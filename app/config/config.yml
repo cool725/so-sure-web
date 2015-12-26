@@ -35,6 +35,8 @@ framework:
 twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
+    globals:
+        fb_appid: %fb_appid%
 
 # Doctrine Configuration
 doctrine:
@@ -75,3 +77,26 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+fos_user:
+    db_driver: mongodb
+    firewall_name: main
+    user_class: AppBundle\Document\User
+
+hwi_oauth:
+    connect:
+        account_connector: app.user
+    firewall_names: [main]
+    fosub:
+        username_iterations: 30
+        properties:
+            # these properties will be used/redefined later in the custom FOSUBUserProvider service.
+            facebook: facebook_id
+    resource_owners:
+        facebook:
+            type:                facebook
+            client_id:           %fb_appid%
+            client_secret:       %fb_secret%
+            options:
+                #display: popup #dialog is optimized for popup window
+                auth_type: rerequest # Re-asking for Declined Permissions
