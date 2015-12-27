@@ -17,3 +17,11 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
+    fb_appid: 
+    fb_secret:
+
+    mongodb_db: mongo
+    mongo.session.options:
+        database: mongo # your MongoDB database name
+        collection: session  # your MongoDB collection name
+    mongodb_host: 127.0.0.1
