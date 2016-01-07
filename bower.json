@@ -1,0 +1,28 @@
+{
+  "name": "lb",
+  "version": "0.0.0",
+  "authors": [
+    "Patrick McAndrew <patrick@so-sure.com>"
+  ],
+  "license": "Private",
+  "homepage": "http://so-sure.com",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4"
+  },
+  "install": { 
+    "path": "web/components",
+    "sources": {
+      "jquery" : [
+       "bower_components/jquery/dist/jquery.min.js"
+      ]
+    }
+  }
+}

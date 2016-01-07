@@ -2,12 +2,35 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}So-Sure{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        {% stylesheets output='css/*'
+           'assets/css/bootstrap.min.css' %}
+            <link rel="stylesheet" href="{{ asset_url }}">
+        {% endstylesheets %}
+
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <meta property="fb:app_id" content="{{ fb_appid }}">
+        {% block meta %}{% endblock %}
     </head>
     <body>
+        <div id="fb-root"></div>
+        <div id="ss-root" data-fb-id="{{ fb_appid }}"
+             data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"></div>
+        {% include '::nav.html.twig' %}
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+        <footer style="margin: 20px">
+            
+        </footer>
+        {% block javascripts %}
+    {% javascripts
+        '@AppBundle/Resources/public/js/*'
+        'components/jquery/jquery.min.js'
+    %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}            
+            {% endblock %}
     </body>
 </html>

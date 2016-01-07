@@ -16,6 +16,11 @@ class User extends BaseUser
      */
     protected $id;
 
+    /** @MongoDB\Date() */
+    protected $created;
+
+    /** @MongoDB\String(name="name", nullable=true) */
+    protected $name;
 
     /** @MongoDB\String(name="facebook_id", nullable=true) */
     protected $facebook_id;
@@ -26,7 +31,13 @@ class User extends BaseUser
     public function __construct()
     {
         parent::__construct();
+        $this->created = new \DateTime();
         // your own logic
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function setFacebookId($facebook_id)
@@ -37,5 +48,15 @@ class User extends BaseUser
     public function setFacebookAccessToken($facebook_access_token)
     {
         $this->facebook_access_token = $facebook_access_token;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 }
