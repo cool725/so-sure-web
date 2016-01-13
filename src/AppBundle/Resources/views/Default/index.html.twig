@@ -7,7 +7,26 @@
             <div class="jumbotron">
                 <h2>Welcome to So-Sure</h2>
     
-                <p></p>
+{{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+    {{ form_errors(form) }}
+    <div class="form-group">
+        {{ form_label(form.name, 'Name', {'label_attr': {'class': 'col-sm-1'}}) }}
+        {{ form_errors(form.name) }}
+        {{ form_widget(form.name, {'attr': {'class': 'col-sm-5'}}) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.email, 'Email', {'label_attr': {'class': 'col-sm-1'}}) }}
+        {{ form_errors(form.email) }}
+        {{ form_widget(form.email, {'attr': {'class': 'col-sm-11'}}) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_widget(form.save, {'label': 'Register', 'attr': {'class': 'btn btn-success'}}) }}
+    </div>
+
+{{ form_end(form) }}
+
             </div>
         </div>
     </div>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="${projectName}" default="build:main">
+  <!-- Properties -->
+    <property name="dir.app" value="${project.basedir}/../app" />
+    <property name="dir.src" value="${project.basedir}/../src" />
+
+    <autoloader autoloaderpath="${dir.app}/autoload.php"/>
+
+    <target name="test:unit" description="Run unit tests">
+        <phpunit configuration="${dir.app}/phpunit.xml.dist"
+        haltonfailure="true" haltonerror="true" groups="unit">
+          <formatter type="plain" usefile="false"/>
+          <batchtest>
+              <fileset dir="${dir.src}">
+                 <include name="**/Tests/**/*Test*.php"/>
+              </fileset>
+          </batchtest>
+       </phpunit>
+    </target>
+                
+    <target name="test:functional" description="Run functional tests">
+        <phpunit configuration="${dir.app}/phpunit.xml.dist"
+        haltonfailure="true" haltonerror="true" groups="functional">
+          <formatter type="plain" usefile="false"/>
+          <batchtest>
+              <fileset dir="${dir.src}">
+                 <include name="**/Tests/**/*Test*.php"/>
+              </fileset>
+          </batchtest>
+       </phpunit>
+    </target>
+
+</project>

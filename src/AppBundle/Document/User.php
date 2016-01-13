@@ -16,6 +16,11 @@ class User extends BaseUser
      */
     protected $id;
 
+    /**
+     * @MongoDB\Id
+     */
+    protected $referralId;
+
     /** @MongoDB\Date() */
     protected $created;
 
@@ -45,6 +50,16 @@ class User extends BaseUser
         $this->facebook_id = $facebook_id;
     }
 
+    public function getReferralId()
+    {
+        return $this->referralId;
+    }
+
+    public function setReferralId($referralId)
+    {
+        $this->referralId = $referralId;
+    }
+    
     public function setFacebookAccessToken($facebook_access_token)
     {
         $this->facebook_access_token = $facebook_access_token;

@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container">
+    <div class="row-fluid">
+        <div class="col-xs-12">
+            <div class="jumbotron">
+                <h2>Thanks for registering.</h2>
+                <p>We'll be in touch when we launch.</p>
+                <p>Your share link is {{ url('homepage', {referal: id}) }}</p>
+    
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

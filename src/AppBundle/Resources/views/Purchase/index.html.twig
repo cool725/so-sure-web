@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container">
+    <div class="row-fluid">
+        <div class="col-xs-12">
+            <h2>Select your phone</h2>
+            <form>
+                <select name="make">
+                    <option value="apple">Apple</option>
+                    <option value="samsung">Samsung</option>
+                </select>
+                <button class="btn btn-success">Continue</button>
+            </form>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="col-xs-12">
+            <h2>We cover you for</h2>
+            <ul>
+                <li>damage</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
