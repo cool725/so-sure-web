@@ -18,25 +18,36 @@ class DefaultController extends BaseController
     public function indexAction(Request $request)
     {
         $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $logger = $this->get('logger');
 
         $user = new User();
-        $user->setReferralId($request->get('referral'));
-
+        $referral = $request->get('referral');
+        if ($referral) {
+            $user->setReferralId($referral);
+            $logger->debug(sprintf('Referral %s', $referral));
+        }
         $form = $this->createForm(LaunchType::class, $user);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $repo = $dm->getRepository(User::class);
-            $existingUser = $repo->findOneBy(['emailCanonical' => $user->getEmailCanonical()]);
-            $id = null;
-            if (!$existingUser) {
+            try {
+                if ($user->getReferralId() && !$user->getReferred()) {
+                    $referred = $repo->find($user->getReferralId());
+                    $referred->addReferral($user);
+                }
                 $dm->persist($user);
                 $dm->flush();
-                $id = $user->getId();
-            } else {
-                $id = $existingUser->getId();
+            } catch (\Exception $e) {
+                // Ignore - most likely existing user
+                $logger->error($e->getMessage());
             }
 
-            return $this->redirectToRoute('launch_share', ['id' => $id]);
+            $existingUser = $repo->findOneBy(['emailCanonical' => $user->getEmailCanonical()]);
+            if (!$existingUser) {
+                throw new \Exception('Failed to add');
+            }
+
+            return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
         }
 
         return array(
@@ -48,7 +59,7 @@ class DefaultController extends BaseController
      * @Route("/launch/{id}", name="launch_share")
      * @Template
      */
-    public function launchAction(Request $request, $id)
+    public function launchAction($id)
     {
         return array('id' => $id);
     }
@@ -57,7 +68,7 @@ class DefaultController extends BaseController
      * @Route("/alpha", name="alpha")
      * @Template
      */
-    public function alphaAction(Request $request)
+    public function alphaAction()
     {
         return array();
     }

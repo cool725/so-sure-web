@@ -12,14 +12,21 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 class User extends BaseUser
 {
     /**
-     * @MongoDB\Id(strategy="auto")
+     * @MongoDB\Id
      */
     protected $id;
 
-    /**
-     * @MongoDB\Id
-     */
     protected $referralId;
+
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="User", mappedBy="referred")
+     */
+    protected $referrals;
+    
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="referrals")
+     */
+    protected $referred;
 
     /** @MongoDB\Date() */
     protected $created;
@@ -36,8 +43,8 @@ class User extends BaseUser
     public function __construct()
     {
         parent::__construct();
+        $this->referrals = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = new \DateTime();
-        // your own logic
     }
 
     public function getId()
@@ -59,7 +66,28 @@ class User extends BaseUser
     {
         $this->referralId = $referralId;
     }
-    
+
+    public function getReferred()
+    {
+        return $this->referred;
+    }
+
+    public function setReferred($referred)
+    {
+        $this->referred = $referred;
+    }
+
+    public function addReferral(User $referred)
+    {
+        $referred->setReferred($this);
+        $this->referrals[] = $referred;
+    }
+
+    public function getReferrals()
+    {
+        return $this->referrals;
+    }
+
     public function setFacebookAccessToken($facebook_access_token)
     {
         $this->facebook_access_token = $facebook_access_token;

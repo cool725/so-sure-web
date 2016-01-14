@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<ruleset name="PeerJStandard">
+ <description>PeerJ custom coding standard.</description>
+ <!-- No need to exclude LineLength inside PSR2 rule as explicitly configured below -->
+ <rule ref="Generic">
+  <exclude name="Generic.Arrays.DisallowShortArraySyntax.Found" /> 
+  <exclude name="Generic.Arrays.DisallowLongArraySyntax.Found" />
+  <exclude name="Generic.Functions.OpeningFunctionBraceBsdAllman" />
+  <exclude name="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop" />
+  <exclude name="Generic.CodeAnalysis.ForLoopWithTestFunctionCall" />
+  <exclude name="Generic.CodeAnalysis.JumbledIncrementer" />
+  <exclude name="Generic.CodeAnalysis.UnconditionalIfStatement" />
+  <exclude name="Generic.CodeAnalysis.UselessOverridingMethod" />
+  <exclude name="Generic.Commenting.DocComment" />
+  <exclude name="Generic.Commenting.Fixme" />
+  <exclude name="Generic.Commenting.Todo" />
+  <exclude name="Generic.Files.ByteOrderMark" />
+  <exclude name="Generic.Files.EndFileNoNewline" />
+  <exclude name="Generic.Files.InlineHTML" />
+  <exclude name="Generic.Files.LineLength" />
+  <exclude name="Generic.Files.LowercasedFilename" />
+  <exclude name="Generic.Formatting.DisallowMultipleStatements" />
+  <exclude name="Generic.Formatting.MultipleStatementAlignment" />
+  <exclude name="Generic.Formatting.NoSpaceAfterCast" />
+  <exclude name="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
+  <exclude name="Generic.Metrics.CyclomaticComplexity" />
+  <exclude name="Generic.Metrics.NestingLevel" />
+  <exclude name="Generic.NamingConventions.CamelCapsFunctionName" />
+  <exclude name="Generic.NamingConventions.ConstructorName" />
+  <exclude name="Generic.PHP.CharacterBeforePHPOpeningTag" />
+  <exclude name="Generic.PHP.ClosingPHPTag" />
+  <exclude name="Generic.PHP.LowerCaseKeyword" />
+  <exclude name="Generic.PHP.SAPIUsage" />
+  <exclude name="Generic.PHP.UpperCaseConstant" />
+  <exclude name="Generic.VersionControl.SubversionProperties" />
+  <exclude name="Generic.WhiteSpace.DisallowSpaceIndent" />
+  <exclude name="Generic.WhiteSpace.ScopeIndent" />
+ </rule>
+ </ruleset>

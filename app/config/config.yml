@@ -7,6 +7,10 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: en
+    mongo.session.options:
+        database: %mongodb_db%
+        collection: session
+
 
 framework:
     #esi:             ~
@@ -63,9 +67,9 @@ doctrine:
 doctrine_mongodb:
     connections:
         default:
-            server: mongodb://localhost:27017
+            server: %mongodb_url%
             options: {}
-    default_database: sosure
+    default_database: %mongodb_db%
     document_managers:
         default:
             auto_mapping: true

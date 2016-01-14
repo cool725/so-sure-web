@@ -1,6 +1,10 @@
 imports:
     - { resource: config_dev.yml }
 
+parameters:
+    mongo.session.options:
+        database: sosure-test
+
 framework:
     test: ~
     session:
@@ -14,3 +18,6 @@ web_profiler:
 
 swiftmailer:
     disable_delivery: true
+
+doctrine_mongodb:
+    default_database: sosure-test

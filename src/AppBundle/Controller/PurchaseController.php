@@ -16,7 +16,7 @@ class PurchaseController extends BaseController
      * @Route("/", name="purchase")
      * @Template
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         return array();
     }

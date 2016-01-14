@@ -1,0 +1,1636 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="${projectName}" default="build:main">
+  <!-- Properties -->
+    <property name="dir.app" value="${project.basedir}/app" />
+    <property name="dir.src" value="${project.basedir}/src" />
+    <property name="dir.web" value="${project.basedir}/web" />
+    <property name="dir.vendor" value="${project.basedir}/vendor" />
+    <property name="dir.build" value="${project.basedir}/app/build" />
+    <property name="dir.logs" value="${project.basedir}/app/logs" />
+    <property name="dir.cache" value="${project.basedir}/app/cache" />
+    <property name="dir.docs" value="${dir.build}/docs" />
+    <property name="dir.docs.phpdoc" value="${dir.docs}/phpdoc" />
+    <property name="dir.docs.phpdoc2" value="${dir.docs}/phpdoc2" />
+    <property name="dir.reports" value="${dir.build}/logs" />
+    <property name="dir.reports.pdepend" value="${dir.reports}/pdepend" />
+    <property name="dir.reports.coverage" value="${dir.reports}/coverage" />
+    <property name="dir.precommit" value="${project.basedir}/.tmp_staging" />
+    <property name="dir.migrations" value="${dir.app}/DoctrineMigrations" />
+    <property name="relpath.migrations" value="app/DoctrineMigrations" />
+    <property name="dir.rollup" value="${dir.app}/DoctrineMigrationsRollup" />
+    <property name="file.migrations.rollup" value="${dir.rollup}/rollup-migrations" />
+    <property name="file.migrations.current" value="${dir.rollup}/current-migrations" />
+
+    <property name="build.verifydb.skip" value="false" />
+
+    <!-- There are many code locations -->
+    <!-- Github is constant and is the master repo -->
+    <property name="github.url" value="git@github.com:PeerJ/peerj.git" />
+    <property name="github.name" value="github" />
+
+    <!-- Tags for the latest deployed code and the previously deployed code (rollback) -->
+    <property name="tags.deploy" value="deployed" />
+    <property name="tags.rollback" value="rollback" />
+    <!-- To help with testing -->
+    <property name="tags.required-env" value="prod" /> <!-- Needs to match peerj-code.name. Should be prod for release -->
+    <property name="tags.required-branch" value="master" /> <!-- Should be master for release -->
+
+    <!-- peerj-code is environment specific and needs to be passed in -->
+    <!-- <property name="peerj-code.url" value="" /> -->
+    <!-- <property name="peerj-code.name" value="" /> -->
+    <property name="peerj-code.dir" value="${project.basedir}" />
+
+    <!-- peerj-deploy is also environment specific and needs to be passed in -->
+    <!-- <property name="peerj-deploy.url" value="" /> -->
+    <!-- <property name="peerj-deploy.name" value="" /> -->
+    <property name="peerj-deploy.dir" value="${project.basedir}/../deploy" />
+    <property name="peerj-deploy.msg" value="Automated deploy message" />
+    <!-- max folders to prevent hash collisions + keep filesize down -->
+    <property name="peerj-deploy.folders.max" value="25" />
+    <property name="peerj-deploy.folders.msg" value="Automated deploy folder cleanup message" />
+
+    <property name="peerj-rollback.dir" value="${project.basedir}/../rollback" />
+
+    <!-- <property name="symfony.env" value="" /> -->
+    <property name="symfony.debug" value="1" />
+    <property name="assetic.yui" value="0" />
+    <property name="assetic.composer" value="0" />
+
+    <!-- <property name="build.dbname" value="" /> -->
+
+    <property name="dir.java" value="${dir.app}/Resources/java" />
+
+    <!-- Properties for Parameters Check -->
+    <property name="parameters.tmpdir" value="${project.basedir}/../tmpparams/" />
+    <property name="parameters.file" value="${parameters.tmpdir}/parameters.yml" />
+    <property name="parameters.maxwait" value="30" />
+    <property name="parameters.skipverifyparameters" value="false" />
+
+  <!-- Filesets -->
+    <fileset id="sourcecode" dir="${dir.src}">
+        <patternset>
+            <include name="**/*.php" />
+            <exclude name="**/skeleton/**/*.php"/>
+        </patternset>
+    </fileset>
+
+    <fileset id="sourcecodesniffer" dir="${dir.src}">
+        <patternset>
+            <include name="**/*.php"/>
+            <exclude name="**/skeleton/**/*.php"/>
+        </patternset>
+    </fileset>
+
+    <fileset id="noop-sourcecodesniffer" dir="${dir.src}">
+        <patternset>
+            <include name="**/*.php"/>
+            <exclude name="**/skeleton/**/*.php"/>
+            <exclude name="**/*Type.php"/>
+            <exclude name="**/*Voter.php"/>
+            <exclude name="**/*Command.php"/>
+            <exclude name="**/Traits/*.php"/>
+        </patternset>
+    </fileset>
+
+    <fileset id="sourcecodesniffer-precommit" dir="${dir.precommit}">
+        <patternset>
+            <include name="**/*.php"/>
+            <exclude name="**/app/**/*.php"/>
+        </patternset>
+    </fileset>
+
+    <fileset id="noop-sourcecodesniffer-precommit" dir="${dir.precommit}">
+        <patternset>
+            <include name="**/*.php"/>
+            <exclude name="**/app/**/*.php"/>
+            <exclude name="**/*Type.php"/>
+            <exclude name="**/*Voter.php"/>
+            <exclude name="**/*Command.php"/>
+            <exclude name="**/Traits/*.php"/>
+        </patternset>
+    </fileset>
+
+    <fileset id="sourcecodecpd" dir="${dir.src}">
+        <patternset>
+            <include name="**/*.php" />
+            <exclude name="**/skeleton/**/*.php"/>
+            <exclude name="**/Entity/**/*.php"/>
+        </patternset>
+    </fileset>
+
+    <target name="require:symfony:env" description="Require symfony environment">
+        <fail unless="symfony.env"
+              message="Symfony environment (symfony.env) is required" />
+        <if>
+            <not>
+                <isset property="symfony.env.current" />
+            </not>
+            <then>
+                <property name="symfony.env.current" value="${symfony.env}" />
+                <echo message="Setting symfony.env.current to ${symfony.env.current} (${symfony.env})" />
+            </then>
+        </if>
+    </target>
+
+    <target name="require:shell:sh" description="Require sh shell">
+        <property name="test.shell" value="sh" />
+        <phingcall target="require:shell" />
+    </target>
+
+    <!-- Note that you probably can't require bash unless system is setup differently; more for testing require.shell works -->
+    <target name="require:shell:bash" description="Require bash shell">
+        <property name="test.shell" value="bash" />
+        <phingcall target="require:shell" />
+    </target>
+
+    <target name="require:shell" description="Require a shell">
+        <fail unless="test.shell" message="Shell param required" />
+        <exec command="ps -p $$ | grep sh | awk '{ print $4 }'" outputProperty="shell" checkreturn="true"  />
+        <if>
+            <not>
+            <equals arg1="${shell}" arg2="${test.shell}" trim="true" />
+            </not>
+            <then>
+                <fail message="Require sh shell" />
+            </then>
+        </if>
+    </target>
+
+    <target name="require:verify:port" description="Require verify port">
+        <fail unless="verify.port"
+              message="Verify port (verify.port) is required (and should be unique per environment)" />
+    </target>
+
+  <!-- targets -->
+    <target name="test:db" description="Run all the tests we have to ensure proper migrations and no code errors"
+        depends="require:symfony:env">
+
+        <!-- For some of the tests, we need to be in debug mode.  Save current state and override -->
+        <property name="symfony.env.current" value="buildDebug" override="true" />
+        <property name="tmp.symfony.debug" value="${symfony.debug}" override="true" />
+        <property name="symfony.debug" value="1" override="true" />
+        <echo message="Setting symfony.env.current to ${symfony.env.current} w/debug ${symfony.debug} (original value: ${symfony.env} / debug: ${tmp.symfony.debug})" />
+
+        <if>
+            <not>
+                <isset property="skip.test.db.verifymigration" />
+            </not>
+            <then>
+                <phingcall target="build:verifymigrations" />
+            </then>
+        </if>
+        <phingcall target="build:build" />
+        <phingcall target="build:verifydb" />
+
+        <!-- Restore the original state -->
+        <property name="symfony.env.current" value="${symfony.env}" override="true" />
+        <property name="symfony.debug" value="${tmp.symfony.debug}" override="true" />
+        <echo message="Restoring symfony.env.current to ${symfony.env} w/debug: ${symfony.debug}" />
+    </target>
+
+    <target name="test:build:compressed"
+          description="For testing Run a build, verifydb with compression enabled">
+     <echo message="Suggested to run: phing -Dsymfony.env=buildNoDebug -Dbuild.dbname=test-build-compress -Dbuild.verifydb.will-drop-db=1 test:build:compressed" />
+     <property name="skip.test.db.verifymigration" value="" />
+     <phingcall target="test:db" />
+
+     <!-- Re-run assetic dump with compression and no-debug prior to creating deploy package -->
+     <property name="symfony.debug" value="0" override="true" />
+     <property name="assetic.yui" value="1" override="true" />
+     <property name="assetic.composer" value="1" override="true" />
+
+     <!-- As the test:db above uses a different assetic dump, need to clear cache again -->
+     <phingcall target="build:cacheclear" />
+
+     <phingcall target="build:assetic" />
+    </target>
+
+    <target name="build:deploy:compressed"
+          description="Run a build, verifydb, and deploy to git with compression enabled">
+     <phingcall target="test:db" />
+
+     <!-- Re-run assetic dump with compression and no-debug prior to creating deploy package -->
+     <property name="symfony.debug" value="0" override="true" />
+     <property name="assetic.yui" value="1" override="true" />
+     <property name="assetic.composer" value="1" override="true" />
+
+     <!-- As the test:db above uses a different assetic dump, need to clear cache again -->
+     <phingcall target="build:cacheclear" />
+
+     <phingcall target="verify:debugsetting" />
+     <phingcall target="build:assetic" />
+
+     <phingcall target="peerj-deploy:deploy" />
+     <phingcall target="peerj-code:deploy" />
+     <phingcall target="peerj-deploy:cleanup" />
+    </target>
+
+    <target name="build:deploy"
+          description="Run a build, verifydb, and deploy to git">
+     <phingcall target="test:db" />
+
+     <!-- Re-run assetic dump prior to creating deploy package -->
+     <phingcall target="verify:debugsetting" />
+     <phingcall target="build:assetic" />
+
+     <phingcall target="peerj-deploy:deploy" />
+     <phingcall target="peerj-code:deploy" />
+     <phingcall target="peerj-deploy:cleanup" />
+    </target>
+
+    <target name="verify:debugsetting"
+        description="Verify the the symfony.debug flag matches the deploy debug flag">
+        <!-- symfony.debug is currently being set in build:deploy:compressed otherwise defaulting to 1 -->
+        <fail unless="deploy.env" message="deploy.env must be set" />
+
+        <!-- Need to quote('') true/false or will convert to 1/0.  Ok due to multiple greps used later on -->
+        <property name="symfony.debug.text" value="'true'" />
+        <if>
+            <equals arg1="${symfony.debug}" arg2="0" />
+            <then>
+                <property name="symfony.debug.text" value="'false'" override="true" />
+            </then>
+        </if>
+
+        <echo msg="Checking ${project.basedir}/web_app/app_${deploy.env}.php for AppKernel('${deploy.env}', ${symfony.debug.text}) [ignore quotes around true/false]" />
+        <!-- For display purposes only -->
+        <exec command="grep 'AppKernel' ${project.basedir}/web_app/app_${deploy.env}.php | grep ${deploy.env} | grep ${symfony.debug.text} "
+               logoutput="true" />
+
+        <!-- exepect line similiar to: $kernel = new AppKernel('prod', false); -->
+        <exec command="grep 'AppKernel' ${project.basedir}/web_app/app_${deploy.env}.php | grep ${deploy.env} | grep ${symfony.debug.text} | wc -l"
+              outputProperty="debugsetting.count" />
+        <if>
+            <equals arg1="${debugsetting.count}" arg2="0" />
+            <then>
+                <fail message="Expected deploy env (${deploy.env}) to have symfony debug flag ${symfony.debug.text}" />
+            </then>
+        </if>
+    </target>
+
+    <target name="build:build:ci"
+          description="Run a ci build">
+
+        <exec command="git log --pretty='%H' -n1" outputProperty="current.hash"  checkreturn="true" logoutput="true" />
+        <exec command="git log --pretty='%H' -n1 origin/master" outputProperty="master.hash"  checkreturn="true"  logoutput="true" />
+
+        <exec command="git log --pretty='%H' --since='yesterday' | grep ${current.hash}" outputProperty="recent.hash" logoutput="true" />
+        <if>
+            <equals arg1="${current.hash}" arg2="${recent.hash}" />
+            <then>
+                <if>
+                    <equals arg1="${current.hash}" arg2="${master.hash}" />
+                    <then>
+                        <echo msg="Current commit is master/head - no need to run ci tests as build process will cover it" />
+                    </then>
+                    <else>
+                        <echo msg="Current commit is not master/head - proceeding to check branch" />
+
+                        <!-- As we're not generating a deploy package, don't need to run yui or a second assetic:dump -->
+                        <property name="assetic.composer.ci" value="1" override="true" />
+                        <phingcall target="build:build" />
+                    </else>
+                </if>
+            </then>
+        <else>
+            <echo msg="Skipping CI test as commit is too old" />
+        </else>
+        </if>
+    </target>
+
+    <target name="build:build" depends="require:symfony:env"
+          description="Run a build on the build server">
+        <phingcall target="build:parameters" />
+        <phingcall target="build:main" />
+    </target>
+
+    <target name="check:vendor:update" depends="require:symfony:env"
+          description="Setup and run a vendor update to check for new packages">
+        <phingcall target="build:parameters" />
+        <phingcall target="build:vendors:update" />
+    </target>
+
+    <target name="build:main"
+          depends="build:clean, build:prepare, build:lint, build:composer:validate, build:vendors, build:assetic, force:cs"
+          description="Run all test and build everything" />
+
+    <target name="build:parameters:restore" description="Restore parameters.yml.bak to parameters.yml">
+          <if>
+            <available file="app/config/parameters.yml.bak" />
+            <then>
+              <echo msg="Restoring app/config/parameters.yml.bak to app/config/parameters.yml" />
+              <move file="app/config/parameters.yml.bak" tofile="app/config/parameters.yml" overwrite="true" />
+            </then>
+            <else>
+                <echo msg="Backup yml file does not exist" />
+            </else>
+          </if>
+    </target>
+
+
+    <target name="build:parameters" description="Copy parameters.yml.dist to parameters.yml">
+      <!-- Backup params first, but don't overwrite the backup -->
+      <if>
+        <not>
+            <available file="app/config/parameters.yml.bak" />
+        </not>
+        <then>
+          <if>
+            <available file="app/config/parameters.yml" />
+            <then>
+              <echo msg="Backing up app/config/parameters.yml to app/config/parameters.yml.bak" />
+              <copy file="app/config/parameters.yml" tofile="app/config/parameters.yml.bak" overwrite="true" />
+            </then>
+          </if>
+        </then>
+      </if>
+
+      <if>
+         <available file="app/config/parameters.yml.dist" />
+            <then>
+               <echo msg="Initializing app/config/parameters.yml from app/config/parameters.yml.dist" />
+               <copy file="app/config/parameters.yml.dist" tofile="app/config/parameters.yml" overwrite="true"/>
+            </then>
+       </if>
+    </target>
+
+    <target name="build:parameters:build" depends="build:parameters"
+            description="Update parameters.yml for build server">
+        <fail unless="build.dbname" message="build.dbname parameter must be set" />
+                <echo msg="Updating database driver" />
+                <exec executable="sed" logoutput="true" escape="true" checkreturn="true" >
+                    <arg value="-i" />
+                    <arg value="s/database_driver.*:.*/database_driver : pdo_mysql/" />
+                    <arg value="app/config/parameters.yml" />
+                </exec>
+                <echo msg="Updating database name" />
+                <exec executable="sed" logoutput="true" escape="true" checkreturn="true" >
+                    <arg value="-i" />
+                    <arg value="s/database_name.*:.*/database_name : ${build.dbname}/" />
+                    <arg value="app/config/parameters.yml" />
+                </exec>
+                <if>
+                    <isset property="build.dbuser" />
+                    <then>
+                        <echo msg="Updating database username" />
+                        <exec executable="sed" logoutput="true" escape="true" checkreturn="true" >
+                            <arg value="-i" />
+                            <arg value="s/database_user.*:.*/database_user : ${build.dbuser}/" />
+                            <arg value="app/config/parameters.yml" />
+                        </exec>
+                    </then>
+                </if>
+                <if>
+                    <isset property="build.dbpassword" />
+                    <then>
+                        <echo msg="Updating database password" />
+                        <exec executable="sed" logoutput="true" escape="true" checkreturn="true" >
+                            <arg value="-i" />
+                            <arg value="s/database_password.*:.*/database_password : ${build.dbpassword}/" />
+                            <arg value="app/config/parameters.yml" />
+                        </exec>
+                    </then>
+                </if>
+    </target>
+
+  <!-- Doc target -->
+    <target name="build:doc"
+          depends="build:prepare, doc:phpdoc2"
+          description="Generates app API documentation." />
+
+  <!-- Check target -->
+    <target name="build:check"
+          depends="check:cs, check:md, check:cpd, check:depend, check:phploc, check:csslint, check:jslint"
+          description="Analyzes app code." />
+
+  <!-- Test target -->
+    <target name="build:test"
+          depends="test:unit"
+          description="Executes all tests.." />
+
+  <!-- Project build clean -->
+    <target name="build:clean" description="Clean up build directories.">
+        <echo msg="Cleaning build directories ..." />
+        <delete dir="${dir.build}" verbose="true" />
+        <delete>
+            <fileset dir="${dir.logs}">
+              <include name="*.log" />
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${dir.web}/css">
+              <include name="*.css" />
+              <include name="*.min" />
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${dir.web}/js">
+              <include name="*.js" />
+              <include name="*.min" />
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${dir.web}/CACHE">
+              <include name="*.js" />
+              <include name="*.css" />
+              <include name="*.min" />
+            </fileset>
+        </delete>
+    </target>
+
+  <!-- Project build prepare -->
+    <target name="build:prepare" description="Create build directories.">
+        <echo msg="Creating build directories ..." />
+        <mkdir dir="${dir.build}" />
+        <mkdir dir="${dir.docs}" />
+        <mkdir dir="${dir.docs.phpdoc}" />
+        <mkdir dir="${dir.docs.phpdoc2}" />
+        <mkdir dir="${dir.reports}" />
+        <mkdir dir="${dir.reports.coverage}" />
+        <mkdir dir="${dir.reports.pdepend}" />
+    </target>
+
+    <target name="build:composer:validate" description="Validate composer file">
+               <exec executable="composer" checkreturn="true" logoutput="true">
+                   <arg value="validate" />
+                   <arg value="composer.json" />
+               </exec>
+    </target>
+
+    <target name="run:bower" description="Bower install">
+        <if>
+            <available file="/usr/local/bin/bower" />
+            <then>
+                <exec command="bower install  --config.interactive=false" logoutput="true" checkreturn="true" />
+            </then>
+            <else>
+                <!-- TODO: Once we use bower in production, will want to change this to a fail -->
+                <echo msg="Unable to locate bower executable" />
+            </else>
+        </if>
+        <if>
+            <available file="/usr/local/bin/bower-installer" />
+            <then>
+                <exec command="bower-installer" logoutput="true" checkreturn="true" />
+            </then>
+            <else>
+                <!-- TODO: Once we use bower in production, will want to change this to a fail -->
+                <echo msg="Unable to locate bower-installer executable" />
+            </else>
+        </if>
+    </target>
+
+    <target name="build:vendors" description="Install vendors">
+     <if>
+         <isset property="SkipMultipleVendorInstall" />
+         <then>
+              <echo msg="Skipping vendor install as previously done" />
+         </then>
+         <else>
+               <if>
+                   <isset property="DeleteVendors" />
+                   <then>
+                       <if>
+                           <equals arg1="${DeleteVendors}" arg2="true" />
+                           <then>
+                               <echo msg="Deleting vendors" />
+                               <exec command="rm -rf ${dir.vendor}/*" logoutput="true" checkreturn="true"  />
+                           </then>
+                       </if>
+
+                   </then>
+               </if>
+
+               <!-- For ubuntu 14.04 php5.5 composer errors with zend_mm_heap corrupted when running a full composer install -->
+               <!-- expected that composer will come up with a solution at somepoint -->
+               <!-- Note that if this is every removed, will need to come up with another solution -->
+               <!-- for scripts/no-scripts, as scripts need to be run to generate bootstrap -->
+               <!-- but have issues with installAssets -->
+               <exec command="php -v | grep 'PHP 5.5' | wc -l" outputProperty="php55" />
+               <if>
+                    <equals arg1="${php55}" arg2="1" trim="true" />
+                    <then>
+                        <echo msg="Starting first vendors install for PHP5.5 - this may take some time for first run and is expected to error with zend_mm_heap corrupted..." />
+                        <exec executable="composer" checkreturn="false" logoutput="true">
+                            <arg value="install" />
+                            <arg value="--optimize-autoloader" />
+                        </exec>
+                    </then>
+               </if>
+               <echo msg="Starting vendors install - this may take some time for first run..." />
+               <exec executable="composer" checkreturn="true" logoutput="true">
+                   <arg value="install" />
+                   <arg value="--optimize-autoloader" />
+                   <arg value="--no-scripts" />
+               </exec>
+               <echo msg="Finished installing vendors" />
+               <property name="SkipMultipleVendorInstall" value="true" />
+          </else>
+     </if>
+    </target>
+
+    <target name="build:vendors:update" description="Install vendors">
+     <if>
+         <isset property="SkipMultipleVendorInstall" />
+         <then>
+              <echo msg="Skipping vendor install as previously done" />
+         </then>
+         <else>
+               <if>
+                   <isset property="DeleteVendors" />
+                   <then>
+                       <if>
+                           <equals arg1="${DeleteVendors}" arg2="true" />
+                           <then>
+                               <echo msg="Deleting vendors" />
+                               <exec command="rm -rf ${dir.vendor}/*" logoutput="true" checkreturn="true" />
+                           </then>
+                       </if>
+
+                   </then>
+               </if>
+               <echo msg="Starting vendors updates - this may take some time..." />
+               <exec executable="composer" checkreturn="true" logoutput="true">
+                   <arg value="update" />
+                   <arg value="--optimize-autoloader" />
+               </exec>
+               <echo msg="Finished updating vendors" />
+               <property name="SkipMultipleVendorInstall" value="true" />
+          </else>
+     </if>
+    </target>
+
+    <target name="build:cacheclear" description="Clear cache" depends="require:symfony:env">
+        <if>
+            <not>
+                <isset property="cacheclear.env" />
+            </not>
+            <then>
+                <property name="cacheclear.env" value="${symfony.env.current}" />
+            </then>
+        </if>
+        <echo msg="Clearing cache for ${cacheclear.env}" />
+
+        <!-- cache:clear isn't very good if things have really changed - following deletes the folder first-->
+        <delete>
+            <fileset dir="${dir.cache}">
+              <include name="**/*" />
+            </fileset>
+        </delete>
+
+        <SymfonyConsole command="cache:clear" checkreturn="false" debug="${symfony.debug}">
+                    <arg name="env" value="${cacheclear.env}" />
+                    <arg name="no-warmup" />
+        </SymfonyConsole>
+    </target>
+
+    <target name="build:assetic" description="Dump assetic file"
+            depends="require:symfony:env,build:vendors,build:parameters:build,build:cacheclear,db:drop-create">
+        <echo msg="Cleaning up any previously dumped assetic files" />
+        <delete>
+            <fileset dir="${dir.web}/js" />
+        </delete>
+        <delete>
+            <fileset dir="${dir.web}/css" />
+        </delete>
+
+        <echo msg="Dumping assetic files" />
+        <SymfonyConsole command="assetic:dump"  checkreturn="true" debug="${symfony.debug}">
+            <arg name="env" value="${symfony.env.current}" />
+        </SymfonyConsole>
+
+        <if>
+            <equals arg1="${assetic.yui}" arg2="1" />
+            <then>
+                <phingcall target="build:yui" />
+            </then>
+        </if>
+
+        <if>
+            <equals arg1="${assetic.composer.ci}" arg2="1" />
+            <then>
+                <phingcall target="build:composer:ci" />
+            </then>
+            <else>
+                <if>
+                    <equals arg1="${assetic.composer}" arg2="1" />
+                        <then>
+                            <phingcall target="build:composer" />
+                        </then>
+                </if>
+            </else>
+        </if>
+    </target>
+
+    <!-- Older method that verifies each file instead of using rollup -->
+    <target name="build:verifydb:old" depends="require:symfony:env,build:parameters:build,build:vendors"
+            description="Verify that current schema won't cause issue and check that all changes are up to date in migrations.">
+
+        <if>
+            <not>
+                <equals arg1="${build.verifydb.skip}" arg2="true" />
+            </not>
+            <then>
+                <fail unless="build.verifydb.will-drop-db"
+                      message="Unable to run build:verifydb:old.  Please accept that db will be dropped by adding parameter build.verifydb.will-drop-db=1" />
+                    <SymfonyConsole command="doctrine:database:drop" checkreturn="false" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                        <arg name="force" />
+                    </SymfonyConsole>
+                    <SymfonyConsole command="doctrine:database:create" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                    </SymfonyConsole>
+                    <SymfonyConsole command="doctrine:schema:update" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                        <arg name="force" />
+                    </SymfonyConsole>
+
+                    <SymfonyConsole command="doctrine:database:drop" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                        <arg name="force" />
+                    </SymfonyConsole>
+                    <SymfonyConsole command="doctrine:database:create" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                    </SymfonyConsole>
+                    <SymfonyConsole command="doctrine:migrations:migrate" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                        <arg name="no-interaction " />
+                    </SymfonyConsole>
+
+                    <!-- now that the db is the most recent version, we can verify the schema -->
+                    <SymfonyConsole command="doctrine:schema:validate" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                    </SymfonyConsole>
+
+                    <!--
+                        Run an assetic dump here once the schema is in place
+                        This might catch possible errors in code, but requires the no-debug
+                        option to be set.  See https://github.com/PeerJ/dev-ops/issues/1912
+                    -->
+                    <SymfonyConsole command="assetic:dump"  checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                    </SymfonyConsole>
+
+                    <SymfonyConsole command="doctrine:schema:update" propertyName="schema-changes" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                        <arg name="dump-sql" />
+                    </SymfonyConsole>
+                    <if>
+                        <contains string="${schema-changes}" substring="Nothing to update - your database is already in sync with the current entity metadata" />
+                        <then>
+                            <echo msg="Doctrine is up to date" />
+                        </then>
+                        <else>
+                            <fail message="There are outstanding schema changes to be added to the doctrine migrations" />
+                        </else>
+                    </if>
+                    <SymfonyConsole command="doctrine:migrations:migrate" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                        <arg name="no-interaction " />
+                        <arg value="first" />
+                    </SymfonyConsole>
+
+                    <SymfonyConsole command="doctrine:schema:drop" propertyName="schema-changes" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                    </SymfonyConsole>
+                    <if>
+                        <contains string="${schema-changes}" substring="Nothing to drop. The database is empty!" />
+                        <then>
+                            <echo msg="Doctrine down migrations are up to date" />
+                        </then>
+                        <else>
+                            <fail message="Doctrine down migrations are not correct - there are changes that need to be applied." />
+                        </else>
+                    </if>
+                    <SymfonyConsole command="doctrine:query:sql" propertyName="schema-tables" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                        <arg name="depth" value="0" />
+                        <arg value="&quot;SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${build.dbname}' and TABLE_NAME != 'migration_versions';&quot;" />
+                    </SymfonyConsole>
+                    <if>
+                        <contains string="${schema-tables}" substring='Array(0)' />
+                        <then>
+                            <echo msg="Doctrine down migrations are up to date" />
+                        </then>
+                        <else>
+                            <fail message="Doctrine down migrations are not correct - there are changes that need to be applied." />
+                        </else>
+                    </if>
+                    <SymfonyConsole command="doctrine:database:drop" checkreturn="true" debug="${symfony.debug}">
+                        <arg name="env" value="${symfony.env.current}" />
+                        <arg name="force" />
+                    </SymfonyConsole>
+                </then>
+                <else>
+                    <echo msg="Skipping DB Verification" />
+                </else>
+            </if>
+    </target>
+
+    <target name="build:yui" depends="peerj-deploy:init" description="Compress assetic css files">
+        <echo msg="Compressing assetic css files" />
+        <property name="asset-path" value="web/css" />
+
+        <!-- For each assetic file we have, see if there's a previously compressed file - if so, use that -->
+        <foreach param="asset-filename" target="build:reuse-previously-deployed">
+          <fileset dir="${asset-path}">
+            <include name="*.css"/>
+          </fileset>
+        </foreach>
+
+        <!-- Compress any .css files that are still present (new or modified files) -->
+        <!-- But only run if there are actually .css files present as yuicompressor errors if not -->
+        <exec dir="${dir.web}/css" command="ls -1 ${dir.web}/css/*.css 2>/dev/null | wc -l" checkreturn="true"
+              outputProperty="css.file.count" />
+        <if>
+            <not>
+                <equals arg1="${css.file.count}" arg2="0" />
+            </not>
+            <then>
+                <echo msg="Running yuicompressor" />
+                <echo msg="css.min files prior to run" />
+                <exec logoutput="true" dir="${dir.web}/css" command="ls -1 *.css.min" />
+
+                <exec dir="${project.basedir}" passthru="true" logoutput="true" escape="false" checkreturn="true"
+                      command='java -jar ${dir.java}/yuicompressor-2.4.8.jar -v -o ".css$:.css.min" web/css/*.css' />
+                <echo msg="css.min files after yui run" />
+                <exec logoutput="true" dir="${dir.web}/css" command="ls -1 *.css.min" />
+            </then>
+            <else>
+                <echo msg="Skipping yuicompressor as there are no new css files (${css.file.count} count) in ${dir.web}/css" />
+            </else>
+        </if>
+
+        <!-- All .css files will now have a .css.min version, so delete the .css files. -->
+        <echo msg="Deleting any remaining .css files as they should now have a .min extension after compression" />
+        <exec logoutput="true" dir="${dir.web}/css" command="ls -1 *.css" />
+        <delete verbose="true">
+            <fileset dir="${dir.web}/css">
+              <include name="*.css" />
+              <exclude name="*.css.min" />
+            </fileset>
+        </delete>
+
+        <!-- And copy back the .css.min files to .css files -->
+        <move todir="${dir.web}/css">
+          <mapper type="glob" from="*.css.min" to="*.css"/>
+            <fileset dir="${dir.web}/css">
+             <include name="*.css.min" />
+           </fileset>
+        </move>
+
+        <echo msg="We should now have all the .css files (both newly compressed files and previously compress files) ${dir.web}/css" />
+        <exec logoutput="true" dir="${dir.web}/css" command="ls -1 *.css" />
+
+        <!-- No sense in verifying anymore as it would just be checking a copied version against itself -->
+        <!--
+        <foreach param="asset-filename" target="build:verify-previously-deployed">
+          <fileset dir="${asset-path}">
+            <include name="*.css"/>
+          </fileset>
+        </foreach>
+        -->
+    </target>
+
+    <target name="build:composer:ci" description="Combine and Compress assetic js files as a lint process for ci">
+        <property name="jsfilename" value="all.js" />
+        <echo msg="Combining all assetic js files into ${jsfilename}" />
+
+        <delete>
+            <fileset dir="${dir.web}/js">
+                <include name="all.js" />
+            </fileset>
+        </delete>
+
+        <exec dir="${dir.web}/js" passthru="true" logoutput="true" escape="false" checkreturn="true"
+              command="cat *.js >> ${jsfilename}" />
+        <phingcall target="composer" />
+    </target>
+
+    <target name="build:reuse-previously-deployed" description="Copy previously compressed assetic files">
+        <if>
+            <available file="${peerj-deploy.previous.dir.resolved}/${asset-path}/${asset-filename}" />
+            <then>
+                <echo msg="Found previously compressed file for ${asset-path}/${asset-filename}" />
+                <copy file="${peerj-deploy.previous.dir.resolved}/${asset-path}/${asset-filename}"
+                      tofile="${project.basedir}/${asset-path}/${asset-filename}.min" overwrite="true" />
+                <delete file="${project.basedir}/${asset-path}/${asset-filename}" />
+            </then>
+        </if>
+    </target>
+
+    <target name="build:verify-previously-deployed" description="Verify previously compressed assetic files are same">
+        <if>
+            <available file="${peerj-deploy.previous.dir.resolved}/${asset-path}/${asset-filename}" />
+            <then>
+                <echo msg="Found previously compressed file for ${asset-path}/${asset-filename}" />
+                <exec checkreturn="true" logoutput="true"
+                      command="diff -q &quot;${peerj-deploy.previous.dir.resolved}/${asset-path}/${asset-filename}&quot; &quot;${project.basedir}/${asset-path}/${jsfilename}&quot;" />
+            </then>
+            <else>
+                <echo msg="Skipping comparison for new file ${asset-path}/${asset-filename} (missing ${peerj-deploy.previous.dir.resolved}/${asset-path}/${asset-filename})" />
+            </else>
+        </if>
+    </target>
+
+    <target name="build:composer" depends="peerj-deploy:init" description="Compress assetic js files">
+        <echo msg="Compressing assetic js files" />
+        <property name="asset-path" value="web/js" />
+
+        <!-- For each assetic file we have, see if there's a previously compressed file - if so, use that -->
+        <foreach param="asset-filename" target="build:reuse-previously-deployed">
+          <fileset dir="${asset-path}">
+            <include name="*.js"/>
+          </fileset>
+        </foreach>
+
+        <!-- Compress any .js files that are still present (new or modified files) -->
+        <foreach param="jsfilename" target="composer">
+          <fileset dir="${asset-path}">
+            <include name="*.js"/>
+          </fileset>
+        </foreach>
+
+        <!-- All .js files will now have a .js.min version, so delete the .js files. -->
+        <delete>
+            <fileset dir="${dir.web}/js">
+              <include name="*.js" />
+            </fileset>
+        </delete>
+
+        <!-- And copy back the .js.min files to .js files -->
+        <move todir="${dir.web}/js">
+          <mapper type="glob" from="*.js.min" to="*.js"/>
+            <fileset dir="${dir.web}/js">
+             <include name="*.js.min" />
+           </fileset>
+        </move>
+
+        <!-- No sense in verifying anymore as it would just be checking a copied version against itself -->
+        <!--
+        <foreach param="asset-filename" target="build:verify-previously-deployed">
+          <fileset dir="${asset-path}">
+            <include name="*.js"/>
+          </fileset>
+        </foreach>
+        -->
+    </target>
+
+    <target name="composer" description="Compress js file">
+        <echo msg="Compressing web/js/${jsfilename}" />
+        <exec dir="${project.basedir}" passthru="true" logoutput="true" escape="false" checkreturn="true"
+              command='java -jar ${dir.java}/compiler.jar --js web/js/${jsfilename} --js_output_file web/js/${jsfilename}.min'  />
+    </target>
+
+    <target name="build:lint" description="Perform syntax check of sourcecode files">
+     <phplint haltonfailure="true">
+      <fileset refid="sourcecode" />
+     </phplint>
+     <echo msg="Finished lint" />
+    </target>
+
+    <target name="build:verifymigrations" description="Ensure that if migrations are present in code, they're set to deploy">
+        <fail unless="peerj-code.name" message="peerj-code.name parameter must be set" />
+        <fail unless="branch" message="branch parameter must be set" />
+        <fail unless="migrations.migrate" message="migrations.migrate parameter must be set" />
+
+        <!-- As we're not using github to store the deployed tag, it may not exist now, or in the future -->
+        <exec command="git tag -l | grep ${tags.deploy} | wc -l" checkreturn="true"
+            outputProperty="tags.deploy.present" dir="${peerj-code.dir}" />
+        <echo msg="Git deployed tag present: ${tags.deploy.present}" />
+
+        <!-- Only check migrations if we're on the required branch (master) and on required-env (prod) and have a deployed tag present -->
+        <if>
+          <and>
+                <equals arg1="${branch}" arg2="${tags.required-branch}" trim="true" />
+                <equals arg1="${peerj-code.name}" arg2="${tags.required-env}" trim="true" />
+                <not>
+                    <equals arg1="${tags.deploy.present}" arg2="0" trim="true" />
+                </not>
+          </and>
+          <then>
+                <exec command="git diff --name-only ${branch} ${tags.deploy} | grep ${relpath.migrations} | wc -l"
+                      logoutput="true" outputProperty="migrations.present" dir="${peerj-code.dir}" checkreturn="true" />
+                <echo msg="Migrations present: ${migrations.present}" />
+                <if>
+                    <and>
+                        <!-- migration count > 0-->
+                        <not>
+                            <equals arg1="${migrations.present}" arg2="0" trim="true" />
+                        </not>
+                        <equals arg1="${migrations.migrate}" arg2="false" trim="true" />
+                    </and>
+                    <then>
+                        <fail message="Migrations are present, but migration is not enabled." />
+                    </then>
+                    <else>
+                        <echo msg="Migration are not present or are present and migration is allowed. safe to continue" />
+                    </else>
+                </if>
+          </then>
+          <else>
+            <echo msg="Skipping Migrations Check as either not on ${tags.required-branch} branch or not using required-env (${tags.required-env}) or missing ${tags.deploy} tag" />
+          </else>
+        </if>
+    </target>
+
+ <target name="check:phploc" description="Measure project size using PHPLOC">
+  <exec executable="phploc" checkreturn="true" >
+   <arg value="--log-csv" />
+   <arg value="${dir.reports}/phploc.csv" />
+   <arg path="${dir.src}" />
+  </exec>
+ </target>
+
+  <!-- PHPDOC API documentation target -->
+    <target name="doc:phpdoc" description="Generate API documentation.">
+        <echo msg="Generating API documentation with PHPDoc..." />
+        <phpdoc title="${phing.project.name} :: API Documentation"
+                defaultpackagename="${phing.project.name}"
+                destdir="${dir.docs.phpdoc}"
+                output="HTML:Smarty:PHP"
+                sourcecode="yes">
+            <fileset refid="sourcecode" />
+        </phpdoc>
+    </target>
+
+  <!-- PHPDOC API documentation target -->
+    <target name="doc:phpdoc2" description="Generate API documentation.">
+        <echo msg="Generating API documentation with PHPDoc..." />
+        <phpdoc2 title="${phing.project.name} :: API Documentation"
+                destdir="${dir.docs.phpdoc2}"
+		template="responsive"
+                >
+            <fileset refid="sourcecode" />
+        </phpdoc2>
+    </target>
+
+    <target name="symfony:security" description="Verify symfony by running security checks" depends="require:symfony:env">
+          <property name="assetic.composer.ci" value="1" override="true" />
+          <phingcall target="build:build" />
+
+          <SymfonyConsole command="security:check" checkreturn="true" debug="true">
+                    <!-- Needs to be a symfony non-prod env (dev or test) -->
+                    <arg name="env" value="${symfony.env.current}" />
+          </SymfonyConsole>
+    </target>
+  <!-- Symfony2 code sniffer -->
+    <target name="check:cs" description="Checks coding standard.">
+        <echo msg="Checking coding standard ..." />
+        <phpcodesniffer standard="Symfony2"
+                        showSniffs="true"
+                        showWarnings="true">
+            <fileset refid="sourcecode" />
+            <formatter type="checkstyle" outfile="${dir.reports}/checkstyle.xml" />
+        </phpcodesniffer>
+    </target>
+
+    <target name="force:cs" description="Forces coding standard.">
+        <property name="force.cs.fileset" value="sourcecodesniffer" />
+        <property name="force.cs.noop-fileset" value="noop-sourcecodesniffer" />
+        <phingcall target="force:cs:run" />
+    </target>
+
+    <target name="force:cs:precommit" description="Forces coding standard.">
+        <echo msg="Using ${dir.precommit}" />
+        <property name="force.cs.fileset" value="sourcecodesniffer-precommit" />
+        <property name="force.cs.noop-fileset" value="noop-sourcecodesniffer-precommit" />
+        <phingcall target="force:cs:run" />
+    </target>
+    <target name="force:cs:run" description="Forces coding standard.">
+        <phpcodesniffer standard="standard-psr2.xml"
+                        showSniffs="true"
+                        showWarnings="true"
+                        haltonwarning="true"
+                        haltonerror="true">
+            <fileset refid="${force.cs.fileset}" />
+            <formatter type="full" usefile="false" />
+        </phpcodesniffer>
+
+        <phpcodesniffer standard="standard-generic.xml"
+                        showSniffs="true"
+                        showWarnings="true"
+                        haltonwarning="true"
+                        haltonerror="true">
+            <!--
+                The primary purpose of this check is the VariableAnalysis sniff.
+                As we're already doing that sniff, we might as well do another few sniffs,
+                but its not so important if some of the Generic sniffs don't run for the excluded files
+                in the noop-sourcecodesniffer.
+            -->
+            <fileset refid="${force.cs.noop-fileset}" />
+            <formatter type="full" usefile="false" />
+        </phpcodesniffer>
+    </target>
+
+    <!-- copy/paste detector -->
+    <target name="check:cpd" description="Checks similar code blocks.">
+        <echo msg="Checking similar code blocks ..." />
+        <phpcpd>
+            <fileset refid="sourcecodecpd" />
+            <formatter type="pmd" outfile="${dir.reports}/cpd.xml" />
+        </phpcpd>
+    </target>
+
+  <!-- Mess detector -->
+    <target name="check:md" description="Generate code metrics.">
+        <echo msg="Generating code metrics ..." />
+        <phpmd rulesets="codesize,unusedcode">
+            <fileset refid="sourcecode" />
+            <formatter type="xml" outfile="${dir.reports}/pmd.xml" />
+        </phpmd>
+    </target>
+
+  <!-- Code dependency -->
+    <target name="check:depend" description="Checks coupling and dependency.">
+        <echo msg="Checking coupling and dependency ..." />
+        <phpdepend>
+            <fileset refid="sourcecode" />
+            <logger type="jdepend-xml" outfile="${dir.reports.pdepend}/jdepend.xml" />
+            <logger type="jdepend-chart" outfile="${dir.reports.pdepend}/dependencies.svg" />
+            <logger type="overview-pyramid" outfile="${dir.reports.pdepend}/overview-pyramid.svg" />
+        </phpdepend>
+    </target>
+
+  <!-- CSS Lint -->
+    <target name="check:csslint" depends="build:assetic" description="Checks css validity and syntax" >
+        <echo msg="Checking css ..." />
+        <exec command="csslint --format=lint-xml --ignore=adjoining-classes,box-model,qualified-headings,universal-selector,ids ${dir.web}/css/*.css > ${dir.reports}/csslint.xml" checkreturn="true" />
+    </target>
+
+  <!-- JS Lint -->
+    <target name="check:jslint" depends="build:assetic" description="Checks js validity and syntax">
+        <echo msg="Checking js ..." />
+        <exec command="jslint ${dir.web}/js/*.js >> ${dir.reports}/jslint.txt" checkreturn="true" />
+    </target>
+
+  <!-- Unit tests -->
+    <target name="test:unit" description="Executes unit tests.">
+        <echo msg="Running unit tests ..." />
+        <exec command="phpunit --log-junit ${dir.reports}/phpunit.xml --coverage-clover ${dir.reports.coverage}/clover.xml --coverage-html ${dir.reports.coverage}/ -c ${dir.app}" checkreturn="true" />
+    </target>
+
+    <target name="test:vendor" description="Executes unit tests.">
+        <echo msg="Running unit tests ..." />
+        <exec command="phpunit -c ${dir.app}/phpunit.xml.dist ${dir.vendor}" checkreturn="true" />
+    </target>
+
+
+    <target name="peerj-deploy:init" description="Resolve the deploy folder">
+        <fail unless="peerj-deploy.url" message="peerj-deploy.url parameter must be set" />
+        <fail unless="peerj-deploy.dir" message="peerj-deploy.dir parameter must be set" />
+
+        <resolvepath propertyName="peerj-deploy.dir.resolved" file="${peerj-deploy.dir}" />
+
+        <if>
+            <available file="${peerj-deploy.dir.resolved}/.git" type="dir" />
+            <then>
+                <exec command="git pull ${peerj-deploy.name}" logoutput="true"  dir="${peerj-deploy.dir.resolved}"  checkreturn="true" />
+            </then>
+            <else>
+                <echo msg="Cloning ${peerj-deploy.url}" />
+                <exec command="git clone -o ${peerj-deploy.name} ${peerj-deploy.url} ${peerj-deploy.dir.resolved}" logoutput="true"  checkreturn="true" />
+            </else>
+        </if>
+
+        <!-- For cleanup, its important that the folder timestamp is set to the commit time, otherwise, all folders will be the same timestamp -->
+        <exec dir="${peerj-deploy.dir.resolved}" command="for FOLDER in `ls ${peerj-deploy.dir.resolved}`; do FOLDER_TIME=`git log &quot;${peerj-deploy.dir.resolved}/$FOLDER&quot; | grep Date | head -n 1 | cut -f 1 -d ' ' --complement | awk -F + '{print $1}'`; echo &quot;Update $FOLDER to $FOLDER_TIME&quot;;touch -d &quot;$FOLDER_TIME&quot; &quot;${peerj-deploy.dir.resolved}/$FOLDER&quot;; done" logoutput="true"  checkreturn="true" />
+
+        <!-- Get the most recently previously updated deploy folder to use for copying previously compressed assets -->
+        <exec dir="${peerj-deploy.dir.resolved}"  command="ls -t1 &quot;${peerj-deploy.dir.resolved}&quot; | head -n 1" logoutput="true" checkreturn="true" outputProperty="peerj-deploy.previous.dir" />
+        <resolvepath propertyName="peerj-deploy.previous.dir.resolved" file="${peerj-deploy.dir}/${peerj-deploy.previous.dir}" />
+        <echo msg="Using most recent previously created deploy folder ${peerj-deploy.previous.dir.resolved} for assets" />
+
+    </target>
+
+    <target name="peerj-deploy:deploy" description="Copy/Add/Commit/Push the deployment" depends="peerj-deploy:init">
+        <fail unless="peerj-deploy.msg" message="peerj-deploy.msg parameter must be set" />
+
+        <exec command="git log --pretty='%h' -n1" outputProperty="deploy.hash"  checkreturn="true" /> <!-- dir="${peerj-code.dir}"/> -->
+        <echo msg="Deploy Version: ${deploy.hash}" />
+        <copy todir="${peerj-deploy.dir.resolved}/deploy_${deploy.hash}" >
+          <fileset dir="${project.basedir}">
+            <include name="web/js/**" />
+            <include name="web/css/**" />
+            <include name="web/CACHE/**" />
+          </fileset>
+        </copy>
+
+        <exec command="git add -A" dir="${peerj-deploy.dir.resolved}/deploy_${deploy.hash}"  checkreturn="true" />
+        <echo msg="Adding all files in deploy_${deploy.hash}" />
+        <!-- If this build has been done before, deploy files will be the same. allow-empty commit to let the build proceed -->
+        <exec command="git commit -a -m '${peerj-deploy.msg}' --allow-empty" dir="${peerj-deploy.dir.resolved}"  checkreturn="true" />
+        <exec command="git push ${peerj-deploy.name}" logoutput="true"  dir="${peerj-deploy.dir.resolved}"  checkreturn="true" />
+    </target>
+
+    <target name="peerj-deploy:cleanup" description="Delete older deploys" depends="peerj-deploy:init">
+        <resolvepath propertyName="peerj-deploy.dir.resolved" file="${peerj-deploy.dir}" />
+        <exec outputProperty="peerj-deploy.folders.maxlines" command="expr ${peerj-deploy.folders.max} + 2" />
+        <exec dir="${peerj-deploy.dir.resolved}"  command="for FOLDER in `ls -lt &quot;${peerj-deploy.dir.resolved}&quot; | tail -n +${peerj-deploy.folders.maxlines} | awk '{ print $9 }'`; do if [ -d &quot;${peerj-deploy.dir.resolved}/$FOLDER&quot; ]; then echo &quot;Removing $FOLDER&quot;;git rm -r &quot;${peerj-deploy.dir.resolved}/$FOLDER&quot;; fi; done" logoutput="true" checkreturn="true" />
+
+        <exec command="git commit -a -m '${peerj-deploy.folders.msg}' --allow-empty" dir="${peerj-deploy.dir.resolved}"  checkreturn="true" />
+        <exec command="git push ${peerj-deploy.name}" logoutput="true"  dir="${peerj-deploy.dir.resolved}"  checkreturn="true" />
+    </target>
+
+    <target name="peerj-code:init" description="Initialise peerj code for build.  e.g. git checkout" depends="require:shell:sh">
+        <fail unless="peerj-code.name" message="peerj-code.name parameter must be set" />
+        <fail unless="peerj-code.url" message="peerj-code.url parameter must be set" />
+        <fail unless="branch" message="branch parameter must be set" />
+
+        <!-- In case there are any local file changes, reset everything-->
+        <exec command="git reset --hard" logoutput="true"  dir="${peerj-code.dir}"  checkreturn="true" />
+        <exec command="git clean -fd" logoutput="true"  dir="${peerj-code.dir}"  checkreturn="true" />
+
+        <!-- sh shell - only use 1 equals for equality comparison -->
+        <echo msg="if [ $(git remote | grep ${peerj-code.name}$ | wc -l) = 0 ]; then git remote add ${peerj-code.name} ${peerj-code.url}; fi"  />
+        <exec command="if [ $(git remote | grep ${peerj-code.name}$ | wc -l) = 0 ]; then git remote add ${peerj-code.name} ${peerj-code.url}; fi"
+              passthru="true" logoutput="true" dir="${peerj-code.dir}"  checkreturn="true"/>
+        <exec command="git checkout master" logoutput="true"  dir="${peerj-code.dir}"  checkreturn="true" />
+        <exec command="git fetch ${github.name}" logoutput="true"  dir="${peerj-code.dir}"  checkreturn="true" />
+        <exec command="git fetch ${peerj-code.name}" logoutput="true"  dir="${peerj-code.dir}"  checkreturn="true" />
+
+        <!-- If we're not on the master branch, then just delete the branch on the build server -->
+        <!-- to avoid potential conflicts when rebasing, etc. -->
+        <!-- We shouldn't do with with master, as if it fails here we wouldn't be able to push to our git server anyway -->
+        <if>
+          <not>
+               <equals arg1="master" arg2="${branch}" trim="true" />
+          </not>
+          <then>
+                <echo msg='if [ "$(git branch | grep ${branch}$ | wc -l)" != "0" ]; then git branch -D ${branch}; fi'  />
+                <exec command='if [ "$(git branch | grep ${branch}$ | wc -l)" != "0" ]; then git branch -D ${branch}; fi' logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+          </then>
+        </if>
+
+        <!-- sh shell - only use 1 equals for equality comparison -->
+        <!-- If branch doesn't exist locally, then we want to checkout the github branch using tracking (as peerj-code repo may also have the branch.
+            Otherwise (branch exists locally), then just checkout local branch -->
+        <echo msg='if [ "$(git branch | grep ${branch}$ | wc -l)" = "0" ]; then git checkout -t ${github.name}/${branch}; else git checkout ${branch}; fi'  />
+        <exec command='if [ "$(git branch | grep ${branch}$ | wc -l)" = "0" ]; then git checkout -t ${github.name}/${branch}; else git checkout ${branch}; fi' logoutput="true"  dir="${peerj-code.dir}"  checkreturn="true" />
+
+        <!-- Merge in changes (in case we previously checkout the branch) -->
+        <exec command="git pull ${github.name} ${branch}" logoutput="true"  dir="${peerj-code.dir}"  checkreturn="true" />
+
+        <if>
+            <!-- For the master branch, we need to merge changes -->
+            <!-- For other branches, just delete what's already there to avoid merge conflicts -->
+            <equals arg1="master" arg2="${branch}" trim="true" />
+            <then>
+                <!-- In case there were updates outside of this build, merge in changes from peerj git, but only if branch exists on peerj git -->
+                <echo msg='if [ "$(git branch --all | grep ${peerj-code.name}/${branch}$ | wc -l)" != "0" ]; then git pull ${peerj-code.name} ${branch}; fi'  />
+                <exec command='if [ "$(git branch --all | grep ${peerj-code.name}/${branch}$ | wc -l)" != "0" ]; then git pull ${peerj-code.name} ${branch}; fi' logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+            </then>
+            <else>
+                <!-- git push remote :branch  will delete branch from remote server -->
+                <echo msg='if [ "$(git branch --all | grep ${peerj-code.name}/${branch}$ | wc -l)" != "0" ]; then git push ${peerj-code.name} :${branch}; fi'  />
+                <exec command='if [ "$(git branch --all | grep ${peerj-code.name}/${branch}$ | wc -l)" != "0" ]; then git push ${peerj-code.name} :${branch}; fi' logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+            </else>
+        </if>
+
+        <exec command="git log --pretty='%h' -n1" outputProperty="deploy.hash" dir="${peerj-code.dir}"  checkreturn="true"/>
+        <echo msg="Code Version: ${deploy.hash}" />
+    </target>
+
+    <target name="peerj-code:deploy" description="">
+        <fail unless="peerj-code.name" message="peerj-code.name parameter must be set" />
+        <fail unless="branch" message="branch parameter must be set" />
+
+        <!-- In case the branch is not master, but was recently branched from master -->
+        <if>
+          <not>
+               <equals arg1="master" arg2="${branch}" trim="true" />
+          </not>
+          <then>
+               <echo msg="Pushing branch master to ${peerj-code.name} prior to branch ${branch} to ensure all heads exist" />
+               <exec command="git push ${peerj-code.name} master:master" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+          </then>
+        </if>
+
+        <echo msg="Pushing ${branch} to ${peerj-code.name}" />
+        <exec command="git push ${peerj-code.name} ${branch}:${branch}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+
+        <!-- Set the rollback and deployed tags if we're on the required branch (master) and on required-env (prod) -->
+        <if>
+          <and>
+                <equals arg1="${branch}" arg2="${tags.required-branch}" trim="true" />
+                <equals arg1="${peerj-code.name}" arg2="${tags.required-env}" trim="true" />
+          </and>
+          <then>
+                <echo msg="Deleting remote tags on ${peerj-code.name}" />
+                <exec command="git push ${peerj-code.name} :refs/tags/${tags.deploy}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+                <exec command="git push ${peerj-code.name} :refs/tags/${tags.rollback}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+
+                <!-- As we're not using github to store the deployed tag, it may not exist now, or in the future -->
+                <exec command="git tag -l | grep ${tags.deploy} | wc -l" checkreturn="true"
+                    outputProperty="tags.deploy.present" dir="${peerj-code.dir}" />
+                <echo msg="Git deployed tag present: ${tags.deploy.present}" />
+                <if>
+                    <not>
+                        <equals arg1="${tags.deploy.present}" arg2="0" trim="true" />
+                    </not>
+                    <then>
+                       <echo msg="Moving rollback tag to the currently deployed code" />
+                       <exec command="git checkout ${tags.deploy}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+                       <exec command="git tag -f ${tags.rollback}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+                    </then>
+                </if>
+
+                <echo msg="Moving deployed tag to latest code in ${branch}" />
+                <exec command="git checkout ${branch}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+                <exec command="git tag -f ${tags.deploy}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+
+                <echo msg="Pushing tags to ${peerj-code.name}" />
+                <exec command="git push --tags ${peerj-code.name}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+          </then>
+          <else>
+            <echo msg="Skipping git tagging as either not on ${tags.required-branch} branch or not on required-env (${tags.required-env})" />
+          </else>
+        </if>
+
+    </target>
+
+    <target name="peerj-code:rollback" description="Rollback peerj code to a commit version" depends="require:shell:sh">
+        <fail unless="rollback-commit" message="rollback-commit parameter must be set" />
+        <fail unless="peerj-code.name" message="peerj-code.name parameter must be set" />
+        <fail unless="branch" message="branch parameter must be set" />
+
+        <!-- Make sure the commit is present in the logs -->
+        <exec command="git log --pretty='%H' -n1 ${rollback-commit}" outputProperty="rollback-commit-log" checkreturn="true"
+              dir="${peerj-code.dir}"/>
+        <if>
+            <not>
+            <equals arg1="${rollback-commit}" arg2="${rollback-commit-log}" />
+            </not>
+            <then>
+                <fail message="Commit ${rollback-commit} does not appear in git log" />
+            </then>
+        </if>
+
+        <property name="migrations.dir" value="${dir.app}/DoctrineMigrations" />
+
+        <exec command="git diff --name-status ${rollback-commit} ${migrations.dir} | wc -l" checkreturn="true"
+              outputProperty="migrations.present" dir="${peerj-code.dir}" />
+        <echo msg="Migration present: ${migrations.present}" />
+        <if>
+            <not>
+              <equals arg1="${migrations.present}" arg2="0" trim="true" />
+            </not>
+            <then>
+                <exec command="git diff --name-status ${rollback-commit} ${migrations.dir}" checkreturn="true"
+                  outputProperty="migrations.files" dir="${peerj-code.dir}" />
+                <echo msg="Migration files that need to be run ${migrations.files}" />
+                <fail unless="rollback-ignore-migrations" message="Rollback requires doctrine migrations to be applied. Manually rollback db and set rollback-ignore-migrations=true." />
+            </then>
+        </if>
+
+        <!-- The following code copies the migrations and does a compare base on the rollback -->
+        <!-- Keeping as may be helpful to automate a rollback? -->
+        <!--
+        note - - changed to - to allow to be placed inside comments
+        <exec command="git log -pretty='%h' -n1" outputProperty="head" dir="${peerj-code.dir}"/>
+        <property name="head.migrations.dir" value="${peerj-rollback.dir}/${head}" />
+        <mkdir dir="${head.migrations.dir}" />
+        <copy todir="${head.migrations.dir}">
+            <fileset dir="${migrations.dir}">
+                <include name="Version*.php" />
+            </fileset>
+        </copy>
+        <exec command="ls -al ${head.migrations.dir}/Version*.php | wc -l" outputProperty="head.migrations.count" dir="${peerj-code.dir}"/>
+        <echo msg="Previous head has ${head.migrations.count} migrations" />
+
+        <exec command="ls -al ${migrations.dir}/Version*.php | wc -l" outputProperty="rollback.migrations.count" dir="${peerj-code.dir}"/>
+        <echo msg="Current head has ${rollback.migrations.count} migrations" />
+
+        <if>
+            <not>
+              <equals arg1="${head.migrations.count}" arg2="${rollback.migrations.count}" trim="true" />
+            </not>
+            <then>
+              <fail unless="rollback-ignore-migrations" message="Rollback requires doctrine migrations to be applied.  Previous head version had ${head.migrations.count} migrations.  Curent head has ${rollback.migrations.count}. Manually rollback db and set rollback-ignore-migrations=true" />
+            </then>
+
+        </if>
+        -->
+
+        <property name="rollback-branch" value="${branch}-rollback-${rollback-commit}" />
+
+        <!-- In case we need to re-rollback, make sure the branch isn't already present on our git server -->
+        <exec command="git branch --all | grep remotes/${peerj-code.name}/${rollback-branch}$ | wc -l" checkreturn="true"
+              outputProperty="rollback-branch-present" logoutput="true"  dir="${peerj-code.dir}" />
+
+        <if>
+            <equals arg1="${rollback-branch-present}" arg2="0" trim="true" />
+            <then>
+                <!-- Create branch from the rollback-commit position -->
+                <exec command="git branch ${rollback-branch} ${rollback-commit}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+
+                <!-- push commit -->
+                <exec command="git push ${peerj-code.name} ${rollback-branch}:${rollback-branch}" logoutput="true"  dir="${peerj-code.dir}" checkreturn="true" />
+            </then>
+        </if>
+    </target>
+
+    <target name="build:verifydb:migrations"
+            description="Verify doctrine migrations are in correct order and copy the new migration scripts for testing">
+          <!-- In case there are left over files from a failed previous build -->
+          <phingcall target="build:verifydb:migrations:cleanup" />
+
+          <!-- Get a list of the current migrations -->
+          <exec command="ls -v1 ${dir.migrations}/*.php | awk -F/ '{print $NF }' > ${file.migrations.current}" logoutput="true" checkreturn="true"  />
+          <!-- <exec command="ls -v1 ${dir.rollup}/*.php | awk -F/ '{print $NF }' | head -n 1" outputProperty="CurrentMigration" logoutput="true" /> -->
+
+          <!-- Get the latest rollup from the file list -->
+          <exec command="tail ${file.migrations.rollup} -n 1" outputProperty="LatestRollupMigration" logoutput="true" checkreturn="true" />
+          <echo msg="Latest rollup migration: ${LatestRollupMigration}" />
+
+          <!-- Copy any new migration scripts after the LatestRollup to the rollup folder and add those files to the rollup list -->
+          <exec command='for FILE in `sed -n -e "/${LatestRollupMigration}/,$ p" ${file.migrations.current} | tail -n +2`; do cp ${dir.migrations}/$FILE ${dir.rollup}; echo $FILE >> ${file.migrations.rollup}; done' checkreturn="true" />
+
+          <echo msg="If the rolling command shows differences, there is an out of order doctrine migration that needs updating" />
+          <exec command="diff ${file.migrations.current} ${file.migrations.rollup}" checkreturn="true" logoutput="true" />
+
+          <!-- We can delete and rollback the file listing files - we will still need the new php migration scripts
+               which will need to be deleted later on -->
+          <exec command="rm ${file.migrations.current}" checkreturn="true" logoutput="true"  />
+          <exec command="git checkout -- ${file.migrations.rollup}" checkreturn="true" logoutput="true" />
+    </target>
+
+    <target name="build:verifydb:migrations:cleanup"
+            description="Cleanup files from the verifydb new-migrations">
+          <!-- Get rid of all files; will get last version from git -->
+          <exec command="rm ${dir.rollup}/*" checkreturn="true" logoutput="true" />
+
+          <!-- Rollup file is checked in -->
+          <exec command="git checkout -- ${file.migrations.rollup}" checkreturn="true" logoutput="true" />
+
+          <!-- Get the latest rollup from the file list -->
+          <exec command="tail ${file.migrations.rollup} -n 1" outputProperty="LatestRollupMigration" logoutput="true" checkreturn="true" />
+
+          <!-- Only other file checked in should be the latest rollup migration script -->
+          <exec command="git checkout -- ${dir.rollup}/${LatestRollupMigration}" checkreturn="true" logoutput="true" />
+    </target>
+
+    <target name="run:rollup:doctrine-migration" description="Common usage for creating new doctrine migration file with the name name as the latest version">
+        <property name="build.dbname" value="doctrine-migration-rollup" override="true" />
+        <property name="build.verifydb.will-drop-db" value="1" override="true" />
+        <property name="symfony.env" value="buildNoDebug" override="true" />
+        <phingcall target="rollup:doctrine-migration" />
+    </target>
+
+    <target name="rollup:doctrine-migration" description="Create new doctrine migration file with the name name as the latest version" depends="require:symfony:env">
+          <tstamp />
+          <exec command="git checkout -b RollupDoctrineMigrations-${DSTAMP}${TSTAMP}" checkreturn="true" logoutput="true" />
+          <if>
+            <not>
+            <available file="${dir.rollup}" />
+            </not>
+            <then>
+               <mkdir dir="${dir.rollup}" />
+            </then>
+          </if>
+          <exec command="git rm ${dir.rollup}/*.php" logoutput="true" checkreturn="true" />
+          <exec command="ls -v1 ${dir.migrations}/*.php | awk -F/ '{print $NF }' > ${file.migrations.rollup}" logoutput="true" checkreturn="true" />
+          <exec command="cat ${file.migrations.rollup} | tail -n 1" outputProperty="LatestMigration" logoutput="true" checkreturn="true" />
+          <phingcall target="db:drop-create" />
+          <SymfonyConsole command="doctrine:migrations:diff" checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+          </SymfonyConsole>
+          <exec command="ls -v1 ${dir.rollup}/*.php | awk -F/ '{print $NF }' | tail -n 1" outputProperty="RollupMigration" logoutput="true" checkreturn="true" />
+          <echo msg="Changing rollup migration file ${RollupMigration} to latest migration ${LatestMigration}" />
+          <exec command="mv ${dir.rollup}/${RollupMigration} ${dir.rollup}/${LatestMigration}" checkreturn="true" logoutput="true" />
+
+          <exec command="echo ${RollupMigration} | awk -F. '{print $1}'" outputProperty="RollupVersion" logoutput="true" checkreturn="true" />
+          <exec command="echo ${LatestMigration} | awk -F. '{print $1}'" outputProperty="LatestVersion" logoutput="true" checkreturn="true" />
+          <echo msg="Updating rollup migration version ${RollupVersion} to latest migration version ${LatestVersion}" />
+          <exec command="pwd" logoutput="true" checkreturn="true"  />
+          <exec command="ls -al ${dir.rollup}/${LatestMigration}" logoutput="true" checkreturn="true"  />
+          <exec command="sed -i 's/${RollupVersion}/${LatestVersion}/g' ${dir.rollup}/${LatestMigration}" checkreturn="true" logoutput="true" />
+          <exec command="git add ${dir.rollup}/${LatestMigration}" checkreturn="true" logoutput="true" />
+          <exec command="git add ${file.migrations.rollup}" checkreturn="true" logoutput="true" />
+          <exec command="git commit -m 'rollup:doctrine-migration'" checkreturn="true" logoutput="true" />
+          <exec command="git push origin RollupDoctrineMigrations-${DSTAMP}${TSTAMP}" checkreturn="true" logoutput="true" />
+    </target>
+
+    <target name="db:drop-create" depends="build:parameters:build,build:vendors">
+        <fail unless="build.verifydb.will-drop-db"
+              message="Unable to run db:drop-create.  Please accept that db will be dropped by adding parameter build.verifydb.will-drop-db=1" />
+                <!-- We want to force a drop/create action, but if the db isn't present, then it will error, so make sure the db exists first -->
+                <SymfonyConsole command="doctrine:database:create" checkreturn="false" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                </SymfonyConsole>
+                <SymfonyConsole command="doctrine:database:drop" checkreturn="false" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                    <arg name="force" />
+                </SymfonyConsole>
+                <SymfonyConsole command="doctrine:database:create" checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                </SymfonyConsole>
+    </target>
+
+    <target name="build:verifydb" depends="build:parameters:build,build:vendors"
+            description="Verify that current schema won't cause issue and check that all changes are up to date in migrations.">
+        <if>
+            <not>
+                <equals arg1="${build.verifydb.skip}" arg2="true" />
+            </not>
+            <then>
+                <fail unless="build.verifydb.will-drop-db"
+                  message="Unable to run build:verifydb.  Please accept that db will be dropped by adding parameter build.verifydb.will-drop-db=1" />
+
+                <phingcall target="build:verifydb:migrations" />
+                <phingcall target="db:drop-create" />
+
+                <!-- is there a reason for this here?? seems like its being called below as well -->
+                <SymfonyConsole command="doctrine:schema:update" checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                    <arg name="force" />
+                </SymfonyConsole>
+
+                <phingcall target="db:drop-create" />
+
+                <SymfonyConsole command="doctrine:migrations:migrate" checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                    <arg name="no-interaction " />
+                </SymfonyConsole>
+
+                <!-- now that the db is the most recent version, we can verify the schema -->
+                <SymfonyConsole command="doctrine:schema:validate" checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                </SymfonyConsole>
+
+                <!--
+                    Run an assetic dump here once the schema is in place
+                    This might catch possible errors in code, but requires the no-debug
+                    option to be set.  See https://github.com/PeerJ/dev-ops/issues/1912
+                -->
+                <SymfonyConsole command="assetic:dump"  checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                </SymfonyConsole>
+
+                <SymfonyConsole command="doctrine:schema:update" propertyName="schema-changes" checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                    <arg name="dump-sql" />
+                </SymfonyConsole>
+                <if>
+                    <contains string="${schema-changes}" substring="Nothing to update - your database is already in sync with the current entity metadata" />
+                    <then>
+                        <echo msg="Doctrine is up to date" />
+                    </then>
+                    <else>
+                        <fail message="There are outstanding schema changes to be added to the doctrine migrations" />
+                    </else>
+                </if>
+                <SymfonyConsole command="doctrine:migrations:migrate" checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                    <arg name="no-interaction " />
+                    <arg value="first" />
+                </SymfonyConsole>
+
+                <SymfonyConsole command="doctrine:schema:drop" propertyName="schema-changes" checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                </SymfonyConsole>
+                <if>
+                    <contains string="${schema-changes}" substring="Nothing to drop. The database is empty!" />
+                    <then>
+                        <echo msg="Doctrine down migrations are up to date" />
+                    </then>
+                    <else>
+                        <fail message="Doctrine down migrations are not correct - there are changes that need to be applied." />
+                    </else>
+                </if>
+                <SymfonyConsole command="doctrine:query:sql" propertyName="schema-tables" checkreturn="true" debug="${symfony.debug}">
+                    <arg name="env" value="${symfony.env.current}" />
+                    <arg name="depth" value="0" />
+                    <arg value="&quot;SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${build.dbname}' and TABLE_NAME != 'migration_versions';&quot;" />
+                </SymfonyConsole>
+                <if>
+                    <contains string="${schema-tables}" substring='Array(0)' />
+                    <then>
+                        <echo msg="Doctrine down migrations are up to date" />
+                    </then>
+                    <else>
+                        <fail message="Doctrine down migrations are not correct - there are changes that need to be applied." />
+                    </else>
+                </if>
+
+                <!-- Do final cleanup of the rollup folder -->
+                <phingcall target="build:verifydb:migrations:cleanup" />
+            </then>
+        </if>
+    </target>
+
+    <!-- Check Params for Farm -->
+    <target name="build:parameters:verify" description="Verify that the current environments parameters.yml file meets the criteria defined in parameters.yml.dist.">
+        <if>
+            <available file="${parameters.file}"/>
+            <then>
+                <exec command="/var/dev-ops/scripts/peerj/compareParameters.py -s ${dir.app}/config/parameters.yml.dist -c ${parameters.file}" checkreturn="true" passthru="true"/>
+            </then>
+            <else>
+                <fail message="${parameters.file} is not available."/>
+            </else>
+        </if>
+    </target>
+
+    <target name="build:parameters:get_file" description="Trigger Script to grab parameters file">
+        <fail unless="parameters.script" message="parameters.script must be set." />
+        <mkdir dir="${parameters.tmpdir}" />
+        <if>
+            <available file="${parameters.file}"/>
+            <then>
+                <delete file="${parameters.file}" />
+            </then>
+        </if>
+        <exec command="/var/dev-ops/scripts/scalr/TriggerBuildParams.pl -s ${parameters.script} -q ${parameters.tmpdir} BuildMonitor" checkreturn="true" passthru="true"/>
+        <echo msg="Checking ${parameters.file} is available." />
+        <trycatch property="parameters.permissionscheck">
+              <try>
+                <waitfor maxwaitunit="second" checkevery="2" maxwait="${parameters.maxwait}" timeoutproperty="parameters.file.timeout">
+                    <available file="${parameters.file}" />
+                </waitfor>
+              </try>
+              <catch>
+                <waitfor maxwaitunit="second" maxwait="3">
+                    <available file="/tmp/a-file-that-should-never-exist"/>
+                </waitfor>
+                <echo msg="Checking File permissions are ok." />
+                <waitfor maxwaitunit="second" checkevery="1" maxwait="10" timeoutproperty="parameters.file.timeout">
+                    <available file="${parameters.file}" />
+                </waitfor>
+              </catch>
+              <finally>
+                  <fail if="parameters.file.timeout" message="Parameters File wasn't found." />
+              </finally>
+        </trycatch>
+    </target>
+
+    <target name="build:parameters:run_verify" description="Run verification tasks for Parameters Files">
+        <if>
+            <equals arg1="${parameters.skipverifyparameters}" arg2="false" />
+            <then>
+                <phingcall target="build:parameters:get_file" />
+                <phingcall target="build:parameters:verify" />
+            </then>
+            <else>
+                <echo msg="Skipping Parameters Verification." />
+            </else>
+        </if>
+    </target>
+
+    <target name="verify:ops:status" description="Verify that production /ops/status/basic/ is accessible" depends="require:verify:port">
+        <!-- The build in php webserver in symfony only support prod & dev environments out of the box -->
+        <!-- although prod works locally, its breaking on the build server for some reason  -->
+
+        <!-- make sure we clear the dev cache -->
+        <property name="cacheclear.env" value="dev" override="true" />
+        <phingcall target="build:cacheclear" />
+
+        <!-- Warmup cache so that web server will be responsive -->
+        <SymfonyConsole command="cache:warmup" checkreturn="false" debug="${symfony.debug}">
+                    <arg name="env" value="${cacheclear.env}" />
+        </SymfonyConsole>
+
+        <property name="verify.address" value="127.0.0.1:${verify.port}" />
+        <!-- Use /basic/ instead of /db/ to avoid requiring the db to be setup. We just want to test that we're not redirecting. -->
+        <property name="verify.url" value="http://${verify.address}/ops/status/basic/" />
+
+        <SymfonyConsole command="server:stop" checkreturn="false" debug="${symfony.debug}">
+            <arg name="env" value="dev" />
+            <arg value="${verify.address}" />
+        </SymfonyConsole>
+        <echo msg="Sleeping 2 seconds to allow server to stop" />
+        <waitfor maxwaitunit="second" maxwait="2">
+            <available file="/tmp/a-file-that-should-never-exist"/>
+        </waitfor>
+        <echo msg="Starting web server on ${verify.address}" />
+        <SymfonyConsole command="server:start" checkreturn="true" debug="${symfony.debug}">
+            <arg name="env" value="dev" />
+            <arg value="${verify.address}" />
+            <!-- Redirect output as required by php exec "If a program is started with this function, in order for it to continue running in the background, the output of the program must be redirected to a file or another output stream. Failing to do so will cause PHP to hang until the execution of the program ends." -->
+            <arg value="> /tmp/verify.log" />
+        </SymfonyConsole>
+
+        <echo msg="Sleeping 2 seconds to allow server to start" />
+        <waitfor maxwaitunit="second" maxwait="2">
+            <available file="/tmp/a-file-that-should-never-exist"/>
+        </waitfor>
+
+        <echo msg="Warming up server with http request - ignoring results" />
+        <exec checkreturn="false" logoutput="true" command="GET ${verify.url}" />
+
+        <echo msg="Sleeping 2 seconds to allow server to fully warmup" />
+        <waitfor maxwaitunit="second" maxwait="2">
+            <available file="/tmp/a-file-that-should-never-exist"/>
+        </waitfor>
+
+        <echo msg="Checking ${verify.url}" />
+        <httpget url="${verify.url}" followRedirects="false" dir="/tmp">
+          <header name="X-Forwarded-Proto" value="https" />
+        </httpget>
+        <SymfonyConsole command="server:stop" checkreturn="false" debug="false">
+            <arg name="env" value="dev" />
+            <arg value="${verify.address}" />
+        </SymfonyConsole>
+    </target>
+
+</project>
