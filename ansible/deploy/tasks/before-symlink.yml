@@ -1,0 +1,13 @@
+- name: params
+  template: src=templates/parameters.yml dest={{ ansistrano_release_path.stdout }}/app/config/parameters.yml
+- composer: command=install no_dev=no working_dir={{ ansistrano_release_path.stdout }}
+- name: assetic dump
+  command: php app/console --env=prod assetic:dump chdir={{ ansistrano_release_path.stdout }}
+- name: app cache
+  file: path={{ ansistrano_release_path.stdout }}/app/cache recurse=yes owner=www-data group=www-data mode=0755 state=directory
+- name: app cache prod
+  file: path={{ ansistrano_release_path.stdout }}/app/cache/prod recurse=yes  owner=www-data group=www-data mode=0755 state=directory
+- name: app logs
+  file: path={{ ansistrano_release_path.stdout }}/app/logs recurse=yes owner=www-data group=www-data mode=0755 state=directory
+- name: app spool
+  file: path={{ ansistrano_release_path.stdout }}/app/spool recurse=yes owner=www-data group=www-data mode=0755 state=directory
