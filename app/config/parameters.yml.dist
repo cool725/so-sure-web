@@ -21,7 +21,4 @@ parameters:
     fb_secret:
 
     mongodb_db: mongo
-    mongo.session.options:
-        database: mongo # your MongoDB database name
-        collection: session  # your MongoDB collection name
-    mongodb_host: 127.0.0.1
+    mongodb_url: mongodb://localhost

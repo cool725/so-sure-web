@@ -15,16 +15,28 @@ class Phone
      */
     protected $id;
 
-    /** @MongoDB\String(name="make", nullable=false) */
+    /** @MongoDB\Field(type="string") */
     protected $make;
 
-    /** @MongoDB\String(name="model", nullable=false) */
+    /** @MongoDB\Field(type="string") */
     protected $model;
-    
+
+    /** @MongoDB\Field(type="string") */
+    protected $detail;
+
+    /** @MongoDB\Field(type="float") */
+    protected $policyPrice;
+
     public function __construct()
     {
-        parent::__construct();
-        // your own logic
+    }
+
+    public function init($make = null, $model = null, $detail = null, $policyPrice = null)
+    {
+        $this->make = $make;
+        $this->model = $model;
+        $this->detail = $detail;
+        $this->policyPrice = $policyPrice;
     }
 
     public function getId()
@@ -40,5 +52,20 @@ class Phone
     public function getModel()
     {
         return $this->model;
+    }
+
+    public function getDetail()
+    {
+        return $this->detail;
+    }
+
+    public function getPolicyPrice()
+    {
+        return $this->policyPrice;
+    }
+
+    public function __toString()
+    {
+        return sprintf("%s %s (%s)", $this->make, $this->model, $this->detail);
     }
 }
