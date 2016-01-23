@@ -1,0 +1,4 @@
+- name: download composer
+  get_url: url=https://getcomposer.org/installer dest=/tmp/composer-install mode=0440
+- name: composer
+  command: sudo php /tmp/composer-install --install-dir=/usr/local/bin --filename=composer

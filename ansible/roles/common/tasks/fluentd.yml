@@ -1,0 +1,18 @@
+- name: gem-msgpack
+  command: gem install msgpack
+- name: gem-fluentd
+  command: gem install fluentd -v "0.10.58"
+- name: gem-fluent-plugin-s3
+  gem: name=fluent-plugin-s3 state=latest user_install=no
+- name: fluentd-group
+  group: name=fluentd
+- name: fluentd-user
+  user: name=fluentd groups=fluentd,adm
+- name: fluent-log
+  file: path=/var/log/fluent owner=fluentd group=fluentd mode=0755 state=directory
+- name: fluent-etc
+  file: path=/etc/fluent owner=fluentd group=fluentd mode=0755 state=directory
+- name: fluent-plugin-location
+  file: path=/etc/fluent/plugin owner=fluentd group=fluentd mode=0755 state=directory
+- name: download-fluent-plugin-common
+  get_url: url=https://raw.githubusercontent.com/PeerJ/fluent-plugin-common-log/master/lib/fluent/plugin/CommonLogFormatter.rb dest=/etc/fluent/plugin/CommonLogFormatter.rb mode=0644

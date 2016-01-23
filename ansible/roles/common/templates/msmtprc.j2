@@ -1,0 +1,13 @@
+defaults
+auth             on
+tls              on
+tls_trust_file   /usr/share/ca-certificates/mozilla/Thawte_Premium_Server_CA.crt
+
+# default account
+account        default
+host           email-smtp.eu-west-1.amazonaws.com
+port           587
+from           {{ ses_email }}
+user           {{ ses_username }}
+password       {{ ses_password }}
+tls_trust_file /etc/ssl/certs/ca-certificates.crt

@@ -1,0 +1,2 @@
+- name: msmtprc
+  template: src=templates/msmtprc.j2 dest=/etc/msmtprc

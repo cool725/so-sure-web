@@ -41,7 +41,7 @@ AWS_PROFILE=$AWS_PROFILE ansible-playbook $1 $DEBUG_OPTION
 #--private-key=~/keys/laptop-urg.pem
 
 if [ "$DEPLOY" == "1" ]; then
-#ACCESS_TOKEN=""
+ACCESS_TOKEN=`AWS_PROFILE=$AWS_PROFILE  credstash get prod/rollbar/access_token`
 ENVIRONMENT=production
 LOCAL_USERNAME=`whoami`
 REVISION=`git log -n 1 --pretty=format:"%H"`

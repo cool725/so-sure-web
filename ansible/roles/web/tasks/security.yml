@@ -1,0 +1,4 @@
+- name: security-http
+  ufw: rule=allow port=80 proto=tcp
+- name: security-https
+  ufw: rule=allow port=443 proto=tcp
