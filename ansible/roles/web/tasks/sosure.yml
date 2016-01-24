@@ -1,0 +1,9 @@
+- name: web-location
+  file: path=/var/sosure owner=ubuntu group=ubuntu mode=0755 state=directory
+- name: web-location-release
+  file: path=/var/sosure/release owner=ubuntu group=ubuntu mode=0755 state=directory
+- name: clone
+  sudo: no
+  git: repo=git@gitlab.com:sosure/sosure.git dest=/var/sosure/release/initial accept_hostkey=true force=yes
+- name: web-location-current
+  file: dest=/var/sosure/current src=/var/sosure/release/initial owner=ubuntu group=ubuntu mode=0755 state=link
