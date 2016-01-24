@@ -28,7 +28,7 @@ fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-install-vendors.sh $CLONE_DIR $ENVIRONMENT
-create-folders.sh $CLONE_DIR $ENVIRONMENT
-clear-cache.sh $CLONE_DIR $ENVIRONMENT
-run-assetic.sh $CLONE_DIR $ENVIRONMENT
+./install-vendors.sh $CLONE_DIR $ENVIRONMENT
+./create-folders.sh $CLONE_DIR $ENVIRONMENT
+./clear-cache.sh $CLONE_DIR $ENVIRONMENT
+./run-assetic.sh $CLONE_DIR $ENVIRONMENT
