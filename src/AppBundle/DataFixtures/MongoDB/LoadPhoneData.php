@@ -38,6 +38,13 @@ class LoadPhoneData implements FixtureInterface
         $this->newPhone($manager, 'Apple', 'iPhone 4', '8GB', 4.99);
         $this->newPhone($manager, 'Apple', 'iPhone 4', '16GB', 4.99);
         $this->newPhone($manager, 'Apple', 'iPhone 4', '32GB', 4.99);
+
+        $this->newPhone($manager, 'Samsung', 'Galaxy', 'Ace 3', 3.99);
+        $this->newPhone($manager, 'Samsung', 'Galaxy', 'Ace 4', 4.99);
+        $this->newPhone($manager, 'Samsung', 'Galaxy', 'Alpha', 5.49);
+        $this->newPhone($manager, 'Samsung', 'Galaxy', 'Note 3', 5.49);
+        $this->newPhone($manager, 'Samsung', 'Galaxy', 'Note 4', 6.99);
+        $this->newPhone($manager, 'Samsung', 'Galaxy', 'Note Edge', 7.99);
         $manager->flush();
     }
 
