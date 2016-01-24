@@ -35,3 +35,4 @@ web/sitemap_index.xml
 VagrantfileExtra.rb
 .idea
 /backup
+*.backup
