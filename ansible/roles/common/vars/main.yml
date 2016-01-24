@@ -1,0 +1,2 @@
+ses_username: "{{ lookup('credstash', 'prod/server/ses_username', region='eu-west-1') }}"
+ses_password: "{{ lookup('credstash', 'prod/server/ses_password', region='eu-west-1') }}"

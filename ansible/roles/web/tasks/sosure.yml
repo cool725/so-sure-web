@@ -7,3 +7,9 @@
   git: repo=git@gitlab.com:sosure/sosure.git dest=/var/sosure/release/initial accept_hostkey=true force=yes
 - name: web-location-current
   file: dest=/var/sosure/current src=/var/sosure/release/initial owner=ubuntu group=ubuntu mode=0755 state=link
+- name: parameters
+  template: src=templates/parameters.yml.j2 dest=/var/sosure/release/initial/app/config/parameters.yml
+- name: composer token
+  command: composer config -g github-oauth.github.com {{ github_token }}
+- name: deploy
+  command: /var/sosure/current/ansible/scripts/deploy.sh /var/sosure/current prod

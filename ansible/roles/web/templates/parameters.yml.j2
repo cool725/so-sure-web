@@ -1,0 +1,11 @@
+parameters:
+    mailer_transport: smtp
+    mailer_host: email-smtp.eu-west-1.amazonaws.com
+    mailer_port: 587
+    mailer_user: {{ app_ses_username }}
+    mailer_password: {{ app_ses_password }}
+    secret: {{ session_secret }}
+    fb_appid: {{ facebook_appid }}
+    fb_secret: {{ facebook_secret }}
+    mongodb_db: so-sure
+    mongodb_url: {{ mongodb_url }}

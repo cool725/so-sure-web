@@ -20,7 +20,7 @@
     "inline": [
       "sudo sudo add-apt-repository ppa:ansible/ansible",
       "sudo apt-get update",
-      "sudo apt-get install -y python-pip ansible", 
+      "sudo apt-get install -y python-pip ansible",
       "sudo pip install credstash" 
     ]
   }, {

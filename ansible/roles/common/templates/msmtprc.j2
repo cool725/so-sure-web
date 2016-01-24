@@ -7,7 +7,7 @@ tls_trust_file   /usr/share/ca-certificates/mozilla/Thawte_Premium_Server_CA.crt
 account        default
 host           email-smtp.eu-west-1.amazonaws.com
 port           587
-from           {{ ses_email }}
+from           server@so-sure.com
 user           {{ ses_username }}
 password       {{ ses_password }}
 tls_trust_file /etc/ssl/certs/ca-certificates.crt

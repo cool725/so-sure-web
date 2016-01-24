@@ -1,3 +1,7 @@
-ses_email: server@so-sure.com
-ses_username: "{{ lookup('credstash', 'prod/server/ses_username', region='eu-west-1') }}"
-ses_password: "{{ lookup('credstash', 'prod/server/ses_password', region='eu-west-1') }}"
+app_ses_username: "{{ lookup('credstash', 'prod/app/ses_username', region='eu-west-1') }}"
+app_ses_password: "{{ lookup('credstash', 'prod/app/ses_password', region='eu-west-1') }}"
+session_secret: "{{ lookup('credstash', 'prod/app/session_secret', region='eu-west-1') }}"
+facebook_appid: "{{ lookup('credstash', 'prod/app/facebook_appid', region='eu-west-1') }}"
+facebook_secret: "{{ lookup('credstash', 'prod/app/facebook_secret', region='eu-west-1') }}"
+mongodb_url: "{{ lookup('credstash', 'prod/app/mongodb_url', region='eu-west-1') }}"
+github_token: "{{ lookup('credstash', 'prod/server/github_token', region='eu-west-1') }}"
