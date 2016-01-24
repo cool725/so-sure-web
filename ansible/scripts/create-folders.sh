@@ -60,10 +60,9 @@ if [ ! -d app/spool ]; then
 fi
 
 chown -R $USER_OWNER:$GROUP_OWNER .
-#chown www-data:www-data -R app/cache app/cache/$ENVIRONMENT app/logs app/spool web/CACHE web/assets web/uploads web/js web/css
 
 # Apache needs execute permissions
-chmod 775 -R app/cache app/cache/$ENVIRONMENT web/CACHE web/js app/logs app/spool web/uploads web/css
+chmod 775 -R app/cache app/cache/$ENVIRONMENT web/CACHE web/js app/logs app/spool web/css
 
 # http://symfony.com/doc/current/book/installation.html - Permissions
 if [ -f /usr/bin/setfacl ]; then
