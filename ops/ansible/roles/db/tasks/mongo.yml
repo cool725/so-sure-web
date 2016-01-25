@@ -1,0 +1,5 @@
+- name: mongo limits
+  template: src=templates/limits.conf dest=/etc/security/limits.conf
+- name: mongo nproc limits
+  template: src=templates/90-nproc.conf dest=/etc/security/limits.d/90-nproc.conf
+

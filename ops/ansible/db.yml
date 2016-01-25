@@ -1,0 +1,6 @@
+- hosts: all
+  become: yes
+  remote_user: ubuntu
+  roles:
+    - common
+    - db

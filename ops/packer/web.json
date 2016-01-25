@@ -25,8 +25,8 @@
     ]
   }, {
     "type": "ansible-local",
-    "playbook_file": "web.yml",
-    "role_paths": [ "roles/common", "roles/web" ]
+    "playbook_file": "../ansible/web.yml",
+    "role_paths": [ "../ansible/roles/common", "../ansible/roles/web" ]
   }]
 }
 

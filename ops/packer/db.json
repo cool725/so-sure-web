@@ -1,0 +1,32 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": ""
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "region": "eu-west-1",
+    "source_ami": "ami-f95ef58a",
+    "ami_virtualization_type": "hvm",
+    "instance_type": "t2.micro",
+    "ssh_username": "ubuntu",
+    "ami_name": "db v0 {{timestamp}}",
+    "iam_instance_profile": "packer"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sudo sudo add-apt-repository ppa:ansible/ansible",
+      "sudo apt-get update",
+      "sudo apt-get install -y python-pip ansible",
+      "sudo pip install credstash" 
+    ]
+  }, {
+    "type": "ansible-local",
+    "playbook_file": "../ansible/db.yml",
+    "role_paths": [ "../ansible/roles/common", "../ansible/roles/db" ]
+  }]
+}
+
