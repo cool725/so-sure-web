@@ -12,4 +12,4 @@
 - name: composer token
   command: composer config -g github-oauth.github.com {{ github_token }}
 - name: deploy
-  command: /var/sosure/current/ansible/scripts/deploy.sh /var/sosure/current prod
+  command: /var/sosure/current/ops/scripts/deploy.sh /var/sosure/current prod
