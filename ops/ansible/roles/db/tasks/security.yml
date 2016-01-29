@@ -1,2 +1,4 @@
 - name: security-mongodb
-  ufw: rule=allow port=27178 proto=tcp
+  ufw: rule=allow port=27017 proto=tcp
+- name: security-mongodb-web
+  ufw: rule=allow port=28017 proto=tcp

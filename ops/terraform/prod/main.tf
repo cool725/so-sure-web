@@ -3,6 +3,17 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
+variable "aws_az_a" {
+  description = "First AWS availability zone"
+  default = "eu-west-1a"
+}
+
+variable "aws_az_b" {
+  description = "Second AWS availability zone"
+  default = "eu-west-1b"
+}
+
+
 # Specify the provider and access details
 provider "aws" {
   region = "${var.aws_region}"
@@ -26,22 +37,173 @@ resource "aws_route" "internet_access" {
 }
 
 # Create a subnet to launch our instances into
-resource "aws_subnet" "default" {
+resource "aws_subnet" "dmz_a" {
   vpc_id                  = "${aws_vpc.default.id}"
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
+  availability_zone       = "${var.aws_az_a}"
+}
+resource "aws_subnet" "dmz_b" {
+  vpc_id                  = "${aws_vpc.default.id}"
+  cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "${var.aws_az_b}"
+}
+
+resource "aws_subnet" "db_a" {
+  vpc_id                  = "${aws_vpc.default.id}"
+  cidr_block              = "10.0.11.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "${var.aws_az_a}"
+}
+resource "aws_subnet" "db_b" {
+  vpc_id                  = "${aws_vpc.default.id}"
+  cidr_block              = "10.0.12.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "${var.aws_az_b}"
+}
+
+resource "aws_network_acl" "dmz" {
+    vpc_id = "${aws_vpc.default.id}"
+    subnet_ids = ["${aws_subnet.dmz_a.id}","${aws_subnet.dmz_b.id}"]
+    
+    # Standard rules
+    ingress {
+        protocol = "icmp"
+        rule_no = 10
+        action = "allow"
+        cidr_block =  "10.0.0.0/16"
+        from_port = 0
+        to_port = 0
+    }
+    ingress {
+        protocol = "tcp"
+        rule_no = 20
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 22
+        to_port = 22
+    }
+    ingress {
+        protocol = "tcp"
+        rule_no = 30
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 32768
+        to_port = 61000
+    }
+    ingress {
+        protocol = "udp"
+        rule_no = 40
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 32768
+        to_port = 61000
+    }
+    egress {
+        protocol = -1
+        rule_no = 10
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 0
+        to_port = 0
+    }
+
+    # Custom rules
+    ingress {
+        protocol = "tcp"
+        rule_no = 50
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 80
+        to_port = 80
+    }
+    ingress {
+        protocol = "tcp"
+        rule_no = 60
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 443
+        to_port = 443
+    }
+}
+
+
+resource "aws_network_acl" "db" {
+    vpc_id = "${aws_vpc.default.id}"
+    subnet_ids = ["${aws_subnet.db_a.id}","${aws_subnet.db_b.id}"]
+    
+    # Standard rules
+    ingress {
+        protocol = "icmp"
+        rule_no = 10
+        action = "allow"
+        cidr_block =  "10.0.0.0/16"
+        from_port = 0
+        to_port = 0
+    }
+    ingress {
+        protocol = "tcp"
+        rule_no = 20
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 22
+        to_port = 22
+    }
+    ingress {
+        protocol = "tcp"
+        rule_no = 30
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 32768
+        to_port = 61000
+    }
+    ingress {
+        protocol = "udp"
+        rule_no = 40
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 32768
+        to_port = 61000
+    }
+    egress {
+        protocol = -1
+        rule_no = 10
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 0
+        to_port = 0
+    }
+
+    # Custom rules
+    ingress {
+        protocol = "tcp"
+        rule_no = 50
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 27017
+        to_port = 27017
+    }
 }
 
 # A security group for the ELB so it is accessible via the web
 resource "aws_security_group" "elb" {
-  name        = "terraform_example_elb"
-  description = "Used in the terraform"
+  name        = "prod_elb"
+  description = "Production ELB"
   vpc_id      = "${aws_vpc.default.id}"
 
   # HTTP access from anywhere
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # HTTP access from anywhere
+  ingress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -57,9 +219,9 @@ resource "aws_security_group" "elb" {
 
 # Our default security group to access
 # the instances over SSH and HTTP
-resource "aws_security_group" "default" {
-  name        = "terraform_example"
-  description = "Used in the terraform"
+resource "aws_security_group" "web" {
+  name        = "web_sg"
+  description = "Web Server Security Group"
   vpc_id      = "${aws_vpc.default.id}"
 
   # SSH access from anywhere
@@ -87,11 +249,40 @@ resource "aws_security_group" "default" {
   }
 }
 
+resource "aws_security_group" "db" {
+  name        = "db_sg"
+  description = "MongoDb Server Security Group"
+  vpc_id      = "${aws_vpc.default.id}"
+
+  # SSH access from anywhere
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Mongodb access from the VPC
+  ingress {
+    from_port   = 27017
+    to_port     = 27017
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  # outbound internet access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
 resource "aws_elb" "web" {
-  name = "terraform-example-elb"
+  name = "prod-elb"
 
-  subnets         = ["${aws_subnet.default.id}"]
+  subnets         = ["${aws_subnet.dmz_a.id}","${aws_subnet.dmz_b.id}"]
   security_groups = ["${aws_security_group.elb.id}"]
 
   listener {
@@ -103,24 +294,49 @@ resource "aws_elb" "web" {
 
 }
 
-resource "aws_launch_configuration" "as_conf" {
-    name_prefix = "terraform-lc-example-"
-    image_id = "ami-c8fb4fbb"
+resource "aws_launch_configuration" "prod_web" {
+    name_prefix = "web-v0-lc-"
+    image_id = "ami-c7d265b4"
     instance_type = "t2.micro"
-    security_groups = ["${aws_security_group.default.id}"]
+    security_groups = ["${aws_security_group.web.id}"]
+    iam_instance_profile = "prod-web"
 
     lifecycle {
       create_before_destroy = true
     }
 }
 
-resource "aws_autoscaling_group" "bar" {
-    name = "terraform-asg-example"
-    launch_configuration = "${aws_launch_configuration.as_conf.name}"
+resource "aws_autoscaling_group" "prod_web" {
+    name = "web-v0-asg"
+    launch_configuration = "${aws_launch_configuration.prod_web.name}"
     min_size = 1
     max_size = 1
-    vpc_zone_identifier = ["${aws_subnet.default.id}"]
+    vpc_zone_identifier = ["${aws_subnet.dmz_a.id}","${aws_subnet.dmz_b.id}"]
     load_balancers =  ["${aws_elb.web.id}"]
+
+    lifecycle {
+      create_before_destroy = true
+    }
+}
+
+resource "aws_launch_configuration" "prod_db" {
+    name_prefix = "db-v0-lc-"
+    image_id = "ami-1d84336e"
+    instance_type = "t2.micro"
+    security_groups = ["${aws_security_group.db.id}"]
+    iam_instance_profile = "prod-db"
+
+    lifecycle {
+      create_before_destroy = true
+    }
+}
+
+resource "aws_autoscaling_group" "prod_db" {
+    name = "db-v0-asg"
+    launch_configuration = "${aws_launch_configuration.prod_db.name}"
+    min_size = 1
+    max_size = 1
+    vpc_zone_identifier = ["${aws_subnet.db_a.id}","${aws_subnet.db_b.id}"]
 
     lifecycle {
       create_before_destroy = true

@@ -1,5 +1,5 @@
     - name: nodesource
-      apt_repository: repo='deb https://deb.nodesource.com/node_0.12 trusty main' state=present
+      apt_repository: repo='deb https://deb.nodesource.com/node_5.x trusty main' state=present
     - name: nodesource-key
       apt_key: url=https://deb.nodesource.com/gpgkey/nodesource.gpg.key state=present
     - name: newrelic-source
@@ -7,12 +7,14 @@
     - name: newrelic-source-key
       apt_key: url=https://download.newrelic.com/548C16BF.gpg state=present
     - name: varnish-source
-      apt_repository: repo='deb https://repo.varnish-cache.org/ubuntu/ precise varnish-3.0' state=present
+      apt_repository: repo='deb https://repo.varnish-cache.org/ubuntu/ trusty varnish-4.1' state=present
     - name: varnish-source-key
       apt_key: url=https://repo.varnish-cache.org/GPG-key.txt state=present
     - name: mongo-source
-      apt_repository: repo='deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse' state=present
-    - name: mongo-source-key
+      apt_repository: repo='deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse' state=present
+    - name: mongo-source-key-old
       apt_key:  keyserver=keyserver.ubuntu.com id=7F0CEB10
+    - name: mongo-source-key-new
+      apt_key:  keyserver=keyserver.ubuntu.com id=EA312927
     - name: apt-update
       apt: update_cache=yes

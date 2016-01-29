@@ -1,7 +1,7 @@
 - name: apt-upgrade
   apt: upgrade=full
 - name: base
-  apt: pkg=apt-show-versions,nodejs,git,zip,libwww-perl,gcc,make,build-essential,imagemagick,mongodb-org-tools,ntp,ruby,ruby-dev,zlib1g-dev,msmtp,msmtp-mta,heirloom-mailx,python-pip,ansible,monit,newrelic-sysmond,varnish state=latest
+  apt: state=latest pkg=apt-show-versions,nodejs,git,zip,libwww-perl,gcc,make,build-essential,imagemagick,mongodb-org-tools,ntp,ruby,ruby-dev,zlib1g-dev,msmtp,msmtp-mta,heirloom-mailx,python-pip,ansible,monit,newrelic-sysmond,varnish
 - name: s3cmd
   pip: name=s3cmd
 - name: boto

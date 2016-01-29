@@ -12,7 +12,7 @@
     "ami_virtualization_type": "hvm",
     "instance_type": "t2.micro",
     "ssh_username": "ubuntu",
-    "ami_name": "packer-example {{timestamp}}",
+    "ami_name": "web v0 {{timestamp}}",
     "iam_instance_profile": "packer"
   }],
   "provisioners": [{

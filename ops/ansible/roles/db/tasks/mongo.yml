@@ -2,4 +2,11 @@
   template: src=templates/limits.conf dest=/etc/security/limits.conf
 - name: mongo nproc limits
   template: src=templates/90-nproc.conf dest=/etc/security/limits.d/90-nproc.conf
-
+- name: mongo hugepages init
+  template: mode=0755 src=templates/disable-transparent-hugepages dest=/etc/init.d/disable-transparent-hugepages
+- name: mongo hugepages boot
+  command: update-rc.d disable-transparent-hugepages defaults
+- name: mongo sysctl
+  template: src=templates/sysctl.conf dest=/etc/sysctl.conf
+- name: mongo conf
+  template: src=templates/mongod.conf dest=/etc/mongod.conf
