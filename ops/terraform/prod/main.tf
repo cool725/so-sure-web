@@ -180,7 +180,7 @@ resource "aws_network_acl" "db" {
         protocol = "tcp"
         rule_no = 50
         action = "allow"
-        cidr_block =  "0.0.0.0/0"
+        cidr_block =  "10.0.0.0/16"
         from_port = 27017
         to_port = 27017
     }
@@ -300,6 +300,7 @@ resource "aws_launch_configuration" "prod_web" {
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.web.id}"]
     iam_instance_profile = "prod-web"
+    user_data = "#!/bin/bash\n/usr/local/bin/tagged-route53.py so-sure.com"
 
     lifecycle {
       create_before_destroy = true
@@ -317,14 +318,27 @@ resource "aws_autoscaling_group" "prod_web" {
     lifecycle {
       create_before_destroy = true
     }
+
+    tag {
+      key = "env"
+      value = "prod"
+      propagate_at_launch = true
+    }
+
+    tag {
+      key = "role"
+      value = "web"
+      propagate_at_launch = true
+    }
 }
 
 resource "aws_launch_configuration" "prod_db" {
     name_prefix = "db-v0-lc-"
-    image_id = "ami-1d84336e"
+    image_id = "ami-263b8c55"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.db.id}"]
     iam_instance_profile = "prod-db"
+    user_data = "#!/bin/bash\n/usr/local/bin/tagged-route53.py so-sure.com"
 
     lifecycle {
       create_before_destroy = true
@@ -334,11 +348,23 @@ resource "aws_launch_configuration" "prod_db" {
 resource "aws_autoscaling_group" "prod_db" {
     name = "db-v0-asg"
     launch_configuration = "${aws_launch_configuration.prod_db.name}"
-    min_size = 1
-    max_size = 1
+    min_size = 2
+    max_size = 2
     vpc_zone_identifier = ["${aws_subnet.db_a.id}","${aws_subnet.db_b.id}"]
 
     lifecycle {
       create_before_destroy = true
+    }
+
+    tag {
+      key = "env"
+      value = "prod"
+      propagate_at_launch = true
+    }
+
+    tag {
+      key = "role"
+      value = "db"
+      propagate_at_launch = true
     }
 }
