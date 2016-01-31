@@ -1,0 +1,23 @@
+To initial replication
+---
+
+rs.initiate(                                                                                    
+    { _id:'prod',                                                                                              
+      members:[
+        { _id:1, host:'db-1.prod.so-sure.com:27017' },                                                                                             
+        { _id:2, host:'db-2.prod.so-sure.com:27017' },                                                                   
+        { _id:3, host:'db-3.prod.so-sure.com:27017' }
+      ]                                                                                             
+    }  
+)
+
+To add initial user (make sure to set password)
+---
+use admin
+db.createUser(
+  {
+    user: "root",
+    pwd: "",
+    roles: [ { role: "root", db: "admin" } ]
+  }
+)

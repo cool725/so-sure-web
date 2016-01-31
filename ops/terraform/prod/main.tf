@@ -291,16 +291,15 @@ resource "aws_elb" "web" {
     lb_port           = 80
     lb_protocol       = "http"
   }
-
 }
 
 resource "aws_launch_configuration" "prod_web" {
     name_prefix = "web-v0-lc-"
-    image_id = "ami-c7d265b4"
+    image_id = "ami-9600b7e5"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.web.id}"]
     iam_instance_profile = "prod-web"
-    user_data = "#!/bin/bash\ncd /var/sosure/current/ops/scripts\n./deploy.sh /var/sosure/current prod"
+    user_data = "#!/bin/bash\ncd /var/sosure/current\ngit pull origin master\ncd /var/sosure/current/ops/scripts\n./deploy.sh /var/sosure/current prod"
 
     lifecycle {
       create_before_destroy = true
@@ -348,8 +347,8 @@ resource "aws_launch_configuration" "prod_db" {
 resource "aws_autoscaling_group" "prod_db" {
     name = "db-v0-asg"
     launch_configuration = "${aws_launch_configuration.prod_db.name}"
-    min_size = 1
-    max_size = 1
+    min_size = 3
+    max_size = 3
     vpc_zone_identifier = ["${aws_subnet.db_a.id}","${aws_subnet.db_b.id}"]
 
     lifecycle {

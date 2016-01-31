@@ -14,3 +14,5 @@
   file: path=/etc/mongodb mode=0700 owner=mongodb state=directory
 - name: mongo keyfile
   template: src=templates/mongodb-keyfile owner=mongodb dest=/etc/mongodb/mongodb-keyfile mode=0600
+- name: mongo init help text
+  template: src=templates/mongodb-init.txt dest=/root/mongodb-init.txt
