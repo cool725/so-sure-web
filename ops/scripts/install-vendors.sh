@@ -84,7 +84,7 @@ fi
 
 export COMPOSER_PROCESS_TIMEOUT=$COMPOSER_TIMEOUT
 
-/usr/bin/time -v composer install --no-interaction --optimize-autoloader --profile 2>&1 | tee $VENDOR_TIME_LOG
+/usr/bin/time -v HOME=$CALLING_FOLDER composer install --no-interaction --optimize-autoloader --profile 2>&1 | tee $VENDOR_TIME_LOG
 cat $VENDOR_TIME_LOG
 if [ "$HISTORY" != "" ]; then
     grep "Elapsed (wall clock) time" $VENDOR_TIME_LOG | awk '{ print "Vendor Elapsed Time: " $8 };' >> $HISTORY

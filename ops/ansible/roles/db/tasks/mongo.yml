@@ -10,3 +10,7 @@
   template: src=templates/sysctl.conf dest=/etc/sysctl.conf
 - name: mongo conf
   template: src=templates/mongod.conf dest=/etc/mongod.conf
+- name: mongodb-etc
+  file: path=/etc/mongodb mode=0700 owner=mongodb state=directory
+- name: mongo keyfile
+  template: src=templates/mongodb-keyfile owner=mongodb dest=/etc/mongodb/mongodb-keyfile mode=0600

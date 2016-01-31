@@ -300,7 +300,7 @@ resource "aws_launch_configuration" "prod_web" {
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.web.id}"]
     iam_instance_profile = "prod-web"
-    user_data = "#!/bin/bash\n/usr/local/bin/tagged-route53.py so-sure.com"
+    user_data = "#!/bin/bash\ncd /var/sosure/current/ops/scripts\n./deploy.sh /var/sosure/current prod"
 
     lifecycle {
       create_before_destroy = true
@@ -334,7 +334,7 @@ resource "aws_autoscaling_group" "prod_web" {
 
 resource "aws_launch_configuration" "prod_db" {
     name_prefix = "db-v0-lc-"
-    image_id = "ami-263b8c55"
+    image_id = "ami-ba0eb9c9"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.db.id}"]
     iam_instance_profile = "prod-db"
@@ -348,8 +348,8 @@ resource "aws_launch_configuration" "prod_db" {
 resource "aws_autoscaling_group" "prod_db" {
     name = "db-v0-asg"
     launch_configuration = "${aws_launch_configuration.prod_db.name}"
-    min_size = 2
-    max_size = 2
+    min_size = 1
+    max_size = 1
     vpc_zone_identifier = ["${aws_subnet.db_a.id}","${aws_subnet.db_b.id}"]
 
     lifecycle {
