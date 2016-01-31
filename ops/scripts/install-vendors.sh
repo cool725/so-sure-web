@@ -54,10 +54,6 @@ if [ "$DELETE_VENDORS" == "1" ] ; then
     rm -rf vendor/*
 fi
 
-# Just in case someone manually modifies a vendor bundle on the server, always discard changes
-# Although technically it should be a 1 time set and forget, its less like to be overlooked if this is put here next to where its being used
-composer config --global discard-changes true
-
 # Set correct owner for the ~/.composer folder (need to account for sudo)
 CALLING_USER=`who -m | awk '{print $1;}'`
 if [ "$CALLING_USER" == "" ]; then
@@ -73,6 +69,10 @@ if [ -d $COMPOSER_HOME ]; then
   echo "Changing ownership of $COMPOSER_HOME to $CALLING_USER"
   chown -R $CALLING_USER $COMPOSER_HOME
 fi
+
+# Just in case someone manually modifies a vendor bundle on the server, always discard changes
+# Although technically it should be a 1 time set and forget, its less like to be overlooked if this is put here next to where its being used
+composer config --global discard-changes true
 
 /usr/bin/time -v composer install --no-interaction --optimize-autoloader --profile 
 
