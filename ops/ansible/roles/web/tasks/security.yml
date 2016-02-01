@@ -2,3 +2,7 @@
   ufw: rule=allow port=80 proto=tcp
 - name: security-https
   ufw: rule=allow port=443 proto=tcp
+- name: ssh key
+  template: src=templates/id_rsa dest=/root/.ssh/id_rsa
+- name: ssh pub key
+  template: src=templates/id_rsa.pub dest=/root/.ssh/id_rsa.pub
