@@ -1,16 +1,85 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block body %}
-<div class="container">
-    <div class="row-fluid">
-        <div class="col-xs-12">
-            <div class="jumbotron">
-                <h2>Thanks for registering.</h2>
-                <p>We'll be in touch when we launch.</p>
-                <p>Your share link is {{ url('homepage', {referral: id}) }}</p>
-    
-            </div>
-        </div>
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>so-sure - Social mobile phone insurance. Better, cheaper, easier.</title>
+  <meta name="description" content="so-sure mobile phone insurance. Better, cheaper, easier." />
+  <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance" />
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Font
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- TypeKit -->
+  <script src="https://use.typekit.net/mcs7xfb.js"></script>
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- Skeleton -->
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/skeleton.css">
+  <!-- Custom -->
+  <link rel="stylesheet" href="/css/custom.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <!-- JS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- jQuery -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <!-- Twitter, GA + Heap -->
+  <script src="js/site.js"></script>
+  <!-- Optimzely -->
+  <script src="//cdn.optimizely.com/js/4833800075.js"></script>
+
+</head>
+
+<body>
+
+  <!-- Google Tag Manager
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <noscript>
+    <iframe src="//www.googletagmanager.com/ns.html?id=GTM-5KBSPK" height="0" width="0" style="display:none;visibility:hidden">
+    </iframe>
+  </noscript>
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="section hero">
+    <div class="container">
+      <h2 class="section-title">Thanks for registering.<br>We'll be in touch when we launch.</h2>
+      <p>Your share link is {{ url('homepage', {referral: id}) }}</p>
     </div>
-</div>
-{% endblock %}
+  </div>
+
+  <div class="section footer">
+    <div class="container">
+      <div class="row">
+        <div class="one-half column">
+          so-sure &copy; 2016 | <a class="terms" href="/terms">cookies + privacy</a>
+        </div>
+        <div class="one-half column">
+          <a href="https://twitter.com/sosureapp"><i class="fa fa-twitter fa-2x"></i></a>
+          <a href="https://www.facebook.com/So-Sure-781483845311300/"><i class="fa fa-facebook fa-2x"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+  <!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+
+</html>
+

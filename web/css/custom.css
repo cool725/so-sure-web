@@ -1,0 +1,305 @@
+  /* Shared
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+  .button {
+    border-radius: 100px;
+  }
+
+  /* Sections
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+  .section {
+    padding: 8rem 0 7rem;
+    text-align: center;
+  }
+  .section-heading {
+    margin-bottom: 1.2rem;
+  }
+  .section-description {
+    margin-bottom: 4rem;
+    max-width: 100%;
+  }
+
+  /* Hero
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+  .hero {
+    color: #00CFF1;
+  }
+  .hero strong {
+    color: #000;
+    font-family: serif;
+  }
+  .logo {
+    width: 50%;
+    padding-bottom: 1rem;
+    padding-top: 2rem;
+  }
+  .hero .button.button-primary {
+    margin-top: 2rem;
+  }
+  @media (max-width: 750px) {
+    .logo {
+      width: 80%;
+    }
+  }
+  /* Mission
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+  .mission {
+    background-color: #f2f2f2;
+  }
+  .mission .section-heading {
+    font-size: 3.0rem;
+  }
+  .mission .section-description {
+    margin-bottom: 2rem;
+    max-width: 90%;
+  }
+  .mission .section-title {
+    margin-bottom: 3.2rem;
+  }
+  .mission i {
+    color: #FF8C87;
+  }
+  @media (max-width: 1000px) {
+    .mission .section-description {
+      max-width: 100%;
+    }
+  }
+
+  /* Intro
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+  .intro .section-heading {
+    font-size: 3.0rem;
+  }
+  .intro .section-description {
+    margin-bottom: 2rem;
+  }
+  .phones {
+    position: relative;
+  }
+  .phone {
+    position: relative;
+    max-width: 80%;
+    margin: 3rem auto -12rem;
+  }
+  .phone + .phone {
+    display: none;
+  }
+
+  /* Bigger than 550 */
+  @media (min-width: 550px) {
+    .section {
+      padding: 11rem 0 10rem;
+    }
+    .hero {
+      text-align: center;
+    }
+    .intro {
+      padding-bottom: 12rem;
+      text-align: left;
+    }
+    .phone {
+      position: absolute;
+      top: -7rem;
+      right: 3rem;
+      max-height: 362px;
+      z-index: 3;
+    }
+    .phone + .phone {
+      top: -6rem;
+      display: block;
+      max-width: 73.8%;
+      right: 0;
+      z-index: 2;
+      max-height: 338px;
+    }
+  }
+
+  /* Bigger than 750 */
+  @media (min-width: 750px) {
+    .section {
+      padding: 12rem 0 12rem;
+    }
+    .section-description {
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .phone {
+      top: -14rem;
+      right: 5rem;
+      max-height: 510px;
+    }
+    .phone + .phone {
+      top: -12rem;
+      max-height: 472px;
+    }
+    .categories {
+      padding: 15rem 0 8rem;
+    }
+  }
+
+  /* Bigger than 1000 */
+  @media (min-width: 1000px) {
+    .section {
+      padding: 13rem 0 13rem;
+    }
+    .hero-heading {
+      font-size: 3.0rem;
+    }
+    .intro {
+      padding: 20rem 0;
+    }
+    .intro-heading {
+      font-size: 3.0rem;
+    }
+    .phone {
+      top: -16rem;
+      max-height: 615px;
+    }
+    .phone + .phone {
+      top: -14rem;
+      max-height: 570px;
+    }
+  }
+
+  /* How
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+  .how {
+    background-color: #f2f2f2;
+  }
+  .how .section-description {
+    max-width: 100%;
+  }
+  .icon {
+    width: 50%;
+    margin-bottom: -1rem;
+  }
+
+  /* Twitter
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+  .twitter p {
+    color: #333333;
+  }
+  .twitter .section-description {
+    padding-top: 1.2rem;
+  }
+
+  /* Terms
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+  .terms {
+    text-align: left;
+  }
+  .terms .logo {
+    text-align: left;
+    width: 70%;
+    margin-bottom: -1rem;
+  }
+  .terms .logo-description {
+    font-weight: 700;
+    color: #00CFF1;
+    width: 70%;
+  }
+  .terms .home-button {
+    padding-top: 7rem;
+    text-align: center;
+  }
+  @media (max-width: 550px) {
+    .terms .logo {
+      text-align: center;
+      width: 100%;
+    }
+    .terms .logo-description {
+      text-align: center;
+      width: 100%;
+    }
+    .terms .home-button {
+      text-align: center;
+      padding-top: 2.5rem;
+    }
+  }
+
+  /* CTA
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+  .cta {
+    background-color: #00CFF1;
+    padding: 6rem 0 6rem;
+    position: relative;
+  }
+  .cta .section-heading {
+    color: #fff;
+  }
+  .cta p {
+    color: #333333;
+  }
+  .cta .signup {
+    width: 424px;
+    margin: 48px auto 37px;
+    position: relative;
+  }
+  .cta input.email {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background-clip: padding-box;
+    padding: 10px 180px 10px 15px;
+    margin-bottom: 0rem;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    box-shadow: none;
+    border: none;
+  }
+  .cta .button.button-primary {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-top: 0;
+    background-color: #1EAEDB;
+    border-color: #1EAEDB;
+  }
+  .cta .button.button-primary:hover {
+    background-color: #3A81B1;
+    border-color: #3A81B1;
+  }
+
+  /* Smaller than 500 - Remove Email Box */
+  @media (max-width: 500px) {
+    .cta {
+      text-align: center;
+    }
+    .cta input.email {
+      margin-bottom: 2rem;
+    }
+    .cta .button.button-primary {
+      border-radius: 100px;
+      position: relative;
+    }
+    .cta .signup {
+      width: auto;
+    }
+  }
+
+  /* Footer
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+  .footer {
+    font-size: 1em;
+    color: #333333;
+    padding: 6rem 0 6rem;
+  }
+  .footer .column {
+    margin-bottom: 1.5rem;
+  }
+  .footer a {
+    padding-left: 1em;
+    position: relative;
+  }
+  .footer a.terms {
+    padding-left: 0em;
+    font-size: 1em;
+  }

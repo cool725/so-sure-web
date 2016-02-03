@@ -72,4 +72,13 @@ class DefaultController extends BaseController
     {
         return array();
     }
+
+    /**
+     * @Route("/terms", name="terms")
+     * @Template
+     */
+    public function termsAction()
+    {
+        return array();
+    }
 }

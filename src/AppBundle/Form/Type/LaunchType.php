@@ -15,9 +15,8 @@ class LaunchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', TextType::class, ['required' => true])
             ->add('referralId', HiddenType::class)
-            ->add('email', EmailType::class)
+            ->add('email', EmailType::class, ['required' => true])
             ->add('save', SubmitType::class)
         ;
     }
