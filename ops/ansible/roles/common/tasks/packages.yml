@@ -7,4 +7,4 @@
 - name: boto
   pip: name=boto
 - name: download tagged-route53
-  get_url: url=https://raw.githubusercontent.com/urg/tagged-route53/master/tagged-route53.py dest=/usr/local/bin/tagged-route53.py mode=0755
+  get_url: url=https://raw.githubusercontent.com/so-sure/tagged-route53/master/tagged-route53.py dest=/usr/local/bin/tagged-route53.py mode=0755
