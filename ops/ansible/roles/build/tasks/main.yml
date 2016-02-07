@@ -1,1 +1,1 @@
-- include: jenkins.yml
+- include: nginx.yml
