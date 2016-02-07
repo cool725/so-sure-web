@@ -1,6 +1,3 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
 $script = <<SCRIPT
 set -e
 export CACHE_DIR=/dev/shm/cache
@@ -18,47 +15,22 @@ else
   fi
 fi
 
-WWW_USER=vagrant
-ENVIRONMENT=vagrant
-
-# Set SYMFONY_ENV 
-BASH_RC=/home/$WWW_USER/.bashrc
-if [ -f $BASH_RC ]; then
-  SYMFONY_ENV_PRESENT=`cat $BASH_RC | grep "SYMFONY_ENV" | wc -l`
-  if [ "$SYMFONY_ENV_PRESENT" == "0" ]; then
-    echo "Adding SYMFONY_ENV to ~/.bashrc"
-    echo "export SYMFONY_ENV=$ENVIRONMENT" >> $BASH_RC
-  else
-    echo "Updating SYMFONY_ENV to ~/.bashrc"
-    sed -i "s/export SYMFONY_ENV\=.*/export SYMFONY_ENV=$ENVIRONMENT/" $BASH_RC
-  fi
+if [ ! -f /usr/bin/ansible-playbook ]; then
+  sudo sudo add-apt-repository ppa:ansible/ansible
+  sudo apt-get update
+  sudo apt-get install -y python-pip ansible
 fi
 
-echo "Setting correct app.php"
-cp /vagrant/web_app/app_$ENVIRONMENT.php /vagrant/web/app.php
-
-if [ ! -d $CACHE_DIR ]; then
-  echo "Creating cache dir"
-  sudo mkdir $CACHE_DIR
-  chown -R $WWW_USER $CACHE_DIR
-fi
-
-sudo sudo add-apt-repository ppa:ansible/ansible
-sudo apt-get update
-sudo apt-get install -y python-pip ansible
-
-cd /vagrant/ops/ansible
-ansible-playbook --connection=local -v vagrant.yml
-
-/vagrant/ops/scripts/deploy.sh -u "" /vagrant vagrant
+#/vagrant/ops/scripts/deploy.sh -u "" /vagrant vagrant
 
 SCRIPT
 
+$deploy = <<SCRIPT
+set -e
+/vagrant/ops/scripts/deploy.sh -u "" /vagrant vagrant
+SCRIPT
+
 Vagrant.configure("2") do |config|
-  config.trigger.before :up do
-    info "Checking files for correct owner"
-    run 'bash -c "if [ `find . -not -user $USER | wc -l` != 0 ]; then echo \"Change file permissions for $USER\" | tee /dev/stderr; exit 1; else echo \"File permissions are ok\"; fi"'
-  end
   config.vm.define "dev", primary: true, autostart: true do |dev_config|
     dev_config.vm.box = "ubuntu1404"
     dev_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
@@ -96,8 +68,26 @@ Vagrant.configure("2") do |config|
     dev_nonfs_config.vm.network "private_network", ip: "10.0.4.2"
     dev_nonfs_config.vm.synced_folder ".", "/vagrant"
     dev_nonfs_config.ssh.forward_agent = true
+
     dev_nonfs_config.vm.provision "shell",
     	inline: $script
+
+    # Patch for https://github.com/mitchellh/vagrant/issues/6793
+    dev_nonfs_config.vm.provision "shell" do |s|
+        s.inline = '[[ ! -f $1 ]] || grep -F -q "$2" $1 || sed -i "/__main__/a \\    $2" $1'
+        s.args = ['/usr/bin/ansible-galaxy', "if sys.argv == ['/usr/bin/ansible-galaxy', '--help']: sys.argv.insert(1, 'info')"]
+    end
+
+    dev_nonfs_config.vm.provision "ansible_local" do |a|
+        a.playbook = "vagrant.yml"
+        a.provisioning_path = "/vagrant/ops/ansible"
+        a.inventory_path = "/vagrant/ops/ansible/vagrant_inventory"
+        a.limit = "vagrant"
+        a.install = false
+    end
+
+    dev_nonfs_config.vm.provision "shell",
+    	inline: $deploy
 
     dev_nonfs_config.vm.provider "virtualbox" do |v|
       v.customize ["modifyvm", :id, "--memory", 1200]

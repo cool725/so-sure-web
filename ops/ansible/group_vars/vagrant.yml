@@ -2,4 +2,7 @@
 ses_username: a
 ses_password: a
 
+private_key: ignore
+public_key: ignore
+
 sosure_path: /vagrant/web

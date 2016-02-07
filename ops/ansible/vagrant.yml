@@ -5,3 +5,6 @@
     - common
     - web
     - db
+  tasks:
+    - lineinfile: dest=/home/vagrant/.bashrc line="export SYMFONY_ENV=vagrant"
+    - copy: src=/vagrant/web_app/app_vagrant.php dest=/vagrant/web/app.php

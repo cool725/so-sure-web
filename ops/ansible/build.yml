@@ -1,0 +1,18 @@
+- hosts: all
+  become: yes
+  remote_user: ubuntu
+
+  vars:
+    - jenkins_repo_url: deb http://pkg.jenkins-ci.org/debian-stable binary/
+    - jenkins_repo_key_url: http://pkg.jenkins-ci.org/debian-stable/jenkins-ci.org.key
+    - jenkins_plugins:
+      - git
+      - ssh
+      - phing
+      - github
+
+  roles:
+    - common
+    - web
+    - geerlingguy.jenkins
+    - build
