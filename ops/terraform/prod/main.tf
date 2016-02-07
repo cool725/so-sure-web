@@ -279,6 +279,28 @@ resource "aws_security_group" "db" {
   }
 }
 
+resource "aws_security_group" "build" {
+  name        = "build_sg"
+  description = "Build Server Security Group"
+  vpc_id      = "${aws_vpc.default.id}"
+
+  # HTTPS access from anywhere
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # outbound internet access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_elb" "web" {
   name = "prod-elb"
 
@@ -370,6 +392,42 @@ resource "aws_autoscaling_group" "prod_db" {
     tag {
       key = "role"
       value = "db"
+      propagate_at_launch = true
+    }
+}
+
+resource "aws_launch_configuration" "prod_build" {
+    name_prefix = "build-v0-lc-"
+    image_id = "ami-3f27964c"
+    instance_type = "t2.micro"
+    security_groups = ["${aws_security_group.build.id}"]
+    iam_instance_profile = "prod-web"
+
+    lifecycle {
+      create_before_destroy = true
+    }
+}
+
+resource "aws_autoscaling_group" "prod_build" {
+    name = "build-v0-asg"
+    launch_configuration = "${aws_launch_configuration.prod_build.name}"
+    min_size = 1
+    max_size = 1
+    vpc_zone_identifier = ["${aws_subnet.dmz_a.id}"]
+
+    lifecycle {
+      create_before_destroy = true
+    }
+
+    tag {
+      key = "env"
+      value = "prod"
+      propagate_at_launch = true
+    }
+
+    tag {
+      key = "role"
+      value = "build"
       propagate_at_launch = true
     }
 }
