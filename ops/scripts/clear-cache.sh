@@ -45,11 +45,8 @@ fi
 
 cd $CLONE_DIR
 
-# Cache must be cleared when running in prod mode
-DEPLOY_TIME_LOG=/tmp/peerj-deploy-time-log
-
 # manual file delete + cache:warmup is ~2x faster than cache:clear
-rm -rf app/cache/*
+rm -rf app/cache/$ENVIRONMENT
 
 # May want to skip warmup for low-memory instances
 if [ "$WARMUP" == "0" ]; then
@@ -58,20 +55,5 @@ if [ "$WARMUP" == "0" ]; then
 fi
 
 set +e
-sudo -u $RUN_USER /usr/bin/time -v env TERM=dumb php app/console $DEBUG_OPTION --env=$ENVIRONMENT cache:warmup 2> $DEPLOY_TIME_LOG
-CACHE_CLEAR=$?
-
-# regardless of cache clear error, lets log a few items in history
-cat $DEPLOY_TIME_LOG
-
-CACHE_SIZE=`du -h -s app/cache/$ENVIRONMENT`
-echo "Cache folder size: $CACHE_SIZE"
-
-# now, if there was an error, send out an email and exit
-if [ "$CACHE_CLEAR" != "0" ]; then
-    ERR_MSG="ERROR!! cache:clear failed (exit code: $CACHE_CLEAR)"
-    echo $ERR_MSG
-    
-    exit 1
-fi
+sudo -u $RUN_USER /usr/bin/time -v env TERM=dumb php app/console $DEBUG_OPTION --env=$ENVIRONMENT cache:warmup
 set -e

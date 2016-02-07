@@ -2,8 +2,7 @@
   apt: pkg=apache2,php5,libapache2-mod-php5,php5-mcrypt,php-pear,php5-dev,php5-curl state=latest
 - name: for mongo pecl
   apt: pkg=pkg-config,libssl-dev,libsslcommon2-dev,libsasl2-dev,libpcre3-dev state=latest
-- name: pecl mongo
-  command: pecl install mongo 
+- pear: name=pecl/mongo state=present
 - name: php mongo
   template: src=templates/mongo.ini dest=/etc/php5/mods-available/mongo.ini
 - name: enable php mongo

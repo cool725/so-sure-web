@@ -6,9 +6,11 @@ set -e # Exit on error
 
 USER_OWNER=www-data
 GROUP_OWNER=www-data
-
-while getopts "hu:g:" opt; do
+while getopts "Phu:g:" opt; do
   case $opt in
+    P)
+      PERMISSIONS=0
+      ;;
     u)
       USER_OWNER=$OPTARG
       ;;
@@ -59,13 +61,15 @@ if [ ! -d app/spool ]; then
   mkdir app/spool 
 fi
 
-chown -R $USER_OWNER:$GROUP_OWNER .
-
 # Apache needs execute permissions
 chmod 775 -R app/cache app/cache/$ENVIRONMENT web/CACHE web/js app/logs app/spool web/css
 
-# http://symfony.com/doc/current/book/installation.html - Permissions
-if [ -f /usr/bin/setfacl ]; then
+if [ "$USER_OWNER" != "" ]; then
+  chown -R $USER_OWNER:$GROUP_OWNER .
+
+  # http://symfony.com/doc/current/book/installation.html - Permissions
+  if [ -f /usr/bin/setfacl ]; then
 	setfacl -R -m u:$USER_OWNER:rwX -m u:root:rwX app/cache app/logs
 	setfacl -dR -m u:$USER_OWNER:rwX -m u:root:rwX app/cache app/logs
+  fi
 fi

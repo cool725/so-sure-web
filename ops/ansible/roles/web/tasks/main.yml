@@ -2,4 +2,3 @@
 - include: apps.yml
 - include: apache.yml
 - include: security.yml
-- include: sosure.yml
