@@ -291,6 +291,12 @@ resource "aws_elb" "web" {
     lb_port           = 80
     lb_protocol       = "http"
   }
+
+  access_logs {
+    bucket = "log.so-sure.com"
+    bucket_prefix = "elb"
+    interval = 60
+  }
 }
 
 resource "aws_launch_configuration" "prod_web" {
