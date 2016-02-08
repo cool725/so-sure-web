@@ -1,1 +1,2 @@
 - include: nginx.yml
+- include: apps.yml

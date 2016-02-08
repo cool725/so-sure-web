@@ -1,0 +1,7 @@
+- name: install phing
+  command: composer require phing/phing
+  args:
+    chdir: /usr/local/share
+    creates: /usr/local/share/vendor/bin/phing
+- name: link phing
+  file: src=/usr/local/share/vendor/bin/phing dest=/usr/bin/phing state=link

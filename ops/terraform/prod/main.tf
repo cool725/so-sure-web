@@ -406,7 +406,7 @@ resource "aws_autoscaling_group" "prod_db" {
 
 resource "aws_launch_configuration" "prod_build" {
     name_prefix = "build-v0-lc-"
-    image_id = "ami-b60fbec5"
+    image_id = "ami-52fd4d21"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.build.id}"]
     iam_instance_profile = "prod-build"
