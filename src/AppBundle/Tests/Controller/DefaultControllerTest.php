@@ -31,7 +31,6 @@ class DefaultControllerTest extends WebTestCase
         $form = $crawler->selectButton('launch[save]')->form();
         
         // set some values
-        $form['launch[name]'] = 'Foo Bar';
         $form['launch[email]'] = 'foo@bar.com';
         // submit the form
         $crawler = $client->submit($form);
@@ -52,7 +51,6 @@ class DefaultControllerTest extends WebTestCase
         $form = $crawler->selectButton('launch[save]')->form();
         
         // set some values
-        $form['launch[name]'] = 'Bar Foo';
         $form['launch[email]'] = 'bar@foo.com';
         // submit the form
         $crawler = $client->submit($form);

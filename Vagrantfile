@@ -32,7 +32,7 @@ SCRIPT
 
 Vagrant.configure("2") do |config|
   config.vm.define "dev", primary: true, autostart: true do |dev_config|
-    dev_config.vm.box = "ubuntu1404"
+    dev_config.vm.box = "ubuntu/trusty64"
     dev_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
     dev_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
     dev_config.vm.network "private_network", ip: "10.0.4.2"
@@ -42,6 +42,23 @@ Vagrant.configure("2") do |config|
     dev_config.ssh.forward_agent = true
     dev_config.vm.provision "shell",
     	inline: $script
+
+    # Patch for https://github.com/mitchellh/vagrant/issues/6793
+    dev_config.vm.provision "shell" do |s|
+        s.inline = '[[ ! -f $1 ]] || grep -F -q "$2" $1 || sed -i "/__main__/a \\    $2" $1'
+        s.args = ['/usr/bin/ansible-galaxy', "if sys.argv == ['/usr/bin/ansible-galaxy', '--help']: sys.argv.insert(1, 'info')"]
+    end
+	
+    dev_config.vm.provision "ansible_local" do |a|
+        a.playbook = "vagrant.yml"
+        a.provisioning_path = "/vagrant/ops/ansible"
+        a.inventory_path = "/vagrant/ops/ansible/vagrant_inventory"
+        a.limit = "vagrant"
+        a.install = false
+    end
+
+    dev_config.vm.provision "shell",
+    	inline: $deploy
     	
     dev_config.vm.provider "virtualbox" do |v|
       v.customize ["modifyvm", :id, "--memory", 1200]
@@ -62,7 +79,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "dev_nonfs", primary: false, autostart: false do |dev_nonfs_config|
-    dev_nonfs_config.vm.box = "ubuntu1404"
+    dev_nonfs_config.vm.box = "ubuntu/trusty64"
     dev_nonfs_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
     dev_nonfs_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
     dev_nonfs_config.vm.network "private_network", ip: "10.0.4.2"
@@ -108,7 +125,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "ubuntu1404", autostart: false do |ubuntu1404_config|
-    ubuntu1404_config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
+    ubuntu1404_config.vm.box = "ubuntu/trusty64"
     ubuntu1404_config.ssh.forward_agent = true
   end
 end
