@@ -40,6 +40,26 @@ class DefaultControllerTest extends WebTestCase
         $this->assertContains('/?referral=', $crawler->text());
     }
 
+    public function testLaunchRetryIndex()
+    {
+        $client = static::createClient();
+        $dm = $this->getManager($client);
+        $repo = $dm->getRepository(User::class);
+        $fooUser = $repo->findOneBy(['email' => 'foo@bar.com']);
+
+        $crawler = $client->request('GET', '/');
+        $form = $crawler->selectButton('launch[save]')->form();
+        
+        // set some values
+        $form['launch[email]'] = 'foo@bar.com';
+        // submit the form
+        $crawler = $client->submit($form);
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+
+        $crawler = $client->followRedirect();
+        $this->assertContains(sprintf('/?referral=%s', $fooUser->getId()), $crawler->text());
+    }
+
     public function testLaunchReferalIndex()
     {
         $client = static::createClient();
