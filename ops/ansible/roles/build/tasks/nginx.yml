@@ -4,5 +4,7 @@
   template: src=templates/jenkins.cfg dest=/etc/nginx/sites-available/jenkins
 - name: enable jenkins
   file: dest=/etc/nginx/sites-enabled/jenkins src=/etc/nginx/sites-available/jenkins state=link
+- name: generate ssl
+  script: files/ca.sh -k /etc/nginx/ssl build.so-sure.com creates=/etc/nginx/ssl/build.so-sure.com.key
 - name: restart nginx
   command: /etc/init.d/nginx restart

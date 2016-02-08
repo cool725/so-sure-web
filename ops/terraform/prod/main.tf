@@ -284,6 +284,14 @@ resource "aws_security_group" "build" {
   description = "Build Server Security Group"
   vpc_id      = "${aws_vpc.default.id}"
 
+  # SSH access from anywhere
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # HTTPS access from anywhere
   ingress {
     from_port   = 443
@@ -398,10 +406,11 @@ resource "aws_autoscaling_group" "prod_db" {
 
 resource "aws_launch_configuration" "prod_build" {
     name_prefix = "build-v0-lc-"
-    image_id = "ami-3f27964c"
+    image_id = "ami-b60fbec5"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.build.id}"]
-    iam_instance_profile = "prod-web"
+    iam_instance_profile = "prod-build"
+    user_data = "#!/bin/bash\n/usr/local/bin/tagged-route53.py so-sure.com"
 
     lifecycle {
       create_before_destroy = true
