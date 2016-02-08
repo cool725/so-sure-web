@@ -6,8 +6,12 @@ set -e # Exit on error
 
 USER_OWNER=www-data
 GROUP_OWNER=www-data
-while getopts "Phu:g:" opt; do
+SET_OWNER=1
+while getopts "Phu:g:n" opt; do
   case $opt in
+    n)
+      SET_OWNER=0
+      ;;
     P)
       PERMISSIONS=0
       ;;
@@ -18,7 +22,7 @@ while getopts "Phu:g:" opt; do
       GROUP_OWNER=$OPTARG
       ;;
     h)
-      echo "Usage: $0 [-u user=$USER_OWNER] [-g group=$GROUP_OWNER] clone_dir environment"
+      echo "Usage: $0 [-u user=$USER_OWNER] [-g group=$GROUP_OWNER] [-n Skip setting owner/group] clone_dir environment"
       exit 3
       ;;
     \?)
@@ -64,7 +68,7 @@ fi
 # Apache needs execute permissions
 chmod 775 -R app/cache app/cache/$ENVIRONMENT web/CACHE web/js app/logs app/spool web/css
 
-if [ "$USER_OWNER" != "" ]; then
+if [ "$SET_OWNER" == "1" ]; then
   chown -R $USER_OWNER:$GROUP_OWNER .
 
   # http://symfony.com/doc/current/book/installation.html - Permissions

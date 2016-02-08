@@ -5,8 +5,12 @@ echo "Running: $0 $@"
 set -e # Exit on error
 USER_OWNER=www-data
 COMPOSER=1
-while getopts "hu:C" opt; do
+SET_OWNER_OPTION=""
+while getopts "hu:Cn" opt; do
   case $opt in
+    n)
+      SET_OWNER_OPTION="-n"
+      ;;
     C)
       COMPOSER=0
       ;;
@@ -14,7 +18,7 @@ while getopts "hu:C" opt; do
       USER_OWNER=$OPTARG
       ;;
     h)
-      echo "Usage: $0 [-u user=$USER_OWNER] [-C skip composer install] clone_dir environment"
+      echo "Usage: $0 [-u user=$USER_OWNER] [-C skip composer install] [-n Skip setting owner/group] clone_dir environment"
       exit 3
       ;;
     \?)
@@ -36,8 +40,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
 if [ "$COMPOSER" == "1" ]; then
-  ./install-vendors.sh $CLONE_DIR $ENVIRONMENT
+  ./install-vendors.sh -u "$USER_OWNER" $SET_OWNER_OPTION $CLONE_DIR $ENVIRONMENT
 fi
-./create-folders.sh -u "$USER_OWNER" $CLONE_DIR $ENVIRONMENT
+./create-folders.sh -u "$USER_OWNER" $SET_OWNER_OPTION $CLONE_DIR $ENVIRONMENT
 ./clear-cache.sh $CLONE_DIR $ENVIRONMENT
 ./run-assetic.sh $CLONE_DIR $ENVIRONMENT

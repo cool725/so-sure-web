@@ -14,3 +14,6 @@ mongodb_url: "{{ lookup('credstash', 'prod/app/mongodb_url', region='eu-west-1')
 github_token: "{{ lookup('credstash', 'prod/server/github_token', region='eu-west-1') }}"
 
 sosure_path: /var/sosure/current/web
+
+db_replication_name: prod
+db_authorization: enabled
