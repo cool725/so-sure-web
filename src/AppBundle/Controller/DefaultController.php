@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -67,9 +68,28 @@ class DefaultController extends BaseController
      * @Route("/launch/{id}", name="launch_share")
      * @Template
      */
-    public function launchAction($id)
+    public function launchAction(Request $request, $id)
     {
-        return array('id' => $id);
+        $url = $this->generateUrl('homepage', ['referral' => $id], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return array('id' => $id, 'referral_url' => $this->addShortLink($url));
+    }
+
+    private function addShortLink($url)
+    {
+        try {
+            $client = new \Google_Client();
+            $client->setApplicationName("SoSure");
+            $client->setDeveloperKey($this->getParameter('google_apikey'));
+            $service = new \Google_Service_Urlshortener($client);
+            $gUrl = new \Google_Service_Urlshortener_Url();
+            $gUrl->longUrl = $url;
+            $result = $service->url->insert($gUrl);
+
+            return $result['id'];
+        } catch (\Exception $e) {
+            return $url;
+        }
     }
     
     /**

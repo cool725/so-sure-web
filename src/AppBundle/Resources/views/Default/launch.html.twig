@@ -10,6 +10,14 @@
   <meta name="description" content="so-sure mobile phone insurance. Better, cheaper, easier." />
   <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance" />
 
+    <!-- You can use Open Graph tags to customize link previews.
+    Learn more: https://developers.facebook.com/docs/sharing/webmasters -->
+	<meta property="og:url"           content="{{ app.request.uri  }}" />
+	<meta property="og:type"          content="website" />
+	<meta property="og:title"         content="So-Sure" />
+	<meta property="og:description"   content="Social Insurance" />
+	<meta property="og:image"         content="http://so-sure.com/images/logo/so-sure-logo.svg" />
+
   <!-- Mobile Specific Metas
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -53,12 +61,29 @@
     </iframe>
   </noscript>
 
+    <!-- Load Facebook SDK for JavaScript -->
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+
   <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <div class="section hero">
     <div class="container">
       <h2 class="section-title">Thanks for registering.<br>We'll be in touch when we launch.</h2>
-      <p>Your share link is {{ url('homepage', {referral: id}) }}</p>
+      <p>Your share link is {{ referral_url }}</p>
+    
+	<!-- Your share button code -->
+	<div class="fb-share-button" 
+		data-href="{{ referral_url }}" 
+		data-layout="button_count">
+	</div>
+    
     </div>
   </div>
 
