@@ -13,6 +13,8 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
     fb_appid: 
     fb_secret:
+    mailchimp_apikey:
+    mailchimp_prelaunch_list:
 
     mongodb_db: mongo
     mongodb_url: mongodb://localhost

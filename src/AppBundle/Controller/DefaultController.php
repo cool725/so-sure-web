@@ -30,21 +30,29 @@ class DefaultController extends BaseController
         $form = $this->createForm(LaunchType::class, $user);
         $form->handleRequest($request);
         if ($form->isValid()) {
+            $addMailchimp = true;
             try {
                 if ($user->getReferralId() && !$user->getReferred()) {
                     $referred = $repo->find($user->getReferralId());
                     $referred->addReferral($user);
                 }
+                $user->setUsername($user->getEmailCanonical());
                 $dm->persist($user);
                 $dm->flush();
             } catch (\Exception $e) {
                 // Ignore - most likely existing user
                 $logger->error($e->getMessage());
+                $addMailchimp = false;
             }
 
             $existingUser = $repo->findOneBy(['emailCanonical' => $user->getEmailCanonical()]);
             if (!$existingUser) {
                 throw new \Exception('Failed to add');
+            }
+
+            if ($addMailchimp) {
+                $mailchimp = $this->get('app.mailchimp.prelaunch');
+                $mailchimp->subscribe($user->getEmail());
             }
 
             return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);

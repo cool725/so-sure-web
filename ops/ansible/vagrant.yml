@@ -10,6 +10,7 @@
     - db
   tasks:
     - lineinfile: dest=/home/vagrant/.bashrc line="export SYMFONY_ENV=vagrant"
+    - lineinfile: dest=/home/vagrant/.bashrc line="alias webvagrant='/vagrant/ops/scripts/deploy.sh -C -n -u vagrant /vagrant vagrant'"
     - copy: src=/vagrant/web_app/app_vagrant.php dest=/vagrant/web/app.php
     
     - name: Create swap file
