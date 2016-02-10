@@ -17,6 +17,7 @@ parameters:
     mailchimp_prelaunch_list:
     google_apikey:
     gocardless_apikey:
+    gocardless_prod: false
 
     mongodb_db: mongo
     mongodb_url: mongodb://localhost

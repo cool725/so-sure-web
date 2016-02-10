@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\User;
+use AppBundle\Document\Phone;
 
 class DefaultController extends BaseController
 {
@@ -108,5 +109,35 @@ class DefaultController extends BaseController
     public function termsAction()
     {
         return array();
+    }
+
+    /**
+     * @Route("/phone/{make}/{model}", name="phone_make_model")
+     * @Template
+     */
+    public function phoneMakeModelAction($make, $model)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->findOneBy(['make' => $make, 'model' => $model]);
+        if (!$phone) {
+            return new RedirectResponse($this->generateUrl('phone_make', ['make' => $make]));
+        }
+
+        return array('phone' => $phone);
+    }
+
+    /**
+     * @Route("/phone/{make}", name="phone_make")
+     * @Template
+     */
+    public function phoneMakeAction($make)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phones = $repo->findBy(['make' => $make]);
+        // TODO: Redirect to other phone
+
+        return array('phones' => $phones);
     }
 }

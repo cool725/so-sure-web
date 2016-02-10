@@ -4,9 +4,9 @@
         <meta charset="UTF-8" />
         <title>{% block title %}So-Sure{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        <link rel="icon" type="image/x-icon" href="{{ cdn_url }}/images/favicon.png" />
         {% stylesheets output='css/*'
-           'assets/css/bootstrap.min.css' %}
+           'css/bootstrap.min.css' %}
             <link rel="stylesheet" href="{{ asset_url }}">
         {% endstylesheets %}
 

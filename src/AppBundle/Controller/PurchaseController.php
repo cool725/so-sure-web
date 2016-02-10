@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
@@ -33,6 +34,24 @@ class PurchaseController extends BaseController
         );
     }
 
+    /**
+     * @Route("/price/{id}/", name="price_item")
+     * @Template
+     */
+    public function priceItemAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        if (!$phone) {
+            return new JsonResponse([], 404);
+        }
+
+        return new JsonResponse([
+            'price' => $phone->getPolicyPrice(),
+        ]);
+    }
+    
     /**
      * @Route("/{id}/", name="purchase_item")
      * @Template

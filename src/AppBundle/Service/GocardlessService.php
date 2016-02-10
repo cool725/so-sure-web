@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use GoCardlessPro\Client;
+use \GoCardlessPro\Environment;
 
 class GocardlessService
 {
@@ -14,14 +15,15 @@ class GocardlessService
 
     /**
      * @param LoggerInterface $logger
-     * @param string $accessToken
+     * @param string          $accessToken
+     * @param boolean         $prod
      */
-    public function __construct(LoggerInterface $logger, $accessToken)
+    public function __construct(LoggerInterface $logger, $accessToken, $prod)
     {
        $this->logger = $logger;
        $client = new Client([
             'access_token' => $accessToken,
-            'environment' => \GoCardlessPro\Environment::SANDBOX
+            'environment' => prod ? Environment::LIVE : Environment::SANDBOX
         ]);
     }
     

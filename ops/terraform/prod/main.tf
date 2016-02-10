@@ -53,13 +53,13 @@ resource "aws_subnet" "dmz_b" {
 resource "aws_subnet" "db_a" {
   vpc_id                  = "${aws_vpc.default.id}"
   cidr_block              = "10.0.11.0/24"
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
   availability_zone       = "${var.aws_az_a}"
 }
 resource "aws_subnet" "db_b" {
   vpc_id                  = "${aws_vpc.default.id}"
   cidr_block              = "10.0.12.0/24"
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
   availability_zone       = "${var.aws_az_b}"
 }
 
@@ -407,7 +407,7 @@ resource "aws_autoscaling_group" "prod_db" {
 
 resource "aws_launch_configuration" "prod_build" {
     name_prefix = "build-v0-lc-"
-    image_id = "ami-52fd4d21"
+    image_id = "ami-a95eeeda"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.build.id}"]
     iam_instance_profile = "prod-build"
