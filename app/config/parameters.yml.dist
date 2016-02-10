@@ -15,9 +15,8 @@ parameters:
     fb_secret:
     mailchimp_apikey:
     mailchimp_prelaunch_list:
-
-    bitly_key:
-    bitly_login:
+    google_apikey:
+    gocardless_apikey:
 
     mongodb_db: mongo
     mongodb_url: mongodb://localhost

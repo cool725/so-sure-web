@@ -14,3 +14,9 @@ services:
           logger: @logger
           apikey: %mailchimp_apikey%
           list: %mailchimp_prelaunch_list%
+
+    app.gocardless:
+        class: AppBundle\Service\GocardlessService
+        arguments:
+            logger: @logger
+            accessToken: %gocardless_apikey%
