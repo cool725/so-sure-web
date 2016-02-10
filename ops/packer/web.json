@@ -26,7 +26,7 @@
   }, {
     "type": "ansible-local",
     "playbook_file": "../ansible/web.yml",
-    "role_paths": [ "../ansible/roles/common", "../ansible/roles/web" ],
+    "role_paths": [ "../ansible/roles/common", "../ansible/roles/web", "../ansible/roles/sosure" ],
     "inventory_groups": "tag_env_prod",
     "group_vars": "../ansible/group_vars"
   }]
