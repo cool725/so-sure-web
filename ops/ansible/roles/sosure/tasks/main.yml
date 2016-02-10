@@ -1,1 +1,2 @@
 - include: sosure.yml
+- include: fluentd.yml

@@ -1,0 +1,6 @@
+    - name: fluent-conf
+      template: src=templates/fluent.conf dest=/etc/fluent/fluent.conf mode=0640 owner=fluentd
+    - name: fluentd-init
+      template: src=templates/fluentd dest=/etc/init.d/fluentd mode=0755
+    - name: restart-fluentd
+      service: name=fluentd state=restarted
