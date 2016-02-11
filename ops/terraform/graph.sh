@@ -6,4 +6,4 @@ if [ "$1" == "" ]; then
 fi
 
 ./run-terraform.sh $1 graph | dot -Tpng > graph.png
-xdg-open graph.png
+open graph.png
