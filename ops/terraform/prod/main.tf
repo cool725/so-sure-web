@@ -404,7 +404,7 @@ resource "aws_launch_configuration" "prod_web" {
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.web.id}"]
     iam_instance_profile = "prod-web"
-    user_data = "#!/bin/bash\ncd /var/sosure/current\ngit pull origin master\ncd /var/sosure/current/ops/scripts\n./deploy.sh /var/sosure/current prod"
+    user_data = "#!/bin/bash\n/usr/local/bin/tagged-route53.py so-sure.com\ncd /var/sosure/current\ngit pull origin master\ncd /var/sosure/current/ops/scripts\n./deploy.sh /var/sosure/current prod"
     associate_public_ip_address = false
 
     lifecycle {
