@@ -8,7 +8,7 @@
     ansistrano_before_symlink_tasks_file: "{{ playbook_dir }}/deploy/tasks/before-symlink.yml"
     ansistrano_after_symlink_tasks_file: "{{ playbook_dir }}/deploy/tasks/after-symlink.yml"
     ansistrano_deploy_via: "git"
-    ansistrano_git_repo: git@gitlab.com:sosure/sosure.git
+    ansistrano_git_repo: git@github.com:So-Sure/so-sure-web.git
     ansistrano_keep_releases: 2
   roles:
     - { role: carlosbuenosvinos.ansistrano-deploy }
