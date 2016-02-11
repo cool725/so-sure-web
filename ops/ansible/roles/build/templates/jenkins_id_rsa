@@ -1,0 +1,3 @@
+-----BEGIN RSA PRIVATE KEY-----
+{{ jenkins_private_key|wordwrap(64) }}
+-----END RSA PRIVATE KEY-----

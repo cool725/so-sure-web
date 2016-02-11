@@ -1,0 +1,1 @@
+ssh-rsa {{ web_public_key }} tech+web@so-sure.com

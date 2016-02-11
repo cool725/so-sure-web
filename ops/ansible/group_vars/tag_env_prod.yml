@@ -2,8 +2,11 @@
 ses_username: "{{ lookup('credstash', 'prod/server/ses_username', region='eu-west-1') }}"
 ses_password: "{{ lookup('credstash', 'prod/server/ses_password', region='eu-west-1') }}"
 
-private_key: "{{ lookup('credstash', 'prod/server/idrsa', region='eu-west-1') }}"
-public_key: "{{ lookup('credstash', 'prod/server/idrsa.pub', region='eu-west-1') }}"
+web_private_key: "{{ lookup('credstash', 'prod/server/idrsa', region='eu-west-1') }}"
+web_public_key: "{{ lookup('credstash', 'prod/server/idrsa.pub', region='eu-west-1') }}"
+
+jenkins_private_key: "{{ lookup('credstash', 'prod/server/jenkins_idrsa', region='eu-west-1') }}"
+jenkins_public_key: "{{ lookup('credstash', 'prod/server/jenkins_idrsa.pub', region='eu-west-1') }}"
 
 logs_access_key: "{{ lookup('credstash', 'prod/fluentd/access_key', region='eu-west-1') }}"
 logs_secret_key: "{{ lookup('credstash', 'prod/fluentd/access_secret', region='eu-west-1') }}"

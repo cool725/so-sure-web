@@ -2,11 +2,13 @@
   ufw: rule=allow port=80 proto=tcp
 - name: security-https
   ufw: rule=allow port=443 proto=tcp
+
 - name: root ssh key
-  template: src=templates/id_rsa dest=/root/.ssh/id_rsa mode=0600
+  template: src=templates/web_id_rsa dest=/root/.ssh/id_rsa mode=0600
 - name: root ssh pub key
-  template: src=templates/id_rsa.pub dest=/root/.ssh/id_rsa.pub
+  template: src=templates/web_id_rsa.pub dest=/root/.ssh/id_rsa.pub
+
 - name: ubuntu ssh key
-  template: src=templates/id_rsa dest=/home/ubuntu/.ssh/id_rsa mode=0600 owner=ubuntu group=ubuntu
+  template: src=templates/web_id_rsa dest=/home/ubuntu/.ssh/id_rsa mode=0600 owner=ubuntu group=ubuntu
 - name: ubuntu ssh pub key
-  template: src=templates/id_rsa.pub dest=/home/ubuntu/.ssh/id_rsa.pub owner=ubuntu group=ubuntu
+  template: src=templates/web_id_rsa.pub dest=/home/ubuntu/.ssh/id_rsa.pub owner=ubuntu group=ubuntu

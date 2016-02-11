@@ -1,0 +1,5 @@
+
+- name: jenkins ssh key
+  template: src=templates/jenkins_id_rsa dest=/var/lib/jenkins/.ssh/id_rsa mode=0600 owner=jenkins group=jenkins
+- name: jenkins ssh pub key
+  template: src=templates/jenkins_id_rsa.pub dest=/var/lib/jenkins/.ssh/id_rsa.pub owner=jenkins group=jenkins

@@ -1,0 +1,6 @@
+- name: clone
+  sudo: no
+  become: jenkins
+  git: repo=ssh://APKAJ3EPZN45CVB6CQJA@git-codecommit.us-east-1.amazonaws.com/v1/repos/jenkins dest=/var/lib/jenkins accept_hostkey=true
+- command: git config --global user.email "tech+jenkins@so-sure.com"
+- command: git config --global user.name "Jenkins So-Sure"
