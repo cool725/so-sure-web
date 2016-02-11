@@ -11,9 +11,16 @@
             </div>
         </div>
         <div class="col-xs-12 col-md-6">
-          <img class="phone" src="{{ cdn_url }}/iphone.png">
+          <img class="phone" src="{{ cdn_url }}/images/iphone.png">
           <img class="phone" src="{{ cdn_url }}/images/nexus.png">
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    '@AppBundle/Resources/public/css/Default/alpha.css'
+    %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
