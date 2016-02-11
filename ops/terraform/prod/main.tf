@@ -40,12 +40,25 @@ resource "aws_route" "internet_access" {
 resource "aws_subnet" "dmz_a" {
   vpc_id                  = "${aws_vpc.default.id}"
   cidr_block              = "10.0.1.0/24"
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
   availability_zone       = "${var.aws_az_a}"
 }
 resource "aws_subnet" "dmz_b" {
   vpc_id                  = "${aws_vpc.default.id}"
   cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = false
+  availability_zone       = "${var.aws_az_b}"
+}
+
+resource "aws_subnet" "dmz_pub_a" {
+  vpc_id                  = "${aws_vpc.default.id}"
+  cidr_block              = "10.0.21.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "${var.aws_az_a}"
+}
+resource "aws_subnet" "dmz_pub_b" {
+  vpc_id                  = "${aws_vpc.default.id}"
+  cidr_block              = "10.0.22.0/24"
   map_public_ip_on_launch = true
   availability_zone       = "${var.aws_az_b}"
 }
@@ -66,6 +79,71 @@ resource "aws_subnet" "db_b" {
 resource "aws_network_acl" "dmz" {
     vpc_id = "${aws_vpc.default.id}"
     subnet_ids = ["${aws_subnet.dmz_a.id}","${aws_subnet.dmz_b.id}"]
+    
+    # Standard rules
+    ingress {
+        protocol = "icmp"
+        rule_no = 10
+        action = "allow"
+        cidr_block =  "10.0.0.0/16"
+        from_port = 0
+        to_port = 0
+    }
+    ingress {
+        protocol = "tcp"
+        rule_no = 20
+        action = "allow"
+        cidr_block =  "10.0.0.0/16"
+        from_port = 22
+        to_port = 22
+    }
+    ingress {
+        protocol = "tcp"
+        rule_no = 30
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 32768
+        to_port = 61000
+    }
+    ingress {
+        protocol = "udp"
+        rule_no = 40
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 32768
+        to_port = 61000
+    }
+    egress {
+        protocol = -1
+        rule_no = 10
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 0
+        to_port = 0
+    }
+
+    # Custom rules
+    ingress {
+        protocol = "tcp"
+        rule_no = 50
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 80
+        to_port = 80
+    }
+    ingress {
+        protocol = "tcp"
+        rule_no = 60
+        action = "allow"
+        cidr_block =  "0.0.0.0/0"
+        from_port = 443
+        to_port = 443
+    }
+}
+
+resource "aws_network_acl" "dmz_pub" {
+    vpc_id = "${aws_vpc.default.id}"
+    subnet_ids = ["${aws_subnet.dmz_pub_a.id}","${aws_subnet.dmz_pub_b.id}"]
     
     # Standard rules
     ingress {
@@ -109,15 +187,6 @@ resource "aws_network_acl" "dmz" {
         to_port = 0
     }
 
-    # Custom rules
-    ingress {
-        protocol = "tcp"
-        rule_no = 50
-        action = "allow"
-        cidr_block =  "0.0.0.0/0"
-        from_port = 80
-        to_port = 80
-    }
     ingress {
         protocol = "tcp"
         rule_no = 60
@@ -336,6 +405,7 @@ resource "aws_launch_configuration" "prod_web" {
     security_groups = ["${aws_security_group.web.id}"]
     iam_instance_profile = "prod-web"
     user_data = "#!/bin/bash\ncd /var/sosure/current\ngit pull origin master\ncd /var/sosure/current/ops/scripts\n./deploy.sh /var/sosure/current prod"
+    associate_public_ip_address = false
 
     lifecycle {
       create_before_destroy = true
@@ -423,7 +493,7 @@ resource "aws_autoscaling_group" "prod_build" {
     launch_configuration = "${aws_launch_configuration.prod_build.name}"
     min_size = 1
     max_size = 1
-    vpc_zone_identifier = ["${aws_subnet.dmz_a.id}"]
+    vpc_zone_identifier = ["${aws_subnet.dmz_pub_a.id}"]
 
     lifecycle {
       create_before_destroy = true
