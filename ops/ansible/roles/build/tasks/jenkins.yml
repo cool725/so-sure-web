@@ -1,0 +1,2 @@
+- name: jenkins
+  git: repo=ssh://APKAJ3EPZN45CVB6CQJA@git-codecommit.us-east-1.amazonaws.com/v1/repos/jenkins dest=/var/lib/jenkins-clone accept_hostkey=yes update=no key_file=/var/lib/jenkins/.ssh/id_rsa

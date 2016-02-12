@@ -7,9 +7,11 @@
     - jenkins_repo_key_url: http://pkg.jenkins-ci.org/debian-stable/jenkins-ci.org.key
     - jenkins_plugins:
       - git
-      - ssh
       - phing
       - github
+      - codedeploy
+      - ansible
+      - github-oauth
 
   roles:
     - common
