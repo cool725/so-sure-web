@@ -36,4 +36,4 @@ staffim_rollbar:
         exceptions:
             - PDOException
         parameters:
-            key: %key%
+            key: unknown
