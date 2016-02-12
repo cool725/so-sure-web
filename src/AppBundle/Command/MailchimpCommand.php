@@ -13,7 +13,7 @@ class MailchimpCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('mailchimp:add')
+            ->setName('sosure:mailchimp:add')
             ->setDescription('Add user to mailchimp')
             ->addArgument(
                 'email',
