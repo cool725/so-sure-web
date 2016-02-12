@@ -4,7 +4,7 @@
   file: path=/var/sosure/release owner=ubuntu group=ubuntu mode=0755 state=directory
 - name: clone
   sudo: no
-  git: repo=git@github.com:so-sure/so-sure-web.git dest=/var/sosure/release/initial accept_hostkey=true force=yes
+  git: repo=APKAIRTMVFOP4MXDRAXA@git-codecommit.us-east-1.amazonaws.com/v1/repos/so-sure-web dest=/var/sosure/release/initial accept_hostkey=true force=yes
 - name: web-location-current
   file: dest=/var/sosure/current src=/var/sosure/release/initial owner=ubuntu group=ubuntu mode=0755 state=link
 - name: composer token
