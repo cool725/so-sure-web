@@ -18,6 +18,7 @@ parameters:
     google_apikey:
     gocardless_apikey:
     gocardless_prod: false
+    rollbar_access_token:
 
     mongodb_db: mongo
     mongodb_url: mongodb://localhost

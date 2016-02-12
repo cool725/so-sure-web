@@ -400,11 +400,10 @@ resource "aws_elb" "web" {
 
 resource "aws_launch_configuration" "prod_web" {
     name_prefix = "web-v0-lc-"
-    image_id = "ami-830dbdf0"
+    image_id = "ami-4cc87b3f"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.web.id}"]
     iam_instance_profile = "prod-web"
-    user_data = "#!/bin/bash\n/usr/local/bin/tagged-route53.py so-sure.com\ncd /var/sosure/current\ngit pull origin master\ncd /var/sosure/current/ops/scripts\n./deploy.sh /var/sosure/current prod"
     associate_public_ip_address = false
 
     lifecycle {
@@ -477,11 +476,10 @@ resource "aws_autoscaling_group" "prod_db" {
 
 resource "aws_launch_configuration" "prod_build" {
     name_prefix = "build-v0-lc-"
-    image_id = "ami-e2e35091"
+    image_id = "ami-4cc87b3f"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.build.id}"]
     iam_instance_profile = "prod-build"
-    user_data = "#!/bin/bash\n/usr/local/bin/tagged-route53.py --public-ip --name build so-sure.com"
 
     lifecycle {
       create_before_destroy = true

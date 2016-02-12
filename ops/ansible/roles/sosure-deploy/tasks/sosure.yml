@@ -1,0 +1,4 @@
+- name: parameters
+  template: src=templates/parameters.yml.j2 dest=/var/sosure/release/initial/app/config/parameters.yml
+- name: deploy
+  command: /var/sosure/current/ops/scripts/deploy.sh /var/sosure/current prod

@@ -23,6 +23,7 @@ mailchimp_apikey: "{{ lookup('credstash', 'prod/app/mailchimp_apikey', region='e
 mailchimp_prelaunch_list: "{{ lookup('credstash', 'prod/app/mailchimp_prelaunch_list', region='eu-west-1') }}"
 google_apikey: "{{ lookup('credstash', 'prod/app/google_apikey', region='eu-west-1') }}"
 gocardless_apikey: "{{ lookup('credstash', 'prod/app/gocardless_apikey', region='eu-west-1') }}"
+rollbar_apikey: "{{ lookup('credstash', 'prod/app/rollbar_apikey', region='eu-west-1') }}"
 
 sosure_path: /var/sosure/current/web
 

@@ -1,3 +1,4 @@
 - include: packages.yml
 - include: mongo.yml
 - include: security.yml
+- include: boot.yml
