@@ -1,0 +1,7 @@
+version: 0.0
+os: linux 
+hooks:
+  AfterInstall:
+    - location: /var/sosure/current/ops/scripts/deploy /var/sosure/current prod
+      timeout: 600
+      runas: root
