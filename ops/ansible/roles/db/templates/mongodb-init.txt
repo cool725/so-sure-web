@@ -14,10 +14,10 @@ rs.initiate(
 To add initial user (make sure to set password)
 ---
 use admin
-db.createUser(
-  {
-    user: "root",
-    pwd: "",
-    roles: [ { role: "root", db: "admin" } ]
-  }
-)
+    db.createUser(
+      {
+        user: "root",
+        pwd: "root",
+        roles: [ { role: "root", db: "admin" } ]
+      }
+    )
