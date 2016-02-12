@@ -36,6 +36,12 @@ resource "aws_route" "internet_access" {
   gateway_id             = "${aws_internet_gateway.default.id}"
 }
 
+resource "aws_vpc_endpoint" "private-s3" {
+    vpc_id = "${aws_vpc.default.id}"
+    service_name = "com.amazonaws.eu-west-1.s3"
+    route_table_ids = ["${aws_vpc.default.main_route_table_id}"]
+}
+
 # Create a subnet to launch our instances into
 resource "aws_subnet" "dmz_a" {
   vpc_id                  = "${aws_vpc.default.id}"
@@ -400,7 +406,7 @@ resource "aws_elb" "web" {
 
 resource "aws_launch_configuration" "prod_web" {
     name_prefix = "web-v0-lc-"
-    image_id = "ami-edb6059e"
+    image_id = "ami-b3bc0fc0"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.web.id}"]
     iam_instance_profile = "prod-web"
@@ -476,7 +482,7 @@ resource "aws_autoscaling_group" "prod_db" {
 
 resource "aws_launch_configuration" "prod_build" {
     name_prefix = "build-v0-lc-"
-    image_id = "ami-b3bc0fc0"
+    image_id = "ami-4cc87b3f"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.build.id}"]
     iam_instance_profile = "prod-build"
