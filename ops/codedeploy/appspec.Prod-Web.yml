@@ -2,6 +2,6 @@ version: 0.0
 os: linux 
 hooks:
   AfterInstall:
-    - location: ops/scripts/deploy /var/sosure/current prod
+    - location: deploy.sh
       timeout: 600
       runas: root
