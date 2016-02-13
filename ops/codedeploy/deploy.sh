@@ -1,2 +1,2 @@
 #!/bin/bash
-/var/sosure/currrent/ops/scripts/deploy /var/sosure/current prod
+/var/sosure/currrent/ops/scripts/deploy.sh /var/sosure/current prod
