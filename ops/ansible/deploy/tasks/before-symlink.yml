@@ -1,8 +1,7 @@
 - name: params
   template: src=roles/sosure-deploy/templates/parameters.yml.j2 dest={{ ansistrano_release_path.stdout }}/app/config/parameters.yml
 - composer: command=install no_dev=no optimize_autoloader=yes working_dir={{ ansistrano_release_path.stdout }}
-  environment:
-    COMPOSER_HOME=/root/.composer
+  environment: "COMPOSER_HOME=/root/.composer"
 - name: assetic dump
   command: php app/console --env=prod assetic:dump chdir={{ ansistrano_release_path.stdout }}
 - name: app cache
