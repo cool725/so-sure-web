@@ -23,3 +23,5 @@
   template: src=templates/awslogs.conf dest=/tmp/awslogs.conf
 - get_url: url=https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py dest=/usr/local/share/awslogs-agent-setup.py mode=0755
 - command: /usr/local/share/awslogs-agent-setup.py -n -r eu-west-1 -c /tmp/awslogs.conf
+
+- command: ansible-galaxy install carlosbuenosvinos.ansistrano-deploy

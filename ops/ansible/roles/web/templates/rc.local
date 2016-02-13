@@ -12,15 +12,10 @@
 # By default this script does nothing.
 
 /usr/local/bin/tagged-route53.py so-sure.com
+
 cd /var/sosure/current
 git pull origin master
 
-# TODO: Change to ansible deploy with params
-cd /var/sosure/current/ops/scripts
-./deploy.sh /var/sosure/current prod
-
-#wget -O /usr/local/share/install-code-deploy https://s3-eu-west-1.amazonaws.com/aws-codedeploy-eu-west-1/latest/install
-#chmod 755 /usr/local/share/install-code-deploy
-#/usr/local/share/install-code-deploy auto
+/var/sosure/current/ops/scripts/run-local-deploy.sh
 
 exit 0
