@@ -6,3 +6,4 @@
 - include: config.yml
 - include: cron.yml
 - include: fluentd.yml
+- include: monitoring.yml
