@@ -14,11 +14,11 @@
 /usr/local/bin/tagged-route53.py --public-ip --name build so-sure.com
 
 cd /var/lib/jenkins-clone
+git pull origin master
 
 cp -R * /var/lib/jenkins
 cp -R .git /var/lib/jenkins
 cp .gitignore /var/lib/jenkins
-cp .owner /var/lib/jenkins
 
 chown -R jenkins:jenkins /var/lib/jenkins
 /etc/init.d/jenkins restart
