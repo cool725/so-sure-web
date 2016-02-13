@@ -6,17 +6,17 @@
   <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <meta charset="utf-8">
-  <title>so-sure - Social mobile phone insurance. Better, cheaper, easier.</title>
+  <title>so-sure - Social mobile phone insurance made better, cheaper and easier.</title>
   <meta name="description" content="so-sure mobile phone insurance. Better, cheaper, easier." />
   <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance" />
 
-    <!-- You can use Open Graph tags to customize link previews.
-    Learn more: https://developers.facebook.com/docs/sharing/webmasters -->
-	<meta property="og:url"           content="{{ app.request.uri  }}" />
+  <!-- FB Open Graph Tags
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta property="og:url"           content="http://so-sure.com" />
 	<meta property="og:type"          content="website" />
-	<meta property="og:title"         content="So-Sure" />
-	<meta property="og:description"   content="Social Insurance" />
-	<meta property="og:image"         content="http://so-sure.com/images/logo/so-sure-logo.svg" />
+	<meta property="og:title"         content="so-sure" />
+	<meta property="og:description"   content="Social mobile phone insurance made better, easier and up to 80% cheaper. The social insurance revolution starts here." />
+	<meta property="og:image"         content="#" />
 
   <!-- Mobile Specific Metas
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -24,8 +24,8 @@
 
   <!-- Font
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <!-- TypeKit -->
-  <script src="https://use.typekit.net/mcs7xfb.js"></script>
+  <link rel="application/x-font-woff" href="fonts/AvenirLTStd-Book.woff">
+  <link rel="application/x-font-woff" href="fonts/AvenirLTStd-Heavy.woff">
 
   <!-- CSS
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -39,63 +39,66 @@
 
   <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
 
   <!-- JS
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <!-- jQuery -->
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <!-- Twitter, GA + Heap -->
-  <script src="js/site.js"></script>
+  <!-- Site JS -->
+  <script src="/js/site.js"></script>
   <!-- Optimzely -->
   <script src="//cdn.optimizely.com/js/4833800075.js"></script>
+
+  <!-- Facebook Pixel Code
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- Custom Event for Refer Page -->
+  <script>fbq('track', 'Lead');</script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1018444924864481&ev=PageView&noscript=1" /></noscript>
 
 </head>
 
 <body>
-
-  <!-- Google Tag Manager
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <noscript>
-    <iframe src="//www.googletagmanager.com/ns.html?id=GTM-5KBSPK" height="0" width="0" style="display:none;visibility:hidden">
-    </iframe>
-  </noscript>
-
-    <!-- Load Facebook SDK for JavaScript -->
-	<div id="fb-root"></div>
-	<script>(function(d, s, id) {
-	  var js, fjs = d.getElementsByTagName(s)[0];
-	  if (d.getElementById(id)) return;
-	  js = d.createElement(s); js.id = id;
-	  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1";
-	  fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));</script>
+  <!-- FB Send Button -->
+  <div id="fb-root"></div>
 
   <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <div class="section hero">
+  <div class="section refer">
     <div class="container">
-      <h2 class="section-title">Thanks for registering.<br>We'll be in touch when we launch.</h2>
-      <p>Your share link is {{ referral_url }}</p>
-    
-	<!-- Your share button code -->
-	<div class="fb-share-button" 
-		data-href="{{ referral_url }}" 
-		data-layout="button_count">
-	</div>
-    
+      <h2><img src="/images/icons/rewards.svg"></img></h2>
+      <h3>Welcome! Refer-a-friend &amp; get rewarded.</h3>
+      <div class="row">
+        <div class="one-half column">
+          <p>Share your unique link and we'll give you an <b>extra £5</b> (on top of the £10 we'll already give you) when you sign-up a friend.</p>
+        </div>
+        <div class="one-half column">
+          <div class="refer-card">
+            <p class="share-url">{{ referral_url }}</p>
+            <div class="row">
+              <div class="one-half column">
+                <div class="fb-share-button" data-href="#" data-layout="button"></div>
+              </div>
+              <div class="one-half column">
+                <div class="twt-share-button"><a class="twitter-share-button" href="https://twitter.com/share" data-via="sosureapp" data-url="{{ url('homepage', {referral: id}) }}">Tweet</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
   </div>
 
   <div class="section footer">
     <div class="container">
       <div class="row">
         <div class="one-half column">
-          so-sure &copy; 2016 | <a class="terms" href="/terms">cookies + privacy</a>
+          so-sure &copy; 2016 | <a class="terms" href="/terms.html">cookies + privacy</a>
         </div>
         <div class="one-half column">
-          <a href="https://twitter.com/sosureapp"><i class="fa fa-twitter fa-2x"></i></a>
-          <a href="https://www.facebook.com/So-Sure-781483845311300/"><i class="fa fa-facebook fa-2x"></i></a>
+          <a href="https://twitter.com/wearesosure"><i class="fa fa-twitter fa-2x"></i></a>
+          <a href="https://www.facebook.com/weraresosure"><i class="fa fa-facebook fa-2x"></i></a>
         </div>
       </div>
     </div>
@@ -107,4 +110,3 @@
 </body>
 
 </html>
-
