@@ -15,6 +15,4 @@
   npm: name=grunt global=yes
 - name: node-grunt-cli
   npm: name=grunt-cli global=yes
-- get_url: url=https://s3-eu-west-1.amazonaws.com/aws-codedeploy-eu-west-1/latest/install dest=/usr/local/share/install-code-deploy mode=0755
-- command: /usr/local/share/install-code-deploy auto
 
