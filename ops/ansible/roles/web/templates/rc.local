@@ -16,6 +16,6 @@
 cd /var/sosure/current
 git pull origin master
 
-/var/sosure/current/ops/scripts/run-local-deploy.sh
+/var/sosure/current/ops/ansible/run-local-deploy.sh
 
 exit 0
