@@ -16,3 +16,10 @@
 - name: node-grunt-cli
   npm: name=grunt-cli global=yes
 
+- get_url: url=https://s3-eu-west-1.amazonaws.com/aws-codedeploy-eu-west-1/latest/install dest=/usr/local/share/install-code-deploy mode=0755
+- command: /usr/local/share/install-code-deploy auto
+
+- name: awslogs conf
+  template: src=templates/awslogs.conf dest=/tmp/awslogs.conf
+- get_url: url=https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py dest=/usr/local/share/awslogs-agent-setup.py mode=0755
+- command: /usr/local/share/awslogs-agent-setup.py -n -r eu-west-1 -c /tmp/awslogs.conf

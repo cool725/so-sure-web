@@ -46,13 +46,13 @@ resource "aws_vpc_endpoint" "private-s3" {
 resource "aws_subnet" "dmz_a" {
   vpc_id                  = "${aws_vpc.default.id}"
   cidr_block              = "10.0.1.0/24"
-  map_public_ip_on_launch = false
+  map_public_ip_on_launch = true
   availability_zone       = "${var.aws_az_a}"
 }
 resource "aws_subnet" "dmz_b" {
   vpc_id                  = "${aws_vpc.default.id}"
   cidr_block              = "10.0.2.0/24"
-  map_public_ip_on_launch = false
+  map_public_ip_on_launch = true
   availability_zone       = "${var.aws_az_b}"
 }
 
@@ -406,11 +406,11 @@ resource "aws_elb" "web" {
 
 resource "aws_launch_configuration" "prod_web" {
     name_prefix = "web-v0-lc-"
-    image_id = "ami-b3bc0fc0"
+    image_id = "ami-a877c4db"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.web.id}"]
     iam_instance_profile = "prod-web"
-    associate_public_ip_address = false
+    associate_public_ip_address = true
 
     lifecycle {
       create_before_destroy = true
