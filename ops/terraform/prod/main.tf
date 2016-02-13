@@ -406,7 +406,7 @@ resource "aws_elb" "web" {
 
 resource "aws_launch_configuration" "prod_web" {
     name_prefix = "web-v0-lc-"
-    image_id = "ami-3c7ccf4f"
+    image_id = "ami-be7ccfcd"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.web.id}"]
     iam_instance_profile = "prod-web"
@@ -482,7 +482,7 @@ resource "aws_autoscaling_group" "prod_db" {
 
 resource "aws_launch_configuration" "prod_build" {
     name_prefix = "build-v0-lc-"
-    image_id = "ami-7578cb06"
+    image_id = "ami-e27fcc91"
     instance_type = "t2.micro"
     security_groups = ["${aws_security_group.build.id}"]
     iam_instance_profile = "prod-build"
