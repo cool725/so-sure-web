@@ -1,5 +1,5 @@
 - name: params
-  template: src=templates/parameters.yml dest={{ ansistrano_release_path.stdout }}/app/config/parameters.yml
+  template: src=../roles/sosure-deploy/templates/parameters.yml dest={{ ansistrano_release_path.stdout }}/app/config/parameters.yml
 - composer: command=install no_dev=no working_dir={{ ansistrano_release_path.stdout }}
 - name: assetic dump
   command: php app/console --env=prod assetic:dump chdir={{ ansistrano_release_path.stdout }}
