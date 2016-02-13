@@ -1,5 +1,8 @@
 version: 0.0
-os: linux 
+os: linux
+files:
+  - source: /
+    destination: /tmp/codedeploy
 hooks:
   AfterInstall:
     - location: deploy.sh
