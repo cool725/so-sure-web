@@ -13,7 +13,8 @@
     "instance_type": "t2.micro",
     "ssh_username": "ubuntu",
     "ami_name": "db v0 {{timestamp}}",
-    "iam_instance_profile": "packer"
+    "iam_instance_profile": "packer",
+    "encrypted": "true"
   }],
   "provisioners": [{
     "type": "shell",
