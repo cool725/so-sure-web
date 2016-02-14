@@ -1,2 +1,0 @@
-- name: boot rc.local
-  template: src=templates/rc.local dest=/etc/rc.local

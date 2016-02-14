@@ -1,2 +1,0 @@
-- name: base
-  apt: state=latest pkg=mongodb-org-server,mongodb-org-shell

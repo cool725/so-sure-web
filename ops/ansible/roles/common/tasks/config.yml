@@ -1,5 +1,0 @@
-- name: msmtprc
-  template: src=templates/msmtprc.j2 dest=/etc/msmtprc
-- file: path=/root/.aws state=directory
-- name: boto credentials
-  template: src=templates/credentials dest=/root/.aws/credentials
