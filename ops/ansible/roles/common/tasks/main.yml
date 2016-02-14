@@ -1,9 +1,0 @@
-- include: auth_keys.yml
-- include: repos.yml
-- include: packages.yml
-- include: apps.yml
-- include: security.yml
-- include: config.yml
-- include: cron.yml
-- include: fluentd.yml
-- include: monitoring.yml

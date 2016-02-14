@@ -1,3 +1,0 @@
------BEGIN RSA PRIVATE KEY-----
-{{ web_private_key|wordwrap(64) }}
------END RSA PRIVATE KEY-----

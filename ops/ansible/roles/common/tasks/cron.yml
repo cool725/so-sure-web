@@ -1,2 +1,0 @@
-- cron: name="boot_swap" special_time="reboot" job="/var/sosure/current/ansible/scripts/create-swap.sh 1024 >> /tmp/boot_swap.log"
-- cron: name="boot_ntp" special_time="reboot" job="/etc/init.d/ntp stop;ntpdate -s 0.ubuntu.pool.ntp.org;/etc/init.d/ntp start"

@@ -1,5 +1,0 @@
-- include: packages.yml
-- include: apps.yml
-- include: apache.yml
-- include: security.yml
-- include: boot.yml

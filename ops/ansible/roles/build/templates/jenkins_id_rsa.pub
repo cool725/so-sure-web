@@ -1,1 +1,0 @@
-ssh-rsa {{ jenkins_public_key }} tech+jenkins@so-sure.com

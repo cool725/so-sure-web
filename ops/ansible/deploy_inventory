@@ -1,2 +1,0 @@
-[tag_env_prod]
-127.0.0.1 ansible_connection=local

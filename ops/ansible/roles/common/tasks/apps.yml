@@ -1,6 +1,0 @@
-- name: download-memon
-  get_url: url=https://raw.github.com/PeerJ/MEMon/master/memon.py dest=/usr/local/bin/memon.py mode=0755
-- name: cli53
-  copy: src=files/cli53 dest=/usr/local/bin/cli53 mode=0755
-- pip: name=awscli
-  

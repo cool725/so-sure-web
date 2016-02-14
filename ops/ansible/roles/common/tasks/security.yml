@@ -1,4 +1,0 @@
-- name: security-ssh
-  ufw: rule=allow port=22 proto=tcp
-- name: security-ufw-enable
-  ufw: state=enabled
