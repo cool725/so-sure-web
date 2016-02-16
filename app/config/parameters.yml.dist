@@ -19,6 +19,9 @@ parameters:
     gocardless_apikey:
     gocardless_prod: false
     rollbar_access_token:
+    judopay_apitoken:
+    judopay_apisecret:
+    judopay_id:
 
     mongodb_db: mongo
     mongodb_url: mongodb://localhost
