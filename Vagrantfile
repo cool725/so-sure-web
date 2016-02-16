@@ -33,7 +33,7 @@ ssh-keyscan -H $FIND_HOST,$FIND_IP >> ~/.ssh/known_hosts
 ssh-keyscan -H $FIND_IP >> ~/.ssh/known_hosts
 ssh-keyscan -H $FIND_HOST >> ~/.ssh/known_hosts
 
-apt-get install -y git
+sudo apt-get install -y git
 
 if [ ! -d /var/ops ]; then
   sudo mkdir /var/ops
