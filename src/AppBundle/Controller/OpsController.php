@@ -19,7 +19,7 @@ class OpsController extends BaseController
      * @Route("/status", name="ops_status")
      * @Template
      */
-    public function statusAction(Request $request)
+    public function statusAction()
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
@@ -28,5 +28,5 @@ class OpsController extends BaseController
         return new JsonResponse([
             'status' => 'Ok',
         ]);
-    }    
+    }
 }

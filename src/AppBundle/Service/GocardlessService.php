@@ -7,11 +7,11 @@ use \GoCardlessPro\Environment;
 
 class GocardlessService
 {
-   /** @var LoggerInterface */
-   protected $logger;
+    /** @var LoggerInterface */
+    protected $logger;
 
-   /** @var Client */
-   protected $client;
+    /** @var Client */
+    protected $client;
 
     /**
      * @param LoggerInterface $logger
@@ -20,12 +20,10 @@ class GocardlessService
      */
     public function __construct(LoggerInterface $logger, $accessToken, $prod)
     {
-       $this->logger = $logger;
-       $client = new Client([
+        $this->logger = $logger;
+        $client = new Client([
             'access_token' => $accessToken,
-            'environment' => prod ? Environment::LIVE : Environment::SANDBOX
+            'environment' => $prod ? Environment::LIVE : Environment::SANDBOX
         ]);
     }
-    
-    
 }
