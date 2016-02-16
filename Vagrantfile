@@ -21,13 +21,35 @@ if [ ! -f /usr/bin/ansible-playbook ]; then
   sudo apt-get install -y python-pip ansible
 fi
 
-#/vagrant/ops/scripts/deploy.sh -u "" /vagrant vagrant
+SCRIPT
+
+$github_ops = <<SCRIPT
+FIND_HOST=github.com
+FIND_IP=`dig +short $FIND_HOST | grep -v ";;"`
+ssh-keygen -R $FIND_HOST
+ssh-keygen -R $FIND_IP
+ssh-keygen -R $FIND_HOST,$FIND_IP
+ssh-keyscan -H $FIND_HOST,$FIND_IP >> ~/.ssh/known_hosts
+ssh-keyscan -H $FIND_IP >> ~/.ssh/known_hosts
+ssh-keyscan -H $FIND_HOST >> ~/.ssh/known_hosts
+
+if [ ! -d /var/ops ]; then
+  sudo mkdir /var/ops
+  sudo chown vagrant /var/ops
+  cd /var/ops
+  git remote add origin git@github.com:so-sure/ops.git
+fi
+
+cd /var/ops
+git fetch
+git checkout master
+git pull origin master
 
 SCRIPT
 
 $deploy = <<SCRIPT
 set -e
-/vagrant/ops/scripts/deploy.sh -u vagrant -n /vagrant vagrant
+/var/ops/scripts/deploy.sh -u vagrant -n /vagrant vagrant
 SCRIPT
 
 Vagrant.configure("2") do |config|
@@ -43,6 +65,10 @@ Vagrant.configure("2") do |config|
     dev_config.vm.provision "shell",
     	inline: $script
 
+    dev_config.vm.provision "shell",
+    	inline: $github_ops,
+		privileged: false
+
     # Patch for https://github.com/mitchellh/vagrant/issues/6793
     dev_config.vm.provision "shell" do |s|
         s.inline = '[[ ! -f $1 ]] || grep -F -q "$2" $1 || sed -i "/__main__/a \\    $2" $1'
@@ -51,8 +77,8 @@ Vagrant.configure("2") do |config|
 	
     dev_config.vm.provision "ansible_local" do |a|
         a.playbook = "vagrant.yml"
-        a.provisioning_path = "/vagrant/ops/ansible"
-        a.inventory_path = "/vagrant/ops/ansible/vagrant_inventory"
+        a.provisioning_path = "/var/ops/ansible"
+        a.inventory_path = "/var/ops/ansible/vagrant_inventory"
         a.limit = "vagrant"
         a.install = false
     end
