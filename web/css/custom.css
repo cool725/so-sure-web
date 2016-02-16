@@ -1,11 +1,21 @@
-  /* Shared
+    /* Fonts
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  .button {
-    border-radius: 100px;
-  }
 
+  @font-face {
+    font-family: 'Avenir LT Std 45 Book';
+    font-style: normal;
+    font-weight: normal;
+    src: local('../fonts/Avenir LT Std 45 Book'), url('../fonts/AvenirLTStd-Book.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Avenir LT Std 85 Heavy';
+    font-style: normal;
+    font-weight: normal;
+    src: local('../fonts/Avenir LT Std 85 Heavy'), url('../fonts/AvenirLTStd-Heavy.woff') format('woff');
+  }
   /* Sections
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
   .section {
     padding: 8rem 0 7rem;
     text-align: center;
@@ -17,9 +27,9 @@
     margin-bottom: 4rem;
     max-width: 100%;
   }
-
   /* Hero
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
   .hero {
     color: #00CFF1;
   }
@@ -42,6 +52,7 @@
   }
   /* Mission
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
   .mission {
     background-color: #f2f2f2;
   }
@@ -63,9 +74,9 @@
       max-width: 100%;
     }
   }
-
   /* Intro
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
   .intro .section-heading {
     font-size: 3.0rem;
   }
@@ -83,8 +94,8 @@
   .phone + .phone {
     display: none;
   }
-
   /* Bigger than 550 */
+
   @media (min-width: 550px) {
     .section {
       padding: 11rem 0 10rem;
@@ -112,8 +123,8 @@
       max-height: 338px;
     }
   }
-
   /* Bigger than 750 */
+
   @media (min-width: 750px) {
     .section {
       padding: 12rem 0 12rem;
@@ -136,8 +147,8 @@
       padding: 15rem 0 8rem;
     }
   }
-
   /* Bigger than 1000 */
+
   @media (min-width: 1000px) {
     .section {
       padding: 13rem 0 13rem;
@@ -160,9 +171,9 @@
       max-height: 570px;
     }
   }
-
   /* How
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
   .how {
     background-color: #f2f2f2;
   }
@@ -173,16 +184,15 @@
     width: 50%;
     margin-bottom: -1rem;
   }
-
   /* Twitter
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
   .twitter p {
     color: #333333;
   }
   .twitter .section-description {
     padding-top: 1.2rem;
   }
-
   /* Terms
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
@@ -217,9 +227,9 @@
       padding-top: 2.5rem;
     }
   }
-
   /* CTA
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
   .cta {
     background-color: #00CFF1;
     padding: 6rem 0 6rem;
@@ -266,8 +276,8 @@
     background-color: #3A81B1;
     border-color: #3A81B1;
   }
-
   /* Smaller than 500 - Remove Email Box */
+
   @media (max-width: 500px) {
     .cta {
       text-align: center;
@@ -283,23 +293,92 @@
       width: auto;
     }
   }
-
-  /* Footer
+  /* Jobs
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
-  .footer {
-    font-size: 1em;
-    color: #333333;
-    padding: 6rem 0 6rem;
+  .section-title {
+    text-align: center;
   }
-  .footer .column {
-    margin-bottom: 1.5rem;
+  ul.jobs {
+    font-size: 2rem;
+    list-style: none;
   }
-  .footer a {
-    padding-left: 1em;
-    position: relative;
+  .jobs li.dev:before {
+    font-family: 'FontAwesome';
+    content: '\f179';
+    margin: 0 5px 0 -15px;
   }
-  .footer a.terms {
-    padding-left: 0em;
-    font-size: 1em;
+  .jobs li.growth:before {
+    font-family: 'FontAwesome';
+    content: '\f0a1';
+    margin: 0 5px 0 -15px;
   }
+    /* Refer
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+    .refer p {
+      padding-top: 3rem;
+    }
+    .refer h3 {
+      padding-top: 3rem;
+    }
+    .refer-card {
+      border-color: #f2f2f2;
+      border-width: 2px;
+      border-style: solid;
+      padding: 20px;
+      position: relative;
+      margin: 0.5rem 0 1rem 0;
+      border-radius: 5px;
+    }
+    .refer .twt-share-button {
+      padding-right: 10rem;
+      padding-top: 0.4rem;
+    }
+    .refer .fb-share-button {
+      padding-left: 10rem;
+    }
+    @media (max-width: 1000px) {
+      .refer .twt-share-button {
+        padding-right: 6rem;
+        padding-top: 0.4rem;
+      }
+      .refer .fb-share-button {
+        padding-left: 6rem;
+      }
+    }
+    @media (max-width: 750px) {
+      .refer .twt-share-button {
+        padding-top: 0.4rem;
+        padding-right: 2rem;
+      }
+      .refer .fb-share-button {
+        padding-left: 2rem;
+      }
+    }
+    @media (max-width: 550px) {
+      .refer .fb-share-button {
+        padding-bottom: 2rem;
+        padding-left: 0rem;
+      }
+      .refer .twt-share-button {
+        padding-right: 0rem;
+      }
+    }
+    /* Footer
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+    .footer {
+      color: #333333;
+      padding: 6rem 0 6rem;
+    }
+    .footer a {
+      position: relative;
+    }
+    .footer a.terms {
+      font-size: 1em;
+    }
+    .footer a.social-links {
+      padding-left: 0em;
+      font-size: 1em;
+      margin-bottom: 2.5rem;
+    }
