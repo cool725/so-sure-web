@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container">
+    <div class="row-fluid">
+        <div class="col-xs-12 col-md-8">
+            <h2>Please confirm the policy details</h2>
+    <form action="{{ form_action }}" method="post">
+    <input  id="Reference" name="Reference" type="hidden" value="{{ reference }}">
+    <input type="submit" class="btn btn-success" value="Pay now">
+    </form>
+            
+        </div>
+        <div class="col-xs-12 col-md-4">
+            <h2>Your policy</h2>
+            <h2>{{ phone }}</h2>
+            <p>£{{ phone.policyPrice }} / month</p>
+            <p>+ £1.50 Lost / month</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

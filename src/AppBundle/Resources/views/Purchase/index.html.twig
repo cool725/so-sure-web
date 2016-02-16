@@ -14,7 +14,8 @@
                 </div>
             
                 <div class="form-group">
-                    {{ form_widget(form.save, {'label': 'Order Policy via Direct Debit', 'attr': {'class': 'btn btn-success'}}) }}
+                    {{ form_widget(form.dd, {'label': 'Order Policy via Direct Debit', 'attr': {'class': 'btn btn-success'}}) }}
+                    {{ form_widget(form.credit, {'label': 'Order Policy via Credit/Debit Card', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
             
             {{ form_end(form) }}

@@ -24,7 +24,8 @@
         "symfony/assetic-bundle": "^2.7",
         "drewm/mailchimp-api": "dev-api-v3",
         "google/apiclient": "^2.0.0@RC",
-        "staffim/rollbar-bundle": "*"
+        "staffim/rollbar-bundle": "*",
+        "judopay/judopay-sdk": "~1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

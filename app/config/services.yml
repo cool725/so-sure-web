@@ -21,3 +21,12 @@ services:
             logger: "@logger"
             accessToken: %gocardless_apikey%
             prod: %gocardless_prod%
+
+    app.judopay:
+        class: AppBundle\Service\JudopayService
+        arguments:
+            doctrine: "@doctrine_mongodb"
+            logger: "@logger"
+            apiToken: %judopay_apitoken%
+            apiSecret: %judopay_apisecret%
+            judoId: %judopay_id%
