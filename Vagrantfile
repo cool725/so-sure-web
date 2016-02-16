@@ -39,6 +39,7 @@ if [ ! -d /var/ops ]; then
   sudo mkdir /var/ops
   sudo chown vagrant /var/ops
   cd /var/ops
+  git init
   git remote add origin git@github.com:so-sure/ops.git
 fi
 
