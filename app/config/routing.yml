@@ -37,3 +37,23 @@ hwi_oauth_connect:
 facebook_login:
     path: /login/check-facebook
 
+redirect_homepage:
+    pattern: /index.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /
+        permanent: true
+
+redirect_terms:
+    pattern: /terms.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /terms
+        permanent: true
+
+redirect_jobs:
+    pattern: /jobs.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /jobs
+        permanent: true

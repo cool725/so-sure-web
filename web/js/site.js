@@ -30,30 +30,62 @@ heap.load("95184740");
 ga('create', 'UA-73109263-1', 'auto');
 ga('send', 'pageview');
 
-//Google Tag Manager
-(function(w, d, s, l, i) {
-  w[l] = w[l] || [];
-  w[l].push({
-    'gtm.start': new Date().getTime(),
-    event: 'gtm.js'
-  });
-  var f = d.getElementsByTagName(s)[0],
-    j = d.createElement(s),
-    dl = l != 'dataLayer' ? '&l=' + l : '';
-  j.async = true;
-  j.src =
-    '//www.googletagmanager.com/gtm.js?id=' + i + dl;
-  f.parentNode.insertBefore(j, f);
-})(window, document, 'script', 'dataLayer', 'GTM-5KBSPK');
+// Facebook Pixel
+! function(f, b, e, v, n, t, s) {
+  if (f.fbq) return;
+  n = f.fbq = function() {
+    n.callMethod ?
+      n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+  };
+  if (!f._fbq) f._fbq = n;
+  n.push = n;
+  n.loaded = !0;
+  n.version = '2.0';
+  n.queue = [];
+  t = b.createElement(e);
+  t.async = !0;
+  t.src = v;
+  s = b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t, s)
+}(window,
+  document, 'script', '//connect.facebook.net/en_US/fbevents.js');
 
-// TypeKit
-try {
-  Typekit.load({
-    async: true
-  });
-} catch (e) {};
+fbq('init', '1018444924864481');
+fbq('track', "PageView");
 
-// Twitter
+// Facebook SDK + Send Button
+window.fbAsyncInit = function() {
+  FB.init({
+    appId: '1061770650548509',
+    xfbml: true,
+    version: 'v2.5'
+  });
+};
+
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {
+    return;
+  }
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+//Twitter Share Button
+! function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    p = /^http:/.test(d.location) ? 'http' : 'https';
+  if (!d.getElementById(id)) {
+    js = d.createElement(s);
+    js.id = id;
+    js.src = p + '://platform.twitter.com/widgets.js';
+    fjs.parentNode.insertBefore(js, fjs);
+  }
+}(document, 'script', 'twitter-wjs');
+
+// Twitter Embeds
 window.twttr = (function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0],
     t = window.twttr || {};

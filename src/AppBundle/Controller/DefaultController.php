@@ -76,23 +76,6 @@ class DefaultController extends BaseController
         return array('id' => $id, 'referral_url' => $this->addShortLink($url));
     }
 
-    private function addShortLink($url)
-    {
-        try {
-            $client = new \Google_Client();
-            $client->setApplicationName("SoSure");
-            $client->setDeveloperKey($this->getParameter('google_apikey'));
-            $service = new \Google_Service_Urlshortener($client);
-            $gUrl = new \Google_Service_Urlshortener_Url();
-            $gUrl->longUrl = $url;
-            $result = $service->url->insert($gUrl);
-
-            return $result['id'];
-        } catch (\Exception $e) {
-            return $url;
-        }
-    }
-    
     /**
      * @Route("/alpha", name="alpha")
      * @Template
@@ -107,6 +90,15 @@ class DefaultController extends BaseController
      * @Template
      */
     public function termsAction()
+    {
+        return array();
+    }
+
+    /**
+     * @Route("/jobs", name="jobs")
+     * @Template
+     */
+    public function jobsAction()
     {
         return array();
     }
@@ -140,4 +132,22 @@ class DefaultController extends BaseController
 
         return array('phones' => $phones);
     }
+
+    private function addShortLink($url)
+    {
+        try {
+            $client = new \Google_Client();
+            $client->setApplicationName("SoSure");
+            $client->setDeveloperKey($this->getParameter('google_apikey'));
+            $service = new \Google_Service_Urlshortener($client);
+            $gUrl = new \Google_Service_Urlshortener_Url();
+            $gUrl->longUrl = $url;
+            $result = $service->url->insert($gUrl);
+
+            return $result['id'];
+        } catch (\Exception $e) {
+            return $url;
+        }
+    }
+    
 }
