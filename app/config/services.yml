@@ -36,7 +36,7 @@ services:
         arguments:
             doctrine: "@doctrine_mongodb"
             logger: "@logger"
-            mailchimp: app.mailchimp.prelaunch
+            mailchimp: "@app.mailchimp.prelaunch"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService

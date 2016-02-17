@@ -13,10 +13,11 @@ class LaunchUserService
     protected $mailchimp;
 
     /**
-     * @param mixed           $doctrine
-     * @param LoggerInterface $logger
+     * @param mixed            $doctrine
+     * @param LoggerInterface  $logger
+     * @param MailchimpService $mailchimp
      */
-    public function __construct($doctrine, LoggerInterface $logger, $mailchimp)
+    public function __construct($doctrine, LoggerInterface $logger, MailchimpService $mailchimp)
     {
         $this->dm = $doctrine->getManager();
         $this->logger = $logger;
