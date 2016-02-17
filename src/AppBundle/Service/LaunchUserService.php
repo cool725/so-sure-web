@@ -38,7 +38,7 @@ class LaunchUserService
                 $referred = $repo->find($user->getReferralId());
                 $referred->addReferral($user);
             }
-            $user->setUsername($user->getEmailCanonical());
+            $user->setUsername(strtolower($user->getEmail()));
             $this->dm->persist($user);
             $this->dm->flush();
         } catch (\Exception $e) {
