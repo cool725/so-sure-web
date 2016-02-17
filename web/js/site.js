@@ -12,7 +12,12 @@ window.heap = window.heap || [], heap.load = function(e, t) {
       }
     }, p = ["clearEventProperties", "identify", "setEventProperties", "track", "unsetEventProperty"], c = 0; c < p.length; c++) heap[p[c]] = r(p[c])
 };
-heap.load("95184740");
+heap_id = $('#ss-root').data('heap-id');
+if (heap_id !== '') {
+    heap.load(heap_id);
+} else {
+  //console.log('no heap');
+}
 
 // Google Anayltics
 (function(i, s, o, g, r, a, m) {
@@ -27,8 +32,13 @@ heap.load("95184740");
   m.parentNode.insertBefore(a, m)
 })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-ga('create', 'UA-73109263-1', 'auto');
-ga('send', 'pageview');
+ga_id = $('#ss-root').data('google-analytics');
+if (ga_id !== '') {
+  ga('create', ga_id, 'auto');
+  ga('send', 'pageview');
+} else {
+  //console.log('no ga');
+}
 
 // Facebook Pixel
 ! function(f, b, e, v, n, t, s) {
@@ -50,13 +60,18 @@ ga('send', 'pageview');
 }(window,
   document, 'script', '//connect.facebook.net/en_US/fbevents.js');
 
-fbq('init', '1018444924864481');
-fbq('track', "PageView");
+fb_pixel_id = $('#ss-root').data('fb-pixel-id');
+if (fb_pixel_id !== '') {
+  fbq('init', fb_pixel_id);
+  fbq('track', "PageView");
+} else {
+  //console.log('no fbpx');
+}
 
 // Facebook SDK + Send Button
 window.fbAsyncInit = function() {
   FB.init({
-    appId: '1061770650548509',
+    appId: $('#ss-root').data('fb-appid'),
     xfbml: true,
     version: 'v2.5'
   });
