@@ -45,17 +45,16 @@ class PremiumCommand extends ContainerAwareCommand
         $table = new Table($output);
         $table
             ->setHeaders(array('Premium', 'User Pays', 'Broker Fee', 'GWP', 'IPT', 'NWT', 'Payout', 'Reserve IPT'))
-            ->setRows(array(
-                array(
-                    $premiumCalc->getPremium(),
-                    $premiumCalc->getUserPayment(),
-                    $premiumCalc->getBrokerFee(),
-                    $premiumCalc->getGWP(),
-                    $premiumCalc->getIPT(),
-                    $premiumCalc->getNWT(),
-                    $premiumCalc->getPayout(),
-                    $premiumCalc->getReserveIPT(),
+            ->setRows(array(array(
+                $premiumCalc->getPremium(),
+                $premiumCalc->getUserPayment(),
+                $premiumCalc->getBrokerFee(),
+                $premiumCalc->getGWP(),
+                $premiumCalc->getIPT(),
+                $premiumCalc->getNWT(),
+                $premiumCalc->getPayout(),
+                $premiumCalc->getReserveIPT(),
             )));
-        $table->render();       
+        $table->render();
     }
 }

@@ -77,19 +77,19 @@ class PurchaseController extends BaseController
      * @Route("/cc/success/", name="purchase_judopay_success")
      * @Template
      */
-    public function purchaseJudoPaySuccessAction(Request $request)
+    public function purchaseJudoPaySuccessAction()
     {
         return array();
-    }    
+    }
 
     /**
      * @Route("/cc/fail/", name="purchase_judopay_fail")
      * @Template
      */
-    public function purchaseJudoPayFailAction(Request $request)
+    public function purchaseJudoPayFailAction()
     {
         return array();
-    }    
+    }
     
     /**
      * @Route("/cc/{id}/", name="purchase_judopay")
@@ -101,7 +101,11 @@ class PurchaseController extends BaseController
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
         $policyPrice = $policy->getPhone()->getPolicyPrice();
-        $webpay = $this->get('app.judopay')->webpay($policyPrice, $request->getClientIp(), $request->headers->get('User-Agent'));
+        $webpay = $this->get('app.judopay')->webpay(
+            $policyPrice,
+            $request->getClientIp(),
+            $request->headers->get('User-Agent')
+        );
 
         return array(
             'form_action' => $webpay['post_url'],

@@ -9,34 +9,35 @@ use AppBundle\Document\Payment;
 
 class JudopayService
 {
-   /** @var LoggerInterface */
-   protected $logger;
+    /** @var LoggerInterface */
+    protected $logger;
 
-   /** @var JudoPay */
-   protected $client;
+    /** @var JudoPay */
+    protected $client;
 
-   /** @var string */
-   protected $judoId;
+    /** @var string */
+    protected $judoId;
    
-   protected $dm;
+    protected $dm;
 
     /**
+     * @param mixed           $doctrine
      * @param LoggerInterface $logger
-     * @param string $apiToken
-     * @param string $apiSecret
-     * @param string $judoId
+     * @param string          $apiToken
+     * @param string          $apiSecret
+     * @param string          $judoId
      */
     public function __construct($doctrine, LoggerInterface $logger, $apiToken, $apiSecret, $judoId)
     {
-       $this->dm = $doctrine->getManager();
-       $this->logger = $logger;
-       $this->judoId = $judoId;
-       $this->client = new Judopay(array(
+        $this->dm = $doctrine->getManager();
+        $this->logger = $logger;
+        $this->judoId = $judoId;
+        $this->client = new Judopay(array(
            'apiToken' => $apiToken,
            'apiSecret' => $apiSecret,
            'judoId' => $judoId,
            'endpointUrl' => 'https://partnerapi.judopay-sandbox.com/',
-       ));
+        ));
     }
 
     /**

@@ -69,7 +69,7 @@ class DefaultController extends BaseController
      * @Route("/launch/{id}", name="launch_share")
      * @Template
      */
-    public function launchAction(Request $request, $id)
+    public function launchAction($id)
     {
         $url = $this->generateUrl('homepage', ['referral' => $id], UrlGeneratorInterface::ABSOLUTE_URL);
 
@@ -149,5 +149,4 @@ class DefaultController extends BaseController
             return $url;
         }
     }
-    
 }
