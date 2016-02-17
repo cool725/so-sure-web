@@ -30,3 +30,17 @@ services:
             apiToken: %judopay_apitoken%
             apiSecret: %judopay_apisecret%
             judoId: %judopay_id%
+
+    app.user.launch:
+        class: AppBundle\Service\LaunchUserService
+        arguments:
+            doctrine: "@doctrine_mongodb"
+            logger: "@logger"
+            mailchimp: app.mailchimp.prelaunch
+
+    app.shortlink:
+        class: AppBundle\Service\ShortLinkService
+        arguments:
+            logger: "@logger"
+            googleAppName: %google_appname%
+            googleApiKey: %google_apikey%

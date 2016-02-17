@@ -32,30 +32,8 @@ class DefaultController extends BaseController
         $form = $this->createForm(LaunchType::class, $user);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $addMailchimp = true;
-            try {
-                if ($user->getReferralId() && !$user->getReferred()) {
-                    $referred = $repo->find($user->getReferralId());
-                    $referred->addReferral($user);
-                }
-                $user->setUsername($user->getEmailCanonical());
-                $dm->persist($user);
-                $dm->flush();
-            } catch (\Exception $e) {
-                // Ignore - most likely existing user
-                $logger->error($e->getMessage());
-                $addMailchimp = false;
-            }
-
-            $existingUser = $repo->findOneBy(['emailCanonical' => $user->getEmailCanonical()]);
-            if (!$existingUser) {
-                throw new \Exception('Failed to add');
-            }
-
-            if ($addMailchimp) {
-                $mailchimp = $this->get('app.mailchimp.prelaunch');
-                $mailchimp->subscribe($user->getEmail());
-            }
+            $launchUser = $this->get('app.user.launch');
+            $existingUser = $launchUser->addUser($user);
 
             return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
         }
@@ -72,8 +50,9 @@ class DefaultController extends BaseController
     public function launchAction($id)
     {
         $url = $this->generateUrl('homepage', ['referral' => $id], UrlGeneratorInterface::ABSOLUTE_URL);
+        $shortLink = $this->get('app.shortlink');
 
-        return array('id' => $id, 'referral_url' => $this->addShortLink($url));
+        return array('id' => $id, 'referral_url' => $shortLink->addShortLink($url));
     }
 
     /**
@@ -131,22 +110,5 @@ class DefaultController extends BaseController
         // TODO: Redirect to other phone
 
         return array('phones' => $phones);
-    }
-
-    private function addShortLink($url)
-    {
-        try {
-            $client = new \Google_Client();
-            $client->setApplicationName("SoSure");
-            $client->setDeveloperKey($this->getParameter('google_apikey'));
-            $service = new \Google_Service_Urlshortener($client);
-            $gUrl = new \Google_Service_Urlshortener_Url();
-            $gUrl->longUrl = $url;
-            $result = $service->url->insert($gUrl);
-
-            return $result['id'];
-        } catch (\Exception $e) {
-            return $url;
-        }
     }
 }

@@ -15,6 +15,7 @@ parameters:
     fb_secret:
     mailchimp_apikey:
     mailchimp_prelaunch_list:
+    google_appname:
     google_apikey:
     gocardless_apikey:
     gocardless_prod: false
