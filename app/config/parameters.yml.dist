@@ -11,15 +11,25 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
-    fb_appid: 
+
+    fb_appid:
     fb_secret:
+    fb_pixel_id:
+
     mailchimp_apikey:
     mailchimp_prelaunch_list:
+
     google_appname:
     google_apikey:
+    google_analytics:
+
     gocardless_apikey:
     gocardless_prod: false
+
     rollbar_access_token:
+
+    heap_id:
+
     judopay_apitoken:
     judopay_apisecret:
     judopay_id:

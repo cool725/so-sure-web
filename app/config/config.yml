@@ -41,7 +41,10 @@ twig:
     strict_variables: "%kernel.debug%"
     globals:
         fb_appid: %fb_appid%
+        fb_pixel_id: %fb_pixel_id%
         cdn_url: "//cdn.so-sure.com"
+        heap_id: %heap_id%
+        google_analytics: %google_analytics%
 
 doctrine_mongodb:
     connections:
