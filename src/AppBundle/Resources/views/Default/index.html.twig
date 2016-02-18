@@ -12,43 +12,10 @@
 
   <!-- FB Open Graph Tags
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta property="og:url" content="http://so-sure.com" />
-  <meta property="og:type" content="website" />
   <meta property="og:title" content="so-sure" />
   <meta property="og:description" content="Social mobile phone insurance. Better, easier and up to 80% cheaper. The social insurance revolution starts here." />
-  <meta property="og:image" content="http://so-sure.com/images/logo/so-sure-logo.svg" />
 
-  <!-- Mobile Specific Metas
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Font
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="application/x-font-woff" href="/fonts/AvenirLTStd-Book.woff">
-  <link rel="application/x-font-woff" href="/fonts/AvenirLTStd-Heavy.woff">
-
-  <!-- CSS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <!-- Skeleton -->
-  <link rel="stylesheet" href="/css/normalize.css">
-  <link rel="stylesheet" href="/css/skeleton.css">
-  <!-- Custom -->
-  <link rel="stylesheet" href="/css/custom.css">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-
-  <!-- Favicon
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="icon" type="image/png" href="/images/favicon.png">
-
-  <!-- JS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <!-- jQuery -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <!-- Site JS -->
-  <script src="/js/site.js"></script>
-  <!-- Optimzely -->
-  <script src="//cdn.optimizely.com/js/4833800075.js"></script>
+  {% include 'AppBundle:Default:header.html.twig' %}
 
 </head>
 
@@ -159,22 +126,7 @@
     </div>
   </div>
 
-  <div class="section footer">
-    <div class="container">
-      <div class="row">
-        <div class="one-third column">
-          <p class="terms-link">so-sure &copy; 2016 | <a class="terms" href="/terms">cookies + privacy</a></p>
-        </div>
-        <div class="one-third column">
-          <p><a href="https://twitter.com/wearesosure"><i class="fa fa-twitter fa-2x"></i></a>
-            <a href="https://www.facebook.com/wearesosure"><i class="fa fa-facebook fa-2x"></i></a></p>
-        </div>
-        <div class="one-third column">
-          <p><a class="button" href="/jobs">We are hiring!</a></p>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% include 'AppBundle:Default:footer.html.twig' %}
 
   </div>
   <!-- Twitter single-event website tag code -->
