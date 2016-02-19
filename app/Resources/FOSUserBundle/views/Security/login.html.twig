@@ -1,0 +1,36 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+{% block fos_user_content %}
+{% if error %}
+    <div class="row"><div class="col-xs-12">{{ error|trans({}, 'FOSUserBundle') }}</div>
+{% endif %}
+<div class="row">
+    <div class="col-xs-12 col-sm-5">
+        <form class="form-horizontal" action="{{ path("fos_user_security_check") }}" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+            <div class="form-group">
+                <label class="col-sm-2" for="username">Email</label>
+                <div class="col-sm-10">
+                    <input type="email" class="form-control" id="username" name="_username" value="{{ last_username }}" required="required" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2" for="password">Password</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="password" name="_password" required="required" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2">
+                    <input type="checkbox" class="form-control" id="remember_me" name="_remember_me" value="on" />
+                </div>
+                <label class="col-sm-10" for="remember_me">Remember me</label>
+            </div>
+            <div class="form-group">
+                <input type="submit" id="_submit" name="_submit" value="Login" class="form-control btn btn-success" />
+            </div>
+        </form>
+    </div>
+    <div class="col-xs-12 col-sm-5 col-offset-sm-1">
+        <a href="#" class="btn btn-success" onclick="fb_login();">Login w/Facebook</a>
+    </div>
+{% endblock fos_user_content %}
