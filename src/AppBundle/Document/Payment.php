@@ -22,8 +22,24 @@ class Payment
     /** @MongoDB\Float(name="amount", nullable=false) */
     protected $amount;
 
-    /** @MongoDB\String(name="refererce", nullable=true) */
+    /** @MongoDB\String(name="refererce", nullable=true) @MongoDB\Index(unique=true, sparse=true)*/
     protected $reference;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="payments")
+     */
+    protected $policy;
+
+    /** @MongoDB\String(name="token", nullable=true) */
+    protected $token;
+
+    /** @MongoDB\String(name="receipt", nullable=true) */
+    protected $receipt;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="User")
+     */
+    protected $user;    
 
     public function __construct()
     {
@@ -53,5 +69,45 @@ class Payment
     public function getReference()
     {
         return $this->reference;
+    }
+    
+    public function setPolicy($policy)
+    {
+        $this->policy = $policy;
+    }
+
+    public function getPolicy()
+    {
+        return $this->policy;
+    }
+
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+    }
+
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    public function setToken($token)
+    {
+        $this->token = $token;
+    }
+
+    public function getReceipt()
+    {
+        return $this->receipt;
+    }
+
+    public function setReceipt($receipt)
+    {
+        $this->receipt = $receipt;
     }
 }

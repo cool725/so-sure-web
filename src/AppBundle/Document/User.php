@@ -39,7 +39,7 @@ class User extends BaseUser
 
     /** @MongoDB\String(name="facebook_access_token", nullable=true) */
     protected $facebook_access_token;
-    
+
     public function __construct()
     {
         parent::__construct();
@@ -93,6 +93,11 @@ class User extends BaseUser
         $this->facebook_access_token = $facebook_access_token;
     }
 
+    public function getFacebookAccessToken()
+    {
+        return $this->facebook_access_token;
+    }
+
     public function getName()
     {
         return $this->name;
@@ -101,5 +106,15 @@ class User extends BaseUser
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    public function setEmail($email){
+        $this->email = $email;
+        $this->username = $email;
+    }
+
+    public function setEmailCanonical($emailCanonical){
+        $this->emailCanonical = $emailCanonical;
+        $this->usernameCanonical = $emailCanonical;
     }
 }

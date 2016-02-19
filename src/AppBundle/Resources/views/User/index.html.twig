@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container">
+    <div class="row-fluid">
+        <div class="col-xs-12 col-sm-7">
+            <div class="row-fluid">
+                <div class="col-xs-12">
+                    <h2>Your pot: £40</h2>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="col-xs-12">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-default progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                      <span class="sr-only">40% Complete (success)</span>
+                    </div>
+                </div>
+                </div>
+            </div>  
+            <div class="row-fluid">
+                <div class="col-xs-12">
+                    <h2>Pending Invitations</h2>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="col-xs-12">
+                {% if app.user.username is defined %}
+                <div class="col-sm-4 " style="border-style: solid; border-width: 1px; border-radius: 5px;margin-bottom: 20px;padding: 10px; text-align: center;">
+                    <p><img src="http://graph.facebook.com/{{ app.user.username }}/picture" width="60" height="60" /></p>
+                    <p>Invited 2 Feb 2016</p>
+                    <p>Reminded 7 Feb 2016</p>
+                    <p>
+                    <a href="#" class="btn btn-warning">Remind</a>
+                    <a href="#" class="btn btn-danger">Cancel</a>
+                    </p>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="row-fluid">
+                <div class="col-xs-12">
+                    <h2>Invite</h2>                    
+                </div>
+            </div>
+            <div class="row-fluid">
+                {% for friend in friends %}
+                    <div class="col-xs-12">
+                        {{ friend['name'] }} <img src="{{ friend['picture']['url'] }}" />
+                        <a href="#" class="btn btn-success">Trust this friend</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-3">
+            <div style="border-style: solid; border-width: 1px; border-radius: 5px;margin-bottom: 20px;padding: 10px; text-align: center; height: 250px">
+                <h3>4 Connections</h3>
+                <div class="row-fluid">
+                    <div class="col-xs-6 col-sm-4" style="margin-bottom: 20px;">
+                        <img src="http://graph.facebook.com/{{ app.user.username }}/picture" width="60" height="60" />
+                    </div>
+                    <div class="col-xs-6 col-sm-4" style="margin-bottom: 20px;">
+                        <img src="http://graph.facebook.com/{{ app.user.username }}/picture" width="60" height="60" />
+                    </div>
+                    <div class="col-xs-6 col-sm-4" style="margin-bottom: 20px;">
+                        <img src="http://graph.facebook.com/{{ app.user.username }}/picture" width="60" height="60" />
+                    </div>
+                    <div class="col-xs-6 col-sm-4" style="margin-bottom: 20px;">
+                        <img src="http://graph.facebook.com/{{ app.user.username }}/picture" width="60" height="60" />
+                    </div>
+                </div>
+            </div>
+            <div style="border-style: solid; border-width: 1px; border-radius: 5px;margin-bottom: 20px;padding: 10px; text-align: center;">
+                <h3>Your policy</h3>
+                <p>SS-3242-3423</p>
+                <p>Apple iPhone 6</p>
+            </div>
+            <div style="border-style: solid; border-width: 1px; border-radius: 5px; padding: 10px;">
+                <h3 style="text-align: center;">To claim</h3>
+                <ol>
+                    <li>
+                        File a police report
+                    </li>
+                    <li>
+                        Call us: 08000
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
