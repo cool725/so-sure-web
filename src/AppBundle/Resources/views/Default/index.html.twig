@@ -30,40 +30,18 @@
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <div class="section hero">
     <div class="container">
-      <h2 class="section-title">Everyone hates insurance.<br>That's why we created</h2>
-      <img class="logo" src="/images/logo/so-sure-logo.svg"></img>
-      <p><a class="button button-primary" href="#mission">Tell me more</a></p>
-    </div>
-  </div>
-
-  <div class="section mission" id="mission">
-    <div class="container">
-      <div class="row">
-        <h2 class="section-title">The social insurance revolution starts here.</h2>
-        <h3 class="section-heading">Insurance is rubbish.</h3>
-        <p class="section-description">It costs too much, you're never quite sure what you're paying for and when you try to claim you discover that you didn't read their <small>small print</small>.</p>
-        <h3 class="section-heading">We are making it better.</h3>
-        <p class="section-description">We're taking insurance back to how it all started: careful, connected people who can trust that when shit does happen, they’re covered. And when it doesn’t, they get most of their money back.
-          <br>We call this social insurance.</p>
-        <h3 class="section-heading">We are starting with phones.</h3>
-        <p class="section-description">Why? Because those shiny, magical objects connect us with the people we <i class="fa fa-heart" alt="love"></i> most.</p>
+      <img class="logo" src="images/logo/so-sure-logo-new-light.svg"></img>
+      <h2 class="section-title">Simply amazing insurance.</h2>
+      <div class="signup">
+        {{ form_start(form) }}
+        {{ form_widget(form.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
+        {{ form_widget(form.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
+        {{ form_end(form) }}
       </div>
     </div>
-  </div>
-
-  <div class="section intro">
-    <div class="container">
-      <div class="row">
-        <div class="one-half column">
-          <h3 class="section-heading">Social mobile phone insurance. Better, cheaper, easier.</h3>
-          <p class="section-description">Get insured, connect to your friends and get rewarded when you don't claim.</p>
-          <a class="button button-primary" href="#join-today">Join the revolution</a>
-        </div>
-        <div class="one-half column phones">
-          <img class="phone" src="images/iphone.png">
-          <img class="phone" src="images/nexus.png">
-        </div>
-      </div>
+    <div class="learn-more">
+      <p>LEARN MORE</p>
+      <span class="chevron bottom"></span>
     </div>
   </div>
 
@@ -87,6 +65,37 @@
           <h5 class="section-heading">Next working day replacement</h5>
           <p class="section-description">To claim, give us a call any time and once approved we’ll get a replacement phone to you the next working day.</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section intro">
+    <div class="container">
+      <div class="row">
+        <div class="one-half column">
+          <h3 class="section-heading">Social mobile phone insurance. Better, cheaper, easier.</h3>
+          <p class="section-description">Get insured, connect to your friends &amp; get rewarded when you don't claim.</p>
+          <a class="button button-primary" href="#join-today">Signup today</a>
+        </div>
+        <div class="one-half column phones">
+          <img class="phone" src="images/iphone.png">
+          <img class="phone" src="images/nexus.png">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section mission" id="mission">
+    <div class="container">
+      <div class="row">
+        <h2 class="section-title">Our mission.</h2>
+        <h3 class="section-heading">Insurance is rubbish.</h3>
+        <p class="section-description">It costs too much, you're never quite sure what you're paying for and when you try to claim you discover that you didn't read their <small>small print</small>.</p>
+        <h3 class="section-heading">We are making it better.</h3>
+        <p class="section-description">We're taking insurance back to how it all started: careful, connected people who can trust that when shit does happen, they’re covered. And when it doesn’t, they get most of their money back.
+          <br>We call this social insurance.</p>
+        <h3 class="section-heading">We are starting with phones.</h3>
+        <p class="section-description">Why? Because those shiny, magical objects connect us with the people we <i class="fa fa-heart" alt="love"></i> most.</p>
       </div>
     </div>
   </div>
@@ -117,11 +126,11 @@
 
   <div class="section cta" id="join-today">
     <div class="container">
-      <h3 class="section-heading">Join the social insurance revolution.</h3>
+      <h3 class="section-heading">Get a better insurance experience.</h3>
       <div class="signup">
         {{ form_start(form) }}
         {{ form_widget(form.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
-        {{ form_widget(form.save, {'label': 'Keep me updated', 'attr': {'class': 'button button-primary'}}) }}
+        {{ form_widget(form.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
         {{ form_end(form) }}
       </div>
     </div>
