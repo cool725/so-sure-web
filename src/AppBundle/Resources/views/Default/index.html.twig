@@ -33,10 +33,10 @@
       <img class="logo" src="images/logo/so-sure-logo-new-light.svg"></img>
       <h2 class="section-title">Simply amazing insurance.</h2>
       <div class="signup">
-        {{ form_start(form) }}
-        {{ form_widget(form.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
-        {{ form_widget(form.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
-        {{ form_end(form) }}
+        {{ form_start(form_top) }}
+        {{ form_widget(form_top.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
+        {{ form_widget(form_top.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
+        {{ form_end(form_top) }}
       </div>
     </div>
     <div class="learn-more">
@@ -128,10 +128,10 @@
     <div class="container">
       <h3 class="section-heading">Get a better insurance experience.</h3>
       <div class="signup">
-        {{ form_start(form) }}
-        {{ form_widget(form.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
-        {{ form_widget(form.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
-        {{ form_end(form) }}
+        {{ form_start(form_bottom) }}
+        {{ form_widget(form_bottom.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
+        {{ form_widget(form_bottom.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
+        {{ form_end(form_bottom) }}
       </div>
     </div>
   </div>
