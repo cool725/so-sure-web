@@ -56,7 +56,7 @@
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 .hero {
-  background-image: url('../images/homepage-cover.jpg');
+  background-image: url('../images/homepage-cover.png');
   background-size: cover;
   color: #fff;
 }
@@ -64,20 +64,17 @@
   color: #000;
   font-family: serif;
 }
-.hero h2 {
-  padding-top: 1.5rem;
-}
 .hero p {
   margin-bottom: 0rem;
   font-size: 1.5rem;
 }
 .hero .learn-more {
-  margin-top: 5rem;
-  margin-bottom: -5rem;
+  margin-top: 8rem;
+  margin-bottom: -7rem;
 }
 .logo {
   width: 50%;
-  padding-bottom: 2rem;
+  padding-bottom: 1rem;
   padding-top: 2rem;
 }
 .hero input.email {
@@ -342,12 +339,8 @@
   right: 0;
   top: 0;
   margin-top: 0;
-  background-color: #66cccc;
-  border-color: #66cccc;
-}
-.cta .button.button-primary:hover {
-  background-color: #66cccc;
-  border-color: #66cccc;
+  background-color: #666666;
+  border-color: #666666 !important;
 }
 /* Smaller than 500 - Remove Email Box */
 
