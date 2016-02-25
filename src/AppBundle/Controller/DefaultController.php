@@ -40,6 +40,7 @@ class DefaultController extends BaseController
 
         return array(
             'form' => $form->createView(),
+            'referral' => $referral,
         );
     }
 
