@@ -12,15 +12,16 @@
 
   <!-- FB Open Graph Tags
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta property="og:title" content="so-sure" />
-  <meta property="og:description" content="Social mobile phone insurance. Better, easier and up to 80% cheaper. The social insurance revolution starts here." />
+  {% if referral !=  '' %}
+    {% set og_title = 'Join today & get rewarded' %}
+    {% set og_image = '//cdn.so-sure.com/images/home/so-sure-simply-amazing-cta.png' %}
+  {% endif %}
 
   {% include 'AppBundle:Default:header.html.twig' %}
 
 </head>
 
 <body>
-
   <!-- Facebook Pixel Code
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1018444924864481&ev=PageView&noscript=1" /></noscript>
