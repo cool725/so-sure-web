@@ -22,24 +22,41 @@ class DefaultController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $logger = $this->get('logger');
+        $launchUser = $this->get('app.user.launch');
 
-        $user = new User();
+        $userTop = new User();
         $referral = $request->get('referral');
         if ($referral) {
-            $user->setReferralId($referral);
+            $userTop->setReferralId($referral);
             $logger->debug(sprintf('Referral %s', $referral));
         }
-        $form = $this->createForm(LaunchType::class, $user);
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $launchUser = $this->get('app.user.launch');
-            $existingUser = $launchUser->addUser($user);
+        $userBottom = clone $userTop;
 
-            return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
+        $formTop = $this->get('form.factory')->createNamedBuilder('launch_top', LaunchType::class, $userTop)->getForm();
+        $formBottom = $this->get('form.factory')->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)->getForm();
+
+        if('POST' === $request->getMethod()) {
+            $existingUser = null;
+            if ($request->request->has('launch_top')) {
+                $formTop->handleRequest($request);
+                if ($formTop->isValid()) {
+                    $existingUser = $launchUser->addUser($userTop);
+                }
+            } elseif ($request->request->has('launch_bottom')) {
+                $formBottom->handleRequest($request);
+                if ($formBottom->isValid()) {
+                    $existingUser = $launchUser->addUser($userBottom);
+                }
+            }
+
+            if ($existingUser) {
+                return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
+            }
         }
 
         return array(
-            'form' => $form->createView(),
+            'form_top' => $formTop->createView(),
+            'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
         );
     }
