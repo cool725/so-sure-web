@@ -10,6 +10,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Policy;
+use AppBundle\Form\Type\PhoneType;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class DefaultController extends BaseController
 {
@@ -80,6 +84,44 @@ class DefaultController extends BaseController
     public function alphaAction()
     {
         return array();
+    }
+
+    /**
+     * @Route("/quote", name="quote")
+     * @Template
+     */
+    public function quoteAction(Request $request)
+    {
+        $policy = new Policy();
+        $form = $this->createForm(PhoneType::class, $policy);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $session = new Session();
+            $session->set('quote', $policy->getPhone()->getId());
+
+            return $this->redirectToRoute('purchase');
+        }
+
+        return array(
+            'form' => $form->createView(),
+        );
+    }
+
+    /**
+     * @Route("/price/{id}/", name="price_item")
+     */
+    public function priceItemAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        if (!$phone) {
+            return new JsonResponse([], 404);
+        }
+
+        return new JsonResponse([
+            'price' => $phone->getPolicyPrice(),
+        ]);
     }
 
     /**

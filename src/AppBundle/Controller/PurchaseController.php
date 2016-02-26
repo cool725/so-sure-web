@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
 use AppBundle\Form\Type\PhoneType;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * @Route("/purchase")
@@ -22,87 +24,105 @@ class PurchaseController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $policy = new Policy();
-        $form = $this->createForm(PhoneType::class, $policy);
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $dm = $this->getManager();
-            $dm->persist($policy);
-            $dm->flush();
-            if ($form->get('dd')->isClicked()) {
-                return $this->redirectToRoute('purchase_item_debit', ['id' => $policy->getId()]);
-            } elseif ($form->get('credit')->isClicked()) {
-                return $this->redirectToRoute('purchase_judopay', ['id' => $policy->getId()]);
-            }
+        $phone = $this->getSessionPhone();
+        if (!$phone) {
+            return $this->redirectToRoute('quote');
         }
 
         return array(
-            'form' => $form->createView(),
+            'phone' => $phone
+        );
+    }
+
+    private function getSessionPhone()
+    {
+        $session = new Session();
+        $phoneId = $session->get('quote');
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($phoneId);
+
+        return $phone;
+    }
+
+    /**
+     * @Route("/dd/", name="purchase_item_debit")
+     * @Template
+     */
+    public function purchaseDdItemAction()
+    {
+        $phone = $this->getSessionPhone();
+        if (!$phone) {
+            return $this->redirectToRoute('quote');
+        }
+
+        return array(
+            'phone' => $phone,
         );
     }
 
     /**
-     * @Route("/price/{id}/", name="price_item")
+     * @Route("/cc/success/", name="purchase_judopay_receive_success")
      * @Template
+     * @Method({"POST"})
      */
-    public function priceItemAction($id)
+    public function purchaseJudoPayReceiveSuccessAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phone = $repo->find($id);
-        if (!$phone) {
-            return new JsonResponse([], 404);
-        }
+        $policy = $this->get('app.judopay')->paymentSuccess(
+            $request->get('Reference'),
+            $request->get('ReceiptId'),
+            $request->get('CardToken')
+        );
 
-        return new JsonResponse([
-            'price' => $phone->getPolicyPrice(),
-        ]);
+        return $this->redirectToRoute('purchase_judopay_success', ['id' => $policy->getId()]);
     }
-    
+
     /**
-     * @Route("/dd/{id}/", name="purchase_item_debit")
+     * @Route("/cc/success/{id}", name="purchase_judopay_success")
      * @Template
+     * @Method({"GET"})
      */
-    public function purchaseDdItemAction($id)
+    public function purchaseJudoPaySuccessAction($id)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
-        return array(
-            'phone' => $policy->getPhone(),
-        );
-    }
+        if (!$policy) {
+            throw new \Exception('Unable to locate policy');
+        }
+        if ($policy->getUser()->getId() != $this->getUser()->getId()) {
+            throw new \Exception('Invalid policy');
+        }
 
-    /**
-     * @Route("/cc/success/", name="purchase_judopay_success")
-     * @Template
-     */
-    public function purchaseJudoPaySuccessAction()
-    {
-        return array();
+        return array('policy' => $policy);
     }
-
+    
     /**
-     * @Route("/cc/fail/", name="purchase_judopay_fail")
+     * @Route("/cc/fail/", name="purchase_judopay_receive_fail")
      * @Template
      */
     public function purchaseJudoPayFailAction()
     {
         return array();
     }
-    
+
     /**
-     * @Route("/cc/{id}/", name="purchase_judopay")
+     * @Route("/cc/", name="purchase_judopay")
      * @Template
      */
-    public function purchaseJudoPayAction(Request $request, $id)
+    public function purchaseJudoPayAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($id);
-        $policyPrice = $policy->getPhone()->getPolicyPrice();
+        $phone = $this->getSessionPhone();
+        if (!$phone) {
+            return $this->redirectToRoute('quote');
+        }
+
+        // TODO: Lost addition?
         $webpay = $this->get('app.judopay')->webpay(
-            $policyPrice,
+            $this->getUser(),
+            $phone,
+            $phone->getPolicyPrice(),
             $request->getClientIp(),
             $request->headers->get('User-Agent')
         );
@@ -110,7 +130,7 @@ class PurchaseController extends BaseController
         return array(
             'form_action' => $webpay['post_url'],
             'reference' => $webpay['payment']->getReference(),
-            'phone' => $policy->getPhone(),
+            'phone' => $phone,
         );
     }
 }

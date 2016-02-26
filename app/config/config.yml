@@ -14,7 +14,7 @@ parameters:
 
 framework:
     #esi:             ~
-    #translator:      { fallbacks: ["%locale%"] }
+    translator:      { fallbacks: ["en"] }
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -55,6 +55,8 @@ doctrine_mongodb:
     document_managers:
         default:
             auto_mapping: true
+    default_commit_options:
+        timeout: 10  # integer >= -1
 
 # Swiftmailer Configuration
 swiftmailer:
@@ -77,7 +79,10 @@ fos_user:
     db_driver: mongodb
     firewall_name: main
     user_class: AppBundle\Document\User
-
+    registration:
+        form:
+            type: AppBundle\Form\Type\RegistrationFormType
+            
 hwi_oauth:
     connect:
         account_connector: app.user

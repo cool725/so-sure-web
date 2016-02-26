@@ -45,5 +45,6 @@ security:
         - { path: ^/admin/, role: ROLE_ADMIN }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/purchase/, role: ROLE_USER }
+        - { path: ^/user/, role: ROLE_USER }
 
         

@@ -15,8 +15,7 @@ class PhoneType extends AbstractType
     {
         $builder
             ->add('phone', DocumentType::class, ['class' => 'AppBundle:Phone'])
-            ->add('dd', SubmitType::class)
-            ->add('credit', SubmitType::class)
+            ->add('next', SubmitType::class)
         ;
     }
 
