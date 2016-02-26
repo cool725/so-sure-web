@@ -87,7 +87,7 @@ class Phone
     {
         return $this->memory;
     }
-    
+
     public function __toString()
     {
         $name = sprintf("%s %s", $this->make, $this->model);
@@ -96,5 +96,15 @@ class Phone
         }
 
         return $name;
+    }
+
+    public function asArray()
+    {
+        return [
+            'make' => $this->getMake(),
+            'model' => $this->getModel(),
+            'devices' => $this->getDevices(),
+            'memory' => $this->getMemory(),
+        ];
     }
 }
