@@ -37,28 +37,28 @@ class UserController extends BaseController
     }
 
     /**
-     * @param string $permisison
+     * @param string $requiredPermission
      * @param array  $allPermissions
      *
      * @return null|RedirectResponse
      */
-    private function getFacebookPermission($permission, $allPermissions)
+    private function getFacebookPermission($requiredPermission, $allPermissions)
     {
         $fb = new \Facebook\Facebook([
           'app_id' => $this->getParameter('fb_appid'),
           'app_secret' => $this->getParameter('fb_secret'),
           'default_graph_version' => 'v2.5',
-          'default_access_token' => $this->getUser()->getFacebookAccessToken(), 
+          'default_access_token' => $this->getUser()->getFacebookAccessToken(),
         ]);
         $response = $fb->get('/me/permissions');
-        $permissions = $response->getGraphEdge();
+        $currentPermissions = $response->getGraphEdge();
         $foundPermission = false;
-        foreach($permissions as $permisison) {
-            if ($permisison['permission'] == $permisison) {
+        foreach ($currentPermissions as $currentPermission) {
+            if ($currentPermission['permission'] == $requiredPermission) {
                 $foundPermission = true;
             }
         }
-        
+
         if (!$foundPermision) {
             $helper = $fb->getRedirectLoginHelper();
             $permissions = $allPermissions; // optional

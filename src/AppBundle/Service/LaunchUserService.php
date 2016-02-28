@@ -39,8 +39,8 @@ class LaunchUserService
         \Swift_Mailer $mailer,
         $templating,
         $router,
-        ShortLinkService $shortLink)
-    {
+        ShortLinkService $shortLink
+    ) {
         $this->dm = $doctrine->getManager();
         $this->logger = $logger;
         $this->mailchimp = $mailchimp;
