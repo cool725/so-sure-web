@@ -32,7 +32,7 @@ class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="User")
      */
-    protected $user;    
+    protected $user;
 
     /** @MongoDB\String() */
     protected $status;

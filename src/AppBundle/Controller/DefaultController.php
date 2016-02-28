@@ -36,8 +36,12 @@ class DefaultController extends BaseController
         }
         $userBottom = clone $userTop;
 
-        $formTop = $this->get('form.factory')->createNamedBuilder('launch_top', LaunchType::class, $userTop)->getForm();
-        $formBottom = $this->get('form.factory')->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)->getForm();
+        $formTop = $this->get('form.factory')
+            ->createNamedBuilder('launch_top', LaunchType::class, $userTop)
+            ->getForm();
+        $formBottom = $this->get('form.factory')
+            ->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)
+            ->getForm();
 
         if('POST' === $request->getMethod()) {
             $existingUser = null;

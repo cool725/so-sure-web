@@ -108,12 +108,14 @@ class User extends BaseUser
         $this->name = $name;
     }
 
-    public function setEmail($email){
+    public function setEmail($email)
+    {
         $this->email = $email;
         $this->username = $email;
     }
 
-    public function setEmailCanonical($emailCanonical){
+    public function setEmailCanonical($emailCanonical)
+    {
         $this->emailCanonical = $emailCanonical;
         $this->usernameCanonical = $emailCanonical;
     }

@@ -37,7 +37,7 @@ class UserController extends BaseController
     }
 
     /**
-     * @param string $permisison
+     * @param string $permission
      * @param array  $allPermissions
      *
      * @return null|RedirectResponse
@@ -48,12 +48,12 @@ class UserController extends BaseController
           'app_id' => $this->getParameter('fb_appid'),
           'app_secret' => $this->getParameter('fb_secret'),
           'default_graph_version' => 'v2.5',
-          'default_access_token' => $this->getUser()->getFacebookAccessToken(), 
+          'default_access_token' => $this->getUser()->getFacebookAccessToken(),
         ]);
         $response = $fb->get('/me/permissions');
         $permissions = $response->getGraphEdge();
         $foundPermission = false;
-        foreach($permissions as $permisison) {
+        foreach ($permissions as $permisison) {
             if ($permisison['permission'] == $permisison) {
                 $foundPermission = true;
             }

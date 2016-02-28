@@ -39,7 +39,7 @@ class Payment
     /**
      * @MongoDB\ReferenceOne(targetDocument="User")
      */
-    protected $user;    
+    protected $user;
 
     public function __construct()
     {
