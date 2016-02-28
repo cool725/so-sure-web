@@ -43,7 +43,7 @@ class DefaultController extends BaseController
             ->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)
             ->getForm();
 
-        if('POST' === $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $existingUser = null;
             if ($request->request->has('launch_top')) {
                 $formTop->handleRequest($request);
