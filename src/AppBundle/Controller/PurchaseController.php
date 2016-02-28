@@ -22,7 +22,7 @@ class PurchaseController extends BaseController
      * @Route("/", name="purchase")
      * @Template
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         $phone = $this->getSessionPhone();
         if (!$phone) {
