@@ -2,6 +2,7 @@ imports:
     - { resource: config.yml }
 
 framework:
+    trusted_hosts: ['localhost', 'dev.so-sure.net']
     router:
         resource: "%kernel.root_dir%/config/routing_dev.yml"
         strict_requirements: true
