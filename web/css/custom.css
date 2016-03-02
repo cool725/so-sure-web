@@ -58,6 +58,7 @@
 .hero {
   background-image: url('../images/homepage-cover.png');
   background-size: cover;
+  background-color: #666666;
   color: #fff;
 }
 .hero strong {
