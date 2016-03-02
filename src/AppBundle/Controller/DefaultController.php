@@ -75,10 +75,10 @@ class DefaultController extends BaseController
      */
     public function launchAction($id)
     {
-        $url = $this->generateUrl('homepage', ['referral' => $id], UrlGeneratorInterface::ABSOLUTE_URL);
-        $shortLink = $this->get('app.shortlink');
+        $launchUser = $this->get('app.user.launch');
+        $url = $launchUser->getLink($id);
 
-        return array('id' => $id, 'referral_url' => $shortLink->addShortLink($url));
+        return array('id' => $id, 'referral_url' => $url);
     }
 
     /**

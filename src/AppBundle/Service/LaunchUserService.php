@@ -65,7 +65,6 @@ class LaunchUserService
                 $referred = $repo->find($user->getReferralId());
                 $referred->addReferral($user);
             }
-            $user->setUsername(strtolower($user->getEmail()));
             $this->dm->persist($user);
             $this->dm->flush();
         } catch (\Exception $e) {
@@ -91,14 +90,26 @@ class LaunchUserService
     }
 
     /**
+     * Get Short Link for a referral
+     *
+     * @param string $userId
+     */
+    public function getLink($userId)
+    {
+        $url = $this->router->generate('homepage', ['referral' => $userId], UrlGeneratorInterface::ABSOLUTE_URL);
+        $referralUrl = $this->shortLink->addShortLink($url);
+
+        return $referralUrl;
+    }
+
+    /**
      * Send user a pre-launch email
      *
      * @param User $user
      */
     public function sendEmail(User $user)
     {
-        $url = $this->router->generate('homepage', ['referral' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $referralUrl = $this->shortLink->addShortLink($url);
+        $referralUrl = $this->getLink($user->getId());
         $message = \Swift_Message::newInstance()
             ->setSubject('Welcome to so-sure')
             ->setFrom('hello@so-sure.com')
