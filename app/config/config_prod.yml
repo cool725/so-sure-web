@@ -1,7 +1,9 @@
 imports:
     - { resource: config.yml }
 
-#framework:
+framework:
+    trusted_hosts: ['wearesosure.com']
+    trusted_proxies:  [10.0.0.0/16]
 #    validation:
 #        cache: validator.mapping.cache.apc
 #    serializer:
