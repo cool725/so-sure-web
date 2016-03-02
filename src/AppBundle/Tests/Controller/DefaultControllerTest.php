@@ -28,16 +28,16 @@ class DefaultControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/');
-        $form = $crawler->selectButton('launch[save]')->form();
+        $form = $crawler->selectButton('launch_bottom[save]')->form();
         
         // set some values
-        $form['launch[email]'] = 'foo@bar.com';
+        $form['launch_bottom[email]'] = 'foo@bar.com';
         // submit the form
         $crawler = $client->submit($form);
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
 
         $crawler = $client->followRedirect();
-        $this->assertContains('/?referral=', $crawler->text());
+        $this->assertContains('http://goo.gl', $crawler->text());
     }
 
     public function testLaunchRetryIndex()
@@ -48,16 +48,16 @@ class DefaultControllerTest extends WebTestCase
         $fooUser = $repo->findOneBy(['email' => 'foo@bar.com']);
 
         $crawler = $client->request('GET', '/');
-        $form = $crawler->selectButton('launch[save]')->form();
+        $form = $crawler->selectButton('launch_bottom[save]')->form();
         
         // set some values
-        $form['launch[email]'] = 'foo@bar.com';
+        $form['launch_bottom[email]'] = 'foo@bar.com';
         // submit the form
         $crawler = $client->submit($form);
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
 
         $crawler = $client->followRedirect();
-        $this->assertContains(sprintf('/?referral=%s', $fooUser->getId()), $crawler->text());
+        $this->assertContains('http://goo.gl', $crawler->text());
     }
 
     public function testLaunchReferalIndex()
@@ -66,22 +66,22 @@ class DefaultControllerTest extends WebTestCase
         $dm = $this->getManager($client);
         $repo = $dm->getRepository(User::class);
         $fooUser = $repo->findOneBy(['email' => 'foo@bar.com']);
+        $this->assertTrue($fooUser !== null);
 
         $crawler = $client->request('GET', sprintf('/?referral=%s', $fooUser->getId()));
-        $form = $crawler->selectButton('launch[save]')->form();
-        
+        $form = $crawler->selectButton('launch_bottom[save]')->form();
+
         // set some values
-        $form['launch[email]'] = 'bar@foo.com';
+        $form['launch_bottom[email]'] = 'bar@foo.com';
         // submit the form
         $crawler = $client->submit($form);
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
 
         $crawler = $client->followRedirect();
-        $this->assertContains('/?referral=', $crawler->text());
-        $this->assertNotContains(sprintf('/?referral=%s', $fooUser->getId()), $crawler->text());
+        $this->assertContains('http://goo.gl', $crawler->text());
 
         $barUser = $repo->findOneBy(['email' => 'bar@foo.com']);
-        $this->assertEquals($fooUser, $barUser->getReferred());
+        $this->assertEquals($fooUser->getId(), $barUser->getReferred()->getId());
         $this->assertEquals(1, count($fooUser->getReferrals()));
     }
 

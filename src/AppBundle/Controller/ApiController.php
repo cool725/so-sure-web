@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,56 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class ApiController extends BaseController
 {
     /**
+     * @Route("/login", name="api_login")
+     * @Method({"POST"})
+     */
+    public function loginAction(Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->findOneBy(['username' => $data['username']]);
+        if (!$user) {
+            return new JsonResponse(['user_exists' => false], 401);
+        }
+
+        $encoder_service = $this->get('security.encoder_factory');
+        $encoder = $encoder_service->getEncoder($user);
+        if (!$encoder->isPasswordValid($user->getPassword(), $data['password'], $user->getSalt())) {
+            return new JsonResponse(['user_exists' => true], 401);
+        }
+
+        return new JsonResponse($user->toApiArray());
+    }
+
+    /**
+     * @Route("/login/facebook", name="api_login_facebook")
+     * @Method({"POST"})
+     */
+    public function loginFacebookAction(Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->findOneBy(['facebook_id' => $data['facebook_id']]);
+        if (!$user) {
+            return new JsonResponse(['user_exists' => false], 401);
+        }
+
+        // TODO: Consider how we validate the facebookAuthToken - can we check against the cognito id.
+        // if auth token matches, is fine, but if its different, could indicate a new token
+        // could perhaps validate token against fb?
+        // or see if facebook is match to authed cognito id?
+        // https://developers.facebook.com/docs/php/FacebookSession/5.0.0
+
+        return new JsonResponse($user->toApiArray());
+    }
+
+    /**
      * @Route("/quote", name="api_quote")
+     * @Method({"GET"})
      */
     public function quoteAction(Request $request)
     {
@@ -46,5 +96,46 @@ class ApiController extends BaseController
         return new JsonResponse([
             'quotes' => $quotes,
         ]);
+    }
+
+    /**
+     * @Route("/referral", name="api_referral")
+     * @Method({"GET"})
+     */
+    public function referralAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->find($request->get('user_id'));
+        if (!$user) {
+            return new JsonResponse(['url' => null]);
+        }
+
+        $launchUser = $this->get('app.user.launch');
+        $url = $launchUser->getLink($user->getId());
+
+        return new JsonResponse(['url' => $url]);
+    }
+
+    /**
+     * @Route("/user", name="api_user")
+     * @Method({"POST"})
+     */
+    public function userAction(Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $userManager = $this->get('fos_user.user_manager');
+        $user = $userManager->createUser();
+        $user->setEmail(isset($data['email']) ? $data['email'] : null);
+        $user->setFirstName(isset($data['first_name']) ? $data['first_name'] : null);
+        $user->setLastName(isset($data['last_name']) ? $data['last_name'] : null);
+        $user->setFacebookId(isset($data['facebook_id']) ? $data['facebook_id'] : null);
+        $user->setFacebookAccessToken(isset($data['facebook_access_token']) ? $data['facebook_access_token'] : null);
+
+        $launchUser = $this->get('app.user.launch');
+        $newUser = $launchUser->addUser($user);
+
+        return new JsonResponse($user->toApiArray());
     }
 }

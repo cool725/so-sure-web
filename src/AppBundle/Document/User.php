@@ -31,14 +31,17 @@ class User extends BaseUser
     /** @MongoDB\Date() */
     protected $created;
 
-    /** @MongoDB\String(name="name", nullable=true) */
-    protected $name;
+    /** @MongoDB\String(name="first_name", nullable=true) */
+    protected $firstName;
+
+    /** @MongoDB\String(name="last_name", nullable=true) */
+    protected $lastName;
 
     /** @MongoDB\String(name="facebook_id", nullable=true) */
-    protected $facebook_id;
+    protected $facebookId;
 
     /** @MongoDB\String(name="facebook_access_token", nullable=true) */
-    protected $facebook_access_token;
+    protected $facebookAccessToken;
 
     public function __construct()
     {
@@ -88,24 +91,39 @@ class User extends BaseUser
         return $this->referrals;
     }
 
-    public function setFacebookAccessToken($facebook_access_token)
+    public function setFacebookAccessToken($facebookAccessToken)
     {
-        $this->facebook_access_token = $facebook_access_token;
+        $this->facebookAccessToken = $facebookAccessToken;
     }
 
     public function getFacebookAccessToken()
     {
-        return $this->facebook_access_token;
+        return $this->facebookAccessToken;
     }
 
-    public function getName()
+    public function getFacebookId()
     {
-        return $this->name;
+        return $this->facebookId;
     }
 
-    public function setName($name)
+    public function getFirstName()
     {
-        $this->name = $name;
+        return $this->firstName;
+    }
+
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+    }
+
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
     }
 
     public function setEmail($email)
@@ -118,5 +136,16 @@ class User extends BaseUser
     {
         $this->emailCanonical = $emailCanonical;
         $this->usernameCanonical = $emailCanonical;
+    }
+
+    public function toApiArray()
+    {
+        return [
+          'id' => $this->getId(),
+          'email' => $this->getEmailCanonical(),
+          'first_name' => $this->getFirstName(),
+          'last_name' => $this->getLastName(),
+          'facebook_id' => $this->getFacebookId(),
+        ];
     }
 }
