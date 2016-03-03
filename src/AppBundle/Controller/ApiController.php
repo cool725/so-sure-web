@@ -75,6 +75,7 @@ class ApiController extends BaseController
      */
     public function quoteAction(Request $request)
     {
+        $this->get('logger')->warning(sprintf("X-AWS-IDENTITY-COGNITO-IDENTITYID: %s", $request->headers->get('X-AWS-IDENTITY-COGNITO-IDENTITYID')));
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phones = $repo->findBy(['devices' => $request->get('device')]);
