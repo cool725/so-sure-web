@@ -61,9 +61,14 @@ if (ga_id !== '') {
   document, 'script', '//connect.facebook.net/en_US/fbevents.js');
 
 fb_pixel_id = $('#ss-root').data('fb-pixel-id');
+fb_pixel_event = $('#ss-root').data('fb-pixel-event');
 if (fb_pixel_id !== '') {
   fbq('init', fb_pixel_id);
   fbq('track', "PageView");
+  if (fb_pixel_event) {
+    fbq('track', fb_pixel_event);
+    //console.log('fb_pixel_event ' + fb_pixel_event);
+  }
 } else {
   //console.log('no fbpx');
 }
