@@ -73,8 +73,14 @@ class ApiController extends BaseController
 
     private function logIdentity(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
-        $this->get('logger')->warning(sprintf("Identity: %s", print_r($data['identity'], true)));
+        $this->get('logger')->warning(sprintf("Raw: %s", $request->getContent()));
+        try {
+            $data = json_decode($request->getContent(), true);
+            $this->get('logger')->warning(sprintf("Data: %s", print_r($data, true)));
+            $this->get('logger')->warning(sprintf("Identity: %s", print_r($data['identity'], true)));
+        } catch(\Exception $e) {
+            $this->get('logger')->error($e->getMessage());
+        }
     }
 
     /**
