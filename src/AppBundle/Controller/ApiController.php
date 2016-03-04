@@ -78,8 +78,10 @@ class ApiController extends BaseController
         $this->get('logger')->warning(sprintf("X-AWS-IDENTITY-COGNITO-IDENTITYID: %s", $request->headers->get('X-AWS-IDENTITY-COGNITO-IDENTITYID')));
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $phones = $repo->findBy(['devices' => $request->get('device')]);
-        if (!$phones || count($phones) == 0) {
+        $device = $request->get('device');
+        $phones = $repo->findBy(['devices' => $device]);
+        if (!$phones || count($phones) == 0 || $device == "") {
+            $this->unknownDevice($device);
             $phones = $repo->findBy(['make' => 'ALL']);
         }
 
@@ -97,6 +99,26 @@ class ApiController extends BaseController
         return new JsonResponse([
             'quotes' => $quotes,
         ]);
+    }
+
+    /**
+     * @param string $devic
+     */
+    private function unknownDevice($device)
+    {
+        if ($device == "") {
+            return;
+        }
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Unknown Device')
+            ->setFrom('tech@so-sure.com')
+            ->setTo('tech@so-sure.com')
+            ->setBody(
+                sprintf('Unknown device queried: %s', $device),
+                'text/html'
+            );
+        $this->get('mailer')->send($message);
     }
 
     /**
