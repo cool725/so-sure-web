@@ -27,7 +27,7 @@ class ApiController extends BaseController
      */
     public function loginAction(Request $request)
     {
-        $this->logIdentity($request);
+        $identity = $this->parseIdentity($request);
         $data = json_decode($request->getContent(), true)['body'];
 
         $dm = $this->getManager();
@@ -52,7 +52,7 @@ class ApiController extends BaseController
      */
     public function loginFacebookAction(Request $request)
     {
-        $this->logIdentity($request);
+        $identity = $this->parseIdentity($request);
         $data = json_decode($request->getContent(), true)['body'];
 
         $dm = $this->getManager();
@@ -71,26 +71,12 @@ class ApiController extends BaseController
         return new JsonResponse($user->toApiArray());
     }
 
-    private function logIdentity(Request $request)
-    {
-        $this->get('logger')->warning(sprintf("Raw: %s", $request->getContent()));
-        try {
-            $data = json_decode($request->getContent(), true);
-            $this->get('logger')->warning(sprintf("Data: %s", print_r($data, true)));
-            $this->get('logger')->warning(sprintf("Identity: %s", print_r($data['identity'], true)));
-        } catch(\Exception $e) {
-            $this->get('logger')->error($e->getMessage());
-        }
-    }
-
     /**
      * @Route("/quote", name="api_quote")
      * @Method({"GET"})
      */
     public function quoteAction(Request $request)
     {
-        $this->logIdentity($request);
-
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $device = $request->get('device');
@@ -142,8 +128,6 @@ class ApiController extends BaseController
      */
     public function referralAction(Request $request)
     {
-        $this->logIdentity($request);
-
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $user = $repo->find($request->get('user_id'));
@@ -163,8 +147,7 @@ class ApiController extends BaseController
      */
     public function userAction(Request $request)
     {
-        $this->logIdentity($request);
-
+        $identity = $this->parseIdentity($request);
         $data = json_decode($request->getContent(), true)['body'];
 
         $userManager = $this->get('fos_user.user_manager');
