@@ -27,7 +27,8 @@ class ApiController extends BaseController
      */
     public function loginAction(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
+        $this->logIdentity($request);
+        $data = json_decode($request->getContent(), true)['body'];
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
@@ -51,7 +52,8 @@ class ApiController extends BaseController
      */
     public function loginFacebookAction(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
+        $this->logIdentity($request);
+        $data = json_decode($request->getContent(), true)['body'];
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
@@ -69,13 +71,20 @@ class ApiController extends BaseController
         return new JsonResponse($user->toApiArray());
     }
 
+    private function logIdentity(Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+        $this->get('logger')->warning(sprintf("Identity: %s", print_r($data['identity'], true)));
+    }
+
     /**
      * @Route("/quote", name="api_quote")
      * @Method({"GET"})
      */
     public function quoteAction(Request $request)
     {
-        $this->get('logger')->warning(sprintf("X-AWS-IDENTITY-COGNITO-IDENTITYID: %s", $request->headers->get('X-AWS-IDENTITY-COGNITO-IDENTITYID')));
+        $this->logIdentity($request);
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $device = $request->get('device');
@@ -102,7 +111,7 @@ class ApiController extends BaseController
     }
 
     /**
-     * @param string $devic
+     * @param string $device
      */
     private function unknownDevice($device)
     {
@@ -127,6 +136,8 @@ class ApiController extends BaseController
      */
     public function referralAction(Request $request)
     {
+        $this->logIdentity($request);
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $user = $repo->find($request->get('user_id'));
@@ -146,7 +157,9 @@ class ApiController extends BaseController
      */
     public function userAction(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
+        $this->logIdentity($request);
+
+        $data = json_decode($request->getContent(), true)['body'];
 
         $userManager = $this->get('fos_user.user_manager');
         $user = $userManager->createUser();
