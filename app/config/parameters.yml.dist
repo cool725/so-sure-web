@@ -37,3 +37,7 @@ parameters:
 
     mongodb_db: mongo
     mongodb_url: mongodb://localhost
+
+    aws_key: ''
+    aws_secret: ''
+    aws_cognito_identitypoolid: ''
