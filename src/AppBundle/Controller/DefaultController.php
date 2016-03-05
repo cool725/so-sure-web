@@ -48,12 +48,12 @@ class DefaultController extends BaseController
             if ($request->request->has('launch_top')) {
                 $formTop->handleRequest($request);
                 if ($formTop->isValid()) {
-                    $existingUser = $launchUser->addUser($userTop);
+                    $existingUser = $launchUser->addUser($userTop)['user'];
                 }
             } elseif ($request->request->has('launch_bottom')) {
                 $formBottom->handleRequest($request);
                 if ($formBottom->isValid()) {
-                    $existingUser = $launchUser->addUser($userBottom);
+                    $existingUser = $launchUser->addUser($userBottom)['user'];
                 }
             }
 

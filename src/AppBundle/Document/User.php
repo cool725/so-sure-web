@@ -138,7 +138,7 @@ class User extends BaseUser
         $this->usernameCanonical = $emailCanonical;
     }
 
-    public function toApiArray()
+    public function toApiArray($identityId = null, $token = null)
     {
         return [
           'id' => $this->getId(),
@@ -146,6 +146,8 @@ class User extends BaseUser
           'first_name' => $this->getFirstName(),
           'last_name' => $this->getLastName(),
           'facebook_id' => $this->getFacebookId(),
+          'cognito_identity_id' => $identityId,
+          'cognito_token' => $token,
         ];
     }
 }

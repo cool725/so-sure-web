@@ -40,7 +40,7 @@ class LaunchUserCommand extends ContainerAwareCommand
 
         $user = new User();
         $user->setEmail($email);
-        $user = $launchUser->addUser($user, $resend);
+        $user = $launchUser->addUser($user, $resend)['user'];
         $url = $router->generate('homepage', ['referral' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         $url = $shortLink->addShortLink($url);
         $output->writeln(sprintf('%s,%s', $email, $url));

@@ -54,7 +54,7 @@ class LaunchUserService
      * @param User    $user
      * @param boolean $resend Resend the launch email even if user exists
      *
-     * @return User
+     * @return array 'user' & 'new'
      */
     public function addUser(User $user, $resend = false)
     {
@@ -86,7 +86,7 @@ class LaunchUserService
             $this->sendEmail($existingUser);
         }
 
-        return $existingUser;
+        return ['user' => $existingUser, 'new' => $userCreated];
     }
 
     /**
