@@ -52,7 +52,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('username' => 'foo', 'password' => 'bar'))
+            json_encode(array('body' => array('username' => 'foo', 'password' => 'bar')))
         );
         $this->assertEquals(401, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent());
@@ -75,7 +75,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('username' => 'foo', 'password' => 'barfoo'))
+            json_encode(array('body' => array('username' => 'foo', 'password' => 'barfoo')))
         );
         $this->assertEquals(401, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent());
@@ -93,7 +93,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('username' => 'foo@api.bar.com', 'password' => 'bar'))
+            json_encode(array('body' => array('username' => 'foo@api.bar.com', 'password' => 'bar')))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent());
@@ -110,7 +110,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('email' => 'api-new-user@api.bar.com'))
+            json_encode(array('body' => array('email' => 'api-new-user@api.bar.com')))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent());

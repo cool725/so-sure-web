@@ -26,7 +26,8 @@
         "google/apiclient": "^2.0.0@RC",
         "staffim/rollbar-bundle": "*",
         "judopay/judopay-sdk": "~1.0",
-        "facebook/php-sdk-v4": "^5.1"
+        "facebook/php-sdk-v4": "^5.1",
+        "aws/aws-sdk-php": "^3.15"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
@@ -34,7 +35,8 @@
         "phing/phing": "^2.13",
         "phpunit/phpunit": "^4.3",
         "liip/functional-test-bundle": "^1.3",
-        "doctrine/doctrine-fixtures-bundle": "^2.3"
+        "doctrine/doctrine-fixtures-bundle": "^2.3",
+        "squizlabs/php_codesniffer": "2.*"
     },
     "scripts": {
         "post-install-cmd": [

@@ -14,6 +14,7 @@ services:
           logger: "@logger"
           apikey: %mailchimp_apikey%
           list: %mailchimp_prelaunch_list%
+          environment: %kernel.environment%
 
     app.gocardless:
         class: AppBundle\Service\GocardlessService
@@ -48,3 +49,22 @@ services:
             logger: "@logger"
             googleAppName: %google_appname%
             googleApiKey: %google_apikey%
+
+    app.cognito.identity:
+        class: AppBundle\Service\CognitoIdentityService
+        arguments:
+            logger: "@logger"
+
+    aws.credentials:
+        class: Aws\Credentials\Credentials
+        arguments:
+            key: "%aws_key%"
+            secret: "%aws_secret%"
+
+    aws.cognito:
+        class: Aws\CognitoIdentity\CognitoIdentityClient
+        arguments:
+            -
+                version: "latest"
+                region: "eu-west-1"
+                credentials: "@aws.credentials"

@@ -79,7 +79,7 @@ class ApiController extends BaseController
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $device = $request->get('device');
+        $device = trim($request->get('device'));
         $phones = $repo->findBy(['devices' => $device]);
         if (!$phones || count($phones) == 0 || $device == "") {
             $this->unknownDevice($device);
@@ -107,7 +107,7 @@ class ApiController extends BaseController
      */
     private function unknownDevice($device)
     {
-        if ($device == "") {
+        if ($device == "" || $device == "generic_x86") {
             return;
         }
 
@@ -159,8 +159,26 @@ class ApiController extends BaseController
         $user->setFacebookAccessToken(isset($data['facebook_access_token']) ? $data['facebook_access_token'] : null);
 
         $launchUser = $this->get('app.user.launch');
-        $newUser = $launchUser->addUser($user);
+        $addedUser = $launchUser->addUser($user);
 
-        return new JsonResponse($user->toApiArray());
+        $identityId = isset($identity['cognitoIdentityId']) ? $identity['cognitoIdentityId'] : null;
+        $token = null;
+        // Important! This should only run if the user is a new user - otherwise, could impersonate an existing user
+        if ($addedUser['new'] && $identityId) {
+            $cognito = $this->get('aws.cognito');
+            $result = $cognito->getOpenIdTokenForDeveloperIdentity(array(
+                'IdentityPoolId' => $this->getParameter('aws_cognito_identitypoolid'),
+                'IdentityId' => $identityId,
+                'Logins' => array(
+                    'login.so-sure.com' => $addedUser['user']->getId(),
+                ),
+                'TokenDuration' => 300,
+            ));
+            $identityId = $result->{'IdentityId'};
+            $token = $result->{'Token'};
+            $this->get('logger')->warning('Created Cognito Identity %s', $identityId);
+        }
+
+        return new JsonResponse($user->toApiArray($identityId, $token));
     }
 }
