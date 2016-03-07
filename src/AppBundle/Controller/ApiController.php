@@ -80,10 +80,12 @@ class ApiController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $device = trim($request->get('device'));
+        $deviceFound = true;
         $phones = $repo->findBy(['devices' => $device]);
         if (!$phones || count($phones) == 0 || $device == "") {
             $this->unknownDevice($device);
             $phones = $repo->findBy(['make' => 'ALL']);
+            $deviceFound = false;
         }
 
         $quotes = [];
@@ -99,6 +101,7 @@ class ApiController extends BaseController
 
         return new JsonResponse([
             'quotes' => $quotes,
+            'device_found' => $deviceFound,
         ]);
     }
 
