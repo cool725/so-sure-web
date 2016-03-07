@@ -99,6 +99,8 @@ class ApiController extends BaseController
             ];
         }
 
+        $this->get('logger')->warning(sprintf('X-Forwarded: %s', $request->headers->get('X-FORWARDED-FOR')));
+
         return new JsonResponse([
             'quotes' => $quotes,
             'device_found' => $deviceFound,
