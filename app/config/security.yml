@@ -46,4 +46,4 @@ security:
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/purchase/, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
-        - { path: ^/api, access: "isApiPort()" }
+        - { path: ^/api, access: "isApiPort(8080)" }
