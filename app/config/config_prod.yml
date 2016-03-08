@@ -2,6 +2,8 @@ imports:
     - { resource: config.yml }
 
 framework:
+    # 10.* required for the elb load balancing health check
+    trusted_hosts: ['wearesosure.com', '10\.\d+\.\d+\.\d+']
 #    validation:
 #        cache: validator.mapping.cache.apc
 #    serializer:
