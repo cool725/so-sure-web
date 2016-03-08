@@ -391,12 +391,22 @@ ul.jobs {
 .refer h3 {
   padding-top: 3rem;
 }
+.refer ul {
+  text-align: left;
+  list-style: none;
+  padding-top: 2rem;
+  font-size: 1.1em;
+}
 .refer-card {
   border-color: #f2f2f2;
   border-width: 2px;
   border-style: solid;
   padding: 20px;
   position: relative;
+  height: 20rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   margin: 0.5rem 0 1rem 0;
   border-radius: 5px;
 }
