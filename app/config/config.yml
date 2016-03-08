@@ -100,3 +100,13 @@ hwi_oauth:
             options:
                 #display: popup #dialog is optimized for popup window
                 auth_type: rerequest # Re-asking for Declined Permissions
+
+jms_di_extra:
+    locations:
+        all_bundles: false
+        bundles: [AppBundle]
+        directories: ["%kernel.root_dir%/../src"]
+
+jms_security_extra:
+    expressions: true
+        
