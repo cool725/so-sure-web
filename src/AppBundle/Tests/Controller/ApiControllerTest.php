@@ -93,7 +93,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('username' => 'foo@api.bar.com', 'password' => 'bar')))
+            json_encode(array('body' => array('username' => 'foo@api.bar.com', 'password' => 'bar'), 'identity' => []))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent());

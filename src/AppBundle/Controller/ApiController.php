@@ -43,7 +43,9 @@ class ApiController extends BaseController
             return new JsonResponse(['user_exists' => true], 401);
         }
 
-        return new JsonResponse($user->toApiArray());
+        list($identityId, $token) = $this->getCognitoIdToken($user, $identity);
+
+        return new JsonResponse($user->toApiArray($identityId, $token));
     }
 
     /**
@@ -108,26 +110,6 @@ class ApiController extends BaseController
     }
 
     /**
-     * @param string $device
-     */
-    private function unknownDevice($device)
-    {
-        if ($device == "" || $device == "generic_x86") {
-            return;
-        }
-
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Unknown Device')
-            ->setFrom('tech@so-sure.com')
-            ->setTo('tech@so-sure.com')
-            ->setBody(
-                sprintf('Unknown device queried: %s', $device),
-                'text/html'
-            );
-        $this->get('mailer')->send($message);
-    }
-
-    /**
      * @Route("/referral", name="api_referral")
      * @Method({"GET"})
      */
@@ -166,24 +148,58 @@ class ApiController extends BaseController
         $launchUser = $this->get('app.user.launch');
         $addedUser = $launchUser->addUser($user);
 
-        $identityId = isset($identity['cognitoIdentityId']) ? $identity['cognitoIdentityId'] : null;
+        $identityId = null;
         $token = null;
         // Important! This should only run if the user is a new user - otherwise, could impersonate an existing user
         if ($addedUser['new'] && $identityId) {
-            $cognito = $this->get('aws.cognito');
-            $result = $cognito->getOpenIdTokenForDeveloperIdentity(array(
-                'IdentityPoolId' => $this->getParameter('aws_cognito_identitypoolid'),
-                'IdentityId' => $identityId,
-                'Logins' => array(
-                    'login.so-sure.com' => $addedUser['user']->getId(),
-                ),
-                'TokenDuration' => 300,
-            ));
-            $identityId = $result->{'IdentityId'};
-            $token = $result->{'Token'};
-            $this->get('logger')->warning('Created Cognito Identity %s', $identityId);
+            list($identityId, $token) = $this->getCognitoIdToken($addedUser['user'], $identity);
         }
 
         return new JsonResponse($user->toApiArray($identityId, $token));
+    }
+
+    private function getCognitoIdToken(User $user, $identity)
+    {
+        $cognito = $this->get('aws.cognito');
+        $devIdentity = array(
+            'IdentityPoolId' => $this->getParameter('aws_cognito_identitypoolid'),
+            'Logins' => array(
+                'login.so-sure.com' => $user->getId(),
+            ),
+            'TokenDuration' => 300,
+        );
+        if (isset($identity['cognitoIdentityId'])) {
+            $devIdentity['IdentityId'] = $identity['cognitoIdentityId'];
+        }
+        $result = $cognito->getOpenIdTokenForDeveloperIdentity($devIdentity);
+        $identityId = $result->get('IdentityId');
+        $token = $result->get('Token');
+        $this->get('logger')->warning(sprintf('Found Cognito Identity %s', $identityId));
+
+        return [$identityId, $token];
+    }
+
+    /**
+     * @param string $device
+     *
+     * @return boolean true if unknown device notification was sent
+     */
+    private function unknownDevice($device)
+    {
+        if ($device == "" || $device == "generic_x86" || $device == "generic_x86_64") {
+            return false;
+        }
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Unknown Device')
+            ->setFrom('tech@so-sure.com')
+            ->setTo('tech@so-sure.com')
+            ->setBody(
+                sprintf('Unknown device queried: %s', $device),
+                'text/html'
+            );
+        $this->get('mailer')->send($message);
+
+        return true;
     }
 }
