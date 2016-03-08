@@ -82,7 +82,15 @@ fos_user:
     registration:
         form:
             type: AppBundle\Form\Type\RegistrationFormType
-            
+    service:
+        mailer: fos_user.mailer.twig_swift
+    resetting:
+        email:
+            template: email/password_resetting.email.twig
+            from_email:
+                address:        hello@wearesosure.com
+                sender_name:    so-sure
+
 hwi_oauth:
     connect:
         account_connector: app.user
