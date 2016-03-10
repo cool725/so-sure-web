@@ -33,4 +33,3 @@ class PortEvaluator
         return intval($_SERVER['SERVER_PORT']) === intval($apiPort);
     }
 }
-
