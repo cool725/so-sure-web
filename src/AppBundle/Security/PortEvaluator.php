@@ -27,9 +27,11 @@ class PortEvaluator
         // See http://php.net/manual/en/reserved.variables.server.php under SERVER_PORT
         // See http://stackoverflow.com/questions/6474783/which-server-variables-are-safe
         // Requires UseCanonicalName On & UseCanonicalPhysicalPort On in apache in order to be trusted
+        $defaultPort = $this->container->getParameter('kernel.environment') == 'test' ? 8080 : 80;
+        $serverPort = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : $defaultPort;
         $logger = $this->container->get('logger');
-        $logger->debug(sprintf("SERVER PORT: %s Expected: %s", $_SERVER['SERVER_PORT'], $apiPort));
+        $logger->debug(sprintf("SERVER PORT: %s Expected: %s", $serverPort, $apiPort));
 
-        return intval($_SERVER['SERVER_PORT']) === intval($apiPort);
+        return intval($serverPort) === intval($apiPort);
     }
 }

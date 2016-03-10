@@ -21,6 +21,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class ApiController extends BaseController
 {
+    const ERROR_USER_EXISTS=100;
+    const ERROR_USER_ABSENT=101;
+
     /**
      * @Route("/login", name="api_login")
      * @Method({"POST"})
@@ -34,18 +37,48 @@ class ApiController extends BaseController
         $repo = $dm->getRepository(User::class);
         $user = $repo->findOneBy(['username' => $data['username']]);
         if (!$user) {
-            return new JsonResponse(['user_exists' => false], 401);
+            return new JsonResponse([
+                'code' => self::ERROR_USER_ABSENT,
+                'description' => 'User not found'
+            ], 403);
         }
 
         $encoder_service = $this->get('security.encoder_factory');
         $encoder = $encoder_service->getEncoder($user);
         if (!$encoder->isPasswordValid($user->getPassword(), $data['password'], $user->getSalt())) {
-            return new JsonResponse(['user_exists' => true], 401);
+            return new JsonResponse([
+                'code' => self::ERROR_USER_EXISTS,
+                'description' => 'Invalid password'
+            ], 403);
         }
 
         list($identityId, $token) = $this->getCognitoIdToken($user, $identity);
 
         return new JsonResponse($user->toApiArray($identityId, $token));
+    }
+
+    /**
+     * @Route("/token", name="api_token")
+     * @Method({"POST"})
+     */
+    public function tokenAction(Request $request)
+    {
+        $identity = $this->parseIdentity($request);
+        $data = json_decode($request->getContent(), true)['body'];
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->findOneBy(['token' => $data['token']]);
+        if (!$user) {
+            return new JsonResponse([
+                'code' => self::ERROR_USER_ABSENT,
+                'description' => 'User not found'
+            ], 403);
+        }
+
+        list($identityId, $token) = $this->getCognitoIdToken($user, $identity);
+
+        return new JsonResponse(['id' => $identityId, 'token' => $token]);
     }
 
     /**
@@ -144,6 +177,7 @@ class ApiController extends BaseController
         $user->setLastName(isset($data['last_name']) ? $data['last_name'] : null);
         $user->setFacebookId(isset($data['facebook_id']) ? $data['facebook_id'] : null);
         $user->setFacebookAccessToken(isset($data['facebook_access_token']) ? $data['facebook_access_token'] : null);
+        $user->setSnsEndpoint(isset($data['sns_endpoint']) ? $data['sns_endpoint'] : null);
 
         $launchUser = $this->get('app.user.launch');
         $addedUser = $launchUser->addUser($user);
