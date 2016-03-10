@@ -43,11 +43,18 @@ class User extends BaseUser
     /** @MongoDB\String(name="facebook_access_token", nullable=true) */
     protected $facebookAccessToken;
 
+    /** @MongoDB\String(name="token", nullable=true) @MongoDB\Index(unique=true, sparse=true) */
+    protected $token;
+
+    /** @MongoDB\String(name="sns_endpoint", nullable=true) */
+    protected $snsEndpoint;
+
     public function __construct()
     {
         parent::__construct();
         $this->referrals = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = new \DateTime();
+        $this->token = bin2hex(openssl_random_pseudo_bytes(64));
     }
 
     public function getId()
@@ -138,6 +145,21 @@ class User extends BaseUser
         $this->usernameCanonical = $emailCanonical;
     }
 
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    public function getSnsEndpoint()
+    {
+        return $this->snsEndpoint;
+    }
+
+    public function setSnsEndpoint($snsEndpoint)
+    {
+        $this->snsEndpoint = $snsEndpoint;
+    }
+
     public function toApiArray($identityId = null, $token = null)
     {
         return [
@@ -146,8 +168,8 @@ class User extends BaseUser
           'first_name' => $this->getFirstName(),
           'last_name' => $this->getLastName(),
           'facebook_id' => $this->getFacebookId(),
-          'cognito_identity_id' => $identityId,
-          'cognito_token' => $token,
+          'cognito_token' => [ 'id' => $identityId, 'token' => $token ],
+          'user_token' => ['token' => $this->getToken()],
         ];
     }
 }

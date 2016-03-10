@@ -54,9 +54,9 @@ class ApiControllerTest extends WebTestCase
             array('CONTENT_TYPE' => 'application/json'),
             json_encode(array('body' => array('username' => 'foo', 'password' => 'bar')))
         );
-        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent());
-        $this->assertFalse($data->{'user_exists'});
+        $this->assertEquals(101, $data->{'code'});
     }
 
     public function testLoginBadPassword()
@@ -77,9 +77,9 @@ class ApiControllerTest extends WebTestCase
             array('CONTENT_TYPE' => 'application/json'),
             json_encode(array('body' => array('username' => 'foo', 'password' => 'barfoo')))
         );
-        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent());
-        $this->assertTrue($data->{'user_exists'});
+        $this->assertEquals(100, $data->{'code'});
     }
 
     public function testLoginOk()
@@ -98,6 +98,40 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent());
         $this->assertEquals('foo@api.bar.com', $data->{'email'});
+    }
+
+    public function testOkToken()
+    {
+        $client = static::createClient();
+        $user = $this->createUser($client, 'token@api.bar.com', 'bar');
+
+        $crawler = $client->request(
+            'POST',
+            '/api/v1/token',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(array('body' => array('token' => $user->getToken()), 'identity' => []))
+        );
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent());
+        $this->assertTrue(strlen($data->{'token'}) > 20);
+    }
+
+    public function testBadToken()
+    {
+        $client = static::createClient();
+        $user = $this->createUser($client, 'badtoken@api.bar.com', 'bar');
+
+        $crawler = $client->request(
+            'POST',
+            '/api/v1/token',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(array('body' => array('token' => $user->getToken() + 'bad'), 'identity' => []))
+        );
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
 
     public function testCreateUser()
