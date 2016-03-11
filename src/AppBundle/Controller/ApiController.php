@@ -12,6 +12,7 @@ use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Sns;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -107,6 +108,25 @@ class ApiController extends BaseController
     }
 
     /**
+     * @Route("/sns", name="api_sns")
+     * @Method({"POST"})
+     */
+    public function snsAction(Request $request)
+    {
+        $identity = $this->parseIdentity($request);
+        $data = json_decode($request->getContent(), true)['body'];
+        $endpoint = isset($data['endpoint']) ? $data['endpoint'] : null;
+        if (!$endpoint) {
+            return new JsonResponse([], 400);
+        }
+
+        $this->snsSubscribe('all', $endpoint);
+        $this->snsSubscribe('unregistered', $endpoint);
+
+        return new JsonResponse();
+    }
+
+    /**
      * @Route("/quote", name="api_quote")
      * @Method({"GET"})
      */
@@ -189,7 +209,89 @@ class ApiController extends BaseController
             list($identityId, $token) = $this->getCognitoIdToken($addedUser['user'], $identity);
         }
 
+        if ($user->getSnsEndpoint() != null) {
+            $this->snsSubscribe('registered', $user->getSnsEndpoint());
+            $this->snsUnsubscribe('unregistered', $user->getSnsEndpoint());
+        }
+
         return new JsonResponse($user->toApiArray($identityId, $token));
+    }
+
+    private function getArnForTopic($topic)
+    {
+        switch($topic) {
+            case 'all':
+                return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_All';
+            case 'registered':
+                return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_Registered';
+            case 'unregistered':
+                return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_Unregistered';
+        }
+
+        return null;
+    }
+
+    private function snsSubscribe($topic, $endpoint)
+    {
+        $client = $this->get('aws.sns');
+        $result = $client->subscribe(array(
+            // TopicArn is required
+            'TopicArn' => $this->getArnForTopic($topic),
+            // Protocol is required
+            'Protocol' => 'application',
+            'Endpoint' => $endpoint,
+        ));
+        $subscriptionArn = $result['SubscriptionArn'];
+
+        $dm = $this->getManager();
+        $snsRepo = $dm->getRepository(Sns::class);
+        $sns = $snsRepo->findOneBy(['endpoint' => $endpoint]);
+        if (!$sns) {
+            $sns = new Sns();
+            $sns->setEndpoint($endpoint);
+            $dm->persist($sns);
+        }
+        switch($topic) {
+            case 'all':
+                $sns->setAll($subscriptionArn);
+                break;
+            case 'registered':
+                $sns->setRegistered($subscriptionArn);
+                break;
+            case 'unregistered':
+                $sns->setUnregistered($subscriptionArn);
+                break;
+        }
+
+        $dm->flush();
+    }
+
+    private function snsUnsubscribe($topic, $endpoint)
+    {
+        $dm = $this->getManager();
+        $snsRepo = $dm->getRepository(Sns::class);
+        $sns = $snsRepo->findOneBy(['endpoint' => $endpoint]);
+        $subscriptionArn = null;
+        switch($topic) {
+            case 'all':
+                $subscriptionArn = $sns->getAll();
+                $sns->setAll(null);
+                break;
+            case 'registered':
+                $subscriptionArn = $sns->getRegistered();
+                $sns->setRegistered(null);
+                break;
+            case 'unregistered':
+                $subscriptionArn = $sns->getUnregistered();
+                $sns->getUnregistered(null);
+                break;
+        }
+
+        $client = $this->get('aws.sns');
+        $result = $client->unsubscribe(array(
+            'SubscriptionArn' => $subscriptionArn,
+        ));
+        $dm->flush();
     }
 
     private function getCognitoIdToken(User $user, $identity)
