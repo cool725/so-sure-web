@@ -287,6 +287,10 @@ class ApiController extends BaseController
                 break;
         }
 
+        if (!$subscriptionArn) {
+            return;
+        }
+
         $client = $this->get('aws.sns');
         $result = $client->unsubscribe(array(
             'SubscriptionArn' => $subscriptionArn,
