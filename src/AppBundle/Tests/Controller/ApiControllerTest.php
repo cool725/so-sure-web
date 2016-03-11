@@ -156,6 +156,36 @@ class ApiControllerTest extends WebTestCase
         $this->assertTrue($fooUser !== null);
     }
 
+    public function testSns()
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request(
+            'POST',
+            '/api/v1/sns',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(array('body' => array('endpoint' => 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e'), 'identity' => []))
+        );
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    }
+
+    public function testMissingEndpointSns()
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request(
+            'POST',
+            '/api/v1/sns',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(array('body' => array(), 'identity' => []))
+        );
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+    }
+
     protected function createUser($client, $email, $password)
     {
         $userManager = $client->getContainer()->get('fos_user.user_manager');

@@ -68,3 +68,11 @@ services:
                 version: "latest"
                 region: "eu-west-1"
                 credentials: "@aws.credentials"
+
+    aws.sns:
+        class: Aws\Sns\SnsClient
+        arguments:
+            -
+                version: "latest"
+                region: "eu-west-1"
+                credentials: "@aws.credentials"
