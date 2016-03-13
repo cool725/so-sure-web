@@ -166,7 +166,11 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('endpoint' => 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e'), 'identity' => []))
+            json_encode(array('body' => array(
+                // @codingStandardsIgnoreStart
+                'endpoint' => 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e'
+                // @codingStandardsIgnoreEnd
+            ), 'identity' => []))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
