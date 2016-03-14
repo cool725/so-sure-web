@@ -182,6 +182,33 @@ class ApiController extends BaseController
     }
 
     /**
+     * @Route("/referral", name="api_add_referral")
+     * @Method({"POST"})
+     */
+    public function referralAddAction(Request $request)
+    {
+        $identity = $this->parseIdentity($request);
+        $data = json_decode($request->getContent(), true)['body'];
+        $userId = isset($data['user_id']) ? $data['user_id'] : null;
+        $referralCode = isset($data['referral_code']) ? $data['referral_code'] : null;
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->find($userId);
+        $referralUser = $repo->find($referralCode);
+        if (!$user || !$referralUser || $user->getReferred()) {
+            return new JsonResponse(['url' => null]);
+        }
+        $user->setReferred($referralUser);
+        $dm->flush();
+
+        $launchUser = $this->get('app.user.launch');
+        $url = $launchUser->getLink($user->getId());
+
+        return new JsonResponse(['url' => $url]);
+    }
+
+    /**
      * @Route("/user", name="api_user")
      * @Method({"POST"})
      */
