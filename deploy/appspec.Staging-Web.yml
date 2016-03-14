@@ -5,6 +5,6 @@ files:
     destination: /tmp/codedeploy
 hooks:
   AfterInstall:
-    - location: deploy.sh prod
+    - location: deploy.sh staging
       timeout: 600
       runas: root
