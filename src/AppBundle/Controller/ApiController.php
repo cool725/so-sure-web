@@ -219,7 +219,7 @@ class ApiController extends BaseController
 
     private function getArnForTopic($topic)
     {
-        switch($topic) {
+        switch ($topic) {
             case 'all':
                 return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_All';
             case 'registered':
@@ -251,7 +251,7 @@ class ApiController extends BaseController
             $sns->setEndpoint($endpoint);
             $dm->persist($sns);
         }
-        switch($topic) {
+        switch ($topic) {
             case 'all':
                 $sns->setAll($subscriptionArn);
                 break;
@@ -272,7 +272,7 @@ class ApiController extends BaseController
         $snsRepo = $dm->getRepository(Sns::class);
         $sns = $snsRepo->findOneBy(['endpoint' => $endpoint]);
         $subscriptionArn = null;
-        switch($topic) {
+        switch ($topic) {
             case 'all':
                 $subscriptionArn = $sns->getAll();
                 $sns->setAll(null);
