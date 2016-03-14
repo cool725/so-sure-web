@@ -1,0 +1,29 @@
+imports:
+    - { resource: config.yml }
+
+framework:
+    # 10.* required for the elb load balancing health check
+    trusted_hosts: ['staging.wearesosure.com', '10\.\d+\.\d+\.\d+']
+#    validation:
+#        cache: validator.mapping.cache.apc
+#    serializer:
+#        cache: serializer.mapping.cache.apc
+
+#doctrine:
+#    orm:
+#        metadata_cache_driver: apc
+#        result_cache_driver: apc
+#        query_cache_driver: apc
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: warning
+            handler:      nested
+        nested:
+            type:  stream
+            path:  "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+        console:
+            type:  console
