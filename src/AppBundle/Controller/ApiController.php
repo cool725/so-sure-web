@@ -14,6 +14,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Sns;
 use AppBundle\Form\Type\PhoneType;
+use AppBundle\Classes\ApiErrorCode;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -22,11 +23,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class ApiController extends BaseController
 {
-    const ERROR_UKNOWN=1;
-    const ERROR_MISSING_PARAM=2;
-    const ERROR_USER_EXISTS=100;
-    const ERROR_USER_ABSENT=101;
-
     /**
      * @Route("/login", name="api_login")
      * @Method({"POST"})
@@ -36,20 +32,20 @@ class ApiController extends BaseController
         $identity = $this->parseIdentity($request);
         $data = json_decode($request->getContent(), true)['body'];
         if (!$this->validateFields($data, ['username', 'password'])) {
-            return $this->getErrorJsonResponse(self::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
         }
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $user = $repo->findOneBy(['username' => $data['username']]);
         if (!$user) {
-            return $this->getErrorJsonResponse(self::ERROR_USER_ABSENT, 'User not found', 403);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
         }
 
         $encoder_service = $this->get('security.encoder_factory');
         $encoder = $encoder_service->getEncoder($user);
         if (!$encoder->isPasswordValid($user->getPassword(), $data['password'], $user->getSalt())) {
-            return $this->getErrorJsonResponse(self::ERROR_USER_EXISTS, 'Invalid password', 403);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid password', 403);
         }
 
         list($identityId, $token) = $this->getCognitoIdToken($user, $identity);
@@ -66,14 +62,14 @@ class ApiController extends BaseController
         $identity = $this->parseIdentity($request);
         $data = json_decode($request->getContent(), true)['body'];
         if (!$this->validateFields($data, ['facebook_id', 'facebook_access_token', 'cognito_id'])) {
-            return $this->getErrorJsonResponse(self::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
         }
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $user = $repo->findOneBy(['facebook_id' => $data['facebook_id']]);
         if (!$user) {
-            return $this->getErrorJsonResponse(self::ERROR_USER_ABSENT, 'Unable to locate facebook user', 403);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Unable to locate facebook user', 403);
         }
 
         // TODO: Consider how we validate the facebookAuthToken - can we check against the cognito id.
@@ -129,7 +125,7 @@ class ApiController extends BaseController
         $repo = $dm->getRepository(User::class);
         $user = $repo->find($request->get('user_id'));
         if (!$user) {
-            return $this->getErrorJsonResponse(self::ERROR_USER_ABSENT, 'Unable to locate referral for user', 422);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Unable to locate referral for user', 422);
         }
 
         $launchUser = $this->get('app.user.launch');
@@ -147,7 +143,7 @@ class ApiController extends BaseController
         $identity = $this->parseIdentity($request);
         $data = json_decode($request->getContent(), true)['body'];
         if (!$this->validateFields($data, ['user_id', 'referral_code'])) {
-            return $this->getErrorJsonResponse(self::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
         }
         $userId = $data['user_id'];
         $referralCode = $data['referral_code'];
@@ -157,7 +153,7 @@ class ApiController extends BaseController
         $user = $repo->find($userId);
         $referralUser = $repo->find($referralCode);
         if (!$user || !$referralUser || $user->getReferred()) {
-            return $this->getErrorJsonResponse(self::ERROR_USER_ABSENT, 'Unable to locate user or referral code', 422);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Unable to locate user or referral code', 422);
         }
         $user->setReferred($referralUser);
         $dm->flush();
@@ -178,7 +174,7 @@ class ApiController extends BaseController
         $data = json_decode($request->getContent(), true)['body'];
         $endpoint = isset($data['endpoint']) ? $data['endpoint'] : null;
         if (!$endpoint) {
-            return $this->getErrorJsonResponse(self::ERROR_MISSING_PARAM, 'Missing endpoint', 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing endpoint', 400);
         }
 
         $this->snsSubscribe('all', $endpoint);
@@ -196,14 +192,14 @@ class ApiController extends BaseController
         $identity = $this->parseIdentity($request);
         $data = json_decode($request->getContent(), true)['body'];
         if (!$this->validateFields($data, ['token'])) {
-            return $this->getErrorJsonResponse(self::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
         }
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $user = $repo->findOneBy(['token' => $data['token']]);
         if (!$user) {
-            return $this->getErrorJsonResponse(self::ERROR_USER_ABSENT, 'Invalid token', 403);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Invalid token', 403);
         }
 
         list($identityId, $token) = $this->getCognitoIdToken($user, $identity);
@@ -233,7 +229,7 @@ class ApiController extends BaseController
         $addedUser = $launchUser->addUser($user);
 
         if (!$addedUser['new']) {
-            return $this->getErrorJsonResponse(self::ERROR_USER_EXISTS, 'User already exists');
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'User already exists');
         }
 
         $identityId = null;
