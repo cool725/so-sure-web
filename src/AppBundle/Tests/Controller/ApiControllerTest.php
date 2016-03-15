@@ -52,7 +52,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('username' => 'foo', 'password' => 'bar')))
+            json_encode(array('body' => array('email' => 'foo', 'password' => 'bar')))
         );
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -68,7 +68,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('username' => 'foo')))
+            json_encode(array('body' => array('email' => 'foo')))
         );
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
@@ -91,12 +91,7 @@ class ApiControllerTest extends WebTestCase
     public function testLoginBadPassword()
     {
         $client = static::createClient();
-
-        $userManager = $client->getContainer()->get('fos_user.user_manager');
-        $user = $userManager->createUser();
-        $user->setUsername('foo');
-        $user->setPlainPassword('bar');
-        $userManager->updateUser($user, true);
+        $user = $this->createUser($client, 'badfoo@api.bar.com', 'bar');
 
         $crawler = $client->request(
             'POST',
@@ -104,7 +99,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('username' => 'foo', 'password' => 'barfoo')))
+            json_encode(array('body' => array('email' => 'badfoo@api.bar.com', 'password' => 'barfoo')))
         );
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -122,7 +117,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('username' => 'foo@api.bar.com', 'password' => 'bar'), 'identity' => []))
+            json_encode(array('body' => array('email' => 'foo@api.bar.com', 'password' => 'bar'), 'identity' => []))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
