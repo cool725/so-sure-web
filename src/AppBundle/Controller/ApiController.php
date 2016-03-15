@@ -61,7 +61,7 @@ class ApiController extends BaseController
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api loginAction. %s', $e->getMessage()));
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UKNOWN, 'Server Error', 500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
 
@@ -152,7 +152,8 @@ class ApiController extends BaseController
         try {
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
-            $user = $repo->find($request->get('user_id'));
+            $email = strtolower($request->get('email'));
+            $user = $repo->findOneBy(['emailCanonical' => $email]);
             if (!$user) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_ABSENT,
@@ -181,15 +182,15 @@ class ApiController extends BaseController
         try {
             $identity = $this->parseIdentity($request);
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['user_id', 'referral_code'])) {
+            if (!$this->validateFields($data, ['email', 'referral_code'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
-            $userId = $data['user_id'];
+            $email = strtolower($data['email']);
             $referralCode = $data['referral_code'];
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
-            $user = $repo->find($userId);
+            $user = $repo->findOneBy(['emailCanonical' => $email]);
             $referralUser = $repo->find($referralCode);
             if (!$user || !$referralUser || $user->getReferred()) {
                 return $this->getErrorJsonResponse(

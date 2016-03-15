@@ -178,7 +178,7 @@ class ApiControllerTest extends WebTestCase
     public function testReferralInvalid()
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/referral?user_id=abc');
+        $crawler = $client->request('GET', '/api/v1/referral?email=abc');
         $this->assertEquals(422, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
     }
@@ -188,7 +188,7 @@ class ApiControllerTest extends WebTestCase
         $client = static::createClient();
         $user = $this->createUser($client, 'referral@api.bar.com', 'bar');
 
-        $crawler = $client->request('GET', sprintf('/api/v1/referral?user_id=%s', $user->getId()));
+        $crawler = $client->request('GET', sprintf('/api/v1/referral?email=%s', $user->getEmail()));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertContains("http://goo.gl", $data['url']);
@@ -207,7 +207,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array('CONTENT_TYPE' => 'application/json'),
             json_encode(array('body' => array(
-                'user_id' => $userReferred->getId(),
+                'email' => $userReferred->getEmail(),
                 'referral_code' => $user->getId(),
             ), 'identity' => []))
         );
@@ -232,7 +232,7 @@ class ApiControllerTest extends WebTestCase
             array(),
             array('CONTENT_TYPE' => 'application/json'),
             json_encode(array('body' => array(
-                'user_id' => 'foo',
+                'email' => 'foo',
                 'referral_code' => 'foo',
             ), 'identity' => []))
         );
