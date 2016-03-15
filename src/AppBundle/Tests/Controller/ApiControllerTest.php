@@ -105,6 +105,8 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals('foo@api.bar.com', $data['email']);
+        $this->assertTrue(strlen($data['cognito_token']['id']) > 10);
+        $this->assertTrue(strlen($data['cognito_token']['token']) > 10);
     }
 
     // quote
