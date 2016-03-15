@@ -157,7 +157,8 @@ class ApiController extends BaseController
             }
 
             $launchUser = $this->get('app.user.launch');
-            $url = $launchUser->getLink($user->getId());
+            //$url = $launchUser->getLink($user->getId());
+            $url = $launchUser->getShortLink($user->getId());
 
             return new JsonResponse(['url' => $url]);
         } catch (\Exception $e) {
@@ -197,7 +198,7 @@ class ApiController extends BaseController
             $dm->flush();
 
             $launchUser = $this->get('app.user.launch');
-            $url = $launchUser->getLink($user->getId());
+            $url = $launchUser->getShortLink($user->getId());
 
             return new JsonResponse(['url' => $url]);
         } catch (\Exception $e) {
