@@ -16,6 +16,28 @@ class ApiControllerTest extends WebTestCase
     {
     }
 
+    // Manual test
+
+    /**
+     * This is a test that can be manually run by uncommenting exception in login
+     * Purely to test that boilerplate exception login & return codes work
+     */
+    /*
+    public function testManual()
+    {
+        $client = static::createClient();
+        $crawler = $client->request(
+            'POST',
+            '/api/v1/login',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(array('body' => array('username' => 'foo', 'password' => 'bar')))
+        );
+        $this->assertEquals(500, $client->getResponse()->getStatusCode());
+    }
+    */
+
     // login
 
     /**
