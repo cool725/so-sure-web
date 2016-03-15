@@ -175,6 +175,33 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
+    public function testReferrals()
+    {
+        $client = static::createClient();
+        $user = $this->createUser($client, 'origin@api.bar.com', 'bar');
+        $userReferred = $this->createUser($client, 'referred@api.bar.com', 'bar');
+
+        $crawler = $client->request(
+            'POST',
+            '/api/v1/referral',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(array('body' => array(
+                'user_id' => $userReferred->getId(),
+                'referral_code' => $user->getId(),
+            ), 'identity' => []))
+        );
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent());
+        $this->assertTrue(strlen($data->{'url'}) > 0);
+        
+        $dm = $this->getManager($client);
+        $repo = $dm->getRepository(User::class);
+        $fooUser = $repo->findOneBy(['email' => 'referred@api.bar.com']);
+        $this->assertTrue($fooUser->getReferred()->getId() === $user->getId());
+    }
+
     public function testMissingEndpointSns()
     {
         $client = static::createClient();
