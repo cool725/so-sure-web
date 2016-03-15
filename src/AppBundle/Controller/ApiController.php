@@ -55,9 +55,7 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid password', 403);
             }
 
-            list($identityId, $token) = $this->getCognitoIdToken($user, $identity);
-
-            return new JsonResponse($user->toApiArray($identityId, $token));
+            return new JsonResponse($user->toApiArray());
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api loginAction. %s', $e->getMessage()));
 
