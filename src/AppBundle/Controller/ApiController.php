@@ -23,11 +23,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class ApiController extends BaseController
 {
-    const ERROR_UKNOWN=1;
-    const ERROR_MISSING_PARAM=2;
-    const ERROR_USER_EXISTS=100;
-    const ERROR_USER_ABSENT=101;
-
     /**
      * @Route("/login", name="api_login")
      * @Method({"POST"})
@@ -38,13 +33,14 @@ class ApiController extends BaseController
             // throw new \Exception('Manual Exception Test');
             $identity = $this->parseIdentity($request);
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['username', 'password'])) {
+            if (!$this->validateFields($data, ['email', 'password'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
-            $user = $repo->findOneBy(['username' => $data['username']]);
+            $email = strtolower($data['email']);
+            $user = $repo->findOneBy(['emailCanonical' => $email]);
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
@@ -97,7 +93,7 @@ class ApiController extends BaseController
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api loginFacebookAction. %s', $e->getMessage()));
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UKNOWN, 'Server Error', 500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
 
@@ -137,7 +133,7 @@ class ApiController extends BaseController
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api quoteAction. %s', $e->getMessage()));
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UKNOWN, 'Server Error', 500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
 
@@ -167,7 +163,7 @@ class ApiController extends BaseController
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api referralAciton. %s', $e->getMessage()));
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UKNOWN, 'Server Error', 500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
 
@@ -192,7 +188,7 @@ class ApiController extends BaseController
             $referralUser = $repo->find($referralCode);
             if (!$user || !$referralUser || $user->getReferred()) {
                 return $this->getErrorJsonResponse(
-                    self::ERROR_USER_ABSENT,
+                    ApiErrorCode::ERROR_USER_ABSENT,
                     'Unable to locate user or referral code',
                     422
                 );
@@ -207,7 +203,7 @@ class ApiController extends BaseController
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api referralAction. %s', $e->getMessage()));
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UKNOWN, 'Server Error', 500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
 
@@ -232,7 +228,7 @@ class ApiController extends BaseController
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api snsAction. %s', $e->getMessage()));
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UKNOWN, 'Server Error', 500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
 
@@ -262,7 +258,7 @@ class ApiController extends BaseController
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api tokenAction. %s', $e->getMessage()));
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UKNOWN, 'Server Error', 500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
 
@@ -310,7 +306,7 @@ class ApiController extends BaseController
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api userAction. %s', $e->getMessage()));
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UKNOWN, 'Server Error', 500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
 
