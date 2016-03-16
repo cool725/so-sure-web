@@ -76,7 +76,7 @@ class DefaultController extends BaseController
     public function launchAction($id)
     {
         $launchUser = $this->get('app.user.launch');
-        $url = $launchUser->getLink($id);
+        $url = $launchUser->getShortLink($id);
 
         return array('id' => $id, 'referral_url' => $url, 'fb_pixel_event' => 'Lead');
     }

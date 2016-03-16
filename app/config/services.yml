@@ -1,7 +1,6 @@
 # Learn more about services, parameters and containers at
 # http://symfony.com/doc/current/book/service_container.html
 parameters:
-#    parameter_name: value
 
 services:
     app.user:
@@ -40,7 +39,7 @@ services:
             mailchimp: "@app.mailchimp.prelaunch"
             mailer: "@mailer"
             templating: "@templating"
-            router: "@router"
+            router: "@api.router"
             shortLink: "@app.shortlink"
 
     app.shortlink:
@@ -76,3 +75,11 @@ services:
                 version: "latest"
                 region: "eu-west-1"
                 credentials: "@aws.credentials"
+
+    api.router:
+        class: AppBundle\Service\ApiRouterService
+        arguments:
+            router: "@router"
+            listenPort: 8080
+            httpPort: 80
+            httpsPort: 443

@@ -46,7 +46,7 @@ class LaunchUserService
         $this->mailchimp = $mailchimp;
         $this->mailer = $mailer;
         $this->templating = $templating;
-        $this->router = $router;
+        $this->router = $router->getRouter();
         $this->shortLink = $shortLink;
     }
 
@@ -90,13 +90,23 @@ class LaunchUserService
     }
 
     /**
-     * Get Short Link for a referral
+     * Get link for a referral
      *
      * @param string $userId
      */
     public function getLink($userId)
     {
-        $url = $this->router->generate('homepage', ['referral' => $userId], UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->router->generate('homepage', ['referral' => $userId], UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    /**
+     * Get Short Link for a referral
+     *
+     * @param string $userId
+     */
+    public function getShortLink($userId)
+    {
+        $url = $this->getLink($userId);
         $referralUrl = $this->shortLink->addShortLink($url);
 
         return $referralUrl;
@@ -109,7 +119,7 @@ class LaunchUserService
      */
     public function sendEmail(User $user)
     {
-        $referralUrl = $this->getLink($user->getId());
+        $referralUrl = $this->getShortLink($user->getId());
         $message = \Swift_Message::newInstance()
             ->setSubject('Welcome to so-sure')
             ->setFrom('hello@so-sure.com')
