@@ -23,17 +23,30 @@ class UserController extends BaseController
      */
     public function indexAction()
     {
-        $addPermission = $this->getFacebookPermission('user_friends', ['user_friends', 'email']);
+        $fb = $this->getFacebook();
+        $addPermission = $this->getFacebookPermission($fb, 'user_friends', ['user_friends', 'email']);
         if ($addPermission) {
             return $addPermission;
         }
 
-        $response = $fb->get('/me/taggable_friends');
+        $response = $fb->get('/me/taggable_friends?fields=id,name,picture.width(512).height(512)');
         $friends = $response->getGraphEdge();
 
         return array(
             'friends' => $friends
         );
+    }
+
+    private function getFacebook()
+    {
+        $fb = new \Facebook\Facebook([
+          'app_id' => $this->getParameter('fb_appid'),
+          'app_secret' => $this->getParameter('fb_secret'),
+          'default_graph_version' => 'v2.5',
+          'default_access_token' => $this->getUser()->getFacebookAccessToken(),
+        ]);
+
+        return $fb;
     }
 
     /**
@@ -42,14 +55,8 @@ class UserController extends BaseController
      *
      * @return null|RedirectResponse
      */
-    private function getFacebookPermission($requiredPermission, $allPermissions)
+    private function getFacebookPermission($fb, $requiredPermission, $allPermissions)
     {
-        $fb = new \Facebook\Facebook([
-          'app_id' => $this->getParameter('fb_appid'),
-          'app_secret' => $this->getParameter('fb_secret'),
-          'default_graph_version' => 'v2.5',
-          'default_access_token' => $this->getUser()->getFacebookAccessToken(),
-        ]);
         $response = $fb->get('/me/permissions');
         $currentPermissions = $response->getGraphEdge();
         $foundPermission = false;
@@ -59,7 +66,7 @@ class UserController extends BaseController
             }
         }
 
-        if (!$foundPermision) {
+        if (!$foundPermission) {
             $helper = $fb->getRedirectLoginHelper();
             $permissions = $allPermissions; // optional
             $redirectUrl = $this->generateUrl('facebook_login', [], UrlGeneratorInterface::ABSOLUTE_URL);

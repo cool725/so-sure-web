@@ -122,7 +122,7 @@ class ApiController extends BaseController
                     'monthly_loss' => $phone->getLossPrice(),
                     'yearly_premium' => $phone->getYearlyPolicyPrice(),
                     'yearly_loss' => $phone->getYearlyLossPrice(),
-                    'phone' => $phone->asArray(),
+                    'phone' => $phone->asApiArray(),
                     'connection_value' => $phone->getConnectionValue(),
                     'max_connections' => $phone->getMaxConnections(),
                     'max_pot' => $phone->getMaxPot(),
