@@ -63,9 +63,19 @@ class Phone
         return $this->make;
     }
 
+    public function setMake($make)
+    {
+        $this->make = $make;
+    }
+
     public function getModel()
     {
         return $this->model;
+    }
+
+    public function setModel($model)
+    {
+        $this->model = $model;
     }
 
     public function getDevices()
@@ -73,9 +83,19 @@ class Phone
         return $this->devices;
     }
 
+    public function setDevices($devices)
+    {
+        $this->devices = $devices;
+    }
+
     public function getPolicyPrice()
     {
         return $this->policyPrice;
+    }
+
+    public function setPolicyPrice($policyPrice)
+    {
+        $this->policyPrice = $policyPrice;
     }
 
     public function getYearlyPolicyPrice()
@@ -86,6 +106,11 @@ class Phone
     public function getLossPrice()
     {
         return $this->lossPrice;
+    }
+
+    public function setLossPrice($lossPrice)
+    {
+        $this->lossPrice = $lossPrice;
     }
 
     public function getYearlyLossPrice()
@@ -106,6 +131,11 @@ class Phone
     public function getMemory()
     {
         return $this->memory;
+    }
+
+    public function setMemory($memory)
+    {
+        $this->memory = $memory;
     }
 
     public function getMaxPot()
@@ -133,13 +163,25 @@ class Phone
         return $name;
     }
 
-    public function asArray()
+    public function asApiArray()
     {
         return [
             'make' => $this->getMake(),
             'model' => $this->getModel(),
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
+        ];
+    }
+
+    public function asEditArray()
+    {
+        return [
+            'make' => $this->getMake(),
+            'model' => $this->getModel(),
+            'devices' => $this->getDevices(),
+            'memory' => $this->getMemory(),
+            'policy_price' => $this->getPolicyPrice(),
+            'loss_price' => $this->getLossPrice(),
         ];
     }
 }

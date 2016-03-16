@@ -14,6 +14,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class DefaultController extends BaseController
 {
