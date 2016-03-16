@@ -48,7 +48,7 @@ class AdminController extends BaseController
      */
     public function phoneAddAction(Request $request)
     {
-        if(!$this->isCsrfTokenValid('default', $request->get('token'))) {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
         }
 
@@ -78,7 +78,7 @@ class AdminController extends BaseController
      */
     public function phoneEditAction(Request $request, $id)
     {
-        if(!$this->isCsrfTokenValid('default', $request->get('token'))) {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
         }
 
@@ -110,7 +110,7 @@ class AdminController extends BaseController
      */
     public function phoneDeleteAction(Request $request, $id)
     {
-        if(!$this->isCsrfTokenValid('default', $request->get('token'))) {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
         }
 
