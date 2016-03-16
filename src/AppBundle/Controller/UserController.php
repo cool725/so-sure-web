@@ -11,6 +11,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Facebook\Facebook;
 
 /**
  * @Route("/user")
@@ -39,7 +40,7 @@ class UserController extends BaseController
 
     private function getFacebook()
     {
-        $fb = new \Facebook\Facebook([
+        $fb = new Facebook([
           'app_id' => $this->getParameter('fb_appid'),
           'app_secret' => $this->getParameter('fb_secret'),
           'default_graph_version' => 'v2.5',
@@ -50,12 +51,13 @@ class UserController extends BaseController
     }
 
     /**
-     * @param string $requiredPermission
-     * @param array  $allPermissions
+     * @param Facebook $fb
+     * @param string   $requiredPermission
+     * @param array    $allPermissions
      *
      * @return null|RedirectResponse
      */
-    private function getFacebookPermission($fb, $requiredPermission, $allPermissions)
+    private function getFacebookPermission(Facebook $fb, $requiredPermission, $allPermissions)
     {
         $response = $fb->get('/me/permissions');
         $currentPermissions = $response->getGraphEdge();
