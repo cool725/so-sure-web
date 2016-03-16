@@ -29,10 +29,10 @@
       <img class="logo" src="images/logo/so-sure-logo-new-light.svg"></img>
       <h2 class="section-title">Social Insurance. Simply amazing.</h2>
       <div class="signup">
-        {{ form_start(form_top) }}
-        {{ form_widget(form_top.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
-        {{ form_widget(form_top.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
-        {{ form_end(form_top) }}
+        {{ form_start(form_phone) }}
+        {{ form_widget(form_phone.phone) }}
+        {{ form_widget(form_phone.next, {'label': 'Get a quote', 'attr': {'class': 'button button-primary'}}) }}
+        {{ form_end(form_phone) }}
       </div>
     </div>
     <div class="learn-more">

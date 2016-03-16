@@ -26,6 +26,7 @@ class DefaultController extends BaseController
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
+        $phoneRepo = $dm->getRepository(Phone::class);
         $logger = $this->get('logger');
         $launchUser = $this->get('app.user.launch');
 
@@ -36,12 +37,16 @@ class DefaultController extends BaseController
             $logger->debug(sprintf('Referral %s', $referral));
         }
         $userBottom = clone $userTop;
+        $policy = new Policy();
 
         $formTop = $this->get('form.factory')
             ->createNamedBuilder('launch_top', LaunchType::class, $userTop)
             ->getForm();
         $formBottom = $this->get('form.factory')
             ->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)
+            ->getForm();
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneType::class, $policy)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -67,6 +72,7 @@ class DefaultController extends BaseController
             'form_top' => $formTop->createView(),
             'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
+            'form_phone' => $formPhone->createView(),
         );
     }
 

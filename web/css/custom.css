@@ -93,6 +93,9 @@
   border: 2px solid #66cccc;
   color: #666666;
 }
+.hero select {
+  color: #666666;  
+}
 .hero .button.button-primary {
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
