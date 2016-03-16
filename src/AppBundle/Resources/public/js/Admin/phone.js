@@ -18,9 +18,11 @@ $('#phoneModal').on('show.bs.modal', function (event) {
 $('.phone-delete').click(function() {
     if (confirm('Are you sure you want to delete this phone?')) {
         var url = $(this).data('delete');
+        var token = $(this).data('token');
         $.ajax({
             url: url,
             type: 'DELETE',
+            data: { token: token },
             success: function(result) {
                 window.location = window.location;
             }

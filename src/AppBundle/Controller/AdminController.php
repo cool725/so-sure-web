@@ -34,11 +34,12 @@ class AdminController extends BaseController
      */
     public function phonesAction()
     {
+        $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phones = $repo->findAll();
 
-        return ['phones' => $phones];
+        return ['phones' => $phones, 'token' => $csrf->generateCsrfToken('default')];
     }
 
     /**
@@ -47,9 +48,13 @@ class AdminController extends BaseController
      */
     public function phoneAddAction(Request $request)
     {
+        if(!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
         $dm = $this->getManager();
         $devices = explode(",", $request->get('devices'));
-        $devices = array_map('trim', $devices);
+        $devices = array_filter(array_map('trim', $devices));
         $phone = new Phone();
         $phone->setMake($request->get('make'));
         $phone->setModel($request->get('model'));
@@ -73,12 +78,16 @@ class AdminController extends BaseController
      */
     public function phoneEditAction(Request $request, $id)
     {
+        if(!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phone = $repo->find($id);
         if ($phone) {
             $devices = explode(",", $request->get('devices'));
-            $devices = array_map('trim', $devices);
+            $devices = array_filter(array_map('trim', $devices));
             $phone->setMake($request->get('make'));
             $phone->setModel($request->get('model'));
             $phone->setDevices($devices);
@@ -101,6 +110,10 @@ class AdminController extends BaseController
      */
     public function phoneDeleteAction(Request $request, $id)
     {
+        if(!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phone = $repo->find($id);
