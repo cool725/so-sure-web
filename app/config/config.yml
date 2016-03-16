@@ -105,10 +105,15 @@ hwi_oauth:
             type:                facebook
             client_id:           %fb_appid%
             client_secret:       %fb_secret%
+            scope:               "email"
             options:
                 #display: popup #dialog is optimized for popup window
                 auth_type: rerequest # Re-asking for Declined Permissions
-
+            infos_url:     "https://graph.facebook.com/me?fields=id,first_name,last_name,email"
+            paths:
+                email:     email
+                firstname: first_name
+                lastname:  last_name
 jms_di_extra:
     locations:
         all_bundles: false
