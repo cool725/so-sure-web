@@ -94,4 +94,25 @@ class AdminController extends BaseController
 
         return new RedirectResponse($this->generateUrl('admin_phones'));
     }
+
+    /**
+     * @Route("/phone/{id}", name="admin_phone_delete")
+     * @Method({"DELETE"})
+     */
+    public function phoneDeleteAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        if ($phone) {
+            $dm->remove($phone);
+            $dm->flush();
+            $this->addFlash(
+                'notice',
+                'Phone deleted!'
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
 }
