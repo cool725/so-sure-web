@@ -120,7 +120,7 @@ class Phone
 
     public function getMaxConnections()
     {
-        return (int)ceil($this->getMaxPot() / $this->getConnectionValue());
+        return (int) ceil($this->getMaxPot() / $this->getConnectionValue());
     }
 
     public function __toString()
