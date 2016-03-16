@@ -11,7 +11,8 @@ class ApiRouterService
     /**
      * @param $router
      */
-    public function __construct($router, $listenPort, $httpPort, $httpsPort) {
+    public function __construct($router, $listenPort, $httpPort, $httpsPort)
+    {
         $this->router = $router;
         $this->listenPort = $listenPort;
         $this->httpPort = $httpPort;
