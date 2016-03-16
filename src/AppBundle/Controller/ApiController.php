@@ -120,9 +120,12 @@ class ApiController extends BaseController
                 $quotes[] = [
                     'monthly_premium' => $phone->getPolicyPrice(),
                     'monthly_loss' => $phone->getLossPrice(),
-                    'yearly_premium' => $phone->getPolicyPrice() * 12,
-                    'yearly_loss' => $phone->getLossPrice() * 12,
+                    'yearly_premium' => $phone->getYearlyPolicyPrice(),
+                    'yearly_loss' => $phone->getYearlyLossPrice(),
                     'phone' => $phone->asArray(),
+                    'connection_value' => $phone->getConnectionValue(),
+                    'max_connections' => $phone->getMaxConnections(),
+                    'max_pot' => $phone->getMaxPot(),
                 ];
             }
 

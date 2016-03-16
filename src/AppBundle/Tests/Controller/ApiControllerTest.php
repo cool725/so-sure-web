@@ -149,6 +149,15 @@ class ApiControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(1, count($data['quotes']));
+        $this->assertEquals(10, $data['quotes'][0]['connection_value']);
+
+        $maxConnections = $data['quotes'][0]['max_connections'];
+        $maxPot = $data['quotes'][0]['max_pot'];
+        $this->assertTrue(5 <= $maxConnections);
+        $this->assertTrue(9 >= $maxConnections);
+
+        $this->assertTrue(50 <= $maxPot);
+        $this->assertTrue(90 >= $maxPot);
     }
 
     public function testQuoteMemoryOptions()
