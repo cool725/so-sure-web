@@ -13,8 +13,8 @@ parameters:
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    fb_appid:
-    fb_secret:
+    fb_appid: changeme
+    fb_secret: changeme
     fb_pixel_id:
 
     mailchimp_apikey:
