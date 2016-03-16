@@ -62,9 +62,9 @@ class User extends BaseUser
         return $this->id;
     }
 
-    public function setFacebookId($facebook_id)
+    public function setFacebookId($facebookId)
     {
-        $this->facebook_id = $facebook_id;
+        $this->facebookId = $facebookId;
     }
 
     public function getReferralId()
