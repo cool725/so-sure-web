@@ -13,6 +13,7 @@ use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * @Route("/user")
