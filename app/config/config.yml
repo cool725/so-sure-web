@@ -43,7 +43,7 @@ twig:
         fb_appid: %fb_appid%
         fb_pixel_id: %fb_pixel_id%
         fb_og_namespace: %fb_og_namespace%
-        cdn_url: "//cdn.so-sure.com"
+        cdn_url: "https://cdn.so-sure.com"
         heap_id: %heap_id%
         google_analytics: %google_analytics%
 
