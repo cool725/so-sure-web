@@ -1,89 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+  <head>
 
-  <!-- Basic Page Needs
+    <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta charset="utf-8">
-  <title>so-sure - Jobs</title>
-  <meta name="description" content="We are hiring! Make the Social Insurance Revolution happen by joining our awesome team." />
-  <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance" />
+    <meta charset="utf-8">
+    <title>so-sure - Your quote</title>
+    <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
+    <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
 
-  {% include 'AppBundle:Default:header.html.twig' %}
-</head>
+    {% include 'AppBundle:Default:header.html.twig' %}
+  </head>
 
-<body>
+  <body>
 
-  <!-- Primary Page Layout
+    <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <div class="section terms">
-    <div class="container">
-      <div class="row">
-        <div class="nine columns">
-          <p class="logo"><img class="logo" src="/images/logo/so-sure-logo-new-dark.svg" alt="so-sure"></img></p>
-          <p class="logo-description">Social mobile phone insurance. Better, cheaper, easier.</p>
+   <nav class="navbar">
+     <div class="container">
+       <a class="navbar-brand" href="#"><img alt="so-sure" src="/images/logo/so-sure-logo-new-dark.svg"></img></a>
+       <ul class="navbar-list">
+         <li class="navbar-item"><a class="navbar-link" href="http://wearesosure.com">Home</a></li>
+         <li class="navbar-item"><a class="navbar-link" href="http://blog.wearesosure.com" target="_blank">Blog</a></li>
+       </ul>
+     </div>
+   </nav>
+
+
+  <div class="section quotes">
+      <div class="container">
+        <h2 class="section-title">Your Quote</h2>
+              <div class="quote">
+                <div class="row">
+                  <div class="four columns" id="quote-title"><h6>Your phone:<h6></div>
+                  <div class="eight columns" id="quote-info">
+                      <h5>{{ phone }}</h5>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="four columns" id="quote-title"><h6>What you're covered for:</h6></div>
+                  <div class="eight columns" id="quote-info">
+                    <ul>
+                    <li><h5>Theft</h5></li>
+                    <li><h5>Loss</h5></li>
+                    <li><h5>Accidental Damage</h5></li>
+                    <li><h5>Unauthorised Usage</h5></li>
+                    <li><h5>Accessories</h5></li>
+                  </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="four columns" id="quote-title"><h6>Estimated monthly price:</h6></div>
+                  <div class="eight columns" id="quote-info">
+                      <h5>£{{ phone.totalPrice }}</h5>
+                  </div>
+                </div>
+              </div>
+
+                <div class="container">
+                <div class="learn-more">
+                  <p>Want to make it even cheaper?</p>
+                  <span class="chevron bottom"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        <div class="section cta" id="join-today">
+          <div class="container">
+            <h3 class="section-heading">Ready for a better insurance experience?</h3>
+            <p>Signup today and as one of our first 1,000 people to sign up we'll reward you and your friends!</p>
+            <div class="signup">
+              {{ form_start(form) }}
+              {{ form_widget(form.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
+              {{ form_widget(form.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
+              {{ form_end(form) }}
+            </div>
+          </div>
         </div>
-        <div class="three columns">
-          <p class="home-button"><a class="button button-primary" href="/">Back to homepage</a></p>
-        </div>
+
+        {% include 'AppBundle:Default:footer.html.twig' %}
+
       </div>
-
-      <hr>
-
-      <h2 class="section-title">Your Quote</h2>
-      <div class="quote">
-        <div class="row">
-          <div class="one columns"></div>
-          <div class="two columns">
-              Your phone:
-          </div>
-          <div class="eight columns">
-              {{ phone }}
-          </div>
-          <div class="one columns"></div>
-        </div>
-        <div class="row">
-          <div class="one columns"></div>
-          <div class="two columns">
-              Price of policy:
-          </div>
-          <div class="eight columns">
-              £{{ phone.totalPrice }}
-          </div>
-          <div class="one columns"></div>
-        </div>
-        <div class="row">
-          <div class="one columns"></div>
-          <div class="two columns">
-              What you're covered for:
-          </div>
-          <div class="eight columns">
-              Theft, loss, accidental damage, accessories & unauthorized usage
-          </div>
-          <div class="one columns"></div>
-        </div>
-      </div>
-    </div>
-
-  <div class="section cta" id="join-today">
-    <div class="container">
-      <h3 class="section-heading">Ready for a better insurance experience?</h3>
-      <p>Signup today and as one of our first 1,000 customers we'll reward you!</p>
-      <div class="signup">
-        {{ form_start(form) }}
-        {{ form_widget(form.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
-        {{ form_widget(form.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
-        {{ form_end(form) }}
-      </div>
-    </div>
-  </div>
-
-  {% include 'AppBundle:Default:footer.html.twig' %}
-
-  </div>
-  <!-- End Document
+      <!-- End Document
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-</body>
+    </body>
 
-</html>
+  </html>
