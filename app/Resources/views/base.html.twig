@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}So-Sure{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
 
         <link rel="icon" type="image/png" href="{{ cdn_url }}/images/favicon.png">
         <link rel="shortcut icon" href="{{ cdn_url }}/images/favicons/favicon.ico" type="image/x-icon" />
@@ -25,10 +24,12 @@
         <meta name="msapplication-wide310x150logo" content="{{ cdn_url }}/images/favicons/widetile.png" />
         <meta name="msapplication-square310x310logo" content="{{ cdn_url }}/images/favicons/largetile.png" />
 
+        {% block stylesheets %}
         {% stylesheets output='css/*'
            'css/bootstrap.min.css' %}
             <link rel="stylesheet" href="{{ asset_url }}">
         {% endstylesheets %}
+        {% endblock %}
 
         <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">

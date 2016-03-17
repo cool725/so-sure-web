@@ -12,6 +12,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * @Route("/user")
@@ -25,17 +26,50 @@ class UserController extends BaseController
     public function indexAction()
     {
         $fb = $this->getFacebook();
-        $addPermission = $this->getFacebookPermission($fb, 'user_friends', ['user_friends', 'email']);
+        $addPermission = $this->getFacebookPermission($fb, 'user_friends', ['user_friends', 'email', 'publish_actions']);
         if ($addPermission) {
             return $addPermission;
         }
 
-        $response = $fb->get('/me/taggable_friends?fields=id,name,picture.width(512).height(512)');
-        $friends = $response->getGraphEdge();
-
+        $session = new Session();
+        if (!$friends = $session->get('friends')) {
+            $response = $fb->get('/me/taggable_friends?fields=id,name,picture.width(150).height(150)');
+            $friends = [];
+            $data = $response->getGraphEdge();
+            $friends = array_merge($friends, $this->edgeToArray($data));
+            while($data = $fb->next($data)) {
+                $friends = array_merge($friends, $this->edgeToArray($data));
+            }
+            $session->set('friends', $friends);
+        }
+        usort($friends, function($a, $b) {
+            return strcmp($a['name'], $b['name']);
+        });
         return array(
             'friends' => $friends
         );
+    }
+
+    /**
+     * @Route("/trust/{id}", name="user_trust")
+     * @Template
+     */
+    public function trustAction($id)
+    {
+        $fb = $this->getFacebook();
+        $fb->post('/me/{{ fb_og_namespace }}:trust', [ 'profile' => $id ]);
+
+        return new RedirectResponse($this->generateUrl('user_home'));
+    }
+
+    private function edgeToArray($edge)
+    {
+        $arr = [];
+        foreach($edge as $data) {
+            $arr[] = $data->asArray();
+        }
+
+        return $arr;
     }
 
     private function getFacebook()
