@@ -26,7 +26,11 @@ class UserController extends BaseController
     public function indexAction()
     {
         $fb = $this->getFacebook();
-        $addPermission = $this->getFacebookPermission($fb, 'user_friends', ['user_friends', 'email', 'publish_actions']);
+        $addPermission = $this->getFacebookPermission(
+            $fb,
+            'user_friends',
+            ['user_friends', 'email', 'publish_actions']
+        );
         if ($addPermission) {
             return $addPermission;
         }
@@ -37,12 +41,12 @@ class UserController extends BaseController
             $friends = [];
             $data = $response->getGraphEdge();
             $friends = array_merge($friends, $this->edgeToArray($data));
-            while($data = $fb->next($data)) {
+            while ($data = $fb->next($data)) {
                 $friends = array_merge($friends, $this->edgeToArray($data));
             }
             $session->set('friends', $friends);
         }
-        usort($friends, function($a, $b) {
+        usort($friends, function ($a, $b) {
             return strcmp($a['name'], $b['name']);
         });
         return array(
@@ -65,7 +69,7 @@ class UserController extends BaseController
     private function edgeToArray($edge)
     {
         $arr = [];
-        foreach($edge as $data) {
+        foreach ($edge as $data) {
             $arr[] = $data->asArray();
         }
 
