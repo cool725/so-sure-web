@@ -514,3 +514,17 @@ li.devices {
   font-size: 1em;
   margin-bottom: 2.5rem;
 }
+
+/* Quote
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.quote {
+  font-size: 20px;
+  margin-top: 20px;
+  background-color: #66CCCC;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 50px;
+}
+.quote .row {
+  margin-bottom: 20px;
+}

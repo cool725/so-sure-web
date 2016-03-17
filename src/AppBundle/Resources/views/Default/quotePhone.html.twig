@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>so-sure - Jobs</title>
+  <meta name="description" content="We are hiring! Make the Social Insurance Revolution happen by joining our awesome team." />
+  <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance" />
+
+  {% include 'AppBundle:Default:header.html.twig' %}
+</head>
+
+<body>
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="section terms">
+    <div class="container">
+      <div class="row">
+        <div class="nine columns">
+          <p class="logo"><img class="logo" src="/images/logo/so-sure-logo-new-dark.svg" alt="so-sure"></img></p>
+          <p class="logo-description">Social mobile phone insurance. Better, cheaper, easier.</p>
+        </div>
+        <div class="three columns">
+          <p class="home-button"><a class="button button-primary" href="/">Back to homepage</a></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <h2 class="section-title">Your Quote</h2>
+      <div class="quote">
+        <div class="row">
+          <div class="one columns"></div>
+          <div class="two columns">
+              Your phone:
+          </div>
+          <div class="eight columns">
+              {{ phone }}
+          </div>
+          <div class="one columns"></div>
+        </div>
+        <div class="row">
+          <div class="one columns"></div>
+          <div class="two columns">
+              Price of policy:
+          </div>
+          <div class="eight columns">
+              £{{ phone.totalPrice }}
+          </div>
+          <div class="one columns"></div>
+        </div>
+        <div class="row">
+          <div class="one columns"></div>
+          <div class="two columns">
+              What you're covered for:
+          </div>
+          <div class="eight columns">
+              Theft, loss, accidental damage, accessories & unauthorized usage
+          </div>
+          <div class="one columns"></div>
+        </div>
+      </div>
+    </div>
+
+  <div class="section cta" id="join-today">
+    <div class="container">
+      <h3 class="section-heading">Ready for a better insurance experience?</h3>
+      <p>Signup today and as one of our first 1,000 customers we'll reward you!</p>
+      <div class="signup">
+        {{ form_start(form) }}
+        {{ form_widget(form.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
+        {{ form_widget(form.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
+        {{ form_end(form) }}
+      </div>
+    </div>
+  </div>
+
+  {% include 'AppBundle:Default:footer.html.twig' %}
+
+  </div>
+  <!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+
+</html>

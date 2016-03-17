@@ -61,6 +61,11 @@ class DefaultController extends BaseController
                 if ($formBottom->isValid()) {
                     $existingUser = $launchUser->addUser($userBottom)['user'];
                 }
+            } elseif ($request->request->has('launch_phone')) {
+                $formPhone->handleRequest($request);
+                if ($formPhone->isValid()) {
+                    return $this->redirectToRoute('quote_phone', ['id' => $policy->getPhone()->getId()]);
+                }
             }
 
             if ($existingUser) {
@@ -181,5 +186,39 @@ class DefaultController extends BaseController
         // TODO: Redirect to other phone
 
         return array('phones' => $phones);
+    }
+
+    /**
+     * @Route("/quote/{id}", name="quote_phone")
+     * @Template
+     */
+    public function quotePhoneAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        if (!$phone) {
+            return new RedirectResponse($this->generateUrl('homepage'));
+        }
+
+        $user = new User();
+
+        $form = $this->get('form.factory')
+            ->createNamedBuilder('launch', LaunchType::class, $user)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            $form->handleRequest($request);
+            if ($form->isValid()) {
+                $launchUser = $this->get('app.user.launch');
+                $existingUser = $launchUser->addUser($user)['user'];
+            }
+
+            if ($existingUser) {
+                return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
+            }
+        }
+
+        return array('phone' => $phone, 'form' => $form->createView());
     }
 }
