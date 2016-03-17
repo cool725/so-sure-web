@@ -56,13 +56,30 @@ class UserController extends BaseController
     }
 
     /**
+     * @Route("/post/{id}", name="user_post")
+     * @Template
+     */
+    public function postAction($id)
+    {
+        $fb = $this->getFacebook();
+        $fb->post('/me/feed', [
+            'tags' => $id,
+            'message' => "I've insured my phone with so-sure, the social insurance provider.",
+            'link' => 'https://wearesosure.com'
+        ]);
+
+        return new RedirectResponse($this->generateUrl('user_home'));
+    }
+
+    /**
      * @Route("/trust/{id}", name="user_trust")
      * @Template
      */
     public function trustAction($id)
     {
         $fb = $this->getFacebook();
-        $fb->post('/me/{{ fb_og_namespace }}:trust', [ 'profile' => $id ]);
+        $fbNamespace = $this->getParameter('fb_og_namespace');
+        $fb->post(sprintf('/me/%s:trust', $fbNamespace), [ 'profile' => $id ]);
 
         return new RedirectResponse($this->generateUrl('user_home'));
     }
