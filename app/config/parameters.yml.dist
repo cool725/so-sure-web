@@ -16,6 +16,7 @@ parameters:
     fb_appid: changeme
     fb_secret: changeme
     fb_pixel_id:
+    fb_og_namespace: 'wearesosure-dev'
 
     mailchimp_apikey:
     mailchimp_prelaunch_list:
