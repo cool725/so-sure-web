@@ -6,7 +6,7 @@
   <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <meta charset="utf-8">
-  <title>so-sure - Social mobile phone insurance. Better, cheaper, easier.</title>
+  <title>so-sure - Welcome to Social Insurance.</title>
   <meta name="description" content="Social mobile phone insurance made better, easier and up to 80% cheaper. The social insurance revolution starts here." />
   <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance" />
 
@@ -26,13 +26,14 @@
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <div class="section hero">
     <div class="container">
-      <img class="logo" src="images/logo/so-sure-logo-new-light.svg"></img>
-      <h2 class="section-title">Social Insurance. Simply amazing.</h2>
+      <img class="logo" src="images/logo/so-sure-logo-new-dark.svg"></img>
+      <h2 class="section-title">Welcome to Social Insurance</h2>
+      <p class="pre-launch-description">Sign up before we launch &amp; we'll reward you and your friends.</p>
       <div class="signup">
-        {{ form_start(form_top) }}
-        {{ form_widget(form_top.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
-        {{ form_widget(form_top.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
-        {{ form_end(form_top) }}
+        {{ form_start(form_phone) }}
+        {{ form_widget(form_phone.phone) }}
+        {{ form_widget(form_phone.next, {'label': 'Get a quote', 'attr': {'class': 'button button-primary'}}) }}
+        {{ form_end(form_phone) }}
       </div>
     </div>
     <div class="learn-more">
@@ -44,38 +45,22 @@
   <div class="section how">
     <div class="container">
       <h3 class="section-heading">Why we're better</h3>
-      <p class="section-description">We're committed to making it as easy as possible for you and your friends to get covered, get rewarded and make a claim.</p>
+      <p class="section-description">We're committed to making it as easy as possible for you and your friends to get covered, make a claim and when you don't get money back.</p>
       <div class="row">
         <div class="one-third column">
           <h2><img src="/images/icons/lock.svg"></img></h2>
-          <h5 class="section-heading">You're covered</h5>
+          <h5 class="section-heading">Your phone is covered</h5>
           <p class="section-description">For a small monthly fee, you're covered for theft, loss, accidental damage, accessories and unauthorised usage.</p>
         </div>
         <div class="one-third column">
           <h2><img src="/images/icons/wallet.svg"></img></h2>
-          <h5 class="section-heading">Get up to 80% of your money back</h5>
-          <p class="section-description">We'll give you money back at the end of the year when you and up to 8 friends don’t make a claim.</p>
+          <h5 class="section-heading">You can get money back</h5>
+          <p class="section-description">Invite your friends &amp; for each one that signs up we'll give you up to £10 credit. No one claims? You get your credit back.</p>
         </div>
         <div class="one-third column">
           <h2><img src="/images/icons/stopwatch.svg"></img></h2>
-          <h5 class="section-heading">Next working day replacement</h5>
-          <p class="section-description">To claim, give us a call any time and once approved we’ll get a replacement phone to you the next working day.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section intro">
-    <div class="container">
-      <div class="row">
-        <div class="one-half column">
-          <h3 class="section-heading">Social mobile phone insurance. Better, cheaper, easier.</h3>
-          <p class="section-description">Get insured, connect to your friends &amp; get rewarded when you don't claim.</p>
-          <a class="button button-primary" href="#join-today">Signup today</a>
-        </div>
-        <div class="one-half column phones">
-          <img class="phone" src="images/iphone.png">
-          <img class="phone" src="images/nexus.png">
+          <h5 class="section-heading">Next day replacement</h5>
+          <p class="section-description">To claim, just give us a call any time and once approved we’ll aim to get a replacement phone to you the next working day.</p>
         </div>
       </div>
     </div>
@@ -99,6 +84,7 @@
   <div class="section twitter">
     <div class="container">
       <h3 class="section-heading">It's time for a change</h3>
+      <p class="section-description">This is why we're commited to giving you the best possible experience.</p>
       <div class="row">
         <div class="one-third column">
           <blockquote class="twitter-tweet" lang="en">
@@ -116,13 +102,13 @@
           </blockquote>
         </div>
       </div>
-      <p class="section-description">This is why we're commited to giving you the best possible experience.</p>
     </div>
   </div>
 
   <div class="section cta" id="join-today">
     <div class="container">
       <h3 class="section-heading">Get a better insurance experience.</h3>
+      <p>Signup today &amp; as one of our first 1,000 people to sign up we'll reward you!</p>
       <div class="signup">
         {{ form_start(form_bottom) }}
         {{ form_widget(form_bottom.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}

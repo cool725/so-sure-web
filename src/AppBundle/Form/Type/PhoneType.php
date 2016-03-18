@@ -8,13 +8,20 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 
 class PhoneType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('phone', DocumentType::class, ['class' => 'AppBundle:Phone'])
+            ->add('phone', DocumentType::class, [
+                    'class' => 'AppBundle:Phone',
+                    'query_builder' => function (DocumentRepository $dr) {
+                        return $dr->createQueryBuilder('p')
+                            ->field('make')->notEqual("ALL");
+                    }
+            ])
             ->add('next', SubmitType::class)
         ;
     }

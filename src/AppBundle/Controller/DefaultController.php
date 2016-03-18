@@ -30,6 +30,7 @@ class DefaultController extends BaseController
         }
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
+        $phoneRepo = $dm->getRepository(Phone::class);
         $logger = $this->get('logger');
         $launchUser = $this->get('app.user.launch');
 
@@ -40,12 +41,16 @@ class DefaultController extends BaseController
             $logger->debug(sprintf('Referral %s', $referral));
         }
         $userBottom = clone $userTop;
+        $policy = new Policy();
 
         $formTop = $this->get('form.factory')
             ->createNamedBuilder('launch_top', LaunchType::class, $userTop)
             ->getForm();
         $formBottom = $this->get('form.factory')
             ->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)
+            ->getForm();
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneType::class, $policy)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -60,6 +65,11 @@ class DefaultController extends BaseController
                 if ($formBottom->isValid()) {
                     $existingUser = $launchUser->addUser($userBottom)['user'];
                 }
+            } elseif ($request->request->has('launch_phone')) {
+                $formPhone->handleRequest($request);
+                if ($formPhone->isValid()) {
+                    return $this->redirectToRoute('quote_phone', ['id' => $policy->getPhone()->getId()]);
+                }
             }
 
             if ($existingUser) {
@@ -71,6 +81,7 @@ class DefaultController extends BaseController
             'form_top' => $formTop->createView(),
             'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
+            'form_phone' => $formPhone->createView(),
         );
     }
 
@@ -179,5 +190,39 @@ class DefaultController extends BaseController
         // TODO: Redirect to other phone
 
         return array('phones' => $phones);
+    }
+
+    /**
+     * @Route("/quote/{id}", name="quote_phone")
+     * @Template
+     */
+    public function quotePhoneAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        if (!$phone) {
+            return new RedirectResponse($this->generateUrl('homepage'));
+        }
+
+        $user = new User();
+
+        $form = $this->get('form.factory')
+            ->createNamedBuilder('launch', LaunchType::class, $user)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            $form->handleRequest($request);
+            if ($form->isValid()) {
+                $launchUser = $this->get('app.user.launch');
+                $existingUser = $launchUser->addUser($user)['user'];
+            }
+
+            if ($existingUser) {
+                return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
+            }
+        }
+
+        return array('phone' => $phone, 'form' => $form->createView());
     }
 }

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>so-sure - Your quote</title>
+    <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
+    <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
+
+    {% include 'AppBundle:Default:header.html.twig' %}
+  </head>
+
+  <body>
+
+    <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+   <nav class="navbar">
+     <div class="container">
+       <a class="navbar-brand" href="/"><img alt="so-sure" src="/images/logo/so-sure-logo-new-dark.svg"></img></a>
+       <ul class="navbar-list">
+         <li class="navbar-item"><a class="navbar-link" href="https://blog.wearesosure.com" target="_blank">Blog</a></li>
+       </ul>
+     </div>
+   </nav>
+
+
+  <div class="section quotes">
+      <div class="container">
+        <h2 class="section-title">Your Quote</h2>
+              <div class="quote">
+                <div class="row-centered" id="device-row">
+                  <div class="five columns col-centered" id="quote-title"><h6>Your phone:<h6></div>
+                  <div class="seven columns col-centered" id="quote-info">
+                      <h5>{{ phone }}</h5>
+                  </div>
+                </div>
+                <div class="row-centered" id="coverage-row">
+                  <div class="five columns col-centered" id="quote-title"><h6>What you're covered for:</h6></div>
+                  <div class="seven columns col-centered" id="quote-info">
+                    <ul>
+                    <li><h5>Theft</h5></li>
+                    <li><h5>Loss</h5></li>
+                    <li><h5>Accidental Damage</h5></li>
+                    <li><h5>Unauthorised Usage (up to £1,000)</h5></li>
+                    <li><h5>Accessories (up to £100)</h5></li>
+                    <li>Full policy details coming soon. Got questions? <a href="mailto:hello@wearesosure.com">Email us</a><li>
+                  </ul>
+                  </div>
+                </div>
+                <div class="row-centered" id="price-row">
+                  <div class="five columns col-centered" id="quote-title"><h6>Estimated monthly price:</h6></div>
+                  <div class="seven columns col-centered" id="quote-info">
+                      <h5>£{{ phone.totalPrice }}</h5>
+                  </div>
+                </div>
+              </div>
+
+                <div class="container">
+                <div class="learn-more">
+                  <p>Want to make it even cheaper?</p>
+                  <span class="chevron bottom"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section how" id="quote-how">
+            <div class="container">
+              <h3 class="section-heading">How you can make it even cheaper.</h3>
+              <p class="section-description">Through Social Insurance we're able to give you money back when you &amp; the friends you connect with all take care of your phones.</p>
+              <div class="row" id="quote-how-it-works">
+                <div class="one-third column">
+                  <h5 class="section-heading">1. <br> Connect with the friends you trust</h5>
+                  <p class="section-description">Invite your friends &amp; for each one that also signs up we'll give add £10 to your Reward Pots (until your pot is worth 80% of your yearly policy cost).</p>
+                </div>
+                <div class="one-third column">
+                  <h5 class="section-heading">2. <br> Neither you or your friends make a claim</h5>
+                  <p class="section-description">If everyone looks after their phone, we’ll give you whatever credit you've built up back at the end of the year.</p>
+                </div>
+                <div class="one-third column">
+                  <h5 class="section-heading">3. <br> You or a friend have to make a claim</h5>
+                  <p class="section-description">If a friend needs to make a claim, your credit will help them get their phone back. They’ll do the same if you need to claim.</p>
+                </div>
+              </div>
+              <h6>However, this connection reward only applies if a friend you invite signs up within the first 2 months of you buying a policy. <br> So get inviting your friends before anyone else takes them!</h6>
+            </div>
+          </div>
+
+        <div class="section cta" id="join-today">
+          <div class="container">
+            <h3 class="section-heading">Ready for a better insurance experience?</h3>
+            <p>Signup today &amp; as one of our first 1,000 people to sign up we'll reward you!</p>
+            <div class="signup">
+              {{ form_start(form) }}
+              {{ form_widget(form.email, {'attr': {'class': 'email', 'placeholder': 'Enter your email'}}) }}
+              {{ form_widget(form.save, {'label': 'Signup', 'attr': {'class': 'button button-primary'}}) }}
+              {{ form_end(form) }}
+            </div>
+          </div>
+        </div>
+
+        {% include 'AppBundle:Default:footer.html.twig' %}
+
+      </div>
+      <!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    </body>
+
+  </html>

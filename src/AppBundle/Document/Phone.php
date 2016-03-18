@@ -157,7 +157,7 @@ class Phone
     {
         $name = sprintf("%s %s", $this->make, $this->model);
         if ($this->memory) {
-            $name = sprintf("%s (%s)", $name, $this->memory);
+            $name = sprintf("%s (%s GB)", $name, $this->memory);
         }
 
         return $name;
