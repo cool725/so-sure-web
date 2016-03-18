@@ -604,6 +604,7 @@ li.devices {
     font-size: 19px;
     line-height: 21px;
     height: 10%;
+    max-width: 50%;
   }
   .navbar-brand>img {
     display: block;
