@@ -43,6 +43,11 @@ class MailchimpService
             return;
         }
 
+        // don't send @so-sure.com emails to mailchimp
+        if (stripos($email, "@so-sure.com") !== false) {
+            return;
+        }
+
         $url = sprintf("lists/%s/members", $this->list);
         $result = $this->mailchimp->post($url, [
                   'email_address' => $email,
