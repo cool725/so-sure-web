@@ -49,6 +49,12 @@ services:
             googleAppName: %google_appname%
             googleApiKey: %google_apikey%
 
+    app.address:
+        class: AppBundle\Service\PCAService
+        arguments:
+            logger: "@logger"
+            apiKey: %pca_apikey%
+
     app.cognito.identity:
         class: AppBundle\Service\CognitoIdentityService
         arguments:

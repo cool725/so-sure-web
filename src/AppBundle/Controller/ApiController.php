@@ -9,11 +9,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
-use AppBundle\Document\User;
+use AppBundle\Form\Type\PhoneType;
+
+use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Sns;
-use AppBundle\Form\Type\PhoneType;
+use AppBundle\Document\User;
+
 use AppBundle\Classes\ApiErrorCode;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,6 +26,40 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class ApiController extends BaseController
 {
+    /**
+     * @Route("/address", name="api_address")
+     * @Method({"GET"})
+     */
+    public function addressAction(Request $request)
+    {
+        try {
+            if (!$this->validateQueryFields($request, ['postcode'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $postcode = trim($request->get('postcode'));
+            $number = trim($request->get('number'));
+
+            $lookup = $this->get('app.address');
+
+            // real method when money
+            // $address = $lookup->getAddress($postcode, $number);
+
+            // Mock lookup
+            $addresses = $lookup->find($postcode, $number);
+            $address = new Address();
+            $address->setAddress1(array_values($addresses)[0]);
+            $address->setCity('???');
+            $address->setPostcode($postcode);
+
+            return new JsonResponse($address->toArray());
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api addressAction. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
     /**
      * @Route("/login", name="api_login")
      * @Method({"POST"})
@@ -147,6 +184,10 @@ class ApiController extends BaseController
     public function referralAction(Request $request)
     {
         try {
+            if (!$this->validateQueryFields($request, ['email'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $email = strtolower($request->get('email'));
@@ -456,7 +497,26 @@ class ApiController extends BaseController
     private function validateFields($data, $fields)
     {
         foreach ($fields as $field) {
-            if (!isset($data[$field]) || strlen($data[$field]) == 0) {
+            if (!isset($data[$field]) || strlen(trim($data[$field])) == 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that request query fields are present
+     *
+     * @param Request $request
+     * @param array   $fields
+     *
+     * @return boolean true if all fields are present
+     */
+    private function validateQueryFields(Request $request, $fields)
+    {
+        foreach ($fields as $field) {
+            if (strlen(trim($request->get($field))) == 0) {
                 return false;
             }
         }
