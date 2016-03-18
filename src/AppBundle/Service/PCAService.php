@@ -17,7 +17,7 @@ class PCAService
 
     /**
      * @param LoggerInterface $logger
-     * @param string          $apikey
+     * @param string          $apiKey
      */
     public function __construct(LoggerInterface $logger, $apiKey)
     {
@@ -50,7 +50,7 @@ class PCAService
     public function find($postcode, $number)
     {
         if ($number) {
-            $search = sprintf("%s, %s", $postcode, $number);            
+            $search = sprintf("%s, %s", $postcode, $number);
         } else {
             $search = $postcode;
         }
@@ -69,14 +69,12 @@ class PCAService
         $this->checkError($file);
 
         $data = [];
-        if (!empty($file->Rows))
-        {
-           foreach ($file->Rows->Row as $item)
-           {
+        if (!empty($file->Rows)) {
+            foreach ($file->Rows->Row as $item) {
                 $id = (string) $item->attributes()->Id;
                 $address = (string) $item->attributes()->Text;
                 $data[$id] = $address;
-           }
+            }
         }
 
         return $data;
@@ -102,8 +100,7 @@ class PCAService
         $file = simplexml_load_file($url);
         $this->checkError($file);
 
-        if (!empty($file->Rows))
-        {
+        if (!empty($file->Rows)) {
             $item = $file->Rows->Row[0];
             $address = new Address();
             $address->setAddress1((string) $item->attributes()->Line1);
@@ -123,9 +120,9 @@ class PCAService
     private function checkError($file)
     {
         //Check for an error, if there is one then throw an exception
-        if (isset($file->Columns) && $file->Columns->Column->attributes()->Name == "Error") 
-        {
-            $err = sprintf("[ID] %s [DESCRIPTION] %s [CAUSE] %s [RESOLUTION] %s",
+        if (isset($file->Columns) && $file->Columns->Column->attributes()->Name == "Error") {
+            $err = sprintf(
+                "[ID] %s [DESCRIPTION] %s [CAUSE] %s [RESOLUTION] %s",
                 $file->Rows->Row->attributes()->Error,
                 $file->Rows->Row->attributes()->Description,
                 $file->Rows->Row->attributes()->Cause,

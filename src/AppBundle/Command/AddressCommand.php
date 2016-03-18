@@ -16,7 +16,9 @@ class AddressCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sosure:address')
+            // @codingStandardsIgnoreStart
             ->setDescription('Query address from our lookup provider.  There is a 5p charge per request if --id or --address is used, so use with caution')
+            // @codingStandardsIgnoreEnd
             ->addOption(
                 'id',
                 null,
