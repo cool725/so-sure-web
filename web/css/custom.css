@@ -130,7 +130,6 @@
 #launch_phone_phone .select::-ms-expand {
   display: none;
 }
-
 .hero .button.button-primary:hover {
   background-color: #00ccff;
   border-color: #00ccff;
@@ -294,6 +293,7 @@
 #quote-how {
   background-color: #efefef;
 }
+
 /* Twitter
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
@@ -424,17 +424,17 @@ ul.jobs {
 /* Refer
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
-.refer p {
-  padding-top: 3rem;
-}
 .refer h3 {
   padding-top: 3rem;
 }
 .refer ul {
-  text-align: left;
+  text-align: center;
   list-style: none;
-  padding-top: 2rem;
   font-size: 1.1em;
+}
+.refer li {
+  margin-bottom: 3rem;
+  margin-left: 0rem;
 }
 .refer-card {
   border-color: #f2f2f2;
@@ -455,6 +455,11 @@ ul.jobs {
 }
 .refer .fb-share-button {
   padding-left: 10rem;
+}
+@media (min-width: 1000px) {
+  .refer ul {
+    padding-top: 5rem;
+  }
 }
 @media (max-width: 1000px) {
   .refer .twt-share-button {
@@ -555,6 +560,7 @@ li.devices {
 
 /* Quote
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
 .quotes {
   padding: 2rem 0 2rem;
 }
@@ -565,8 +571,8 @@ li.devices {
   margin-bottom: 50px;
 }
 .col-centered {
-    display: inline-block;
-    float: none;
+  display: inline-block;
+  float: none;
 }
 .quote ul {
   list-style-type: none;
@@ -592,63 +598,64 @@ li.devices {
   border-bottom-right-radius: 5px;
 }
 @media (min-width: 1000px) {
-#quote-title {
-  padding-top: .8rem;
-}
-.row-centered {
-    text-align:center;
-}
-.col-centered {
+  #quote-title {
+    padding-top: .8rem;
+  }
+  .row-centered {
+    text-align: center;
+  }
+  .col-centered {
     display: inline-block;
     float: none;
     margin-left: -10rem;
     vertical-align: middle;
-}
+  }
 }
 .learn-more > p:nth-child(1) {
   margin-bottom: 0.5rem;
 }
+
 /* Navbar
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  .navbar,
-  .navbar-spacer {
-    display: block;
-    width: 100%;
-    height: 6.5rem;
-    background: #fff;
-    z-index: 100;
-    border-bottom: 1px solid #eee;
-  }
-  .navbar > .container {
-    width: 100%;
-  }
-  .navbar-brand {
-    float: left;
-    padding: 19.5px 15px;
-    font-size: 19px;
-    line-height: 21px;
-    height: 10%;
-    max-width: 50%;
-  }
-  .navbar-brand>img {
-    width: 60%;
+
+.navbar, .navbar-spacer {
+  display: block;
+  width: 100%;
+  height: 6.5rem;
+  background: #fff;
+  z-index: 100;
+  border-bottom: 1px solid #eee;
 }
-  .navbar-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    color: #eee;
-  }
-  .navbar-list>li {
-    float: right;
-  }
-  .navbar-list>li>a {
-    text-decoration: none;
-    display: block;
-    padding: 20px 14px 0px 10px;
-    text-transform: uppercase;
-  }
+.navbar > .container {
+  width: 100%;
+}
+.navbar-brand {
+  float: left;
+  padding: 19.5px 15px;
+  font-size: 19px;
+  line-height: 21px;
+  height: 10%;
+  max-width: 50%;
+}
+.navbar-brand>img {
+  width: 60%;
+}
+.navbar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: #eee;
+}
+.navbar-list>li {
+  float: right;
+}
+.navbar-list>li>a {
+  text-decoration: none;
+  display: block;
+  padding: 20px 14px 0px 10px;
+  text-transform: uppercase;
+}
 @media (min-width: 750px) {
   .navbar-brand>img {
     display: block;
