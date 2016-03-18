@@ -132,8 +132,8 @@
 }
 
 .hero .button.button-primary:hover {
-  background-color: #297ACC;
-  border-color: #297ACC;
+  background-color: #00ccff;
+  border-color: #00ccff;
 }
 @media (max-width: 750px) {
   .logo {
@@ -291,7 +291,9 @@
   width: 50%;
   margin-bottom: -1rem;
 }
-
+#quote-how {
+  background-color: #efefef;
+}
 /* Twitter
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
@@ -545,8 +547,8 @@ li.devices {
 .footer a.terms {
   font-size: 1em;
 }
-.footer a.social-links {
-  padding-left: 0em;
+.social-links a {
+  padding-left: 1em;
   font-size: 1em;
   margin-bottom: 2.5rem;
 }
@@ -556,35 +558,58 @@ li.devices {
 .quotes {
   padding: 2rem 0 2rem;
 }
-
 .quote {
   margin-top: 1rem;
   border-radius: 15px;
-  padding: 1rem;
-  background-color: #efefef;
+  padding: 2rem;
   margin-bottom: 50px;
 }
-
+.col-centered {
+    display: inline-block;
+    float: none;
+}
 .quote ul {
   list-style-type: none;
   margin-left: -3rem;
 }
 .quote .row {
   margin-bottom: 20px;
+  vertical-align: middle;
 }
+#device-row {
+  background-color: #efefef;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+#coverage-row {
+  background-color: #fff;
+  border-left: 5px solid #efefef;
+  border-right: 5px solid #efefef;
+}
+#price-row {
+  background-color: #efefef;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+@media (min-width: 1000px) {
 #quote-title {
   padding-top: .8rem;
+}
+.row-centered {
+    text-align:center;
+}
+.col-centered {
+    display: inline-block;
+    float: none;
+    margin-left: -10rem;
+    vertical-align: middle;
+}
 }
 .learn-more > p:nth-child(1) {
   margin-bottom: 0.5rem;
 }
 /* Navbar
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-.navbar {
-  display: none;
-}
-
-@media (min-width: 750px) {
   .navbar,
   .navbar-spacer {
     display: block;
@@ -592,7 +617,6 @@ li.devices {
     height: 6.5rem;
     background: #fff;
     z-index: 100;
-    border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
   }
   .navbar > .container {
@@ -607,22 +631,27 @@ li.devices {
     max-width: 50%;
   }
   .navbar-brand>img {
-    display: block;
-    width: 20%;
-  }
+    width: 60%;
+}
   .navbar-list {
     list-style: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
+    color: #eee;
   }
   .navbar-list>li {
     float: right;
   }
   .navbar-list>li>a {
     text-decoration: none;
-    text-transform: capitalize;
     display: block;
-    padding: 14px 16px;
+    padding: 20px 14px 0px 10px;
+    text-transform: uppercase;
+  }
+@media (min-width: 750px) {
+  .navbar-brand>img {
+    display: block;
+    width: 30%;
   }
 }

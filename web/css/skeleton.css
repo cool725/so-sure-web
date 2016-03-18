@@ -160,7 +160,7 @@ p {
 a {
   color: #3399ff; }
 a:hover {
-  color: #3399ff; }
+  color: #00ccff; }
 
 
 /* Buttons
@@ -220,8 +220,8 @@ input[type="submit"].button-primary:focus,
 input[type="reset"].button-primary:focus,
 input[type="button"].button-primary:focus {
   color: #FFF;
-  background-color: #297ACC;
-  border-color: #297ACC; }
+  background-color: #00ccff;
+  border-color: #00ccff; }
 
 
 /* Forms
