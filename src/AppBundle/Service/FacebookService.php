@@ -43,11 +43,21 @@ class FacebookService
      */
     public function init(User $user)
     {
+        return $this->initToken($user->getFacebookAccessToken());
+    }
+
+    /**
+     * @param string $token
+     *
+     * @return Facebook
+     */
+    public function initToken($token)
+    {
         $this->fb = new Facebook([
           'app_id' => $this->appId,
           'app_secret' => $this->secret,
           'default_graph_version' => 'v2.5',
-          'default_access_token' => $user->getFacebookAccessToken(),
+          'default_access_token' => $token,
         ]);
 
         return $this->fb;
@@ -94,7 +104,7 @@ class FacebookService
 
         return $helper->getLoginUrl($redirectUrl, $allPermissions);
     }
-    
+
     public function postToFeed($message, $link = 'https://wearesosure.com', $tags = null)
     {
         $data = [
@@ -104,10 +114,22 @@ class FacebookService
             $data['link'] = $link;
         }
         if ($tags) {
-            $data['tags'] = $id;
+            $data['tags'] = $tags;
         }
 
         $this->fb->post('/me/feed', $data);
+    }
+
+    /**
+     * get 60 day token
+     *
+     * @return string access token
+     */
+    public function getExtendedAccessToken()
+    {
+        //long-live access_token 60 days
+        $this->fb->setExtendedAccessToken();
+        return $this->fb->getAccessToken();
     }
 
     /**
