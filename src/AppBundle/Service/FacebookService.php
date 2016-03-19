@@ -25,7 +25,7 @@ class FacebookService
     /**
      * @param LoggerInterface $logger
      * @param                 $router
-     * @param string          $apId
+     * @param string          $appId
      * @param string          $secret
      */
     public function __construct(LoggerInterface $logger, $router, $appId, $secret)
@@ -111,7 +111,7 @@ class FacebookService
     }
 
     /**
-     * @param string   $requiredPermission
+     * @param string $requiredPermission
      *
      * @return boolean
      */
