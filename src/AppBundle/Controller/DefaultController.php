@@ -25,7 +25,7 @@ class DefaultController extends BaseController
     public function indexAction(Request $request)
     {
         // hack to redirect on facebook connect to the user screen
-        if ($this->container->get('security.context')->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->container->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('user_home');
         }
         $dm = $this->getManager();
