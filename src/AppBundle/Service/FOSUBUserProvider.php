@@ -31,7 +31,7 @@ class FOSUBUserProvider extends BaseClass
 
         //we connect current user
         $user->$setter_id($username);
-        $user->$setter_token($response->getAccessToken());
+        $user->$setter_token($this->getLongLivedAccessToken($response));
 
         $this->userManager->updateUser($user);
     }
@@ -52,7 +52,7 @@ class FOSUBUserProvider extends BaseClass
             // create new user here
             $user = $this->userManager->createUser();
             $user->$setter_id($username);
-            $user->$setter_token($response->getAccessToken());
+            $user->$setter_token($this->getLongLivedAccessToken($response));
 
             $user->setEmail($response->getEmail());
             $user->setFirstName($response->getFirstName());
@@ -70,8 +70,29 @@ class FOSUBUserProvider extends BaseClass
         $setter = 'set' . ucfirst($serviceName) . 'AccessToken';
 
         //update access token
-        $user->$setter($response->getAccessToken());
+        $user->$setter($this->getLongLivedAccessToken($response));
 
         return $user;
+    }
+
+    /**
+     * @param FacebookService $facebook
+     */
+    public function setFacebook(FacebookService $facebook)
+    {
+        $this->facebook = $facebook;
+    }
+
+    private function getLongLivedAccessToken(UserResponseInterface $response)
+    {
+        $service = $response->getResourceOwner()->getName();
+        if ($service != 'Facebook' || !$this->facebook) {
+            return $response->getAccessToken();
+        }
+
+        $fb = $this->facebook->initToken($response->getAccessToken());
+        $fb->setExtendedAccessToken(); //long-live access_token 60 days
+
+        return $fb->getAccessToken();
     }
 }
