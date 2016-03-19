@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
 use AppBundle\Form\Type\PhoneType;
+use AppBundle\Service\FacebookService;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -26,30 +27,22 @@ class UserController extends BaseController
      */
     public function indexAction()
     {
-        $fb = $this->getFacebook();
-        $addPermission = $this->getFacebookPermission(
-            $fb,
-            'user_friends',
+        $facebook = $this->get('app.facebook');
+        $facebook->init($this->getUser());
+        if ($redirect = $this->ensureFacebookPermission(
+            $facebook,
+            'publish_actions',
             ['user_friends', 'email', 'publish_actions']
-        );
-        if ($addPermission) {
-            return $addPermission;
+        )) {
+            return $redirect;
         }
 
         $session = new Session();
         if (!$friends = $session->get('friends')) {
-            $response = $fb->get('/me/taggable_friends?fields=id,name,picture.width(150).height(150)');
-            $friends = [];
-            $data = $response->getGraphEdge();
-            $friends = array_merge($friends, $this->edgeToArray($data));
-            while ($data = $fb->next($data)) {
-                $friends = array_merge($friends, $this->edgeToArray($data));
-            }
+            $friends = $facebook->getAllFriends();
             $session->set('friends', $friends);
         }
-        usort($friends, function ($a, $b) {
-            return strcmp($a['name'], $b['name']);
-        });
+
         return array(
             'friends' => $friends
         );
@@ -61,12 +54,13 @@ class UserController extends BaseController
      */
     public function postAction($id)
     {
-        $fb = $this->getFacebook();
-        $fb->post('/me/feed', [
-            'tags' => $id,
-            'message' => "I've insured my phone with so-sure, the social insurance provider.",
-            'link' => 'https://wearesosure.com'
-        ]);
+        $facebook = $this->get('app.facebook');
+        $facebook->init($this->getUser());
+        $facebook->postToFeed(
+            "I've insured my phone with so-sure, the social insurance provider.",
+            'https://wearesosure.com',
+            $id
+        );
 
         return new RedirectResponse($this->generateUrl('user_home'));
     }
@@ -77,33 +71,12 @@ class UserController extends BaseController
      */
     public function trustAction($id)
     {
-        $fb = $this->getFacebook();
+        $facebook = $this->get('app.facebook');
+        $fb = $facebook->init($this->getUser());
         $fbNamespace = $this->getParameter('fb_og_namespace');
         $fb->post(sprintf('/me/%s:trust', $fbNamespace), [ 'profile' => $id ]);
 
         return new RedirectResponse($this->generateUrl('user_home'));
-    }
-
-    private function edgeToArray($edge)
-    {
-        $arr = [];
-        foreach ($edge as $data) {
-            $arr[] = $data->asArray();
-        }
-
-        return $arr;
-    }
-
-    private function getFacebook()
-    {
-        $fb = new Facebook([
-          'app_id' => $this->getParameter('fb_appid'),
-          'app_secret' => $this->getParameter('fb_secret'),
-          'default_graph_version' => 'v2.5',
-          'default_access_token' => $this->getUser()->getFacebookAccessToken(),
-        ]);
-
-        return $fb;
     }
 
     /**
@@ -113,26 +86,12 @@ class UserController extends BaseController
      *
      * @return null|RedirectResponse
      */
-    private function getFacebookPermission(Facebook $fb, $requiredPermission, $allPermissions)
+    private function ensureFacebookPermission(FacebookService $fb, $requiredPermission, $allPermissions)
     {
-        $response = $fb->get('/me/permissions');
-        $currentPermissions = $response->getGraphEdge();
-        $foundPermission = false;
-        foreach ($currentPermissions as $currentPermission) {
-            if ($currentPermission['permission'] == $requiredPermission) {
-                $foundPermission = true;
-            }
+        if ($fb->hasPermission($requiredPermission)) {
+            return null;
         }
 
-        if (!$foundPermission) {
-            $helper = $fb->getRedirectLoginHelper();
-            $permissions = $allPermissions; // optional
-            $redirectUrl = $this->generateUrl('facebook_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
-            $loginUrl = $helper->getLoginUrl($redirectUrl, $permissions);
-
-            return $this->redirect($loginUrl);
-        }
-
-        return null;
+        return $this->redirect($fb->getPermissionUrl($allPermissions));
     }
 }
