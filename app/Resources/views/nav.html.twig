@@ -16,10 +16,13 @@
                 {% if app.user %}
                   <li class="">
                     <a href="#">
-                    <img src="http://graph.facebook.com/{{ app.user.username }}/picture" width="30" height="30" />
+                    <img src="http://graph.facebook.com/{{ app.user.facebookId }}/picture" width="20" height="20" />
                     {{ app.user.firstName }}
                     </a>
                   </li>
+                  {% if is_granted('ROLE_ADMIN') %}
+                    <li><a href="{{ path('admin_home') }}">Admin</a></li>
+                  {% endif %}
                   <li><a href="{{ path('fos_user_security_logout') }}">Logout</a></li>                  
                 {% else %}
                   <li><a href="#" onclick="fb_login();">Login</a></li>
