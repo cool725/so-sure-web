@@ -28,7 +28,8 @@
         "judopay/judopay-sdk": "~1.0",
         "facebook/php-sdk-v4": "^5.1",
         "aws/aws-sdk-php": "^3.15",
-        "jms/security-extra-bundle": "^1.6"
+        "jms/security-extra-bundle": "^1.6",
+        "white-october/pagerfanta-bundle": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

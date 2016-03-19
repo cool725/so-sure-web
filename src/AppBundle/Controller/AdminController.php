@@ -10,9 +10,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
+use AppBundle\Document\User;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Pagerfanta\Pagerfanta;
+use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 
 /**
  * @Route("/admin")
@@ -32,14 +35,18 @@ class AdminController extends BaseController
      * @Route("/phones", name="admin_phones")
      * @Template
      */
-    public function phonesAction()
+    public function phonesAction(Request $request)
     {
         $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $phones = $repo->findAll();
+        $pager = $this->pager($request, $repo->createQueryBuilder());
 
-        return ['phones' => $phones, 'token' => $csrf->generateCsrfToken('default')];
+        return [
+            'phones' => $pager->getCurrentPageResults(),
+            'token' => $csrf->generateCsrfToken('default'),
+            'pager' => $pager
+        ];
     }
 
     /**
@@ -127,5 +134,24 @@ class AdminController extends BaseController
         }
 
         return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
+     * @Route("/users", name="admin_users")
+     * @Template
+     */
+    public function usersAction(Request $request)
+    {
+        $csrf = $this->get('form.csrf_provider');
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $users = $repo->createQueryBuilder();
+        $pager = $this->pager($request, $users);
+
+        return [
+            'users' => $pager->getCurrentPageResults(),
+            'token' => $csrf->generateCsrfToken('default'),
+            'pager' => $pager
+        ];
     }
 }
