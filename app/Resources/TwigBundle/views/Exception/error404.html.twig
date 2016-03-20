@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>so-sure - Page not found</title>
+
+  {% include 'AppBundle:Default:header.html.twig' %}
+
+</head>
+
+<body>
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="section hero">
+    <div class="container">
+      <img class="logo" src="/images/logo/so-sure-logo-new-dark.svg"></img>
+      <h2 class="section-title">Page not found</h2>
+      <p class="pre-launch-description">
+        The requested page couldn't be located. Check the URL for any
+        misspellings or <a href="{{ path('homepage') }}">return to the homepage</a>.
+        </p>
+    </div>
+  </div>
+
+  {% include 'AppBundle:Default:footer.html.twig' %}
+
+  </div>
+  <!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+
+</html>
