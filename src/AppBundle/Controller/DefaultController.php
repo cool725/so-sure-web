@@ -34,6 +34,8 @@ class DefaultController extends BaseController
         $referral = $request->get('referral');
         if ($referral) {
             $userTop->setReferralId($referral);
+            $session = $this->get('session');
+            $session->set('referral', $referral);
             $logger->debug(sprintf('Referral %s', $referral));
         }
         $userBottom = clone $userTop;
