@@ -8,7 +8,7 @@ use AppBundle\Controller\OpsController;
 /**
  * @group unit
  */
-class CognitoIdentityServiceTest extends WebTestCase
+class CognitoIdentityServiceUnitTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;

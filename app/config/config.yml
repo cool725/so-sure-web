@@ -10,7 +10,7 @@ parameters:
     mongo.session.options:
         database: %mongodb_db%
         collection: session
-
+    cognito_developer_login: 'login.so-sure.com'
 
 framework:
     #esi:             ~

@@ -68,7 +68,11 @@ services:
     app.cognito.identity:
         class: AppBundle\Service\CognitoIdentityService
         arguments:
-            logger: "@logger"
+            logger:         "@logger"
+            doctrine:       "@doctrine_mongodb"
+            coginto:        "@aws.cognito"
+            developerLogin: "%cognito_developer_login%"
+            identityPoolId: "%aws_cognito_identitypoolid%"
 
     aws.credentials:
         class: Aws\Credentials\Credentials
