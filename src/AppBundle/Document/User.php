@@ -49,6 +49,9 @@ class User extends BaseUser
     /** @MongoDB\String(name="sns_endpoint", nullable=true) */
     protected $snsEndpoint;
 
+    /** @MongoDB\String(name="signup_ip", nullable=true) */
+    protected $signupIp;
+
     public function __construct()
     {
         parent::__construct();
@@ -158,6 +161,16 @@ class User extends BaseUser
     public function setSnsEndpoint($snsEndpoint)
     {
         $this->snsEndpoint = $snsEndpoint;
+    }
+
+    public function getSignupIp()
+    {
+        return $this->signupIp;
+    }
+
+    public function setSignupIp($signupIp)
+    {
+        $this->signupIp = $signupIp;
     }
 
     public function toApiArray($identityId = null, $token = null)

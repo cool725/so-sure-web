@@ -393,6 +393,32 @@ class ApiControllerTest extends WebTestCase
         $this->assertTrue($fooUser !== null);
     }
 
+    public function testUserCreateIp()
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request(
+            'POST',
+            '/api/v1/user',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_X_FORWARDED_FOR' => '10.10.10.10',
+            ),
+            json_encode(array('body' => array('email' => 'api-ip-user@api.bar.com')))
+        );
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('api-ip-user@api.bar.com', $data['email']);
+
+        $dm = $this->getManager($client);
+        $repo = $dm->getRepository(User::class);
+        $fooUser = $repo->findOneBy(['email' => 'api-ip-user@api.bar.com']);
+        $this->assertTrue($fooUser !== null);
+        $this->assertEquals('10.10.10.10', $fooUser->getSignupIp());
+    }
+
     // helpers
 
     /**

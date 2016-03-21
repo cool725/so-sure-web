@@ -327,6 +327,8 @@ class ApiController extends BaseController
                 isset($data['facebook_access_token']) ? $data['facebook_access_token'] : null
             );
             $user->setSnsEndpoint(isset($data['sns_endpoint']) ? $data['sns_endpoint'] : null);
+            // Should be forwarding the X-Forwarded Header
+            $user->setSignupIp($request->getClientIp());
 
             $launchUser = $this->get('app.user.launch');
             $addedUser = $launchUser->addUser($user);
