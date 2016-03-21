@@ -396,6 +396,7 @@ class ApiControllerTest extends WebTestCase
     public function testUserCreateIp()
     {
         $client = static::createClient();
+        $identity = "{sourceIp=10.10.10.10}";
 
         $crawler = $client->request(
             'POST',
@@ -404,9 +405,8 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_X_FORWARDED_FOR' => '10.10.10.10',
             ),
-            json_encode(array('body' => array('email' => 'api-ip-user@api.bar.com')))
+            json_encode(array('body' => array('email' => 'api-ip-user@api.bar.com'), 'identity' => $identity))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);

@@ -52,6 +52,12 @@ class User extends BaseUser
     /** @MongoDB\String(name="signup_ip", nullable=true) */
     protected $signupIp;
 
+    /** @MongoDB\String(name="signup_country", nullable=true) */
+    protected $signupCountry;
+
+    /** @MongoDB\Hash(name="signup_loc", nullable=true) */
+    protected $signupLoc;
+
     public function __construct()
     {
         parent::__construct();
@@ -171,6 +177,26 @@ class User extends BaseUser
     public function setSignupIp($signupIp)
     {
         $this->signupIp = $signupIp;
+    }
+
+    public function getSignupCountry()
+    {
+        return $this->signupCountry;
+    }
+
+    public function setSignupCountry($signupCountry)
+    {
+        $this->signupCountry = $signupCountry;
+    }
+
+    public function getSignupLoc()
+    {
+        return $this->signupLoc;
+    }
+
+    public function setSignupLoc($signupLoc)
+    {
+        $this->signupLoc = $signupLoc;
     }
 
     public function toApiArray($identityId = null, $token = null)
