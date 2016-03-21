@@ -443,27 +443,6 @@ class ApiController extends BaseController
         $dm->flush();
     }
 
-    private function getCognitoIdToken(User $user, $identity)
-    {
-        $cognito = $this->get('aws.cognito');
-        $devIdentity = array(
-            'IdentityPoolId' => $this->getParameter('aws_cognito_identitypoolid'),
-            'Logins' => array(
-                'login.so-sure.com' => $user->getId(),
-            ),
-            'TokenDuration' => 300,
-        );
-        if (isset($identity['cognitoIdentityId'])) {
-            $devIdentity['IdentityId'] = $identity['cognitoIdentityId'];
-        }
-        $result = $cognito->getOpenIdTokenForDeveloperIdentity($devIdentity);
-        $identityId = $result->get('IdentityId');
-        $token = $result->get('Token');
-        $this->get('logger')->warning(sprintf('Found Cognito Identity %s', $identityId));
-
-        return [$identityId, $token];
-    }
-
     /**
      * @param string $device
      *
@@ -484,44 +463,6 @@ class ApiController extends BaseController
                 'text/html'
             );
         $this->get('mailer')->send($message);
-
-        return true;
-    }
-
-    /**
-     * Validate that body fields are present
-     *
-     * @param array $data
-     * @param array $fields
-     *
-     * @return boolean true if all fields are present
-     */
-    private function validateFields($data, $fields)
-    {
-        foreach ($fields as $field) {
-            if (!isset($data[$field]) || strlen(trim($data[$field])) == 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Validate that request query fields are present
-     *
-     * @param Request $request
-     * @param array   $fields
-     *
-     * @return boolean true if all fields are present
-     */
-    private function validateQueryFields(Request $request, $fields)
-    {
-        foreach ($fields as $field) {
-            if (strlen(trim($request->get($field))) == 0) {
-                return false;
-            }
-        }
 
         return true;
     }
