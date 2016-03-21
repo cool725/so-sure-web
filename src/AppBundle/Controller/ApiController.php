@@ -48,7 +48,7 @@ class ApiController extends BaseController
             // Mock lookup
             $addresses = $lookup->find($postcode, $number);
             $address = new Address();
-            $address->setAddress1(array_values($addresses)[0]);
+            $address->setLine1(array_values($addresses)[0]);
             $address->setCity('???');
             $address->setPostcode($postcode);
 
