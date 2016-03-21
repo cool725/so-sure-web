@@ -19,20 +19,20 @@ class Address
     /** @MongoDB\Date() */
     protected $created;
 
-    /** @MongoDB\String(name="address1", nullable=false) */
-    protected $address1;
+    /** @MongoDB\String(name="line1", nullable=false) */
+    protected $line1;
 
-    /** @MongoDB\String(name="address1", nullable=true) */
-    protected $address2;
+    /** @MongoDB\String(name="line2", nullable=true) */
+    protected $line2;
 
-    /** @MongoDB\String(name="address1", nullable=true) */
-    protected $address3;
+    /** @MongoDB\String(name="line3", nullable=true) */
+    protected $line3;
 
-    /** @MongoDB\String(name="address1", nullable=true) */
-    protected $address4;
+    /** @MongoDB\String(name="line4", nullable=true) */
+    protected $line4;
 
-    /** @MongoDB\String(name="address1", nullable=true) */
-    protected $address5;
+    /** @MongoDB\String(name="line5", nullable=true) */
+    protected $line5;
 
     /** @MongoDB\String(name="city", nullable=false) */
     protected $city;
@@ -55,54 +55,54 @@ class Address
         return $this->id;
     }
 
-    public function setAddress1($address1)
+    public function setLine1($line1)
     {
-        $this->address1 = $address1;
+        $this->line1 = $line1;
     }
 
-    public function getAddress1()
+    public function getLine1()
     {
-        return $this->address1;
+        return $this->line1;
     }
 
-    public function setAddress2($address2)
+    public function setLine2($line2)
     {
-        $this->address2 = $address2;
+        $this->line2 = $line2;
     }
 
-    public function getAddress2()
+    public function getLine2()
     {
-        return $this->address2;
+        return $this->line2;
     }
 
-    public function setAddress3($address3)
+    public function setLine3($line3)
     {
-        $this->address3 = $address3;
+        $this->line3 = $line3;
     }
 
-    public function getAddress3()
+    public function getLine3()
     {
-        return $this->address3;
+        return $this->line3;
     }
 
-    public function setAddress4($address4)
+    public function setLine4($line4)
     {
-        $this->address4 = $address4;
+        $this->line4 = $line4;
     }
 
-    public function getAddress4()
+    public function getLine4()
     {
-        return $this->address4;
+        return $this->line4;
     }
 
-    public function setAddress5($address5)
+    public function setLine5($line5)
     {
-        $this->address5 = $address5;
+        $this->line5 = $line5;
     }
 
-    public function getAddress5()
+    public function getLine5()
     {
-        return $this->address5;
+        return $this->line5;
     }
 
     public function setCity($city)
@@ -128,11 +128,11 @@ class Address
     public function toArray()
     {
         return [
-          'address1' => $this->getAddress1(),
-          'address2' => $this->getAddress2(),
-          'address3' => $this->getAddress3(),
-          'address4' => $this->getAddress4(),
-          'address5' => $this->getAddress5(),
+          'line1' => $this->getLine1(),
+          'line2' => $this->getLine2(),
+          'line3' => $this->getLine3(),
+          'line4' => $this->getLine4(),
+          'line5' => $this->getLine5(),
           'city' => $this->getCity(),
           'postcode' => $this->getPostcode(),
         ];
