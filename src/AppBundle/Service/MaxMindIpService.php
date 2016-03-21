@@ -37,7 +37,7 @@ class MaxMindIpService
         }
         try {
             $this->data = $this->reader->city($ip);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error(sprintf('Failed to query ip %s Err: %s', $ip, $e->getMessage()));
         }
 
@@ -60,7 +60,10 @@ class MaxMindIpService
         }
 
         // geoPhp = geoJson as php array
-        $geoPhp = ['type' => 'Point', 'coordinates' => [$this->data->location->latitude, $this->data->location->longitude]];
+        $geoPhp = ['type' => 'Point', 'coordinates' => [
+            $this->data->location->latitude,
+            $this->data->location->longitude
+        ]];
 
         return json_encode($geoPhp);
     }
