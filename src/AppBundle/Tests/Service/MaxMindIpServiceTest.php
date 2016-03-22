@@ -49,6 +49,14 @@ class MaxMindServiceIpTest extends WebTestCase
         $this->assertEquals(-0.13, $data->location->longitude);
     }
 
+    public function testInternalIp()
+    {
+        $data = self::$geoip->find('10.10.10.10');
+        print_r(self::$geoip->getData());
+        $this->assertEquals(null, self::$geoip->getCountry());
+        $this->assertEquals(null, self::$geoip->getCoordinates());
+    }
+
     public function testUserGeoLocQuery()
     {
         $user = $this->createUser('geo@service.so-sure.com', 'foo');
@@ -65,7 +73,6 @@ class MaxMindServiceIpTest extends WebTestCase
             ->field('signupLoc')
             ->geoNear(new Point([1, 60]))
             ->spherical(true)
-            ->setDistanceField('distance')
             // in meters
             ->distanceMultiplier(0.001)
             ->getQuery();

@@ -396,7 +396,7 @@ class ApiControllerTest extends WebTestCase
     public function testUserCreateIp()
     {
         $client = static::createClient();
-        $identity = "{sourceIp=10.10.10.10}";
+        $identity = "{sourceIp=62.253.24.186}";
 
         $crawler = $client->request(
             'POST',
@@ -416,9 +416,11 @@ class ApiControllerTest extends WebTestCase
         $repo = $dm->getRepository(User::class);
         $fooUser = $repo->findOneBy(['email' => 'api-ip-user@api.bar.com']);
         $this->assertTrue($fooUser !== null);
-        $this->assertEquals('10.10.10.10', $fooUser->getSignupIp());
+        $this->assertEquals('62.253.24.186', $fooUser->getSignupIp());
+        $this->assertEquals('GB', $fooUser->getSignupCountry());
+        $this->assertEquals([-0.13,51.5], $fooUser->getSignupLoc()->coordinates);
     }
-
+    
     // helpers
 
     /**
