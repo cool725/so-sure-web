@@ -5,9 +5,11 @@ namespace AppBundle\Document;
 
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use GeoJson\Geometry\Point;
 
 /**
  * @MongoDB\Document
+ * @MongoDB\Index(keys={"signup_loc"="2dsphere"}, sparse="true")
  */
 class User extends BaseUser
 {
@@ -55,8 +57,11 @@ class User extends BaseUser
     /** @MongoDB\String(name="signup_country", nullable=true) */
     protected $signupCountry;
 
-    /** @MongoDB\Hash(name="signup_loc", nullable=true) */
+    /** @MongoDB\EmbedOne(targetDocument="Coordinates", name="signup_loc") */
     protected $signupLoc;
+
+    /** @MongoDB\Distance */
+    public $signupDistance;
 
     public function __construct()
     {

@@ -3,6 +3,8 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use GeoIp2\Database\Reader;
+use AppBundle\Document\Coordinates;
+use GeoJson\Geometry\Point;
 
 class MaxMindIpService
 {
@@ -53,18 +55,15 @@ class MaxMindIpService
         return $this->data->country->isoCode;
     }
 
-    public function getGeoJson()
+    public function getCoordinates()
     {
         if (!$this->data) {
             return null;
         }
 
-        // geoPhp = geoJson as php array
-        $geoPhp = ['type' => 'Point', 'coordinates' => [
-            $this->data->location->latitude,
-            $this->data->location->longitude
-        ]];
+        $coordinates = new Coordinates();
+        $coordinates->coordinates = [$this->data->location->longitude, $this->data->location->latitude];
 
-        return json_encode($geoPhp);
+        return $coordinates;
     }
 }
