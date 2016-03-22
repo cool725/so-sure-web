@@ -335,7 +335,7 @@ class ApiController extends BaseController
 
             $geoip = $this->get('app.geoip');
             $data = $geoip->find($clientIp);
-            $user->getSignupCountry($geoip->getCountry());
+            $user->setSignupCountry($geoip->getCountry());
             $user->setSignupLoc($geoip->getCoordinates());
 
             $launchUser = $this->get('app.user.launch');

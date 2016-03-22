@@ -34,6 +34,9 @@ class MaxMindIpService
      */
     public function find($ip)
     {
+        // reset data in case city throws exception
+        $this->data = null;
+
         if (!$this->reader) {
             return null;
         }
@@ -43,6 +46,11 @@ class MaxMindIpService
             $this->logger->error(sprintf('Failed to query ip %s Err: %s', $ip, $e->getMessage()));
         }
 
+        return $this->data;
+    }
+
+    public function getData()
+    {
         return $this->data;
     }
 
