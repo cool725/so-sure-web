@@ -65,6 +65,12 @@ services:
             logger: "@logger"
             apiKey: %pca_apikey%
 
+    app.geoip:
+        class: AppBundle\Service\MaxMindIpService
+        arguments:
+            logger: "@logger"
+            db:     "%geoip_db%"
+
     app.cognito.identity:
         class: AppBundle\Service\CognitoIdentityService
         arguments:
