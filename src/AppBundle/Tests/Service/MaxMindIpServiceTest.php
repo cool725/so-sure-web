@@ -58,7 +58,9 @@ class MaxMindServiceIpTest extends WebTestCase
         self::$dm->flush();
 
         // This will search with the correct query, which can be logged
+        // @codingStandardsIgnoreStart
         // db.runCommand({ geoNear: "User", near: { type: "Point", coordinates: [ 1, 60 ] }, spherical: true, distanceMultiplier: 0.001, query: {} })
+            // @codingStandardsIgnoreEnd
         $searchUserQuery = self::$dm->createQueryBuilder('AppBundle:User')
             ->field('signupLoc')
             ->geoNear(new Point([1, 60]))
@@ -72,9 +74,11 @@ class MaxMindServiceIpTest extends WebTestCase
         // \Doctrine\Common\Util\Debug::dump($searchUser);
 
         // There appears to be a problem in mapping the distance results in doctrine.  As its not used at this point,
-        // going to comment out the test, however, it can be run manually to verify that the data storage appears to be correct
+        // going to comment out the test, however, it can be run manually
+        // to verify that the data storage appears to be correct
         // print sprintf("Dist: %s", $searchUser->signupDistance);
-        // http://www.movable-type.co.uk/scripts/latlong.html can verify the distance approximately - 947.8 vs 948.8186329264697
+        // http://www.movable-type.co.uk/scripts/latlong.html can verify the distance approximately
+        // 947.8 vs 948.8186329264697
         // $this->assertEquals(948.8186329264697, $searchUser->signupDistance);
     }
 
