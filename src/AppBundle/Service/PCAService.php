@@ -101,20 +101,41 @@ class PCAService
         $this->checkError($file);
 
         if (!empty($file->Rows)) {
-            $item = $file->Rows->Row[0];
-            $address = new Address();
-            $address->setAddress1((string) $item->attributes()->Line1);
-            $address->setAddress2((string) $item->attributes()->Line2);
-            $address->setAddress3((string) $item->attributes()->Line3);
-            $address->setAddress4((string) $item->attributes()->Line4);
-            $address->setAddress5((string) $item->attributes()->Line5);
-            $address->setCity((string) $item->attributes()->City);
-            $address->setPostcode((string) $item->attributes()->PostalCode);
-
-            return $address;
+            return $this->transformAddress($file->Rows->Row[0]);
         }
 
         return null;
+    }
+
+    /**
+     * Transform xml row to address
+     *
+     * @param $row
+     *
+     * return @Address
+     */
+    public function transformAddress($row)
+    {
+        $address = new Address();
+        $line1 = (string) $row->attributes()->Line1;
+        $line2 = (string) $row->attributes()->Line2;
+        $line3 = (string) $row->attributes()->Line3;
+        $line4 = (string) $row->attributes()->Line4;
+        $line5 = (string) $row->attributes()->Line5;
+        if (strlen($line5) > 0) {
+            $line1 = sprintf("%s, %s", $line1, $line2);
+            $line2 = $line3;
+            $line3 = sprintf("%s, %s", $line4, $line5);
+        } elseif (strlen($line4) > 0) {
+            $line3 = sprintf("%s, %s", $line3, $line4);
+        }
+        $address->setLine1($line1);
+        $address->setLine2($line2);
+        $address->setLine3($line3);
+        $address->setCity((string) $row->attributes()->City);
+        $address->setPostcode((string) $row->attributes()->PostalCode);
+
+        return $address;
     }
 
     private function checkError($file)
