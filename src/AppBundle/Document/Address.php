@@ -85,26 +85,6 @@ class Address
         return $this->line3;
     }
 
-    public function setLine4($line4)
-    {
-        $this->line4 = $line4;
-    }
-
-    public function getLine4()
-    {
-        return $this->line4;
-    }
-
-    public function setLine5($line5)
-    {
-        $this->line5 = $line5;
-    }
-
-    public function getLine5()
-    {
-        return $this->line5;
-    }
-
     public function setCity($city)
     {
         $this->city = $city;
@@ -131,8 +111,6 @@ class Address
           'line1' => $this->getLine1(),
           'line2' => $this->getLine2(),
           'line3' => $this->getLine3(),
-          'line4' => $this->getLine4(),
-          'line5' => $this->getLine5(),
           'city' => $this->getCity(),
           'postcode' => $this->getPostcode(),
         ];
