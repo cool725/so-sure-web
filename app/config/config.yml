@@ -47,6 +47,7 @@ twig:
         cdn_url: "https://cdn.so-sure.com"
         heap_id: %heap_id%
         google_analytics: %google_analytics%
+        branch_key: %branch_key%
 
 doctrine_mongodb:
     connections:
