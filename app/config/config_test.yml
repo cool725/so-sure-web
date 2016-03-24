@@ -23,3 +23,6 @@ swiftmailer:
 
 doctrine_mongodb:
     default_database: sosure-test
+
+swiftmailer:
+    delivery_address: "tech+envmail@so-sure.com"

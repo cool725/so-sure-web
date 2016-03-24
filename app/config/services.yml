@@ -64,6 +64,7 @@ services:
         arguments:
             logger: "@logger"
             apiKey: %pca_apikey%
+            environment: %kernel.environment%
 
     app.geoip:
         class: AppBundle\Service\MaxMindIpService

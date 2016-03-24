@@ -41,16 +41,7 @@ class ApiController extends BaseController
             $number = trim($request->get('number'));
 
             $lookup = $this->get('app.address');
-
-            // real method when money
-            // $address = $lookup->getAddress($postcode, $number);
-
-            // Mock lookup
-            $addresses = $lookup->find($postcode, $number);
-            $address = new Address();
-            $address->setLine1(array_values($addresses)[0]);
-            $address->setCity('???');
-            $address->setPostcode($postcode);
+            $address = $lookup->getAddress($postcode, $number);
 
             return new JsonResponse($address->toArray());
         } catch (\Exception $e) {
@@ -374,11 +365,11 @@ class ApiController extends BaseController
     {
         switch ($topic) {
             case 'all':
-                return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_All';
+                return $this->getParameter('sns_prelaunch_all');
             case 'registered':
-                return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_Registered';
+                return $this->getParameter('sns_prelaunch_registered');
             case 'unregistered':
-                return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_Unregistered';
+                return $this->getParameter('sns_prelaunch_unregistered');
         }
 
         return null;
@@ -458,7 +449,7 @@ class ApiController extends BaseController
      */
     private function unknownDevice($device)
     {
-        if ($device == "" || $device == "generic_x86" || $device == "generic_x86_64") {
+        if ($device == "" || $device == "generic_x86" || $device == "generic_x86_64" || $device == "Simulator") {
             return false;
         }
 
