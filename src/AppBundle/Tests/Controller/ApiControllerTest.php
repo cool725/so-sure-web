@@ -46,12 +46,13 @@ class ApiControllerTest extends WebTestCase
     public function testAddress()
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/address?postcode=se152sz');
+        $crawler = $client->request('GET', '/api/v1/address?postcode=WR53DA');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertContains("SE15 2SZ", $data['line1']);
-        $this->assertContains("Lugard Road, London", $data['line1']);
-        $this->assertEquals("se152sz", $data['postcode']);
+        $this->assertEquals("Lock Keepers Cottage", $data['line1']);
+        $this->assertEquals("Basin Road", $data['line2']);
+        $this->assertEquals("Worcester", $data['city']);
+        $this->assertEquals("WR5 3DA", $data['postcode']);
     }
 
     // login

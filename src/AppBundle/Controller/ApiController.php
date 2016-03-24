@@ -41,16 +41,7 @@ class ApiController extends BaseController
             $number = trim($request->get('number'));
 
             $lookup = $this->get('app.address');
-
-            // real method when money
-            // $address = $lookup->getAddress($postcode, $number);
-
-            // Mock lookup
-            $addresses = $lookup->find($postcode, $number);
-            $address = new Address();
-            $address->setLine1(array_values($addresses)[0]);
-            $address->setCity('???');
-            $address->setPostcode($postcode);
+            $address = $lookup->getAddress($postcode, $number);
 
             return new JsonResponse($address->toArray());
         } catch (\Exception $e) {
