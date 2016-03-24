@@ -1,9 +1,10 @@
 <?php
-namespace AppBundle\Service;
+namespace AppBundle\Security;
 
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
 use Symfony\Component\Security\Core\User\UserInterface;
+use AppBundle\Service\FacebookService;
 
 class FOSUBUserProvider extends BaseClass
 {

@@ -35,43 +35,12 @@ class CognitoIdentityService
     }
 
     /**
-     * @param string $requestContent
-     *
-     * @return array|null
-     */
-    public function parseIdentity($requestContent)
-    {
-        // TODO: Change to debug
-        $this->logger->warning(sprintf("Raw: %s", $requestContent));
-        try {
-            $data = json_decode($requestContent, true);
-
-            $str = $data['identity'];
-            $str = str_replace(',', '&', $str);
-            $str = str_replace('{', '', $str);
-            $str = str_replace('}', '', $str);
-            $str = str_replace(' ', '', $str);
-            parse_str($str, $identity);
-
-            // TODO: Change to debug
-            $this->logger->warning(sprintf("Data: %s", print_r($data, true)));
-            $this->logger->warning(sprintf("Identity: %s", print_r($identity, true)));
-
-            return $identity;
-        } catch (\Exception $e) {
-            $this->logger->error(sprintf('Error processing identity: %s', $e->getMessage()));
-        }
-
-        return null;
-    }
-
-    /**
      * Get open id token for cognito
      *
-     * @param User  $user
-     * @param array $identity
+     * @param User   $user
+     * @param string $cognitoIdentityId
      */
-    public function getCognitoIdToken(User $user, $identity)
+    public function getCognitoIdToken(User $user, $cognitoIdentityId = null)
     {
         $devIdentity = array(
             'IdentityPoolId' => $this->identityPoolId,
@@ -80,8 +49,8 @@ class CognitoIdentityService
             ),
             'TokenDuration' => 300,
         );
-        if (isset($identity['cognitoIdentityId'])) {
-            $devIdentity['IdentityId'] = $identity['cognitoIdentityId'];
+        if ($cognitoIdentityId) {
+            $devIdentity['IdentityId'] = $cognitoIdentityId;
         }
         $result = $this->cognito->getOpenIdTokenForDeveloperIdentity($devIdentity);
         $identityId = $result->get('IdentityId');
@@ -91,39 +60,13 @@ class CognitoIdentityService
         return [$identityId, $token];
     }
 
-    /**
-     * Get the user from the identity
-     *
-     * @param array $identity
-     *
-     * @return User
-     */
-    public function getUser($identity)
+    public function getId()
     {
-        if (!isset($identity['cognitoIdentityId'])) {
-            return null;
-        }
+        $result = $this->cognito->getId(array(
+            'IdentityPoolId' => $this->identityPoolId,
+        ));
+        $identityId = $result->get('IdentityId');
 
-        $repo = $this->dm->getRepository(User::class);
-        $identities = $this->cognito->describeIdentity(['IdentityId' => $identity['cognitoIdentityId']]);
-        $logins = $identities['Logins'];
-        $user = null;
-        if (in_array($this->developerLogin, $logins)) {
-            $result = $this->cognito->lookupDeveloperIdentity(array(
-                // IdentityPoolId is required
-                'IdentityPoolId' => $this->identityPoolId,
-                'IdentityId' => $identity['cognitoIdentityId'],
-                'MaxResults' => 10,
-            ));
-            if (isset($result['DeveloperUserIdentifierList'])) {
-                $userId = $result['DeveloperUserIdentifierList'][0];
-                $user = $repo->find($userId);
-            }
-        } elseif (in_array("graph.facebook.com", $logins)) {
-            // TODO: need to see what's being returned here for facebook
-            $user = $repo->findOneBy(['facebookId' => $logins['graph.facebook.com']]);
-        }
-
-        return $user;
+        return $identityId;
     }
 }

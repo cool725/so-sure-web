@@ -1,12 +1,12 @@
 <?php
 
-namespace AppBundle\Tests\Controller;
+namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * @group functional
+ * @group functional-nonet
  */
 class ApiRouterServiceTest extends WebTestCase
 {

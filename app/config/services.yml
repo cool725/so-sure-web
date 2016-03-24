@@ -4,10 +4,24 @@ parameters:
 
 services:
     app.user:
-        class: AppBundle\Service\FOSUBUserProvider
+        class: AppBundle\Security\FOSUBUserProvider
         arguments: ["@fos_user.user_manager",{facebook: facebook_id}]
         calls:
             - [setFacebook, ['@app.facebook']]
+
+    app.user.cognitoidentity:
+        class: AppBundle\Security\CognitoIdentityUserProvider
+        arguments:
+            user_manager:   "@fos_user.user_manager"
+            doctrine:       "@doctrine_mongodb"
+            coginto:        "@aws.cognito"
+            developerLogin: "%cognito_developer_login%"
+            identityPoolId: "%aws_cognito_identitypoolid%"
+            logger:         "@logger"
+
+    app.user.cognitoidentity.authenticator:
+        class: AppBundle\Security\CognitoIdentityAuthenticator
+        arguments: ["@security.http_utils"]
 
     app.facebook:
         class: AppBundle\Service\FacebookService

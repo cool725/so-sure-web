@@ -1,13 +1,13 @@
 <?php
 
-namespace AppBundle\Tests\Controller;
+namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use GeoJson\Geometry\Point;
 
 /**
- * @group functional
+ * @group functional-nonet
  */
 class MaxMindServiceIpTest extends WebTestCase
 {
