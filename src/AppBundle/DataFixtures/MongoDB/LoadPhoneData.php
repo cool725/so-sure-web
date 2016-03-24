@@ -125,7 +125,7 @@ class LoadPhoneData implements FixtureInterface
         $this->newPhone($manager, 'Motorola', 'Moto G', 4.29, null, ['falcon_cdma', 'falcon_umts', 'falcon_umtsds', 'titan_udstv', 'titan_umts', 'titan_umtsds', 'osprey_cdma', 'osprey_u2', 'osprey_uds', 'osprey_udstv', 'osprey_umts']);
         $this->newPhone($manager, 'Motorola', 'Moto E', 4.29, null, ['condor_cdma', 'condor_udstv', 'condor_umts', 'condor_umtsds', 'otus', 'otus_ds']);
         $this->newPhone($manager, 'OnePlus', 'One', 5.29, 16, ['A0001']);
-        $this->newPhone($manager, 'OnePlus', 'One', 5.79, 32, ['A0001']);
+        $this->newPhone($manager, 'OnePlus', 'One', 5.79, 64, ['A0001']);
 
         /*
         $this->newPhone($manager, 'Amazon', 'Fire', 5.79, 32);

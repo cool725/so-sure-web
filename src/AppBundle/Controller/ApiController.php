@@ -365,11 +365,11 @@ class ApiController extends BaseController
     {
         switch ($topic) {
             case 'all':
-                return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_All';
+                return $this->getParameter('sns_prelaunch_all');
             case 'registered':
-                return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_Registered';
+                return $this->getParameter('sns_prelaunch_registered');
             case 'unregistered':
-                return 'arn:aws:sns:eu-west-1:812402538357:Prelaunch_Unregistered';
+                return $this->getParameter('sns_prelaunch_unregistered');
         }
 
         return null;
