@@ -27,3 +27,6 @@ monolog:
             level: debug
         console:
             type:  console
+
+swiftmailer:
+    delivery_address: "tech+envmail@so-sure.com"
