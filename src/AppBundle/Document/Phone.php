@@ -90,7 +90,7 @@ class Phone
 
     public function getPolicyPrice()
     {
-        return $this->policyPrice;
+        return $this->toTwoDp($this->policyPrice);
     }
 
     public function setPolicyPrice($policyPrice)
@@ -100,12 +100,12 @@ class Phone
 
     public function getYearlyPolicyPrice()
     {
-        return $this->policyPrice * 12;
+        return $this->toTwoDp($this->policyPrice * 12);
     }
 
     public function getLossPrice()
     {
-        return $this->lossPrice;
+        return $this->toTwoDp($this->lossPrice);
     }
 
     public function setLossPrice($lossPrice)
@@ -115,7 +115,7 @@ class Phone
 
     public function getYearlyLossPrice()
     {
-        return $this->lossPrice * 12;
+        return $this->toTwoDp($this->lossPrice * 12);
     }
 
     public function getTotalPrice()
@@ -125,7 +125,7 @@ class Phone
 
     public function getYearlyTotalPrice()
     {
-        return $this->getTotalPrice() * 12;
+        return $this->toTwoDp($this->getTotalPrice() * 12);
     }
 
     public function getMemory()
@@ -140,7 +140,7 @@ class Phone
 
     public function getMaxPot()
     {
-        return round($this->getYearlyTotalPrice() * 0.8, 2);
+        return $this->toTwoDp($this->getYearlyTotalPrice() * 0.8);
     }
 
     public function getConnectionValue()
@@ -153,6 +153,11 @@ class Phone
         return (int) ceil($this->getMaxPot() / $this->getConnectionValue());
     }
 
+    private function toTwoDp($float)
+    {
+        return round($float, 2);
+    }
+    
     public function __toString()
     {
         $name = sprintf("%s %s", $this->make, $this->model);
