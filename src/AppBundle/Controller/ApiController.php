@@ -458,7 +458,7 @@ class ApiController extends BaseController
      */
     private function unknownDevice($device)
     {
-        if ($device == "" || $device == "generic_x86" || $device == "generic_x86_64") {
+        if ($device == "" || $device == "generic_x86" || $device == "generic_x86_64" || $device == "Simulator") {
             return false;
         }
 
