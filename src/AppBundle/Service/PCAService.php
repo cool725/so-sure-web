@@ -15,14 +15,19 @@ class PCAService
     /** @var string */
     protected $apiKey;
 
+    /** @var string */
+    protected $environment;
+
     /**
      * @param LoggerInterface $logger
      * @param string          $apiKey
+     * @param string          $environment
      */
-    public function __construct(LoggerInterface $logger, $apiKey)
+    public function __construct(LoggerInterface $logger, $apiKey, $environment)
     {
         $this->logger = $logger;
         $this->apiKey = $apiKey;
+        $this->environment = $environment;
     }
 
     /**
@@ -31,6 +36,12 @@ class PCAService
      */
     public function getAddress($postcode, $number)
     {
+        // WR5 3DA is a free search via pca, so can used for non productione environments
+        if ($this->environment != 'prod') {
+            $postcode = "WR53DA";
+            $number = null;
+        }
+
         $data = $this->find($postcode, $number);
         if ($data) {
             $key = array_keys($data)[0];
@@ -54,6 +65,7 @@ class PCAService
         } else {
             $search = $postcode;
         }
+
         $data = [
             'Key' => $this->apiKey,
             'SearchTerm' => $search,
@@ -149,7 +161,7 @@ class PCAService
                 $file->Rows->Row->attributes()->Cause,
                 $file->Rows->Row->attributes()->Resolution
             );
-            $this->logger->err($err);
+            $this->logger->error($err);
 
             throw new \Exception();
         }
