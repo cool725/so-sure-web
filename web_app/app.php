@@ -29,6 +29,17 @@ $kernel->loadClassCache();
 $request = Request::createFromGlobals();
 // http://symfony.com/doc/current/cookbook/request/load_balancer_reverse_proxy.html
 Request::setTrustedProxies(array('127.0.0.1', $request->server->get('REMOTE_ADDR')));
-$response = $kernel->handle($request);
+
+// If we're getting untrusted host, user is hitting elb ip.  Difficult to find correct rewrite rules that don't also catch the elb ip probes
+// so just redirect on the untrusted host exception.
+try {
+    $response = $kernel->handle($request);
+} catch (\UnexpectedValueException $e) {
+    if (stripos($e->getMessage(), "Untrusted Host") !== false) {
+        $response = new RedirectResponse('https://wearesosure.com');
+    } else {
+        throw $e;
+    }
+}
 $response->send();
 $kernel->terminate($request, $response);

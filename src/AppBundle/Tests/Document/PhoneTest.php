@@ -53,6 +53,20 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(9, $phoneB->getMaxConnections());
     }
 
+    public function testPolicy2dp()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'iPhone 6', 6.990001, 1.5);
+        $this->assertEquals(6.99, $phone->getPolicyPrice());
+    }
+
+    public function testLoss2dp()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'iPhone 6', 6.99, 1.50001);
+        $this->assertEquals(1.50, $phone->getLossPrice());
+    }
+    
     private function getSamplePhoneA()
     {
         $phone = new Phone();
