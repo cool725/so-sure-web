@@ -37,11 +37,14 @@
         {{ form_end(form_phone) }}
       </div>
     </div>
+  {# Direct link to playstore would loose the referral link.  Branch.io link wouldn't work as desktop link would go to sms page #}
+  {% if referral ==  '' %}
     <div class="row">
     <p>Or download our app to get an instant quote, start inviting your friends &amp; get rewarded!</p>
     <a href="https://play.google.com/store/apps/details?id=com.wearesosure&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img class="google-play" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a>
     <p><small>(iOS coming soon)</small></p>
     </div>
+  {% endif %}
     <div class="row">
     <div class="learn-more">
       <span class="chevron bottom"></span>
