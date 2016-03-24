@@ -19,7 +19,7 @@
 
 .signup {
   width: 424px;
-  margin: 48px auto 37px;
+  margin: 35px auto 37px;
   position: relative;
 }
 .chevron::before {
@@ -36,7 +36,7 @@
   width: 1em;
 }
 .chevron.bottom:before {
-  top: 0;
+  top: -0.5rem;
   transform: rotate(135deg);
 }
 
@@ -60,8 +60,16 @@
 
 .hero {
   background-size: cover;
-  background-color: #efefef;
-  color: #2e424d;
+  background: #3399ff; /* Old browsers */
+    background: -moz-linear-gradient(45deg, #3399ff 50%, #00ccff 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, #3399ff 50%,#00ccff 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, #3399ff 50%,#00ccff 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  color: #fff;
+}
+#homepage-navbar {
+  border-bottom: none;
+  background-color: rgba(255,255,255,0);
 }
 .hero strong {
   color: #000;
@@ -74,13 +82,17 @@
   margin-bottom: 0rem;
   font-size: 1.5rem;
 }
+.select-device {
+  margin-top: 4rem;
+  margin-bottom: -2rem !important;
+}
 .hero .learn-more {
   padding-top: 7rem;
   margin-bottom: -5rem;
 }
 .logo {
-  width: 50%;
-  padding-bottom: 1rem;
+  width: 45%;
+  padding-bottom: 3rem;
   padding-top: 2rem;
 }
 .hero input.email {
@@ -95,11 +107,14 @@
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   box-shadow: none;
-  border: 2px solid #747678;
-  color: #747678;
+  border: none;
+  color: #2e424d;
 }
 .hero select {
-  color: #747678;
+  color: #2e424d;
+}
+.select-device > a:nth-child(1) {
+  color: #fff;
 }
 .hero .button.button-primary {
   border: 5px;
@@ -107,8 +122,8 @@
   right: 0;
   top: 0;
   margin-top: 0;
-  background-color: #3399ff;
-  border-color: #3399ff;
+  background-color: #2e424d;
+  border-color:  #2e424d;
 }
 #launch_phone_phone {
   display: block;
@@ -130,9 +145,19 @@
   background-color: #00ccff;
   border-color: #00ccff;
 }
+.hero img.google-play {
+  padding-top: 2rem;
+  width: 40%;
+}
 @media (max-width: 750px) {
   .logo {
     width: 80%;
+  }
+}
+@media (min-width: 500px) {
+  .hero img.google-play {
+    padding-top: 2rem;
+    width: 20%;
   }
 }
 @media (max-width: 500px) {
@@ -344,7 +369,11 @@
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 .cta {
-  background-color: #2e424d;
+  background: #3399ff; /* Old browsers */
+    background: -moz-linear-gradient(45deg, #3399ff 50%, #00ccff 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, #3399ff 50%,#00ccff 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, #3399ff 50%,#00ccff 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
   padding: 6rem 0 6rem;
   position: relative;
 }
@@ -658,6 +687,6 @@ li.devices {
 @media (min-width: 750px) {
   .navbar-brand>img {
     display: block;
-    width: 30%;
+    width: 25%;
   }
 }
