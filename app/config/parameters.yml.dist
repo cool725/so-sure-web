@@ -46,3 +46,7 @@ parameters:
     pca_apikey: ''
     branch_key: ''
     geoip_db: ''
+
+    sns_prelaunch_all: ''
+    sns_prelaunch_registered: ''
+    sns_prelaunch_unregistered: ''
