@@ -135,16 +135,21 @@ class ApiController extends BaseController
             $dm = $this->getManager();
             $repo = $dm->getRepository(Phone::class);
             $device = trim($request->get('device'));
+            $memory = (float)trim($request->get('memory'));
             $deviceFound = true;
             $phones = $repo->findBy(['devices' => $device]);
             if (!$phones || count($phones) == 0 || $device == "") {
-                $this->unknownDevice($device);
                 $phones = $repo->findBy(['make' => 'ALL']);
                 $deviceFound = false;
             }
 
             $quotes = [];
+            // Memory is only an issue if there are multiple phones
+            $memoryFound = count($phones) <= 1;
             foreach ($phones as $phone) {
+                if ($memory <= $phone->getMemory()) {
+                    $memoryFound = true;
+                }
                 $quotes[] = [
                     'monthly_premium' => $phone->getPolicyPrice(),
                     'monthly_loss' => $phone->getLossPrice(),
@@ -156,11 +161,21 @@ class ApiController extends BaseController
                     'max_pot' => $phone->getMaxPot(),
                 ];
             }
+            
+            if (!$deviceFound || !$memoryFound) {
+                $this->unknownDevice($device, $memory);
+            }
 
-            return new JsonResponse([
+            $response = [
                 'quotes' => $quotes,
-                'device_found' => $deviceFound,
-            ]);
+                'device_found' => $deviceFound,                
+            ];
+
+            if ($request->get('debug')) {
+                $response['memory_found'] = $memoryFound;
+            }
+
+            return new JsonResponse($response);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api quoteAction. %s', $e->getMessage()));
 
@@ -444,23 +459,26 @@ class ApiController extends BaseController
 
     /**
      * @param string $device
+     * @param float  $memory
      *
      * @return boolean true if unknown device notification was sent
      */
-    private function unknownDevice($device)
+    private function unknownDevice($device, $memory)
     {
         if ($device == "" || $device == "generic_x86" || $device == "generic_x86_64" || $device == "Simulator") {
             return false;
         }
 
+        $body = sprintf(
+            'Unknown device queried: %s (%s GB). If device exists, memory may be higher than expected',
+            $device,
+            $memory
+        );
         $message = \Swift_Message::newInstance()
-            ->setSubject('Unknown Device')
+            ->setSubject('Unknown Device/Memory')
             ->setFrom('tech@so-sure.com')
             ->setTo('tech@so-sure.com')
-            ->setBody(
-                sprintf('Unknown device queried: %s', $device),
-                'text/html'
-            );
+            ->setBody($body, 'text/html');
         $this->get('mailer')->send($message);
 
         return true;

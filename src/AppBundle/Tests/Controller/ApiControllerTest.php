@@ -188,7 +188,37 @@ class ApiControllerTest extends WebTestCase
         // Make sure we're not returning all the quotes
         $this->assertTrue(count($data['quotes']) < 10);
     }
+
+    public function testQuoteUnknownDevice()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/quote?device=foo&debug=true');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(false, $data['device_found']);
+        $this->assertEquals(true, $data['memory_found']);
+    }
+
+    public function testQuoteKnownDeviceKnownMemory()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/quote?device=A0001&memory=15.5&debug=true');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertEquals(true, $data['memory_found']);
+    }
     
+    public function testQuoteKnownDeviceUnKnownMemory()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/quote?device=A0001&memory=65&debug=true');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertEquals(false, $data['memory_found']);
+    }
+
     // referral
     
     /**
