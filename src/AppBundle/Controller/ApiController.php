@@ -135,7 +135,7 @@ class ApiController extends BaseController
             $dm = $this->getManager();
             $repo = $dm->getRepository(Phone::class);
             $device = trim($request->get('device'));
-            $memory = (float)trim($request->get('memory'));
+            $memory = (float) trim($request->get('memory'));
             $deviceFound = true;
             $phones = $repo->findBy(['devices' => $device]);
             if (!$phones || count($phones) == 0 || $device == "") {
