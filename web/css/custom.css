@@ -669,6 +669,7 @@ li.devices {
 }
 .navbar-brand>img {
   width: 90%;
+  margin-left: 1rem;
 }
 .navbar-list {
   list-style: none;
@@ -686,6 +687,7 @@ li.devices {
 button.btn {
   padding: 0px 10px;
   margin-top: 1rem;
+  margin-right: 1rem;
 }
 @media (min-width: 750px) {
   .navbar-brand>img {
