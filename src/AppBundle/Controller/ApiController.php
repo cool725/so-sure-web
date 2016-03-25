@@ -168,7 +168,7 @@ class ApiController extends BaseController
 
             $response = [
                 'quotes' => $quotes,
-                'device_found' => $deviceFound,                
+                'device_found' => $deviceFound,
             ];
 
             if ($request->get('debug')) {
