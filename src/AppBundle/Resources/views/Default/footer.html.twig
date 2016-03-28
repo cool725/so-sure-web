@@ -24,6 +24,7 @@
        data-google-analytics="{{ google_analytics }}"
        data-heap-id="{{ heap_id }}"
        data-branch-key="{{ branch_key }}"
+       data-smooch-key="{{ smooch_key }}"
        data-referral="{{ app.session.get('referral') }}"
        {% if fb_pixel_event is defined %}data-fb-pixel-event="{{ fb_pixel_event }}"{% endif %}
        ></div>
@@ -32,10 +33,12 @@
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <!-- jQuery -->
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <!-- Site JS -->
-  <script src="/js/site.js"></script>
   <!-- Optimzely -->
   <script src="//cdn.optimizely.com/js/4833800075.js"></script>
+  <!-- Smootch -->
+  <script src="https://cdn.smooch.io/smooch.min.js"></script>
+  <!-- Site JS -->
+  <script src="/js/site.js"></script>
 
   <!-- Facebook Pixel Code
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -43,27 +46,3 @@
   {% if fb_pixel_event is defined %}
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id={{ fb_pixel_id }}&ev={{ fb_pixel_event }}&noscript=1" /></noscript>
   {% endif %}
-
-  <!-- Smootch -->
-  <script src="https://cdn.smooch.io/smooch.min.js"></script>
-  <script>
-    Smooch.init({appToken: 'aa83ed9x7259nh17sl5px0oga', emailCaptureEnabled: true, customText: {settingsText: 'In case we\'re slow to respond you can leave us your email & we\'ll get back to you as soon as possible. Thanks.'}});
-  </script>
-
-  <script>
-  (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity track validateCode".split(" "), 0);
-  branch.init($('#ss-root').data('branch-key'));
-  var data = {};
-  var referral = $('#ss-root').data('referral');
-  if (referral) {
-    data = { data: { 'referral': referral }};
-  }
-  branch.banner({
-      icon: 'https://cdn.so-sure.com/images/favicons/apple-touch-icon-180x180.png',
-      title: 'so-sure - Quick Quote',
-      description: 'Download our Android app for an instant quote.',
-      phonePreviewText: '+44 XXXXX XXX XXX',
-      showiOS: false,
-      sendLinkText: 'Text me a link',
-  }, data);
-  </script>
