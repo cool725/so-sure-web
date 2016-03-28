@@ -1,0 +1,45 @@
+
+@font-face {
+  font-family: 'Avenir LT Std 45 Book';
+  font-style: normal;
+  font-weight: normal;
+  src: local('/fonts/Avenir LT Std 45 Book'), url('/fonts/AvenirLTStd-Book.woff') format('woff');
+}
+@font-face {
+  font-family: 'Avenir LT Std 85 Heavy';
+  font-style: normal;
+  font-weight: normal;
+  src: local('/fonts/Avenir LT Std 85 Heavy'), url('/fonts/AvenirLTStd-Heavy.woff') format('woff');
+}
+.section {
+  padding: 8rem 0 7rem;
+  text-align: center;
+}
+.section-heading {
+  margin-bottom: 1.2rem;
+}
+.section-description {
+  margin-bottom: 4rem;
+  max-width: 100%;
+}
+.navbar-brand img {
+    max-height: 20px;
+}
+.chevron::before {
+  border-style: solid;
+  border-width: 0.25em 0.25em 0 0;
+  content: '';
+  display: inline-block;
+  height: 1em;
+  top: 0.25em;
+  transform: rotate(-45deg);
+  vertical-align: top;
+  width: 1em;
+}
+.chevron.bottom:before {
+  top: -0.5rem;
+  transform: rotate(135deg);
+}
+.navbar-item button {
+    margin-top: 10px;
+}

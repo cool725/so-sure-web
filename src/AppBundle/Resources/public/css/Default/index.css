@@ -1,0 +1,195 @@
+.signup {
+  width: 424px;
+  margin: 35px auto 37px;
+  position: relative;
+}
+.hero {
+  background-size: cover;
+  background: #3399ff; /* Old browsers */
+    background: -moz-linear-gradient(45deg, #3399ff 50%, #00ccff 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, #3399ff 50%,#00ccff 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, #3399ff 50%,#00ccff 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  color: #fff;
+  text-align: center;
+}
+.hero strong {
+  color: #000;
+  font-family: serif;
+}
+.hero p.pre-launch-description {
+  font-size: 1.9rem;
+}
+.hero p {
+  margin-bottom: 0rem;
+  font-size: 1.5rem;
+}
+.select-device {
+  margin-top: 4rem;
+  margin-bottom: -2rem !important;
+}
+.hero .learn-more {
+  padding-top: 7rem;
+  margin-bottom: 5rem;
+}
+.logo {
+  width: 45%;
+  padding-bottom: 3rem;
+  padding-top: 2rem;
+}
+.hero input.email {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background-clip: padding-box;
+  padding: 10px 180px 10px 15px;
+  margin-bottom: 0rem;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: none;
+  border: none;
+  color: #2e424d;
+}
+.hero select {
+  display: block;
+  width: 60%;
+  box-sizing: border-box;
+  background-clip: padding-box;
+  margin-bottom: 0rem;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: none;
+  border: none;
+  color: #2e424d;
+  height: 40px;
+}
+.select-device > a:nth-child(1) {
+  color: #fff;
+}
+#launch_phone_phone .select::-ms-expand {
+  display: none;
+}
+.hero img.google-play {
+  padding-top: 2rem;
+  width: 40%;
+}
+@media (max-width: 750px) {
+  .logo {
+    width: 80%;
+  }
+}
+@media (min-width: 500px) {
+  .hero img.google-play {
+    padding-top: 2rem;
+    width: 20%;
+  }
+}
+@media (max-width: 500px) {
+  .hero input.email {
+    width: 95%;
+    display: inline;
+  }
+}
+
+/* How
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.how {
+  background-color: #fff;
+}
+.how .section-description {
+  max-width: 100%;
+}
+.icon {
+  width: 50%;
+  margin-bottom: -1rem;
+}
+#quote-how {
+  background-color: #efefef;
+}
+
+/* Mission
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.mission {
+  background-color: #efefef;
+}
+.mission .section-heading {
+  font-size: 3.0rem;
+}
+.mission .section-description {
+  margin-bottom: 2rem;
+  max-width: 90%;
+}
+.mission .section-title {
+  margin-bottom: 3.2rem;
+}
+.mission i {
+  color: #ff3300;
+}
+@media (max-width: 1000px) {
+  .mission .section-description {
+    max-width: 100%;
+  }
+}
+
+/* Twitter
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.twitter p {
+  color: #333333;
+}
+.twitter .section-description {
+  padding-top: 1.2rem;
+}
+
+.cta {
+  background: #3399ff; /* Old browsers */
+    background: -moz-linear-gradient(45deg, #3399ff 50%, #00ccff 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, #3399ff 50%,#00ccff 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, #3399ff 50%,#00ccff 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  padding: 6rem 0 6rem;
+  position: relative;
+}
+.cta .section-heading {
+  color: #fff;
+}
+.cta p {
+  color: #fff;
+}
+.cta input.email {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background-clip: padding-box;
+  padding: 10px 180px 10px 15px;
+  margin-bottom: 0rem;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: none;
+  border: none;
+}
+
+/* Smaller than 500 - Remove Email Box */
+
+@media (max-width: 500px) {
+  .cta {
+    text-align: center;
+  }
+  .cta input.email {
+    margin-bottom: 2rem;
+    width: 95%;
+    display: inline;
+  }
+  .signup {
+    width: auto;
+  }
+}
+
