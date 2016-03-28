@@ -45,6 +45,7 @@ parameters:
 
     pca_apikey: ''
     branch_key: ''
+    smooch_key: ''
     geoip_db: ''
 
     sns_prelaunch_all: ''

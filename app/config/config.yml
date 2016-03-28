@@ -48,6 +48,7 @@ twig:
         heap_id: %heap_id%
         google_analytics: %google_analytics%
         branch_key: %branch_key%
+        smooch_key: %smooch_key%
 
 doctrine_mongodb:
     connections:
