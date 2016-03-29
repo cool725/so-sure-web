@@ -27,6 +27,31 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class ApiController extends BaseController
 {
     /**
+     * @Route("/address", name="api_address")
+     * @Method({"GET"})
+     */
+    public function addressAction(Request $request)
+    {
+        try {
+            if (!$this->validateQueryFields($request, ['postcode'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $postcode = trim($request->get('postcode'));
+            $number = trim($request->get('number'));
+
+            $lookup = $this->get('app.address');
+            $address = $lookup->getAddress($postcode, $number);
+
+            return new JsonResponse($address->toArray());
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api addressAction. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/login", name="api_login")
      * @Method({"POST"})
      */

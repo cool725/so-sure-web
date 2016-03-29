@@ -27,25 +27,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class ApiAuthController extends BaseController
 {
     /**
-     * @Route("/address", name="api_address")
-     * @Method({"GET"})
+     * @Route("/ping", name="api_auth_ping")
+     * @Method({"GET", "POST"})
      */
-    public function addressAction(Request $request)
+    public function pingAuthAction(Request $request)
     {
         try {
-            if (!$this->validateQueryFields($request, ['postcode'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-
-            $postcode = trim($request->get('postcode'));
-            $number = trim($request->get('number'));
-
-            $lookup = $this->get('app.address');
-            $address = $lookup->getAddress($postcode, $number);
-
-            return new JsonResponse($address->toArray());
+            return new JsonResponse(['pong' => 1]);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api addressAction. %s', $e->getMessage()));
+            $this->get('logger')->error(sprintf('Error in api pingAuth. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
