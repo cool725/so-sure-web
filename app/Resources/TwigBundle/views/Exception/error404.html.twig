@@ -1,20 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html.twig' %}
 
-<head>
+{% block title %}so-sure - Page not found{% endblock %}
 
-  <!-- Basic Page Needs
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta charset="utf-8">
-  <title>so-sure - Page not found</title>
-
-  {% include 'AppBundle:Default:header.html.twig' %}
-
-</head>
-
-<body>
-  <!-- Primary Page Layout
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+{% block body %}
   <div class="section hero">
     <div class="container">
       <img class="logo" src="/images/logo/so-sure-logo-new-dark.svg"></img>
@@ -25,12 +13,4 @@
         </p>
     </div>
   </div>
-
-  {% include 'AppBundle:Default:footer.html.twig' %}
-
-  </div>
-  <!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-</body>
-
-</html>
+{% endblock %}
