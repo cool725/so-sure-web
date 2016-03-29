@@ -1,0 +1,52 @@
+.quotes {
+  padding: 2rem 0 2rem;
+}
+.quote .section-title {
+  padding-bottom: 2rem;
+}
+.quote {
+  margin-top: 2rem;
+  border-radius: 2px;
+  padding: 2rem;
+  margin-bottom: 20px;
+  background-color: #efefef;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    transition: all 0.2s ease-in-out;
+  color: #2e424d;
+  text-align: left;
+}
+.quote:hover {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    transition: all 0.2s ease-in-out;
+}
+.col-centered {
+  display: inline-block;
+  float: none;
+}
+.quote ul {
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+.quote li {
+  margin-left: 0;
+  margin-bottom: 15px;
+}
+.quote .row {
+  margin-bottom: 20px;
+  vertical-align: top;
+}
+@media (min-width: 1000px) {
+  .row-centered {
+    text-align: left;
+  }
+  .col-centered {
+    display: inline-block;
+    float: none;
+    margin-left: -10rem;
+    vertical-align: top;
+  }
+}
+.learn-more > p:nth-child(1) {
+  margin-bottom: 0.5rem;
+}

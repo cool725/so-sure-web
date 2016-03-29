@@ -1,34 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html.twig' %}
 
-<head>
-
-  <!-- Basic Page Needs
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta charset="utf-8">
-  <title>so-sure - Jobs</title>
+{% block title %}so-sure - Jobs{% endblock %}
+{% block meta %}
   <meta name="description" content="We are hiring! Make the Social Insurance Revolution happen by joining our awesome team."/>
   <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance" />
+{% endblock %}
 
-  {% include 'AppBundle:Default:header.html.twig' %}
-</head>
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'bundles/app/css/Default/jobs.css'
+    %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
 
-<body>
-
-  <!-- Primary Page Layout
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <div class="navbar-spacer">
-   <nav class="navbar">
-     <div class="container">
-       <ul class="navbar-list">
-         <a class="navbar-brand" href="#"><img alt="so-sure" src="/images/logo/so-sure-logo-new-dark.svg"></img></a>
-         <li class="navbar-item"><a class="navbar-link" href="http://blog.wearesosure.com" target="_blank">Blog</a></li>
-         <li class="navbar-item"><a class="navbar-link">Home</a></li>
-       </ul>
-     </div>
-   </nav>
-   </div>
-
+{% block body %}
   <div class="section terms">
     <div class="container">
 
@@ -107,12 +92,4 @@
       <h5>If this interests you then drop us an email – <a href="mailto:jobs@so-sure.com?subject=Growth / Marketing Exec">jobs@so-sure.com</a></h5>
     </div>
   </div>
-
-  {% include 'AppBundle:Default:footer.html.twig' %}
-
-  </div>
-  <!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-</body>
-
-</html>
+{% endblock %}

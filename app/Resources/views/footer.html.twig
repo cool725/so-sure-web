@@ -1,26 +1,27 @@
-  <div class="section footer">
+  <footer>
     <div class="container">
       <div class="row">
-        <div class="one-third column">
+        <div class="col-md-4">
           <p class="terms-link">
             so-sure &copy; 2016 | <a href="//www.iubenda.com/privacy-policy/7805295" class="iubenda-nostyle no-brand iubenda-embed" title="Privacy Policy">Privacy Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "//cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>
           </p>
         </div>
-        <div class="one-third column">
+        <div class="col-md-4">
           <p class="social-links">
             <a href="https://blog.wearesosure.com"><i class="fa fa-medium fa-2x"></i></a>
             <a href="https://www.facebook.com/wearesosure"><i class="fa fa-facebook fa-2x"></i></a>
             <a href="https://twitter.com/wearesosure"><i class="fa fa-twitter fa-2x"></i></a>
           </p>
         </div>
-        <div class="one-third column">
+        <div class="col-md-4">
           <p><a href="https://mixpanel.com/f/partner" rel="nofollow"><img src="//cdn.mxpnl.com/site_media/images/partner/badge_light.png" alt="Mobile Analytics" /></a></p>
         </div>
       </div>
     </div>
-  </div>
-
+  </footer>
+  <div id="fb-root"></div>
   <div id="ss-root" data-fb-id="{{ fb_appid }}" data-fb-pixel-id="{{ fb_pixel_id }}"
+       data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"
        data-google-analytics="{{ google_analytics }}"
        data-heap-id="{{ heap_id }}"
        data-branch-key="{{ branch_key }}"
@@ -28,17 +29,6 @@
        data-referral="{{ app.session.get('referral') }}"
        {% if fb_pixel_event is defined %}data-fb-pixel-event="{{ fb_pixel_event }}"{% endif %}
        ></div>
-
-  <!-- JS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <!-- jQuery -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <!-- Optimzely -->
-  <script src="//cdn.optimizely.com/js/4833800075.js"></script>
-  <!-- Smootch -->
-  <script src="https://cdn.smooch.io/smooch.min.js"></script>
-  <!-- Site JS -->
-  <script src="/js/site.js"></script>
 
   <!-- Facebook Pixel Code
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->

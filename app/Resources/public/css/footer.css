@@ -1,0 +1,16 @@
+footer {
+  color: #333333;
+  padding: 6rem 0 6rem;
+  text-align: center;
+}
+footer a {
+  position: relative;
+}
+footer a.terms {
+  font-size: 1em;
+}
+footer .social-links a {
+  padding-left: 1em;
+  font-size: 1em;
+  margin-bottom: 2.5rem;
+}

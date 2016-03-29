@@ -1,58 +1,44 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8" />
         <title>{% block title %}So-Sure{% endblock %}</title>
+        {% block meta %}{% endblock %}
 
-        <link rel="icon" type="image/png" href="{{ cdn_url }}/images/favicon.png">
-        <link rel="shortcut icon" href="{{ cdn_url }}/images/favicons/favicon.ico" type="image/x-icon" />
-        <link rel="apple-touch-icon" sizes="57x57" href="{{ cdn_url }}/images/favicons/apple-touch-icon-57x57.png">
-        <link rel="apple-touch-icon" sizes="60x60" href="{{ cdn_url }}/images/favicons/apple-touch-icon-60x60.png">
-        <link rel="apple-touch-icon" sizes="72x72" href="{{ cdn_url }}/images/favicons/apple-touch-icon-72x72.png">
-        <link rel="apple-touch-icon" sizes="76x76" href="{{ cdn_url }}/images/favicons/apple-touch-icon-76x76.png">
-        <link rel="apple-touch-icon" sizes="114x114" href="{{ cdn_url }}/images/favicons/apple-touch-icon-114x114.png">
-        <link rel="apple-touch-icon" sizes="120x120" href="{{ cdn_url }}/images/favicons/apple-touch-icon-120x120.png">
-        <link rel="apple-touch-icon" sizes="144x144" href="{{ cdn_url }}/images/favicons/apple-touch-icon-144x144.png">
-        <link rel="apple-touch-icon" sizes="152x152" href="{{ cdn_url }}/images/favicons/apple-touch-icon-152x152.png">
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ cdn_url }}/images/favicons/apple-touch-icon-180x180.png">
-        <link rel="icon" type="image/png" href="{{ cdn_url }}/images/favicons/favicon-16x16.png" sizes="16x16">
-        <link rel="icon" type="image/png" href="{{ cdn_url }}/images/favicons/favicon-32x32.png" sizes="32x32">
-        <link rel="icon" type="image/png" href="{{ cdn_url }}/images/favicons/favicon-96x96.png" sizes="96x96">
-        <link rel="icon" type="image/png" href="{{ cdn_url }}/images/favicons/android-chrome-192x192.png" sizes="192x192">
-        <meta name="msapplication-square70x70logo" content="{{ cdn_url }}/images/favicons/smalltile.png" />
-        <meta name="msapplication-square150x150logo" content="{{ cdn_url }}/images/favicons/mediumtile.png" />
-        <meta name="msapplication-wide310x150logo" content="{{ cdn_url }}/images/favicons/widetile.png" />
-        <meta name="msapplication-square310x310logo" content="{{ cdn_url }}/images/favicons/largetile.png" />
+        {% include '::header.html.twig' %}
 
         {% block stylesheets %}
-        {% stylesheets output='css/*'
-           'css/bootstrap.min.css' %}
-            <link rel="stylesheet" href="{{ asset_url }}">
-        {% endstylesheets %}
+            {% stylesheets output='css/*'
+               '../app/Resources/public/css/bootstrap.min.css'
+               '../app/Resources/public/css/all.css'
+               '../app/Resources/public/css/footer.css'
+               %}
+                <link rel="stylesheet" href="{{ asset_url }}">
+            {% endstylesheets %}
         {% endblock %}
-
-        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-        <meta property="fb:app_id" content="{{ fb_appid }}">
-        {% block meta %}{% endblock %}
     </head>
     <body>
-        <div id="fb-root"></div>
-        <div id="ss-root" data-fb-id="{{ fb_appid }}"
-             data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"></div>
-        {% include '::nav.html.twig' %}
+        {% if not hide_nav is defined or hide_nav != 1 %}
+            {% include '::nav.html.twig' %}
+        {% endif %}
+
         {% block body %}{% endblock %}
-        <footer style="margin: 20px">
-            
-        </footer>
-        {% block javascripts %}
-    {% javascripts
-        '@AppBundle/Resources/public/js/*'
-        'components/jquery/jquery.min.js'
-    %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}            
+
+        {% include '::footer.html.twig' %}
+
+        <!-- jQuery -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-            {% endblock %}
+        <script src="//cdn.optimizely.com/js/4833800075.js"></script>
+        <script src="https://cdn.smooch.io/smooch.min.js"></script>
+        {% block javascripts %}
+            {% javascripts
+                '@AppBundle/Resources/public/js/*'
+            %}
+                <script src="{{ asset_url }}"></script>
+            {% endjavascripts %}
+        {% endblock %}
+
+        <!-- Site JS -->
+        <script src="/js/site.js"></script>
     </body>
 </html>
