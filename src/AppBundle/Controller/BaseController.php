@@ -15,22 +15,25 @@ abstract class BaseController extends Controller
         return $this->get('doctrine_mongodb')->getManager();
     }
 
-    /**
-     * @param string $request
-     *
-     * @return array|null
-     */
-    protected function parseIdentity(Request $request)
+    protected function getCognitoIdentityId(Request $request)
     {
-        return $this->get('app.cognito.identity')->parseIdentity($request->getContent());
+        $auth = $this->get('app.user.cognitoidentity.authenticator');
+
+        return $auth->getCognitoIdentityId($request->getContent());
     }
 
+    protected function getCognitoIdentityIp(Request $request)
+    {
+        $auth = $this->get('app.user.cognitoidentity.authenticator');
 
-    protected function getCognitoIdToken(User $user, $identity)
+        return $auth->getCognitoIdentityIp($request->getContent());
+    }
+
+    protected function getCognitoIdToken(User $user, Request $request)
     {
         $cognitoIdentity = $this->get('app.cognito.identity');
 
-        return $cognitoIdentity->getCognitoIdToken($user, $identity);
+        return $cognitoIdentity->getCognitoIdToken($user, $this->getCognitoIdentityId($request));
     }
 
     /**

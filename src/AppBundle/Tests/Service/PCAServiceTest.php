@@ -1,12 +1,12 @@
 <?php
 
-namespace AppBundle\Tests\Controller;
+namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 
 /**
- * @group functional
+ * @group functional-nonet
  */
 class PCAServiceTest extends WebTestCase
 {

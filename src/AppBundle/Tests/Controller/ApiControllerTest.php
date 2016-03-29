@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 
 /**
- * @group functional
+ * @group functional-net
  */
 class ApiControllerTest extends WebTestCase
 {
@@ -55,6 +55,16 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals("WR5 3DA", $data['postcode']);
     }
 
+    /**
+     *
+     */
+    public function testAddressReqParam()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/address?postcode=');
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+    }
+
     // login
 
     /**
@@ -63,13 +73,17 @@ class ApiControllerTest extends WebTestCase
     public function testLoginNoUser()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $crawler = $client->request(
             'POST',
             '/api/v1/login',
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('email' => 'foo', 'password' => 'bar')))
+            json_encode(array(
+                'body' => array('email' => 'foo', 'password' => 'bar'),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -79,13 +93,17 @@ class ApiControllerTest extends WebTestCase
     public function testLoginMissingPasswordParam()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $crawler = $client->request(
             'POST',
             '/api/v1/login',
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('email' => 'foo')))
+            json_encode(array(
+                'body' => array('email' => 'foo'),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
@@ -93,13 +111,17 @@ class ApiControllerTest extends WebTestCase
     public function testLoginMissingUserParam()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $crawler = $client->request(
             'POST',
             '/api/v1/login',
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('password' => 'bar')))
+            json_encode(array(
+                'body' => array('password' => 'bar'),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
@@ -108,6 +130,7 @@ class ApiControllerTest extends WebTestCase
     public function testLoginBadPassword()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $user = $this->createUser($client, 'badfoo@api.bar.com', 'bar');
 
         $crawler = $client->request(
@@ -116,7 +139,10 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('email' => 'badfoo@api.bar.com', 'password' => 'barfoo')))
+            json_encode(array(
+                'body' => array('email' => 'badfoo@api.bar.com', 'password' => 'barfoo'),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -126,6 +152,7 @@ class ApiControllerTest extends WebTestCase
     public function testLoginOk()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $user = $this->createUser($client, 'foo@api.bar.com', 'bar');
 
         $crawler = $client->request(
@@ -134,7 +161,10 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('email' => 'foo@api.bar.com', 'password' => 'bar'), 'identity' => []))
+            json_encode(array(
+                'body' => array('email' => 'foo@api.bar.com', 'password' => 'bar'),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -149,6 +179,7 @@ class ApiControllerTest extends WebTestCase
     public function testQuoteUnknown()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $crawler = $client->request('GET', '/api/v1/quote');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -246,6 +277,7 @@ class ApiControllerTest extends WebTestCase
     public function testReferralCreate()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $user = $this->createUser($client, 'origin@api.bar.com', 'bar');
         $userReferred = $this->createUser($client, 'referred@api.bar.com', 'bar');
 
@@ -255,10 +287,13 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array(
-                'email' => $userReferred->getEmail(),
-                'referral_code' => $user->getId(),
-            ), 'identity' => []))
+            json_encode(array(
+                'body' => array(
+                    'email' => $userReferred->getEmail(),
+                    'referral_code' => $user->getId(),
+                ),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -273,6 +308,7 @@ class ApiControllerTest extends WebTestCase
     public function testReferralCreateInvalid()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
 
         $crawler = $client->request(
             'POST',
@@ -280,10 +316,13 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array(
-                'email' => 'foo',
-                'referral_code' => 'foo',
-            ), 'identity' => []))
+            json_encode(array(
+                'body' => array(
+                    'email' => 'foo',
+                    'referral_code' => 'foo',
+                ),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(422, $client->getResponse()->getStatusCode());
     }
@@ -296,6 +335,7 @@ class ApiControllerTest extends WebTestCase
     public function testSns()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
 
         $crawler = $client->request(
             'POST',
@@ -303,11 +343,14 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array(
-                // @codingStandardsIgnoreStart
-                'endpoint' => 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e'
-                // @codingStandardsIgnoreEnd
-            ), 'identity' => []))
+            json_encode(array(
+                'body' => array(
+                    // @codingStandardsIgnoreStart
+                    'endpoint' => 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e'
+                    // @codingStandardsIgnoreEnd
+                ),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
@@ -315,6 +358,7 @@ class ApiControllerTest extends WebTestCase
     public function testSnsMissingEndpoint()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
 
         $crawler = $client->request(
             'POST',
@@ -322,7 +366,10 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array(), 'identity' => []))
+            json_encode(array(
+                'body' => array(),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
@@ -335,6 +382,7 @@ class ApiControllerTest extends WebTestCase
     public function testTokenOk()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $user = $this->createUser($client, 'token@api.bar.com', 'bar');
 
         $crawler = $client->request(
@@ -343,7 +391,10 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('token' => $user->getToken()), 'identity' => []))
+            json_encode(array(
+                'body' => array('token' => $user->getToken()),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -353,6 +404,7 @@ class ApiControllerTest extends WebTestCase
     public function testTokenBad()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $user = $this->createUser($client, 'badtoken@api.bar.com', 'bar');
 
         $crawler = $client->request(
@@ -361,7 +413,10 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('token' => $user->getToken() + 'bad'), 'identity' => []))
+            json_encode(array(
+                'body' => array('token' => $user->getToken() + 'bad'),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
@@ -369,6 +424,7 @@ class ApiControllerTest extends WebTestCase
     public function testTokenMissing()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
 
         $crawler = $client->request(
             'POST',
@@ -376,7 +432,10 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => [], 'identity' => []))
+            json_encode(array(
+                'body' => [],
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
@@ -389,6 +448,7 @@ class ApiControllerTest extends WebTestCase
     public function testUserDuplicate()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
         $user = $this->createUser($client, 'dup-user@api.bar.com', 'bar');
 
         $crawler = $client->request(
@@ -397,7 +457,10 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('email' => 'dup-user@api.bar.com')))
+            json_encode(array(
+                'body' => array('email' => 'dup-user@api.bar.com'),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(422, $client->getResponse()->getStatusCode());
     }
@@ -405,6 +468,7 @@ class ApiControllerTest extends WebTestCase
     public function testUserCreate()
     {
         $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
 
         $crawler = $client->request(
             'POST',
@@ -412,7 +476,10 @@ class ApiControllerTest extends WebTestCase
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('email' => 'api-new-user@api.bar.com')))
+            json_encode(array(
+                'body' => array('email' => 'api-new-user@api.bar.com'),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -427,7 +494,7 @@ class ApiControllerTest extends WebTestCase
     public function testUserCreateIp()
     {
         $client = static::createClient();
-        $identity = "{sourceIp=62.253.24.186}";
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
 
         $crawler = $client->request(
             'POST',
@@ -437,7 +504,10 @@ class ApiControllerTest extends WebTestCase
             array(
                 'CONTENT_TYPE' => 'application/json',
             ),
-            json_encode(array('body' => array('email' => 'api-ip-user@api.bar.com'), 'identity' => $identity))
+            json_encode(array(
+                'body' => array('email' => 'api-ip-user@api.bar.com'),
+                'identity' => $cognitoIdentityId
+            ))
         );
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
@@ -447,7 +517,7 @@ class ApiControllerTest extends WebTestCase
         $repo = $dm->getRepository(User::class);
         $fooUser = $repo->findOneBy(['email' => 'api-ip-user@api.bar.com']);
         $this->assertTrue($fooUser !== null);
-        $this->assertEquals('62.253.24.186', $fooUser->getSignupIp());
+        $this->assertEquals('62.253.24.189', $fooUser->getSignupIp());
         $this->assertEquals('GB', $fooUser->getSignupCountry());
         $this->assertEquals([-0.13,51.5], $fooUser->getSignupLoc()->coordinates);
     }
@@ -468,6 +538,17 @@ class ApiControllerTest extends WebTestCase
         return $user;
     }
 
+    protected function getUnauthIdentity($client)
+    {
+        $cognitoIdentityId = $client->getContainer()->get('app.cognito.identity')->getId();
+        //$cognitoIdentityId = 'eu-west-1:85376078-5f0f-43b8-8529-9021bb2096a4';
+        // @codingStandardsIgnoreStart
+        $identity = sprintf('{cognitoIdentityPoolId=eu-west-1:e7a6cfd2-c60f-4a04-a7a0-79eec2150720, accountId=812402538357, cognitoIdentityId=%s, caller=AROAIOCRWVZM5HTY5DI3E:CognitoIdentityCredentials, apiKey=null, sourceIp=62.253.24.189, cognitoAuthenticationType=unauthenticated, cognitoAuthenticationProvider=null, userArn=arn:aws:sts::812402538357:assumed-role/Cognito_sosureUnauth_Role/CognitoIdentityCredentials, userAgent=aws-sdk-iOS/2.3.5 iPhone-OS/9.2.1 en_GB, user=AROAIOCRWVZM5HTY5DI3E:CognitoIdentityCredentials}"', $cognitoIdentityId);
+        // @codingStandardsIgnoreEnd
+
+        return $identity;
+    }
+    
     protected function getManager($client)
     {
         return $client->getContainer()->get('doctrine_mongodb')->getManager();

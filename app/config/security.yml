@@ -12,12 +12,21 @@ security:
     providers:
         fos_userbundle:
             id: fos_user.user_provider.username
+        cognito_identity_user_provider:
+            id: app.user.cognitoidentity
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
+        api:
+            pattern: ^/api
+            stateless: true
+            simple_preauth:
+                authenticator: app.user.cognitoidentity.authenticator
+            provider: cognito_identity_user_provider
 
         main:
             pattern: ^/

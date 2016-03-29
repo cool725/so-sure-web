@@ -59,7 +59,6 @@ class ApiController extends BaseController
     {
         try {
             // throw new \Exception('Manual Exception Test');
-            $identity = $this->parseIdentity($request);
             $data = json_decode($request->getContent(), true)['body'];
             if (!$this->validateFields($data, ['email', 'password'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
@@ -94,7 +93,6 @@ class ApiController extends BaseController
     public function loginFacebookAction(Request $request)
     {
         try {
-            $identity = $this->parseIdentity($request);
             $data = json_decode($request->getContent(), true)['body'];
             if (!$this->validateFields($data, ['facebook_id', 'facebook_access_token', 'cognito_id'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
@@ -225,7 +223,6 @@ class ApiController extends BaseController
     public function referralAddAction(Request $request)
     {
         try {
-            $identity = $this->parseIdentity($request);
             $data = json_decode($request->getContent(), true)['body'];
             if (!$this->validateFields($data, ['email', 'referral_code'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
@@ -265,7 +262,6 @@ class ApiController extends BaseController
     public function snsAction(Request $request)
     {
         try {
-            $identity = $this->parseIdentity($request);
             $data = json_decode($request->getContent(), true)['body'];
             $endpoint = isset($data['endpoint']) ? $data['endpoint'] : null;
             if (!$endpoint) {
@@ -290,20 +286,18 @@ class ApiController extends BaseController
     public function tokenAction(Request $request)
     {
         try {
-            $identity = $this->parseIdentity($request);
             $data = json_decode($request->getContent(), true)['body'];
             if (!$this->validateFields($data, ['token'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(User::class);
-            $user = $repo->findOneBy(['token' => $data['token']]);
+            $identity = $this->get('app.user.cognitoidentity');
+            $user = $identity->loadUserByUserToken($data['token']);
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Invalid token', 403);
             }
 
-            list($identityId, $token) = $this->getCognitoIdToken($user, $identity);
+            list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (\Exception $e) {
@@ -320,7 +314,6 @@ class ApiController extends BaseController
     public function userAction(Request $request)
     {
         try {
-            $identity = $this->parseIdentity($request);
             $data = json_decode($request->getContent(), true)['body'];
 
             $userManager = $this->get('fos_user.user_manager');
@@ -336,7 +329,7 @@ class ApiController extends BaseController
             // NOTE: not completely secure, but as we're only using for an indication, it's good enough
             // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
             // https://forums.aws.amazon.com/thread.jspa?messageID=673393
-            $clientIp = $identity['sourceIp'];
+            $clientIp = $this->getCognitoIdentityIp($request);
             $user->setSignupIp($clientIp);
 
             $geoip = $this->get('app.geoip');
@@ -355,7 +348,7 @@ class ApiController extends BaseController
             $token = null;
             // Important! This should only run if the user is a new user - otherwise, could impersonate an existing user
             if ($addedUser['new'] && $identityId) {
-                list($identityId, $token) = $this->getCognitoIdToken($addedUser['user'], $identity);
+                list($identityId, $token) = $this->getCognitoIdToken($addedUser['user'], $request);
             }
 
             if ($user->getSnsEndpoint() != null) {

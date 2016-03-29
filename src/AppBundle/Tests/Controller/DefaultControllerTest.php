@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 
 /**
- * @group functional
+ * @group functional-net
  */
 class DefaultControllerTest extends WebTestCase
 {
