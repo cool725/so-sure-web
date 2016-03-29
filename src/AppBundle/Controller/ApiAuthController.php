@@ -40,4 +40,54 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
+
+    /**
+     * @Route("/user/{id}", name="api_auth_get_user")
+     * @Method({"POST"})
+     */
+    public function getUserAction(Request $request, $id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($id);
+            if (!$user) {
+                return new JsonResponse([], 404);
+            }
+
+            $this->denyAccessUnlessGranted('view', $user);
+
+            return new JsonResponse($user->toApiArray());
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api getUser. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/user/{id}/address", name="api_auth_add_user_address")
+     * @Method({"POST"})
+     *
+    public function addUserAddressAction(Request $request, $id)
+    {
+        try {
+            if (!$this->validateQueryFields($request, ['id'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($id);
+
+            $this->denyAccessUnlessGranted('view', $user);
+
+            return new JsonResponse($user->toApiArray());
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api getUser. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+    /
 }
