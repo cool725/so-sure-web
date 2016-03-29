@@ -30,7 +30,7 @@ class ApiAuthController extends BaseController
      * @Route("/ping", name="api_auth_ping")
      * @Method({"GET", "POST"})
      */
-    public function pingAuthAction(Request $request)
+    public function pingAuthAction()
     {
         try {
             return new JsonResponse(['pong' => 1]);
