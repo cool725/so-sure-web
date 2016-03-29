@@ -124,3 +124,8 @@ services:
             listenPort: 8080
             httpPort: 80
             httpsPort: 443
+
+    app.voter.user:
+        class: AppBundle\Security\UserVoter
+        tags:
+            - { name: security.voter }
