@@ -32,20 +32,14 @@ class ApiAuthController extends BaseController
      */
     public function pingAuthAction()
     {
-        try {
-            return new JsonResponse(['pong' => 1]);
-        } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api pingAuth. %s', $e->getMessage()));
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
+        return new JsonResponse(['pong' => 1]);
     }
 
     /**
      * @Route("/user/{id}", name="api_auth_get_user")
      * @Method({"POST"})
      */
-    public function getUserAction(Request $request, $id)
+    public function getUserAction($id)
     {
         try {
             $dm = $this->getManager();
@@ -89,5 +83,5 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
-    /
+    */
 }

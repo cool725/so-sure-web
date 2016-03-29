@@ -308,7 +308,9 @@ class ApiControllerTest extends WebTestCase
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
         $user = static::createUser($this->getUserManager($client), 'token@api.bar.com', 'bar');
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array('token' => $user->getToken()));
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+            'token' => $user->getToken()
+        ));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue(strlen($data['token']) > 20);
@@ -319,7 +321,9 @@ class ApiControllerTest extends WebTestCase
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
         $user = static::createUser($this->getUserManager($client), 'badtoken@api.bar.com', 'bar');
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array('token' => $user->getToken() + 'bad'));
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+            'token' => $user->getToken() + 'bad'
+        ));
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
     }
 
@@ -341,7 +345,9 @@ class ApiControllerTest extends WebTestCase
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
         $user = static::createUser($this->getUserManager($client), 'dup-user@api.bar.com', 'bar');
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array('email' => 'dup-user@api.bar.com'));
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => 'dup-user@api.bar.com'
+        ));
         $this->assertEquals(422, $client->getResponse()->getStatusCode());
     }
 
@@ -350,7 +356,9 @@ class ApiControllerTest extends WebTestCase
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array('email' => 'api-new-user@api.bar.com'));
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => 'api-new-user@api.bar.com'
+        ));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals('api-new-user@api.bar.com', $data['email']);
@@ -366,7 +374,9 @@ class ApiControllerTest extends WebTestCase
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array('email' => 'api-ip-user@api.bar.com'));
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => 'api-ip-user@api.bar.com'
+        ));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals('api-ip-user@api.bar.com', $data['email']);
