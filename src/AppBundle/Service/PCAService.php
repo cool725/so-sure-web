@@ -36,8 +36,19 @@ class PCAService
      */
     public function getAddress($postcode, $number)
     {
-        // WR5 3DA is a free search via pca, so can used for non productione environments
-        if ($this->environment != 'prod') {
+        // Use BX1 1LT as a hard coded address for testing
+        // (its a non-geographical postcode for Lloyds Bank, so is hopefully safe ;)
+        if (strtoupper(trim($postcode)) == "BX11LT") {
+            $address = new Address();
+            $address->setLine1('so-sure Test Address Line 1');
+            $address->setLine2('so-sure Test Address Line 2');
+            $address->setLine3('so-sure Test Address Line 3');
+            $address->setCity('so-sure Test City');
+            $address->setPostcode('BX1 1LT');
+
+            return $address;
+        } elseif ($this->environment != 'prod') {
+            // WR5 3DA is a free search via pca, so can used for non productione environments
             $postcode = "WR53DA";
             $number = null;
         }

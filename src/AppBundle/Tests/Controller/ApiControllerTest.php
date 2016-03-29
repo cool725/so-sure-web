@@ -46,9 +46,21 @@ class ApiControllerTest extends WebTestCase
      */
     public function testAddress()
     {
-        // TODO: Move to different test as test will count against our limit
-        return;
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/address?postcode=BX11LT');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals("so-sure Test Address Line 1", $data['line1']);
+        $this->assertEquals("so-sure Test Address Line 2", $data['line2']);
+        $this->assertEquals("so-sure Test City", $data['city']);
+        $this->assertEquals("BX1 1LT", $data['postcode']);
+    }
 
+    /* TODO: Consider moving to a different type of test.
+     * Note that once we're out of test mode mid-apr 2016,
+     * then it should be possible to use this test
+    public function testAddress()
+    {
         $client = static::createClient();
         $crawler = $client->request('GET', '/api/v1/address?postcode=WR53DA');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -58,15 +70,13 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals("Worcester", $data['city']);
         $this->assertEquals("WR5 3DA", $data['postcode']);
     }
+    */
 
     /**
      *
      */
     public function testAddressReqParam()
     {
-        // TODO: Move to different test as test will count against our limit
-        return;
-
         $client = static::createClient();
         $crawler = $client->request('GET', '/api/v1/address?postcode=');
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
