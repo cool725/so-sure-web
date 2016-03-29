@@ -12,6 +12,7 @@
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
   color: #fff;
   text-align: center;
+  padding: 4rem 0 4rem;
 }
 .hero strong {
   color: #000;
@@ -29,8 +30,7 @@
   margin-bottom: -2rem !important;
 }
 .hero .learn-more {
-  padding-top: 7rem;
-  margin-bottom: 5rem;
+  padding-top: 2rem;
 }
 .logo {
   width: 45%;
@@ -123,7 +123,6 @@
 }
 .mission .section-description {
   margin-bottom: 2rem;
-  max-width: 90%;
 }
 .mission .section-title {
   margin-bottom: 3.2rem;
@@ -192,4 +191,3 @@
     width: auto;
   }
 }
-
