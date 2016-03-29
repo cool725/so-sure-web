@@ -12,6 +12,7 @@ use GeoJson\Geometry\Point;
 class MaxMindServiceIpTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
+    use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $geoip;
     protected static $launch;
@@ -59,7 +60,7 @@ class MaxMindServiceIpTest extends WebTestCase
 
     public function testUserGeoLocQuery()
     {
-        $user = $this->createUser('geo@service.so-sure.com', 'foo');
+        $user = static::createUser(self::$userManager, 'geo@security.so-sure.com', 'foo');
 
         self::$geoip->find('62.253.24.186');
         $user->setSignupLoc(self::$geoip->getCoordinates());
@@ -87,20 +88,5 @@ class MaxMindServiceIpTest extends WebTestCase
         // http://www.movable-type.co.uk/scripts/latlong.html can verify the distance approximately
         // 947.8 vs 948.8186329264697
         // $this->assertEquals(948.8186329264697, $searchUser->signupDistance);
-    }
-
-    // helpers
-
-    /**
-     *
-     */
-    protected function createUser($email, $password)
-    {
-        $user = self::$userManager->createUser();
-        $user->setEmail($email);
-        $user->setPlainPassword($password);
-        self::$userManager->updateUser($user, true);
-
-        return $user;
     }
 }

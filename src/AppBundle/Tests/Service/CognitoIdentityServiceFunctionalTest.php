@@ -11,6 +11,7 @@ use AppBundle\Controller\OpsController;
 class CognitoIdentityServiceFunctionalTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
+    use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $cognito;
     protected static $userManager;
@@ -38,24 +39,9 @@ class CognitoIdentityServiceFunctionalTest extends WebTestCase
 
     public function testIdentity()
     {
-        $user = $this->createUser('identity@service.so-sure.com', 'foo');
+        $user = static::createUser(self::$userManager, 'identity@service.so-sure.com', 'foo');
         list($identityId, $token) = self::$cognito->getCognitoIdToken($user);
         $searchUser = self::$userProvider->loadUserByCognitoIdentityId($identityId);
         $this->assertEquals($searchUser->getId(), $user->getId());
-    }
-
-    // helpers
-
-    /**
-     *
-     */
-    protected function createUser($email, $password)
-    {
-        $user = self::$userManager->createUser();
-        $user->setEmail($email);
-        $user->setPlainPassword($password);
-        self::$userManager->updateUser($user, true);
-
-        return $user;
     }
 }

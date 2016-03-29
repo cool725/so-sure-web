@@ -11,6 +11,7 @@ use AppBundle\Document\User;
 class ApiControllerTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
+    use \AppBundle\Tests\UserClassTrait;
 
     public function tearDown()
     {
@@ -131,7 +132,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = $this->createUser($client, 'badfoo@api.bar.com', 'bar');
+        $user = static::createUser($this->getUserManager($client), 'badfoo@api.bar.com', 'bar');
 
         $crawler = $client->request(
             'POST',
@@ -153,7 +154,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = $this->createUser($client, 'foo@api.bar.com', 'bar');
+        $user = static::createUser($this->getUserManager($client), 'foo@api.bar.com', 'bar');
 
         $crawler = $client->request(
             'POST',
@@ -266,7 +267,7 @@ class ApiControllerTest extends WebTestCase
     public function testReferral()
     {
         $client = static::createClient();
-        $user = $this->createUser($client, 'referral@api.bar.com', 'bar');
+        $user = static::createUser($this->getUserManager($client), 'referral@api.bar.com', 'bar');
 
         $crawler = $client->request('GET', sprintf('/api/v1/referral?email=%s', $user->getEmail()));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -278,8 +279,8 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = $this->createUser($client, 'origin@api.bar.com', 'bar');
-        $userReferred = $this->createUser($client, 'referred@api.bar.com', 'bar');
+        $user = static::createUser($this->getUserManager($client), 'origin@api.bar.com', 'bar');
+        $userReferred = static::createUser($this->getUserManager($client), 'referred@api.bar.com', 'bar');
 
         $crawler = $client->request(
             'POST',
@@ -383,7 +384,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = $this->createUser($client, 'token@api.bar.com', 'bar');
+        $user = static::createUser($this->getUserManager($client), 'token@api.bar.com', 'bar');
 
         $crawler = $client->request(
             'POST',
@@ -405,7 +406,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = $this->createUser($client, 'badtoken@api.bar.com', 'bar');
+        $user = static::createUser($this->getUserManager($client), 'badtoken@api.bar.com', 'bar');
 
         $crawler = $client->request(
             'POST',
@@ -449,7 +450,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = $this->createUser($client, 'dup-user@api.bar.com', 'bar');
+        $user = static::createUser($this->getUserManager($client), 'dup-user@api.bar.com', 'bar');
 
         $crawler = $client->request(
             'POST',
@@ -527,17 +528,6 @@ class ApiControllerTest extends WebTestCase
     /**
      *
      */
-    protected function createUser($client, $email, $password)
-    {
-        $userManager = $client->getContainer()->get('fos_user.user_manager');
-        $user = $userManager->createUser();
-        $user->setEmail($email);
-        $user->setPlainPassword($password);
-        $userManager->updateUser($user, true);
-
-        return $user;
-    }
-
     protected function getUnauthIdentity($client)
     {
         $cognitoIdentityId = $client->getContainer()->get('app.cognito.identity')->getId();
@@ -552,5 +542,10 @@ class ApiControllerTest extends WebTestCase
     protected function getManager($client)
     {
         return $client->getContainer()->get('doctrine_mongodb')->getManager();
+    }
+
+    protected function getUserManager($client)
+    {
+        return $client->getContainer()->get('fos_user.user_manager');
     }
 }
