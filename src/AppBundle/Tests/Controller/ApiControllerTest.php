@@ -525,6 +525,9 @@ class ApiControllerTest extends WebTestCase
     
     // helpers
 
+    /**
+     *
+     */
     protected function getUnauthIdentity($client)
     {
         $cognitoIdentityId = $client->getContainer()->get('app.cognito.identity')->getId();
