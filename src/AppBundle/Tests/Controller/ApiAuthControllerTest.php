@@ -189,6 +189,50 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
 
+    // user/{id}
+
+    /**
+     *
+     */
+    public function testUserAddAddress()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'city' => 'London',
+            'postcode' => 'ec1v 1rx',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+
+        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(self::$testUser->getEmailCanonical(), $result['email']);
+        $this->assertEquals($data['type'], $result['address'][0]['type']);
+        $this->assertEquals($data['line1'], $result['address'][0]['line1']);
+        $this->assertEquals($data['city'], $result['address'][0]['city']);
+        $this->assertEquals($data['postcode'], $result['address'][0]['postcode']);
+    }
+
+    public function testUserAddAddressDifferentUser()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser2->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'city' => 'London',
+            'postcode' => 'ec1v 1rx',
+        ]);
+        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+    }
+
+    // helpers
+
+    /**
+     *
+     */
     protected function getAuthUser($user)
     {
         return static::authUser(self::$identity, $user);

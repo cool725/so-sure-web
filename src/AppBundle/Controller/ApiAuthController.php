@@ -148,11 +148,11 @@ class ApiAuthController extends BaseController
     /**
      * @Route("/user/{id}/address", name="api_auth_add_user_address")
      * @Method({"POST"})
-     *
+     */
     public function addUserAddressAction(Request $request, $id)
     {
         try {
-            if (!$this->validateQueryFields($request, ['id'])) {
+            if (!$this->validateFields($request, ['type', 'line1', 'city', 'postcode'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -162,14 +162,25 @@ class ApiAuthController extends BaseController
 
             $this->denyAccessUnlessGranted('view', $user);
 
+            $address = new Address();
+            $address->setType($request['type']);
+            $address->setLine1($request['line1']);
+            $address->setLine2($request['line2']);
+            $address->setLine3($request['line3']);
+            $address->setCity($request['city']);
+            $address->setPostcode($request['postcode']);
+            $address->setUser($user);
+
+            $dm->persist($address);
+            $dm->flush();
+
             return new JsonResponse($user->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api getUser. %s', $e->getMessage()));
+            $this->get('logger')->error(sprintf('Error in api addUserAddress. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
-    */
 }
