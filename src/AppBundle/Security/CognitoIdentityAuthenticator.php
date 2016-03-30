@@ -71,9 +71,7 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
     protected function parseIdentity($requestContent)
     {
         try {
-            $this->logger->error($requestContent);
             $data = json_decode($requestContent, true);
-            $this->logger->error(print_r($data, true));
 
             $str = $data['identity'];
             $str = str_replace(',', '&', $str);
@@ -100,10 +98,7 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
                 $user = self::ANON_USER_AUTH_PATH;
             }
             
-            // Odd issue where aws api gateway isn't passing on the cognito identity from the app
-            // so ignore it for now
-            // TODO: FIX THIS!!
-            if (!$cognitoIdentityId && $user == self::ANON_USER_AUTH_PATH) {
+            if (!$cognitoIdentityId) {
                 throw new BadCredentialsException('No Cognito Identifier found');
             }
         }
@@ -135,7 +130,7 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
                 // CAUTION: this message will be returned to the client
                 // (so don't put any un-trusted messages / error strings here)
                 throw new CustomUserMessageAuthenticationException(
-                    sprintf('API Key "%s" does not exist.', $cognitoIdentityId)
+                    sprintf('Cognity Identity "%s" is not authenticated.', $cognitoIdentityId)
                 );
             } else {
                 $user = $token->getUser();
@@ -157,10 +152,8 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        \AppBundle\Classes\NoOp::noOp([$request, $exception]);
-
-        // Temporarily log to see whats occuring?
-        $this->logger->error($exception->getMessage());
+        \AppBundle\Classes\NoOp::noOp([$request]);
+        $this->logger->debug($exception->getMessage());
 
         return new Response(
             "Auth failure",
