@@ -72,6 +72,7 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
     {
         try {
             $data = json_decode($requestContent, true);
+            $this->logger->error($data);
 
             $str = $data['identity'];
             $str = str_replace(',', '&', $str);
