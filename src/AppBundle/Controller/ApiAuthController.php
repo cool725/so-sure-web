@@ -20,6 +20,7 @@ use AppBundle\Document\User;
 use AppBundle\Classes\ApiErrorCode;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/api/v1/auth")
@@ -33,6 +34,60 @@ class ApiAuthController extends BaseController
     public function pingAuthAction()
     {
         return new JsonResponse(['pong' => 1]);
+    }
+
+    /**
+     * @Route("/policy", name="api_auth_new_policy")
+     * @Method({"POST"})
+     */
+    public function newPolicyAction(Request $request)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['user_id', 'imei'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $imeiValidator = $this->get('app.imei');
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($data['user_id']);
+            if (!$user) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_USER_NOT_FOUND,
+                    'Unable to find user',
+                    422
+                );
+            }
+            $this->denyAccessUnlessGranted('edit', $user);
+
+            // TODO: validate user isn't blacklisted
+            // TODO: validate imei isn't blacklisted
+            $imei = str_replace(' ', '', $data['imei']);
+            if (!$imeiValidator->isImei($imei)) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_IMEI_INVALID,
+                    'Imei fails validation checks',
+                    422
+                );
+            }
+
+            $policy = new Policy();
+            $policy->setUser($user);
+            $policy->setImei($imei);
+
+            $dm->persist($policy);
+            $dm->flush();
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            print_r(get_class($e));
+            $this->get('logger')->error(sprintf('Error in api newPolicy. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
     }
 
     /**
@@ -52,6 +107,8 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('view', $user);
 
             return new JsonResponse($user->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api getUser. %s', $e->getMessage()));
 
@@ -77,6 +134,8 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('view', $user);
 
             return new JsonResponse($user->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api getUser. %s', $e->getMessage()));
 

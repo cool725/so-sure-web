@@ -95,6 +95,11 @@ services:
             developerLogin: "%cognito_developer_login%"
             identityPoolId: "%aws_cognito_identitypoolid%"
 
+    app.imei:
+        class: AppBundle\Service\ImeiService
+        arguments:
+            logger: "@logger"
+
     aws.credentials:
         class: Aws\Credentials\Credentials
         arguments:

@@ -13,6 +13,7 @@ class Policy
     const STATUS_ACTIVE = 'active';
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_EXPIRED = 'expired';
+    const STATUS_UNPAID = 'unpaid';
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -34,8 +35,14 @@ class Policy
      */
     protected $user;
 
-    /** @MongoDB\String() */
+    /** @MongoDB\Field(type="string") */
     protected $status;
+
+    /** @MongoDB\Field(type="string", nullable=true) */
+    protected $policyNumber;
+
+    /** @MongoDB\Field(type="string", nullable=false) */
+    protected $imei;
 
     /** @MongoDB\Date() */
     protected $created;
@@ -118,12 +125,46 @@ class Policy
         $this->status = $status;
     }
     
-    public function create()
+    public function getPolicyNumber()
+    {
+        return $this->policyNumber;
+    }
+
+    public function setPolicyNumber($policyNumber)
+    {
+        $this->policyNumber = $policyNumber;
+    }
+
+    public function getImei()
+    {
+        return $this->imei;
+    }
+
+    public function setImei($imei)
+    {
+        $this->imei = $imei;
+    }
+
+    public function activate()
     {
         $this->setStatus(self::STATUS_ACTIVE);
         $this->setStart(new \DateTime());
         $nextYear = clone $this->getStart();
         $nextYear = $nextYear->modify('+1 year');
         $this->setEnd($nextYear);
+    }
+
+    public function toApiArray()
+    {
+        return [
+          'id' => $this->getId(),
+          'status' => $this->getStatus(),
+          'policy_number' => $this->getPolicyNumber(),
+          'imei' => $this->getImei(),
+          'phone' => $this->getPhone() ? $this->getUser()->toApiArray() : null,
+          'user' => $this->getUser() ? $this->getUser()->toApiArray() : null,
+          'pot' => null,
+          'payment' => null,
+        ];
     }
 }
