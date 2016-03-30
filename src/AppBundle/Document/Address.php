@@ -11,6 +11,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class Address
 {
+    const TYPE_BILLING = 'billing';
+    public static $types = [self::TYPE_BILLING];
+
     /**
      * @MongoDB\Id
      */
@@ -18,6 +21,9 @@ class Address
 
     /** @MongoDB\Date() */
     protected $created;
+
+    /** @MongoDB\String(name="type", nullable=false) */
+    protected $type;
 
     /** @MongoDB\String(name="line1", nullable=false) */
     protected $line1;
@@ -27,12 +33,6 @@ class Address
 
     /** @MongoDB\String(name="line3", nullable=true) */
     protected $line3;
-
-    /** @MongoDB\String(name="line4", nullable=true) */
-    protected $line4;
-
-    /** @MongoDB\String(name="line5", nullable=true) */
-    protected $line5;
 
     /** @MongoDB\String(name="city", nullable=false) */
     protected $city;
@@ -53,6 +53,19 @@ class Address
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setType($type)
+    {
+        if (!in_array($type, self::$types)) {
+            throw new \InvalidArgumentException('Type must be a valid type');
+        }
+        $this->type = $type;
+    }
+
+    public function getType()
+    {
+        return $this->type;
     }
 
     public function setLine1($line1)
