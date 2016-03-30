@@ -91,6 +91,35 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/policy/{id}", name="api_auth_get_policy")
+     * @Method({"POST"})
+     */
+    public function getPolicyAction(Request $request, $id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted('view', $policy);
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api getPolicy. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/user/{id}", name="api_auth_get_user")
      * @Method({"POST"})
      */
@@ -101,7 +130,7 @@ class ApiAuthController extends BaseController
             $repo = $dm->getRepository(User::class);
             $user = $repo->find($id);
             if (!$user) {
-                return new JsonResponse([], 404);
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
             }
 
             $this->denyAccessUnlessGranted('view', $user);
