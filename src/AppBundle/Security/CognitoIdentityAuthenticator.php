@@ -96,12 +96,15 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
         if ($request->getMethod() != "GET") {
             $cognitoIdentityId = $this->getCognitoIdentityId($request->getContent());
 
-            if (!$cognitoIdentityId) {
-                throw new BadCredentialsException('No Cognito Identifier found');
-            }
-
             if (stripos($request->getPathInfo(), self::AUTH_PATH) !== false) {
                 $user = self::ANON_USER_AUTH_PATH;
+            }
+            
+            // Odd issue where aws api gateway isn't passing on the cognito identity from the app
+            // so ignore it for now
+            // TODO: FIX THIS!!
+            if (!$cognitoIdentityId && $user == self::ANON_USER_AUTH_PATH) {
+                throw new BadCredentialsException('No Cognito Identifier found');
             }
         }
 
