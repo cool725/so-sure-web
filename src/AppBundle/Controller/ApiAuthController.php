@@ -94,7 +94,7 @@ class ApiAuthController extends BaseController
      * @Route("/policy/{id}", name="api_auth_get_policy")
      * @Method({"POST"})
      */
-    public function getPolicyAction(Request $request, $id)
+    public function getPolicyAction($id)
     {
         try {
             $dm = $this->getManager();
