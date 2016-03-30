@@ -364,11 +364,6 @@ class ApiController extends BaseController
         }
     }
 
-    private function getErrorJsonResponse($errorCode, $description, $httpCode = 422)
-    {
-        return new JsonResponse(['code' => $errorCode, 'description' => $description], $httpCode);
-    }
-
     private function getArnForTopic($topic)
     {
         switch ($topic) {

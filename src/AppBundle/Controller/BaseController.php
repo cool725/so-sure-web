@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use AppBundle\Document\User;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 abstract class BaseController extends Controller
 {
@@ -91,5 +92,19 @@ abstract class BaseController extends Controller
         }
 
         return true;
+    }
+
+    /**
+     * Return a standard json error message
+     *
+     * @param string  $errorCode
+     * @param string  $description
+     * @param integer $httpCode
+     *
+     * @return JsonResponse
+     */
+    protected function getErrorJsonResponse($errorCode, $description, $httpCode = 422)
+    {
+        return new JsonResponse(['code' => $errorCode, 'description' => $description], $httpCode);
     }
 }
