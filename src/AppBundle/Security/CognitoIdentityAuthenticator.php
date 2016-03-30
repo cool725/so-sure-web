@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\HttpUtils;
+use Psr\Log\LoggerInterface;
 
 class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, AuthenticationFailureHandlerInterface
 {
@@ -21,10 +22,12 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
     const AUTH_PATH = '/api/v1/auth';
 
     protected $httpUtils;
+    protected $logger;
 
-    public function __construct(HttpUtils $httpUtils)
+    public function __construct(HttpUtils $httpUtils, LoggerInterface $logger)
     {
         $this->httpUtils = $httpUtils;
+        $this->logger = $logger;
     }
 
     /**
@@ -150,6 +153,10 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         \AppBundle\Classes\NoOp::noOp([$request, $exception]);
+
+        // Temporarily log to see whats occuring?
+        $this->logger->error($exception->getMessage());
+
         return new Response(
             "Auth failure",
             403

@@ -21,7 +21,9 @@ services:
 
     app.user.cognitoidentity.authenticator:
         class: AppBundle\Security\CognitoIdentityAuthenticator
-        arguments: ["@security.http_utils"]
+        arguments:
+            httpUtils: "@security.http_utils"
+            logger:    "@logger"
 
     app.facebook:
         class: AppBundle\Service\FacebookService
