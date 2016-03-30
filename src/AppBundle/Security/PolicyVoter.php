@@ -1,0 +1,45 @@
+<?php
+namespace AppBundle\Security;
+
+use AppBundle\Document\User;
+use AppBundle\Document\Policy;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+
+class PolicyVoter extends Voter
+{
+    // these strings are just invented: you can use anything
+    const VIEW = 'view';
+    const EDIT = 'edit';
+
+    public function supports($attribute, $subject)
+    {
+        // if the attribute isn't one we support, return false
+        if (!in_array($attribute, array(self::VIEW, self::EDIT))) {
+            return false;
+        }
+
+        // only vote on Policy objects inside this voter
+        if (!$subject instanceof Policy) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    {
+        $currentUser = $token->getUser();
+
+        if (!$currentUser instanceof User) {
+            // the user must be logged in; if not, deny access
+            return false;
+        }
+
+        // you know $subject is a Policy object, thanks to supports
+        /** @var Policy $policy */
+        $policy = $subject;
+        
+        return $policy->getUser()->getId() == $currentUser->getId();
+    }
+}

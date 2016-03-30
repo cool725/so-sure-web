@@ -136,3 +136,8 @@ services:
         class: AppBundle\Security\UserVoter
         tags:
             - { name: security.voter }
+
+    app.voter.policy:
+        class: AppBundle\Security\PolicyVoter
+        tags:
+            - { name: security.voter }

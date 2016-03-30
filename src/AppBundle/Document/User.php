@@ -76,6 +76,11 @@ class User extends BaseUser
         return $this->id;
     }
 
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
     public function setFacebookId($facebookId)
     {
         $this->facebookId = $facebookId;

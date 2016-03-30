@@ -4,16 +4,17 @@ namespace AppBundle\Tests\Security;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 
 /**
  * @group functional-nonet
  */
-class UserVoterTest extends WebTestCase
+class PolicyVoterTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;
-    protected static $userVoter;
+    protected static $policyVoter;
 
     public static function setUpBeforeClass()
     {
@@ -26,7 +27,7 @@ class UserVoterTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
-         self::$userVoter = self::$container->get('app.voter.user');
+         self::$policyVoter = self::$container->get('app.voter.policy');
     }
 
     public function tearDown()
@@ -35,36 +36,40 @@ class UserVoterTest extends WebTestCase
 
     public function testSupportsUnknown()
     {
-        $user = new User();
-        $this->assertFalse(self::$userVoter->supports('unknown', $user));
-        $this->assertFalse(self::$userVoter->supports('view', null));
+        $policy = new Policy();
+        $this->assertFalse(self::$policyVoter->supports('unknown', $policy));
+        $this->assertFalse(self::$policyVoter->supports('view', null));
     }
 
     public function testSupports()
     {
-        $user = new User();
-        $this->assertTrue(self::$userVoter->supports('view', $user));
-        $this->assertTrue(self::$userVoter->supports('edit', $user));
+        $policy = new Policy();
+        $this->assertTrue(self::$policyVoter->supports('view', $policy));
+        $this->assertTrue(self::$policyVoter->supports('edit', $policy));
     }
 
     public function testVoteOk()
     {
         $user = new User();
         $user->setId(1);
+        $policy = new Policy();
+        $policy->setUser($user);
         $token = new PreAuthenticatedToken($user, '1', 'test');
 
-        $this->assertTrue(self::$userVoter->voteOnAttribute('view', $user, $token));
+        $this->assertTrue(self::$policyVoter->voteOnAttribute('view', $policy, $token));
     }
 
     public function testVoteDiffUser()
     {
         $user = new User();
         $user->setId(1);
+        $policy = new Policy();
+        $policy->setUser($user);
 
         $userDiff = new User();
         $userDiff->setId(2);
         $token = new PreAuthenticatedToken($userDiff, '1', 'test');
 
-        $this->assertFalse(self::$userVoter->voteOnAttribute('view', $user, $token));
+        $this->assertFalse(self::$policyVoter->voteOnAttribute('view', $policy, $token));
     }
 }
