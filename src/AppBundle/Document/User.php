@@ -30,6 +30,11 @@ class User extends BaseUser
      */
     protected $referred;
 
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="Address", mappedBy="user")
+     */
+    protected $addresses;
+
     /** @MongoDB\Date() */
     protected $created;
 
@@ -63,10 +68,14 @@ class User extends BaseUser
     /** @MongoDB\Distance */
     public $signupDistance;
 
+    /** @MongoDB\EmbedOne(targetDocument="Gocardless", name="gocardless") */
+    protected $gocardless;
+
     public function __construct()
     {
         parent::__construct();
         $this->referrals = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->addresses = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = new \DateTime();
         $this->token = bin2hex(openssl_random_pseudo_bytes(64));
     }
@@ -117,6 +126,28 @@ class User extends BaseUser
         return $this->referrals;
     }
 
+    public function addAddress(Address $address)
+    {
+        $address->setUser($this);
+        $this->addresses[] = $address;
+    }
+
+    public function getAddresses()
+    {
+        return $this->addresses;
+    }
+
+    public function getBillingAddress()
+    {
+        foreach ($this->addresses as $address) {
+            if ($address->getType() == Address::TYPE_BILLING) {
+                return $address;
+            }
+        }
+
+        return null;
+    }
+
     public function setFacebookAccessToken($facebookAccessToken)
     {
         $this->facebookAccessToken = $facebookAccessToken;
@@ -150,6 +181,11 @@ class User extends BaseUser
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
+    }
+
+    public function getName()
+    {
+        return sprintf("%s %s", $this->getFirstName(), $this->getLastName());
     }
 
     public function setEmail($email)
@@ -209,8 +245,29 @@ class User extends BaseUser
         $this->signupLoc = $signupLoc;
     }
 
+    public function getGocardless()
+    {
+        return $this->gocardless;
+    }
+
+    public function setGocardless($gocardless)
+    {
+        $this->gocardless = $gocardless;
+    }
+
+    public function hasGocardless()
+    {
+        return $this->getGocardless() !== null;
+    }
+
     public function toApiArray($identityId = null, $token = null)
     {
+        $addresses = [];
+        if ($this->addresses) {
+            foreach ($this->addresses as $address) {
+                $addresses[] = $address->toApiArray();
+            }
+        }
         return [
           'id' => $this->getId(),
           'email' => $this->getEmailCanonical(),
@@ -219,6 +276,7 @@ class User extends BaseUser
           'facebook_id' => $this->getFacebookId(),
           'cognito_token' => [ 'id' => $identityId, 'token' => $token ],
           'user_token' => ['token' => $this->getToken()],
+          'addresses' => $addresses,
         ];
     }
 }

@@ -44,9 +44,10 @@ services:
     app.gocardless:
         class: AppBundle\Service\GocardlessService
         arguments:
-            logger: "@logger"
-            accessToken: %gocardless_apikey%
-            prod: %gocardless_prod%
+            manager:     "@doctrine_mongodb.odm.default_document_manager"
+            logger:      "@logger"
+            accessToken: "%gocardless_apikey%"
+            prod:        "%gocardless_prod%"
 
     app.judopay:
         class: AppBundle\Service\JudopayService

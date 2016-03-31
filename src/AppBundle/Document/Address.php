@@ -41,7 +41,7 @@ class Address
     protected $postcode;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="addresses")
      */
     protected $user;
 
@@ -118,7 +118,17 @@ class Address
         return $this->postcode;
     }
 
-    public function toArray()
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function toApiArray()
     {
         return [
           'line1' => $this->getLine1(),
@@ -126,6 +136,7 @@ class Address
           'line3' => $this->getLine3(),
           'city' => $this->getCity(),
           'postcode' => $this->getPostcode(),
+          'type' => $this->getType(),
         ];
     }
 }

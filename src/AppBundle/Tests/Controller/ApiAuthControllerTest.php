@@ -156,6 +156,25 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
     }
 
+    // policy/{id}/dd
+
+    /**
+     *
+     */
+    public function testNewPolicyDdMissingData()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
+            'sortcode' => '333333',
+        ]);
+        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
+            'account' => '12345678',
+        ]);
+        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+    }
+
     // user/{id}
 
     /**
@@ -209,10 +228,12 @@ class ApiAuthControllerTest extends WebTestCase
 
         $result = json_decode(self::$client->getResponse()->getContent(), true);
         $this->assertEquals(self::$testUser->getEmailCanonical(), $result['email']);
-        $this->assertEquals($data['type'], $result['address'][0]['type']);
-        $this->assertEquals($data['line1'], $result['address'][0]['line1']);
-        $this->assertEquals($data['city'], $result['address'][0]['city']);
-        $this->assertEquals($data['postcode'], $result['address'][0]['postcode']);
+        $this->assertTrue(isset($result['addresses']));
+        $this->assertTrue(isset($result['addresses'][0]));
+        $this->assertEquals($data['type'], $result['addresses'][0]['type']);
+        $this->assertEquals($data['line1'], $result['addresses'][0]['line1']);
+        $this->assertEquals($data['city'], $result['addresses'][0]['city']);
+        $this->assertEquals($data['postcode'], $result['addresses'][0]['postcode']);
     }
 
     public function testUserAddAddressDifferentUser()

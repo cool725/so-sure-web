@@ -31,7 +31,8 @@
         "jms/security-extra-bundle": "^1.6",
         "white-october/pagerfanta-bundle": "^1.0",
         "geoip2/geoip2": "~2.0",
-        "jmikola/geojson": "~1.0"
+        "jmikola/geojson": "~1.0",
+        "gocardless/gocardless-pro": "^0.9.3"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
