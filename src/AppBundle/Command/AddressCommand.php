@@ -56,7 +56,7 @@ class AddressCommand extends ContainerAwareCommand
             print_r($addressData);
         } elseif ($useAddress) {
             $addresses = $address->getAddress($postcode, $number);
-            print_r($addresses->toArray());
+            print_r($addresses->toApiArray());
         } else {
             $addresses = $address->find($postcode, $number);
             print_r($addresses);

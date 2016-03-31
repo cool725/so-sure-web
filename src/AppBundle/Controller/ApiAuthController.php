@@ -120,6 +120,43 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/policy/{id}/dd", name="api_auth_new_policy_dd")
+     * @Method({"POST"})
+     */
+    public function newPolicyDdAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['sortcode', 'account'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted('edit', $policy);
+
+            $gocardless = $this->get('app.gocardless');
+            $gocardless->add($policy->getUser(), $data['sortcode'], $data['account']);
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api newPolicy. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/user/{id}", name="api_auth_get_user")
      * @Method({"POST"})
      */
@@ -152,7 +189,8 @@ class ApiAuthController extends BaseController
     public function addUserAddressAction(Request $request, $id)
     {
         try {
-            if (!$this->validateFields($request, ['type', 'line1', 'city', 'postcode'])) {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['type', 'line1', 'city', 'postcode'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -163,13 +201,13 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('view', $user);
 
             $address = new Address();
-            $address->setType($request['type']);
-            $address->setLine1($request['line1']);
-            $address->setLine2($request['line2']);
-            $address->setLine3($request['line3']);
-            $address->setCity($request['city']);
-            $address->setPostcode($request['postcode']);
-            $address->setUser($user);
+            $address->setType($data['type']);
+            $address->setLine1($data['line1']);
+            $address->setLine2(isset($data['line2']) ? $data['line2'] : null);
+            $address->setLine3(isset($data['line3']) ? $data['line3'] : null);
+            $address->setCity($data['city']);
+            $address->setPostcode($data['postcode']);
+            $user->addAddress($address);
 
             $dm->persist($address);
             $dm->flush();

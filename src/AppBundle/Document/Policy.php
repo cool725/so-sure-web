@@ -15,6 +15,8 @@ class Policy
     const STATUS_EXPIRED = 'expired';
     const STATUS_UNPAID = 'unpaid';
 
+    const PAYMENT_DD_MONTHLY = 'gocardless_monthly';
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -38,11 +40,17 @@ class Policy
     /** @MongoDB\Field(type="string") */
     protected $status;
 
-    /** @MongoDB\Field(type="string", nullable=true) */
+    /** @MongoDB\Field(type="string", name="policy_number", nullable=true) */
     protected $policyNumber;
 
     /** @MongoDB\Field(type="string", nullable=false) */
     protected $imei;
+
+    /** @MongoDB\Field(type="string", name="payment_type", nullable=true) */
+    protected $paymentType;
+
+    /** @MongoDB\Field(type="string", name="gocardless_mandate", nullable=true) */
+    protected $gocardlessMandate;
 
     /** @MongoDB\Date() */
     protected $created;
@@ -143,6 +151,26 @@ class Policy
     public function setImei($imei)
     {
         $this->imei = $imei;
+    }
+
+    public function getPaymentType()
+    {
+        return $this->paymentType;
+    }
+
+    public function setPaymentType($paymentType)
+    {
+        $this->paymentType = $paymentType;
+    }
+
+    public function getGocardlessMandate()
+    {
+        return $this->gocardlessMandate;
+    }
+
+    public function setGocardlessMandate($gocardlessMandate)
+    {
+        $this->gocardlessMandate = $gocardlessMandate;
     }
 
     public function activate()

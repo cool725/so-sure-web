@@ -43,7 +43,7 @@ class ApiController extends BaseController
             $lookup = $this->get('app.address');
             $address = $lookup->getAddress($postcode, $number);
 
-            return new JsonResponse($address->toArray());
+            return new JsonResponse($address->toApiArray());
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api addressAction. %s', $e->getMessage()));
 
