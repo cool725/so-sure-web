@@ -75,5 +75,5 @@ class Gocardless
     public function hasMandates()
     {
         return count($this->getMandates()) > 0;
-    }    
+    }
 }
