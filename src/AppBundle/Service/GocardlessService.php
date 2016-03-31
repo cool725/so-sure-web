@@ -194,15 +194,52 @@ class GocardlessService
         $policy->setGocardlessMandate($mandate->id);
 
         $this->dm->flush();
-        /*
-        try {
-        } catch (\GoCardlessPro\Core\Exception\ApiException $e) {
-          // Api request failed / record couldn't be created.
-        } catch (\GoCardlessPro\Core\Exception\MalformedResponseException $e) {
-          // Unexpected non-JSON response
-        } catch (\GoCardlessPro\Core\Exception\ApiConnectionException $e) {
-          // Network error
+    }
+
+    /**
+     */
+    public function subscribe(Policy $policy, $idempotent = true)
+    {
+        $user = $policy->getUser();
+        if (!$policy->getGocardlessMandate()) {
+            throw new \InvalidArgumentException('Subscription requires a gocardless mandate');
         }
-        */
+
+        // For now, only allow 1 subscription
+        // TODO: Check for subscription
+
+        $mandate = $policy->getGocardlessMandate();
+        $data = [
+            "amount" => $policy->getPhone()->getTotalPrice(),
+            "count" => 12,
+            "current" => "GBP",
+            "interval_unit" => "monthly",
+            "links" => [
+                "mandate" => $mandate,
+            ],
+            "metadata" => [
+                "policy" => $policy->getId(),
+            ]
+        ];
+        $headers = [];
+        if ($idempotent) {
+            $headers['Idempotency-Key'] = sprintf('mandate-%s', $policy->getId());
+        }
+
+        $mandate = $this->client->subscriptions()->create([
+            'params' => $data,
+            'headers' => $headers,
+        ]);
+
+        // TODO: If $idempotent and 409 idempotent_creation_conflict occurs, query customer
+
+        $user->getGocardless()->addMandate($mandate->id, json_encode([
+            'id' => $mandate->id,
+            'customer_bank_account' => $mandate->links->customer_bank_account,
+            'policy' => $policy->getId(),
+        ]));
+        $policy->setGocardlessMandate($mandate->id);
+
+        $this->dm->flush();
     }
 }
