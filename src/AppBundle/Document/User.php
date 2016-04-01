@@ -260,6 +260,20 @@ class User extends BaseUser
         return $this->getGocardless() !== null;
     }
 
+    public function hasValidGocardlessDetails()
+    {
+        if (!$this->getFirstName() || !$this->getLastName()) {
+            return false;
+        }
+
+        $billing = $this->getBillingAddress();
+        if (!$billing || !$billing->getLine1() || !$billing->getPostcode() || !$billing->getCity()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function toApiArray($identityId = null, $token = null)
     {
         $addresses = [];
