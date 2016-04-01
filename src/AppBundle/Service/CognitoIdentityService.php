@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 class CognitoIdentityService
 {
@@ -10,6 +11,8 @@ class CognitoIdentityService
     protected $logger;
 
     protected $cognito;
+
+    /** @var DocumentManager */
     protected $dm;
 
     /** @var string */
@@ -20,15 +23,15 @@ class CognitoIdentityService
 
     /**
      * @param LoggerInterface $logger
-     * @param                 $doctrine
+     * @param DocumentManager $dm
      * @param                 $cognito
      * @param string          $developerLogin
      * @param string          $identityPoolId
      */
-    public function __construct(LoggerInterface $logger, $doctrine, $cognito, $developerLogin, $identityPoolId)
+    public function __construct(LoggerInterface $logger, DocumentManager $dm, $cognito, $developerLogin, $identityPoolId)
     {
         $this->logger = $logger;
-        $this->dm = $doctrine->getManager();
+        $this->dm = $dm;
         $this->cognito = $cognito;
         $this->developerLogin = $developerLogin;
         $this->identityPoolId = $identityPoolId;

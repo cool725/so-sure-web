@@ -31,7 +31,7 @@ class ApiAuthControllerTest extends WebTestCase
     {
         self::$client = self::createClient();
         self::$identity = self::$client->getContainer()->get('app.cognito.identity');
-        self::$dm = self::$client->getContainer()->get('doctrine_mongodb')->getManager();
+        self::$dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         self::$userManager = self::$client->getContainer()->get('fos_user.user_manager');
         self::$testUser = self::createUser(
             self::$userManager,

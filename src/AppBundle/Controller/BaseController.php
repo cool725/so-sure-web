@@ -13,7 +13,7 @@ abstract class BaseController extends Controller
 {
     protected function getManager()
     {
-        return $this->get('doctrine_mongodb')->getManager();
+        return $this->get('doctrine_mongodb.odm.default_document_manager');
     }
 
     protected function getCognitoIdentityId(Request $request)

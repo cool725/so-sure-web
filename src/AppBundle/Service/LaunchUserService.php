@@ -4,12 +4,14 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 class LaunchUserService
 {
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var DocumentManager */
     protected $dm;
 
     /** @var MailchimpService */
@@ -24,7 +26,7 @@ class LaunchUserService
     protected $shortLink;
 
     /**
-     * @param mixed            $doctrine
+     * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
      * @param MailchimpService $mailchimp
      * @param \Swift_Mailer    $mailer
@@ -33,7 +35,7 @@ class LaunchUserService
      * @param ShortLinkService $shortLink
      */
     public function __construct(
-        $doctrine,
+        DocumentManager $dm,
         LoggerInterface $logger,
         MailchimpService $mailchimp,
         \Swift_Mailer $mailer,
@@ -41,7 +43,7 @@ class LaunchUserService
         $router,
         ShortLinkService $shortLink
     ) {
-        $this->dm = $doctrine->getManager();
+        $this->dm = $dm;
         $this->logger = $logger;
         $this->mailchimp = $mailchimp;
         $this->mailer = $mailer;

@@ -11,15 +11,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use AppBundle\Document\User;
 use Psr\Log\LoggerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 class CognitoIdentityUserProvider implements UserProviderInterface
 {
-    /**
-     * @var UserManagerInterface
-     */
+    /** @var UserManagerInterface */
     protected $userManager;
 
     protected $cognito;
+    
+    /** @var DocumentManager */
     protected $dm;
 
     /** @var string */
@@ -35,14 +36,14 @@ class CognitoIdentityUserProvider implements UserProviderInterface
      */
     public function __construct(
         UserManagerInterface $userManager,
-        $doctrine,
+        DocumentManager $dm,
         $cognito,
         $developerLogin,
         $identityPoolId,
         LoggerInterface $logger
     ) {
         $this->userManager = $userManager;
-        $this->dm = $doctrine->getManager();
+        $this->dm = $dm;
         $this->cognito = $cognito;
         $this->developerLogin = $developerLogin;
         $this->identityPoolId = $identityPoolId;
