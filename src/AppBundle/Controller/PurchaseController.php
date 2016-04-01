@@ -8,7 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\HttpFoundation\Session\Session;

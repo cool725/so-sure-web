@@ -8,7 +8,7 @@ use JudoPay;
 use AppBundle\Document\Payment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
-use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class JudopayService
@@ -74,7 +74,7 @@ class JudopayService
         $webpaymentDetails = $webPayment->create();
         $payment->setReference($webpaymentDetails["reference"]);
 
-        $policy = new Policy();
+        $policy = new PhonePolicy();
         $policy->setUser($user);
         $policy->setPhone($phone);
         $policy->addPayment($payment);
