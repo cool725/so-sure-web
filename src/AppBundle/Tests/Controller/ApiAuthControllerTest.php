@@ -20,6 +20,7 @@ class ApiAuthControllerTest extends WebTestCase
     protected static $testUser2;
     protected static $client;
     protected static $userManager;
+    protected static $dm;
     protected static $identity;
 
     public function tearDown()
@@ -30,6 +31,7 @@ class ApiAuthControllerTest extends WebTestCase
     {
         self::$client = self::createClient();
         self::$identity = self::$client->getContainer()->get('app.cognito.identity');
+        self::$dm = self::$client->getContainer()->get('doctrine_mongodb')->getManager();
         self::$userManager = self::$client->getContainer()->get('fos_user.user_manager');
         self::$testUser = self::createUser(
             self::$userManager,
@@ -173,6 +175,50 @@ class ApiAuthControllerTest extends WebTestCase
             'account' => '12345678',
         ]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+    }
+
+    public function testNewPolicyDdUnknownPolicy()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
+            'sortcode' => '200000',
+            'account' => '55779911',
+        ]);
+        $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
+    }
+
+    /**
+     *
+     */
+    public function testNewPolicyDdOk()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        self::$testUser->setFirstName('foo');
+        self::$testUser->setLastName('bar');
+        self::$dm->flush();
+
+        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'city' => 'London',
+            'postcode' => 'ec1v 1rx',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
+            'user_id' => self::$testUser->getId(),
+            'imei' => self::VALID_IMEI,
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $url = sprintf("/api/v1/auth/policy/%s/dd", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'sortcode' => '200000',
+            'account' => '55779911',
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
     }
 
     // user/{id}

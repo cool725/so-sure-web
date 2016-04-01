@@ -54,6 +54,10 @@ class GocardlessService
      */
     public function createCustomer(User $user, $idempotent = true)
     {
+        if (!$user->hasValidGocardlessDetails()) {
+            throw new \InvalidArgumentException('User is missing details such as name or billing address');
+        }
+
         if ($user->hasGocardless() && $user->getGocardless()->getCustomerId()) {
             return;
         }

@@ -43,6 +43,7 @@ class ApiAuthController extends BaseController
     public function newPolicyAction(Request $request)
     {
         try {
+            // TODO: Add phone number
             $data = json_decode($request->getContent(), true)['body'];
             if (!$this->validateFields($data, ['user_id', 'imei'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
