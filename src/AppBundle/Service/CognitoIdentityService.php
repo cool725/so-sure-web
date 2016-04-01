@@ -28,8 +28,13 @@ class CognitoIdentityService
      * @param string          $developerLogin
      * @param string          $identityPoolId
      */
-    public function __construct(LoggerInterface $logger, DocumentManager $dm, $cognito, $developerLogin, $identityPoolId)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        DocumentManager $dm,
+        $cognito,
+        $developerLogin,
+        $identityPoolId
+    ) {
         $this->logger = $logger;
         $this->dm = $dm;
         $this->cognito = $cognito;
