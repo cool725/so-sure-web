@@ -13,6 +13,7 @@ use AppBundle\Form\Type\PhoneType;
 
 use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
@@ -73,7 +74,7 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $policy = new Policy();
+            $policy = new PhonePolicy();
             $policy->setUser($user);
             $policy->setImei($imei);
 

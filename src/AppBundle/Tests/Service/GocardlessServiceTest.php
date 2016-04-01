@@ -5,7 +5,7 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
-use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 
 /**
  * @group functional-nonet
@@ -86,7 +86,7 @@ class GocardlessServiceTest extends WebTestCase
     public function testCreateMandate()
     {
         $user = static::$userRepo->findOneBy(['email' => 'user2@gocardless.so-sure.com']);
-        $policy = new Policy();
+        $policy = new PhonePolicy();
         $policy->setUser($user);
 
         static::$dm->persist($policy);

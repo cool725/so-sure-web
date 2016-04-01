@@ -13,7 +13,6 @@ use AppBundle\Form\Type\PhoneType;
 
 use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
-use AppBundle\Document\Policy;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
 

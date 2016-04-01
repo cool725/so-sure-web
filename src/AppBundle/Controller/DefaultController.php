@@ -10,7 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
-use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +39,7 @@ class DefaultController extends BaseController
             $logger->debug(sprintf('Referral %s', $referral));
         }
         $userBottom = clone $userTop;
-        $policy = new Policy();
+        $policy = new PhonePolicy();
 
         $formTop = $this->get('form.factory')
             ->createNamedBuilder('launch_top', LaunchType::class, $userTop)
@@ -110,7 +110,7 @@ class DefaultController extends BaseController
      */
     public function quoteAction(Request $request)
     {
-        $policy = new Policy();
+        $policy = new PhonePolicy();
         $form = $this->createForm(PhoneType::class, $policy);
         $form->handleRequest($request);
         if ($form->isValid()) {
