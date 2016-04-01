@@ -9,6 +9,7 @@ use AppBundle\Document\Payment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 class JudopayService
 {
@@ -20,19 +21,20 @@ class JudopayService
 
     /** @var string */
     protected $judoId;
-    
+
+    /** @var DocumentManager */
     protected $dm;
 
     /**
-     * @param mixed           $doctrine
+     * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $apiToken
      * @param string          $apiSecret
      * @param string          $judoId
      */
-    public function __construct($doctrine, LoggerInterface $logger, $apiToken, $apiSecret, $judoId)
+    public function __construct(DocumentManager $dm, LoggerInterface $logger, $apiToken, $apiSecret, $judoId)
     {
-        $this->dm = $doctrine->getManager();
+        $this->dm = $dm;
         $this->logger = $logger;
         $this->judoId = $judoId;
         $this->client = new Judopay(array(

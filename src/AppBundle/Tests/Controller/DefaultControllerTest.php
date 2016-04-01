@@ -87,6 +87,6 @@ class DefaultControllerTest extends WebTestCase
 
     protected function getManager($client)
     {
-        return $client->getContainer()->get('doctrine_mongodb')->getManager();
+        return $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
     }
 }

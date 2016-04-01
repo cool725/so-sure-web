@@ -414,7 +414,7 @@ class ApiControllerTest extends WebTestCase
     
     protected function getManager($client)
     {
-        return $client->getContainer()->get('doctrine_mongodb')->getManager();
+        return $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
     }
 
     protected function getUserManager($client)

@@ -33,7 +33,7 @@ class MaxMindServiceIpTest extends WebTestCase
          //each test method, do this in setUp() instead
          self::$geoip = self::$container->get('app.geoip');
          self::$launch = self::$container->get('app.user.launch');
-         self::$dm = self::$container->get('doctrine_mongodb')->getManager();
+         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
          self::$userRepo = self::$dm->getRepository(User::class);
          self::$userManager = self::$container->get('fos_user.user_manager');
     }

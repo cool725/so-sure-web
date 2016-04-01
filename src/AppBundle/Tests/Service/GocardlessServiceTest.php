@@ -32,7 +32,7 @@ class GocardlessServiceTest extends WebTestCase
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
          self::$gocardless = self::$container->get('app.gocardless');
-         self::$dm = self::$container->get('doctrine_mongodb')->getManager();
+         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
          self::$userRepo = self::$dm->getRepository(User::class);
          self::$userManager = self::$container->get('fos_user.user_manager');
     }

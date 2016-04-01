@@ -13,7 +13,7 @@ services:
         class: AppBundle\Security\CognitoIdentityUserProvider
         arguments:
             user_manager:   "@fos_user.user_manager"
-            doctrine:       "@doctrine_mongodb"
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
             coginto:        "@aws.cognito"
             developerLogin: "%cognito_developer_login%"
             identityPoolId: "%aws_cognito_identitypoolid%"
@@ -44,7 +44,7 @@ services:
     app.gocardless:
         class: AppBundle\Service\GocardlessService
         arguments:
-            manager:     "@doctrine_mongodb.odm.default_document_manager"
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
             logger:      "@logger"
             accessToken: "%gocardless_apikey%"
             prod:        "%gocardless_prod%"
@@ -52,22 +52,22 @@ services:
     app.judopay:
         class: AppBundle\Service\JudopayService
         arguments:
-            doctrine: "@doctrine_mongodb"
-            logger: "@logger"
-            apiToken: %judopay_apitoken%
-            apiSecret: %judopay_apisecret%
-            judoId: %judopay_id%
+            dm:        "@doctrine_mongodb.odm.default_document_manager"
+            logger:    "@logger"
+            apiToken:  "%judopay_apitoken%"
+            apiSecret: "%judopay_apisecret%"
+            judoId:    "%judopay_id%"
 
     app.user.launch:
         class: AppBundle\Service\LaunchUserService
         arguments:
-            doctrine: "@doctrine_mongodb"
-            logger: "@logger"
-            mailchimp: "@app.mailchimp.prelaunch"
-            mailer: "@mailer"
+            dm:         "@doctrine_mongodb.odm.default_document_manager"
+            logger:     "@logger"
+            mailchimp:  "@app.mailchimp.prelaunch"
+            mailer:     "@mailer"
             templating: "@templating"
-            router: "@api.router"
-            shortLink: "@app.shortlink"
+            router:     "@api.router"
+            shortLink:  "@app.shortlink"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
@@ -93,7 +93,7 @@ services:
         class: AppBundle\Service\CognitoIdentityService
         arguments:
             logger:         "@logger"
-            doctrine:       "@doctrine_mongodb"
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
             coginto:        "@aws.cognito"
             developerLogin: "%cognito_developer_login%"
             identityPoolId: "%aws_cognito_identitypoolid%"
