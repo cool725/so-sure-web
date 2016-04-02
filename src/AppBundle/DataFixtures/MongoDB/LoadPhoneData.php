@@ -74,10 +74,10 @@ class LoadPhoneData implements FixtureInterface
         $this->newPhone($manager, 'Samsung', 'Galaxy A5', 5.79, null, ['a53g', 'a5lte', 'a5ltechn', 'a5ltectc', 'a5ltezh', 'a5ltezt', 'a5ulte', 'a5ultebmc', 'a5ultektt', 'a5ultelgt', 'a5ulteskt', 'a5xelte', 'a5xeltecmcc', 'a5xeltektt', 'a5xeltelgt', 'a5xelteskt', 'a5xeltextc', 'a5xltechn', 'a5xeltextc']);
         $this->newPhone($manager, 'Samsung', 'Galaxy S6 Edge+', 8.29, 32, ['zenlte', 'zenlteatt', 'zenltebmc', 'zenltechn', 'zenltektt', 'zenltekx', 'zenltelgt', 'zenlteskt', 'zenltespr', 'zenltetmo', 'zenltevzw']);
         $this->newPhone($manager, 'Samsung', 'Galaxy S6 Edge+', 9.29, 64, ['zenlte', 'zenlteatt', 'zenltebmc', 'zenltechn', 'zenltektt', 'zenltekx', 'zenltelgt', 'zenlteskt', 'zenltespr', 'zenltetmo', 'zenltevzw']);
-        $this->newPhone($manager, 'LG', 'Nexus 4', 5.29, 8, null, ['mako']);
-        $this->newPhone($manager, 'LG', 'Nexus 4', 5.79, 16, null, ['mako']);
-        $this->newPhone($manager, 'LG', 'Nexus 5', 5.79, 8, null, ['hammerhead']);
-        $this->newPhone($manager, 'LG', 'Nexus 5', 5.79, 16, null, ['hammerhead']);
+        $this->newPhone($manager, 'LG', 'Nexus 4', 5.29, 8, ['mako']);
+        $this->newPhone($manager, 'LG', 'Nexus 4', 5.79, 16, ['mako']);
+        $this->newPhone($manager, 'LG', 'Nexus 5', 5.79, 8, ['hammerhead']);
+        $this->newPhone($manager, 'LG', 'Nexus 5', 5.79, 16, ['hammerhead']);
         $this->newPhone($manager, 'LG', 'Optimus One', 5.79, null, ['thunderg']);
         $this->newPhone($manager, 'LG', 'Optimus 4x', 6.29, null, ['x3']);
         $this->newPhone($manager, 'LG', 'G Flex', 8.29, null, ['zee']);
