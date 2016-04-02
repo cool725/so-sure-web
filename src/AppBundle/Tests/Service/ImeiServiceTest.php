@@ -34,7 +34,7 @@ class ImeiServiceTest extends WebTestCase
     {
     }
 
-    public function testImei()
+    public function testIsImei()
     {
         $this->assertFalse(self::$imei->isImei(0));
         $this->assertFalse(self::$imei->isImei('0'));
@@ -46,5 +46,10 @@ class ImeiServiceTest extends WebTestCase
         // 356938035643809 is valid 356938035643808 changes check digit should invalidate luhn check
         $this->assertFalse(self::$imei->isImei(356938035643808));
         $this->assertFalse(self::$imei->isImei('356938035643808'));
+    }
+
+    public function testCheckImei()
+    {
+        $this->assertTrue(self::$imei->checkImei(356938035643809));
     }
 }

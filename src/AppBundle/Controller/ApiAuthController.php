@@ -74,6 +74,14 @@ class ApiAuthController extends BaseController
                 );
             }
 
+            if (!$imeiValidator->checkImei($imei)) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED,
+                    'Imei is blacklisted',
+                    422
+                );
+            }
+
             $policy = new PhonePolicy();
             $policy->setUser($user);
             $policy->setImei($imei);
