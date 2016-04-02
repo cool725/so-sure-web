@@ -17,7 +17,7 @@ framework:
 
 # Swiftmailer Configuration
 swiftmailer:
-    default_mailer: ses
+    default_mailer: default
     mailers:
         default:
             transport:  "%ses_mailer_transport%"
