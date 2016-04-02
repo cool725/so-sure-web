@@ -47,6 +47,8 @@ parameters:
     branch_key: ''
     smooch_key: ''
     geoip_db: ''
+    gsma_apikey:  ''
+    gsma_username: ''
 
     sns_prelaunch_all: ''
     sns_prelaunch_registered: ''

@@ -101,7 +101,9 @@ services:
     app.imei:
         class: AppBundle\Service\ImeiService
         arguments:
-            logger: "@logger"
+            logger:   "@logger"
+            apiKey:   "%gsma_apikey%"
+            username: "%gsma_username%"
 
     aws.credentials:
         class: Aws\Credentials\Credentials
