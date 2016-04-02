@@ -15,6 +15,27 @@ framework:
 #        result_cache_driver: apc
 #        query_cache_driver: apc
 
+# Swiftmailer Configuration
+swiftmailer:
+    default_mailer: ses
+    mailers:
+        default:
+            transport:  "%ses_mailer_transport%"
+            host:       "%ses_mailer_host%"
+            port:       "%ses_mailer_port%"
+            username:   "%ses_mailer_user%"
+            password:   "%ses_mailer_password%"
+            encryption: "%ses_mailer_encryption%"
+            spool:      { type: memory }
+        invite:
+            transport:  "%blue_mailer_transport%"
+            host:       "%blue_mailer_host%"
+            port:       "%blue_mailer_port%"
+            username:   "%blue_mailer_user%"
+            password:   "%blue_mailer_password%"
+            encryption: "%blue_mailer_encryption%"
+            spool:      { type: memory }
+
 monolog:
     handlers:
         main:

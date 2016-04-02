@@ -64,13 +64,24 @@ doctrine_mongodb:
 
 # Swiftmailer Configuration
 swiftmailer:
-    transport: "%mailer_transport%"
-    host:      "%mailer_host%"
-    port:      "%mailer_port%"
-    username:  "%mailer_user%"
-    password:  "%mailer_password%"
-    encryption: "%mailer_encryption%"
-    spool:     { type: memory }
+    default_mailer: ses
+    mailers:
+        default:
+            transport:  "%ses_mailer_transport%"
+            host:       "%ses_mailer_host%"
+            port:       "%ses_mailer_port%"
+            username:   "%ses_mailer_user%"
+            password:   "%ses_mailer_password%"
+            encryption: "%ses_mailer_encryption%"
+            spool:      { type: memory }
+        invite:
+            transport:  "%ses_mailer_transport%"
+            host:       "%ses_mailer_host%"
+            port:       "%ses_mailer_port%"
+            username:   "%ses_mailer_user%"
+            password:   "%ses_mailer_password%"
+            encryption: "%ses_mailer_encryption%"
+            spool:      { type: memory }
 
 assetic:
     bundles:        [ AppBundle ]

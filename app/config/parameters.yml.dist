@@ -3,12 +3,19 @@
 # http://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
 parameters:
 
-    mailer_transport:  smtp
-    mailer_host:       127.0.0.1
-    mailer_port:       25
-    mailer_user:       ~
-    mailer_password:   ~
-    mailer_encryption: ~
+    ses_mailer_transport:  smtp
+    ses_mailer_host:       127.0.0.1
+    ses_mailer_port:       25
+    ses_mailer_user:       ~
+    ses_mailer_password:   ~
+    ses_mailer_encryption: ~
+
+    blue_mailer_transport:  smtp
+    blue_mailer_host:       127.0.0.1
+    blue_mailer_port:       25
+    blue_mailer_user:       ~
+    blue_mailer_password:   ~
+    blue_mailer_encryption: ~
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
