@@ -60,3 +60,7 @@ parameters:
     sns_prelaunch_all: ''
     sns_prelaunch_registered: ''
     sns_prelaunch_unregistered: ''
+
+    plivo_authid:        ''
+    plivo_authtoken:     ''
+    plivo_sendingnumber: ''
