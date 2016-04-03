@@ -60,7 +60,7 @@ doctrine_mongodb:
         default:
             auto_mapping: true
     default_commit_options:
-        timeout: 10  # integer >= -1
+        timeout: 1000  # integer >= -1
 
 # Swiftmailer Configuration
 swiftmailer:
