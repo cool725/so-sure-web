@@ -7,11 +7,22 @@
   <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
 {% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
+        'components/Chart.js/Chart.js'
+        'bundles/app/js/Default/connections.js'
+    %}<script src="{{ asset_url }}"></script>{% endjavascripts %}            
+{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
     'bundles/app/css/Default/index.css'
     'bundles/app/css/Default/quotePhone.css'
+    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
+    'bundles/app/css/Default/connections.css'
     %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -87,6 +98,13 @@
               <span class="chevron bottom"></span>
             </div>
           </div>
+        <div class="section">
+          <div class="container">
+            <h3 class="section-heading">How much money could you save?</h3>
+            {% include 'AppBundle:Default:connections.html.twig' %}
+          </div>
+          
+        </div>
 
 
 

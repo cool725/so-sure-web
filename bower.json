@@ -15,13 +15,22 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "~2.1.4"
+    "jquery": "~2.1.4",
+    "seiyria-bootstrap-slider": "~6.1",
+    "Chart.js": "^1.1.0"
   },
-  "install": { 
+  "install": {
     "path": "web/components",
     "sources": {
-      "jquery" : [
-       "bower_components/jquery/dist/jquery.min.js"
+      "jquery": [
+        "bower_components/jquery/dist/jquery.min.js"
+      ],
+      "seiyria-bootstrap-slider": [
+        "bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js",
+        "bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css"
+      ],
+      "Chart.js": [
+        "bower_components/Chart.js/Chart.js"
       ]
     }
   }
