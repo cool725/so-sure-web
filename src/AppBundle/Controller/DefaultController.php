@@ -29,6 +29,7 @@ class DefaultController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
         $logger = $this->get('logger');
         $launchUser = $this->get('app.user.launch');
+        $deviceAtlas = $this->get('app.deviceatlas');
 
         $userTop = new User();
         $referral = $request->get('referral');
@@ -40,6 +41,12 @@ class DefaultController extends BaseController
         }
         $userBottom = clone $userTop;
         $policy = new PhonePolicy();
+        if ($request->getMethod() == "GET") {
+            $phone = $deviceAtlas->getPhone($request);
+            if ($phone instanceof Phone) {
+                $policy->setPhone($phone);
+            }
+        }
 
         $formTop = $this->get('form.factory')
             ->createNamedBuilder('launch_top', LaunchType::class, $userTop)
