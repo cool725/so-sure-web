@@ -105,6 +105,16 @@ services:
             apiKey:   "%gsma_apikey%"
             username: "%gsma_username%"
 
+    app.sms:
+        class: AppBundle\Service\SmsService
+        arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
+            logger:         "@logger"
+            router:         "@router"
+            auth_id:        "%plivo_authid%"
+            auth_token:     "%plivo_authtoken%"
+            sending_number: "%plivo_sendingnumber%"
+
     aws.credentials:
         class: Aws\Credentials\Credentials
         arguments:

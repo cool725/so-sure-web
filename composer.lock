@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d76ddc967edacb94f19d3f20eb5b803c",
-    "content-hash": "f125cdf1decc04df6dc9d3388429c689",
+    "hash": "57e4861457c991bdfdf7bf91bb8f0b5c",
+    "content-hash": "ac03d8f88218f55769c673764b30cfc5",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -3114,6 +3114,54 @@
                 "dependency injection"
             ],
             "time": "2014-07-24 07:10:08"
+        },
+        {
+            "name": "plivo/plivo-php",
+            "version": "v1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/plivo/plivo-php.git",
+                "reference": "193ed6f5865fd51d706c140fb66df02c2168716a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/plivo/plivo-php/zipball/193ed6f5865fd51d706c140fb66df02c2168716a",
+                "reference": "193ed6f5865fd51d706c140fb66df02c2168716a",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "plivo.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Radu Topala",
+                    "email": "radu.topala@trisoft.ro"
+                },
+                {
+                    "name": "Adam Homsi",
+                    "email": "adam.homsi@gmail.com"
+                },
+                {
+                    "name": "Plivo Team",
+                    "email": "hello@plivo.com"
+                },
+                {
+                    "name": "Ben McInturff",
+                    "email": "benmcinturff@gmail.com"
+                }
+            ],
+            "description": "Plivo PHP helper library to access PlivoCloud API and generate Plivo XML",
+            "time": "2016-03-29 05:43:12"
         },
         {
             "name": "psr/http-message",
