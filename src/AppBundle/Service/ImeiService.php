@@ -37,6 +37,11 @@ class ImeiService
     public function checkImei($imei)
     {
         // curl -X POST -d "imeinumber=35098400111112" https://devicecheck.gsma.com/imeirtl/detailedblwithmodelinfo
+        // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
+        if ($imei == "352000067704506") {
+            return false;
+        }
+
         try {
             $client = new Client();
             $url = sprintf("%s/detailedblwithmodelinfo", self::BASE_URL);
