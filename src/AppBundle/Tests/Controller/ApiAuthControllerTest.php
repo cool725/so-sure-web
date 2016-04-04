@@ -18,6 +18,7 @@ class ApiAuthControllerTest extends WebTestCase
 
     protected static $testUser;
     protected static $testUser2;
+    protected static $testUser3;
     protected static $client;
     protected static $userManager;
     protected static $dm;
@@ -42,6 +43,11 @@ class ApiAuthControllerTest extends WebTestCase
             self::$userManager,
             'bar@auth-api.so-sure.com',
             'bar'
+        );
+        self::$testUser3 = self::createUser(
+            self::$userManager,
+            'foobar@auth-api.so-sure.com',
+            'barfoo'
         );
     }
 
@@ -254,7 +260,42 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
 
-    // user/{id}
+    // put user/{id}
+
+    /**
+     *
+     */
+    public function testUpdateUser()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $data = [
+            'first_name' => 'bar',
+            'last_name' => 'foo',
+            'email' => 'barfoo@auth-api.so-sure.com',
+            'mobile_number' => '1234',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+
+        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals('barfoo@auth-api.so-sure.com', $result['email']);
+        $this->assertEquals('bar', $result['first_name']);
+        $this->assertEquals('foo', $result['last_name']);
+        $this->assertEquals('1234', $result['mobile_number']);
+    }
+
+    public function testUpdateUserDifferentUser()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser2->getId());
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, [
+            'first_name' => 'bar',
+        ]);
+        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+    }
+
+    // user/{id}/address
 
     /**
      *

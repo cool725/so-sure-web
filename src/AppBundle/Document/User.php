@@ -304,6 +304,7 @@ class User extends BaseUser
           'cognito_token' => [ 'id' => $identityId, 'token' => $token ],
           'user_token' => ['token' => $this->getToken()],
           'addresses' => $addresses,
+          'mobile_number' => $this->getMobileNumber(),
         ];
     }
 }

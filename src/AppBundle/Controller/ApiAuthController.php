@@ -193,6 +193,56 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/user/{id}", name="api_auth_update_user")
+     * @Method({"PUT"})
+     */
+    public function updateUserAction(Request $request, $id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($id);
+            if (!$user) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
+            }
+
+            $this->denyAccessUnlessGranted('edit', $user);
+
+            $data = json_decode($request->getContent(), true)['body'];
+            $userChanged = false;
+            if (isset($data['mobile_number']) && strlen($data['mobile_number']) > 0) {
+                $user->setMobileNumber($data['mobile_number']);
+                $userChanged = true;
+            }
+            if (isset($data['email']) && strlen($data['email']) > 0) {
+                // TODO: Send email to both old & new email addresses
+                $user->setEmail($data['email']);
+                $userChanged = true;
+            }
+            if (isset($data['first_name']) && strlen($data['first_name']) > 0) {
+                $user->setFirstName($data['first_name']);
+                $userChanged = true;
+            }
+            if (isset($data['last_name']) && strlen($data['last_name']) > 0) {
+                $user->setLastName($data['last_name']);
+                $userChanged = true;
+            }
+
+            if ($userChanged) {
+                $dm->flush();
+            }
+
+            return new JsonResponse($user->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api updateUser. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/user/{id}/address", name="api_auth_add_user_address")
      * @Method({"POST"})
      */
