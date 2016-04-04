@@ -63,8 +63,6 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted('edit', $user);
 
-            // TODO: validate user isn't blacklisted
-            // TODO: validate imei isn't blacklisted
             $imei = str_replace(' ', '', $data['imei']);
             if (!$imeiValidator->isImei($imei)) {
                 return $this->getErrorJsonResponse(

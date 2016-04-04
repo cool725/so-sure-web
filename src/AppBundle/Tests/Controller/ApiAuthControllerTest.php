@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Classes\ApiErrorCode;
 
 /**
  * @group functional-net
@@ -15,6 +16,7 @@ class ApiAuthControllerTest extends WebTestCase
 
     const VALID_IMEI = '356938035643809';
     const INVALID_IMEI = '356938035643808';
+    const BLACKLISTED_IMEI = '352000067704506';
 
     protected static $testUser;
     protected static $testUser2;
@@ -96,6 +98,18 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
     }
 
+    public function testNewPolicyBlacklistedImei()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
+            'user_id' => self::$testUser->getId(),
+            'imei' => self::BLACKLISTED_IMEI,
+        ]);
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED, $data['code']);
+    }
+
     public function testNewPolicyDifferentUser()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -114,6 +128,8 @@ class ApiAuthControllerTest extends WebTestCase
             'imei' => self::VALID_IMEI,
         ]);
         $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_POLICY_USER_NOT_FOUND, $data['code']);
     }
 
     public function testNewPolicyMissingData()
