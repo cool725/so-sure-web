@@ -11,10 +11,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Form\Type\PhoneType;
+use AppBundle\Form\Type\UserSearchType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
+use MongoRegex;
 
 /**
  * @Route("/admin")
@@ -139,7 +141,7 @@ class AdminController extends BaseController
      * @Route("/users", name="admin_users")
      * @Template
      */
-    public function usersAction(Request $request)
+    public function adminUsersAction(Request $request)
     {
         $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
@@ -147,10 +149,48 @@ class AdminController extends BaseController
         $users = $repo->createQueryBuilder();
         $pager = $this->pager($request, $users);
 
+        $users = $repo->createQueryBuilder();
+        $form = $this->createForm(UserSearchType::class);
+        print_r($data);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $this->formToMongoSearch($form, $users, 'email', 'email');
+            $this->formToMongoSearch($form, $users, 'lastname', 'lastName');
+            $this->formToMongoSearch($form, $users, 'mobile', 'mobileNumber');
+        }
+        $pager = $this->pager($request, $users);
+
         return [
             'users' => $pager->getCurrentPageResults(),
             'token' => $csrf->generateCsrfToken('default'),
-            'pager' => $pager
+            'pager' => $pager,
+            'form' => $form->createView(),
+        ];
+    }
+
+    private function formToMongoSearch($form, $qb, $formField, $mongoField)
+    {
+        $data = $form->get($formField)->getData();
+        if (strlen($data) > 0) {
+            $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/", $data)));
+        }
+    }
+
+    /**
+     * @Route("/user/{id}", name="admin_user")
+     * @Template
+     */
+    public function adminUserAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->find($id);
+        if (!$user) {
+            return $this->createNotFoundException('User not found');
+        }
+
+        return [
+            'user' => $user,
         ];
     }
 }

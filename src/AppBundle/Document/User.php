@@ -71,6 +71,9 @@ class User extends BaseUser
     /** @MongoDB\EmbedOne(targetDocument="Gocardless", name="gocardless") */
     protected $gocardless;
 
+    /** @MongoDB\String(name="mobile_number", nullable=true) */
+    protected $mobileNumber;
+
     public function __construct()
     {
         parent::__construct();
@@ -272,6 +275,16 @@ class User extends BaseUser
         }
 
         return true;
+    }
+
+    public function getMobileNumber()
+    {
+        return $this->mobileNumber;
+    }
+
+    public function setMobileNumber($mobileNumber)
+    {
+        $this->mobileNumber = $mobileNumber;
     }
 
     public function toApiArray($identityId = null, $token = null)
