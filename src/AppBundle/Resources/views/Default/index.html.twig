@@ -120,12 +120,13 @@
 
   <div class="section cta">
     <div class="container">
-      <h3 class="section-heading">Ready for a better insurance experience?</h3>
-      <p>Signup today &amp; as one of our first 1,000 people to sign up we'll reward you!</p>
+      <h2 class="section-heading">Sign up today &amp; get rewarded</h2>
+      <h4 style="color: #fff;">We've not launched yet, but as one of our first 1,000 customers you could get your first year's insurance for free!</h4>
+      <p>Enter your email to find out how.</p>
       <div class="signup">
         {{ form_start(form_bottom) }}
         <div class="input-group">
-          {{ form_widget(form_bottom.email, {'attr': {'class': 'form-control email', 'placeholder': 'Enter your email'}}) }}
+          {{ form_widget(form_bottom.email, {'attr': {'class': 'form-control email', 'placeholder': 'Your email address'}}) }}
             <span class="input-group-btn">
             {{ form_widget(form_bottom.save, {'label': 'Signup', 'attr': {'class': 'btn btn-success'}}) }}
             </span>
