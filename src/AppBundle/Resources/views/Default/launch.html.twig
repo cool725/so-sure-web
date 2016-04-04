@@ -2,7 +2,7 @@
 
 {% block title %}so-sure - Refer a friend &amp; get rewarded!{% endblock %}
 {% block meta %}
-  <meta name="description" content="Welcome to so-sure. Refer-a-friend and we'll reward you both when we launch!" />
+  <meta name="description" content="Welcome to so-sure. Invite your friends and we'll reward you both when we launch!" />
   <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance" />
 {% endblock %}
 
@@ -17,19 +17,21 @@
   <div class="section refer">
     <div class="container">
       <h2><img src="/images/icons/rewards.svg"></img></h2>
-      <h3>Welcome! Refer-a-friend &amp; get rewarded.</h3>
-      <p class="section-description">As one of our first 1,000 customers we'd like to reward you and your friends.</p>
+      <h3>Welcome! Invite your friends &amp; get rewarded.</h3>
+      <p class="section-description">As one of our first 1,000 customers you could get your first year's insurance for free!</p>
       <div class="row">
         <div class="col-md-6">
+          <h5>How it works</h5>
           <ul>
           <li>Simply share your unique link with your friends and for each one that also gets their phone insured with us we'll add an <b>extra £5</b> to both of your Reward Pots. </li>
           <li>That's on top of the £10 we'll add to your Reward Pots when you get a friend to join!</li>
+          <li>If none of you make a claim you all get whatever is in your Reward Pots back at the end of the year.</li>
         </ul>
         </div>
         <div class="col-md-6">
+          <h5>Your unique link</h5>
           <div class="refer-card">
-            <h5>Share your unique link:</h5>
-            <p class="share-url">{{ referral_url }}</p>
+            <p class="share-url" style="text-decoration: underline; color: #1288ff;">{{ referral_url }}</p>
             <div class="row">
               <div class="col-md-6 column">
                 <div class="fb-share-button" data-href="{{ referral_url }}" data-layout="button"></div>
@@ -41,6 +43,9 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <h3>Got questions?</h3>
+        <p>We don't want to hide anything from you so if you've got any questions about how this works then just drop us an <a href="mailto:hello@wearesosure.com?Subject=Referral Scheme - How does it work?">email.</a></p>
     </div>
   </div>
 
