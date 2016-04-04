@@ -40,10 +40,10 @@ class GocardlessServiceTest extends WebTestCase
     public function tearDown()
     {
     }
-
-    public function testCreateCustomer()
+    
+    private function createValidUser($email)
     {
-        $user = static::createUser(self::$userManager, 'user1@gocardless.so-sure.com', 'foo');
+        $user = static::createUser(self::$userManager, $email, 'foo');
         $user->setFirstName('foo');
         $user->setLastName('bar');
         $address = new Address();
@@ -55,6 +55,13 @@ class GocardlessServiceTest extends WebTestCase
 
         static::$dm->persist($address);
         static::$dm->flush();
+
+        return $user;
+    }
+
+    public function testCreateCustomer()
+    {
+        $user = $this->createValidUser('user1@gocardless.so-sure.com');
 
         self::$gocardless->createCustomer($user);
         $this->assertTrue(strlen($user->getGocardless()->getCustomerId()) > 5);
@@ -62,27 +69,32 @@ class GocardlessServiceTest extends WebTestCase
 
     public function testAddBankAccount()
     {
-        $user = static::createUser(self::$userManager, 'user2@gocardless.so-sure.com', 'foo');
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        $address = new Address();
-        $address->setType(Address::TYPE_BILLING);
-        $address->setLine1('10 Finsbury Square');
-        $address->setCity('London');
-        $address->setPostcode('EC1V 1RS');
-        $user->addAddress($address);
-
-        static::$dm->persist($address);
-        static::$dm->flush();
+        $user = $this->createValidUser('user2@gocardless.so-sure.com');
 
         self::$gocardless->createCustomer($user);
         $this->assertTrue(strlen($user->getGocardless()->getCustomerId()) > 5);
+
         self::$gocardless->addBankAccount($user, '200000', '55779911');
         $this->assertTrue(count($user->getGocardless()->getAccounts()) > 0);
+
         $accountDetail = $user->getGocardless()->getPrimaryAccount();
         $this->assertEquals('11', $accountDetail->account_number_ending);
     }
 
+    public function testAddBankAccountWithHyphens()
+    {
+        $user = $this->createValidUser('user3@gocardless.so-sure.com');
+
+        self::$gocardless->createCustomer($user);
+        $this->assertTrue(strlen($user->getGocardless()->getCustomerId()) > 5);
+
+        self::$gocardless->addBankAccount($user, '20-00-00', '55779911');
+        $this->assertTrue(count($user->getGocardless()->getAccounts()) > 0);
+
+        $accountDetail = $user->getGocardless()->getPrimaryAccount();
+        $this->assertEquals('11', $accountDetail->account_number_ending);
+    }
+    
     public function testCreateMandate()
     {
         $user = static::$userRepo->findOneBy(['email' => 'user2@gocardless.so-sure.com']);
