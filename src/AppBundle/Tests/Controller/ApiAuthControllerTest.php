@@ -180,6 +180,15 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
     }
 
+    public function testGetPolicyUnAuthUser()
+    {
+        $user = static::createUser(self::$userManager, 'getpolicy-unauth@auth-api.so-sure.com', 'foo');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = sprintf('/api/v1/auth/user/%s', $user->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+    }
+
     // policy/{id}/dd
 
     /**
