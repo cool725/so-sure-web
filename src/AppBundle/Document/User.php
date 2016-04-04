@@ -35,6 +35,11 @@ class User extends BaseUser
      */
     protected $addresses;
 
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="Invitation", mappedBy="inviter")
+     */
+    protected $invitations;
+
     /** @MongoDB\Date() */
     protected $created;
 
@@ -79,6 +84,7 @@ class User extends BaseUser
         parent::__construct();
         $this->referrals = new \Doctrine\Common\Collections\ArrayCollection();
         $this->addresses = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = new \DateTime();
         $this->token = bin2hex(openssl_random_pseudo_bytes(64));
     }

@@ -73,6 +73,21 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
     }
 
+    // invitation
+
+    /**
+     *
+     */
+    public function testNewInvitation()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/invitation', [
+            'email' => 'patrick@so-sure.com',
+            'name' => 'functional test',
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+    }
+
     // policy
 
     /**

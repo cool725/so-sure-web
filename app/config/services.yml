@@ -69,6 +69,17 @@ services:
             router:     "@api.router"
             shortLink:  "@app.shortlink"
 
+    app.invitation:
+        class: AppBundle\Service\InvitationService
+        arguments:
+            dm:         "@doctrine_mongodb.odm.default_document_manager"
+            logger:     "@logger"
+            mailer:     "@swiftmailer.mailer.invite"
+            templating: "@templating"
+            router:     "@api.router"
+            shortLink:  "@app.shortlink"
+            sms:        "@app.sms"
+
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
         arguments:

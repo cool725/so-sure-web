@@ -17,6 +17,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
+use AppBundle\Document\Invitation;
 
 use AppBundle\Classes\ApiErrorCode;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -28,6 +29,39 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class ApiAuthController extends BaseController
 {
+    /**
+     * @Route("/invitation", name="api_auth_new_invitation")
+     * @Method({"POST"})
+     */
+    public function newInvitationAction(Request $request)
+    {
+        try {
+            $user = $this->getUser();
+            $this->denyAccessUnlessGranted('send-invitation', $user);
+
+            $invitationService = $this->get('app.invitation');
+
+            $data = json_decode($request->getContent(), true)['body'];
+            $email = isset($data['email']) ? $data['email'] : null;
+            $name = isset($data['name']) ? $data['name'] : null;
+            if ($email) {
+                $invitation = $invitationService->email($user, $email, $name);
+
+                return new JsonResponse($invitation->toApiArray());
+            }
+            // TODO: SMS, General
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Missing data found', 422);
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            print_r(get_class($e));
+            $this->get('logger')->error(sprintf('Error in api newInvitation. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
     /**
      * @Route("/ping", name="api_auth_ping")
      * @Method({"GET", "POST"})
@@ -44,7 +78,6 @@ class ApiAuthController extends BaseController
     public function newPolicyAction(Request $request)
     {
         try {
-            // TODO: Add phone number
             $data = json_decode($request->getContent(), true)['body'];
             if (!$this->validateFields($data, ['user_id', 'imei'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);

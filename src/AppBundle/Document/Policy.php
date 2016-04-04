@@ -8,7 +8,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  * @MongoDB\Document
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
- * @MongoDB\DiscriminatorMap({"phone"="Phone"})
+ * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy"})
  */
 abstract class Policy
 {
