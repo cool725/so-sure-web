@@ -30,39 +30,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ApiAuthController extends BaseController
 {
     /**
-     * @Route("/invitation", name="api_auth_new_invitation")
-     * @Method({"POST"})
-     */
-    public function newInvitationAction(Request $request)
-    {
-        try {
-            $user = $this->getUser();
-            $this->denyAccessUnlessGranted('send-invitation', $user);
-
-            $invitationService = $this->get('app.invitation');
-
-            $data = json_decode($request->getContent(), true)['body'];
-            $email = isset($data['email']) ? $data['email'] : null;
-            $name = isset($data['name']) ? $data['name'] : null;
-            if ($email) {
-                $invitation = $invitationService->email($user, $email, $name);
-
-                return new JsonResponse($invitation->toApiArray());
-            }
-            // TODO: SMS, General
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Missing data found', 422);
-        } catch (AccessDeniedException $ade) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (\Exception $e) {
-            print_r(get_class($e));
-            $this->get('logger')->error(sprintf('Error in api newInvitation. %s', $e->getMessage()));
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
-    }
-
-    /**
      * @Route("/ping", name="api_auth_ping")
      * @Method({"GET", "POST"})
      */
@@ -192,6 +159,48 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api newPolicy. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/invitation", name="api_auth_new_invitation")
+     * @Method({"POST"})
+     */
+    public function newInvitationAction(Request $request, $id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted('send-invitation', $policy);
+
+            $invitationService = $this->get('app.invitation');
+
+            $data = json_decode($request->getContent(), true)['body'];
+            $email = isset($data['email']) ? $data['email'] : null;
+            $name = isset($data['name']) ? $data['name'] : null;
+            if ($email) {
+                $invitation = $invitationService->email($policy, $email, $name);
+
+                return new JsonResponse($invitation->toApiArray());
+            }
+            // TODO: SMS, General
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Missing data found', 422);
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            print_r(get_class($e));
+            $this->get('logger')->error(sprintf('Error in api newInvitation. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

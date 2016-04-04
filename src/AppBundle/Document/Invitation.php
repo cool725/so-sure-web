@@ -31,6 +31,11 @@ abstract class Invitation
      */
     protected $inviter;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="invitations")
+     */
+    protected $policy;
+
     /** @MongoDB\String(name="link", nullable=true) */
     protected $link;
 
@@ -104,6 +109,17 @@ abstract class Invitation
         $this->inviter = $inviter;
     }
     
+    public function getPolicy()
+    {
+        return $this->policy;
+    }
+
+    public function setPolicy($policy)
+    {
+        $this->policy = $policy;
+        $this->setInviter($policy->getUser());
+    }
+
     public function hasAccepted()
     {
         return $this->getAccepted() !== null;

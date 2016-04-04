@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
+use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\EmailInvitation;
 use AppBundle\Document\Invitation;
@@ -79,14 +80,14 @@ class InvitationService
         return $invitationUrl;
     }
 
-    public function email(User $inviter, $email, $name = null)
+    public function email(Policy $policy, $email, $name = null)
     {
         // TODO: Validate its not a re-invite
-        // TODO: Validate the user hasn't requested an opt out
+        // TODO: Validate the email isn't blocked hasn't requested an opt out
 
         $invitation = new EmailInvitation();
         $invitation->setEmail($email);
-        $invitation->setInviter($inviter);
+        $invitation->setPolicy($policy);
         $invitation->setName($name);
         $this->dm->persist($invitation);
         $this->dm->flush();

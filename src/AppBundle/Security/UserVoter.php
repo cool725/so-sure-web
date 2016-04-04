@@ -10,12 +10,11 @@ class UserVoter extends Voter
     // these strings are just invented: you can use anything
     const VIEW = 'view';
     const EDIT = 'edit';
-    const SEND_INVITATION = 'send-invitation';
 
     public function supports($attribute, $subject)
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, array(self::VIEW, self::EDIT, self::SEND_INVITATION))) {
+        if (!in_array($attribute, array(self::VIEW, self::EDIT))) {
             return false;
         }
 
