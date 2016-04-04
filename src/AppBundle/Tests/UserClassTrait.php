@@ -32,8 +32,18 @@ trait UserClassTrait
 
     public static function postRequest($client, $cognitoIdentityId, $url, $body)
     {
+        return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "POST");
+    }
+
+    public static function putRequest($client, $cognitoIdentityId, $url, $body)
+    {
+        return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "PUT");
+    }
+
+    private static function cognitoRequest($client, $cognitoIdentityId, $url, $body, $method)
+    {
         return $client->request(
-            'POST',
+            $method,
             $url,
             array(),
             array(),
