@@ -124,7 +124,7 @@ class GocardlessService
 
         $data = [
             "account_number" => $account,
-            "branch_code" => $sortcode,
+            "branch_code" => $sortcode, // no need to remove -
             "account_holder_name" => $user->getName(),
             "country_code" => "GB",
             "links" => [
