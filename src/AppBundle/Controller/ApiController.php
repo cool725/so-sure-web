@@ -315,10 +315,13 @@ class ApiController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['email'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
 
             $userManager = $this->get('fos_user.user_manager');
             $user = $userManager->createUser();
-            $user->setEmail(isset($data['email']) ? $data['email'] : null);
+            $user->setEmail($data['email']);
             $user->setFirstName(isset($data['first_name']) ? $data['first_name'] : null);
             $user->setLastName(isset($data['last_name']) ? $data['last_name'] : null);
             $user->setFacebookId(isset($data['facebook_id']) ? $data['facebook_id'] : null);
@@ -326,6 +329,8 @@ class ApiController extends BaseController
                 isset($data['facebook_access_token']) ? $data['facebook_access_token'] : null
             );
             $user->setSnsEndpoint(isset($data['sns_endpoint']) ? $data['sns_endpoint'] : null);
+            $user->setMobileNumber(isset($data['mobile_number']) ? $data['mobile_number'] : null);
+
             // NOTE: not completely secure, but as we're only using for an indication, it's good enough
             // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
             // https://forums.aws.amazon.com/thread.jspa?messageID=673393

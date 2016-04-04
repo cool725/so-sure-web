@@ -402,6 +402,31 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals([-0.13,51.5], $fooUser->getSignupLoc()->coordinates);
     }
     
+    public function testUserWithMobileCreate()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => 'api-new-user-mobile@api.bar.com',
+            'mobile_number' => '1234'
+        ));
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('api-new-user-mobile@api.bar.com', $data['email']);
+        $this->assertEquals('1234', $data['mobile_number']);
+    }
+
+    public function testUserNoEmail()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+        ));
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+    }
+
     // helpers
 
     /**
