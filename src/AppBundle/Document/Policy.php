@@ -8,7 +8,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  * @MongoDB\Document
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
- * @MongoDB\DiscriminatorMap({"phone"="Phone"})
+ * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy"})
  */
 abstract class Policy
 {
@@ -47,6 +47,11 @@ abstract class Policy
     /** @MongoDB\Field(type="string", name="gocardless_mandate", nullable=true) */
     protected $gocardlessMandate;
 
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Invitation\Invitation", mappedBy="policy")
+     */
+    protected $invitations;
+
     /** @MongoDB\Date() */
     protected $created;
 
@@ -60,6 +65,7 @@ abstract class Policy
     {
         $this->created = new \DateTime();
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->status = self::STATUS_PENDING;
     }
 

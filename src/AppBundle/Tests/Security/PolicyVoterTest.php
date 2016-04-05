@@ -46,6 +46,7 @@ class PolicyVoterTest extends WebTestCase
         $policy = new PhonePolicy();
         $this->assertTrue(self::$policyVoter->supports('view', $policy));
         $this->assertTrue(self::$policyVoter->supports('edit', $policy));
+        $this->assertTrue(self::$policyVoter->supports('send-invitation', $policy));
     }
 
     public function testVoteOk()
