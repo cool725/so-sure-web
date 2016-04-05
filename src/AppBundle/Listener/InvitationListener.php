@@ -15,7 +15,7 @@ class InvitationListener
     protected $dm;
 
     /**
-     * @param DocumentManager  $dm
+     * @param DocumentManager $dm
      */
     public function __construct(DocumentManager $dm)
     {
@@ -23,7 +23,7 @@ class InvitationListener
     }
 
     /**
-     * @param InvitationEvent $event)
+     * @param InvitationEvent $event
      */
     public function onInvitationEvent(InvitationEvent $event)
     {
