@@ -36,7 +36,7 @@ class User extends BaseUser
     protected $addresses;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Invitation", mappedBy="inviter")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Invitation\Invitation", mappedBy="inviter")
      */
     protected $invitations;
 

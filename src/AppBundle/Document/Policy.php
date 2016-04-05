@@ -48,7 +48,7 @@ abstract class Policy
     protected $gocardlessMandate;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Invitation", mappedBy="policy")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Invitation\Invitation", mappedBy="policy")
      */
     protected $invitations;
 

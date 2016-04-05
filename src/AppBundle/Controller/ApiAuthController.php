@@ -17,7 +17,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
-use AppBundle\Document\Invitation;
+use AppBundle\Document\Invitation\Invitation;
 
 use AppBundle\Classes\ApiErrorCode;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -187,13 +187,18 @@ class ApiAuthController extends BaseController
 
             $data = json_decode($request->getContent(), true)['body'];
             $email = isset($data['email']) ? $data['email'] : null;
+            $mobile = isset($data['mobile']) ? $data['mobile'] : null;
             $name = isset($data['name']) ? $data['name'] : null;
             if ($email) {
                 $invitation = $invitationService->email($policy, $email, $name);
 
                 return new JsonResponse($invitation->toApiArray());
+            } elseif ($mobile) {
+                $invitation = $invitationService->sms($policy, $mobile, $name);
+
+                return new JsonResponse($invitation->toApiArray());
             }
-            // TODO: SMS, General
+            // TODO: General
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Missing data found', 422);
         } catch (AccessDeniedException $ade) {

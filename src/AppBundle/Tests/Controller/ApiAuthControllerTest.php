@@ -257,7 +257,7 @@ class ApiAuthControllerTest extends WebTestCase
     /**
      *
      */
-    public function testNewInvitation()
+    public function testNewEmailInvitation()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
@@ -270,6 +270,27 @@ class ApiAuthControllerTest extends WebTestCase
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => 'patrick@so-sure.com',
+            'name' => 'functional test',
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+    }
+
+    /**
+     *
+     */
+    public function testNewSmsInvitation()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
+            'user_id' => self::$testUser->getId(),
+            'imei' => self::VALID_IMEI,
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation", $data['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'mobile' => '+447775740466',
             'name' => 'functional test',
         ]);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());

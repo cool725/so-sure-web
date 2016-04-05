@@ -4,8 +4,9 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
-use AppBundle\Document\EmailInvitation;
-use AppBundle\Document\Invitation;
+use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Document\Invitation\SmsInvitation;
+use AppBundle\Document\Invitation\Invitation;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -101,6 +102,27 @@ class InvitationService
         return $invitation;
     }
 
+    public function sms(Policy $policy, $mobile, $name = null)
+    {
+        // TODO: Validate its not a re-invite
+        // TODO: Validate the sms isn't blocked hasn't requested an opt out
+
+        $invitation = new SmsInvitation();
+        $invitation->setMobile($mobile);
+        $invitation->setPolicy($policy);
+        $invitation->setName($name);
+        $this->dm->persist($invitation);
+        $this->dm->flush();
+
+        $link = $this->getShortLink($invitation);
+        $invitation->setLink($link);
+        $this->dm->flush();
+
+        $this->sendSms($invitation);
+
+        return $invitation;
+    }
+
     /**
      * Send an invitation email
      *
@@ -108,7 +130,6 @@ class InvitationService
      */
     public function sendEmail(EmailInvitation $invitation)
     {
-        $referralUrl = $this->getShortLink($invitation);
         $message = \Swift_Message::newInstance()
             ->setSubject(sprintf('%s has invited you to so-sure', $invitation->getInviter()->getName()))
             ->setFrom('hello@so-sure.com')
@@ -122,5 +143,16 @@ class InvitationService
                 'text/plain'
             );
         $this->mailer->send($message);
+    }
+
+    /**
+     * Send an invitation sms
+     *
+     * @param SmsInvitation $invitation
+     */
+    public function sendSms(SmsInvitation $invitation)
+    {
+        $message = $this->templating->render('AppBundle:Sms:invitation.txt.twig', ['invitation' => $invitation]);
+        $this->sms->send($invitation->getMobile(), $message);
     }
 }

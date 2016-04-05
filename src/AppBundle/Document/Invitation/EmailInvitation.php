@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Document;
+namespace AppBundle\Document\Invitation;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
