@@ -9,6 +9,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class EmailInvitation extends Invitation
 {
+    const EVENT_UPDATED = 'event.invitation.updated';
+
     /** @MongoDB\Field(type="string", nullable=false) */
     protected $email;
 

@@ -171,3 +171,18 @@ services:
         class: AppBundle\Security\PolicyVoter
         tags:
             - { name: security.voter }
+
+    doctrine.listener.invitation:
+        class:   AppBundle\Listener\DoctrineInvitationListener
+        arguments:
+            dispatcher: "@event_dispatcher"
+        tags:
+            -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
+            -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
+
+    app.listener.invitation:
+        class:   AppBundle\Listener\InvitationListener
+        arguments:
+            dm: "@doctrine_mongodb.odm.default_document_manager"
+        tags:
+            -  { name: kernel.event_listener, event: event.invitation.updated, method: onInvitationEvent }

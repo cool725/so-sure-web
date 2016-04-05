@@ -8,7 +8,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  * @MongoDB\Document
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("invitation_type")
- * @MongoDB\DiscriminatorMap({"email"="EmailInvitation"})
+ * @MongoDB\DiscriminatorMap({"email"="EmailInvitation", "sms"="SmsInvitation"})
  */
 abstract class Invitation
 {
@@ -26,14 +26,13 @@ abstract class Invitation
     /** @MongoDB\Date() */
     protected $rejected;
 
-    /**
-     * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="invitations")
-     */
+    /** @MongoDB\ReferenceOne(targetDocument="User", inversedBy="sentInvitations") */
     protected $inviter;
 
-    /**
-     * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="invitations")
-     */
+    /** @MongoDB\ReferenceOne(targetDocument="User", inversedBy="receivedInvitations") */
+    protected $invitee;
+
+    /** @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="invitations") */
     protected $policy;
 
     /** @MongoDB\String(name="link", nullable=true) */
@@ -108,7 +107,17 @@ abstract class Invitation
     {
         $this->inviter = $inviter;
     }
-    
+
+    public function getInvitee()
+    {
+        return $this->invitee;
+    }
+
+    public function setInvitee($invitee)
+    {
+        $this->invitee = $invitee;
+    }
+
     public function getPolicy()
     {
         return $this->policy;
