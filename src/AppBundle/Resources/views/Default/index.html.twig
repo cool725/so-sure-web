@@ -33,7 +33,7 @@
           <div class="input-group">
             {{ form_widget(form_phone.phone, { 'attr': {'class': 'form-control'}}) }}
             <span class="input-group-btn">
-            {{ form_widget(form_phone.next, {'label': 'Get a quote', 'attr': {'class': 'btn btn-success'}}) }}
+            {{ form_widget(form_phone.next, {'label': 'Quote me', 'attr': {'class': 'btn btn-success'}}) }}
             </span>
           </div>
           {{ form_end(form_phone) }}
@@ -42,9 +42,17 @@
   {# Direct link to playstore would loose the referral link.  Branch.io link wouldn't work as desktop link would go to sms page #}
   {% if referral ==  '' %}
       <div class="row">
-        <p>Or download our app to get an instant quote, start inviting your friends &amp; get rewarded!</p>
+        <p>Or download our app to get an instant quote &amp; start inviting your friends!</p>
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-3 center-block">
         <a href="https://play.google.com/store/apps/details?id=com.wearesosure&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img class="google-play" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a>
-        <p><small>(iOS coming soon)</small></p>
+      </div>
+      <div class="col-md-3 center-block">
+      <a href="itms://geo.itunes.apple.com/gb/app/so-sure/id1094307449?mt=8"><img class="app-store" src="/images/icons/Download_on_the_App_Store_Badge_US-UK_135x40.svg"></img></a>
+    </div>
+      <div class="col-md-3">
+      </div>
       </div>
   {% endif %}
       <div class="row">
@@ -120,13 +128,13 @@
 
   <div class="section cta">
     <div class="container">
-      <h2 class="section-heading">Sign up today &amp; get rewarded</h2>
+      <h2 class="section-heading">Sign up today &amp; get rewarded!</h2>
       <h4 style="color: #fff;">We've not launched yet, but as one of our first 1,000 customers you could get your first year's insurance for free!</h4>
       <p>Enter your email to find out how.</p>
       <div class="signup">
         {{ form_start(form_bottom) }}
         <div class="input-group">
-          {{ form_widget(form_bottom.email, {'attr': {'class': 'form-control email', 'placeholder': 'Your email address'}}) }}
+          {{ form_widget(form_bottom.email, {'attr': {'class': 'form-control email', 'placeholder': 'Email address'}}) }}
             <span class="input-group-btn">
             {{ form_widget(form_bottom.save, {'label': 'Signup', 'attr': {'class': 'btn btn-success'}}) }}
             </span>
