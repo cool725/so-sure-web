@@ -132,6 +132,18 @@ services:
             auth_token:     "%plivo_authtoken%"
             sending_number: "%plivo_sendingnumber%"
 
+    app.excel:
+        class: AppBundle\Service\ExcelService
+        arguments:
+            logger:         "@logger"
+
+    app.davies:
+        class: AppBundle\Service\DaviesService
+        arguments:
+            logger:         "@logger"
+            excel:          "@app.excel"
+            s3:             "@aws.s3"
+
     aws.credentials:
         class: Aws\Credentials\Credentials
         arguments:
@@ -148,6 +160,14 @@ services:
 
     aws.sns:
         class: Aws\Sns\SnsClient
+        arguments:
+            -
+                version: "latest"
+                region: "eu-west-1"
+                credentials: "@aws.credentials"
+
+    aws.s3:
+        class: Aws\S3\S3Client
         arguments:
             -
                 version: "latest"
