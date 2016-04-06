@@ -37,64 +37,75 @@
   padding-bottom: 3rem;
   padding-top: 2rem;
 }
-.hero input.email {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  background-clip: padding-box;
-  padding: 10px 180px 10px 15px;
-  margin-bottom: 0rem;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
+#launch_phone_phone {
   box-shadow: none;
   border: none;
   color: #2e424d;
+  border-radius: 5px;
 }
-.hero select {
-  display: block;
-  width: 60%;
-  box-sizing: border-box;
-  background-clip: padding-box;
-  margin-bottom: 0rem;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  box-shadow: none;
-  border: none;
-  color: #2e424d;
-  height: 40px;
+#launch_phone_next {
+  right: 0;
+  top: 0;
+  margin-top: 0;
+  background-color: #2e414d;
+  border-color: #2e414d;
+  margin-left: 10px;
+  border-radius: 5px;
+}
+.input-group {
+  padding: 2rem;
 }
 .select-device > a:nth-child(1) {
   color: #fff;
-}
-#launch_phone_phone .select::-ms-expand {
-  display: none;
+  text-decoration: underline;
 }
 .hero img.google-play {
   padding-top: 2rem;
-  width: 40%;
+  width: 50%;
+}
+.hero img.app-store {
+  padding-top: 2rem;
+}
+@media (min-width: 340px) {
+  .hero img.google-play {
+    width: 34%;
+  }
+}
+@media (min-width: 580px) {
+  .hero img.google-play {
+    width: 22%;
+  }
+}
+@media (min-width: 750px) {
+  .hero img.google-play {
+    width: 24%;
+  }
+}
+@media (min-width: 992px) {
+  .hero img.google-play {
+    width: 62%;
+  }
+}
+@media (min-width: 1200px) {
+  .hero img.google-play {
+    width: 50%;
+  }
+  .hero img.app-store {
+    padding-top: 2rem;
+  }
 }
 @media (max-width: 750px) {
   .logo {
-    width: 80%;
-  }
-}
-@media (min-width: 500px) {
-  .hero img.google-play {
-    padding-top: 2rem;
-    width: 20%;
+    width: 70%;
   }
 }
 @media (max-width: 500px) {
-  .hero input.email {
-    width: 95%;
-    display: inline;
+  #launch_phone_phone {
+    float: none;
+    border-radius: 5px;
+    font-size: 1.3rem;
   }
 }
-
 /* How
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
@@ -146,6 +157,8 @@
   padding-top: 1.2rem;
 }
 
+/* CTA
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
 .cta {
   background: #3399ff; /* Old browsers */
     background: -moz-linear-gradient(45deg, #3399ff 50%, #00ccff 100%); /* FF3.6-15 */
@@ -161,31 +174,28 @@
 .cta p {
   color: #fff;
 }
-.cta input.email {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  background-clip: padding-box;
-  padding: 10px 180px 10px 15px;
-  margin-bottom: 0rem;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
+#launch_bottom_email {
   box-shadow: none;
   border: none;
+  color: #2e424d;
+}
+#launch_bottom_save {
+  right: 0;
+  top: 0;
+  margin-top: 0;
+  background-color: #2e414d;
+  border-color: #2e414d;
+  margin-left: 10px;
+  border-radius: 5px;
 }
 
 /* Smaller than 500 - Remove Email Box */
 
 @media (max-width: 500px) {
-  .cta {
-    text-align: center;
-  }
-  .cta input.email {
-    margin-bottom: 2rem;
-    width: 95%;
-    display: inline;
+  #launch_bottom_email {
+    float: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
   }
   .signup {
     width: auto;
