@@ -92,6 +92,7 @@ class DaviesService
 
     public function moveS3($sourceKey, $folder)
     {
+        // TODO: Should split into date folders
         $destKey = str_replace(sprintf('/%s/', self::UNPROCESSED_FOLDER), sprintf('/%s/', $folder), $sourceKey);
         $this->s3->copyObject([
             'Bucket' => $this->bucket,
