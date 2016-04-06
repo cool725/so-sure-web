@@ -145,9 +145,8 @@ if (branch_banner !== '') {
   branch.banner({
       icon: 'https://cdn.so-sure.com/images/favicons/apple-touch-icon-180x180.png',
       title: 'so-sure - Quick Quote',
-      description: 'Download our Android app for an instant quote.',
+      description: 'Download our app for an instant quote.',
       phonePreviewText: '+44 XXXXX XXX XXX',
-      showiOS: false,
       sendLinkText: 'Text me a link',
   }, data);
 } else {
