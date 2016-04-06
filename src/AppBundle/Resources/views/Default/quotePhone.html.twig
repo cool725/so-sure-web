@@ -13,7 +13,7 @@
         'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
         'components/Chart.js/Chart.js'
         'bundles/app/js/Default/connections.js'
-    %}<script src="{{ asset_url }}"></script>{% endjavascripts %}            
+    %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block stylesheets %}
@@ -94,7 +94,6 @@
               <h5>Connection rewards are worth £10 for first 2 months and then £2 afterwards. <br> So get inviting your friends before anyone else takes them!</h5>
             </div>
             <div class="learn-more">
-              <p>Want to get your first year for free?</p>
               <span class="chevron bottom"></span>
             </div>
           </div>
@@ -103,7 +102,10 @@
             <h3 class="section-heading">How much money could you save?</h3>
             {% include 'AppBundle:Default:connections.html.twig' %}
           </div>
-          
+          <div class="learn-more">
+            <p>Want to get your first year for free?</p>
+            <span class="chevron bottom"></span>
+          </div>
         </div>
 
 
@@ -112,7 +114,7 @@
           <div class="container">
             <h2 class="section-heading">Sign up today &amp; get rewarded</h2>
             <h4 style="color: #fff;">We've not launched yet, but as one of our first 1,000 customers you could get your first year's insurance for free!</h4>
-            <p>Enter your email to find out how.</p>
+            <p>Enter your email below to find out how.</p>
             <div class="signup">
               {{ form_start(form) }}
               <div class="input-group">

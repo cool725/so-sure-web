@@ -15,7 +15,7 @@ var data = [
         value: max_value - initial_value,
         color:"#EFEFEF",
         highlight: "#6F6F6F",
-        label: "Possible savings"
+        label: "Potential Value"
     },
 ]
 
@@ -28,7 +28,7 @@ var setConnectionText = function() {
     if (save_value > maxpot_value) {
         save_value = maxpot_value;
     }
-    var connectionText = "With " + slider.getValue() + " connections, you could save £" + save_value + " if you and your friend don't claim in the year";
+    var connectionText = "With " + slider.getValue() + " connection(s), you could get £" + save_value + " back at the end of the year if you and your friend(s) don't claim.";
     $('#connectionLegend').text(connectionText);
 }
 

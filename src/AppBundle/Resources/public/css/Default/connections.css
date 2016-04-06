@@ -4,3 +4,10 @@
 #connection-slider .slider-handle {
 	background: #1B262D;
 }
+#connectionLegend {
+	padding-bottom: 2rem;
+}
+#slider-description {
+	font-size: 1rem;
+	padding-top: 2rem;
+}
