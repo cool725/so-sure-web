@@ -178,6 +178,7 @@
   box-shadow: none;
   border: none;
   color: #2e424d;
+  border-radius: 5px;
 }
 #launch_bottom_save {
   right: 0;
