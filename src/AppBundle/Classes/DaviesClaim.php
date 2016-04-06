@@ -29,6 +29,12 @@ class DaviesClaim
     {
         // TODO: Improve validation - should should exceptions in the setters
         $this->client = $data[0];
+        if ($this->client == "") {
+            return;
+        } elseif ($this->client != "So-Sure") {
+            throw new \Exception('Incorrect client');
+        }
+
         $this->claimNumber = $data[1];
         $this->insuredName = $data[2];
         $this->riskPostCode = $data[3];
@@ -49,6 +55,18 @@ class DaviesClaim
         $this->notificationDate = $this->excelDate($data[18]);
         $this->dateCreated = $this->excelDate($data[19]);
         $this->dateClosed = $this->excelDate($data[20]);
+    }
+
+    public static function create($data)
+    {
+        $claim = new DaviesClaim();
+        $claim->fromArray($data);
+
+        if ($claim->client == "") {
+            return null;
+        }
+
+        return $claim;
     }
 
     private function excelDate($days)
