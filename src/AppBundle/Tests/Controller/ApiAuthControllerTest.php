@@ -247,12 +247,20 @@ class ApiAuthControllerTest extends WebTestCase
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
-            'sortcode' => '333333',
+            'sort_code' => '333333',
+            'account_number' => '12345678',
         ]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
-            'account' => '12345678',
+            'account_number' => '12345678',
+            'account_name' => 'foo bar',
+        ]);
+        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
+            'sort_code' => '12345678',
+            'account_name' => 'foo bar',
         ]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
     }
@@ -261,8 +269,9 @@ class ApiAuthControllerTest extends WebTestCase
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
-            'sortcode' => '200000',
-            'account' => '55779911',
+            'sort_code' => '200000',
+            'account_number' => '55779911',
+            'account_name' => 'foo bar',
         ]);
         $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
     }
@@ -292,8 +301,9 @@ class ApiAuthControllerTest extends WebTestCase
         $data = json_decode(self::$client->getResponse()->getContent(), true);
         $url = sprintf("/api/v1/auth/policy/%s/dd", $data['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'sortcode' => '200000',
-            'account' => '55779911',
+            'sort_code' => '200000',
+            'account_number' => '55779911',
+            'account_name' => 'foo bar',
         ]);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
     }

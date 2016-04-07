@@ -63,7 +63,7 @@ class GocardlessServiceTest extends WebTestCase
     {
         $user = $this->createValidUser('user1@gocardless.so-sure.com');
 
-        self::$gocardless->createCustomer($user);
+        self::$gocardless->createCustomer($user, $user->getFirstName(), $user->getLastName());
         $this->assertTrue(strlen($user->getGocardless()->getCustomerId()) > 5);
     }
 
@@ -71,7 +71,7 @@ class GocardlessServiceTest extends WebTestCase
     {
         $user = $this->createValidUser('user2@gocardless.so-sure.com');
 
-        self::$gocardless->createCustomer($user);
+        self::$gocardless->createCustomer($user, $user->getFirstName(), $user->getLastName());
         $this->assertTrue(strlen($user->getGocardless()->getCustomerId()) > 5);
 
         self::$gocardless->addBankAccount($user, '200000', '55779911');
@@ -85,7 +85,7 @@ class GocardlessServiceTest extends WebTestCase
     {
         $user = $this->createValidUser('user3@gocardless.so-sure.com');
 
-        self::$gocardless->createCustomer($user);
+        self::$gocardless->createCustomer($user, $user->getFirstName(), $user->getLastName());
         $this->assertTrue(strlen($user->getGocardless()->getCustomerId()) > 5);
 
         self::$gocardless->addBankAccount($user, '20-00-00', '55779911');

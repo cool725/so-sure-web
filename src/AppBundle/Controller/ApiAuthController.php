@@ -140,8 +140,17 @@ class ApiAuthController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['sortcode', 'account'])) {
+            if (!$this->validateFields($data, ['sort_code', 'account_number', 'account_name'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $accountNames = explode(" ", $data['account_name']);
+            if (count($accountNames) != 2) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_INVALID_ACCOUNT_NAME,
+                    'Account name is firstname lastname',
+                    422
+                );
             }
 
             $dm = $this->getManager();
@@ -157,7 +166,7 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('edit', $policy);
 
             $gocardless = $this->get('app.gocardless');
-            $gocardless->add($policy, $data['sortcode'], $data['account']);
+            $gocardless->add($policy, $accountNames[0], $accountNames[1], $data['sort_code'], $data['account_number']);
 
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
