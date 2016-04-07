@@ -87,6 +87,7 @@ class ApiAuthControllerTest extends WebTestCase
 
         $this->assertTrue(strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone']['devices']));
+        $this->assertTrue(in_array($data['id'], $data['user']['policies']));
     }
 
     public function testNewPolicyMemoryExceeded()

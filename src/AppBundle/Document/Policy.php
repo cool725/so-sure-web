@@ -29,9 +29,9 @@ abstract class Policy
      * @MongoDB\ReferenceMany(targetDocument="Payment", mappedBy="policy")
      */
     protected $payments;
-    
+
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="policies")
      */
     protected $user;
 

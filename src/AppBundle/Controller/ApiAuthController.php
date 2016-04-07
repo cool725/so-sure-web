@@ -83,10 +83,14 @@ class ApiAuthController extends BaseController
             // TODO: check we're not already insuring the same imei (only for policy state active,pending)
 
             $policy = new PhonePolicy();
-            $policy->setUser($user);
             $policy->setImei($imei);
             $policy->setPhone($phone);
-            // TODO: Save original make/device/memory just in case
+            $policy->setPhoneData(json_encode([
+                'make' => $data['make'],
+                'device' => $data['device'],
+                'memory' => $data['memory'],
+            ]));
+            $user->addPolicy($policy);
 
             $dm = $this->getManager();
             $dm->persist($policy);

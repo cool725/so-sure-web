@@ -90,6 +90,9 @@ class User extends BaseUser
     /** @MongoDB\String(name="mobile_number", nullable=true) */
     protected $mobileNumber;
 
+    /** @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user") */
+    protected $policies;
+
     public function __construct()
     {
         parent::__construct();
@@ -97,6 +100,7 @@ class User extends BaseUser
         $this->addresses = new \Doctrine\Common\Collections\ArrayCollection();
         $this->sentInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->receviedInvitations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->policies = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = new \DateTime();
         $this->token = bin2hex(openssl_random_pseudo_bytes(64));
     }
@@ -167,6 +171,17 @@ class User extends BaseUser
         }
 
         return null;
+    }
+
+    public function addPolicy(Policy $policy)
+    {
+        $policy->setUser($this);
+        $this->policies[] = $policy;
+    }
+
+    public function getPolicies()
+    {
+        return $this->policies;
     }
 
     public function setFacebookAccessToken($facebookAccessToken)
@@ -313,6 +328,13 @@ class User extends BaseUser
                 $addresses[] = $address->toApiArray();
             }
         }
+        $policies = [];
+        if ($this->policies) {
+            foreach ($this->policies as $policy) {
+                $policies[] = $policy->getId();
+            }
+        }
+
         return [
           'id' => $this->getId(),
           'email' => $this->getEmailCanonical(),
@@ -323,6 +345,7 @@ class User extends BaseUser
           'user_token' => ['token' => $this->getToken()],
           'addresses' => $addresses,
           'mobile_number' => $this->getMobileNumber(),
+          'policies' => $policies,
         ];
     }
 }
