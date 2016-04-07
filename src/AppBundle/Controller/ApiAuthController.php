@@ -46,21 +46,12 @@ class ApiAuthController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['user_id', 'imei'])) {
+            if (!$this->validateFields($data, ['imei', 'make', 'device', 'memory'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
             $imeiValidator = $this->get('app.imei');
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(User::class);
-            $user = $repo->find($data['user_id']);
-            if (!$user) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_USER_NOT_FOUND,
-                    'Unable to find user',
-                    422
-                );
-            }
+            $user = $this->getUser();
             $this->denyAccessUnlessGranted('edit', $user);
 
             $imei = str_replace(' ', '', $data['imei']);
@@ -80,10 +71,24 @@ class ApiAuthController extends BaseController
                 );
             }
 
+            $phone = $this->getPhone($data['make'], $data['device'], $data['memory']);
+            if (!$phone) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to provide policy for this phone',
+                    404
+                );
+            }
+
+            // TODO: check we're not already insuring the same imei (only for policy state active,pending)
+
             $policy = new PhonePolicy();
             $policy->setUser($user);
             $policy->setImei($imei);
+            $policy->setPhone($phone);
+            // TODO: Save original make/device/memory just in case
 
+            $dm = $this->getManager();
             $dm->persist($policy);
             $dm->flush();
 

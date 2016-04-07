@@ -34,7 +34,7 @@
                             <td>{{ phone.maxConnections }}</td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-                                    data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}" data-phone="{{ phone.asEditArray()|json_encode }}">Edit</button>
+                                    data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}" data-phone="{{ phone.toEditArray()|json_encode }}">Edit</button>
                                 <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
                                         data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}">Delete</button>
                             </td>

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use AppBundle\Document\User;
+use AppBundle\Document\Phone;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 abstract class BaseController extends Controller
@@ -35,6 +36,62 @@ abstract class BaseController extends Controller
         $cognitoIdentity = $this->get('app.cognito.identity');
 
         return $cognitoIdentity->getCognitoIdToken($user, $this->getCognitoIdentityId($request));
+    }
+
+    protected function getQuotes($make, $device, $returnAllIfNone = true)
+    {
+        // TODO: We should probably be checking make as well.  However, we need to analyize the data
+        \AppBundle\Classes\NoOp::noOp([$make]);
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phones = $repo->findBy(['devices' => $device]);
+        if ($returnAllIfNone &&
+            (count($phones) == 0 || $device == "")) {
+            $phones = $repo->findBy(['make' => 'ALL']);
+        }
+
+        return $phones;
+    }
+
+    /**
+     * Get the best matching phone.
+     * Assuming that memory will be a bit less than actual advertised size, but find the closest matching
+     *
+     * @param string $make
+     * @param string $device see googe play device list (or apple phone list)
+     * @param float  $memory in gb
+     *
+     * @return Phone|null
+     */
+    protected function getPhone($make, $device, $memory)
+    {
+        $phones = $this->getQuotes($make, $device, false);
+        if (count($phones) == 0) {
+            return null;
+        }
+
+        // most phones don't care about memory - only 1 entry to return
+        if (count($phones) == 1) {
+            return $phones[0];
+        }
+
+        // sort low to high
+        usort($phones, function ($a, $b) {
+            return $a->getMemory() > $b->getMemory();
+        });
+
+        // 3 cases to consider
+        // low - phone memory is less than smallest
+        // standard - phone memory is somewhere in the middle
+        // high - phone exceeds all cases (new device with more memory?)
+        foreach ($phones as $phone) {
+            if ($memory < $phone->getMemory()) {
+                return $phone;
+            }
+        }
+
+        return $phones[count($phones) - 1];
     }
 
     /**
