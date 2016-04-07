@@ -167,7 +167,7 @@ class Phone
         return $name;
     }
 
-    public function asApiArray()
+    public function toApiArray()
     {
         return [
             'make' => $this->getMake(),
@@ -177,7 +177,7 @@ class Phone
         ];
     }
 
-    public function asEditArray()
+    public function toEditArray()
     {
         return [
             'make' => $this->getMake(),

@@ -49,7 +49,7 @@ class PhonePolicy extends Policy
           'status' => $this->getStatus(),
           'policy_number' => $this->getPolicyNumber(),
           'imei' => $this->getImei(),
-          'phone' => $this->getPhone() ? $this->getUser()->toApiArray() : null,
+          'phone' => $this->getPhone() ? $this->getPhone()->toApiArray() : null,
           'user' => $this->getUser() ? $this->getUser()->toApiArray() : null,
           'pot' => null,
           'payment' => null,

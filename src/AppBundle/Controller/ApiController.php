@@ -130,16 +130,12 @@ class ApiController extends BaseController
     public function quoteAction(Request $request)
     {
         try {
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(Phone::class);
+            $make = trim($request->get('make'));
             $device = trim($request->get('device'));
             $memory = (float) trim($request->get('memory'));
-            $deviceFound = true;
-            $phones = $repo->findBy(['devices' => $device]);
-            if (!$phones || count($phones) == 0 || $device == "") {
-                $phones = $repo->findBy(['make' => 'ALL']);
-                $deviceFound = false;
-            }
+
+            $phones = $this->getQuotes($make, $device, true);
+            $deviceFound = $phones[0]->getMake() != "ALL";
 
             $quotes = [];
             // Memory is only an issue if there are multiple phones
@@ -153,7 +149,7 @@ class ApiController extends BaseController
                     'monthly_loss' => $phone->getLossPrice(),
                     'yearly_premium' => $phone->getYearlyPolicyPrice(),
                     'yearly_loss' => $phone->getYearlyLossPrice(),
-                    'phone' => $phone->asApiArray(),
+                    'phone' => $phone->toApiArray(),
                     'connection_value' => $phone->getConnectionValue(),
                     'max_connections' => $phone->getMaxConnections(),
                     'max_pot' => $phone->getMaxPot(),
