@@ -7,14 +7,14 @@ var adjusted_potential_value = maxpot_value - (max_value * 10);
 var data = [
     {
         value: initial_value,
-        color:"#1B262D",
+        color:"#3399FF",
         highlight: "#3399FF",
         // If changing text, verify tooltipTemplate isn't affected
         label: "Pot Value"
     },
     {
         value: max_value - initial_value,
-        color:"#EFEFEF",
+        color:"#1B262D",
         highlight: "#6F6F6F",
         // If changing text, verify tooltipTemplate isn't affected
         label: "Potential Value"
