@@ -309,6 +309,7 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $policyData = json_decode(self::$client->getResponse()->getContent(), true);
         $this->assertTrue($policyData['status'] == null);
+        $this->assertEquals($data['id'], $policyData['id']);
     }
 
     // policy/{id}/invitation
