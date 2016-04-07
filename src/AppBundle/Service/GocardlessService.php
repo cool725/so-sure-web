@@ -39,20 +39,22 @@ class GocardlessService
 
     /**
      * @param Policy $policy
-     * @param string $sortcode
-     * @param string $account
+     * @param string $accountFirstName
+     * @param string $accountLastName
+     * @param string $sortCode
+     * @param string $accountNumber
      */
-    public function add(Policy $policy, $sortcode, $account)
+    public function add(Policy $policy, $accountFirstName, $accountLastName, $sortCode, $accountNumber)
     {
-        $this->createCustomer($policy->getUser());
-        $this->addBankAccount($policy->getUser(), $sortcode, $account);
+        $this->createCustomer($policy->getUser(), $accountFirstName, $accountLastName);
+        $this->addBankAccount($policy->getUser(), $sortCode, $accountNumber);
         $this->createMandate($policy);
     }
 
     /**
      * Only public for testing
      */
-    public function createCustomer(User $user, $idempotent = true)
+    public function createCustomer(User $user, $accountFirstName, $accountLastName, $idempotent = true)
     {
         if (!$user->hasValidGocardlessDetails()) {
             throw new \InvalidArgumentException('User is missing details such as name or billing address');
@@ -65,8 +67,8 @@ class GocardlessService
         $billing = $user->getBillingAddress();
         $data = [
             "email" => $user->getEmailCanonical(),
-            "given_name" => $user->getFirstName(),
-            "family_name" => $user->getLastName(),
+            "given_name" => $accountFirstName,
+            "family_name" => $accountLastName,
             "address_line1" => $billing->getLine1(),
             "address_line2" => $billing->getLine2(),
             "address_line3" => $billing->getLine3(),
@@ -111,7 +113,7 @@ class GocardlessService
     /**
      * Only public for testing
      */
-    public function addBankAccount(User $user, $sortcode, $account, $idempotent = true)
+    public function addBankAccount(User $user, $sortCode, $accountNumber, $idempotent = true)
     {
         if (!$user->hasGocardless() || !$user->getGocardless()->getCustomerId()) {
             throw new \InvalidArgumentException('User requires a gocardless customer account');
@@ -123,8 +125,8 @@ class GocardlessService
         }
 
         $data = [
-            "account_number" => $account,
-            "branch_code" => $sortcode, // no need to remove -
+            "account_number" => $accountNumber,
+            "branch_code" => $sortCode, // no need to remove -
             "account_holder_name" => $user->getName(),
             "country_code" => "GB",
             "links" => [
