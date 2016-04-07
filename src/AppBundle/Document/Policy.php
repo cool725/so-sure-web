@@ -66,7 +66,6 @@ abstract class Policy
         $this->created = new \DateTime();
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->status = self::STATUS_PENDING;
     }
 
     public function getId()
