@@ -39,8 +39,11 @@ var updateValue = function() {
     setConnectionText();
 }
 
-var slider = $('#connection-value').slider()
-        .on('change', updateValue)
-		.data('slider');
+var slider = $('#connection-value').slider({
+    formatter: function(value) {
+        return value + ' connections';
+    }})
+    .on('change', updateValue)
+    .data('slider');
 
 setConnectionText();
