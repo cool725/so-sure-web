@@ -299,6 +299,7 @@ class ApiAuthControllerTest extends WebTestCase
         $crawler = $this->createPolicy($cognitoIdentityId);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
+
         $url = sprintf("/api/v1/auth/policy/%s/dd", $data['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'sort_code' => '200000',
@@ -306,6 +307,8 @@ class ApiAuthControllerTest extends WebTestCase
             'account_name' => 'foo bar',
         ]);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $policyData = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertTrue($policyData['status'] == null);
     }
 
     // policy/{id}/invitation
