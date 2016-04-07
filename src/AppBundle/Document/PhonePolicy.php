@@ -14,10 +14,11 @@ class PhonePolicy extends Policy
      */
     protected $id;
 
-    /**
-     * @MongoDB\ReferenceOne(targetDocument="Phone")
-     */
+    /** @MongoDB\ReferenceOne(targetDocument="Phone") */
     protected $phone;
+
+    /** @MongoDB\Field(type="string", name="phone_data") */
+    protected $phoneData;
 
     /** @MongoDB\Field(type="string", nullable=false) */
     protected $imei;
@@ -40,6 +41,16 @@ class PhonePolicy extends Policy
     public function setImei($imei)
     {
         $this->imei = $imei;
+    }
+
+    public function getPhoneData()
+    {
+        return $this->phoneData;
+    }
+
+    public function setPhoneData($phoneData)
+    {
+        $this->phoneData = $phoneData;
     }
 
     public function toApiArray()
