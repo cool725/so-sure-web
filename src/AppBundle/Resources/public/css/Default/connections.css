@@ -1,0 +1,20 @@
+#connection-slider .slider-selection {
+	background: #3399FF;
+}
+#connection-slider .slider-handle {
+	background: #3399FF;
+}
+#connectionLegend {
+	padding-bottom: 2rem;
+}
+#slider-description {
+	padding-top: 2rem;
+}
+
+#connectionsChartLegend ul {
+	list-style: none;
+}
+
+#connectionsChartLegend ul li span {
+	padding-right: 5px;
+}
