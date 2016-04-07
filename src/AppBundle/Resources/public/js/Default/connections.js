@@ -26,7 +26,24 @@ function roundToTwo(num) {
 }
 
 var connectionsDoughnutChart = new Chart(ctx).Doughnut(data, {
-    tooltipTemplate: "<%if (label){%><%=label%>: <%}%>£<% if (label && label.indexOf('Pot ') > -1) { if (value * 10 > " + maxpot_value + "){%>" + maxpot_value + "<%} else {%><%= value * 10 %><% }} else { %><%= roundToTwo(" + adjusted_potential_value + " + value * 10 ) %><% }%>"
+    tooltipTemplate: "<%if (label){%><%=label%>: <%}%>£" +
+                     "<% if (label && label.indexOf('Pot ') > -1) { " +
+                         "if (value * 10 > " + maxpot_value + "){%>" +
+                             maxpot_value +
+                          "<%} else {%>" +
+                             "<%= value * 10 %>" +
+                          "<% }" +
+                     "} else { %>" +
+                         "<%= roundToTwo(" + adjusted_potential_value + " + value * 10 ) %>" +
+                     "<% }%>",
+    legendTemplate : '<ul>'
+                  +'<% for (var i=0; i<data.length; i++) { %>'
+                    +'<li>'
+                    +'<span style=\"color:<%=data[i].color%>\"><i class=\"fa fa-circle\"></i></span><span id=\"connectionChartLegend-<%= i %>\">'
+                    +'<% if (data[i].label) { %><%= data[i].label %>: £<% } %>'
+                  +'</span></li>'
+                +'<% } %>'
+              +'</ul>'
 });
 
 var setConnectionText = function() {
@@ -34,8 +51,13 @@ var setConnectionText = function() {
     if (save_value > maxpot_value) {
         save_value = maxpot_value;
     }
+    var potential_value = roundToTwo(maxpot_value - save_value);
     var connectionText = "With " + slider.getValue() + " connection(s), you could get £" + save_value + " back at the end of the year if you and your friend(s) don't claim.";
     $('#connectionLegend').text(connectionText);
+    var potText = $('#connectionChartLegend-0').text().replace(/£.*/, '£' + save_value);
+    $('#connectionChartLegend-0').text(potText);
+    var potentialText = $('#connectionChartLegend-1').text().replace(/£.*/, '£' + potential_value);
+    $('#connectionChartLegend-1').text(potentialText);
 }
 
 var updateValue = function() {
@@ -52,4 +74,5 @@ var slider = $('#connection-value').slider({
     .on('change', updateValue)
     .data('slider');
 
+$('#connectionsChartLegend').html(connectionsDoughnutChart.generateLegend());
 setConnectionText();

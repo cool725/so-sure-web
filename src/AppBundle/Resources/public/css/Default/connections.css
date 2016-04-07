@@ -11,3 +11,11 @@
 	font-size: 1rem;
 	padding-top: 2rem;
 }
+
+#connectionsChartLegend ul {
+	list-style: none;
+}
+
+#connectionsChartLegend ul li span {
+	padding-right: 5px;
+}
