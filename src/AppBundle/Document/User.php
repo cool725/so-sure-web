@@ -6,6 +6,7 @@ namespace AppBundle\Document;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use GeoJson\Geometry\Point;
+use AppBundle\Document\Invitation\Invitation;
 
 /**
  * @MongoDB\Document
@@ -102,7 +103,7 @@ class User extends BaseUser
         $this->referrals = new \Doctrine\Common\Collections\ArrayCollection();
         $this->addresses = new \Doctrine\Common\Collections\ArrayCollection();
         $this->sentInvitations = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->receviedInvitations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->receivedInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->policies = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = new \DateTime();
         $this->token = bin2hex(openssl_random_pseudo_bytes(64));
@@ -195,6 +196,28 @@ class User extends BaseUser
     public function getPolicies()
     {
         return $this->policies;
+    }
+
+    public function addSentInvitation(Invitation $invitation)
+    {
+        $invitation->setInviter($this);
+        $this->sentInvitations[] = $invitation;
+    }
+
+    public function getSentInvitations()
+    {
+        return $this->sentInvitations;
+    }
+
+    public function addReceivedInvitation(Invitation $invitation)
+    {
+        $invitation->setInvitee($this);
+        $this->receivedInvitations[] = $invitation;
+    }
+
+    public function getReceivedInvitations()
+    {
+        return $this->receivedInvitations;
     }
 
     public function setFacebookAccessToken($facebookAccessToken)
