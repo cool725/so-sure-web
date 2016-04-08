@@ -317,6 +317,7 @@ class ApiController extends BaseController
 
             $userManager = $this->get('fos_user.user_manager');
             $user = $userManager->createUser();
+            $user->setCognitoId($this->getCognitoIdentityId($request));
             $user->setEmail($data['email']);
             $user->setFirstName(isset($data['first_name']) ? $data['first_name'] : null);
             $user->setLastName(isset($data['last_name']) ? $data['last_name'] : null);
