@@ -46,11 +46,12 @@ class ApiAuthController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['imei', 'make', 'device', 'memory'])) {
+            if (!$this->validateFields($data, ['imei', 'make', 'device', 'memory', 'validation_data'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
             $imeiValidator = $this->get('app.imei');
+            $jwtValidator = $this->get('app.jwt');
             $user = $this->getUser();
             $this->denyAccessUnlessGranted('edit', $user);
 
@@ -90,6 +91,20 @@ class ApiAuthController extends BaseController
 
             // TODO: check we're not already insuring the same imei (only for policy state active,pending)
 
+            try {
+                $jwtValidator->validate(
+                    $this->getCognitoIdentityId($request),
+                    (string) $data['validation_data'],
+                    ['imei' => $imei]
+                );
+            } catch (\InvalidArgumentException $argE) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION,
+                    'Validation data is not valid',
+                    422
+                );
+            }
+
             $policy = new PhonePolicy();
             $policy->setImei($imei);
             $policy->setPhone($phone);
@@ -108,7 +123,6 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            print_r(get_class($e));
             $this->get('logger')->error(sprintf('Error in api newPolicy. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
@@ -184,7 +198,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api newPolicy. %s', $e->getMessage()));
+            $this->get('logger')->error(sprintf('Error in api newPolicyDD. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -258,6 +272,16 @@ class ApiAuthController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
+    }
+
+    /**
+     * @Route("/secret", name="api_auth_secret")
+     * @Method({"GET", "POST"})
+     */
+    public function secretAuthAction()
+    {
+        // TODO: This should be stored in redis against the sourceIp and time limited
+        return new JsonResponse(['secret' => $this->getParameter('api_secret')]);
     }
 
     /**

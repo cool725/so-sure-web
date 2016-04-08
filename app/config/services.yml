@@ -153,6 +153,12 @@ services:
             excel:          "@app.excel"
             s3:             "@aws.s3"
 
+    app.jwt:
+        class: AppBundle\Service\JWTService
+        arguments:
+            logger:         "@logger"
+            secret:         "%api_secret%"
+
     aws.credentials:
         class: Aws\Credentials\Credentials
         arguments:

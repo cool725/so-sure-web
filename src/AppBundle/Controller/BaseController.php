@@ -124,7 +124,7 @@ abstract class BaseController extends Controller
     protected function validateFields($data, $fields)
     {
         foreach ($fields as $field) {
-            if (!isset($data[$field]) || strlen(trim($data[$field])) == 0) {
+            if (!isset($data[$field]) || is_array($data[$field]) || strlen(trim($data[$field])) == 0) {
                 return false;
             }
         }
