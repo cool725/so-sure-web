@@ -18,17 +18,17 @@ class SalvaExportServiceTest extends WebTestCase
 
     public static function setUpBeforeClass()
     {
-         //start the symfony kernel
-         $kernel = static::createKernel();
-         $kernel->boot();
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-         //get the DI container
-         self::$container = $kernel->getContainer();
+        //get the DI container
+        self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$salva = self::$container->get('app.salva');
-         self::$xmlFile = sprintf(
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        self::$salva = self::$container->get('app.salva');
+        self::$xmlFile = sprintf(
             "%s/../src/AppBundle/Tests/Resources/salva-example-boat.xml",
             self::$container->getParameter('kernel.root_dir')
         );
