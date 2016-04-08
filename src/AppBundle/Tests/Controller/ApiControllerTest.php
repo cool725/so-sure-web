@@ -379,6 +379,8 @@ class ApiControllerTest extends WebTestCase
         $repo = $dm->getRepository(User::class);
         $fooUser = $repo->findOneBy(['email' => 'api-new-user@api.bar.com']);
         $this->assertTrue($fooUser !== null);
+        $cognitoIdentityValue = sprintf("cognitoIdentityId=%s,", $fooUser->getCognitoId());
+        $this->assertTrue(stripos($cognitoIdentityId, $cognitoIdentityValue) !== false);
     }
 
     public function testUserCreateIp()

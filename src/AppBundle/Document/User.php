@@ -72,6 +72,9 @@ class User extends BaseUser
     /** @MongoDB\String(name="sns_endpoint", nullable=true) */
     protected $snsEndpoint;
 
+    /** @MongoDB\String(name="cognito_id", nullable=true) */
+    protected $cognitoId;
+
     /** @MongoDB\String(name="signup_ip", nullable=true) */
     protected $signupIp;
 
@@ -113,6 +116,16 @@ class User extends BaseUser
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    public function getCognitoId()
+    {
+        return $this->cognitoId;
+    }
+
+    public function setCognitoId($cognitoId)
+    {
+        $this->cognitoId = $cognitoId;
     }
 
     public function setFacebookId($facebookId)
