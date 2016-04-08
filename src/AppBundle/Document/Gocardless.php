@@ -17,6 +17,9 @@ class Gocardless
     /** @MongoDB\Field(type="hash", name="mandates", nullable=true) */
     protected $mandates = array();
 
+    /** @MongoDB\Field(type="collection", name="account_hashes", nullable=true) */
+    protected $accountHashes = array();
+
     public function setCustomerId($customerId)
     {
         $this->customerId = $customerId;
@@ -30,6 +33,10 @@ class Gocardless
     public function addAccount($key, $value)
     {
         $this->accounts[$key] = $value;
+        $data = json_decode($value, true);
+        if (isset($data['account_hash'])) {
+            $this->accountHashes[] = $data['account_hash'];
+        }
     }
 
     public function getAccounts()
@@ -40,6 +47,11 @@ class Gocardless
     public function hasAccounts()
     {
         return count($this->getAccounts()) > 0;
+    }
+
+    public function getAccountHashes()
+    {
+        return $this->accountHashes;
     }
 
     /**

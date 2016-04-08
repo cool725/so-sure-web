@@ -76,9 +76,11 @@ class GocardlessServiceTest extends WebTestCase
 
         self::$gocardless->addBankAccount($user, '200000', '55779911');
         $this->assertTrue(count($user->getGocardless()->getAccounts()) > 0);
+        $this->assertTrue(count($user->getGocardless()->getAccountHashes()) > 0);
 
         $accountDetail = $user->getGocardless()->getPrimaryAccount();
         $this->assertEquals('11', $accountDetail->account_number_ending);
+        $this->assertTrue(in_array($accountDetail->account_hash, $user->getGocardless()->getAccountHashes()));
     }
 
     public function testAddBankAccountWithHyphens()

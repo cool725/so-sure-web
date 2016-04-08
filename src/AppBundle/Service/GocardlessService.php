@@ -151,6 +151,7 @@ class GocardlessService
             'account_number_ending' => $bankAccount->account_number_ending,
             'bank_name' => $bankAccount->bank_name,
             'currency' => $bankAccount->currency,
+            'account_hash' => sha1(sprintf("%s:%s", str_replace("-", "", $sortCode), $accountNumber)),
         ]));
         $this->dm->flush();
     }
