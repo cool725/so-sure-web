@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://sims.salva.ee/service/schema/invoice/v1"
+    xmlns="http://sims.salva.ee/service/schema/invoice/v1"
+    xmlns:base="http://sims.salva.ee/service/schema/v1"
+    xmlns:policy="http://sims.salva.ee/service/schema/policy/v1"
+    elementFormDefault="qualified"
+    attributeFormDefault="qualified">
+
+    <xs:import namespace="http://sims.salva.ee/service/schema/v1" schemaLocation="../baseTypesV1.xsd"></xs:import>
+    <xs:import namespace="http://sims.salva.ee/service/schema/policy/v1" schemaLocation="../policy/policyBaseTypesV1.xsd"></xs:import>
+
+    <xs:complexType name="invoiceType">
+        <xs:sequence>
+            <xs:element name="invoiceNo" type="xs:string" />
+            <xs:element name="dueDate" type="xs:date" />
+            <xs:element name="newDueDate" type="xs:date" minOccurs="0"/>
+            <xs:element name="invoiceDate" type="xs:date" />
+            <xs:element name="amount" type="base:moneyType" />
+            <xs:element name="usedDepositAmount" type="base:moneyType" minOccurs="0"/>
+            <xs:element name="referenceNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="fullyPaid" type="xs:boolean"/>
+            <xs:element name="recipientCustomer" type="policy:customerType"/>
+            <xs:element name="payerCustomer" type="policy:customerType"/>
+
+            <xs:element name="invoiceRows">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="invoiceRow" type="policy:invoiceRowType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="invoicesContainerType">
+	    <xs:sequence>
+	        <xs:element name="invoice" minOccurs="0" maxOccurs="unbounded" type="invoiceType"/>
+	    </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

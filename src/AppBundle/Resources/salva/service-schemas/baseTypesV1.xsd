@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://sims.salva.ee/service/schema/v1"
+    xmlns="http://sims.salva.ee/service/schema/v1"
+    elementFormDefault="qualified"
+    attributeFormDefault="qualified">
+
+    <xs:element name="errorResponse" type="errorResponseType" />
+
+    <xs:complexType name="abstractResponseType" abstract="true">
+        <xs:sequence>
+            <xs:element name="constraints" type="constraintsContainerType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="logId" type="xs:long"/>
+        <xs:attribute name="versionDate" type="xs:dateTime"/>
+    </xs:complexType>
+
+    <xs:complexType name="errorResponseType">
+        <xs:sequence>
+            <xs:element name="errorList" type="constraintsContainerType"/>
+        </xs:sequence>
+        <xs:attribute name="logId" type="xs:long"/>
+    </xs:complexType>
+
+    <xs:complexType name="constraintsContainerType">
+        <xs:sequence>
+            <xs:element name="constraint" type="constraintType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="constraintType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="code" type="xs:string"/>
+                <xs:attribute name="level" type="xs:string"/>
+                <xs:attribute name="path" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="addressType">
+        <xs:sequence>
+            <xs:element name="countryCode" type="nonEmptyString"/>
+            <xs:element name="building" type="xs:string" minOccurs="0"/>
+            <xs:element name="room" type="xs:string" minOccurs="0"/>
+            <xs:element name="additionalAddress" type="xs:string" minOccurs="0"/>
+            <xs:element name="postcode" type="xs:string" minOccurs="0"/>
+            <xs:element name="addressComponents" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="addressComponent" type="addressComponentType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="addressComponentType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="level" type="nonEmptyString" use="required"/>
+                <xs:attribute name="externalCode" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="moneyType">
+        <xs:simpleContent>
+            <xs:extension base="xs:decimal">
+                <xs:attribute name="currency" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="nonEmptyString">
+	    <xs:restriction base="xs:string">
+	        <xs:pattern value=".*\S+.*"/>
+	    </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

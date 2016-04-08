@@ -137,6 +137,15 @@ services:
         arguments:
             logger:         "@logger"
 
+    app.salva:
+        class: AppBundle\Service\SalvaExportService
+        arguments:
+            logger:         "@logger"
+            baseUrl:        "%salva_url%"
+            username:       "%salva_username%"
+            password:       "%salva_password%"
+            rootDir:        "%kernel.root_dir%"
+
     app.davies:
         class: AppBundle\Service\DaviesService
         arguments:

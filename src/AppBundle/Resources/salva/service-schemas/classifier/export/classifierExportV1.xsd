@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://sims.salva.ee/service/schema/classifier/export/v1"
+  xmlns="http://sims.salva.ee/service/schema/classifier/export/v1" xmlns:base="http://sims.salva.ee/service/schema/v1" elementFormDefault="qualified"
+  attributeFormDefault="qualified">
+
+  <xs:import namespace="http://sims.salva.ee/service/schema/v1" schemaLocation="../../baseTypesV1.xsd"></xs:import>
+
+  <xs:element name="serviceRequest" type="serviceRequestType" />
+  <xs:element name="serviceResponse" type="serviceResponseType" />
+
+  <xs:complexType name="serviceRequestType">
+    <xs:sequence>
+      <xs:element name="classifiers">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="classifier" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="classifierCode" type="xs:string" use="required" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="locale" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="serviceResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:abstractResponseType">
+        <xs:sequence>
+          <xs:element name="classifiers">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="classifier" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="classifierValue" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="valueAttribute" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:complexType>
+                                        <xs:attribute name="name" type="xs:string"/>
+                                        <xs:attribute name="value" type="xs:string"/>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                          <xs:attribute name="classifierValueCode" type="xs:string" use="required" />
+                          <xs:attribute name="classifierValueTranslation" type="xs:string" use="required" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="classifierCode" type="xs:string" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

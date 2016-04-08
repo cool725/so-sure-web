@@ -57,6 +57,10 @@ parameters:
     gsma_apikey:  ''
     gsma_username: ''
 
+    salva_url: ''
+    salva_username: ''
+    salva_password: ''
+
     sns_prelaunch_all: ''
     sns_prelaunch_registered: ''
     sns_prelaunch_unregistered: ''

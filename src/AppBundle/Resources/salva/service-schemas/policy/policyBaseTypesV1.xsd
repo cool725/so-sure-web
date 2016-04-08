@@ -1,0 +1,261 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://sims.salva.ee/service/schema/policy/v1"
+    xmlns="http://sims.salva.ee/service/schema/policy/v1"
+    xmlns:base="http://sims.salva.ee/service/schema/v1"
+    elementFormDefault="qualified"
+    attributeFormDefault="qualified">
+
+    <xs:import namespace="http://sims.salva.ee/service/schema/v1" schemaLocation="../baseTypesV1.xsd"></xs:import>
+
+    <xs:complexType name="policyType">
+        <xs:sequence>
+            <xs:element name="recordId" type="xs:long" minOccurs="0"/>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="policyPremium" type="base:moneyType" minOccurs="0"/>
+            <xs:element name="renewable" type="xs:boolean"/>
+            <xs:element name="renewedFromPolicy" type="xs:string" minOccurs="0"/>
+            <xs:element name="insurancePeriodStart" type="xs:dateTime"/>
+            <xs:element name="insurancePeriodEnd" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="issueTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="terminationTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="terminationReasonCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="paymentsPerYearCode" type="xs:int" minOccurs="0"/>
+            <xs:element name="issuerContract" type="xs:string" minOccurs="0"/>
+            <xs:element name="issuerDivision" type="xs:string" minOccurs="0"/>
+            <xs:element name="issuerUser" type="xs:string" minOccurs="0"/>
+            <xs:element name="issuerUserFullName" type="xs:string" minOccurs="0"/>
+            <xs:element name="deliveryModeCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="contactPersonTypeCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="contactAddress" type="base:addressType" minOccurs="0"/>
+            <xs:element name="contactEmail" type="xs:string" minOccurs="0"/>
+            <xs:element name="referenceNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="currencyCode" type="base:nonEmptyString" minOccurs="0"/>
+            <xs:element name="policyNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="policyStatusCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="firstDueDate" type="xs:date" minOccurs="0"/>
+            <xs:element name="policyCustomers" type="customersContainerType" minOccurs="0"/>
+            <xs:element name="insuredObjects">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="insuredObject" type="insuredObjectType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="invoiceRows" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="invoiceRow" type="invoiceRowType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="fileRelations" type="fileRelationsContainerType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="insuredObjectType">
+        <xs:sequence>
+            <xs:element name="productObjectCode" type="base:nonEmptyString"/>
+            <xs:element name="insurancePeriodStart" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="insurancePeriodEnd" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="name" type="xs:string" minOccurs="0"/>
+            <xs:element name="sumInsured" type="base:moneyType" minOccurs="0"/>
+            <xs:element name="calculatedPremium" type="base:moneyType" minOccurs="0"/>
+            <xs:element name="finalPremium" type="base:moneyType" minOccurs="0"/>
+            <xs:element name="salesChannelCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="registryObject" type="registryObjectType" minOccurs="0"/>
+            <xs:element name="objectCustomers" type="customersContainerType" minOccurs="0"/>
+            <xs:element name="objectFields">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="objectField" type="objectFieldType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="objectRisks" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="objectRisk" type="objectRiskType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="objectPremiumComponents" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="objectPremiumComponent" type="objectPremiumComponentType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="campaigns" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="campaign" type="campaignType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="generalConditions" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="generalCondition" type="generalConditionType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="specialConditions" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="specialCondition" type="specialConditionType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="additionalSpecialCondition" type="xs:string" minOccurs="0"/>
+            <xs:element name="discounts" type="discountsType" minOccurs="0"/>
+            <xs:element name="additionalObjects" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="insuredObject" type="insuredObjectType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="objectRiskType">
+        <xs:sequence>
+            <xs:element name="riskDeductibles">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="riskDeductible" type="riskDeductibleType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="riskCode" type="base:nonEmptyString" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="riskDeductibleType">
+        <xs:choice>
+            <xs:element name="deductibleAmount" type="base:moneyType"/>
+            <xs:element name="deductiblePercentage" type="xs:decimal"/>
+        </xs:choice>
+        <xs:attribute name="deductibleTypeCode" type="base:nonEmptyString" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="registryObjectType">
+        <xs:choice>
+            <xs:element name="vehicle" type="vehicleType"/>
+            <xs:element name="customer" type="customerType"/>
+            <xs:element name="address" type="base:addressType"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="vehicleType">
+        <xs:sequence>
+            <xs:element name="registrationNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="vinCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="makeCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="make" type="xs:string" minOccurs="0"/>
+            <xs:element name="modelModification" type="xs:string" minOccurs="0"/>
+            <xs:element name="certificateNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="constructionYear" type="xs:int" minOccurs="0"/>
+            <xs:element name="vehicleCategoryCode" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="customerType">
+        <xs:sequence>
+            <xs:element name="code" type="xs:string" minOccurs="0"/>
+            <xs:element name="name" type="xs:string" minOccurs="0"/>
+            <xs:element name="firstName" type="xs:string" minOccurs="0"/>
+            <xs:element name="countryCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="personTypeCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="birthDate" type="xs:date" minOccurs="0"/>
+            <xs:element name="genderCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="address" type="base:addressType" minOccurs="0"/>
+            <xs:element name="email" type="xs:string" minOccurs="0"/>
+            <xs:element name="phone" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="role" type="base:nonEmptyString"/>
+    </xs:complexType>
+
+    <xs:complexType name="policiesContainerType">
+        <xs:sequence>
+            <xs:element name="policy" minOccurs="0" maxOccurs="unbounded" type="policyType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="customersContainerType">
+        <xs:sequence>
+            <xs:element name="customer" minOccurs="0" maxOccurs="unbounded" type="customerType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="invoiceRowType">
+        <xs:sequence>
+            <xs:element name="dueDate" type="xs:date"/>
+            <xs:element name="amount" type="base:moneyType"/>
+            <xs:element name="invoiceRowTypeCode" type="xs:string"/>
+            <xs:element name="invoiceRowStatusCode" type="xs:string"/>
+            <xs:element name="invoiceNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="invoiceFileRelations" type="fileRelationsContainerType" minOccurs="0"/>
+            <xs:element name="payerCustomer" type="customerType" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="paidAmount" type="base:moneyType" minOccurs="0"/>
+            <xs:element name="productCode" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="objectFieldType">
+        <xs:choice>
+            <xs:element name="numberValue" type="xs:decimal" minOccurs="0"/>
+            <xs:element name="textValue" type="xs:string" minOccurs="0"/>
+            <xs:element name="dateValue" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="booleanValue" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="classifierValue" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="amountValue" type="base:moneyType" minOccurs="0"/>
+        </xs:choice>
+        <xs:attribute name="fieldCode" type="base:nonEmptyString" use="required"/>
+        <xs:attribute name="fieldTypeCode" type="base:nonEmptyString"/>
+    </xs:complexType>
+
+    <xs:complexType name="objectPremiumComponentType">
+        <xs:sequence>
+            <xs:element name="calculatedPremium" type="base:moneyType"/>
+            <xs:element name="discountAmount" type="base:moneyType"/>
+            <xs:element name="finalPremium" type="base:moneyType"/>
+        </xs:sequence>
+        <xs:attribute name="premiumComponentCode" type="base:nonEmptyString" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="campaignType">
+        <xs:sequence>
+            <xs:element name="discountAmount" type="xs:decimal" minOccurs="0"/>
+            <xs:element name="percentage" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="campaignCode" type="base:nonEmptyString" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="specialConditionType">
+        <xs:attribute name="code" type="base:nonEmptyString" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="generalConditionType">
+        <xs:attribute name="code" type="base:nonEmptyString" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="fileRelationsContainerType">
+        <xs:sequence>
+            <xs:element name="fileRelation" minOccurs="0" maxOccurs="unbounded" type="fileRelationType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fileRelationType">
+        <xs:attribute name="fileId" type="xs:long" use="required"/>
+        <xs:attribute name="fileRelationTypeCode" type="base:nonEmptyString"/>
+    </xs:complexType>
+
+    <xs:complexType name="discountsType">
+        <xs:sequence>
+            <xs:element name="discountCoefficient" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
