@@ -91,6 +91,24 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/login-redirect", name="login_redirect")
+     */
+    public function loginRedirectAction()
+    {
+        if ($this->getUser()) {
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('admin_home');
+            } elseif ($this->isGranted('ROLE_CLAIMS')) {
+                return $this->redirectToRoute('claims_home');
+            } elseif ($this->isGranted('ROLE_USER')) {
+                return $this->redirectToRoute('user_home');
+            }
+        }
+
+        return $this->redirectToRoute('homepage');
+    }
+
+    /**
      * @Route("/launch/{id}", name="launch_share")
      * @Template
      */

@@ -151,7 +151,6 @@ class AdminController extends BaseController
 
         $users = $repo->createQueryBuilder();
         $form = $this->createForm(UserSearchType::class);
-        print_r($data);
         $form->handleRequest($request);
         if ($form->isValid()) {
             $this->formToMongoSearch($form, $users, 'email', 'email');
