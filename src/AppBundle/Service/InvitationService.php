@@ -4,6 +4,8 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
@@ -28,6 +30,9 @@ class InvitationService
 
     /** @var SmsService */
     protected $sms;
+
+    /** @var boolean */
+    protected $debug;
 
     /**
      * @param DocumentManager  $dm
@@ -54,6 +59,11 @@ class InvitationService
         $this->router = $router->getRouter();
         $this->shortLink = $shortLink;
         $this->sms = $sms;
+    }
+
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
     }
 
     /**
@@ -83,8 +93,17 @@ class InvitationService
 
     public function email(Policy $policy, $email, $name = null)
     {
-        // TODO: Validate its not a re-invite
-        // TODO: Validate the email isn't blocked hasn't requested an opt out
+        $invitationRepo = $this->dm->getRepository(EmailInvitation::class);
+        $prevInvitations = $invitationRepo->findDuplicate($policy, $email);
+        if (count($prevInvitations) > 0) {
+            throw new \InvalidArgumentException('Email was already invited to this policy');
+        }
+
+        $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
+        $optouts = $optOutRepo->findOptOut($email, EmailOptOut::OPTOUT_CAT_INVITATIONS);
+        if (count($optouts) > 0) {
+            return null;
+        }
 
         $invitation = new EmailInvitation();
         $invitation->setEmail($email);
@@ -106,6 +125,17 @@ class InvitationService
     {
         // TODO: Validate its not a re-invite
         // TODO: Validate the sms isn't blocked hasn't requested an opt out
+        $invitationRepo = $this->dm->getRepository(SmsInvitation::class);
+        $prevInvitations = $invitationRepo->findDuplicate($policy, $mobile);
+        if (count($prevInvitations) > 0) {
+            throw new \InvalidArgumentException('Mobile was already invited to this policy');
+        }
+
+        $optOutRepo = $this->dm->getRepository(SmsOptOut::class);
+        $optouts = $optOutRepo->findOptOut($mobile, EmailOptOut::OPTOUT_CAT_INVITATIONS);
+        if (count($optouts) > 0) {
+            return null;
+        }
 
         $invitation = new SmsInvitation();
         $invitation->setMobile($mobile);
@@ -142,7 +172,9 @@ class InvitationService
                 $this->templating->render('AppBundle:Email:invitation.txt.twig', ['invitation' => $invitation]),
                 'text/plain'
             );
-        $this->mailer->send($message);
+        if (!$this->debug) {
+            $this->mailer->send($message);
+        }
     }
 
     /**
@@ -153,6 +185,8 @@ class InvitationService
     public function sendSms(SmsInvitation $invitation)
     {
         $message = $this->templating->render('AppBundle:Sms:invitation.txt.twig', ['invitation' => $invitation]);
-        $this->sms->send($invitation->getMobile(), $message);
+        if (!$this->debug) {
+            $this->sms->send($invitation->getMobile(), $message);
+        }
     }
 }

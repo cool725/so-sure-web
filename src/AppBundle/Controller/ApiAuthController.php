@@ -208,9 +208,25 @@ class ApiAuthController extends BaseController
             $mobile = isset($data['mobile']) ? $data['mobile'] : null;
             $name = isset($data['name']) ? $data['name'] : null;
             if ($email) {
-                $invitation = $invitationService->email($policy, $email, $name);
+                try {
+                    if (!$invitation = $invitationService->email($policy, $email, $name)) {
+                        // TODO: Change error code
+                        return $this->getErrorJsonResponse(
+                            ApiErrorCode::ERROR_NOT_FOUND,
+                            'Person has opted out of invitations',
+                            422
+                        );
+                    }
 
-                return new JsonResponse($invitation->toApiArray());
+                    return new JsonResponse($invitation->toApiArray());
+                } catch (\InvalidArgumentException $argEx) {
+                    // TODO: Change error code
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_NOT_FOUND,
+                        'Duplicate invitation',
+                        422
+                    );
+                }
             } elseif ($mobile) {
                 $invitation = $invitationService->sms($policy, $mobile, $name);
 
