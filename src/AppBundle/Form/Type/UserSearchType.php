@@ -19,6 +19,7 @@ class UserSearchType extends AbstractType
             ->add('mobile', TextType::class, ['required' => false])
             ->add('postcode', TextType::class, ['required' => false])
             ->add('lastname', TextType::class, ['required' => false])
+            ->add('policy', TextType::class, ['required' => false])
             ->add('search', SubmitType::class)
         ;
     }

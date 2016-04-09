@@ -128,6 +128,17 @@ class Address
         return $this->user;
     }
 
+    public function __toString()
+    {
+        $lines = $this->getLine1();
+        if (strlen($this->getLine3()) > 0) {
+            $lines = sprintf("%s %s %s", $this->getLine1(), $this->getLine2(), $this->getLine3());
+        } elseif (strlen($this->getLine2()) > 0) {
+            $lines = sprintf("%s %s", $this->getLine1(), $this->getLine2());
+        }
+        return sprintf("%s %s %s", $lines, $this->getCity(), $this->getPostcode());
+    }
+
     public function toApiArray()
     {
         return [

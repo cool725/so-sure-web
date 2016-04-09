@@ -20,14 +20,17 @@
                 <li class="navbar-item"><a class="navbar-link" href="http://blog.wearesosure.com" target="_blank">Blog</a></li>
                 <li class="navbar-item"><button class="btn btn-success" href="https://play.google.com/store/apps/details?id=com.wearesosure"><i class="fa fa-android fa-lg"></i> Download</button></li>
                 {% if app.user %}
-                  <li class="">
-                    <a href="#">
-                    <img src="https://graph.facebook.com/{{ app.user.facebookId }}/picture" width="20" height="20" />
-                    {{ app.user.firstName }}
-                    </a>
-                  </li>
                   {% if is_granted('ROLE_ADMIN') %}
-                    <li><a href="{{ path('admin_home') }}">Admin</a></li>
+                    <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
+                  {% elseif is_granted('ROLE_CLAIMS') %}
+                    <li><a href="{{ path('claims_home') }}"><i class="fa fa-home"></i> Claims</a></li>
+                  {% else %}
+                    <li class="">
+                      <a href="{{ path('user_home') }}">
+                      <img src="https://graph.facebook.com/{{ app.user.facebookId }}/picture" width="20" height="20" />
+                      {{ app.user.firstName }}
+                      </a>
+                    </li>
                   {% endif %}
                   <li><a href="{{ path('fos_user_security_logout') }}">Logout</a></li>                  
                 {% else %}
