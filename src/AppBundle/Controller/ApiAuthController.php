@@ -46,7 +46,11 @@ class ApiAuthController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['imei', 'make', 'device', 'memory', 'validation_data'])) {
+            if (!isset($data['phone_policy'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            if (!$this->validateFields($data['phone_policy'], ['imei', 'make', 'device', 'memory', 'validation_data'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -63,7 +67,7 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $imei = str_replace(' ', '', $data['imei']);
+            $imei = str_replace(' ', '', $data['phone_policy']['imei']);
             if (!$imeiValidator->isImei($imei)) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_IMEI_INVALID,
@@ -80,7 +84,7 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $phone = $this->getPhone($data['make'], $data['device'], $data['memory']);
+            $phone = $this->getPhone($data['phone_policy']['make'], $data['phone_policy']['device'], $data['phone_policy']['memory']);
             if (!$phone) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_NOT_FOUND,
@@ -94,8 +98,8 @@ class ApiAuthController extends BaseController
             try {
                 $jwtValidator->validate(
                     $this->getCognitoIdentityId($request),
-                    (string) $data['validation_data'],
-                    ['imei' => $imei]
+                    (string) $data['phone_policy']['validation_data'],
+                    ['imei' => $data['phone_policy']['imei']]
                 );
             } catch (\InvalidArgumentException $argE) {
                 return $this->getErrorJsonResponse(
@@ -109,9 +113,9 @@ class ApiAuthController extends BaseController
             $policy->setImei($imei);
             $policy->setPhone($phone);
             $policy->setPhoneData(json_encode([
-                'make' => $data['make'],
-                'device' => $data['device'],
-                'memory' => $data['memory'],
+                'make' => $data['phone_policy']['make'],
+                'device' => $data['phone_policy']['device'],
+                'memory' => $data['phone_policy']['memory'],
             ]));
             $user->addPolicy($policy);
 
