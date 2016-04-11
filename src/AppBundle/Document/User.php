@@ -333,6 +333,19 @@ class User extends BaseUser
         $this->mobileNumber = $mobileNumber;
     }
 
+    public function hasValidDetails()
+    {
+        // TODO: Improve validation
+        if (strlen($this->getFirstName()) == 0 ||
+            strlen($this->getLastName()) == 0 ||
+            strlen($this->getEmail()) == 0 ||
+            strlen($this->getMobileNumber()) == 0) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function toApiArray($identityId = null, $token = null)
     {
         $addresses = [];
