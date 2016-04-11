@@ -276,7 +276,7 @@ class ApiController extends BaseController
             $this->snsSubscribe('all', $endpoint);
             $this->snsSubscribe('unregistered', $endpoint);
 
-            return new JsonResponse();
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Endpoint added', 200);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api snsAction. %s', $e->getMessage()));
 
