@@ -169,7 +169,13 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('edit', $policy);
 
             $gocardless = $this->get('app.gocardless');
-            $gocardless->add($policy, $data['first_name'], $data['last_name'], $data['sort_code'], $data['account_number']);
+            $gocardless->add(
+                $policy,
+                $data['first_name'],
+                $data['last_name'],
+                $data['sort_code'],
+                $data['account_number']
+            );
 
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
