@@ -124,6 +124,15 @@ class ApiController extends BaseController
     }
 
     /**
+     * @Route("/ping", name="api_ping")
+     * @Method({"GET", "POST"})
+     */
+    public function pingAuthAction()
+    {
+        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+    }
+
+    /**
      * @Route("/quote", name="api_quote")
      * @Method({"GET"})
      */
