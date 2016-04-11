@@ -25,6 +25,7 @@ class ApiAuthControllerTest extends WebTestCase
     protected static $userManager;
     protected static $dm;
     protected static $identity;
+    protected static $jwt;
 
     public function tearDown()
     {
@@ -36,6 +37,7 @@ class ApiAuthControllerTest extends WebTestCase
         self::$identity = self::$client->getContainer()->get('app.cognito.identity');
         self::$dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         self::$userManager = self::$client->getContainer()->get('fos_user.user_manager');
+        self::$jwt = self::$client->getContainer()->get('app.jwt');
         self::$testUser = self::createUser(
             self::$userManager,
             'foo@auth-api.so-sure.com',
@@ -110,6 +112,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'Apple',
             'device' => 'iPhone 6',
             'memory' => 512,
+            'validation_data' => $this->getValidationData($cognitoIdentityId),
         ]);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
@@ -126,9 +129,10 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'Apple',
             'device' => 'iPhone 6',
             'memory' => 60,
+            'validation_data' => $this->getValidationData($cognitoIdentityId),
         ]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
         $this->assertTrue(strlen($data['id']) > 5);
         $this->assertEquals('64', $data['phone']['memory']);
@@ -142,6 +146,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 65,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::INVALID_IMEI]),
         ]);
         $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
     }
@@ -154,6 +159,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 65,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::BLACKLISTED_IMEI]),
         ]);
         $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
@@ -169,6 +175,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 65,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::INVALID_IMEI]),
         ]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
 
@@ -177,6 +184,7 @@ class ApiAuthControllerTest extends WebTestCase
             'imei' => self::VALID_IMEI,
             'make' => 'OnePlus',
             'device' => 'A0001',
+            'validation_data' => $this->getValidationData($cognitoIdentityId),
         ]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
 
@@ -185,6 +193,7 @@ class ApiAuthControllerTest extends WebTestCase
             'imei' => self::VALID_IMEI,
             'make' => 'OnePlus',
             'memory' => 65,
+            'validation_data' => $this->getValidationData($cognitoIdentityId),
         ]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
 
@@ -193,6 +202,7 @@ class ApiAuthControllerTest extends WebTestCase
             'imei' => self::VALID_IMEI,
             'device' => 'A0001',
             'memory' => 65,
+            'validation_data' => $this->getValidationData($cognitoIdentityId),
         ]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
     }
@@ -207,6 +217,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'foo',
             'device' => 'bar',
             'memory' => 65,
+            'validation_data' => $this->getValidationData($cognitoIdentityId),
         ]);
         $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
     }
@@ -397,6 +408,19 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(ApiErrorCode::ERROR_INVITATION_DUPLICATE, $data['code']);
     }
 
+    // secret
+
+    /**
+     *
+     */
+    public function testAuthSecret()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/auth/secret');
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $data['secret']);
+    }
+
     // user/{id}
 
     /**
@@ -521,6 +545,17 @@ class ApiAuthControllerTest extends WebTestCase
         return static::getIdentityString(self::$identity->getId());
     }
 
+    protected function getValidationData($cognitoIdentityId, $validateData = null)
+    {
+        if (!$validateData) {
+            $validateData = ['imei' => self::VALID_IMEI];
+        }
+        return static::$jwt->create(
+            $cognitoIdentityId,
+            $validateData
+        );
+    }
+
     protected function createPolicy($cognitoIdentityId, $user)
     {
         if ($user) {
@@ -537,6 +572,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 65,
+            'validation_data' => $this->getValidationData($cognitoIdentityId),
         ]);
 
         return $crawler;

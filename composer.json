@@ -34,7 +34,8 @@
         "jmikola/geojson": "~1.0",
         "gocardless/gocardless-pro": "^0.9.3",
         "plivo/plivo-php": "^1.1",
-        "phpoffice/phpexcel": "^1.8"
+        "phpoffice/phpexcel": "^1.8",
+        "lcobucci/jwt": "^3.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
