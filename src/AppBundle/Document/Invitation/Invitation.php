@@ -3,6 +3,7 @@
 namespace AppBundle\Document\Invitation;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use AppBundle\Document\User;
 
 /**
  * @MongoDB\Document
@@ -103,7 +104,7 @@ abstract class Invitation
         return $this->inviter;
     }
 
-    public function setInviter($inviter)
+    public function setInviter(User $inviter)
     {
         $this->inviter = $inviter;
     }
@@ -113,7 +114,7 @@ abstract class Invitation
         return $this->invitee;
     }
 
-    public function setInvitee($invitee)
+    public function setInvitee(User $invitee)
     {
         $this->invitee = $invitee;
     }
@@ -126,7 +127,8 @@ abstract class Invitation
     public function setPolicy($policy)
     {
         $this->policy = $policy;
-        $this->setInviter($policy->getUser());
+        $policy->getUser()->addSentInvitation($this);
+        //$this->setInviter($policy->getUser());
     }
 
     public function hasAccepted()

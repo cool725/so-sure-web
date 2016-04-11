@@ -209,9 +209,24 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
 
+    doctrine.listener.user:
+        class:   AppBundle\Listener\DoctrineUserListener
+        arguments:
+            dispatcher: "@event_dispatcher"
+        tags:
+            -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
+            -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
+
     app.listener.invitation:
         class:   AppBundle\Listener\InvitationListener
         arguments:
             dm: "@doctrine_mongodb.odm.default_document_manager"
         tags:
             -  { name: kernel.event_listener, event: event.invitation.updated, method: onInvitationEvent }
+
+    app.listener.user:
+        class:   AppBundle\Listener\UserListener
+        arguments:
+            dm: "@doctrine_mongodb.odm.default_document_manager"
+        tags:
+            -  { name: kernel.event_listener, event: event.user.updated, method: onUserEvent }

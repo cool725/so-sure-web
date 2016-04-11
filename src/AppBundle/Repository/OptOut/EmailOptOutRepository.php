@@ -11,7 +11,7 @@ class EmailOptOutRepository extends DocumentRepository
     {
         $categoryAll = EmailOptOut::OPTOUT_CAT_ALL;
         return $this->createQueryBuilder()
-            ->field('email')->equals($email)
+            ->field('email')->equals(strtolower($email))
             ->field('category')->in([$categoryAll, $category])
             ->getQuery()
             ->execute();
