@@ -3,6 +3,7 @@ namespace AppBundle\Classes;
 
 class ApiErrorCode
 {
+    const SUCCESS = 0;
     const ERROR_UNKNOWN = 1;
     const ERROR_MISSING_PARAM = 2;
     const ERROR_ACCESS_DENIED = 3;

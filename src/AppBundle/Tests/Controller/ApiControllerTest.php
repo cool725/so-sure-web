@@ -151,6 +151,21 @@ class ApiControllerTest extends WebTestCase
         $this->assertTrue(strlen($data['cognito_token']['token']) > 10);
     }
 
+    // ping
+
+    /**
+     *
+     */
+    public function testPing()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $crawler = $client->request('GET', '/api/v1/ping');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(0, $data['code']);
+    }
+
     // quote
     
     /**
