@@ -71,7 +71,7 @@ class ApiAuthControllerTest extends WebTestCase
     {
         $crawler = self::$client->request('GET', '/api/v1/auth/ping');
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
         $this->assertEquals(0, $data['code']);
     }
 

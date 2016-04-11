@@ -35,7 +35,7 @@ class ApiAuthController extends BaseController
      */
     public function pingAuthAction()
     {
-        return new JsonResponse(['pong' => 1]);
+        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
     }
 
     /**
