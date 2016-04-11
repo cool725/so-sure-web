@@ -392,7 +392,7 @@ class ApiController extends BaseController
             // Test version
             if ($version == "0.0.0") {
                 return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_UNKNOWN,
+                    ApiErrorCode::ERROR_UPGRADE_APP,
                     sprintf('%s %s is not allowed', $platform, $version),
                     422
                 );

@@ -475,7 +475,7 @@ class ApiControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/api/v1/version?platform=ios&version=0.0.0');
         $this->assertEquals(422, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_UNKNOWN, $data['code']);
+        $this->assertEquals(ApiErrorCode::ERROR_UPGRADE_APP, $data['code']);
     }
 
     // helpers
