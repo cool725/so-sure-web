@@ -60,7 +60,7 @@ class InvitationServiceTest extends WebTestCase
     public function tearDown()
     {
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -77,7 +77,7 @@ class InvitationServiceTest extends WebTestCase
 
         self::$invitationService->email($policy, static::generateEmail('invite1', $this));
     }
-    
+
     public function testOptOutCatIntivationsEmailInvitation()
     {
         $user = static::createUser(

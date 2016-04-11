@@ -24,6 +24,6 @@ class EmailInvitation extends Invitation
 
     public function setEmail($email)
     {
-        $this->email = $email;
+        $this->email = strtolower($email);
     }
 }

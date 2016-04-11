@@ -44,16 +44,6 @@ class UserListenerTest extends WebTestCase
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$invitationRepo = self::$dm->getRepository(Invitation::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$testUser = self::createUser(
-            self::$userManager,
-            'foo@user-invitation.foo.com',
-            'foo'
-        );
-        self::$testUser2 = self::createUser(
-            self::$userManager,
-            'bar@user-invitation.foo.com',
-            'bar'
-        );
     }
 
     public function tearDown()
@@ -62,39 +52,87 @@ class UserListenerTest extends WebTestCase
 
     public function testUserWithEmailInvitation()
     {
+        $testUser = static::createUser(
+            self::$userManager,
+            self::generateEmail('foo', $this),
+            'foo'
+        );
+
         $invitation = new EmailInvitation();
-        $invitation->setInviter(self::$testUser);
-        $invitation->setEmail('email@user-invitation.foo.com');
+        $invitation->setInviter($testUser);
+        $invitation->setEmail(self::generateEmail('invite1', $this));
         self::$dm->persist($invitation);
         self::$dm->flush();
 
         $user = new User();
-        $user->setEmail('email@user-invitation.foo.com');
-        
+        // set both - email canonical will get set on flush, but as we're not flushing...
+        $user->setEmail(self::generateEmail('invite1', $this));
+        $user->setEmailCanonical(self::generateEmail('invite1', $this));
+        self::$dm->persist($user);
+
         $event = new UserEvent($user);
 
         $listener = new UserListener(self::$dm);
         $listener->onUserEvent($event);
 
-        $this->assertTrue(count($user->getReceivedInvitations()) > 0);
+        $user = self::$userRepo->find($user->getId());
+        $this->assertTrue($user->hasReceivedInvitations());
+    }
+
+    public function testUserWithEmailInvitationActual()
+    {
+        $testUser = static::createUser(
+            self::$userManager,
+            self::generateEmail('foo-inviter', $this),
+            'foo'
+        );
+
+        $invitation = new EmailInvitation();
+        $invitation->setInviter($testUser);
+        $invitation->setEmail(self::generateEmail('invite2', $this));
+        self::$dm->persist($invitation);
+        self::$dm->flush();
+
+        $newUser = static::createUser(
+            self::$userManager,
+            self::generateEmail('invite2', $this),
+            'foo'
+        );
+
+        $newUser = self::$userRepo->find($newUser->getId());
+        $this->assertTrue($newUser->hasReceivedInvitations());
     }
 
     public function testUserWithMobileInvitation()
     {
+        $testUserMobile = static::createUser(
+            self::$userManager,
+            self::generateEmail('mobile', $this),
+            'mobile'
+        );
+
         $invitation = new SmsInvitation();
-        $invitation->setInviter(self::$testUser2);
-        $invitation->setMobile('12123');
+        $invitation->setInviter($testUserMobile);
+        $invitation->setMobile('13123');
         self::$dm->persist($invitation);
         self::$dm->flush();
 
         $user = new User();
-        $user->setMobileNumber('12123');
+        $user->setMobileNumber('13123');
+        self::$dm->persist($user);
 
         $event = new UserEvent($user);
 
         $listener = new UserListener(self::$dm);
         $listener->onUserEvent($event);
 
-        $this->assertTrue(count($user->getReceivedInvitations()) > 0);
+        $user = self::$userRepo->find($user->getId());
+        $count = 0;
+        foreach ($user->getReceivedInvitations() as $invitation) {
+            $count = $count + 1;
+            //\Doctrine\Common\Util\Debug::dump($invitation);
+        }
+        $user = self::$userRepo->find($user->getId());
+        $this->assertTrue($user->hasReceivedInvitations());
     }
 }

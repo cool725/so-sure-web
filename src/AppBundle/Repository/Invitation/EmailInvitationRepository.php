@@ -11,7 +11,7 @@ class EmailInvitationRepository extends DocumentRepository
     {
         return $this->createQueryBuilder()
             ->field('policy')->references($policy)
-            ->field('email')->equals($email)
+            ->field('email')->equals(strtolower($email))
             ->getQuery()
             ->execute();
     }

@@ -220,6 +220,16 @@ class User extends BaseUser
         return $this->receivedInvitations;
     }
 
+    public function hasReceivedInvitations()
+    {
+        // TODO: Necessary? Some indications say that you need to interate in order to load
+        foreach ($this->receivedInvitations as $invitation) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function setFacebookAccessToken($facebookAccessToken)
     {
         $this->facebookAccessToken = $facebookAccessToken;

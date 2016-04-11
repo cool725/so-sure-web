@@ -30,21 +30,28 @@ class UserListener
         $user = $event->getUser();
         $email = $user->getEmailCanonical();
         $mobile = $user->getMobileNumber();
+        $flush = false;
+
         if ($email) {
             $emailInvitationRepo = $this->dm->getRepository(EmailInvitation::class);
             $invitations = $emailInvitationRepo->findBy(['email' => $email, 'invitee' => null]);
             foreach ($invitations as $invitation) {
                 $user->addReceivedInvitation($invitation);
+                $flush = true;
             }
-            // Do not flush as causes a loop
         }
+
         if ($mobile) {
             $smsInvitationRepo = $this->dm->getRepository(SmsInvitation::class);
             $invitations = $smsInvitationRepo->findBy(['mobile' => $mobile, 'invitee' => null]);
             foreach ($invitations as $invitation) {
                 $user->addReceivedInvitation($invitation);
+                $flush = true;
             }
-            // Do not flush as causes a loop
+        }
+
+        if ($flush) {
+            $this->dm->flush();
         }
     }
 }
