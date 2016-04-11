@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Classes\ApiErrorCode;
 
 /**
  * @group functional-net
@@ -442,6 +443,39 @@ class ApiControllerTest extends WebTestCase
         $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
         ));
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
+    }
+
+    // version
+
+    /**
+     *
+     */
+    public function testVersionOk()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/version?platform=ios&version=0.0.1');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::SUCCESS, $data['code']);
+    }
+
+    public function testVersionMissingParam()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/version?platform=ios');
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+
+        $crawler = $client->request('GET', '/api/v1/version?version=0.0.1');
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+    }
+
+    public function testVersionInvalid()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/version?platform=ios&version=0.0.0');
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_UPGRADE_APP, $data['code']);
     }
 
     // helpers
