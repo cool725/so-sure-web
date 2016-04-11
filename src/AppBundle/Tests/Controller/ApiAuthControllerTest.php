@@ -318,37 +318,53 @@ class ApiAuthControllerTest extends WebTestCase
     /**
      *
      */
-    public function testNewEmailInvitation()
+    public function testNewEmailAndDupInvitation()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $crawler = $this->createPolicy($cognitoIdentityId);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $url = sprintf("/api/v1/auth/policy/%s/invitation", $data['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => 'patrick@so-sure.com',
             'name' => 'functional test',
         ]);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => 'patrick@so-sure.com',
+            'name' => 'functional test',
+        ]);
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $this->assertEquals(ApiErrorCode::ERROR_INVITATION_DUPLICATE, $data['code']);
     }
 
     /**
      *
      */
-    public function testNewSmsInvitation()
+    public function testNewSmsAndDupInvitation()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $crawler = $this->createPolicy($cognitoIdentityId);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $url = sprintf("/api/v1/auth/policy/%s/invitation", $data['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'mobile' => '+447775740466',
             'name' => 'functional test',
         ]);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'mobile' => '+447775740466',
+            'name' => 'functional test',
+        ]);
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $this->assertEquals(ApiErrorCode::ERROR_INVITATION_DUPLICATE, $data['code']);
     }
 
     // user/{id}

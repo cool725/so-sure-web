@@ -2,8 +2,16 @@
 
 namespace AppBundle\Tests;
 
+use AppBundle\Document\User;
+use AppBundle\Document\PhonePolicy;
+
 trait UserClassTrait
 {
+    public static function generateEmail($name, $caller)
+    {
+        return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
+    }
+
     public static function createUser($userManager, $email, $password)
     {
         $user = $userManager->createUser();
@@ -12,6 +20,18 @@ trait UserClassTrait
         $userManager->updateUser($user, true);
 
         return $user;
+    }
+    
+    public static function createPolicy(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm)
+    {
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setImei(356938035643809);
+
+        $dm->persist($policy);
+        $dm->flush();
+
+        return $policy;
     }
 
     public static function authUser($cognito, $user)

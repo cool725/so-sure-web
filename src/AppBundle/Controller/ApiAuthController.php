@@ -202,23 +202,46 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('send-invitation', $policy);
 
             $invitationService = $this->get('app.invitation');
+            // avoid sending email/sms invitations if testing
+            if ($request->get('debug')) {
+                $invitationService->setDebug(true);
+            }
 
             $data = json_decode($request->getContent(), true)['body'];
             $email = isset($data['email']) ? $data['email'] : null;
             $mobile = isset($data['mobile']) ? $data['mobile'] : null;
             $name = isset($data['name']) ? $data['name'] : null;
-            if ($email) {
-                $invitation = $invitationService->email($policy, $email, $name);
+            try {
+                $invitation  = null;
+                if ($email) {
+                    $invitation = $invitationService->email($policy, $email, $name);
+                } elseif ($mobile) {
+                    $invitation = $invitationService->sms($policy, $mobile, $name);
+                } else {
+                    // TODO: General
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_NOT_FOUND,
+                        'Missing data found',
+                        422
+                    );
+                }
+
+                if (!$invitation) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_INVITATION_OPTOUT,
+                        'Person has opted out of invitations',
+                        422
+                    );
+                }
 
                 return new JsonResponse($invitation->toApiArray());
-            } elseif ($mobile) {
-                $invitation = $invitationService->sms($policy, $mobile, $name);
-
-                return new JsonResponse($invitation->toApiArray());
+            } catch (\InvalidArgumentException $argEx) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_DUPLICATE,
+                    'Duplicate invitation',
+                    422
+                );
             }
-            // TODO: General
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Missing data found', 422);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {

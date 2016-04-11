@@ -54,7 +54,7 @@ class SmsService
         if ($number == "+447775740466") {
             return;
         }
-
+        
         $params = array(
             'src' => $this->sending_number, // Sender's phone number with country code
             'dst' => $number, // Receiver's phone number with country code

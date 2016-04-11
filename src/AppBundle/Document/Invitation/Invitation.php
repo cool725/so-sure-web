@@ -26,13 +26,13 @@ abstract class Invitation
     /** @MongoDB\Date() */
     protected $rejected;
 
-    /** @MongoDB\ReferenceOne(targetDocument="User", inversedBy="sentInvitations") */
+    /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="sentInvitations") */
     protected $inviter;
 
-    /** @MongoDB\ReferenceOne(targetDocument="User", inversedBy="receivedInvitations") */
+    /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="receivedInvitations") */
     protected $invitee;
 
-    /** @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="invitations") */
+    /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="invitations") */
     protected $policy;
 
     /** @MongoDB\String(name="link", nullable=true) */

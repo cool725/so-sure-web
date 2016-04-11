@@ -1,22 +1,17 @@
 <?php
 
-namespace AppBundle\Document\Invitation;
+namespace AppBundle\Document\OptOut;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @MongoDB\Document(repositoryClass="AppBundle\Repository\Invitation\EmailInvitationRepository")
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\OptOut\EmailOptOutRepository")
  */
-class EmailInvitation extends Invitation
+class EmailOptOut extends OptOut
 {
     /** @MongoDB\Field(type="string", nullable=false) */
     protected $email;
 
-    public function isSingleUse()
-    {
-        return true;
-    }
-    
     public function getEmail()
     {
         return $this->email;
