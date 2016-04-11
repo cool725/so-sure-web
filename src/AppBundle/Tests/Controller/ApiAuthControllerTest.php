@@ -92,6 +92,16 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertTrue(in_array($data['id'], $data['user']['policies']));
     }
 
+    public function testNewPolicyInvalidUser()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser2);
+        $crawler = $this->createPolicy($cognitoIdentityId, null);
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+
+        $this->assertEquals(ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS, $data['code']);
+    }
+
     public function testNewPolicyMemoryExceeded()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -495,12 +505,15 @@ class ApiAuthControllerTest extends WebTestCase
 
     protected function createPolicy($cognitoIdentityId, $user)
     {
-        $userUpdateUrl = sprintf('/api/v1/auth/user/%s', $user->getId());
-        static::putRequest(self::$client, $cognitoIdentityId, $userUpdateUrl, [
-            'first_name' => 'foo',
-            'last_name' => 'bar',
-            'mobile_number' => '0123456789',
-        ]);
+        if ($user) {
+            $userUpdateUrl = sprintf('/api/v1/auth/user/%s', $user->getId());
+            static::putRequest(self::$client, $cognitoIdentityId, $userUpdateUrl, [
+                'first_name' => 'foo',
+                'last_name' => 'bar',
+                'mobile_number' => '0123456789',
+            ]);
+        }
+
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
             'imei' => self::VALID_IMEI,
             'make' => 'OnePlus',
