@@ -50,7 +50,10 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            if (!$this->validateFields($data['phone_policy'], ['imei', 'make', 'device', 'memory', 'validation_data'])) {
+            if (!$this->validateFields(
+                $data['phone_policy'],
+                ['imei', 'make', 'device', 'memory', 'validation_data']
+            )) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -84,7 +87,11 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $phone = $this->getPhone($data['phone_policy']['make'], $data['phone_policy']['device'], $data['phone_policy']['memory']);
+            $phone = $this->getPhone(
+                $data['phone_policy']['make'],
+                $data['phone_policy']['device'],
+                $data['phone_policy']['memory']
+            );
             if (!$phone) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_NOT_FOUND,
