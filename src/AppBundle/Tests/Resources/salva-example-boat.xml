@@ -1,0 +1,43 @@
+<ns3:serviceRequest ns3:mode="calculation" 
+xmlns:ns3="http://sims.salva.ee/service/schema/policy/import/v1"
+xmlns:ns2="http://sims.salva.ee/service/schema/policy/v1" 
+xmlns:ns1="http://sims.salva.ee/service/schema/v1">
+   <ns3:policy>
+      <ns2:renewable>false</ns2:renewable>
+      <ns2:insurancePeriodStart>2016-09-17T00:00:00</ns2:insurancePeriodStart>
+     <ns2:insurancePeriodEnd>2017-09-16T23:59:00</ns2:insurancePeriodEnd>
+      <ns2:policyCustomers>
+         <ns2:customer ns2:role="policyholder">
+            <ns2:code>39005010336</ns2:code>
+            <ns2:name>PURRE</ns2:name>
+            <ns2:firstName>IVAR</ns2:firstName>
+            <ns2:countryCode>EE</ns2:countryCode>
+            <ns2:personTypeCode>private</ns2:personTypeCode>
+            <ns2:email>ivar@salva.ee</ns2:email>
+         </ns2:customer>
+      </ns2:policyCustomers>
+      <ns2:insuredObjects>
+         <ns2:insuredObject>
+            <ns2:productObjectCode>boat</ns2:productObjectCode>
+            <ns2:sumInsured ns1:currency="EUR">1000</ns2:sumInsured>
+            <ns2:objectCustomers>
+               <ns2:customer ns2:role="insured_person">
+                   <ns2:code>39005010336</ns2:code>
+                  <ns2:countryCode>EE</ns2:countryCode>
+                  <ns2:personTypeCode>private</ns2:personTypeCode>
+                  <ns2:birthDate>1990-05-01</ns2:birthDate>
+               </ns2:customer>
+            </ns2:objectCustomers>
+            <ns2:objectFields>
+               <ns2:objectField ns2:fieldCode="boat_description" ns2:fieldTypeCode="string">
+                  <ns2:textValue>White boat</ns2:textValue>
+               </ns2:objectField>
+              <ns2:objectField ns2:fieldCode="boat_base_tariff" ns2:fieldTypeCode="number">
+                  <ns2:numberValue>10.51</ns2:numberValue>
+                </ns2:objectField>
+            </ns2:objectFields>
+            <ns2:objectRisks/>
+         </ns2:insuredObject>
+      </ns2:insuredObjects>
+   </ns3:policy>
+</ns3:serviceRequest>

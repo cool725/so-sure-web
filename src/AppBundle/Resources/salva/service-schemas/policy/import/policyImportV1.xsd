@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://sims.salva.ee/service/schema/policy/import/v1"
+    xmlns="http://sims.salva.ee/service/schema/policy/import/v1"
+    xmlns:policy="http://sims.salva.ee/service/schema/policy/v1"
+    xmlns:base="http://sims.salva.ee/service/schema/v1"
+    elementFormDefault="qualified"
+    attributeFormDefault="qualified">
+
+    <xs:import namespace="http://sims.salva.ee/service/schema/policy/v1" schemaLocation="../policyBaseTypesV1.xsd"></xs:import>
+    <xs:import namespace="http://sims.salva.ee/service/schema/v1" schemaLocation="../../baseTypesV1.xsd"></xs:import>
+
+    <xs:element name="serviceRequest" type="serviceRequestType"/>
+    <xs:element name="serviceResponse" type="serviceResponseType"/>
+
+    <xs:complexType name="serviceRequestType">
+        <xs:sequence>
+            <xs:element name="policy" type="policy:policyType"/>
+            <xs:element name="periods" type="periodsType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="mode" type="base:nonEmptyString" use="required"/>
+        <xs:attribute name="createInvoice" type="xs:boolean"/>
+        <xs:attribute name="includeInvoiceRows" type="xs:boolean"/>
+        <xs:attribute name="invoicePaymentMethod" type="base:nonEmptyString"/>
+    </xs:complexType>
+
+    <xs:complexType name="periodsType">
+        <xs:sequence>
+            <xs:element name="period" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="serviceResponseType">
+        <xs:complexContent>
+            <xs:extension base="base:abstractResponseType">
+                <xs:sequence>
+					<xs:element name="policies" type="policy:policiesContainerType"/>
+					<xs:element name="request" type="serviceRequestType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>
