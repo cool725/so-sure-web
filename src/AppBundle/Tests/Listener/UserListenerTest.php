@@ -66,6 +66,7 @@ class UserListenerTest extends WebTestCase
         $invitation->setInviter(self::$testUser);
         $invitation->setEmail('email@user-invitation.foo.com');
         self::$dm->persist($invitation);
+        self::$dm->flush();
 
         $user = new User();
         $user->setEmail('email@user-invitation.foo.com');
@@ -75,7 +76,25 @@ class UserListenerTest extends WebTestCase
         $listener = new UserListener(self::$dm);
         $listener->onUserEvent($event);
 
-        print_r($user);
+        $this->assertTrue(count($user->getReceivedInvitations()) > 0);
+    }
+
+    public function testUserWithMobileInvitation()
+    {
+        $invitation = new SmsInvitation();
+        $invitation->setInviter(self::$testUser2);
+        $invitation->setMobile('12123');
+        self::$dm->persist($invitation);
+        self::$dm->flush();
+
+        $user = new User();
+        $user->setMobileNumber('12123');
+
+        $event = new UserEvent($user);
+
+        $listener = new UserListener(self::$dm);
+        $listener->onUserEvent($event);
+
         $this->assertTrue(count($user->getReceivedInvitations()) > 0);
     }
 }

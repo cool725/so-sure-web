@@ -36,7 +36,7 @@ class UserListener
             foreach ($invitations as $invitation) {
                 $user->addReceivedInvitation($invitation);
             }
-            //$this->dm->flush();
+            // Do not flush as causes a loop
         }
         if ($mobile) {
             $smsInvitationRepo = $this->dm->getRepository(SmsInvitation::class);
@@ -44,7 +44,7 @@ class UserListener
             foreach ($invitations as $invitation) {
                 $user->addReceivedInvitation($invitation);
             }
-            //$this->dm->flush();
+            // Do not flush as causes a loop
         }
     }
 }
