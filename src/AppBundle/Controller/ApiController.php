@@ -375,6 +375,37 @@ class ApiController extends BaseController
         }
     }
 
+    /**
+     * @Route("/version", name="api_version")
+     * @Method({"GET", "POST"})
+     */
+    public function versionAction(Request $request)
+    {
+        try {
+            if (!$this->validateQueryFields($request, ['platform', 'version'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $platform = $request->get('platform');
+            $version = $request->get('version');
+
+            // Test version
+            if ($version == "0.0.0") {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_UNKNOWN,
+                    sprintf('%s %s is not allowed', $platform, $version),
+                    422
+                );
+            }
+
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api versionAction. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
     private function getArnForTopic($topic)
     {
         switch ($topic) {
