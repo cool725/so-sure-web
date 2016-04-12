@@ -280,7 +280,7 @@ abstract class Policy
         }
 
         $claims = $this->getClaims();
-        uasort($claims, function($a, $b) {
+        uasort($claims, function ($a, $b) {
             return $a->getDate() < $b->getDate();
         });
 
