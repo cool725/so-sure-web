@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\UserSearchType;
@@ -70,20 +71,20 @@ class ClaimsController extends BaseController
     }
 
     /**
-     * @Route("/user/{id}", name="claims_user")
+     * @Route("/policy/{id}", name="claims_policy")
      * @Template
      */
-    public function claimsUserAction($id)
+    public function claimsPolicyAction($id)
     {
         $dm = $this->getManager();
-        $repo = $dm->getRepository(User::class);
-        $user = $repo->find($id);
-        if (!$user) {
-            return $this->createNotFoundException('User not found');
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            return $this->createNotFoundException('Policy not found');
         }
 
         return [
-            'user' => $user,
+            'policy' => $policy,
         ];
     }
 }

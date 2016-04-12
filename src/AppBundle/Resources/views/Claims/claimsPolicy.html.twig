@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/Claims/tabs.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}            
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h2>so-sure Claims - {{policy.user.name }}</h2>
+    <ul class="nav nav-tabs nav-justified">
+      <li role="presentation" class="active"><a href="#policy">Policy</a></li>
+      <li role="presentation"><a href="#claims">Claims <span class="badge" title="Number of claims">{{ policy.claims|length }}</span></a></li>
+      <li role="presentation"><a href="#user">User</a></li>
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="policy">
+            {% if policy.isPolicy %}
+                <table class="table table-striped">
+                    <tr>
+                        <td>Policy Number</td>
+                        <td>{{ policy.policyNumber }}</td>
+                    </tr>
+                    <tr>
+                        <td>Policy Status</td>
+                        <td>{{ policy.status }}</td>
+                    </tr>
+                    <tr>
+                        <td>Policy Dates</td>
+                        <td>{{ policy.start|date }} - {{ policy.end|date }}</td>
+                    </tr>
+                    <tr>
+                        <td>Phone</td>
+                        <td>{{ policy.phone }}</td>
+                    </tr>
+                    <tr>
+                        <td>Risk</td>
+                        <td>{{ policy.risk }}</td>
+                    </tr>
+                    <tr>
+                        <td>Connections</td>
+                        <td>{{ policy.connections|length }}</td>
+                    </tr>
+                    <tr>
+                        <td>Pot Value</td>
+                        <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
+                    </tr>
+                </table>
+            {% else %}
+                <h4>No policy</h4>
+            {% endif %}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="claims">
+            {% for claim in policy.claims %}
+                <table class="table table-striped">
+                    <tr>
+                        <td>Policy Number</td>
+                        <td>{{ policy.policyNumber }}</td>
+                    </tr>
+                </table>
+            {% endfor %}
+            {% if policy.claims|length == 0 %}
+            <h4>No claims</h4>
+            {% endif %}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="user">
+            <table class="table table-striped">
+                <tr>
+                    <td>Name</td>
+                    <td>{{ policy.user.name }}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>{{ policy.user.email }}</td>
+                </tr>
+                <tr>
+                    <td>Mobile</td>
+                    <td>{{ policy.user.mobileNumber }}</td>
+                </tr>
+                <tr>
+                    <td>Billing Address</td>
+                    <td>{{ policy.user.billingAddress }}</td>
+                </tr>
+                <tr>
+                    <td>Signup Country</td>
+                    <td>{{ policy.user.signupCountry }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

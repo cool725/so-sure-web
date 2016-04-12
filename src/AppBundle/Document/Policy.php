@@ -12,6 +12,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 abstract class Policy
 {
+    const RISK_HIGH = 'high';
+    const RISK_MEDIUM = 'medium';
+    const RISK_LOW = 'low';
+
     const STATUS_PENDING = 'pending';
     const STATUS_ACTIVE = 'active';
     const STATUS_CANCELLED = 'cancelled';
@@ -52,6 +56,16 @@ abstract class Policy
      */
     protected $invitations;
 
+    /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Connection")
+     */
+    protected $connections = array();
+
+    /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Claim")
+     */
+    protected $claims = array();
+
     /** @MongoDB\Date() */
     protected $created;
 
@@ -60,6 +74,9 @@ abstract class Policy
 
     /** @MongoDB\Date(nullable=true) */
     protected $end;
+
+    /** @MongoDB\Field(type="float", name="pot_value", nullable=false) */
+    protected $potValue;
 
     public function __construct()
     {
@@ -153,12 +170,136 @@ abstract class Policy
         $this->gocardlessMandate = $gocardlessMandate;
     }
 
-    public function activate()
+    public function addConnection(Connection $connection)
     {
-        $this->setStatus(self::STATUS_ACTIVE);
+        $this->connections[] = $connection;
+    }
+
+    public function getConnections()
+    {
+        return $this->connections;
+    }
+
+    public function addClaim(Claim $claim)
+    {
+        $this->claims[] = $claim;
+    }
+
+    public function getClaims()
+    {
+        return $this->claims;
+    }
+
+    public function getPotValue()
+    {
+        return $this->potValue;
+    }
+
+    public function setPotValue($potValue)
+    {
+        $this->potValue = $potValue;
+    }
+
+    public function create($seq)
+    {
         $this->setStart(new \DateTime());
         $nextYear = clone $this->getStart();
         $nextYear = $nextYear->modify('+1 year');
         $this->setEnd($nextYear);
+
+        $initialPolicyNumber = 5500000;
+        $this->setPolicyNumber(sprintf("Mob/%s/%d", $this->getStart()->format("Y"), $initialPolicyNumber + $seq));
+        $this->setStatus(self::STATUS_ACTIVE);
+    }
+
+    public function getRisk($date = null)
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        if (count($this->getConnections()) > 0) {
+            // Connected and value of their pot is zero
+            if ($this->getPotValue() == 0) {
+                return self::RISK_HIGH;
+            }
+
+            if ($this->getLatestClaim()) {
+                // Connected and value of their pot is £10 following a claim in the past month
+                if ($this->hasClaimedInLast30Days($date)) {
+                    return self::RISK_MEDIUM;
+                } else {
+                    // Connected and value of their pot is £10 following a claim which took place over a month ago
+                    return self::RISK_LOW;
+                }
+            }
+
+            // Connected and no claims in their network
+            return self::RISK_LOW;
+        }
+
+        // Claim within first month of buying policy, has no connections and has made no attempts to make connections
+        if ($this->isPolicyWithin30Days($date)) {
+            return self::RISK_HIGH;
+        } else {
+            // No connections & claiming after the 1st month
+            return self::RISK_MEDIUM;
+        }
+    }
+
+    public function isPolicyWithin30Days($date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $this->getStart()->diff($date)->days <= 30;
+    }
+    
+    public function hasClaimedInLast30Days($date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        if (!$latestClaim = $this->getLatestClaim()) {
+            return false;
+        }
+
+        return $latestClaim->getDate()->diff($date)->days <= 30;
+    }
+
+    public function getLatestClaim()
+    {
+        if (!$this->getClaims() || count($this->getClaims()) == 0) {
+            return null;
+        }
+
+        $claims = $this->getClaims();
+        uasort($claims, function($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+
+        return array_values($claims)[0];
+    }
+
+    public function calculatePotValue()
+    {
+        $potValue = 0;
+        foreach ($this->connections as $connection) {
+            $potValue += $connection->value;
+        }
+        // TODO: claims
+
+        return $potValue;
+    }
+
+    public function isPolicy()
+    {
+        return $this->getStatus() !== null;
     }
 }
