@@ -33,7 +33,7 @@ class JWTService
     public function setSecret($secret, $transform = true)
     {
         if ($transform) {
-            $this->secret = $this->transformSecret($secret);
+            $this->secret = base64_encode($this->transformSecret($secret));
         } else {
             $this->secret = $secret;
         }
