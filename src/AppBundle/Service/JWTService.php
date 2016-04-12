@@ -44,8 +44,9 @@ class JWTService
         return sha1($secret);
     }
     
-    protected function base64UrlEncode($data) {
-      return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    protected function base64UrlEncode($data)
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
     public function validate($cognitoId, $jwt, $additionalValidations = null)
