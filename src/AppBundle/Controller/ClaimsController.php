@@ -8,10 +8,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Form\Type\PhoneType;
+use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\UserSearchType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -74,7 +76,7 @@ class ClaimsController extends BaseController
      * @Route("/policy/{id}", name="claims_policy")
      * @Template
      */
-    public function claimsPolicyAction($id)
+    public function claimsPolicyAction(Request $request, $id)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
@@ -83,8 +85,21 @@ class ClaimsController extends BaseController
             return $this->createNotFoundException('Policy not found');
         }
 
+        $claim = new Claim();
+        $form = $this->createForm(ClaimType::class, $claim);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $claim->setHandler($this->getUser());
+            $policy->addClaim($claim);
+            $dm->flush();
+            $this->addFlash('success', sprintf('Claim %s is added', $claim->getNumber()));
+
+            return $this->redirectToRoute('claims_policy', ['id' => $id]);
+        }
+
         return [
             'policy' => $policy,
+            'form' => $form->createView(),
         ];
     }
 }

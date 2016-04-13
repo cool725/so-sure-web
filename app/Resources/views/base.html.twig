@@ -21,6 +21,22 @@
             {% include '::nav.html.twig' %}
         {% endif %}
 
+        {% if app.session.isStarted %}
+            {% if app.session.flashBag.peekAll|length > 0 %}
+                <div class="container text-center">
+                {% for flash_message in app.session.flashBag.get('success') %}
+                    <div class="bg-success"><h4>{{ flash_message }}</h4></div>
+                {% endfor %}
+                {% for flash_message in app.session.flashBag.get('warning') %}
+                    <div class="bg-warning"><h4>{{ flash_message }}</h4></div>
+                {% endfor %}
+                {% for flash_message in app.session.flashBag.get('error') %}
+                    <div class="bg-error"><h4>{{ flash_message }}</h4></div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+
         {% block body %}{% endblock %}
 
         {% include '::footer.html.twig' %}
