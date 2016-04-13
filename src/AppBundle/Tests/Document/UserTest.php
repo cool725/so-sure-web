@@ -43,4 +43,23 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $address->setPostcode('ec1v 1rx');
         $this->assertTrue($user->hasValidGocardlessDetails());
     }
+
+    public function testReplaceBillingAddress()
+    {
+        $user = new User();
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostcode('123');
+        $user->addAddress($address);
+
+        $billingAddress = $user->getBillingAddress();
+        $user->removeAddress($billingAddress);
+
+        $address2 = new Address();
+        $address2->setType(Address::TYPE_BILLING);
+        $address->setPostcode('456');
+        $user->addAddress($address);
+
+        $this->assertEquals('456', $user->getBillingAddress()->getPostcode());
+    }
 }

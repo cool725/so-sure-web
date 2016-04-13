@@ -86,6 +86,7 @@ class ApiAuthControllerTest extends WebTestCase
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
 
@@ -332,7 +333,7 @@ class ApiAuthControllerTest extends WebTestCase
             'type' => 'billing',
             'line1' => 'address line 1',
             'city' => 'London',
-            'postcode' => 'ec1v 1rx',
+            'postcode' => 'SE152SZ',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
@@ -502,7 +503,7 @@ class ApiAuthControllerTest extends WebTestCase
             'type' => 'billing',
             'line1' => 'address line 1',
             'city' => 'London',
-            'postcode' => 'ec1v 1rx',
+            'postcode' => 'SE152SZ',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
@@ -565,6 +566,16 @@ class ApiAuthControllerTest extends WebTestCase
                 'last_name' => 'bar',
                 'mobile_number' => '0123456789',
             ]);
+
+            $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
+            $data = [
+                'type' => 'billing',
+                'line1' => 'address line 1',
+                'city' => 'London',
+                'postcode' => 'EC2A 1AF',
+            ];
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+            $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         }
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [

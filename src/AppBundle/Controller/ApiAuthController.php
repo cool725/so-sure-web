@@ -59,6 +59,7 @@ class ApiAuthController extends BaseController
 
             $imeiValidator = $this->get('app.imei');
             $jwtValidator = $this->get('app.jwt');
+            $addressValidator = $this->get('app.address');
             $user = $this->getUser();
             $this->denyAccessUnlessGranted('edit', $user);
 
@@ -66,6 +67,22 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
                     'User must have firstname/lastname, email & mobile number present before policy can be created',
+                    422
+                );
+            }
+
+            if (!$user->hasValidGocardlessDetails()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
+                    'User must have billing address set before policy can be created',
+                    422
+                );
+            }
+
+            if (!$addressValidator->validatePostcode($user->getBillingAddress()->getPostCode())) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_GEO_RESTRICTED,
+                    "User's billing address must be valid and in GB",
                     422
                 );
             }
@@ -388,7 +405,21 @@ class ApiAuthController extends BaseController
             $repo = $dm->getRepository(User::class);
             $user = $repo->find($id);
 
-            $this->denyAccessUnlessGranted('view', $user);
+            $this->denyAccessUnlessGranted('edit', $user);
+
+            $addressValidator = $this->get('app.address');
+            if (!$addressValidator->validatePostcode($data['postcode'])) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_INVALID_ADDRESS,
+                    "Invalid postcode",
+                    422
+                );
+            }
+
+            if ($existingAddress = $user->getBillingAddress()) {
+                $user->removeAddress($existingAddress);
+                $dm->remove($existingAddress);
+            }
 
             $address = new Address();
             $address->setType($data['type']);

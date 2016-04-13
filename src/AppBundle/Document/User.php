@@ -176,6 +176,15 @@ class User extends BaseUser
         return $this->addresses;
     }
 
+    public function removeAddress($type)
+    {
+        foreach ($this->addresses as $check) {
+            if ($check->getType() == $type) {
+                $this->addresses->removeElement($check);
+            }
+        }
+    }
+
     public function getBillingAddress()
     {
         foreach ($this->addresses as $address) {
