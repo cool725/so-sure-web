@@ -531,6 +531,23 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
 
+    public function testUserInvalidAddress()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'city' => 'London',
+            'postcode' => 'ec1v 1rx',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+
+        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_USER_INVALID_ADDRESS, $result['code']);
+    }
+
     // helpers
 
     /**
