@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Doctrine\ODM\MongoDB\PersistentCollection;
 
 /**
  * @MongoDB\Document
@@ -280,6 +281,9 @@ abstract class Policy
         }
 
         $claims = $this->getClaims();
+        if ($claims instanceof PersistentCollection) {
+            $claims = $claims->getValues();
+        }
         uasort($claims, function ($a, $b) {
             return $a->getDate() < $b->getDate();
         });
