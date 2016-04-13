@@ -64,6 +64,29 @@ class PCAService
     }
 
     /**
+     * Use the free find service to ensure that the postcode is valid
+     *
+     * @param string $postcode
+     *
+     * @return boolean
+     */
+    public function validatePostcode($postcode)
+    {
+        // TODO: If we cache the original postcode in redis, we can avoid querying the api service for most cases
+        $postcode = strtolower(str_replace(' ', '', $postcode));
+        $results = $this->find($postcode, null);
+        if (!$results || count($results) == 0) {
+            return false;
+        }
+
+        foreach ($results as $id => $line) {
+            $items = explode(',', $line);
+            $found = strtolower(str_replace(' ', '', $items[0]));
+            return $postcode == $found;
+        }
+    }
+
+    /**
      * Call pca find to get list of addresses that match criteria
      *
      * @param string $postcode
