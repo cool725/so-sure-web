@@ -90,9 +90,10 @@ services:
     app.address:
         class: AppBundle\Service\PCAService
         arguments:
-            logger: "@logger"
-            apiKey: %pca_apikey%
+            logger:      "@logger"
+            apiKey:      %pca_apikey%
             environment: %kernel.environment%
+            redis:       "@snc_redis.default"
 
     app.geoip:
         class: AppBundle\Service\MaxMindIpService

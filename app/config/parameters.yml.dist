@@ -47,6 +47,9 @@ parameters:
     mongodb_db: mongo
     mongodb_url: mongodb://localhost
 
+    redis_default_dsn: redis://localhost/0
+    redis_session_dsn: redis://localhost/1
+
     aws_key: ''
     aws_secret: ''
     aws_cognito_identitypoolid: ''

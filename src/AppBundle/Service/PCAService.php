@@ -6,6 +6,7 @@ use AppBundle\Document\Address;
 
 class PCAService
 {
+    const CACHE_TIME = 84600; // 1 day
     const FIND_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/xmla.ws";
     const RETRIEVE_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/xmla.ws";
 
@@ -18,16 +19,20 @@ class PCAService
     /** @var string */
     protected $environment;
 
+    protected $redis;
+
     /**
      * @param LoggerInterface $logger
      * @param string          $apiKey
      * @param string          $environment
+     * @param                 $redis
      */
-    public function __construct(LoggerInterface $logger, $apiKey, $environment)
+    public function __construct(LoggerInterface $logger, $apiKey, $environment, $redis)
     {
         $this->logger = $logger;
         $this->apiKey = $apiKey;
         $this->environment = $environment;
+        $this->redis = $redis;
     }
 
     /**
@@ -36,6 +41,11 @@ class PCAService
      */
     public function getAddress($postcode, $number)
     {
+        $redisKey = sprintf("address:%s:%s", $postcode, $number);
+        if ($value = $this->redis->get($redisKey)) {
+            return unserialize($value);
+        }
+
         // Use BX1 1LT as a hard coded address for testing
         // (its a non-geographical postcode for Lloyds Bank, so is hopefully safe ;)
         if (strtoupper(trim($postcode)) == "BX11LT") {
@@ -57,7 +67,10 @@ class PCAService
         if ($data) {
             $key = array_keys($data)[0];
 
-            return $this->retreive($key);
+            $value = $this->retreive($key);
+            $this->redis->setex($redisKey, self::CACHE_TIME, serialize($value));
+
+            return $value;
         }
 
         return null;
