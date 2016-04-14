@@ -17,6 +17,7 @@ trait UserClassTrait
         $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setPlainPassword($password);
+        $user->setEnabled(true);
         $userManager->updateUser($user, true);
 
         return $user;
