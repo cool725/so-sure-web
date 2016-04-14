@@ -63,15 +63,21 @@ class ApiAuthController extends BaseController
             }
 
             if ($data['action'] == 'accept') {
-
+                $this->denyAccessUnlessGranted('accept', $invitation);
+                // TODO: Create connection
+                $invitation->setAccepted(new \DateTime());
+                $dm->flush();
             } elseif ($data['action'] == 'reject') {
-
+                $this->denyAccessUnlessGranted('reject', $invitation);
+                $invitation->setRejected(new \DateTime());
+                $dm->flush();
             } elseif ($data['action'] == 'cancel') {
                 $this->denyAccessUnlessGranted('cancel', $invitation);
                 $invitation->setCancelled(new \DateTime());
                 $dm->flush();
             } elseif ($data['action'] == 'reinvite') {
-
+                $this->denyAccessUnlessGranted('reinvite', $invitation);
+                // TODO: Send reinvite
             }
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Invitation cancelled', 200);
