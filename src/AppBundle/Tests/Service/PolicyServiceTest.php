@@ -24,7 +24,7 @@ class PolicyServiceTest extends WebTestCase
     protected static $container;
     protected static $policyService;
     protected static $dm;
-    protected static $userRepo;
+    protected static $policyRepo;
     protected static $userManager;
 
     public static function setUpBeforeClass()
@@ -58,7 +58,7 @@ class PolicyServiceTest extends WebTestCase
         $policy = static::createPolicy($user, static::$dm);
         static::$policyService->cancel($policy);
 
-        $updatedPolicy = $policyRepo->find($policy->getId());
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::STATUS_CANCELLED, $policy->getStatus());
     }
 }
