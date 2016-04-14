@@ -92,6 +92,20 @@ class ApiAuthControllerTest extends WebTestCase
 
         $this->assertTrue(strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
+
+        // Now make sure that the policy shows up against the user
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+
+        $userData = json_decode(self::$client->getResponse()->getContent(), true);
+        $foundPolicy = false;
+        foreach ($userData['policies'] as $policy) {
+            if ($policy['id'] == $data['id']) {
+                $foundPolicy = true;
+            }
+        }
+        $this->assertTrue($foundPolicy);
     }
 
     public function testNewPolicyInvalidUser()
