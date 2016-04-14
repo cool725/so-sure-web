@@ -56,14 +56,19 @@ class PhonePolicy extends Policy
     public function toApiArray()
     {
         return [
-          'id' => $this->getId(),
-          'status' => $this->getStatus(),
-          'policy_number' => $this->getPolicyNumber(),
-          'imei' => $this->getImei(),
-          'phone' => $this->getPhone() ? $this->getPhone()->toApiArray() : null,
-          'user' => $this->getUser() ? $this->getUser()->toApiArray() : null,
-          'pot' => null,
-          'payment' => null,
+            'id' => $this->getId(),
+            'status' => $this->getStatus(),
+            'policy_number' => $this->getPolicyNumber(),
+            'imei' => $this->getImei(),
+            'phone' => $this->getPhone() ? $this->getPhone()->toApiArray() : null,
+            'user' => $this->getUser() ? $this->getUser()->toApiArray() : null,
+            'pot' => [
+                'connections' => count($this->getConnections()),
+                'max_connections' => $this->getPhone()->getMaxConnections(),
+                'value' => $this->getPotValue(),
+                'max_value' => $this->getPhone()->getMaxPot(),
+            ],
+            'payment' => null,
         ];
     }
 }
