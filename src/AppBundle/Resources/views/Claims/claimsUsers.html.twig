@@ -62,7 +62,7 @@
                     {% for user in users %}
                         {% for policy in user.policies %}
                         <tr>
-                            <td><a href="{{ path('claims_policy', {id: policy.id}) }}">{{ policy.policyNumber }}</a></td>
+                            <td><a href="{{ path(policy_route, {id: policy.id}) }}">{{ policy.policyNumber }}</a></td>
                             <td>{{ user.firstname }} {{ user.lastname }}</td>
                             <td>{{ user.email }}</td>
                             <td>{{ user.mobileNumber }}</td>
