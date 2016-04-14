@@ -9,14 +9,15 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class InvitationVoter extends Voter
 {
     // these strings are just invented: you can use anything
-    const VIEW = 'view';
-    const EDIT = 'edit';
-    const DELETE = 'delete';
+    const REINVITE = 'reinvite';
+    const ACCEPT = 'accept';
+    const REJECT = 'reject';
+    const CANCEL = 'cancel';
 
     public function supports($attribute, $subject)
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, array(self::VIEW, self::EDIT, self::DELETE))) {
+        if (!in_array($attribute, array(self::ACCEPT, self::REJECT, self::REINVITE, self::CANCEL))) {
             return false;
         }
 
@@ -41,6 +42,12 @@ class InvitationVoter extends Voter
         /** @var Invitation $invitation */
         $invitation = $subject;
 
-        return $invitation->getInviter()->getId() == $currentUser->getId();
+        if (in_array($attribute, [self::ACCEPT, self::REJECT]) && $invitation->getInvitee()) {
+            return $invitation->getInvitee()->getId() == $currentUser->getId();
+        } elseif (in_array($attribute, [self::REINVITE, self::CANCEL]) && $invitation->getInviter()) {
+            return $invitation->getInviter()->getId() == $currentUser->getId();
+        }
+
+        return false;
     }
 }

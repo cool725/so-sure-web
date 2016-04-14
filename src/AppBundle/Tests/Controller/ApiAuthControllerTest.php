@@ -76,7 +76,7 @@ class ApiAuthControllerTest extends WebTestCase
         $invitationData = json_decode(self::$client->getResponse()->getContent(), true);
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
-        $crawler = static::deleteRequest(self::$client, $cognitoIdentityId, $url, []);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'cancel']);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
     }
 

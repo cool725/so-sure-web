@@ -30,12 +30,17 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ApiAuthController extends BaseController
 {
     /**
-     * @Route("/invitation/{id}", name="api_auth_cancel_invitation")
-     * @Method({"DELETE"})
+     * @Route("/invitation/{id}", name="api_auth_process_invitation")
+     * @Method({"POST"})
      */
-    public function deleteInvitationAction($id)
+    public function processInvitationAction(Request $request, $id)
     {
         try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!isset($data['action'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
             $dm = $this->getManager();
             $repo = $dm->getRepository(Invitation::class);
             $invitation = $repo->find($id);
@@ -46,9 +51,9 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
-            $this->denyAccessUnlessGranted('delete', $invitation);
 
-            if ($invitation->getAccepted() || $invitation->getRejcted()) {
+            // make sure invitation hasn't already been processed
+            if ($invitation->getAccepted() || $invitation->getRejected() || $invitation->getCancelled()) {
                 // TODO - add error code
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_UNKNOWN,
@@ -57,14 +62,23 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $invitation->setCancelled(new \DateTime());
-            $dm->flush();
+            if ($data['action'] == 'accept') {
+
+            } elseif ($data['action'] == 'reject') {
+
+            } elseif ($data['action'] == 'cancel') {
+                $this->denyAccessUnlessGranted('cancel', $invitation);
+                $invitation->setCancelled(new \DateTime());
+                $dm->flush();
+            } elseif ($data['action'] == 'reinvite') {
+
+            }
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Invitation cancelled', 200);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api deleteInvitation. %s', $e->getMessage()));
+            $this->get('logger')->error(sprintf('Error in api processInvitation. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
