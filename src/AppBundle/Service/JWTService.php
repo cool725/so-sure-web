@@ -33,7 +33,7 @@ class JWTService
     public function setSecret($secret, $transform = true)
     {
         if ($transform) {
-            $this->secret = $this->base64UrlEncode($this->transformSecret($secret));
+            $this->secret = $this->transformSecret($secret);
         } else {
             $this->secret = $secret;
         }
@@ -42,11 +42,6 @@ class JWTService
     protected function transformSecret($secret)
     {
         return sha1($secret);
-    }
-    
-    protected function base64UrlEncode($data)
-    {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
     public function validate($cognitoId, $jwt, $additionalValidations = null)
