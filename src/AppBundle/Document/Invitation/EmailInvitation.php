@@ -16,7 +16,12 @@ class EmailInvitation extends Invitation
     {
         return true;
     }
-    
+
+    public function getChannel()
+    {
+        return 'email';
+    }
+
     public function getEmail()
     {
         return $this->email;

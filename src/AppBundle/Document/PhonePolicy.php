@@ -55,6 +55,10 @@ class PhonePolicy extends Policy
 
     public function toApiArray()
     {
+        $connections = [];
+        foreach ($this->getConnections() as $connection) {
+            $connections[] = $connection->toApiArray();
+        }
         return [
             'id' => $this->getId(),
             'status' => $this->getStatus(),
@@ -72,7 +76,7 @@ class PhonePolicy extends Policy
                 'value' => $this->getPotValue(),
                 'max_value' => $this->getPhone()->getMaxPot(),
             ],
-            'payment' => null,
+            'connections' => $connections,
         ];
     }
 }

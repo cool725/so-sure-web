@@ -30,6 +30,47 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ApiAuthController extends BaseController
 {
     /**
+     * @Route("/invitation/{id}", name="api_auth_cancel_invitation")
+     * @Method({"DELETE"})
+     */
+    public function deleteInvitationAction($id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Invitation::class);
+            $invitation = $repo->find($id);
+            if (!$invitation) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find invitation',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted('delete', $invitation);
+
+            if ($invitation->getAccepted() || $invitation->getRejcted()) {
+                // TODO - add error code
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_UNKNOWN,
+                    'Invitation has already been accepted/reject',
+                    422
+                );
+            }
+
+            $invitation->setCancelled(new \DateTime());
+            $dm->flush();
+
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Invitation cancelled', 200);
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api deleteInvitation. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/ping", name="api_auth_ping")
      * @Method({"GET", "POST"})
      */

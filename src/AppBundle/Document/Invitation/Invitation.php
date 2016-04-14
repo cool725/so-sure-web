@@ -22,6 +22,9 @@ abstract class Invitation
     protected $created;
 
     /** @MongoDB\Date() */
+    protected $cancelled;
+
+    /** @MongoDB\Date() */
     protected $accepted;
 
     /** @MongoDB\Date() */
@@ -43,6 +46,7 @@ abstract class Invitation
     protected $name;
 
     abstract public function isSingleUse();
+    abstract public function getChannel();
 
     public function __construct()
     {
@@ -77,6 +81,16 @@ abstract class Invitation
     public function setRejected($rejected)
     {
         $this->rejected = $rejected;
+    }
+
+    public function getCancelled()
+    {
+        return $this->cancelled;
+    }
+
+    public function setCancelled($cancelled)
+    {
+        $this->cancelled = $cancelled;
     }
 
     public function getName()
@@ -135,12 +149,15 @@ abstract class Invitation
     {
         return $this->getAccepted() !== null;
     }
-    
+
     public function toApiArray()
     {
         return [
             'id' => $this->getId(),
+            'name' => $this->getName() ? $this->getName() : null,
+            'channel' => $this->getChannel(),
             'link' => $this->getLink(),
+            'created_date' => $this->getCreated(),
         ];
     }
 }

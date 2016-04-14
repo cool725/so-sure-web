@@ -61,6 +61,11 @@ trait UserClassTrait
         return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "PUT");
     }
 
+    public static function deleteRequest($client, $cognitoIdentityId, $url, $body)
+    {
+        return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "DELETE");
+    }
+
     private static function cognitoRequest($client, $cognitoIdentityId, $url, $body, $method)
     {
         return $client->request(

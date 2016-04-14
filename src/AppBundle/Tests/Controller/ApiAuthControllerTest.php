@@ -55,6 +55,31 @@ class ApiAuthControllerTest extends WebTestCase
         );
     }
 
+    // invitation/{id} cancel
+
+    /**
+     *
+     */
+    public function testInvitationCancel()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $policyData = json_decode(self::$client->getResponse()->getContent(), true);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('invite-cancel', $this),
+            'name' => 'invite cancel test',
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $invitationData = json_decode(self::$client->getResponse()->getContent(), true);
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::deleteRequest(self::$client, $cognitoIdentityId, $url, []);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+    }
+
     // ping / auth
 
     /**

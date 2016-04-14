@@ -22,4 +22,12 @@ class Connection
     {
         $this->date = new \DateTime();
     }
+
+    public function toApiArray()
+    {
+        return [
+            'name' => $this->user ? $this->user->getName() : null,
+            'date' => $this->date ? $this->date->format(\DateTime::ISO8601) : null,
+        ];
+    }
 }
