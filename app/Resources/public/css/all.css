@@ -40,7 +40,7 @@
   top: -0.5rem;
   transform: rotate(135deg);
 }
-#navbar > ul.nav.navbar-nav.navbar-right > li:nth-child(3) > div > button {
+#navbar .download-button {
     margin-top: 6px;
     border: none;
 }
