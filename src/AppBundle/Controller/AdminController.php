@@ -12,6 +12,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\UserSearchType;
@@ -177,15 +178,28 @@ class AdminController extends BaseController
      */
     public function claimsPolicyAction(Request $request, $id)
     {
+        $policyService = $this->get('app.policy');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
         if (!$policy) {
             return $this->createNotFoundException('Policy not found');
         }
+        $form = $this->createForm(CancelPolicyType::class);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $policyService->cancel($policy);
+            $this->addFlash(
+                'success',
+                sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
+            );
+
+            return $this->redirectToRoute('admin_users');
+        }
 
         return [
             'policy' => $policy,
+            'form' => $form->createView(),
         ];
     }
 }
