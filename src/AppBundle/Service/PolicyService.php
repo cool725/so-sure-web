@@ -21,8 +21,8 @@ class PolicyService
     protected $dm;
 
     /**
-     * @param DocumentManager  $dm
-     * @param LoggerInterface  $logger
+     * @param DocumentManager $dm
+     * @param LoggerInterface $logger
      */
     public function __construct(
         DocumentManager $dm,
