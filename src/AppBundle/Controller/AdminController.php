@@ -8,8 +8,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\UserSearchType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -139,7 +142,7 @@ class AdminController extends BaseController
 
     /**
      * @Route("/users", name="admin_users")
-     * @Template
+     * @Template("AppBundle::Claims/claimsUsers.html.twig")
      */
     public function adminUsersAction(Request $request)
     {
@@ -164,32 +167,25 @@ class AdminController extends BaseController
             'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
             'form' => $form->createView(),
+            'policy_route' => 'admin_policy',
         ];
     }
 
-    private function formToMongoSearch($form, $qb, $formField, $mongoField)
-    {
-        $data = $form->get($formField)->getData();
-        if (strlen($data) > 0) {
-            $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/", $data)));
-        }
-    }
-
     /**
-     * @Route("/user/{id}", name="admin_user")
-     * @Template
+     * @Route("/policy/{id}", name="admin_policy")
+     * @Template("AppBundle::Admin/claimsPolicy.html.twig")
      */
-    public function adminUserAction($id)
+    public function claimsPolicyAction(Request $request, $id)
     {
         $dm = $this->getManager();
-        $repo = $dm->getRepository(User::class);
-        $user = $repo->find($id);
-        if (!$user) {
-            return $this->createNotFoundException('User not found');
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            return $this->createNotFoundException('Policy not found');
         }
 
         return [
-            'user' => $user,
+            'policy' => $policy,
         ];
     }
 }

@@ -61,15 +61,8 @@ class ClaimsController extends BaseController
             'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
             'form' => $form->createView(),
+            'policy_route' => 'claims_policy',
         ];
-    }
-
-    private function formToMongoSearch($form, $qb, $formField, $mongoField)
-    {
-        $data = $form->get($formField)->getData();
-        if (strlen($data) > 0) {
-            $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/", $data)));
-        }
     }
 
     /**

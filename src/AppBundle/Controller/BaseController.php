@@ -9,6 +9,7 @@ use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use MongoRegex;
 
 abstract class BaseController extends Controller
 {
@@ -163,5 +164,13 @@ abstract class BaseController extends Controller
     protected function getErrorJsonResponse($errorCode, $description, $httpCode = 422)
     {
         return new JsonResponse(['code' => $errorCode, 'description' => $description], $httpCode);
+    }
+
+    protected function formToMongoSearch($form, $qb, $formField, $mongoField)
+    {
+        $data = $form->get($formField)->getData();
+        if (strlen($data) > 0) {
+            $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/", $data)));
+        }
     }
 }
