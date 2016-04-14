@@ -152,6 +152,63 @@ class ApiControllerTest extends WebTestCase
         $this->assertTrue(strlen($data['cognito_token']['token']) > 10);
     }
 
+    public function testLoginOkUserExpired()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $user = static::createUser($this->getUserManager($client), static::generateEmail('token1', $this), 'bar');
+
+        $user->setExpired(true);
+        $dm = $this->getManager($client);
+        $dm->flush();
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array(
+            'email' => static::generateEmail('login1', $this),
+            'password' => 'bar'
+        ));
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_USER_ABSENT, $data['code']);
+    }
+
+    public function testLoginOkUserDisabled()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $user = static::createUser($this->getUserManager($client), static::generateEmail('login2', $this), 'bar');
+
+        $user->setEnabled(false);
+        $dm = $this->getManager($client);
+        $dm->flush();
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array(
+            'email' => static::generateEmail('login2', $this),
+            'password' => 'bar'
+        ));
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_USER_RESET_PASSWORD, $data['code']);
+    }
+
+    public function testLoginOkUserLocked()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $user = static::createUser($this->getUserManager($client), static::generateEmail('login3', $this), 'bar');
+
+        $user->setLocked(true);
+        $dm = $this->getManager($client);
+        $dm->flush();
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array(
+            'email' => static::generateEmail('login3', $this),
+            'password' => 'bar'
+        ));
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_USER_SUSPENDED, $data['code']);
+    }
+
     // ping
 
     /**
@@ -335,7 +392,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), 'token@api.bar.com', 'bar');
+        $user = static::createUser($this->getUserManager($client), static::generateEmail('token', $this), 'bar');
         $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
             'token' => $user->getToken()
         ));
@@ -348,7 +405,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), 'badtoken@api.bar.com', 'bar');
+        $user = static::createUser($this->getUserManager($client), static::generateEmail('badtoken', $this), 'bar');
         $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
             'token' => $user->getToken() + 'bad'
         ));
@@ -361,6 +418,60 @@ class ApiControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getUnauthIdentity($client);
         $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', []);
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
+    }
+
+    public function testTokenOkUserExpired()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $user = static::createUser($this->getUserManager($client), static::generateEmail('token2', $this), 'bar');
+
+        $user->setExpired(true);
+        $dm = $this->getManager($client);
+        $dm->flush();
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+            'token' => $user->getToken()
+        ));
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_USER_ABSENT, $data['code']);
+    }
+
+    public function testTokenOkUserDisabled()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $user = static::createUser($this->getUserManager($client), static::generateEmail('token3', $this), 'bar');
+
+        $user->setEnabled(false);
+        $dm = $this->getManager($client);
+        $dm->flush();
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+            'token' => $user->getToken()
+        ));
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_USER_RESET_PASSWORD, $data['code']);
+    }
+
+    public function testTokenOkUserLocked()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $user = static::createUser($this->getUserManager($client), static::generateEmail('token4', $this), 'bar');
+
+        $user->setLocked(true);
+        $dm = $this->getManager($client);
+        $dm->flush();
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+            'token' => $user->getToken()
+        ));
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_USER_SUSPENDED, $data['code']);
     }
 
     // user

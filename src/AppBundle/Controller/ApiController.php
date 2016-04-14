@@ -71,6 +71,25 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
 
+            // soft delete
+            if ($user->isExpired()) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User does not exist', 403);
+            }
+
+            if (!$user->isEnabled()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_RESET_PASSWORD,
+                    'User account is temporarily disabled - reset password',
+                    422
+                );
+            } elseif ($user->isLocked()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_SUSPENDED,
+                    'User account is suspended - contact us',
+                    422
+                );
+            }
+
             $encoder_service = $this->get('security.encoder_factory');
             $encoder = $encoder_service->getEncoder($user);
             if (!$encoder->isPasswordValid($user->getPassword(), $data['password'], $user->getSalt())) {
@@ -302,6 +321,25 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Invalid token', 403);
             }
 
+            // soft delete
+            if ($user->isExpired()) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User does not exist', 403);
+            }
+
+            if (!$user->isEnabled()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_RESET_PASSWORD,
+                    'User account is temporarily disabled - reset password',
+                    422
+                );
+            } elseif ($user->isLocked()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_SUSPENDED,
+                    'User account is suspended - contact us',
+                    422
+                );
+            }
+
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
@@ -326,6 +364,7 @@ class ApiController extends BaseController
 
             $userManager = $this->get('fos_user.user_manager');
             $user = $userManager->createUser();
+            $user->setEnabled(true);
             $user->setCognitoId($this->getCognitoIdentityId($request));
             $user->setEmail($data['email']);
             $user->setFirstName(isset($data['first_name']) ? $data['first_name'] : null);
