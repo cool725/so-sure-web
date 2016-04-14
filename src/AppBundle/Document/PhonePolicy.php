@@ -58,10 +58,14 @@ class PhonePolicy extends Policy
         return [
             'id' => $this->getId(),
             'status' => $this->getStatus(),
+            'type' => 'phone',
+            'start_date' => $this->getStart() ? $this->getStart(\DateTime::ISO8601)->format('') : null,
+            'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ISO8601) : null,
             'policy_number' => $this->getPolicyNumber(),
-            'imei' => $this->getImei(),
-            'phone' => $this->getPhone() ? $this->getPhone()->toApiArray() : null,
-            'user' => $this->getUser() ? $this->getUser()->toApiArray() : null,
+            'phone_policy' => [
+                'imei' => $this->getImei(),
+                'phone' => $this->getPhone() ? $this->getPhone()->toApiArray() : null,
+            ],
             'pot' => [
                 'connections' => count($this->getConnections()),
                 'max_connections' => $this->getPhone()->getMaxConnections(),

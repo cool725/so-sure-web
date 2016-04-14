@@ -399,7 +399,7 @@ class User extends BaseUser
         $policies = [];
         if ($this->policies) {
             foreach ($this->policies as $policy) {
-                $policies[] = $policy->getId();
+                $policies[] = $policy->toApiArray();
             }
         }
 
