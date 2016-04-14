@@ -17,6 +17,11 @@ class SmsInvitation extends Invitation
         return true;
     }
 
+    public function getChannel()
+    {
+        return 'sms';
+    }
+
     public function getMobile()
     {
         return $this->mobile;

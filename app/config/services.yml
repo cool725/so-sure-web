@@ -215,6 +215,11 @@ services:
         tags:
             - { name: security.voter }
 
+    app.voter.invitation:
+        class: AppBundle\Security\InvitationVoter
+        tags:
+            - { name: security.voter }
+
     doctrine.listener.invitation:
         class:   AppBundle\Listener\DoctrineInvitationListener
         arguments:
