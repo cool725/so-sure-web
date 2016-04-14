@@ -6,6 +6,9 @@ use AppBundle\Document\Address;
 
 class PCAService
 {
+    const REDIS_POSTCODE_KEY = 'postcode';
+    const REDIS_ADDRESS_KEY_FORMAT = 'address:%s:%s';
+    const CACHE_TIME = 84600; // 1 day
     const FIND_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/xmla.ws";
     const RETRIEVE_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/xmla.ws";
 
@@ -18,16 +21,25 @@ class PCAService
     /** @var string */
     protected $environment;
 
+    protected $redis;
+
     /**
      * @param LoggerInterface $logger
      * @param string          $apiKey
      * @param string          $environment
+     * @param                 $redis
      */
-    public function __construct(LoggerInterface $logger, $apiKey, $environment)
+    public function __construct(LoggerInterface $logger, $apiKey, $environment, $redis)
     {
         $this->logger = $logger;
         $this->apiKey = $apiKey;
         $this->environment = $environment;
+        $this->redis = $redis;
+    }
+
+    public function normalizePostcode($postcode)
+    {
+        return strtoupper(str_replace(' ', '', trim($postcode)));
     }
 
     /**
@@ -36,19 +48,27 @@ class PCAService
      */
     public function getAddress($postcode, $number)
     {
+        $postcode = $this->normalizePostcode($postcode);
+
+        $redisKey = sprintf(self::REDIS_ADDRESS_KEY_FORMAT, $postcode, $number);
+        if ($value = $this->redis->get($redisKey)) {
+            return unserialize($value);
+        }
+
         // Use BX1 1LT as a hard coded address for testing
         // (its a non-geographical postcode for Lloyds Bank, so is hopefully safe ;)
-        if (strtoupper(trim($postcode)) == "BX11LT") {
+        if ($postcode == "BX11LT") {
             $address = new Address();
             $address->setLine1('so-sure Test Address Line 1');
             $address->setLine2('so-sure Test Address Line 2');
             $address->setLine3('so-sure Test Address Line 3');
             $address->setCity('so-sure Test City');
             $address->setPostcode('BX1 1LT');
+            $this->cacheResults($postcode, $number, $address);
 
             return $address;
         } elseif ($this->environment != 'prod') {
-            // WR5 3DA is a free search via pca, so can used for non productione environments
+            // WR5 3DA is a free search via pca, so can used for non production environments
             $postcode = "WR53DA";
             $number = null;
         }
@@ -57,10 +77,20 @@ class PCAService
         if ($data) {
             $key = array_keys($data)[0];
 
-            return $this->retreive($key);
+            $address = $this->retreive($key);
+            $this->cacheResults($postcode, $number, $address);
+
+            return $address;
         }
 
         return null;
+    }
+
+    protected function cacheResults($postcode, $number, $address)
+    {
+        $redisKey = sprintf(self::REDIS_ADDRESS_KEY_FORMAT, $postcode, $number);
+        $this->redis->setex($redisKey, self::CACHE_TIME, serialize($address));
+        $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
     }
 
     /**
@@ -72,8 +102,12 @@ class PCAService
      */
     public function validatePostcode($postcode)
     {
-        // TODO: If we cache the original postcode in redis, we can avoid querying the api service for most cases
-        $postcode = strtolower(str_replace(' ', '', $postcode));
+        $postcode = $this->normalizePostcode($postcode);
+
+        if ($this->redis->hexists(self::REDIS_POSTCODE_KEY, $postcode)) {
+            return true;
+        }
+
         $results = $this->find($postcode, null);
         if (!$results || count($results) == 0) {
             return false;
@@ -81,9 +115,16 @@ class PCAService
 
         foreach ($results as $id => $line) {
             $items = explode(',', $line);
-            $found = strtolower(str_replace(' ', '', $items[0]));
-            return $postcode == $found;
+            $found = $this->normalizePostcode($items[0]);
+
+            if ($postcode == $found) {
+                $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
+
+                return true;
+            }
         }
+
+        return false;
     }
 
     /**
