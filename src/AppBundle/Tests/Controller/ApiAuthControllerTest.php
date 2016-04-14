@@ -91,8 +91,7 @@ class ApiAuthControllerTest extends WebTestCase
         $data = json_decode(self::$client->getResponse()->getContent(), true);
 
         $this->assertTrue(strlen($data['id']) > 5);
-        $this->assertTrue(in_array('A0001', $data['phone']['devices']));
-        $this->assertTrue(in_array($data['id'], $data['user']['policies']));
+        $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
     }
 
     public function testNewPolicyInvalidUser()
@@ -119,7 +118,7 @@ class ApiAuthControllerTest extends WebTestCase
         $data = json_decode(self::$client->getResponse()->getContent(), true);
 
         $this->assertTrue(strlen($data['id']) > 5);
-        $this->assertEquals('128', $data['phone']['memory']);
+        $this->assertEquals('128', $data['phone_policy']['phone']['memory']);
     }
 
     public function testNewPolicyMemoryStandard()
@@ -136,7 +135,7 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
         $this->assertTrue(strlen($data['id']) > 5);
-        $this->assertEquals('64', $data['phone']['memory']);
+        $this->assertEquals('64', $data['phone_policy']['phone']['memory']);
     }
 
     public function testNewPolicyInvalidImei()
@@ -242,8 +241,7 @@ class ApiAuthControllerTest extends WebTestCase
         $getData = json_decode(self::$client->getResponse()->getContent(), true);
 
         $this->assertEquals($createData['id'], $getData['id']);
-        $this->assertEquals($createData['imei'], $getData['imei']);
-        $this->assertEquals($createData['user']['id'], $getData['user']['id']);
+        $this->assertEquals($createData['phone_policy']['imei'], $getData['phone_policy']['imei']);
         $this->assertEquals(0, $createData['pot']['connections']);
         $this->assertEquals(7, $createData['pot']['max_connections']);
         $this->assertEquals(0, $createData['pot']['value']);
