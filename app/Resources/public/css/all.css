@@ -40,6 +40,7 @@
   top: -0.5rem;
   transform: rotate(135deg);
 }
-.navbar-item button {
+#navbar .download-button {
     margin-top: 6px;
+    border: none;
 }

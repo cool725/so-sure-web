@@ -18,7 +18,14 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="navbar-item"><a class="navbar-link" href="/">Home</a></li>
                 <li class="navbar-item"><a class="navbar-link" href="http://blog.wearesosure.com" target="_blank">Blog</a></li>
-                <li class="navbar-item"><button class="btn btn-success" href="https://play.google.com/store/apps/details?id=com.wearesosure"><i class="fa fa-android fa-lg"></i> Download</button></li>
+                <li><div class="dropdown">
+                  <button class="btn btn-primary dropdown-toggle download-button" type="button" data-toggle="dropdown">Download
+                    <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                      <li><a href="https://play.google.com/store/apps/details?id=com.wearesosure"><i class="fa fa-android fa-lg"></i> Android</a></li>
+                      <li><a href="itms://geo.itunes.apple.com/gb/app/so-sure/id1094307449?mt=8"><i class="fa fa-apple fa-lg"></i> iOS</a></li>
+                    </ul>
+                </div></li>
                 {% if app.user %}
                   {% if is_granted('ROLE_ADMIN') %}
                     <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
@@ -32,12 +39,12 @@
                       </a>
                     </li>
                   {% endif %}
-                  <li><a href="{{ path('fos_user_security_logout') }}">Logout</a></li>                  
+                  <li><a href="{{ path('fos_user_security_logout') }}">Logout</a></li>
                 {% else %}
                   {# not showing login for now #}
                   {# <li><a href="/login"">Login</a></li> #}
                 {% endif %}
-              </ul>              
+              </ul>
             </div>
           </div>
         </nav>
