@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Service\PCAService;
 
 /**
  * @group functional-nonet
@@ -13,6 +14,7 @@ class PCAServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;
     protected static $pca;
+    protected static $redis;
 
     public static function setUpBeforeClass()
     {
@@ -26,10 +28,25 @@ class PCAServiceTest extends WebTestCase
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
          self::$pca = self::$container->get('app.address');
+         self::$redis = self::$container->get('snc_redis.default');
     }
 
     public function tearDown()
     {
+    }
+
+    public function testGetAddressCaching()
+    {
+        self::$redis->flushdb();
+        $this->assertFalse(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT'));
+        $address = self::$pca->getAddress('BX11LT', null);
+        $this->assertEquals('BX1 1LT', $address->getPostCode());
+        $this->assertTrue(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT'));
+    }
+
+    public function testNormalize()
+    {
+        $this->assertEquals('SE152SZ', self::$pca->normalizePostcode('se15 2sz '));
     }
 
     public function testTransform3()

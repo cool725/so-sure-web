@@ -64,6 +64,7 @@ class PCAService
             $address->setLine3('so-sure Test Address Line 3');
             $address->setCity('so-sure Test City');
             $address->setPostcode('BX1 1LT');
+            $this->cacheResults($postcode, $number, $address);
 
             return $address;
         } elseif ($this->environment != 'prod') {
@@ -77,13 +78,19 @@ class PCAService
             $key = array_keys($data)[0];
 
             $address = $this->retreive($key);
-            $this->redis->setex($redisKey, self::CACHE_TIME, serialize($address));
-            $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
+            $this->cacheResults($postcode, $number, $address);
 
             return $address;
         }
 
         return null;
+    }
+
+    protected function cacheResults($postcode, $number, $address)
+    {
+        $redisKey = sprintf(self::REDIS_ADDRESS_KEY_FORMAT, $postcode, $number);
+        $this->redis->setex($redisKey, self::CACHE_TIME, serialize($address));
+        $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
     }
 
     /**
@@ -110,14 +117,14 @@ class PCAService
             $items = explode(',', $line);
             $found = $this->normalizePostcode($items[0]);
 
-            if($postcode == $found) {
+            if ($postcode == $found) {
                 $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
 
                 return true;
             }
         }
 
-        return $false;
+        return false;
     }
 
     /**
