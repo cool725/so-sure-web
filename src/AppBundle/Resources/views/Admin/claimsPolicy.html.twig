@@ -4,6 +4,7 @@
     {{ parent() }}
     {% javascripts
         '@AppBundle/Resources/public/js/Claims/tabs.js'
+        '@AppBundle/Resources/public/js/Admin/claimsPolicy.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}            
@@ -12,6 +13,11 @@
 {% block body %}
 <div class="container">
     <h2>so-sure Claims - {{policy.user.name }}</h2>
+    <div class="bg-danger text-right" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+        {{ form_start(form) }}
+        {{ form_widget(form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
+        {{ form_end(form) }}
+    </div>
     {% include 'AppBundle::Claims/claimsPolicyItem.html.twig' %}
 </div>
 {% endblock %}
