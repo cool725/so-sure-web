@@ -38,15 +38,16 @@ class InvitationVoterTest extends WebTestCase
     {
         $invitation = new EmailInvitation();
         $this->assertFalse(self::$invitationVoter->supports('unknown', $invitation));
-        $this->assertFalse(self::$invitationVoter->supports('view', null));
+        $this->assertFalse(self::$invitationVoter->supports('accept', null));
     }
 
     public function testSupports()
     {
         $invitation = new EmailInvitation();
-        $this->assertTrue(self::$invitationVoter->supports('view', $invitation));
-        $this->assertTrue(self::$invitationVoter->supports('edit', $invitation));
-        $this->assertTrue(self::$invitationVoter->supports('delete', $invitation));
+        $this->assertTrue(self::$invitationVoter->supports('accept', $invitation));
+        $this->assertTrue(self::$invitationVoter->supports('reject', $invitation));
+        $this->assertTrue(self::$invitationVoter->supports('cancel', $invitation));
+        $this->assertTrue(self::$invitationVoter->supports('reinvite', $invitation));
     }
 
     public function testVoteOk()
@@ -57,7 +58,11 @@ class InvitationVoterTest extends WebTestCase
         $invitation->setInviter($user);
         $token = new PreAuthenticatedToken($user, '1', 'test');
 
-        $this->assertTrue(self::$invitationVoter->voteOnAttribute('view', $invitation, $token));
+        $this->assertTrue(self::$invitationVoter->voteOnAttribute('cancel', $invitation, $token));
+        $this->assertTrue(self::$invitationVoter->voteOnAttribute('reinvite', $invitation, $token));
+
+        $this->assertFalse(self::$invitationVoter->voteOnAttribute('accept', $invitation, $token));
+        $this->assertFalse(self::$invitationVoter->voteOnAttribute('reject', $invitation, $token));
     }
 
     public function testVoteDiffUser()
@@ -71,6 +76,6 @@ class InvitationVoterTest extends WebTestCase
         $userDiff->setId(2);
         $token = new PreAuthenticatedToken($userDiff, '1', 'test');
 
-        $this->assertFalse(self::$invitationVoter->voteOnAttribute('view', $invitation, $token));
+        $this->assertFalse(self::$invitationVoter->voteOnAttribute('cancel', $invitation, $token));
     }
 }
