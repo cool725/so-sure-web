@@ -244,6 +244,10 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals($createData['id'], $getData['id']);
         $this->assertEquals($createData['imei'], $getData['imei']);
         $this->assertEquals($createData['user']['id'], $getData['user']['id']);
+        $this->assertEquals(0, $createData['pot']['connections']);
+        $this->assertEquals(7, $createData['pot']['max_connections']);
+        $this->assertEquals(0, $createData['pot']['value']);
+        $this->assertEquals(69.98, round($createData['pot']['max_value'], 2));
     }
 
     public function testGetPolicyUnknownId()
