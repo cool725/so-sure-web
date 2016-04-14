@@ -77,9 +77,17 @@ class ApiController extends BaseController
             }
 
             if (!$user->isEnabled()) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_RESET_PASSWORD, 'User account is temporarily disabled - reset password', 422);
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_RESET_PASSWORD,
+                    'User account is temporarily disabled - reset password',
+                    422
+                );
             } elseif ($user->isLocked()) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_SUSPENDED, 'User account is suspended - contact us', 422);
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_SUSPENDED,
+                    'User account is suspended - contact us',
+                    422
+                );
             }
 
             $encoder_service = $this->get('security.encoder_factory');
@@ -319,9 +327,17 @@ class ApiController extends BaseController
             }
 
             if (!$user->isEnabled()) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_RESET_PASSWORD, 'User account is temporarily disabled - reset password', 422);
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_RESET_PASSWORD,
+                    'User account is temporarily disabled - reset password',
+                    422
+                );
             } elseif ($user->isLocked()) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_SUSPENDED, 'User account is suspended - contact us', 422);
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_SUSPENDED,
+                    'User account is suspended - contact us',
+                    422
+                );
             }
 
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
