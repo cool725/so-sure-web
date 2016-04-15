@@ -383,7 +383,7 @@ class ApiAuthControllerTest extends WebTestCase
             'type' => 'billing',
             'line1' => 'address line 1',
             'city' => 'London',
-            'postcode' => 'SE152SZ',
+            'postcode' => 'BX11LT',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
@@ -553,7 +553,7 @@ class ApiAuthControllerTest extends WebTestCase
             'type' => 'billing',
             'line1' => 'address line 1',
             'city' => 'London',
-            'postcode' => 'SE152SZ',
+            'postcode' => 'BX11LT',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
@@ -576,7 +576,7 @@ class ApiAuthControllerTest extends WebTestCase
             'type' => 'billing',
             'line1' => 'address line 1',
             'city' => 'London',
-            'postcode' => 'ec1v 1rx',
+            'postcode' => 'BX11LT',
         ]);
         $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
@@ -639,7 +639,7 @@ class ApiAuthControllerTest extends WebTestCase
                 'type' => 'billing',
                 'line1' => 'address line 1',
                 'city' => 'London',
-                'postcode' => 'EC2A 1AF',
+                'postcode' => 'BX11LT',
             ];
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
             $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
