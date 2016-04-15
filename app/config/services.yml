@@ -18,6 +18,7 @@ services:
             developerLogin: "%cognito_developer_login%"
             identityPoolId: "%aws_cognito_identitypoolid%"
             logger:         "@logger"
+            facebook:       "@app.facebook"
 
     app.user.cognitoidentity.authenticator:
         class: AppBundle\Security\CognitoIdentityAuthenticator

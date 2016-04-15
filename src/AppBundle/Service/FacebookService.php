@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use Facebook\Facebook;
+use Facebook\FacebookSession;
 use AppBundle\Document\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -62,7 +63,15 @@ class FacebookService
 
         return $this->fb;
     }
-    
+
+    public function getUserId()
+    {
+        $response = $this->fb->get('/me?fields=id');
+        $user = $response->getGraphUser();
+
+        return $user['id'];
+    }
+
     /**
      * @param integer $pictureSize
      *
