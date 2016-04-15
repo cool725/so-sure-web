@@ -5,7 +5,6 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Service\RateLimitService;
 
-
 /**
  * @group functional-nonet
  */
@@ -37,7 +36,11 @@ class RateLimitServiceTest extends WebTestCase
     public function testAddressRateLimitIp()
     {
         for ($i = 1; $i < 30; $i++) {
-            $allowed = self::$rateLimit->allowed(RateLimitService::TYPE_ADDRESS, '1.1.1.1', sprintf('address-cog-%d', $i));
+            $allowed = self::$rateLimit->allowed(
+                RateLimitService::TYPE_ADDRESS,
+                '1.1.1.1',
+                sprintf('address-cog-%d', $i)
+            );
             if ($i <= 21) {
                 $this->assertTrue($allowed);
             } else {
@@ -49,7 +52,11 @@ class RateLimitServiceTest extends WebTestCase
     public function testAddressRateLimitCognito()
     {
         for ($i = 1; $i < 10; $i++) {
-            $allowed = self::$rateLimit->allowed(RateLimitService::TYPE_ADDRESS, sprintf('1.1.2.%d', $i), 'address-cog-cog');
+            $allowed = self::$rateLimit->allowed(
+                RateLimitService::TYPE_ADDRESS,
+                sprintf('1.1.2.%d', $i),
+                'address-cog-cog'
+            );
             if ($i <= 3) {
                 $this->assertTrue($allowed);
             } else {
@@ -61,7 +68,11 @@ class RateLimitServiceTest extends WebTestCase
     public function testImeiRateLimitIp()
     {
         for ($i = 1; $i < 30; $i++) {
-            $allowed = self::$rateLimit->allowed(RateLimitService::TYPE_IMEI, '1.1.3.1', sprintf('address-imei-%d', $i));
+            $allowed = self::$rateLimit->allowed(
+                RateLimitService::TYPE_IMEI,
+                '1.1.3.1',
+                sprintf('address-imei-%d', $i)
+            );
             if ($i <= 14) {
                 $this->assertTrue($allowed);
             } else {
@@ -73,7 +84,11 @@ class RateLimitServiceTest extends WebTestCase
     public function testImeiRateLimitCognito()
     {
         for ($i = 1; $i < 10; $i++) {
-            $allowed = self::$rateLimit->allowed(RateLimitService::TYPE_IMEI, sprintf('1.1.4.%d', $i), 'address-imei-cog');
+            $allowed = self::$rateLimit->allowed(
+                RateLimitService::TYPE_IMEI,
+                sprintf('1.1.4.%d', $i),
+                'address-imei-cog'
+            );
             if ($i <= 2) {
                 $this->assertTrue($allowed);
             } else {

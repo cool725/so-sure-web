@@ -39,7 +39,7 @@ class RateLimitService
      * Is the call allowed
      *
      * @param string $type      TYPE_ADDRESS|TYPE_IMEI
-     * @param string $ip        
+     * @param string $ip
      * @param string $cognitoId
      *
      * @return boolean
