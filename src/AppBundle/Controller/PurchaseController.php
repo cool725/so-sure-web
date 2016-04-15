@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Phone;
+use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -49,15 +50,60 @@ class PurchaseController extends BaseController
      * @Route("/dd/", name="purchase_item_debit")
      * @Template
      */
-    public function purchaseDdItemAction()
+    public function purchaseDdItemAction(Request $request)
     {
         $phone = $this->getSessionPhone();
         if (!$phone) {
             return $this->redirectToRoute('quote');
         }
 
+        $user = $this->getUser();
+        $form = $this->createForm(BasicUserType::class, $user);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $dm = $this->getManager();
+            $dm->flush();
+
+            $this->redirectToRoute('purchase_item_debit_address');
+        }
+
         return array(
             'phone' => $phone,
+            'form' => $form->createView(),
+        );
+    }
+
+    /**
+     * @Route("/dd/address", name="purchase_item_debit_address")
+     * @Template
+     */
+    public function purchaseDdItemAddressAction(Request $request)
+    {
+        $phone = $this->getSessionPhone();
+        if (!$phone) {
+            return $this->redirectToRoute('quote');
+        }
+
+        $dm = $this->getManager();
+        $user = $this->getUser();
+        if (!$address = $user->getBillingAddress()) {
+            $address = new Address();
+            $address->setType(Address::Billing);
+            $address->setUser($user);
+        }
+
+        $form = $this->createForm(AddressType::class, $address);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $dm->persist($address);
+            $dm->flush();
+
+            //$this->redirectToRoute('purchase_item_debit_address');
+        }
+
+        return array(
+            'phone' => $phone,
+            'form' => $form->createView(),
         );
     }
 
