@@ -19,6 +19,7 @@ use AppBundle\Document\Sns;
 use AppBundle\Document\User;
 use AppBundle\Document\Invitation\Invitation;
 
+use AppBundle\Service\RateLimitService;
 use AppBundle\Classes\ApiErrorCode;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -146,6 +147,15 @@ class ApiAuthController extends BaseController
                     "User's billing address must be valid and in GB",
                     422
                 );
+            }
+
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowed(
+                RateLimitService::TYPE_IMEI,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
             $imei = str_replace(' ', '', $data['phone_policy']['imei']);

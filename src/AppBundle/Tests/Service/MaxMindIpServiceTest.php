@@ -53,7 +53,6 @@ class MaxMindServiceIpTest extends WebTestCase
     public function testInternalIp()
     {
         $data = self::$geoip->find('10.10.10.10');
-        print_r(self::$geoip->getData());
         $this->assertEquals(null, self::$geoip->getCountry());
         $this->assertEquals(null, self::$geoip->getCoordinates());
     }

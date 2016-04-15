@@ -17,6 +17,7 @@ use AppBundle\Document\Sns;
 use AppBundle\Document\User;
 
 use AppBundle\Classes\ApiErrorCode;
+use AppBundle\Service\RateLimitService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -34,6 +35,15 @@ class ApiController extends BaseController
         try {
             if (!$this->validateQueryFields($request, ['postcode'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowed(
+                RateLimitService::TYPE_ADDRESS,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
             $postcode = trim($request->get('postcode'));

@@ -146,6 +146,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testNewPolicyMemoryExceeded()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::VALID_IMEI,
             'make' => 'Apple',
@@ -163,6 +164,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testNewPolicyMemoryStandard()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::VALID_IMEI,
             'make' => 'Apple',
@@ -180,6 +182,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testNewPolicyInvalidImei()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::INVALID_IMEI,
             'make' => 'OnePlus',
@@ -193,6 +196,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testNewPolicyBlacklistedImei()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::BLACKLISTED_IMEI,
             'make' => 'OnePlus',
@@ -210,6 +214,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
 
         // missing imei
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'make' => 'OnePlus',
             'device' => 'A0001',
@@ -219,6 +224,7 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
 
         // missing memory
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::VALID_IMEI,
             'make' => 'OnePlus',
@@ -228,6 +234,7 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
 
         // missing device
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::VALID_IMEI,
             'make' => 'OnePlus',
@@ -237,6 +244,7 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
 
         // missing make
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::VALID_IMEI,
             'device' => 'A0001',
@@ -251,6 +259,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
 
         // missing imei
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::VALID_IMEI,
             'make' => 'foo',
@@ -636,6 +645,7 @@ class ApiAuthControllerTest extends WebTestCase
             $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         }
 
+        $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::VALID_IMEI,
             'make' => 'OnePlus',
@@ -645,5 +655,11 @@ class ApiAuthControllerTest extends WebTestCase
         ]]);
 
         return $crawler;
+    }
+
+    protected function clearRateLimit()
+    {
+        // clear out redis rate limiting
+        self::$client->getContainer()->get('snc_redis.default')->flushdb();
     }
 }
