@@ -172,6 +172,12 @@ services:
             dm:             "@doctrine_mongodb.odm.default_document_manager"
             logger:         "@logger"
 
+    app.ratelimit:
+        class: AppBundle\Service\RateLimitService
+        arguments:
+            redis:          "@snc_redis.default"
+            logger:         "@logger"
+
     aws.credentials:
         class: Aws\Credentials\Credentials
         arguments:

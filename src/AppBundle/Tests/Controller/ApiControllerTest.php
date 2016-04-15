@@ -57,6 +57,20 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals("BX1 1LT", $data['postcode']);
     }
 
+    public function testAddressRateLimited()
+    {
+        $client = static::createClient();
+
+        // Run enough to trigger cognito rate limit
+        for ($i = 0; $i < 4; $i++) {
+            $crawler = $client->request('GET', '/api/v1/address?postcode=BX11LT');
+        }
+
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, $data['code']);
+    }
+
     /* TODO: Consider moving to a different type of test.
      * Note that once we're out of test mode mid-apr 2016,
      * then it should be possible to use this test
