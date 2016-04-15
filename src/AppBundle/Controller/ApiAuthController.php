@@ -381,6 +381,30 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/user", name="api_auth_get_current_user")
+     * @Method({"GET"})
+     */
+    public function getCurrentUserAction()
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
+            }
+
+            $this->denyAccessUnlessGranted('view', $user);
+
+            return new JsonResponse($user->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api getUser. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/user/{id}", name="api_auth_get_user")
      * @Method({"POST"})
      */

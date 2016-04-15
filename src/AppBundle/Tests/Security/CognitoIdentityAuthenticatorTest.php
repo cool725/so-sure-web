@@ -56,14 +56,6 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
         $this->assertEquals(CognitoIdentityAuthenticator::ANON_USER_AUTH_PATH, $token->getUser());
     }
 
-    public function testAuthGetToken()
-    {
-        $cognitoIdentityId = self::$cognito->getId();
-        $request = $this->getRequest($cognitoIdentityId, '/api/v1/auth/address', 'GET');
-        $token = self::$auth->createToken($request, 'login.so-sure.com');
-        $this->assertEquals(CognitoIdentityAuthenticator::ANON_USER_UNAUTH_PATH, $token->getUser());
-    }
-
     /**
      * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
      */

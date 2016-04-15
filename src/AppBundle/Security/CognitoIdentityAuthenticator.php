@@ -89,18 +89,14 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
     public function createToken(Request $request, $providerKey)
     {
         $user = self::ANON_USER_UNAUTH_PATH;
-        $cognitoIdentityId = null;
-        // AWS Gateway won't pass identity via get
-        if ($request->getMethod() != "GET") {
-            $cognitoIdentityId = $this->getCognitoIdentityId($request->getContent());
+        $cognitoIdentityId = $this->getCognitoIdentityId($request->getContent());
 
-            if (stripos($request->getPathInfo(), self::AUTH_PATH) !== false) {
-                $user = self::ANON_USER_AUTH_PATH;
-            }
-            
-            if (!$cognitoIdentityId) {
-                throw new BadCredentialsException('No Cognito Identifier found');
-            }
+        if (stripos($request->getPathInfo(), self::AUTH_PATH) !== false) {
+            $user = self::ANON_USER_AUTH_PATH;
+        }
+
+        if ($user == self::ANON_USER_AUTH_PATH && !$cognitoIdentityId) {
+            throw new BadCredentialsException('No Cognito Identifier found');
         }
 
         return new PreAuthenticatedToken(
