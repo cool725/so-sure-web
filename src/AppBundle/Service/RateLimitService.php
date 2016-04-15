@@ -58,7 +58,12 @@ class RateLimitService
 
         $this->redis->expire($ipKey, self::CACHE_TIME);
         $this->redis->expire($cognitoIdKey, self::CACHE_TIME);
-        
+
+        // ignore rate limiting from runway easy
+        if ($ip == "62.253.24.186") {
+            return true;
+        }
+
         // ip should always be higher as may be multiple users behind a nat
         if ($ipRequests > $maxIpRequests || $cognitoRequests > $maxCognitoRequests) {
             $allowed = false;
