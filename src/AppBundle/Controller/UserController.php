@@ -26,8 +26,14 @@ class UserController extends BaseController
      */
     public function indexAction()
     {
+        /*
+        $fb = $this->get('app.facebook');
+        $fb->init($this->getUser());
+        $userId = $fb->getUserId();
+        */
         return array(
             'user' => $this->getUser(),
+            //'user_id' => $userId
         );
     }
 

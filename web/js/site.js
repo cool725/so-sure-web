@@ -76,9 +76,10 @@ if (fb_pixel_id !== '') {
 // Facebook SDK + Send Button
 window.fbAsyncInit = function() {
   FB.init({
-    appId: $('#ss-root').data('fb-appid'),
+    appId: $('#ss-root').data('fb-id'),
     xfbml: true,
-    version: 'v2.5'
+    version: 'v2.5',
+    status     : true
   });
 };
 
