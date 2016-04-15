@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use AppBundle\Document\User;
+use AppBundle\Service\FacebookService;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -32,6 +33,9 @@ class CognitoIdentityUserProvider implements UserProviderInterface
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var FacebookService */
+    protected $fb;
+
     /**
      */
     public function __construct(
@@ -40,7 +44,8 @@ class CognitoIdentityUserProvider implements UserProviderInterface
         $cognito,
         $developerLogin,
         $identityPoolId,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        FacebookService $fb
     ) {
         $this->userManager = $userManager;
         $this->dm = $dm;
@@ -48,6 +53,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
         $this->developerLogin = $developerLogin;
         $this->identityPoolId = $identityPoolId;
         $this->logger = $logger;
+        $this->fb = $fb;
     }
 
     
@@ -85,8 +91,9 @@ class CognitoIdentityUserProvider implements UserProviderInterface
                     $user = $repo->find($userId);
                 }
             } elseif (in_array("graph.facebook.com", $logins)) {
-                // TODO: need to see what's being returned here for facebook
-                $user = $repo->findOneBy(['facebookId' => $logins['graph.facebook.com']]);
+                $this->fb->initToken($logins['graph.facebook.com']);
+                $facebookId = $this->fb->getUserId();
+                $user = $repo->findOneBy(['facebookId' => $facebookId]);
             }
     
             return $user;
