@@ -26,6 +26,17 @@ class UserController extends BaseController
      */
     public function indexAction()
     {
+        return array(
+            'user' => $this->getUser(),
+        );
+    }
+
+    /**
+     * @Route("/fb", name="user_facebook")
+     * @Template
+     */
+    public function fbAction()
+    {
         $facebook = $this->get('app.facebook');
         $facebook->init($this->getUser());
         if ($redirect = $this->ensureFacebookPermission(
