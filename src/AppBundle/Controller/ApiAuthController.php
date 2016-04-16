@@ -157,6 +157,13 @@ class ApiAuthController extends BaseController
             )) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
+            if (!$rateLimit->allowed(
+                RateLimitService::TYPE_POLICY,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
 
             $imei = str_replace(' ', '', $data['phone_policy']['imei']);
             if (!$imeiValidator->isImei($imei)) {

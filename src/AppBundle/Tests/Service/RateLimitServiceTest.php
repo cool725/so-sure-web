@@ -33,66 +33,37 @@ class RateLimitServiceTest extends WebTestCase
     {
     }
 
-    public function testAddressRateLimitIp()
+    public function testRateLimits()
     {
-        for ($i = 1; $i < 30; $i++) {
-            $allowed = self::$rateLimit->allowed(
-                RateLimitService::TYPE_ADDRESS,
-                '1.1.1.1',
-                sprintf('address-cog-%d', $i)
-            );
-            if ($i <= 21) {
-                $this->assertTrue($allowed);
-            } else {
-                $this->assertFalse($allowed);
-            }
-        }
-    }
+        $rates = [
+            RateLimitService::TYPE_ADDRESS,
+            RateLimitService::TYPE_IMEI,
+            RateLimitService::TYPE_LOGIN,
+            RateLimitService::TYPE_POLICY
+        ];
+        foreach ($rates as $type) {
+            for ($i = 1; $i < 100; $i++) {
+                $allowedIp = self::$rateLimit->allowed(
+                    $type,
+                    '1.1.1.1',
+                    sprintf('address-cog-%d', $i)
+                );
+                if ($i <= RateLimitService::$maxRequests[$type] * RateLimitService::IP_ADDRESS_MULTIPLIER) {
+                    $this->assertTrue($allowedIp);
+                } else {
+                    $this->assertFalse($allowedIp);
+                }
 
-    public function testAddressRateLimitCognito()
-    {
-        for ($i = 1; $i < 10; $i++) {
-            $allowed = self::$rateLimit->allowed(
-                RateLimitService::TYPE_ADDRESS,
-                sprintf('1.1.2.%d', $i),
-                'address-cog-cog'
-            );
-            if ($i <= 3) {
-                $this->assertTrue($allowed);
-            } else {
-                $this->assertFalse($allowed);
-            }
-        }
-    }
-
-    public function testImeiRateLimitIp()
-    {
-        for ($i = 1; $i < 30; $i++) {
-            $allowed = self::$rateLimit->allowed(
-                RateLimitService::TYPE_IMEI,
-                '1.1.3.1',
-                sprintf('address-imei-%d', $i)
-            );
-            if ($i <= 14) {
-                $this->assertTrue($allowed);
-            } else {
-                $this->assertFalse($allowed);
-            }
-        }
-    }
-
-    public function testImeiRateLimitCognito()
-    {
-        for ($i = 1; $i < 10; $i++) {
-            $allowed = self::$rateLimit->allowed(
-                RateLimitService::TYPE_IMEI,
-                sprintf('1.1.4.%d', $i),
-                'address-imei-cog'
-            );
-            if ($i <= 2) {
-                $this->assertTrue($allowed);
-            } else {
-                $this->assertFalse($allowed);
+                $allowedCognito = self::$rateLimit->allowed(
+                    $type,
+                    sprintf('1.1.2.%d', $i),
+                    'address-cog-cog'
+                );
+                if ($i <= RateLimitService::$maxRequests[$type]) {
+                    $this->assertTrue($allowedCognito);
+                } else {
+                    $this->assertFalse($allowedCognito);
+                }
             }
         }
     }

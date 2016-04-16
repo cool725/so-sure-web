@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Classes\ApiErrorCode;
+use AppBundle\Service\RateLimitService;
 
 /**
  * @group functional-net
@@ -221,6 +222,22 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals(422, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(ApiErrorCode::ERROR_USER_SUSPENDED, $data['code']);
+    }
+
+    public function testLoginRateLimited()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+
+        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::TYPE_LOGIN] + 1; $i++) {
+            $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array(
+                'email' => static::generateEmail('invalid-user', $this),
+                'password' => 'invalid'
+            ));
+        }
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, $data['code']);
     }
 
     // ping
