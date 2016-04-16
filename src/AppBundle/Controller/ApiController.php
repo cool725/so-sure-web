@@ -116,43 +116,6 @@ class ApiController extends BaseController
     }
 
     /**
-     * @Route("/login/facebook", name="api_login_facebook")
-     * @Method({"POST"})
-     */
-    public function loginFacebookAction(Request $request)
-    {
-        try {
-            $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['facebook_id', 'facebook_access_token', 'cognito_id'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(User::class);
-            $user = $repo->findOneBy(['facebook_id' => $data['facebook_id']]);
-            if (!$user) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_USER_ABSENT,
-                    'Unable to locate facebook user',
-                    403
-                );
-            }
-
-            // TODO: Consider how we validate the facebookAuthToken - can we check against the cognito id.
-            // if auth token matches, is fine, but if its different, could indicate a new token
-            // could perhaps validate token against fb?
-            // or see if facebook is match to authed cognito id?
-            // https://developers.facebook.com/docs/php/FacebookSession/5.0.0
-
-            return new JsonResponse($user->toApiArray());
-        } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api loginFacebookAction. %s', $e->getMessage()));
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
-    }
-
-    /**
      * @Route("/ping", name="api_ping")
      * @Method({"GET", "POST"})
      */
@@ -426,7 +389,7 @@ class ApiController extends BaseController
 
     /**
      * @Route("/version", name="api_version")
-     * @Method({"GET", "POST"})
+     * @Method({"GET"})
      */
     public function versionAction(Request $request)
     {
