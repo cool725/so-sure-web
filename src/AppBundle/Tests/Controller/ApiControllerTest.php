@@ -603,6 +603,17 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals(ApiErrorCode::ERROR_UPGRADE_APP, $data['code']);
     }
 
+    public function testVersionNotRegulated()
+    {
+        $client = static::createClient();
+        $redis = $client->getContainer()->get('snc_redis.default');
+        $redis->set('ERROR_NOT_YET_REGULATED', 1);
+        $crawler = $client->request('GET', '/api/v1/version?platform=ios&version=0.0.0');
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_NOT_YET_REGULATED, $data['code']);
+    }
+
     // helpers
 
     /**

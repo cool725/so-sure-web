@@ -10,6 +10,7 @@ class ApiErrorCode
     const ERROR_NOT_FOUND = 4;
     const ERROR_UPGRADE_APP = 5;
     const ERROR_TOO_MANY_REQUESTS = 6;
+    const ERROR_NOT_YET_REGULATED = 7;
     const ERROR_USER_EXISTS = 100;
     const ERROR_USER_ABSENT = 101;
     const ERROR_USER_INVALID_ADDRESS = 102;

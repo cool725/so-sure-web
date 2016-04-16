@@ -400,6 +400,15 @@ class ApiController extends BaseController
 
             $platform = $request->get('platform');
             $version = $request->get('version');
+            $redis = $this->get('snc_redis.default');
+
+            if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_YET_REGULATED,
+                    "Coming soon",
+                    422
+                );
+            }
 
             // Test version
             if ($version == "0.0.0") {
