@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Classes\ApiErrorCode;
+use AppBundle\Service\RateLimitService;
 
 /**
  * @group functional-net
@@ -131,6 +132,17 @@ class ApiAuthControllerTest extends WebTestCase
             }
         }
         $this->assertTrue($foundPolicy);
+    }
+
+    public function testNewPolicyRateLimited()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::TYPE_POLICY] + 1; $i++) {
+            $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser, false);
+        }
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, $data['code']);
     }
 
     public function testNewPolicyInvalidUser()
@@ -642,7 +654,7 @@ class ApiAuthControllerTest extends WebTestCase
         );
     }
 
-    protected function createPolicy($cognitoIdentityId, $user)
+    protected function createPolicy($cognitoIdentityId, $user, $clearRateLimit = true)
     {
         if ($user) {
             $userUpdateUrl = sprintf('/api/v1/auth/user/%s', $user->getId());
@@ -663,7 +675,9 @@ class ApiAuthControllerTest extends WebTestCase
             $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         }
 
-        $this->clearRateLimit();
+        if ($clearRateLimit) {
+            $this->clearRateLimit();
+        }
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::VALID_IMEI,
             'make' => 'OnePlus',

@@ -73,6 +73,15 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowed(
+                RateLimitService::TYPE_LOGIN,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
+
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $email = strtolower($data['email']);
