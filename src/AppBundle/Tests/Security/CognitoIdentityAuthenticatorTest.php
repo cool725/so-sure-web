@@ -86,7 +86,49 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
         $token = self::$auth->createToken($request, 'login.so-sure.com');
         $authToken = self::$auth->authenticateToken($token, self::$userProvider, 'login.so-sure.com');
     }
-    
+
+    /**
+     * @expectedException Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException
+     */
+    public function testAuthenticateExceptionUserDisabled()
+    {
+        $user = static::createUser(self::$userManager, self::generateEmail('user-disabled', $this), 'foo');
+        $user->setEnabled(false);
+        $cognitoIdentityId = static::authUser(self::$cognito, $user);
+
+        $request = $this->getAuthRequest($cognitoIdentityId);
+        $token = self::$auth->createToken($request, 'login.so-sure.com');
+        $authToken = self::$auth->authenticateToken($token, self::$userProvider, 'login.so-sure.com');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException
+     */
+    public function testAuthenticateExceptionUserExpired()
+    {
+        $user = static::createUser(self::$userManager, self::generateEmail('user-expired', $this), 'foo');
+        $user->setExpired(true);
+        $cognitoIdentityId = static::authUser(self::$cognito, $user);
+
+        $request = $this->getAuthRequest($cognitoIdentityId);
+        $token = self::$auth->createToken($request, 'login.so-sure.com');
+        $authToken = self::$auth->authenticateToken($token, self::$userProvider, 'login.so-sure.com');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException
+     */
+    public function testAuthenticateExceptionUserLocked()
+    {
+        $user = static::createUser(self::$userManager, self::generateEmail('user-locked', $this), 'foo');
+        $user->setLocked(true);
+        $cognitoIdentityId = static::authUser(self::$cognito, $user);
+
+        $request = $this->getAuthRequest($cognitoIdentityId);
+        $token = self::$auth->createToken($request, 'login.so-sure.com');
+        $authToken = self::$auth->authenticateToken($token, self::$userProvider, 'login.so-sure.com');
+    }
+
     public function testGetCognitoIdentityId()
     {
         $identity = static::getIdentityString("eu-west-1:85376078-5f1f-43b8-8529-9021bb2096a4");
@@ -107,7 +149,7 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
 
     private function getAuthRequest($cognitoIdentityId)
     {
-        return $this->getRequest($cognitoIdentityId, '/api/v1/auth/address', 'POST');
+        return $this->getRequest($cognitoIdentityId, '/api/v1/auth/ping?_method=GET', 'POST');
     }
     
     private function getRequest($cognitoIdentityId, $path = "/", $method = "GET")
