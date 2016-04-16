@@ -230,7 +230,7 @@ class ApiAuthController extends BaseController
 
     /**
      * @Route("/policy/{id}", name="api_auth_get_policy")
-     * @Method({"POST"})
+     * @Method({"GET"})
      */
     public function getPolicyAction($id)
     {
@@ -372,7 +372,7 @@ class ApiAuthController extends BaseController
 
     /**
      * @Route("/secret", name="api_auth_secret")
-     * @Method({"GET", "POST"})
+     * @Method({"GET"})
      */
     public function secretAuthAction()
     {
@@ -406,7 +406,7 @@ class ApiAuthController extends BaseController
 
     /**
      * @Route("/user/{id}", name="api_auth_get_user")
-     * @Method({"POST"})
+     * @Method({"GET"})
      */
     public function getUserAction($id)
     {

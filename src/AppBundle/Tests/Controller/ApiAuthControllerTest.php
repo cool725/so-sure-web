@@ -119,7 +119,7 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
 
         // Now make sure that the policy shows up against the user
-        $url = sprintf('/api/v1/auth/user/%s', self::$testUser->getId());
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET', self::$testUser->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
@@ -283,7 +283,7 @@ class ApiAuthControllerTest extends WebTestCase
         $createData = json_decode(self::$client->getResponse()->getContent(), true);
         $policyId = $createData['id'];
 
-        $url = sprintf('/api/v1/auth/policy/%s', $policyId);
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $policyId);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $getData = json_decode(self::$client->getResponse()->getContent(), true);
@@ -299,7 +299,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testGetPolicyUnknownId()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/policy/1');
+        $url = sprintf('/api/v1/auth/policy/1?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
     }
@@ -308,7 +308,7 @@ class ApiAuthControllerTest extends WebTestCase
     {
         $user = static::createUser(self::$userManager, 'getpolicy-unauth@auth-api.so-sure.com', 'foo');
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $url = sprintf('/api/v1/auth/user/%s', $user->getId());
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
@@ -498,7 +498,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testGetUser()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/user/%s', self::$testUser->getId());
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET', self::$testUser->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
@@ -509,7 +509,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testGetUserDifferentUser()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/user/%s', self::$testUser2->getId());
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET', self::$testUser2->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
@@ -518,7 +518,7 @@ class ApiAuthControllerTest extends WebTestCase
     {
         $user = static::createUser(self::$userManager, 'getuser-unauth@auth-api.so-sure.com', 'foo');
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $url = sprintf('/api/v1/auth/user/%s', $user->getId());
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
