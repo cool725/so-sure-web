@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\HttpUtils;
+use AppBundle\Document\User;
 use Psr\Log\LoggerInterface;
 
 class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, AuthenticationFailureHandlerInterface
@@ -131,6 +132,14 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
             } else {
                 $user = $token->getUser();
             }
+        }
+
+        if ($user instanceof User && (
+            $user->isExpired() || !$user->isEnabled() || $user->isLocked()
+        )) {
+            throw new CustomUserMessageAuthenticationException(
+                sprintf('User %s (%s) is disabled', $user->getName(), $user->getEmail())
+            );
         }
 
         return new PreAuthenticatedToken(

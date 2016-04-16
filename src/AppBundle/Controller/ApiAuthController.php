@@ -93,7 +93,7 @@ class ApiAuthController extends BaseController
 
     /**
      * @Route("/ping", name="api_auth_ping")
-     * @Method({"GET", "POST"})
+     * @Method({"GET"})
      */
     public function pingAuthAction()
     {

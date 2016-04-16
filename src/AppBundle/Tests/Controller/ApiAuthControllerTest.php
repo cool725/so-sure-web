@@ -87,7 +87,7 @@ class ApiAuthControllerTest extends WebTestCase
      */
     public function testAuthRequiresIdentity()
     {
-        $crawler = self::$client->request('POST', '/api/v1/auth/ping');
+        $crawler = self::$client->request('POST', '/api/v1/auth/ping?_method=GET');
         $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
 
