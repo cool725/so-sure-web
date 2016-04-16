@@ -123,8 +123,6 @@ class InvitationService
 
     public function sms(Policy $policy, $mobile, $name = null)
     {
-        // TODO: Validate its not a re-invite
-        // TODO: Validate the sms isn't blocked hasn't requested an opt out
         $invitationRepo = $this->dm->getRepository(SmsInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $mobile);
         if (count($prevInvitations) > 0) {
@@ -132,7 +130,7 @@ class InvitationService
         }
 
         $optOutRepo = $this->dm->getRepository(SmsOptOut::class);
-        $optouts = $optOutRepo->findOptOut($mobile, EmailOptOut::OPTOUT_CAT_INVITATIONS);
+        $optouts = $optOutRepo->findOptOut($mobile, SmsOptOut::OPTOUT_CAT_INVITATIONS);
         if (count($optouts) > 0) {
             return null;
         }
