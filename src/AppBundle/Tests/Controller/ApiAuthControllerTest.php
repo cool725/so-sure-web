@@ -549,6 +549,8 @@ class ApiAuthControllerTest extends WebTestCase
             'last_name' => 'foo',
             'email' => 'barfoo@auth-api.so-sure.com',
             'mobile_number' => '1234',
+            'facebook_id' => 'abcd',
+            'facebook_access_token' => 'zy',
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
@@ -558,6 +560,46 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals('bar', $result['first_name']);
         $this->assertEquals('foo', $result['last_name']);
         $this->assertEquals('1234', $result['mobile_number']);
+        $this->assertEquals('abcd', $result['facebook_id']);
+    }
+
+    public function testUpdateFacebook()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $data = [
+            'first_name' => 'bar',
+            'last_name' => 'foo',
+            'email' => 'barfoo@auth-api.so-sure.com',
+            'mobile_number' => '1234',
+            'facebook_id' => 'abcd',
+            'facebook_access_token' => 'zy',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals('abcd', $result['facebook_id']);
+
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, ['last_name' => 'barfoo']);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals('abcd', $result['facebook_id']);
+
+        // facebook update needs auth token as well
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, [
+            'facebook_id' => 'barfoo'
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals('abcd', $result['facebook_id']);
+
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, [
+            'facebook_id' => 'barfoo',
+            'facebook_access_token' => 'lala'
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals('barfoo', $result['facebook_id']);
     }
 
     public function testUpdateUserDifferentUser()
