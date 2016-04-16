@@ -323,7 +323,6 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $createData = json_decode(self::$client->getResponse()->getContent(), true);
         $policyId = $createData['id'];
-        print_r($createData);
 
         $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $policyId);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
