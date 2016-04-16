@@ -477,6 +477,13 @@ class ApiAuthController extends BaseController
                 $userChanged = true;
             }
 
+            if (isset($data['facebook_id']) && strlen($data['facebook_id']) > 0 &&
+                isset($data['facebook_access_token']) && strlen($data['facebook_access_token']) > 0 ) {
+                $user->setFacebookId($data['facebook_id']);
+                $user->setFacebookAccessToken($data['facebook_access_token']);
+                $userChanged = true;
+            }
+
             if ($userChanged) {
                 $dm->flush();
             }
