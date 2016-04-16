@@ -211,6 +211,18 @@ class ApiAuthController extends BaseController
                 );
             }
 
+            $dm = $this->getManager();
+            $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+
+            // TODO: Once a lost/stolen imei store is setup, will want to check there as well.
+            if (!$phonePolicyRepo->isMissingOrExpiredOnlyPolicy($imei)) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI,
+                    'Imei is already registered for a policy',
+                    422
+                );
+            }
+
             $policy = new PhonePolicy();
             $policy->setImei($imei);
             $policy->setPhone($phone);
@@ -221,7 +233,6 @@ class ApiAuthController extends BaseController
             ]));
             $user->addPolicy($policy);
 
-            $dm = $this->getManager();
             $dm->persist($policy);
             $dm->flush();
 
