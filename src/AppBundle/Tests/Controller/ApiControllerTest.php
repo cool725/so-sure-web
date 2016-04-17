@@ -569,12 +569,12 @@ class ApiControllerTest extends WebTestCase
 
         $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => 'api-new-user-mobile@api.bar.com',
-            'mobile_number' => '1234'
+            'mobile_number' => '+447700900000'
         ));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals('api-new-user-mobile@api.bar.com', $data['email']);
-        $this->assertEquals('1234', $data['mobile_number']);
+        $this->assertEquals('+447700900000', $data['mobile_number']);
     }
 
     public function testUserNoEmail()
@@ -585,6 +585,33 @@ class ApiControllerTest extends WebTestCase
         $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
         ));
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
+    }
+
+    public function testUserInvalidEmail()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => 'abc'
+        ));
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $data['code']);
+    }
+
+    public function testUserInvalidMobile()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('invalid-mobile', $this),
+            'mobile_number' => '+44770090000'
+        ));
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $data['code']);
     }
 
     // version

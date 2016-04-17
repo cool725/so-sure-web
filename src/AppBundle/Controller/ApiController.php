@@ -369,6 +369,12 @@ class ApiController extends BaseController
             $user->setSignupCountry($geoip->getCountry());
             $user->setSignupLoc($geoip->getCoordinates());
 
+            $validator = $this->get('validator');
+            $errors = $validator->validate($user);
+            if (count($errors) > 0) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, (string) $errors);
+            }
+
             $launchUser = $this->get('app.user.launch');
             $addedUser = $launchUser->addUser($user);
 

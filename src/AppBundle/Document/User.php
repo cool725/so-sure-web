@@ -7,6 +7,7 @@ use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use GeoJson\Geometry\Point;
 use AppBundle\Document\Invitation\Invitation;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @MongoDB\Document
@@ -18,6 +19,11 @@ class User extends BaseUser
      * @MongoDB\Id
      */
     protected $id;
+
+    /**
+     * @Assert\Email(strict=true)
+     */
+    protected $email;
 
     protected $referralId;
 
@@ -91,7 +97,10 @@ class User extends BaseUser
     /** @MongoDB\EmbedOne(targetDocument="Gocardless", name="gocardless") */
     protected $gocardless;
 
-    /** @MongoDB\String(name="mobile_number", nullable=true) */
+    /**
+     * @Assert\Regex(pattern="/^(00447[1-9]\d{8,8}|\+447[1-9]\d{8,8})$/")
+     * @MongoDB\String(name="mobile_number", nullable=true)
+     */
     protected $mobileNumber;
 
     /** @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user") */
