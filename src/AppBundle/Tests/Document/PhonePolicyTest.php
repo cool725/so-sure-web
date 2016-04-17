@@ -5,14 +5,28 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * @group unit
+ * @group functional-nonet
  */
-class PhonePolicyTest extends \PHPUnit_Framework_TestCase
+class PhonePolicyTest extends WebTestCase
 {
+    protected static $container;
+    protected static $dm;
+
     public static function setUpBeforeClass()
     {
+         //start the symfony kernel
+         $kernel = static::createKernel();
+         $kernel->boot();
+
+         //get the DI container
+         self::$container = $kernel->getContainer();
+
+         //now we can instantiate our service (if you want a fresh one for
+         //each test method, do this in setUp() instead
+         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
     }
 
     public function tearDown()
@@ -77,7 +91,7 @@ class PhonePolicyTest extends \PHPUnit_Framework_TestCase
     public function testGetRiskPolicyNoConnectionsPre30()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(1);
+        $policyA->create(rand(1,999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(PhonePolicy::RISK_HIGH, $policyA->getRisk(new \DateTime("2016-01-10")));
     }
@@ -85,7 +99,7 @@ class PhonePolicyTest extends \PHPUnit_Framework_TestCase
     public function testGetRiskPolicyNoConnectionsPost30()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(1);
+        $policyA->create(rand(1,999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(PhonePolicy::RISK_MEDIUM, $policyA->getRisk(new \DateTime("2016-02-10")));
     }
@@ -93,7 +107,7 @@ class PhonePolicyTest extends \PHPUnit_Framework_TestCase
     public function testGetRiskPolicyConnectionsZeroPot()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(1);
+        $policyA->create(rand(1,999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(0);
 
@@ -106,7 +120,7 @@ class PhonePolicyTest extends \PHPUnit_Framework_TestCase
     public function testGetRiskPolicyConnectionsNoClaims()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(1);
+        $policyA->create(rand(1,999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(20);
 
@@ -119,7 +133,7 @@ class PhonePolicyTest extends \PHPUnit_Framework_TestCase
     public function testGetRiskPolicyConnectionsClaimedPre30()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(1);
+        $policyA->create(rand(1,999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(20);
 
@@ -136,7 +150,7 @@ class PhonePolicyTest extends \PHPUnit_Framework_TestCase
     public function testGetRiskPolicyConnectionsClaimedPost30()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(1);
+        $policyA->create(rand(1,999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(20);
 
@@ -148,5 +162,19 @@ class PhonePolicyTest extends \PHPUnit_Framework_TestCase
         $policyA->addClaim($claimA);
 
         $this->assertEquals(PhonePolicy::RISK_LOW, $policyA->getRisk(new \DateTime("2016-02-20")));
+    }
+
+    /**
+     * @expectedException \MongoDuplicateKeyException
+     */
+    public function testDuplicatePolicyNumberFails()
+    {
+        $policyA = new PhonePolicy();
+        $policyB = new PhonePolicy();
+        $policyA->setPolicyNumber(1);
+        $policyB->setPolicyNumber(1);
+        self::$dm->persist($policyA);
+        self::$dm->persist($policyB);
+        self::$dm->flush();
     }
 }

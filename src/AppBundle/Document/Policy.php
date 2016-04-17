@@ -45,7 +45,10 @@ abstract class Policy
     /** @MongoDB\Field(type="string") */
     protected $status;
 
-    /** @MongoDB\Field(type="string", name="policy_number", nullable=true) */
+    /**
+     * @MongoDB\Field(type="string", name="policy_number")
+     * @MongoDB\Index(unique=true, sparse=true)
+     */
     protected $policyNumber;
 
     /** @MongoDB\Field(type="string", name="payment_type", nullable=true) */
