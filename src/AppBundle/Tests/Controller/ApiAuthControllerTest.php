@@ -500,6 +500,70 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(ApiErrorCode::ERROR_INVITATION_DUPLICATE, $data['code']);
     }
 
+    public function testSentInvitationAppears()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => $this->generateEmail('invite-appears', $this),
+            'name' => 'Invitation Name',
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+
+        $policyData = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertTrue(count($policyData['sent_invitiations']) > 0);
+        $foundInvitation = false;
+        foreach ($policyData['sent_invitiations'] as $invitation) {
+            if ($invitation['name'] == "Invitation Name") {
+                $foundInvitation = true;
+            }
+        }
+        $this->assertTrue($foundInvitation);
+    }
+
+    public function testReceivedInvitationAppears()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser2);
+        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser2);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
+
+        print sprintf("Invite from %s to %s", self::$testUser2->getName(), self::$testUser->getName());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::$testUser->getEmail(),
+            'name' => self::$testUser->getName(),
+        ]);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $invitationData = json_decode(self::$client->getResponse()->getContent(), true);
+
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET&debug=true', self::$testUser->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+
+        $userData = json_decode(self::$client->getResponse()->getContent(), true);
+        print_r($userData);
+        $this->assertTrue(count($userData['received_invitations']) > 0);
+        $foundInvitation = false;
+        foreach ($userData['received_invitations'] as $invitation) {
+            if ($invitation['id'] == $invitationData['id']) {
+                $foundInvitation = true;
+                $this->assertEquals(self::$testUser2->getId(), $invitation['inviter_id']);
+            }
+        }
+        $this->assertTrue($foundInvitation);
+    }
+
     // secret
 
     /**

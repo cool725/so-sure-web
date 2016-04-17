@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User extends BaseUser
 {
+    use ArrayToApiArrayTrait;
+
     /**
      * @MongoDB\Id
      */
@@ -401,21 +403,8 @@ class User extends BaseUser
         return true;
     }
 
-    public function toApiArray($identityId = null, $token = null)
+    public function toApiArray($identityId = null, $token = null, $debug = false)
     {
-        $addresses = [];
-        if ($this->addresses) {
-            foreach ($this->addresses as $address) {
-                $addresses[] = $address->toApiArray();
-            }
-        }
-        $policies = [];
-        if ($this->policies) {
-            foreach ($this->policies as $policy) {
-                $policies[] = $policy->toApiArray();
-            }
-        }
-
         return [
           'id' => $this->getId(),
           'email' => $this->getEmailCanonical(),
@@ -424,9 +413,10 @@ class User extends BaseUser
           'facebook_id' => $this->getFacebookId(),
           'cognito_token' => [ 'id' => $identityId, 'token' => $token ],
           'user_token' => ['token' => $this->getToken()],
-          'addresses' => $addresses,
+          'addresses' => $this->eachApiArray($this->addresses),
           'mobile_number' => $this->getMobileNumber(),
-          'policies' => $policies,
+          'policies' => $this->eachApiArray($this->policies),
+          'received_invitations' => $this->eachApiArray($this->getReceivedInvitations(), $debug),
         ];
     }
 }
