@@ -614,6 +614,20 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $data['code']);
     }
 
+    public function testUserUkMobile()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('uk-mobile', $this),
+            'mobile_number' => '07700 900000'
+        ));
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('+447700900000', $data['mobile_number']);
+    }
+
     // version
 
     /**
