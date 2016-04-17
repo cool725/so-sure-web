@@ -552,7 +552,6 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
         $userData = json_decode(self::$client->getResponse()->getContent(), true);
-        print_r($userData);
         $this->assertTrue(count($userData['received_invitations']) > 0);
         $foundInvitation = false;
         foreach ($userData['received_invitations'] as $invitation) {
