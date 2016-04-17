@@ -34,7 +34,7 @@ framework:
         handler_id: snc_redis.session.handler
     fragments:       ~
     http_method_override: true
-
+    
 # Twig Configuration
 twig:
     debug:            "%kernel.debug%"

@@ -486,13 +486,13 @@ class ApiAuthControllerTest extends WebTestCase
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'mobile' => '+447775740466',
+            'mobile' => '+447700900000',
             'name' => 'functional test',
         ]);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'mobile' => '+447775740466',
+            'mobile' => '+447700900000',
             'name' => 'functional test',
         ]);
         $data = json_decode(self::$client->getResponse()->getContent(), true);
@@ -576,7 +576,7 @@ class ApiAuthControllerTest extends WebTestCase
             'first_name' => 'bar',
             'last_name' => 'foo',
             'email' => 'barfoo@auth-api.so-sure.com',
-            'mobile_number' => '1234',
+            'mobile_number' => '+447700900000',
             'facebook_id' => 'abcd',
             'facebook_access_token' => 'zy',
         ];
@@ -587,7 +587,7 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals('barfoo@auth-api.so-sure.com', $result['email']);
         $this->assertEquals('bar', $result['first_name']);
         $this->assertEquals('foo', $result['last_name']);
-        $this->assertEquals('1234', $result['mobile_number']);
+        $this->assertEquals('+447700900000', $result['mobile_number']);
         $this->assertEquals('abcd', $result['facebook_id']);
     }
 
@@ -599,7 +599,7 @@ class ApiAuthControllerTest extends WebTestCase
             'first_name' => 'bar',
             'last_name' => 'foo',
             'email' => 'barfoo@auth-api.so-sure.com',
-            'mobile_number' => '1234',
+            'mobile_number' => '+447700900000',
             'facebook_id' => 'abcd',
             'facebook_access_token' => 'zy',
         ];
@@ -638,6 +638,33 @@ class ApiAuthControllerTest extends WebTestCase
             'first_name' => 'bar',
         ]);
         $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+    }
+
+    public function testUpdateUserInvalidEmail()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $data = [
+            'email' => 'barfoo@',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $data['code']);
+    }
+
+    public function testUpdateUserInvalidMobile()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $data = [
+            'email' => static::generateEmail('invalid-mobile', $this),
+            'mobile_number' => '+44770090000',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $data['code']);
     }
 
     // user/{id}/address
@@ -728,7 +755,7 @@ class ApiAuthControllerTest extends WebTestCase
             static::putRequest(self::$client, $cognitoIdentityId, $userUpdateUrl, [
                 'first_name' => 'foo',
                 'last_name' => 'bar',
-                'mobile_number' => '0123456789',
+                'mobile_number' => '+447700900000',
             ]);
 
             $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());

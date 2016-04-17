@@ -495,6 +495,12 @@ class ApiAuthController extends BaseController
                 $userChanged = true;
             }
 
+            $validator = $this->get('validator');
+            $errors = $validator->validate($user);
+            if (count($errors) > 0) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, (string) $errors);
+            }
+
             if ($userChanged) {
                 $dm->flush();
             }
