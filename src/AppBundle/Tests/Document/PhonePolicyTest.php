@@ -91,7 +91,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyNoConnectionsPre30()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(rand(1,999999));
+        $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(PhonePolicy::RISK_HIGH, $policyA->getRisk(new \DateTime("2016-01-10")));
     }
@@ -99,7 +99,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyNoConnectionsPost30()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(rand(1,999999));
+        $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(PhonePolicy::RISK_MEDIUM, $policyA->getRisk(new \DateTime("2016-02-10")));
     }
@@ -107,7 +107,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyConnectionsZeroPot()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(rand(1,999999));
+        $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(0);
 
@@ -120,7 +120,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyConnectionsNoClaims()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(rand(1,999999));
+        $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(20);
 
@@ -133,7 +133,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyConnectionsClaimedPre30()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(rand(1,999999));
+        $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(20);
 
@@ -150,7 +150,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyConnectionsClaimedPost30()
     {
         $policyA = new PhonePolicy();
-        $policyA->create(rand(1,999999));
+        $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(20);
 
