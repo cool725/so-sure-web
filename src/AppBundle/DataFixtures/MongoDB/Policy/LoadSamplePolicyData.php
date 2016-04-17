@@ -53,7 +53,7 @@ class LoadSamplePolicyData implements FixtureInterface
         $policy->addConnection($connection);
         $policy->setPotValue($policy->calculatePotValue());
         $manager->persist($connection);
-        \Doctrine\Common\Util\Debug::dump($policy);
+        //\Doctrine\Common\Util\Debug::dump($policy);
         $manager->persist($policy);
     }
 }

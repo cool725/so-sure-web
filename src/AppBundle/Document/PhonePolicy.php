@@ -9,6 +9,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class PhonePolicy extends Policy
 {
+    use ArrayToApiArrayTrait;
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -55,28 +57,11 @@ class PhonePolicy extends Policy
 
     public function toApiArray()
     {
-        $connections = [];
-        foreach ($this->getConnections() as $connection) {
-            $connections[] = $connection->toApiArray();
-        }
-        return [
-            'id' => $this->getId(),
-            'status' => $this->getStatus(),
-            'type' => 'phone',
-            'start_date' => $this->getStart() ? $this->getStart(\DateTime::ISO8601)->format('') : null,
-            'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ISO8601) : null,
-            'policy_number' => $this->getPolicyNumber(),
+        return array_merge(parent::toApiArray(), [
             'phone_policy' => [
                 'imei' => $this->getImei(),
                 'phone' => $this->getPhone() ? $this->getPhone()->toApiArray() : null,
-            ],
-            'pot' => [
-                'connections' => count($this->getConnections()),
-                'max_connections' => $this->getPhone()->getMaxConnections(),
-                'value' => $this->getPotValue(),
-                'max_value' => $this->getPhone()->getMaxPot(),
-            ],
-            'connections' => $connections,
-        ];
+            ]
+        ]);
     }
 }

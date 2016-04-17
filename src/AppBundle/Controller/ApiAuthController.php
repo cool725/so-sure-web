@@ -426,7 +426,7 @@ class ApiAuthController extends BaseController
      * @Route("/user/{id}", name="api_auth_get_user")
      * @Method({"GET"})
      */
-    public function getUserAction($id)
+    public function getUserAction(Request $request, $id)
     {
         try {
             $dm = $this->getManager();
@@ -437,8 +437,12 @@ class ApiAuthController extends BaseController
             }
 
             $this->denyAccessUnlessGranted('view', $user);
+            $debug = false;
+            if ($request->get('debug')) {
+                $debug = true;
+            }
 
-            return new JsonResponse($user->toApiArray());
+            return new JsonResponse($user->toApiArray(null, null, $debug));
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {

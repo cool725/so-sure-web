@@ -13,6 +13,8 @@ use Doctrine\ODM\MongoDB\PersistentCollection;
  */
 abstract class Policy
 {
+    use ArrayToApiArrayTrait;
+
     const RISK_HIGH = 'high';
     const RISK_MEDIUM = 'medium';
     const RISK_LOW = 'low';
@@ -201,6 +203,21 @@ abstract class Policy
         $this->potValue = $potValue;
     }
 
+    public function getInvitations()
+    {
+        return $this->invitations;
+    }
+
+    public function getInvitationsAsArray()
+    {
+        // TODO: should be instanceof \Doctrine\Common\Collections\ArrayCollection, but not working
+        if (is_object($this->getInvitations())) {
+            return $this->getInvitations()->toArray();
+        }
+
+        return $this->getInvitations();
+    }
+
     public function create($seq)
     {
         $this->setStart(new \DateTime());
@@ -305,5 +322,37 @@ abstract class Policy
     public function isPolicy()
     {
         return $this->getStatus() !== null;
+    }
+
+    public function getSentInvitations()
+    {
+        $userId = $this->getUser() ? $this->getUser()->getId() : null;
+        return array_filter($this->getInvitationsAsArray(), function ($invitation) use ($userId) {
+            if ($inviter = $invitation->getInviter()) {
+                return $inviter->getId() == $userId;
+            }
+
+            return false;
+        });
+    }
+
+    protected function toApiArray()
+    {
+        return [
+            'id' => $this->getId(),
+            'status' => $this->getStatus(),
+            'type' => 'phone',
+            'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ISO8601) : null,
+            'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ISO8601) : null,
+            'policy_number' => $this->getPolicyNumber(),
+            'pot' => [
+                'connections' => count($this->getConnections()),
+                'max_connections' => $this->getPhone()->getMaxConnections(),
+                'value' => $this->getPotValue(),
+                'max_value' => $this->getPhone()->getMaxPot(),
+            ],
+            'connections' => $this->eachApiArray($this->getConnections()),
+            'sent_invitiations' => $this->eachApiArray($this->getSentInvitations()),
+        ];
     }
 }
