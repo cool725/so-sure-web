@@ -84,4 +84,9 @@ class Claim
     {
         $this->suspectedFraud = $suspectedFraud;
     }
+
+    public function isMonetaryClaim()
+    {
+        return in_array($this->getType(), [self::TYPE_DAMAGE, self::TYPE_LOSS, self::TYPE_THEFT]);
+    }
 }

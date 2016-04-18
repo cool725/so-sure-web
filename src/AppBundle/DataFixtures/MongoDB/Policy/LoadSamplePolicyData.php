@@ -48,8 +48,8 @@ class LoadSamplePolicyData implements FixtureInterface
         $policy->create(1);
 
         $connection = new Connection();
-        $connection->user = $users[0];
-        $connection->value = 10;
+        $connection->setUser($users[0]);
+        $connection->setValue(10);
         $policy->addConnection($connection);
         $policy->setPotValue($policy->calculatePotValue());
         $manager->persist($connection);

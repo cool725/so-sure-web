@@ -55,6 +55,22 @@ class PhonePolicy extends Policy
         $this->phoneData = $phoneData;
     }
 
+    public function getConnectionValue()
+    {
+        // TODO: Check if > 2 months, return 2
+        return 10;
+    }
+
+    public function getMaxConnections()
+    {
+        return $this->getPhone()->getMaxConnections();
+    }
+
+    public function getMaxPot()
+    {
+        return $this->getPhone()->getMaxPot();
+    }
+
     public function toApiArray()
     {
         return array_merge(parent::toApiArray(), [

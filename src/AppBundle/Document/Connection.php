@@ -10,24 +10,54 @@ class Connection
     /**
      * @MongoDB\ReferenceOne(targetDocument="User")
      */
-    public $user;
+    protected $user;
 
     /** @MongoDB\Date() */
-    public $date;
+    protected $date;
 
     /** @MongoDB\Field(type="float") */
-    public $value;
+    protected $value;
 
     public function __construct()
     {
         $this->date = new \DateTime();
     }
 
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function setDate($date)
+    {
+        $this->date = $date;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
+
     public function toApiArray()
     {
         return [
-            'name' => $this->user ? $this->user->getName() : null,
-            'date' => $this->date ? $this->date->format(\DateTime::ISO8601) : null,
+            'name' => $this->getUser() ? $this->getUser()->getName() : null,
+            'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ISO8601) : null,
         ];
     }
 }

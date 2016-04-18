@@ -150,6 +150,11 @@ abstract class Invitation
         return $this->getAccepted() !== null;
     }
 
+    public function isProcessed()
+    {
+        return $this->getAccepted() || $this->getRejected() || $this->getCancelled();
+    }
+
     public function toApiArray($debug = false)
     {
         $inviterName = $this->getInviter() ? $this->getInviter()->getName() : null;

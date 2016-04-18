@@ -519,9 +519,9 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
         $policyData = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertTrue(count($policyData['sent_invitiations']) > 0);
+        $this->assertTrue(count($policyData['sent_invitations']) > 0);
         $foundInvitation = false;
-        foreach ($policyData['sent_invitiations'] as $invitation) {
+        foreach ($policyData['sent_invitations'] as $invitation) {
             if ($invitation['name'] == "Invitation Name") {
                 $foundInvitation = true;
             }
