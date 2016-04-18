@@ -356,7 +356,7 @@ abstract class Policy
 
     public function updatePotValue()
     {
-        $this->setPotValue($this->updatePotValue());
+        $this->setPotValue($this->calculatePotValue());
     }
 
     public function isPolicy()

@@ -76,6 +76,11 @@ abstract class Invitation
         return $this->accepted;
     }
 
+    public function isAccepted()
+    {
+        return $this->accepted !== null;
+    }
+
     public function setAccepted($accepted)
     {
         $this->accepted = $accepted;
@@ -198,7 +203,7 @@ abstract class Invitation
 
     public function isProcessed()
     {
-        return $this->getAccepted() || $this->getRejected() || $this->getCancelled();
+        return $this->isAccepted() || $this->isRejected() || $this->isCancelled();
     }
 
     public function toApiArray($debug = false)

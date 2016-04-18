@@ -8,7 +8,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\PhonePolicy;
 
 /**
- * @group functional-nonet
+ * @group functional-net
  */
 class GocardlessServiceTest extends WebTestCase
 {
