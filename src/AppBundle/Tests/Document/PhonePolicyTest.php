@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection;
+use AppBundle\Document\Phone;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
