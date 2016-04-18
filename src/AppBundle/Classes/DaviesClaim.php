@@ -13,6 +13,7 @@ class DaviesClaim
     public $endDate;
     public $lossType;
     public $lossDescription;
+    public $location;
     public $status;
     public $miStatus;
     public $replacementMake;
@@ -38,23 +39,24 @@ class DaviesClaim
         $this->claimNumber = $data[1];
         $this->insuredName = $data[2];
         $this->riskPostCode = $data[3];
-        $this->shippingAddress = $data[4];
-        $this->lossDate = $this->excelDate($data[5]);
-        $this->startDate = $this->excelDate($data[6]);
-        $this->endDate = $this->excelDate($data[7]);
-        $this->lossType = $data[8];
-        $this->lossDescription = $data[9];
+        $this->lossDate = $this->excelDate($data[4]);
+        $this->startDate = $this->excelDate($data[5]);
+        $this->endDate = $this->excelDate($data[6]);
+        $this->lossType = $data[7];
+        $this->lossDescription = $data[8];
+        $this->location = $data[9];
         $this->status = $data[10];
         $this->miStatus = $data[11];
         $this->replacementMake = $data[12];
         $this->replacementModel = $data[13];
-        $this->brightstarProductNumber = $data[14];
-        $this->incurred = $data[15];
-        $this->excess = $data[16];
-        $this->policyNumber = $data[17];
-        $this->notificationDate = $this->excelDate($data[18]);
-        $this->dateCreated = $this->excelDate($data[19]);
-        $this->dateClosed = $this->excelDate($data[20]);
+        $this->incurred = $data[14];
+        $this->excess = $data[15];
+        $this->policyNumber = $data[16];
+        $this->notificationDate = $this->excelDate($data[17]);
+        $this->dateCreated = $this->excelDate($data[18]);
+        $this->dateClosed = $this->excelDate($data[19]);
+        $this->shippingAddress = $data[20];
+        //$this->brightstarProductNumber = $data[14];
     }
 
     public static function create($data)
