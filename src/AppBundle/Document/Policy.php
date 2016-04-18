@@ -360,9 +360,9 @@ abstract class Policy
         });
     }
 
-    public abstract function getMaxConnections();
-    public abstract function getMaxPot();
-    public abstract function getConnectionValue();
+    abstract public function getMaxConnections();
+    abstract public function getMaxPot();
+    abstract public function getConnectionValue();
 
     protected function toApiArray()
     {
