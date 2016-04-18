@@ -86,6 +86,11 @@ abstract class Invitation
         return $this->rejected;
     }
 
+    public function isRejected()
+    {
+        return $this->rejected !== null;
+    }
+
     public function setRejected($rejected)
     {
         $this->rejected = $rejected;
@@ -94,6 +99,11 @@ abstract class Invitation
     public function getCancelled()
     {
         return $this->cancelled;
+    }
+
+    public function isCancelled()
+    {
+        return $this->cancelled !== null;
     }
 
     public function setCancelled($cancelled)

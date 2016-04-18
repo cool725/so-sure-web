@@ -291,4 +291,16 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-03-01')));
         $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-02')));
     }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testSetPolicyValueExceeded()
+    {
+        $policyA = new PhonePolicy();
+        $policyA->create(rand(1, 999999));
+        $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPhone(self::$phone);
+        $policyA->setPotValue(80);
+    }
 }

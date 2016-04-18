@@ -196,4 +196,55 @@ class InvitationServiceTest extends WebTestCase
         $invitation = self::$invitationService->sms($policy, '1123456');
         $this->assertTrue($invitation instanceof SmsInvitation);
     }
+
+    public function testEmailInvitationReinvite()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user5', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite5', $this),
+            'bar'
+        );
+        $invitation = self::$invitationService->email($policy, static::generateEmail('invite5', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
+        self::$invitationService->reinvite($invitation);
+
+        $this->assertEquals(1, $invitation->getReinvitedCount());
+    }
+
+    public function testEmailInvitationCancel()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user6', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm);
+        $invitation = self::$invitationService->email($policy, static::generateEmail('invite6', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
+        self::$invitationService->cancel($invitation);
+
+        $this->assertTrue($invitation->isCancelled());
+    }
+
+    public function testEmailInvitationRejectl()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user7', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm);
+        $invitation = self::$invitationService->email($policy, static::generateEmail('invite7', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
+        self::$invitationService->reject($invitation);
+
+        $this->assertTrue($invitation->isRejected());
+    }
 }
