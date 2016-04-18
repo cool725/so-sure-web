@@ -177,6 +177,15 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/terms", name="terms")
+     * @Template
+     */
+    public function termsAction()
+    {
+        return array();
+    }
+
+    /**
      * @Route("/phone/{make}/{model}", name="phone_make_model")
      * @Template
      */
