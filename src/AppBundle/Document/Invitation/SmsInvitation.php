@@ -22,6 +22,11 @@ class SmsInvitation extends Invitation
         return 'sms';
     }
 
+    public function getMaxReinvitations()
+    {
+        return 2;
+    }
+
     public function getMobile()
     {
         return $this->mobile;

@@ -5,6 +5,7 @@ namespace AppBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\Connection;
 
@@ -43,8 +44,12 @@ class LoadSamplePolicyData implements FixtureInterface
         $user->setLastName(sprintf('last'));            
         $manager->persist($user);
 
+        $phoneRepo = $manager->getRepository(Phone::class);
+        $phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+
         $policy = new PhonePolicy();
         $policy->setUser($user);
+        $policy->setPhone($phone);
         $policy->create(1);
 
         $connection = new Connection();

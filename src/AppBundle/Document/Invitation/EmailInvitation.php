@@ -22,6 +22,11 @@ class EmailInvitation extends Invitation
         return 'email';
     }
 
+    public function getMaxReinvitations()
+    {
+        return 5;
+    }
+
     public function getEmail()
     {
         return $this->email;

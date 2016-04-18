@@ -55,10 +55,13 @@ class PhonePolicy extends Policy
         $this->phoneData = $phoneData;
     }
 
-    public function getConnectionValue()
+    public function getConnectionValue(\DateTime $date = null)
     {
-        // TODO: Check if > 2 months, return 2
-        return 10;
+        if (!$this->isPolicy() || $this->isPolicyWithin60Days($date)) {
+            return 10;
+        } else {
+            return 2;
+        }
     }
 
     public function getMaxConnections()

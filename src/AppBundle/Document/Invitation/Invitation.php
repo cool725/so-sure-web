@@ -30,6 +30,12 @@ abstract class Invitation
     /** @MongoDB\Date() */
     protected $rejected;
 
+    /** @MongoDB\Date(name="last_reinvited") */
+    protected $lastReinvited;
+
+    /** @MongoDB\Field(type="integer", name="reinvited_count") */
+    protected $reinvitedCount;
+
     /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="sentInvitations") */
     protected $inviter;
 
@@ -47,10 +53,12 @@ abstract class Invitation
 
     abstract public function isSingleUse();
     abstract public function getChannel();
+    abstract public function getMaxReinvitations();
 
     public function __construct()
     {
         $this->created = new \DateTime();
+        $this->reinvitedCount = 0;
     }
 
     public function getId()
@@ -143,6 +151,34 @@ abstract class Invitation
         $this->policy = $policy;
         $policy->getUser()->addSentInvitation($this);
         //$this->setInviter($policy->getUser());
+    }
+
+    public function getReinvitedCount()
+    {
+        return $this->reinvitedCount;
+    }
+
+    public function getLastReinvited()
+    {
+        return $this->lastReinvited;
+    }
+
+    public function canReinvite()
+    {
+        return $this->getReinvitedCount() <= $this->getMaxReinvitations();
+    }
+
+    public function reinvite(\DateTime $date = null)
+    {
+        if (!$this->canReinvite()) {
+            throw new \Exception('Max invitations have been reached');
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $this->lastReinvited = $date;
+        $this->reinvitedCount++;
     }
 
     public function hasAccepted()

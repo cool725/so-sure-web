@@ -15,19 +15,22 @@ class PhonePolicyTest extends WebTestCase
 {
     protected static $container;
     protected static $dm;
+    protected static $phone;
 
     public static function setUpBeforeClass()
     {
-         //start the symfony kernel
-         $kernel = static::createKernel();
-         $kernel->boot();
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-         //get the DI container
-         self::$container = $kernel->getContainer();
+        //get the DI container
+        self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
     }
 
     public function tearDown()
@@ -53,6 +56,15 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policyA->isPolicyWithin30Days(new \DateTime("2016-01-02")));
         $this->assertTrue($policyA->isPolicyWithin30Days(new \DateTime("2016-01-29")));
         $this->assertFalse($policyA->isPolicyWithin30Days(new \DateTime("2016-02-01")));
+    }
+
+    public function testIsPolicyWithin60Days()
+    {
+        $policyA = new PhonePolicy();
+        $policyA->setStart(new \DateTime("2016-01-01"));
+        $this->assertTrue($policyA->isPolicyWithin60Days(new \DateTime("2016-01-02")));
+        $this->assertTrue($policyA->isPolicyWithin60Days(new \DateTime("2016-03-01")));
+        $this->assertFalse($policyA->isPolicyWithin60Days(new \DateTime("2016-03-02")));
     }
 
     public function testGetLastestClaim()
@@ -122,6 +134,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new PhonePolicy();
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPhone(self::$phone);
         $policyA->setPotValue(0);
 
         $connectionA = new Connection();
@@ -135,6 +148,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new PhonePolicy();
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPhone(self::$phone);
         $policyA->setPotValue(20);
 
         $connectionA = new Connection();
@@ -148,6 +162,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new PhonePolicy();
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPhone(self::$phone);
         $policyA->setPotValue(20);
 
         $connectionA = new Connection();
@@ -165,6 +180,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new PhonePolicy();
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPhone(self::$phone);
         $policyA->setPotValue(20);
 
         $connectionA = new Connection();
@@ -263,5 +279,16 @@ class PhonePolicyTest extends WebTestCase
         $claim->setType(Claim::TYPE_WITHDRAWN);
         $policy->addClaim($claim);
         $this->assertEquals(50, $policy->calculatePotValue());
+    }
+
+    public function testConnectionValue()
+    {
+        $policy = new PhonePolicy();
+        $this->assertEquals(10, $policy->getConnectionValue());
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $policy->setStart(new \DateTime('2016-01-01'));
+        $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-03-01')));
+        $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-02')));
     }
 }
