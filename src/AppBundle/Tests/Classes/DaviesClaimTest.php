@@ -24,23 +24,26 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '320160401000001',
             'Mr John Smith',
             'AB12 3CD',
-            '',
             '42461',
             '42430',
             '42794',
             'Damage',
             'Cracked Screen',
+            'Work',
             'Closed',
             'Settled',
+            '345678',
             'Samsung',
             'S6',
-            'XXX',
+            '351236666677777',
+            'Yes',
             '250.49',
-            'XX.XX',
+            '50',
             '07123 456789',
             '42461',
             '42461',
-            '42461'
+            '42461',
+            '123 The Street, Town, City, Postcode'
         ];
         $davies = new DaviesClaim();
         $davies->fromArray($data);
