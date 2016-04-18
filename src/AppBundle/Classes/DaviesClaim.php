@@ -16,9 +16,11 @@ class DaviesClaim
     public $location;
     public $status;
     public $miStatus;
+    public $brightstarProductNumber;
     public $replacementMake;
     public $replacementModel;
-    public $brightstarProductNumber;
+    public $replacementImei;
+    public $unauthorizedCalls;
     public $incurred;
     public $excess;
     public $policyNumber;
@@ -47,16 +49,18 @@ class DaviesClaim
         $this->location = $data[9];
         $this->status = $data[10];
         $this->miStatus = $data[11];
-        $this->replacementMake = $data[12];
-        $this->replacementModel = $data[13];
-        $this->incurred = $data[14];
-        $this->excess = $data[15];
-        $this->policyNumber = $data[16];
-        $this->notificationDate = $this->excelDate($data[17]);
-        $this->dateCreated = $this->excelDate($data[18]);
-        $this->dateClosed = $this->excelDate($data[19]);
-        $this->shippingAddress = $data[20];
-        //$this->brightstarProductNumber = $data[14];
+        $this->brightstarProductNumber = $data[12];
+        $this->replacementMake = $data[13];
+        $this->replacementModel = $data[14];
+        $this->replacementImei = $data[15];
+        $this->unauthorizedCalls = $data[16];
+        $this->incurred = $data[17];
+        $this->excess = $data[18];
+        $this->policyNumber = $data[19];
+        $this->notificationDate = $this->excelDate($data[20]);
+        $this->dateCreated = $this->excelDate($data[21]);
+        $this->dateClosed = $this->excelDate($data[22]);
+        $this->shippingAddress = $data[23];
     }
 
     public static function create($data)
