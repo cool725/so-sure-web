@@ -219,7 +219,7 @@ abstract class Invitation
             'inviter_name' => $inviterName,
             'channel' => $this->getChannel(),
             'link' => $this->getLink(),
-            'created_date' => $this->getCreated(),
+            'created_date' => $this->getCreated() ? $this->getCreated()->format(\DateTime::ISO8601) : null,
         ];
 
         if ($debug) {
