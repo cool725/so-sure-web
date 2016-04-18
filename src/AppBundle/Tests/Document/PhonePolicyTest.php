@@ -33,6 +33,18 @@ class PhonePolicyTest extends WebTestCase
     {
     }
 
+    public function testEmptyPolicyReturnsCorrectApiData()
+    {
+        $policy = new PhonePolicy();
+        $phone = new Phone();
+        $phone->init('foo', 'bar', 7.29, 1.50);
+        $policy->setPhone($phone);
+
+        $policyApi = $policy->toApiArray();
+        $this->assertEquals(0, $policyApi['pot']['connections']);
+        $this->assertEquals(0, $policyApi['pot']['value']);
+    }
+
     public function testIsPolicyWithin30Days()
     {
         $policyA = new PhonePolicy();

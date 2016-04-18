@@ -89,6 +89,7 @@ abstract class Policy
         $this->created = new \DateTime();
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->potValue = 0;
     }
 
     public function getId()
@@ -359,9 +360,9 @@ abstract class Policy
         });
     }
 
-    abstract function getMaxConnections();
-    abstract function getMaxPot();
-    abstract function getConnectionValue();
+    public abstract function getMaxConnections();
+    public abstract function getMaxPot();
+    public abstract function getConnectionValue();
 
     protected function toApiArray()
     {
