@@ -14,6 +14,7 @@ use Doctrine\ODM\MongoDB\PersistentCollection;
 abstract class Policy
 {
     use ArrayToApiArrayTrait;
+    use CurrencyTrait;
 
     const RISK_HIGH = 'high';
     const RISK_MEDIUM = 'medium';
@@ -204,7 +205,10 @@ abstract class Policy
 
     public function setPotValue($potValue)
     {
-        // TODO: Should validate this value does not go over 80% of policy value
+        if ($this->toTwoDp($potValue) > $this->getMaxPot()) {
+            throw new \Exception('Max pot value exceeded');
+        }
+
         $this->potValue = $potValue;
     }
 
@@ -223,9 +227,12 @@ abstract class Policy
         return $this->getInvitations();
     }
 
-    public function create($seq)
+    public function create($seq, $startDate = null)
     {
-        $this->setStart(new \DateTime());
+        if (!$startDate) {
+            $startDate = new \DateTime();
+        }
+        $this->setStart($startDate);
         $nextYear = clone $this->getStart();
         $nextYear = $nextYear->modify('+1 year');
         $this->setEnd($nextYear);
@@ -282,7 +289,16 @@ abstract class Policy
 
         return $this->getStart()->diff($date)->days <= 30;
     }
-    
+
+    public function isPolicyWithin60Days($date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $this->getStart()->diff($date)->days <= 60;
+    }
+
     public function hasClaimedInLast30Days($date = null)
     {
         if ($date == null) {
@@ -340,7 +356,7 @@ abstract class Policy
 
     public function updatePotValue()
     {
-        $this->setPotValue($this->updatePotValue());
+        $this->setPotValue($this->calculatePotValue());
     }
 
     public function isPolicy()

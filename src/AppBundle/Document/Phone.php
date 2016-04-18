@@ -9,6 +9,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class Phone
 {
+    use CurrencyTrait;
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -152,11 +154,6 @@ class Phone
         return (int) ceil($this->getMaxPot() / $this->getConnectionValue());
     }
 
-    private function toTwoDp($float)
-    {
-        return round($float, 2);
-    }
-    
     public function __toString()
     {
         $name = sprintf("%s %s", $this->make, $this->model);

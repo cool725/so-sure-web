@@ -192,7 +192,7 @@ class InvitationService
     public function accept(Invitation $invitation, Policy $inviteePolicy)
     {
         if ($invitation->isProcessed()) {
-            throw new \Exception("Invitationhas already been processed");
+            throw new \Exception("Invitation has already been processed");
         }
 
         $inviterPolicy = $invitation->getPolicy();
@@ -229,7 +229,6 @@ class InvitationService
 
     public function cancel(Invitation $invitation)
     {
-        print 'here';
         $invitation->setCancelled(new \DateTime());
         $this->dm->flush();
         // TODO: notify invitee??
@@ -237,9 +236,22 @@ class InvitationService
 
     public function reinvite(Invitation $invitation)
     {
-        //$invitation->setCancelled(new \DateTime());
-        // TODO: record another invitation
-        $this->dm->flush();
-        // TODO: re-notify invitee
+        if (!$invitation->canReinvite()) {
+            return false;
+        }
+
+        if ($invitation instanceof EmailInvitation) {
+            $this->sendEmail($invitation);
+            $invitation->reinvite();
+            $this->dm->flush();
+        } elseif ($invitation instanceof SmsInvitation) {
+            $this->sendSms($invitation);
+            $invitation->reinvite();
+            $this->dm->flush();
+        } else {
+            throw new \Exception('Unknown invitation type. Unable to reinvite.');
+        }
+
+        return true;
     }
 }

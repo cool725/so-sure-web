@@ -30,6 +30,12 @@ abstract class Invitation
     /** @MongoDB\Date() */
     protected $rejected;
 
+    /** @MongoDB\Date(name="last_reinvited") */
+    protected $lastReinvited;
+
+    /** @MongoDB\Field(type="integer", name="reinvited_count") */
+    protected $reinvitedCount;
+
     /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="sentInvitations") */
     protected $inviter;
 
@@ -47,10 +53,12 @@ abstract class Invitation
 
     abstract public function isSingleUse();
     abstract public function getChannel();
+    abstract public function getMaxReinvitations();
 
     public function __construct()
     {
         $this->created = new \DateTime();
+        $this->reinvitedCount = 0;
     }
 
     public function getId()
@@ -68,6 +76,11 @@ abstract class Invitation
         return $this->accepted;
     }
 
+    public function isAccepted()
+    {
+        return $this->accepted !== null;
+    }
+
     public function setAccepted($accepted)
     {
         $this->accepted = $accepted;
@@ -78,6 +91,11 @@ abstract class Invitation
         return $this->rejected;
     }
 
+    public function isRejected()
+    {
+        return $this->rejected !== null;
+    }
+
     public function setRejected($rejected)
     {
         $this->rejected = $rejected;
@@ -86,6 +104,11 @@ abstract class Invitation
     public function getCancelled()
     {
         return $this->cancelled;
+    }
+
+    public function isCancelled()
+    {
+        return $this->cancelled !== null;
     }
 
     public function setCancelled($cancelled)
@@ -145,6 +168,34 @@ abstract class Invitation
         //$this->setInviter($policy->getUser());
     }
 
+    public function getReinvitedCount()
+    {
+        return $this->reinvitedCount;
+    }
+
+    public function getLastReinvited()
+    {
+        return $this->lastReinvited;
+    }
+
+    public function canReinvite()
+    {
+        return $this->getReinvitedCount() <= $this->getMaxReinvitations();
+    }
+
+    public function reinvite(\DateTime $date = null)
+    {
+        if (!$this->canReinvite()) {
+            throw new \Exception('Max invitations have been reached');
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $this->lastReinvited = $date;
+        $this->reinvitedCount++;
+    }
+
     public function hasAccepted()
     {
         return $this->getAccepted() !== null;
@@ -152,7 +203,7 @@ abstract class Invitation
 
     public function isProcessed()
     {
-        return $this->getAccepted() || $this->getRejected() || $this->getCancelled();
+        return $this->isAccepted() || $this->isRejected() || $this->isCancelled();
     }
 
     public function toApiArray($debug = false)
