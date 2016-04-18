@@ -41,9 +41,13 @@ class ApiAuthController extends BaseController
             if (!isset($data['action'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
+            if ($data['action'] == 'accept' && !isset($data['policy_id'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(Invitation::class);
+            $policyRepo = $dm->getRepository(Policy::class);
             $invitation = $repo->find($id);
             if (!$invitation) {
                 return $this->getErrorJsonResponse(
@@ -53,35 +57,33 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            // make sure invitation hasn't already been processed
-            if ($invitation->getAccepted() || $invitation->getRejected() || $invitation->getCancelled()) {
-                // TODO - add error code
+            if ($invitation->isProcessed()) {
                 return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_UNKNOWN,
+                    ApiErrorCode::ERROR_INVITATION_PREVIOUSLY_PROCESSED,
                     'Invitation has already been accepted/reject',
                     422
                 );
             }
 
+            $invitationService = $this->get('app.invitation');
+
             if ($data['action'] == 'accept') {
                 $this->denyAccessUnlessGranted('accept', $invitation);
-                // TODO: Create connection
-                $invitation->setAccepted(new \DateTime());
-                $dm->flush();
+                $policy = $policyRepo->find($data['policy_id']);
+                // TODO: Validation user hasn't exceeded pot amout
+                $invitationService->accept($invitation, $policy);
             } elseif ($data['action'] == 'reject') {
                 $this->denyAccessUnlessGranted('reject', $invitation);
-                $invitation->setRejected(new \DateTime());
-                $dm->flush();
+                $invitationService->reject($invitation);
             } elseif ($data['action'] == 'cancel') {
                 $this->denyAccessUnlessGranted('cancel', $invitation);
-                $invitation->setCancelled(new \DateTime());
-                $dm->flush();
+                $invitationService->cancel($invitation);
             } elseif ($data['action'] == 'reinvite') {
                 $this->denyAccessUnlessGranted('reinvite', $invitation);
-                // TODO: Send reinvite
+                $invitationService->reinvite($invitation);
             }
 
-            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Invitation cancelled', 200);
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Invitation processed', 200);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {

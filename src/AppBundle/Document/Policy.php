@@ -203,6 +203,7 @@ abstract class Policy
 
     public function setPotValue($potValue)
     {
+        // TODO: Should validate this value does not go over 80% of policy value
         $this->potValue = $potValue;
     }
 
@@ -314,12 +315,31 @@ abstract class Policy
     public function calculatePotValue()
     {
         $potValue = 0;
+        // TODO: How does a cancelled policy affect networked connections?  Would the connection be withdrawn?
         foreach ($this->connections as $connection) {
-            $potValue += $connection->value;
+            $potValue += $connection->getValue();
         }
-        // TODO: claims
+
+        $claimCount = 0;
+        foreach ($this->claims as $claim) {
+            if ($claim->isMonetaryClaim()) {
+                $claimCount++;
+            }
+        }
+
+        // TODO: Do we need to adjust for connections that occur post claim?
+        if ($claimCount == 1 && count($this->getConnections()) >= 4) {
+            $potValue = 10;
+        } elseif ($claimCount > 0) {
+            $potValue = 0;
+        }
 
         return $potValue;
+    }
+
+    public function updatePotValue()
+    {
+        $this->setPotValue($this->updatePotValue());
     }
 
     public function isPolicy()
@@ -339,6 +359,10 @@ abstract class Policy
         });
     }
 
+    abstract function getMaxConnections();
+    abstract function getMaxPot();
+    abstract function getConnectionValue();
+
     protected function toApiArray()
     {
         return [
@@ -350,12 +374,12 @@ abstract class Policy
             'policy_number' => $this->getPolicyNumber(),
             'pot' => [
                 'connections' => count($this->getConnections()),
-                'max_connections' => $this->getPhone()->getMaxConnections(),
+                'max_connections' => $this->getMaxConnections(),
                 'value' => $this->getPotValue(),
-                'max_value' => $this->getPhone()->getMaxPot(),
+                'max_value' => $this->getMaxPot(),
             ],
             'connections' => $this->eachApiArray($this->getConnections()),
-            'sent_invitiations' => $this->eachApiArray($this->getSentInvitations()),
+            'sent_invitations' => $this->eachApiArray($this->getSentInvitations()),
         ];
     }
 }

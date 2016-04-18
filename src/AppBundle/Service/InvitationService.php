@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
+use AppBundle\Document\Connection;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\OptOut\EmailOptOut;
@@ -186,5 +187,59 @@ class InvitationService
         if (!$this->debug) {
             $this->sms->send($invitation->getMobile(), $message);
         }
+    }
+
+    public function accept(Invitation $invitation, Policy $inviteePolicy)
+    {
+        if ($invitation->isProcessed()) {
+            throw new \Exception("Invitationhas already been processed");
+        }
+
+        $inviterPolicy = $invitation->getPolicy();
+
+        $connectionInviter = new Connection();
+        $connectionInviter->setUser($invitation->getInviter());
+        // connection value is based on that user's policy date
+        $connectionInviter->setValue($inviterPolicy->getConnectionValue());
+        // TODO: Validate connection with same user doesn't already exist
+        $inviteePolicy->addConnection($connectionInviter);
+        $inviteePolicy->updatePotValue();
+
+        $connectionInvitee = new Connection();
+        $connectionInvitee->setUser($invitation->getInvitee());
+        // connection value is based on that user's policy date
+        $connectionInvitee->setValue($inviteePolicy->getConnectionValue());
+        $inviterPolicy->addConnection($connectionInvitee);
+        $inviterPolicy->updatePotValue();
+
+        $invitation->setAccepted(new \DateTime());
+
+        // TODO: ensure transaction state for this one....
+        $this->dm->flush();
+
+        // TODO: notify inviter (push? email?)
+    }
+
+    public function reject(Invitation $invitation)
+    {
+        $invitation->setRejected(new \DateTime());
+        $this->dm->flush();
+        // TODO: notify inviter
+    }
+
+    public function cancel(Invitation $invitation)
+    {
+        print 'here';
+        $invitation->setCancelled(new \DateTime());
+        $this->dm->flush();
+        // TODO: notify invitee??
+    }
+
+    public function reinvite(Invitation $invitation)
+    {
+        //$invitation->setCancelled(new \DateTime());
+        // TODO: record another invitation
+        $this->dm->flush();
+        // TODO: re-notify invitee
     }
 }

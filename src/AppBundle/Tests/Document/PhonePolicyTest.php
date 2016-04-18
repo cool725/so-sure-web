@@ -177,4 +177,78 @@ class PhonePolicyTest extends WebTestCase
         self::$dm->persist($policyB);
         self::$dm->flush();
     }
+
+    public function testCalculatePotValueNoConnections()
+    {
+        $policy = new PhonePolicy();
+        $this->assertEquals(0, $policy->calculatePotValue());
+    }
+
+    public function testCalculatePotValueOneConnection()
+    {
+        $policy = new PhonePolicy();
+        $connection = new Connection();
+        $connection->setValue(10);
+        $policy->addConnection($connection);
+        $this->assertEquals(10, $policy->calculatePotValue());
+    }
+
+    public function testCalculatePotValueOneOldOneNewConnection()
+    {
+        $policy = new PhonePolicy();
+        $connectionOld = new Connection();
+        $connectionOld->setValue(10);
+        $policy->addConnection($connectionOld);
+        $connectionNew = new Connection();
+        $connectionNew->setValue(2);
+        $policy->addConnection($connectionNew);
+        $this->assertEquals(12, $policy->calculatePotValue());
+    }
+
+    public function testCalculatePotValueOneValidClaimFiveConnections()
+    {
+        $policy = new PhonePolicy();
+        for ($i = 1; $i <= 5; $i++) {
+            $connection = new Connection();
+            $connection->setValue(10);
+            $policy->addConnection($connection);
+        }
+
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
+        $this->assertEquals(10, $policy->calculatePotValue());
+    }
+
+    public function testCalculatePotValueTwoValidClaimsFiveConnections()
+    {
+        $policy = new PhonePolicy();
+        for ($i = 1; $i <= 5; $i++) {
+            $connection = new Connection();
+            $connection->setValue(10);
+            $policy->addConnection($connection);
+        }
+
+        for ($i = 1; $i <= 2; $i++) {
+            $claim = new Claim();
+            $claim->setType(Claim::TYPE_LOSS);
+            $policy->addClaim($claim);
+        }
+        $this->assertEquals(00, $policy->calculatePotValue());
+    }
+
+    public function testCalculatePotValueOneInvalidClaimFiveConnections()
+    {
+        $policy = new PhonePolicy();
+        for ($i = 1; $i <= 5; $i++) {
+            $connection = new Connection();
+            $connection->setValue(10);
+            $policy->addConnection($connection);
+        }
+
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_WITHDRAWN);
+        $policy->addClaim($claim);
+        $this->assertEquals(50, $policy->calculatePotValue());
+    }
 }
