@@ -218,6 +218,39 @@ class User extends BaseUser
         return $this->policies;
     }
 
+    public function hasCancelledPolicy()
+    {
+        foreach ($this->getPolicies() as $policy) {
+            if ($policy->getStatus() == Policy::STATUS_CANCELLED) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasUnpaidPolicy()
+    {
+        foreach ($this->getPolicies() as $policy) {
+            if ($policy->getStatus() == Policy::STATUS_UNPAID) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasValidPolicy()
+    {
+        foreach ($this->getPolicies() as $policy) {
+            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_PENDING])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function addSentInvitation(Invitation $invitation)
     {
         $invitation->setInviter($this);
@@ -417,6 +450,9 @@ class User extends BaseUser
           'mobile_number' => $this->getMobileNumber(),
           'policies' => $this->eachApiArray($this->policies),
           'received_invitations' => $this->eachApiArray($this->getReceivedInvitations(), $debug),
+          'has_cancelled_policy' => $this->hasCancelledPolicy(),
+          'has_unpaid_policy' => $this->hasUnpaidPolicy(),
+          'has_valid_policy' => $this->hasValidPolicy(),
         ];
     }
 }
