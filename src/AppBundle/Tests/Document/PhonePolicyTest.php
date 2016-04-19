@@ -303,4 +303,18 @@ class PhonePolicyTest extends WebTestCase
         $policyA->setPhone(self::$phone);
         $policyA->setPotValue(80);
     }
+
+    public function testPolicyEndDate()
+    {
+        $policy = new PhonePolicy();
+        $policy->create(rand(1, 999999), new \DateTime('2016-01-01 16:00'));
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $policy->getEnd());
+    }
+
+    public function testPolicyEndDateBST()
+    {
+        $policy = new PhonePolicy();
+        $policy->create(rand(1, 999999), new \DateTime('2016-07-01 16:00'));
+        $this->assertEquals(new \DateTime('2017-06-30 23:59:59'), $policy->getEnd());
+    }
 }
