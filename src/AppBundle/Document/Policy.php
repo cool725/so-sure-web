@@ -58,6 +58,9 @@ abstract class Policy
     /** @MongoDB\Field(type="string", name="gocardless_mandate", nullable=true) */
     protected $gocardlessMandate;
 
+    /** @MongoDB\Field(type="string", name="gocardless_subscription", nullable=true) */
+    protected $gocardlessSubscription;
+
     /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Invitation\Invitation", mappedBy="policy")
      */
@@ -178,6 +181,16 @@ abstract class Policy
         $this->gocardlessMandate = $gocardlessMandate;
     }
 
+    public function getGocardlessSubscription()
+    {
+        return $this->gocardlessSubscription;
+    }
+
+    public function setGocardlessSubscription($gocardlessSubscription)
+    {
+        $this->gocardlessSubscription = $gocardlessSubscription;
+    }
+
     public function addConnection(Connection $connection)
     {
         $this->connections[] = $connection;
@@ -243,7 +256,7 @@ abstract class Policy
 
         $initialPolicyNumber = 5500000;
         $this->setPolicyNumber(sprintf("Mob/%s/%d", $this->getStart()->format("Y"), $initialPolicyNumber + $seq));
-        $this->setStatus(self::STATUS_ACTIVE);
+        $this->setStatus(self::STATUS_PENDING);
     }
 
     public function getRisk($date = null)
