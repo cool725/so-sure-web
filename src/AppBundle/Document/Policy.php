@@ -303,6 +303,19 @@ abstract class Policy
         return $this->getStart()->diff($date)->days <= 60;
     }
 
+    public function getConnectionCliffDate()
+    {
+        if (!$this->getStart()) {
+            return null;
+        }
+
+        $cliffDate = clone $this->getStart();
+        // add 60 days
+        $cliffDate->add(new \DateInterval('P60D'));
+
+        return $cliffDate;
+    }
+
     public function hasClaimedInLast30Days($date = null)
     {
         if ($date == null) {
@@ -398,6 +411,8 @@ abstract class Policy
                 'max_connections' => $this->getMaxConnections(),
                 'value' => $this->getPotValue(),
                 'max_value' => $this->getMaxPot(),
+                'connection_value' => $this->getConnectionValue(),
+                'connection_cliff_date' => $this->getConnectionCliffDate() ? $this->getConnectionCliffDate()->format(\DateTime::ISO8601) : null,
             ],
             'connections' => $this->eachApiArray($this->getConnections()),
             'sent_invitations' => $this->eachApiArray($this->getSentInvitations()),

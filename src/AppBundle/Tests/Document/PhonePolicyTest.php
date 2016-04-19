@@ -317,4 +317,11 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), new \DateTime('2016-07-01 16:00'));
         $this->assertEquals(new \DateTime('2017-06-30 23:59:59'), $policy->getEnd());
     }
+
+    public function testConnectionCliffDate()
+    {
+        $policy = new PhonePolicy();
+        $policy->create(rand(1, 999999), new \DateTime('2016-04-19 16:00'));
+        $this->assertEquals(new \DateTime('2016-06-18 16:00'), $policy->getConnectionCliffDate());
+    }
 }
