@@ -116,9 +116,17 @@ class ApiAuthController extends BaseController
 
             if (!$this->validateFields(
                 $data['phone_policy'],
-                ['imei', 'make', 'device', 'memory', 'validation_data']
+                ['imei', 'make', 'device', 'memory', 'rooted', 'validation_data']
             )) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            if ($data['phone_policy']['rooted']) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED,
+                    'Not able to insure rooted devices at the moment',
+                    422
+                );
             }
 
             $imeiValidator = $this->get('app.imei');

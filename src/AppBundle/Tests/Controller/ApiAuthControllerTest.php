@@ -150,6 +150,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'Apple',
             'device' => 'iPhone 6',
             'memory' => 64,
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
         $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
@@ -188,6 +189,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'Apple',
             'device' => 'iPhone 6',
             'memory' => 512,
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
@@ -207,6 +209,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'Apple',
             'device' => 'iPhone 6',
             'memory' => 60,
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
         $data = json_decode(self::$client->getResponse()->getContent(), true);
@@ -225,6 +228,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 65,
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::INVALID_IMEI]),
         ]]);
         $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
@@ -239,7 +243,26 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 65,
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::BLACKLISTED_IMEI]),
+        ]]);
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED, $data['code']);
+    }
+
+    public function testNewPolicyRooted()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $this->clearRateLimit();
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'OnePlus',
+            'device' => 'A0001',
+            'memory' => 65,
+            'rooted' => true,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
         $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
@@ -256,6 +279,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 65,
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::INVALID_IMEI]),
         ]]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
@@ -267,6 +291,7 @@ class ApiAuthControllerTest extends WebTestCase
             'imei' => $imei,
             'make' => 'OnePlus',
             'device' => 'A0001',
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
@@ -278,6 +303,7 @@ class ApiAuthControllerTest extends WebTestCase
             'imei' => $imei,
             'make' => 'OnePlus',
             'memory' => 65,
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
         $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
@@ -287,6 +313,19 @@ class ApiAuthControllerTest extends WebTestCase
         $imei = self::generateRandomImei();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
+            'device' => 'A0001',
+            'memory' => 65,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+        ]]);
+        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+
+        // missing rooted
+        $this->clearRateLimit();
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 65,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -306,6 +345,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'foo',
             'device' => 'bar',
             'memory' => 65,
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
         $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
@@ -841,6 +881,7 @@ class ApiAuthControllerTest extends WebTestCase
             'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 65,
+            'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
 
