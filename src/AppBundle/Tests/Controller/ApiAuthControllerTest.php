@@ -56,6 +56,66 @@ class ApiAuthControllerTest extends WebTestCase
         );
     }
 
+    // address
+
+    /**
+     *
+     */
+    public function testAddress()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = '/api/v1/auth/address?postcode=BX11LT&_method=GET';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals("so-sure Test Address Line 1", $data['line1']);
+        $this->assertEquals("so-sure Test Address Line 2", $data['line2']);
+        $this->assertEquals("so-sure Test City", $data['city']);
+        $this->assertEquals("BX1 1LT", $data['postcode']);
+    }
+
+    public function testAddressRateLimited()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = '/api/v1/auth/address?postcode=BX11LT&_method=GET';
+
+        // Run enough to trigger cognito rate limit
+        for ($i = 0; $i < 4; $i++) {
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        }
+
+        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, $data['code']);
+    }
+
+    /* TODO: Consider moving to a different type of test.
+     * Note that once we're out of test mode mid-apr 2016,
+     * then it should be possible to use this test
+    public function testAddress()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/auth/address?postcode=WR53DA');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals("Lock Keepers Cottage", $data['line1']);
+        $this->assertEquals("Basin Road", $data['line2']);
+        $this->assertEquals("Worcester", $data['city']);
+        $this->assertEquals("WR5 3DA", $data['postcode']);
+    }
+    */
+
+    /**
+     *
+     */
+    public function testAddressReqParam()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = '/api/v1/auth/address?postcode=&_method=GET';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+    }
+
     // invitation/{id} cancel
 
     /**
