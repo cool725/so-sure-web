@@ -234,8 +234,12 @@ abstract class Policy
         }
         $this->setStart($startDate);
         $nextYear = clone $this->getStart();
+        // This is same date/time but add 1 to the year
         $nextYear = $nextYear->modify('+1 year');
-        $this->setEnd($nextYear);
+        // strip the time, so should be 00:00 of current day (e.g. midnight of previous day)
+        $midnight = new \DateTime($nextYear->format('Y-m-d'));
+        $midnight->modify("-1 second");
+        $this->setEnd($midnight);
 
         $initialPolicyNumber = 5500000;
         $this->setPolicyNumber(sprintf("Mob/%s/%d", $this->getStart()->format("Y"), $initialPolicyNumber + $seq));
