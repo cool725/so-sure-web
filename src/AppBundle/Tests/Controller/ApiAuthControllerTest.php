@@ -23,6 +23,7 @@ class ApiAuthControllerTest extends WebTestCase
     protected static $testUser;
     protected static $testUser2;
     protected static $testUser3;
+    protected static $testUserDisabled;
     protected static $client;
     protected static $userManager;
     protected static $dm;
@@ -193,6 +194,63 @@ class ApiAuthControllerTest extends WebTestCase
             }
         }
         $this->assertTrue($foundPolicy);
+    }
+
+    public function testNewPolicyDisabledUser()
+    {
+        $this->clearRateLimit();
+        $userDisabled = self::createUser(self::$userManager, self::generateEmail('disabled', $this), 'foo');
+        $cognitoIdentityId = $this->getAuthUser($userDisabled);
+        $userDisabled->setEnabled(false);
+        self::$dm->flush();
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'Apple',
+            'device' => 'iPhone 6',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+        ]]);
+        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+    }
+
+    public function testNewPolicyExpiredUser()
+    {
+        $this->clearRateLimit();
+        $userExpired = self::createUser(self::$userManager, self::generateEmail('expired', $this), 'foo');
+        $cognitoIdentityId = $this->getAuthUser($userExpired);
+        $userExpired->setExpired(true);
+        self::$dm->flush();
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'Apple',
+            'device' => 'iPhone 6',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+        ]]);
+        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+    }
+
+    public function testNewPolicyLockedUser()
+    {
+        $this->clearRateLimit();
+        $userLocked = self::createUser(self::$userManager, self::generateEmail('locked', $this), 'foo');
+        $cognitoIdentityId = $this->getAuthUser($userLocked);
+        $userLocked->setLocked(true);
+        self::$dm->flush();
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'Apple',
+            'device' => 'iPhone 6',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+        ]]);
+        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
 
     public function testNewPolicyDuplicateImei()
