@@ -69,7 +69,15 @@ class ApiController extends BaseController
         try {
             // throw new \Exception('Manual Exception Test');
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['email', 'password'])) {
+            if (isset($data['email_user'])) {
+                if (!$this->validateFields($data['email_user'], ['email', 'password'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+            } elseif (isset($data['facebook_user'])) {
+                if (!$this->validateFields($data['facebook_user'], ['facebook_id', 'facebook_access_token'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+            } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -84,8 +92,14 @@ class ApiController extends BaseController
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
-            $email = strtolower($data['email']);
-            $user = $repo->findOneBy(['emailCanonical' => $email]);
+            $user = null;
+            if (isset($data['email_user'])) {
+                $email = strtolower($data['email_user']['email']);
+                $user = $repo->findOneBy(['emailCanonical' => $email]);
+            } elseif (isset($data['facebook_user'])) {
+                $facebookId = trim($data['facebook_user']['facebook_id']);
+                $user = $repo->findOneBy(['facebook_id' => $facebookId]);
+            }
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
@@ -109,10 +123,19 @@ class ApiController extends BaseController
                 );
             }
 
-            $encoder_service = $this->get('security.encoder_factory');
-            $encoder = $encoder_service->getEncoder($user);
-            if (!$encoder->isPasswordValid($user->getPassword(), $data['password'], $user->getSalt())) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid password', 403);
+            if (isset($data['email_user'])) {
+                $encoderService = $this->get('security.encoder_factory');
+                $encoder = $encoderService->getEncoder($user);
+                if (!$encoder->isPasswordValid($user->getPassword(), $data['email_user']['password'], $user->getSalt())) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid password', 403);
+                }
+            } elseif (isset($data['facebook_user'])) {
+                $facebookService = $this->get('app.facebook');
+                if (!$facebookService->validateToken($user, $data['facebook_user']['facebook_access_token'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
+                }
+                // TODO: Here we would either add a session linking a facebook_id to a cognito session
+                // or on the client side, the cognito id returned, could be linked to the login
             }
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
