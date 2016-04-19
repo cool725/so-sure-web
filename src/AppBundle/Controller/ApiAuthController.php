@@ -31,6 +31,40 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ApiAuthController extends BaseController
 {
     /**
+     * @Route("/address", name="api_auth_address")
+     * @Method({"GET"})
+     */
+    public function addressAction(Request $request)
+    {
+        try {
+            if (!$this->validateQueryFields($request, ['postcode'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowed(
+                RateLimitService::TYPE_ADDRESS,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
+
+            $postcode = trim($request->get('postcode'));
+            $number = trim($request->get('number'));
+
+            $lookup = $this->get('app.address');
+            $address = $lookup->getAddress($postcode, $number);
+
+            return new JsonResponse($address->toApiArray());
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api addressAction. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/invitation/{id}", name="api_auth_process_invitation")
      * @Method({"POST"})
      */
