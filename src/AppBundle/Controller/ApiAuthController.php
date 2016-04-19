@@ -20,6 +20,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Invitation\Invitation;
 
 use AppBundle\Service\RateLimitService;
+use AppBundle\Security\UserVoter;
 use AppBundle\Classes\ApiErrorCode;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -167,7 +168,7 @@ class ApiAuthController extends BaseController
             $jwtValidator = $this->get('app.jwt');
             $addressValidator = $this->get('app.address');
             $user = $this->getUser();
-            $this->denyAccessUnlessGranted('edit', $user);
+            $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
 
             if (!$user->hasValidDetails()) {
                 return $this->getErrorJsonResponse(

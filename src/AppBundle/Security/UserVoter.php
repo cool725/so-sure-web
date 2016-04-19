@@ -10,11 +10,12 @@ class UserVoter extends Voter
     // these strings are just invented: you can use anything
     const VIEW = 'view';
     const EDIT = 'edit';
+    const ADD_POLICY = 'add-policy';
 
     public function supports($attribute, $subject)
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, array(self::VIEW, self::EDIT))) {
+        if (!in_array($attribute, array(self::VIEW, self::EDIT, self::ADD_POLICY))) {
             return false;
         }
 
@@ -39,6 +40,11 @@ class UserVoter extends Voter
         /** @var User $user */
         $requestedUser = $subject;
         
+        if ($attribute == self::ADD_POLICY &&
+            (!$requestedUser->isEnabled() || $requestedUser->isLocked() || $requestedUser->isExpired())) {
+            return false;
+        }
+
         return $requestedUser->getId() == $currentUser->getId();
     }
 }

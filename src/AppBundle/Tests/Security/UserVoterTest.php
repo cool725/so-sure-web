@@ -45,6 +45,7 @@ class UserVoterTest extends WebTestCase
         $user = new User();
         $this->assertTrue(self::$userVoter->supports('view', $user));
         $this->assertTrue(self::$userVoter->supports('edit', $user));
+        $this->assertTrue(self::$userVoter->supports('add-policy', $user));
     }
 
     public function testVoteOk()
@@ -66,5 +67,35 @@ class UserVoterTest extends WebTestCase
         $token = new PreAuthenticatedToken($userDiff, '1', 'test');
 
         $this->assertFalse(self::$userVoter->voteOnAttribute('view', $user, $token));
+    }
+
+    public function testVoteUserDisabled()
+    {
+        $user = new User();
+        $user->setId(1);
+        $user->setEnabled(false);
+        $token = new PreAuthenticatedToken($user, '1', 'test');
+
+        $this->assertFalse(self::$userVoter->voteOnAttribute('add-policy', $user, $token));
+    }
+
+    public function testVoteUserLocked()
+    {
+        $user = new User();
+        $user->setId(1);
+        $user->setLocked(true);
+        $token = new PreAuthenticatedToken($user, '1', 'test');
+
+        $this->assertFalse(self::$userVoter->voteOnAttribute('add-policy', $user, $token));
+    }
+
+    public function testVoteUserExpired()
+    {
+        $user = new User();
+        $user->setId(1);
+        $user->setExpired(true);
+        $token = new PreAuthenticatedToken($user, '1', 'test');
+
+        $this->assertFalse(self::$userVoter->voteOnAttribute('add-policy', $user, $token));
     }
 }
