@@ -412,7 +412,9 @@ abstract class Policy
                 'value' => $this->getPotValue(),
                 'max_value' => $this->getMaxPot(),
                 'connection_value' => $this->getConnectionValue(),
-                'connection_cliff_date' => $this->getConnectionCliffDate() ? $this->getConnectionCliffDate()->format(\DateTime::ISO8601) : null,
+                'connection_cliff_date' => $this->getConnectionCliffDate() ?
+                    $this->getConnectionCliffDate()->format(\DateTime::ISO8601) :
+                    null,
             ],
             'connections' => $this->eachApiArray($this->getConnections()),
             'sent_invitations' => $this->eachApiArray($this->getSentInvitations()),
