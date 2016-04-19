@@ -126,7 +126,11 @@ class ApiController extends BaseController
             if (isset($data['email_user'])) {
                 $encoderService = $this->get('security.encoder_factory');
                 $encoder = $encoderService->getEncoder($user);
-                if (!$encoder->isPasswordValid($user->getPassword(), $data['email_user']['password'], $user->getSalt())) {
+                if (!$encoder->isPasswordValid(
+                    $user->getPassword(),
+                    $data['email_user']['password'],
+                    $user->getSalt()
+                )) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid password', 403);
                 }
             } elseif (isset($data['facebook_user'])) {
