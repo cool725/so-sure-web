@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
+use AppBundle\Document\PhonePolicy;
 
 /**
  * @group unit
@@ -61,5 +62,32 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->addAddress($address);
 
         $this->assertEquals('456', $user->getBillingAddress()->getPostcode());
+    }
+
+    public function testHasCancelledPolicy()
+    {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        $user->addPolicy($policy);
+        $this->assertTrue($user->hasCancelledPolicy());
+    }
+
+    public function testHasUnpaidPolicy()
+    {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        $user->addPolicy($policy);
+        $this->assertTrue($user->hasUnpaidPolicy());
+    }
+
+    public function testHasValidPolicy()
+    {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $user->addPolicy($policy);
+        $this->assertTrue($user->hasValidPolicy());
     }
 }

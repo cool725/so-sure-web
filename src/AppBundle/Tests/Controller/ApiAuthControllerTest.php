@@ -577,8 +577,7 @@ class ApiAuthControllerTest extends WebTestCase
         $data = json_decode(self::$client->getResponse()->getContent(), true);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
-        print sprintf("Invite from %s to %s", self::$testUser2->getName(), self::$testUser->getName());
-
+        //print sprintf("Invite from %s to %s", self::$testUser2->getName(), self::$testUser->getName());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => self::$testUser->getEmail(),
             'name' => self::$testUser->getName(),

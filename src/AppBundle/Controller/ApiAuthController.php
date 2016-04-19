@@ -489,13 +489,11 @@ class ApiAuthController extends BaseController
             $data = json_decode($request->getContent(), true)['body'];
             $userChanged = false;
 
-            // TODO: Validate phone number
             if (isset($data['mobile_number']) && strlen($data['mobile_number']) > 0) {
                 $user->setMobileNumber($data['mobile_number']);
                 $userChanged = true;
             }
 
-            // TODO: Validate email
             if (isset($data['email']) && strlen($data['email']) > 0) {
                 // TODO: Send email to both old & new email addresses
                 $user->setEmail($data['email']);
