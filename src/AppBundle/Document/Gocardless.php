@@ -17,6 +17,9 @@ class Gocardless
     /** @MongoDB\Field(type="hash", name="mandates", nullable=true) */
     protected $mandates = array();
 
+    /** @MongoDB\Field(type="hash", name="subscriptions", nullable=true) */
+    protected $subscriptions = array();
+
     /** @MongoDB\Field(type="collection", name="account_hashes", nullable=true) */
     protected $accountHashes = array();
 
@@ -87,5 +90,20 @@ class Gocardless
     public function hasMandates()
     {
         return count($this->getMandates()) > 0;
+    }
+
+    public function addSubscription($key, $value)
+    {
+        $this->subscriptions[$key] = $value;
+    }
+
+    public function getSubscriptions()
+    {
+        return $this->subscriptions;
+    }
+
+    public function hasSubscription()
+    {
+        return count($this->getSubscriptions()) > 0;
     }
 }

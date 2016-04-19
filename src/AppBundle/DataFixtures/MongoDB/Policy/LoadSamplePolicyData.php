@@ -50,7 +50,7 @@ class LoadSamplePolicyData implements FixtureInterface
         $policy = new PhonePolicy();
         $policy->setUser($user);
         $policy->setPhone($phone);
-        $policy->create(1);
+        $policy->create(-5000);
 
         $connection = new Connection();
         $connection->setUser($users[0]);

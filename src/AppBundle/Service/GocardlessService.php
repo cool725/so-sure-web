@@ -7,6 +7,7 @@ use GoCardlessPro\Environment;
 use AppBundle\Document\User;
 use AppBundle\Document\Gocardless;
 use AppBundle\Document\Policy;
+use AppBundle\Service\SequenceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -21,20 +22,30 @@ class GocardlessService
     /** @var Client */
     protected $client;
 
+    /** @var SequenceService */
+    protected $sequence;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
+     * @param SequenceService $sequence
      * @param string          $accessToken
      * @param boolean         $prod
      */
-    public function __construct(DocumentManager $dm, LoggerInterface $logger, $accessToken, $prod)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        LoggerInterface $logger,
+        SequenceService $sequence,
+        $accessToken,
+        $prod
+    ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->client = new Client([
             'access_token' => $accessToken,
             'environment' => $prod ? Environment::LIVE : Environment::SANDBOX
         ]);
+        $this->sequence = $sequence;
     }
 
     /**
@@ -49,6 +60,9 @@ class GocardlessService
         $this->createCustomer($policy->getUser(), $accountFirstName, $accountLastName);
         $this->addBankAccount($policy->getUser(), $sortCode, $accountNumber);
         $this->createMandate($policy);
+        $this->subscribe($policy);
+        $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE));
+        $this->dm->flush();
     }
 
     /**
@@ -213,13 +227,17 @@ class GocardlessService
         }
 
         // For now, only allow 1 subscription
-        // TODO: Check for subscription
+        if ($user->getGocardless()->hasSubscription()) {
+            return;
+        }
 
         $mandate = $policy->getGocardlessMandate();
+        // gocardless wants in pence
+        $priceInPence = $policy->getPhone()->getTotalPrice() * 100;
         $data = [
-            "amount" => $policy->getPhone()->getTotalPrice(),
+            "amount" => $priceInPence,
             "count" => 12,
-            "current" => "GBP",
+            "currency" => "GBP",
             "interval_unit" => "monthly",
             "links" => [
                 "mandate" => $mandate,
@@ -230,22 +248,22 @@ class GocardlessService
         ];
         $headers = [];
         if ($idempotent) {
-            $headers['Idempotency-Key'] = sprintf('mandate-%s', $policy->getId());
+            $headers['Idempotency-Key'] = sprintf('subscription-%s', $policy->getId());
         }
 
-        $mandate = $this->client->subscriptions()->create([
+        $subscription = $this->client->subscriptions()->create([
             'params' => $data,
             'headers' => $headers,
         ]);
 
         // TODO: If $idempotent and 409 idempotent_creation_conflict occurs, query customer
 
-        $user->getGocardless()->addMandate($mandate->id, json_encode([
-            'id' => $mandate->id,
-            'customer_bank_account' => $mandate->links->customer_bank_account,
+        $user->getGocardless()->addSubscription($subscription->id, json_encode([
+            'id' => $subscription->id,
+            'mandate' => $subscription->links->mandate,
             'policy' => $policy->getId(),
         ]));
-        $policy->setGocardlessMandate($mandate->id);
+        $policy->setGocardlessSubscription($subscription->id);
 
         $this->dm->flush();
     }
