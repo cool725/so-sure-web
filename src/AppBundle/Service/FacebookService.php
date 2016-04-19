@@ -64,6 +64,20 @@ class FacebookService
         return $this->fb;
     }
 
+    /**
+     * Ensure that token is valid and matches the expected user
+     */
+    public function validateToken(User $user, $token)
+    {
+        try {
+            $this->initToken($token);
+
+            return $this->getUserId() == $user->getFacebookId();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public function getUserId()
     {
         $response = $this->fb->get('/me?fields=id');
