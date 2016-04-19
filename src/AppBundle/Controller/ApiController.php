@@ -143,6 +143,7 @@ class ApiController extends BaseController
             $make = trim($request->get('make'));
             $device = trim($request->get('device'));
             $memory = (float) trim($request->get('memory'));
+            $rooted = $request->get('rooted') !== null ? (boolean) trim($request->get('rooted')) : false;
 
             $phones = $this->getQuotes($make, $device, true);
             $deviceFound = $phones[0]->getMake() != "ALL";
@@ -168,6 +169,10 @@ class ApiController extends BaseController
             
             if (!$deviceFound || !$memoryFound) {
                 $this->unknownDevice($device, $memory);
+            }
+
+            if ($rooted) {
+                $this->rootedDevice($device, $memory);
             }
 
             $response = [
@@ -548,5 +553,24 @@ class ApiController extends BaseController
         $this->get('mailer')->send($message);
 
         return true;
+    }
+
+    /**
+     * @param string $device
+     * @param float  $memory
+     */
+    private function rootedDevice($device, $memory)
+    {
+        $body = sprintf(
+            'Rooted device queried: %s (%s GB).',
+            $device,
+            $memory
+        );
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Rooted Device/Memory')
+            ->setFrom('tech@so-sure.com')
+            ->setTo('tech@so-sure.com')
+            ->setBody($body, 'text/html');
+        $this->get('mailer')->send($message);
     }
 }
