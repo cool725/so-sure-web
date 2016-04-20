@@ -14,7 +14,7 @@ class Premium
      * @param float $premium  Premium / month
      * @param float $discount Monthly discount to be applied (e.g. pot from previous year)
      * @param float $pot      Value of the customer pot / month (e.g £80/12).
-     *                        For claims, the pot should be redcued to £10/12 or 0.
+     *                        For claims, the pot should be reduced to £10/12 or 0.
      *
      */
     public function __construct($premium, $discount, $pot)
