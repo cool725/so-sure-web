@@ -15,6 +15,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
 use AppBundle\Document\Invitation\Invitation;
@@ -271,6 +272,11 @@ class ApiAuthController extends BaseController
             $policy = new PhonePolicy();
             $policy->setImei($imei);
             $policy->setPhone($phone);
+
+            $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+            $policy->setPolicyTerms($latestTerms);
+
             $policy->setPhoneData(json_encode([
                 'make' => $data['phone_policy']['make'],
                 'device' => $data['phone_policy']['device'],
@@ -423,6 +429,40 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            print_r(get_class($e));
+            $this->get('logger')->error(sprintf('Error in api newInvitation. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/terms", name="api_auth_get_policy_terms")
+     * @Method({"GET"})
+     */
+    public function getPolicyTermsAction(Request $request, $id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted('view', $policy);
+            $policyTermsUrl = $this->get('router')->generate('policy_terms', [
+                'id' => $policy->getId(),
+                'policy_key' => $this->getParameter('policy_key'),
+            ]);
+
+            return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
