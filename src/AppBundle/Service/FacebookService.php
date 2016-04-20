@@ -69,11 +69,21 @@ class FacebookService
      */
     public function validateToken(User $user, $token)
     {
+        return $this->validateTokenId($user->getFacebookId(), $token);
+    }
+
+    /**
+     * Ensure that token is valid and matches the expected id
+     */
+    public function validateTokenId($id, $token)
+    {
         try {
             $this->initToken($token);
 
-            return $this->getUserId() == $user->getFacebookId();
+            return $this->getUserId() == $id;
         } catch (\Exception $e) {
+            $this->logger->error(sprintf('Unable to validate facebook token for fb id %s, Ex: %s', $id, $e->getMessage()));
+
             return false;
         }
     }

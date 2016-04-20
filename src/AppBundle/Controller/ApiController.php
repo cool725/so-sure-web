@@ -101,7 +101,7 @@ class ApiController extends BaseController
                 }
             } elseif (isset($data['facebook_user'])) {
                 $facebookService = $this->get('app.facebook');
-                if (!$facebookService->validateToken($user, $data['facebook_user']['facebook_access_token'])) {
+                if (!$facebookService->validateToken($user, trim($data['facebook_user']['facebook_access_token']))) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                 }
                 // TODO: Here we would either add a session linking a facebook_id to a cognito session
