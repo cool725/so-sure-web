@@ -171,5 +171,16 @@ class LoadPhoneData implements FixtureInterface
         $phone = new Phone();
         $phone->init($make, $model, $policyPrice, 1.5, $memory, $devices);
         $manager->persist($phone);
+
+        if (!$phone->getCurrentPolicyPremium()) {
+            throw new \Exception('Failed to init phone');
+        }
+        /*
+        \Doctrine\Common\Util\Debug::dump($phone->getCurrentPolicyPremium());
+        
+        $repo = $manager->getRepository(Phone::class);
+        $compare = $repo->find($phone->getId());
+        \Doctrine\Common\Util\Debug::dump($compare->getCurrentPolicyPremium());
+        */
     }
 }

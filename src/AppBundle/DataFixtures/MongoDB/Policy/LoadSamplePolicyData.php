@@ -68,8 +68,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->persist($user);
 
         $phoneRepo = $manager->getRepository(Phone::class);
-        $phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
-
+        $phone = $phoneRepo->findOneBy(['model' => 'iPhone 5', 'memory' => 64]);
+        if (!$phone->getCurrentPolicyPremium()) {
+            throw new \Exception('Failed to load phone policy');
+        }
+        \Doctrine\Common\Util\Debug::dump($phone);
+        \Doctrine\Common\Util\Debug::dump($phone->getPolicyPremiums());
+        \Doctrine\Common\Util\Debug::dump($phone->getCurrentPolicyPremium());
         $policy = new PhonePolicy();
         $policy->setUser($user);
         $policy->setPhone($phone);
@@ -84,7 +89,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $connection->setUser($users[0]);
         $connection->setValue(10);
         $policy->addConnection($connection);
-        $policy->setPotValue($policy->calculatePotValue());
+        $policy->updatePotValue();
         $manager->persist($connection);
         //\Doctrine\Common\Util\Debug::dump($policy);
         $manager->persist($policy);

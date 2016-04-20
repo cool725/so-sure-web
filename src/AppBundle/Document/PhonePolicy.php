@@ -33,6 +33,11 @@ class PhonePolicy extends Policy
     public function setPhone(Phone $phone)
     {
         $this->phone = $phone;
+        if (!$phone->getCurrentPolicyPremium()) {
+            throw new \Exception('Phone must have a premium');
+        }
+
+        $this->setPremium($phone->getCurrentPolicyPremium());
     }
 
     public function getImei()
@@ -66,12 +71,12 @@ class PhonePolicy extends Policy
 
     public function getMaxConnections()
     {
-        return $this->getPhone()->getMaxConnections();
+        return $this->getPremium()->getMaxConnections();
     }
 
     public function getMaxPot()
     {
-        return $this->getPhone()->getMaxPot();
+        return $this->getPremium()->getMaxPot();
     }
 
     public function toApiArray()
