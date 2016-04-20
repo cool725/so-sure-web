@@ -208,15 +208,10 @@ abstract class Invitation
 
     public function toApiArray($debug = false)
     {
-        $inviterName = $this->getInviter() ? $this->getInviter()->getName() : null;
-        $inviteeName = $this->getInvitee() ? $this->getInvitee()->getName() : null;
-        $inviterId = $this->getInviter() ? $this->getInviter()->getId() : null;
-        $inviteeId = $this->getInvitee() ? $this->getInvitee()->getId() : null;
         $data = [
             'id' => $this->getId(),
             'name' => $this->getName() ? $this->getName() : null,
-            'invitee_name' => $inviteeName,
-            'inviter_name' => $inviterName,
+            'inviter_name' => $this->getInviter() ? $this->getInviter()->getName() : null,
             'channel' => $this->getChannel(),
             'link' => $this->getLink(),
             'created_date' => $this->getCreated() ? $this->getCreated()->format(\DateTime::ISO8601) : null,
@@ -224,8 +219,9 @@ abstract class Invitation
 
         if ($debug) {
             $data = array_merge($data, [
-                'inviter_id' => $inviterId,
-                'invitee_id' => $inviteeId,
+                'inviter_id' => $this->getInviter() ? $this->getInviter()->getId() : null,
+                'invitee_id' => $this->getInvitee() ? $this->getInvitee()->getId() : null,
+                'invitee_name' => $this->getInvitee() ? $this->getInvitee()->getName() : null,
             ]);
         }
 
