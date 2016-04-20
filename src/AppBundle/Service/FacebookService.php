@@ -82,7 +82,11 @@ class FacebookService
 
             return $this->getUserId() == $id;
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Unable to validate facebook token for fb id %s, Ex: %s', $id, $e->getMessage()));
+            $this->logger->error(sprintf(
+                'Unable to validate facebook token for fb id %s, Ex: %s',
+                $id,
+                $e->getMessage()
+            ));
 
             return false;
         }
