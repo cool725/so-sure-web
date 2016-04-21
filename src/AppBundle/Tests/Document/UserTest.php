@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Invitation\EmailInvitation;
 
 /**
  * @group unit
@@ -100,5 +101,18 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $userB = new User();
         $userB->setMobileNumber('00447700 900000');
         $this->assertEquals('+447700900000', $userB->getMobileNumber());
+    }
+
+    public function testUnprocessedReceivedInvitations()
+    {
+        $user = new User();
+        $invitiationA = new EmailInvitation();
+        $user->addReceivedInvitation($invitiationA);
+        $this->assertEquals(1, count($user->getUnprocessedReceivedInvitations()));
+
+        $invitiationB = new EmailInvitation();
+        $invitiationB->setAccepted(true);
+        $user->addReceivedInvitation($invitiationB);
+        $this->assertEquals(1, count($user->getUnprocessedReceivedInvitations()));
     }
 }
