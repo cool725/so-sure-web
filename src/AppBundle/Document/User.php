@@ -71,7 +71,7 @@ class User extends BaseUser
     protected $lastName;
 
     /**
-     * @MongoDB\String(name="facebook_id") 
+     * @MongoDB\String(name="facebook_id")
      * @MongoDB\Index(unique=true, sparse=true)
      */
     protected $facebookId;
