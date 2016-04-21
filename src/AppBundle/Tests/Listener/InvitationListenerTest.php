@@ -28,6 +28,8 @@ class InvitationListenerTest extends WebTestCase
     protected static $userManager;
     protected static $testUser;
     protected static $testUser2;
+    protected static $testUser3;
+    protected static $testUser4;
 
     public static function setUpBeforeClass()
     {
@@ -52,6 +54,16 @@ class InvitationListenerTest extends WebTestCase
         self::$testUser2 = self::createUser(
             self::$userManager,
             'bar@invitation.foo.com',
+            'bar'
+        );
+        self::$testUser3 = self::createUser(
+            self::$userManager,
+            'foobar@invitation.foo.com',
+            'bar'
+        );
+        self::$testUser4 = self::createUser(
+            self::$userManager,
+            'barfoo@invitation.foo.com',
             'bar'
         );
     }
@@ -95,6 +107,41 @@ class InvitationListenerTest extends WebTestCase
         // Refresh invitation
         $this->assertTrue($invitation->getInvitee() !== null);
         $this->assertTrue($invitation->getInvitee()->getId() == self::$testUser2->getId());
+    }
+
+    public function testSmsPreventSameUser()
+    {
+        self::$testUser3->setMobileNumber('1214');
+        self::$dm->flush();
+
+        $invitation = new SmsInvitation();
+        $invitation->setInviter(self::$testUser3);
+        $invitation->setMobile('1214');
+        self::$dm->persist($invitation);
+
+        $event = new InvitationEvent($invitation);
+
+        $listener = new InvitationListener(self::$dm);
+        $listener->onInvitationEvent($event);
+
+        // Refresh invitation
+        $this->assertTrue($invitation->getInvitee() == null);
+    }
+
+    public function testEmailPreventSameUser()
+    {
+        $invitation = new EmailInvitation();
+        $invitation->setInviter(self::$testUser4);
+        $invitation->setEmail('barfoo@invitation.foo.com');
+        self::$dm->persist($invitation);
+
+        $event = new InvitationEvent($invitation);
+
+        $listener = new InvitationListener(self::$dm);
+        $listener->onInvitationEvent($event);
+
+        // Refresh invitation
+        $this->assertTrue($invitation->getInvitee() == null);
     }
 
     public function testEmailInvitationInviteeKernelEvents()

@@ -106,6 +106,10 @@ class InvitationService
             return null;
         }
 
+        if ($policy->getUser()->getEmailCanonical() == strtolower($email)) {
+            throw new \Exception('User can not invite themself');
+        }
+
         $invitation = new EmailInvitation();
         $invitation->setEmail($email);
         $invitation->setPolicy($policy);
@@ -134,6 +138,10 @@ class InvitationService
         $optouts = $optOutRepo->findOptOut($mobile, SmsOptOut::OPTOUT_CAT_INVITATIONS);
         if (count($optouts) > 0) {
             return null;
+        }
+
+        if ($policy->getUser()->getMobileNumber() == $mobile) {
+            throw new \Exception('User can not invite themself');
         }
 
         $invitation = new SmsInvitation();

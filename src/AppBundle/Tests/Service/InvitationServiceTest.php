@@ -277,4 +277,37 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals(10, $policy->getPotValue());
         $this->assertEquals(10, $policyInvitee->getPotValue());
     }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testEmailInvitationSelf()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user9', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm);
+        $policy->setPhone(static::$phone);
+
+        $invitation = self::$invitationService->email($policy, static::generateEmail('user9', $this));
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testMobileInvitationSelf()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user10', $this),
+            'bar'
+        );
+        $user->setMobileNumber('+447700900001');
+        $policy = static::createPolicy($user, static::$dm);
+        $policy->setPhone(static::$phone);
+
+        $invitation = self::$invitationService->sms($policy, '+447700900001');
+    }
 }

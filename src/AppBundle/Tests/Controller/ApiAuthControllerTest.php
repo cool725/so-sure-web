@@ -647,13 +647,13 @@ class ApiAuthControllerTest extends WebTestCase
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'mobile' => '+447700900000',
+            'mobile' => '+447700900002',
             'name' => 'functional test',
         ]);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'mobile' => '+447700900000',
+            'mobile' => '+447700900002',
             'name' => 'functional test',
         ]);
         $data = json_decode(self::$client->getResponse()->getContent(), true);
@@ -721,6 +721,21 @@ class ApiAuthControllerTest extends WebTestCase
             }
         }
         $this->assertTrue($foundInvitation);
+    }
+
+    public function testUnableToInviteSelf()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::$testUser->getEmail(),
+            'name' => 'Invitation Name',
+        ]);
+        $this->assertEquals(500, self::$client->getResponse()->getStatusCode());
     }
 
     // policy/{id}/terms
