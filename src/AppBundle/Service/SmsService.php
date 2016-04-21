@@ -64,6 +64,5 @@ class SmsService
         );
         // Send mes
         $resp = $this->client->send_message($params);
-        print_r($resp);
     }
 }

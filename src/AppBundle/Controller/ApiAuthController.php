@@ -428,11 +428,14 @@ class ApiAuthController extends BaseController
                     'Duplicate invitation',
                     422
                 );
+            } catch (\Exception $e) {
+                $this->get('logger')->error(sprintf('Error in api newInvitation. %s', $e->getMessage()));
+
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
             }
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            print_r(get_class($e));
             $this->get('logger')->error(sprintf('Error in api newInvitation. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
