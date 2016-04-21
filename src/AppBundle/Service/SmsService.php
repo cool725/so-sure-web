@@ -48,6 +48,8 @@ class SmsService
     /**
      * @param string $number
      * @param string $message
+     *
+     * @return boolean
      */
     public function send($number, $message)
     {
@@ -55,14 +57,23 @@ class SmsService
             return;
         }
         
-        $params = array(
-            'src' => $this->sending_number, // Sender's phone number with country code
-            'dst' => $number, // Receiver's phone number with country code
-            'text' => $message, // Your SMS text message
-            //'url' => 'http://example.com/report/', // The URL to which with the status of the message is sent
-            //'method' => 'POST' // The method used to call the url
-        );
-        // Send mes
-        $resp = $this->client->send_message($params);
+        try {
+            $params = array(
+                'src' => $this->sending_number, // Sender's phone number with country code
+                'dst' => $number, // Receiver's phone number with country code
+                'text' => $message, // Your SMS text message
+                //'url' => 'http://example.com/report/', // The URL to which with the status of the message is sent
+                //'method' => 'POST' // The method used to call the url
+            );
+            // Send mes
+            $resp = $this->client->send_message($params);
+
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf("Unable to send to %s Ex: %s", $number, $e->getMessage()));
+
+            return false;
+        }
+
+        return true;
     }
 }

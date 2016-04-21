@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class User extends BaseUser
 {
     use ArrayToApiArrayTrait;
+    use PhoneTrait;
 
     /**
      * @MongoDB\Id
@@ -414,13 +415,9 @@ class User extends BaseUser
         return $this->mobileNumber;
     }
 
-    public function setMobileNumber($mobileNumber)
+    public function setMobileNumber($mobile)
     {
-        $mobileNumber = str_replace(" ", "", $mobileNumber);
-        if (preg_match("/07[1-9]\d{8,8}/", $mobileNumber)) {
-            $mobileNumber = sprintf("+44%s", substr($mobileNumber, 1));
-        }
-        $this->mobileNumber = $mobileNumber;
+        $this->mobileNumber = $this->normalizeUkMobile($mobile);
     }
 
     public function hasValidDetails()
