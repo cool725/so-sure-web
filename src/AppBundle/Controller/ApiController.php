@@ -343,6 +343,18 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $facebookId = isset($data['facebook_id']) ? $data['facebook_id'] : null;
+            $userExists = $repo->existsUser($data['email'], $facebookId);
+            if ($userExists) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_EXISTS,
+                    'User already exists',
+                    422
+                );
+            }
+
             $userManager = $this->get('fos_user.user_manager');
             $user = $userManager->createUser();
             $user->setEnabled(true);
@@ -377,8 +389,9 @@ class ApiController extends BaseController
             $launchUser = $this->get('app.user.launch');
             $addedUser = $launchUser->addUser($user);
 
+            // Should never occur as we're checking before, but just in case
             if (!$addedUser['new']) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'User already exists');
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'User already exists', 422);
             }
 
             $identityId = null;

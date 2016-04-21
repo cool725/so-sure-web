@@ -67,6 +67,9 @@ class PCAService
             $this->cacheResults($postcode, $number, $address);
 
             return $address;
+        } elseif ($postcode == "ZZ993CZ") {
+            // Used for testing invalid postcode - pseudo-postcodes for england
+            return null;
         } elseif ($this->environment != 'prod') {
             // WR5 3DA is a free search via pca, so can used for non production environments
             $postcode = "WR53DA";

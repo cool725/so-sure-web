@@ -149,7 +149,7 @@ class ApiControllerTest extends WebTestCase
             static::generateEmail('facebook-invalid-token', $this),
             'bar'
         );
-        $user->setFacebookId(1);
+        $user->setFacebookId(rand(1, 999999));
         $dm = $this->getManager($client);
         $dm->flush();
 
@@ -526,6 +526,24 @@ class ApiControllerTest extends WebTestCase
             'email' => 'dup-user@api.bar.com'
         ));
         $this->assertEquals(422, $client->getResponse()->getStatusCode());
+    }
+
+    public function testUserFacebookDuplicate()
+    {
+        $client = static::createClient();
+        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $user = static::createUser($this->getUserManager($client), self::generateEmail('dup-fb', $this), 'bar');
+        $user->setFacebookId(rand(1, 999999));
+        $dm = self::getManager($client);
+        $dm->flush();
+        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => self::generateEmail('dup-fb-diff', $this),
+            'facebook_id' => $user->getFacebookId(),
+            'facebook_access_token' => 'foo',
+        ));
+        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(ApiErrorCode::ERROR_USER_EXISTS, $data['code']);
     }
 
     public function testUserCreate()
