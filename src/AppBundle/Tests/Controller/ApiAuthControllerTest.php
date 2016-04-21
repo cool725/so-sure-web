@@ -961,7 +961,7 @@ class ApiAuthControllerTest extends WebTestCase
             'type' => 'billing',
             'line1' => 'address line 1',
             'city' => 'London',
-            'postcode' => 'ec1v 1rx',
+            'postcode' => 'ZZ99 3CZ',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $this->assertEquals(422, self::$client->getResponse()->getStatusCode());

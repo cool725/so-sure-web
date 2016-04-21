@@ -10,7 +10,7 @@ use AppBundle\Document\Invitation\Invitation;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
  * @MongoDB\Index(keys={"signup_loc"="2dsphere"}, sparse="true")
  */
 class User extends BaseUser
@@ -70,7 +70,10 @@ class User extends BaseUser
     /** @MongoDB\String(name="last_name", nullable=true) */
     protected $lastName;
 
-    /** @MongoDB\String(name="facebook_id", nullable=true) */
+    /**
+     * @MongoDB\String(name="facebook_id")
+     * @MongoDB\Index(unique=true, sparse=true)
+     */
     protected $facebookId;
 
     /** @MongoDB\String(name="facebook_access_token", nullable=true) */
