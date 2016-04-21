@@ -277,6 +277,23 @@ class User extends BaseUser
         return $this->receivedInvitations;
     }
 
+    public function getReceivedInvitationsAsArray()
+    {
+        // TODO: should be instanceof \Doctrine\Common\Collections\ArrayCollection, but not working
+        if (is_object($this->getReceivedInvitations())) {
+            return $this->getReceivedInvitations()->toArray();
+        }
+
+        return $this->getReceivedInvitations();
+    }
+
+    public function getUnprocessedReceivedInvitations()
+    {
+        return array_filter($this->getReceivedInvitationsAsArray(), function($invitation) {
+           return !$invitation->isProcessed();
+        });
+    }
+
     public function hasReceivedInvitations()
     {
         // TODO: Necessary? Some indications say that you need to interate in order to load
@@ -449,7 +466,7 @@ class User extends BaseUser
           'addresses' => $this->eachApiArray($this->addresses),
           'mobile_number' => $this->getMobileNumber(),
           'policies' => $this->eachApiArray($this->policies),
-          'received_invitations' => $this->eachApiArray($this->getReceivedInvitations(), $debug),
+          'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), $debug),
           'has_cancelled_policy' => $this->hasCancelledPolicy(),
           'has_unpaid_policy' => $this->hasUnpaidPolicy(),
           'has_valid_policy' => $this->hasValidPolicy(),
