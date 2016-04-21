@@ -443,7 +443,7 @@ class ApiAuthController extends BaseController
      * @Route("/policy/{id}/terms", name="api_auth_get_policy_terms")
      * @Method({"GET"})
      */
-    public function getPolicyTermsAction(Request $request, $id)
+    public function getPolicyTermsAction($id)
     {
         try {
             $dm = $this->getManager();
@@ -466,8 +466,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            print_r(get_class($e));
-            $this->get('logger')->error(sprintf('Error in api newInvitation. %s', $e->getMessage()));
+            $this->get('logger')->error(sprintf('Error in api getPolicyTerms. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
