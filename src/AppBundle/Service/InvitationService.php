@@ -148,6 +148,7 @@ class InvitationService
         $this->dm->flush();
 
         $this->sendSms($invitation);
+        $this->dm->flush();
 
         return $invitation;
     }
@@ -172,7 +173,17 @@ class InvitationService
                 'text/plain'
             );
         if (!$this->debug) {
-            $this->mailer->send($message);
+            try {
+                $this->mailer->send($message);
+                $invitation->setStatus(EmailInvitation::STATUS_SENT);
+            } catch (\Exception $e) {
+                $invitation->setStatus(EmailInvitation::STATUS_FAILED);
+                $this->logger->error(sprintf(
+                    'Failed sending invite to %s Ex: %s',
+                    $invitation->getEmail(),
+                    $e->getMessage()
+                ));
+            }
         }
     }
 
@@ -185,7 +196,11 @@ class InvitationService
     {
         $message = $this->templating->render('AppBundle:Sms:invitation.txt.twig', ['invitation' => $invitation]);
         if (!$this->debug) {
-            $this->sms->send($invitation->getMobile(), $message);
+            if ($this->sms->send($invitation->getMobile(), $message)) {
+                $invitation->setStatus(SmsInvitation::STATUS_SENT);
+            } else {
+                $invitation->setStatus(SmsInvitation::STATUS_FAILED);
+            }
         }
     }
 

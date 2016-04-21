@@ -49,7 +49,7 @@ class InvitationTest extends WebTestCase
     {
         $invitationA = new SmsInvitation();
         $invitationA->setMobile('07700 900000');
-        $this->assertEquals('+4407700900000', $invitationA->getMobile());
+        $this->assertEquals('+447700900000', $invitationA->getMobile());
 
         $invitationB = new SmsInvitation();
         $invitationB->setMobile('00447700 900000');
