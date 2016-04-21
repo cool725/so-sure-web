@@ -305,6 +305,7 @@ class ApiControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(false, $data['device_found']);
         $this->assertEquals(true, $data['memory_found']);
+        $this->assertEquals(false, $data['rooted']);
     }
 
     public function testQuoteKnownDeviceKnownMemory()
@@ -315,16 +316,29 @@ class ApiControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(true, $data['memory_found']);
+        $this->assertEquals(false, $data['rooted']);
     }
     
     public function testQuoteKnownDeviceUnKnownMemory()
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/quote?device=A0001&memory=65&debug=true');
+        $crawler = $client->request('GET', '/api/v1/quote?device=A0001&memory=65&rooted=false&debug=true');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(false, $data['memory_found']);
+        $this->assertEquals(false, $data['rooted']);
+    }
+
+    public function testQuoteKnownDeviceRooted()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/api/v1/quote?device=A0001&memory=65&rooted=true&debug=true');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertEquals(false, $data['memory_found']);
+        $this->assertEquals(true, $data['rooted']);
     }
 
     // referral

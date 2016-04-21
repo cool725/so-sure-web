@@ -136,7 +136,7 @@ class ApiController extends BaseController
             $make = trim($request->get('make'));
             $device = trim($request->get('device'));
             $memory = (float) trim($request->get('memory'));
-            $rooted = $request->get('rooted') !== null ? (boolean) trim($request->get('rooted')) : false;
+            $rooted = filter_var($request->get('rooted'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 
             $phones = $this->getQuotes($make, $device, true);
             $deviceFound = $phones[0]->getMake() != "ALL";
@@ -175,6 +175,7 @@ class ApiController extends BaseController
 
             if ($request->get('debug')) {
                 $response['memory_found'] = $memoryFound;
+                $response['rooted'] = $rooted;
             }
 
             return new JsonResponse($response);
