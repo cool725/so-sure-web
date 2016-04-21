@@ -289,8 +289,8 @@ class User extends BaseUser
 
     public function getUnprocessedReceivedInvitations()
     {
-        return array_filter($this->getReceivedInvitationsAsArray(), function($invitation) {
-           return !$invitation->isProcessed();
+        return array_filter($this->getReceivedInvitationsAsArray(), function ($invitation) {
+            return !$invitation->isProcessed();
         });
     }
 
