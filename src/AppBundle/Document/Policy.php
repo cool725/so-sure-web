@@ -67,6 +67,11 @@ abstract class Policy
     protected $invitations;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\PolicyTerms")
+     */
+    protected $policyTerms;
+
+    /**
      * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Connection")
      */
     protected $connections = array();
@@ -223,6 +228,16 @@ abstract class Policy
         }
 
         $this->potValue = $potValue;
+    }
+
+    public function getPolicyTerms()
+    {
+        return $this->policyTerms;
+    }
+
+    public function setPolicyTerms(PolicyTerms $policyTerms)
+    {
+        $this->policyTerms = $policyTerms;
     }
 
     public function getInvitations()
@@ -412,6 +427,10 @@ abstract class Policy
 
     protected function toApiArray()
     {
+        if ($this->isPolicy() && !$this->getPolicyTerms()) {
+            throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
+        }
+
         return [
             'id' => $this->getId(),
             'status' => $this->getStatus(),
@@ -419,6 +438,7 @@ abstract class Policy
             'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ISO8601) : null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ISO8601) : null,
             'policy_number' => $this->getPolicyNumber(),
+            'policy_terms_id' => $this->getPolicyTerms() ? $this->getPolicyTerms()->getId() : null,
             'pot' => [
                 'connections' => count($this->getConnections()),
                 'max_connections' => $this->getMaxConnections(),

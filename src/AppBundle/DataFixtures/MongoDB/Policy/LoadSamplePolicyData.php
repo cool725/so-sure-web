@@ -6,19 +6,42 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Connection;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // @codingStandardsIgnoreFile
-class LoadSamplePolicyData implements FixtureInterface
+class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 {
+     /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     public function load(ObjectManager $manager)
     {
+        $this->newPolicyTerms($manager);
+        $manager->flush();
+
         $users = $this->newUsers($manager);
         $manager->flush();
 
         $this->newPolicy($manager, $users);
         $manager->flush();
+    }
+
+    private function newPolicyTerms($manager)
+    {
+        $policyTerms = new PolicyTerms();
+        $policyTerms->setLatest(true);
+        $manager->persist($policyTerms);
     }
 
     private function newUsers($manager)
@@ -51,6 +74,11 @@ class LoadSamplePolicyData implements FixtureInterface
         $policy->setUser($user);
         $policy->setPhone($phone);
         $policy->create(-5000);
+
+        $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $policy->setPolicyTerms($latestTerms);
 
         $connection = new Connection();
         $connection->setUser($users[0]);

@@ -29,6 +29,7 @@ class ApiAuthControllerTest extends WebTestCase
     protected static $dm;
     protected static $identity;
     protected static $jwt;
+    protected static $router;
 
     public function tearDown()
     {
@@ -40,6 +41,7 @@ class ApiAuthControllerTest extends WebTestCase
         self::$identity = self::$client->getContainer()->get('app.cognito.identity');
         self::$dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         self::$userManager = self::$client->getContainer()->get('fos_user.user_manager');
+        self::$router = self::$client->getContainer()->get('router');
         self::$jwt = self::$client->getContainer()->get('app.jwt');
         self::$testUser = self::createUser(
             self::$userManager,
@@ -719,6 +721,28 @@ class ApiAuthControllerTest extends WebTestCase
             }
         }
         $this->assertTrue($foundInvitation);
+    }
+
+    // policy/{id}/terms
+
+    /**
+     *
+     */
+    public function testGetPolicyTerms()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $createData = json_decode(self::$client->getResponse()->getContent(), true);
+        $policyId = $createData['id'];
+
+        $url = sprintf('/api/v1/auth/policy/%s/terms?_method=GET', $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $getData = json_decode(self::$client->getResponse()->getContent(), true);
+        $policyUrl = self::$router->generate('policy_terms', ['id' => $policyId]);
+        print $getData["view_url"];
+        $this->assertTrue(stripos($getData["view_url"], $policyUrl) >= 0);
     }
 
     // secret
