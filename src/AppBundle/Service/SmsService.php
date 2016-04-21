@@ -53,10 +53,6 @@ class SmsService
      */
     public function send($number, $message)
     {
-        if ($number == "+447775740466") {
-            return;
-        }
-        
         try {
             $params = array(
                 'src' => $this->sending_number, // Sender's phone number with country code
