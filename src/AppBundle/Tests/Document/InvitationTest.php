@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Document\Invitation\SmsInvitation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -42,5 +43,16 @@ class InvitationTest extends WebTestCase
         }
         $invitation->reinvite();
         $this->assertFalse($invitation->canReinvite());
+    }
+
+    public function testMobileNumberIsNormalized()
+    {
+        $invitationA = new SmsInvitation();
+        $invitationA->setMobile('07700 900000');
+        $this->assertEquals('+447700900000', $invitationA->getMobile());
+
+        $invitationB = new SmsInvitation();
+        $invitationB->setMobile('00447700 900000');
+        $this->assertEquals('+447700900000', $invitationB->getMobile());
     }
 }

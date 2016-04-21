@@ -90,4 +90,15 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->addPolicy($policy);
         $this->assertTrue($user->hasValidPolicy());
     }
+
+    public function testMobileNumberIsNormalized()
+    {
+        $userA = new User();
+        $userA->setMobileNumber('07700 900000');
+        $this->assertEquals('+447700900000', $userA->getMobileNumber());
+
+        $userB = new User();
+        $userB->setMobileNumber('00447700 900000');
+        $this->assertEquals('+447700900000', $userB->getMobileNumber());
+    }
 }

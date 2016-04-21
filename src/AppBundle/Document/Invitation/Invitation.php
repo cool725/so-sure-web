@@ -13,6 +13,9 @@ use AppBundle\Document\User;
  */
 abstract class Invitation
 {
+    const STATUS_SENT = 'sent';
+    const STATUS_FAILED = 'failed';
+
     /**
      * @MongoDB\Id
      */
@@ -35,6 +38,9 @@ abstract class Invitation
 
     /** @MongoDB\Field(type="integer", name="reinvited_count") */
     protected $reinvitedCount;
+
+    /** @MongoDB\Field(type="string") */
+    protected $status;
 
     /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="sentInvitations") */
     protected $inviter;
@@ -66,6 +72,16 @@ abstract class Invitation
         return $this->id;
     }
     
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
     public function getCreated()
     {
         return $this->created;
@@ -214,6 +230,7 @@ abstract class Invitation
             'inviter_name' => $this->getInviter() ? $this->getInviter()->getName() : null,
             'channel' => $this->getChannel(),
             'link' => $this->getLink(),
+            'status' => $this->getStatus(),
             'created_date' => $this->getCreated() ? $this->getCreated()->format(\DateTime::ISO8601) : null,
         ];
 

@@ -3,12 +3,15 @@
 namespace AppBundle\Document\Invitation;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use AppBundle\Document\PhoneTrait;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\Invitation\SmsInvitationRepository")
  */
 class SmsInvitation extends Invitation
 {
+    use PhoneTrait;
+
     /** @MongoDB\Field(type="string", nullable=false) */
     protected $mobile;
 
@@ -34,6 +37,6 @@ class SmsInvitation extends Invitation
 
     public function setMobile($mobile)
     {
-        $this->mobile = $mobile;
+        $this->mobile = $this->normalizeUkMobile($mobile);
     }
 }
