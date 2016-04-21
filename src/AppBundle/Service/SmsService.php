@@ -67,7 +67,6 @@ class SmsService
             );
             // Send mes
             $resp = $this->client->send_message($params);
-
         } catch (\Exception $e) {
             $this->logger->error(sprintf("Unable to send to %s Ex: %s", $number, $e->getMessage()));
 
