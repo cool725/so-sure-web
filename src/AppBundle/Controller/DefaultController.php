@@ -270,6 +270,10 @@ class DefaultController extends BaseController
             }
         }
 
-        return array('phone' => $phone, 'form' => $form->createView());
+        return array(
+            'phone' => $phone,
+            'premium' => $phone->getCurrentPolicyPremium(),
+            'form' => $form->createView()
+        );
     }
 }

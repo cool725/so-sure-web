@@ -154,9 +154,9 @@ class ApiController extends BaseController
                 }
                 $quotes[] = [
                     'monthly_premium' => $currentPremium->getPolicyPrice(),
-                    'monthly_loss' => $currentPremium->getLossPrice(),
+                    'monthly_loss' => 0,
                     'yearly_premium' => $currentPremium->getYearlyPolicyPrice(),
-                    'yearly_loss' => $currentPremium->getYearlyLossPrice(),
+                    'yearly_loss' => 0,
                     'phone' => $phone->toApiArray(),
                     'connection_value' => $currentPremium->getConnectionValue(),
                     'max_connections' => $currentPremium->getMaxConnections(),

@@ -14,9 +14,6 @@ class PhonePremium extends Premium
     /** @MongoDB\Field(type="float") */
     protected $policyPrice;
 
-    /** @MongoDB\Field(type="float") */
-    protected $lossPrice;
-
     public function __construct()
     {
     }
@@ -25,7 +22,7 @@ class PhonePremium extends Premium
     {
         return $this->toTwoDp($this->policyPrice);
     }
-
+    
     public function setPolicyPrice($policyPrice)
     {
         $this->policyPrice = $policyPrice;
@@ -36,34 +33,9 @@ class PhonePremium extends Premium
         return $this->toTwoDp($this->getPolicyPrice() * 12);
     }
 
-    public function getLossPrice()
-    {
-        return $this->toTwoDp($this->lossPrice);
-    }
-
-    public function setLossPrice($lossPrice)
-    {
-        $this->lossPrice = $lossPrice;
-    }
-
-    public function getYearlyLossPrice()
-    {
-        return $this->toTwoDp($this->lossPrice * 12);
-    }
-
-    public function getTotalPrice()
-    {
-        return $this->getPolicyPrice() + $this->getLossPrice();
-    }
-
-    public function getYearlyTotalPrice()
-    {
-        return $this->toTwoDp($this->getTotalPrice() * 12);
-    }
-
     public function getMaxPot()
     {
-        return $this->toTwoDp($this->getYearlyTotalPrice() * 0.8);
+        return $this->toTwoDp($this->getYearlyPolicyPrice() * 0.8);
     }
 
     public function getMaxConnections()

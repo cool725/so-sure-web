@@ -39,7 +39,6 @@ class Phone
         $make,
         $model,
         $policyPrice,
-        $lossPrice,
         $memory = null,
         $devices = null
     ) {
@@ -55,7 +54,6 @@ class Phone
             $this->addPolicyPremium($policyPremium);
         }
         $policyPremium->setPolicyPrice($policyPrice);
-        $policyPremium->setLossPrice($lossPrice);
     }
 
     public function getId()
@@ -157,7 +155,6 @@ class Phone
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
             'policy_price' => $this->getPolicyPrice(),
-            'loss_price' => $this->getLossPrice(),
         ];
     }
 }

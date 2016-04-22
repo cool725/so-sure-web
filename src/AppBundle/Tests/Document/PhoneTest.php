@@ -22,16 +22,8 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
     {
         $phoneA = $this->getSamplePhoneA();
         $phoneB = $this->getSamplePhoneB();
-        $this->assertEquals(77.88, $phoneA->getCurrentPolicyPremium()->getYearlyPolicyPrice());
-        $this->assertEquals(83.88, $phoneB->getCurrentPolicyPremium()->getYearlyPolicyPrice());
-    }
-
-    public function testYearlyLoss()
-    {
-        $phoneA = $this->getSamplePhoneA();
-        $phoneB = $this->getSamplePhoneB();
-        $this->assertEquals(18, $phoneA->getCurrentPolicyPremium()->getYearlyLossPrice());
-        $this->assertEquals(18, $phoneB->getCurrentPolicyPremium()->getYearlyLossPrice());
+        $this->assertEquals(95.88, $phoneA->getCurrentPolicyPremium()->getYearlyPolicyPrice());
+        $this->assertEquals(101.88, $phoneB->getCurrentPolicyPremium()->getYearlyPolicyPrice());
     }
 
     public function testMaxPot()
@@ -59,13 +51,6 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $phone = new Phone();
         $phone->init('Apple', 'iPhone 6', 6.990001, 1.5);
         $this->assertEquals(6.99, $phone->getCurrentPolicyPremium()->getPolicyPrice());
-    }
-
-    public function testLoss2dp()
-    {
-        $phone = new Phone();
-        $phone->init('Apple', 'iPhone 6', 6.99, 1.50001);
-        $this->assertEquals(1.50, $phone->getCurrentPolicyPremium()->getLossPrice());
     }
     
     public function testGetCurrentPolicyPremium()
@@ -95,7 +80,7 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
     private function getSamplePhoneA()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'iPhone 5s', 6.49, 1.5);
+        $phone->init('Apple', 'iPhone 5s', 6.49 + 1.5);
 
         return $phone;
     }
@@ -103,7 +88,7 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
     private function getSamplePhoneB()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'iPhone 6', 6.99, 1.5);
+        $phone->init('Apple', 'iPhone 6', 6.99 + 1.5);
 
         return $phone;
     }
