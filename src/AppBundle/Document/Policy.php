@@ -343,7 +343,7 @@ abstract class Policy
             $date = new \DateTime();
         }
 
-        return $this->getStart()->diff($date)->days <= 60;
+        return $this->getStart()->diff($date)->days < 60;
     }
 
     public function getConnectionCliffDate()
@@ -369,7 +369,7 @@ abstract class Policy
             return false;
         }
 
-        return $latestClaim->getDate()->diff($date)->days <= 30;
+        return $latestClaim->getDate()->diff($date)->days < 30;
     }
 
     public function getLatestClaim()
@@ -440,6 +440,34 @@ abstract class Policy
     abstract public function getMaxPot();
     abstract public function getConnectionValue();
 
+    public function getConnectionValues()
+    {
+        $connectionValues = [];
+        if (!$this->isPolicy()) {
+            return $connectionValues;
+        }
+
+        $connectionValues[] = [
+            'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ISO8601) : null,
+            'end_date' => $this->getConnectionCliffDate() ?
+                $this->getConnectionCliffDate()->format(\DateTime::ISO8601) :
+                null,
+            'value' => $this->getConnectionValue($this->getStart()),
+        ];
+
+        $afterCliffDate = clone $this->getConnectionCliffDate();
+        $afterCliffDate->add(new \DateInterval('PT1S'));
+        $connectionValues[] = [
+            'start_date' => $this->getConnectionCliffDate() ?
+                $this->getConnectionCliffDate()->format(\DateTime::ISO8601) :
+                null,
+            'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ISO8601) : null,
+            'value' => $this->getConnectionValue($afterCliffDate),
+        ];
+
+        return $connectionValues;
+    }
+
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms()) {
@@ -459,10 +487,7 @@ abstract class Policy
                 'max_connections' => $this->getMaxConnections(),
                 'value' => $this->getPotValue(),
                 'max_value' => $this->getMaxPot(),
-                'connection_value' => $this->getConnectionValue(),
-                'connection_cliff_date' => $this->getConnectionCliffDate() ?
-                    $this->getConnectionCliffDate()->format(\DateTime::ISO8601) :
-                    null,
+                'connection_values' => $this->getConnectionValues(),
             ],
             'connections' => $this->eachApiArray($this->getConnections()),
             'sent_invitations' => $this->eachApiArray($this->getSentInvitations()),
