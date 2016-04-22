@@ -10,4 +10,7 @@ else
     echo "Non-production server - safe to run"
 fi
 
+set -e
+
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
+./vendor/phing/phing/bin/phing force:cs
