@@ -449,14 +449,18 @@ abstract class Policy
 
         $connectionValues[] = [
             'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ISO8601) : null,
-            'end_date' => $this->getConnectionCliffDate() ? $this->getConnectionCliffDate()->format(\DateTime::ISO8601) : null,
+            'end_date' => $this->getConnectionCliffDate() ?
+                $this->getConnectionCliffDate()->format(\DateTime::ISO8601) :
+                null,
             'value' => $this->getConnectionValue($this->getStart()),
         ];
 
         $afterCliffDate = clone $this->getConnectionCliffDate();
         $afterCliffDate->add(new \DateInterval('PT1S'));
         $connectionValues[] = [
-            'start_date' => $this->getConnectionCliffDate() ? $this->getConnectionCliffDate()->format(\DateTime::ISO8601) : null,
+            'start_date' => $this->getConnectionCliffDate() ?
+                $this->getConnectionCliffDate()->format(\DateTime::ISO8601) :
+                null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ISO8601) : null,
             'value' => $this->getConnectionValue($afterCliffDate),
         ];
