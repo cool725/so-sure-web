@@ -22,7 +22,7 @@ class PhonePremium extends Premium
     {
         return $this->toTwoDp($this->policyPrice);
     }
-    
+
     public function setPolicyPrice($policyPrice)
     {
         $this->policyPrice = $policyPrice;
@@ -40,10 +40,10 @@ class PhonePremium extends Premium
 
     public function getMaxConnections()
     {
-        return (int) ceil($this->getMaxPot() / $this->getConnectionValue());
+        return (int) ceil($this->getMaxPot() / $this->getInitialConnectionValue());
     }
 
-    public function getConnectionValue()
+    public function getInitialConnectionValue()
     {
         return 10;
     }

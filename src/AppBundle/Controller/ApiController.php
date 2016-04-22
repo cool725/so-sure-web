@@ -158,7 +158,7 @@ class ApiController extends BaseController
                     'yearly_premium' => $currentPremium->getYearlyPolicyPrice(),
                     'yearly_loss' => 0,
                     'phone' => $phone->toApiArray(),
-                    'connection_value' => $currentPremium->getConnectionValue(),
+                    'connection_value' => $currentPremium->getInitialConnectionValue(),
                     'max_connections' => $currentPremium->getMaxConnections(),
                     'max_pot' => $currentPremium->getMaxPot(),
                 ];
