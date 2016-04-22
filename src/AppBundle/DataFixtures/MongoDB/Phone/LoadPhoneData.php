@@ -169,7 +169,7 @@ class LoadPhoneData implements FixtureInterface
     private function newPhone($manager, $make, $model, $policyPrice, $memory = null, $devices = null)
     {
         $phone = new Phone();
-        $phone->init($make, $model, $policyPrice, 1.5, $memory, $devices);
+        $phone->init($make, $model, $policyPrice + 1.5, $memory, $devices);
         $manager->persist($phone);
 
         if (!$phone->getCurrentPolicyPremium()) {
