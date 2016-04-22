@@ -72,9 +72,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (!$phone->getCurrentPolicyPremium()) {
             throw new \Exception('Failed to load phone policy');
         }
-        \Doctrine\Common\Util\Debug::dump($phone);
-        \Doctrine\Common\Util\Debug::dump($phone->getPolicyPremiums());
-        \Doctrine\Common\Util\Debug::dump($phone->getCurrentPolicyPremium());
+        //\Doctrine\Common\Util\Debug::dump($phone);
+        //\Doctrine\Common\Util\Debug::dump($phone->getPolicyPremiums());
+        //\Doctrine\Common\Util\Debug::dump($phone->getCurrentPolicyPremium());
         $policy = new PhonePolicy();
         $policy->setUser($user);
         $policy->setPhone($phone);
