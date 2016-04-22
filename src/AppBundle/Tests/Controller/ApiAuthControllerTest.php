@@ -174,17 +174,30 @@ class ApiAuthControllerTest extends WebTestCase
      */
     public function testNewPolicy()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
+
+        $this->clearRateLimit();
+        $user = self::createUser(self::$userManager, self::generateEmail('policy', $this), 'foo', true);
+        self::addAddress($user, self::$dm);
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+        ]]);
+
         $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode(), print_r($data, true));
         $data = json_decode(self::$client->getResponse()->getContent(), true);
 
         $this->assertTrue(strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
 
         // Now make sure that the policy shows up against the user
-        $url = sprintf('/api/v1/auth/user/%s?_method=GET', self::$testUser->getId());
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
@@ -477,7 +490,7 @@ class ApiAuthControllerTest extends WebTestCase
     /**
      *
      */
-    public function testGetPolicy()
+    public function testGetNullPolicy()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
@@ -493,9 +506,9 @@ class ApiAuthControllerTest extends WebTestCase
         $this->assertEquals($createData['id'], $getData['id']);
         $this->assertEquals($createData['phone_policy']['imei'], $getData['phone_policy']['imei']);
         $this->assertEquals(0, $createData['pot']['connections']);
-        $this->assertEquals(7, $createData['pot']['max_connections']);
+        $this->assertEquals(0, $createData['pot']['max_connections']);
         $this->assertEquals(0, $createData['pot']['value']);
-        $this->assertEquals(69.98, round($createData['pot']['max_value'], 2));
+        $this->assertEquals(0, round($createData['pot']['max_value'], 2));
     }
 
     public function testGetPolicyUnknownId()
@@ -588,11 +601,12 @@ class ApiAuthControllerTest extends WebTestCase
             'postcode' => 'BX11LT',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode(), print_r($data, true));
 
         $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode(), print_r($data, true));
 
         $url = sprintf("/api/v1/auth/policy/%s/dd", $data['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -601,8 +615,8 @@ class ApiAuthControllerTest extends WebTestCase
             'first_name' => 'foo',
             'last_name' => 'bar',
         ]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $policyData = json_decode(self::$client->getResponse()->getContent(), true);
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode(), print_r($data, true));
         $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
     }

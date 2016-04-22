@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\OptOut\EmailOptOut;
@@ -20,16 +21,35 @@ class PolicyService
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var SequenceService */
+    protected $sequence;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
+     * @param SequenceService $sequence
      */
     public function __construct(
         DocumentManager $dm,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        SequenceService $sequence
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
+        $this->sequence = $sequence;
+    }
+
+    public function create(Policy $policy)
+    {
+        $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE));
+        if ($policy instanceof PhonePolicy) {
+            $repo = $this->dm->getRepository(PhonePolicy::class);
+            if ($repo->countAllPolicies() < 1000) {
+                $policy->setPromoCode(Policy::PROMO_LAUNCH);
+            }
+        }
+
+        $this->dm->flush();
     }
 
     public function cancel(Policy $policy)

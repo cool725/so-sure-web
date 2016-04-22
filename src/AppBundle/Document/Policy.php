@@ -26,6 +26,9 @@ abstract class Policy
     const STATUS_EXPIRED = 'expired';
     const STATUS_UNPAID = 'unpaid';
 
+    // First 1000 policies
+    const PROMO_LAUNCH = 'launch';
+
     const PAYMENT_DD_MONTHLY = 'gocardless_monthly';
 
     /**
@@ -92,6 +95,9 @@ abstract class Policy
 
     /** @MongoDB\Field(type="float", name="pot_value", nullable=false) */
     protected $potValue;
+
+    /** @MongoDB\Field(type="string") */
+    protected $promoCode;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Premium")
@@ -243,6 +249,16 @@ abstract class Policy
     public function setPolicyTerms(PolicyTerms $policyTerms)
     {
         $this->policyTerms = $policyTerms;
+    }
+
+    public function getPromoCode()
+    {
+        return $this->promoCode;
+    }
+
+    public function setPromoCode($promoCode)
+    {
+        $this->promoCode = $promoCode;
     }
 
     public function getInvitations()

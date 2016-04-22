@@ -115,4 +115,15 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->addReceivedInvitation($invitiationB);
         $this->assertEquals(1, count($user->getUnprocessedReceivedInvitations()));
     }
+
+    public function testPreLaunchUser()
+    {
+        $userA = new User();
+        $userA->setCreated(new \DateTime('2015-12-01'));
+        $this->assertTrue($userA->isPreLaunchUser(new \DateTime('2016-01-01')));
+
+        $userB = new User();
+        $userB->setCreated(new \DateTime('2016-02-01'));
+        $this->assertFalse($userB->isPreLaunchUser(new \DateTime('2016-01-01')));
+    }
 }

@@ -134,6 +134,16 @@ class User extends BaseUser
         $this->id = $id;
     }
 
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
     public function getCognitoId()
     {
         return $this->cognitoId;
@@ -438,6 +448,20 @@ class User extends BaseUser
     public function setMobileNumber($mobile)
     {
         $this->mobileNumber = $this->normalizeUkMobile($mobile);
+    }
+
+    public function isPreLaunchUser($launchDate = null)
+    {
+        if (!$launchDate) {
+            // TODO: Make sure we adjust based on launch date
+            $launchDate = new \DateTime('2016-05-09');
+        }
+
+        if ($this->created < $launchDate) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function hasValidDetails()

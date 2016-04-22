@@ -47,7 +47,7 @@ services:
         arguments:
             dm:          "@doctrine_mongodb.odm.default_document_manager"
             logger:      "@logger"
-            sequence:    "@app.sequence"
+            policy:      "@app.policy"
             accessToken: "%gocardless_apikey%"
             prod:        "%gocardless_prod%"
 
@@ -173,6 +173,7 @@ services:
         arguments:
             dm:             "@doctrine_mongodb.odm.default_document_manager"
             logger:         "@logger"
+            sequence:    "@app.sequence"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService

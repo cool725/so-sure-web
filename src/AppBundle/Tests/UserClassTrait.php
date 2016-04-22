@@ -4,6 +4,7 @@ namespace AppBundle\Tests;
 
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Address;
 
 trait UserClassTrait
 {
@@ -12,15 +13,42 @@ trait UserClassTrait
         return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
     }
 
-    public static function createUser($userManager, $email, $password)
+    public static function createUser($userManager, $email, $password, $phone = null)
     {
         $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setPlainPassword($password);
         $user->setEnabled(true);
+
+        // Most tests should be against non-prelaunch users
+        $user->setCreated(new \DateTime('2017-01-01'));
+
+        if ($phone) {
+            $user->setMobileNumber(self::getRandomMobile());
+            $user->setFirstName('foo');
+            $user->setLastName('bar');
+        }
+
         $userManager->updateUser($user, true);
 
         return $user;
+    }
+
+    public static function addAddress(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm)
+    {
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setLine1('123 s road');
+        $address->setCity('London');
+        $address->setPostcode('BX11LT');
+        $user->addAddress($address);
+        $dm->persist($address);
+        $dm->flush();
+    }
+
+    public static function getRandomMobile()
+    {
+        return sprintf('+4477009%.05d', rand(1, 99999));
     }
     
     public static function createPolicy(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm)
@@ -28,6 +56,7 @@ trait UserClassTrait
         $policy = new PhonePolicy();
         $policy->setUser($user);
         $policy->setImei(self::generateRandomImei());
+        $policy->create(rand(1, 999999));
 
         $dm->persist($policy);
         $dm->flush();

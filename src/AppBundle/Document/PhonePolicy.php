@@ -62,21 +62,51 @@ class PhonePolicy extends Policy
 
     public function getConnectionValue(\DateTime $date = null)
     {
-        if (!$this->isPolicy() || $this->isPolicyWithin60Days($date)) {
-            return 10;
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+        if (!$this->getUser()) {
+            throw new \Exception('Policy is missing a user');
+        }
+
+        if ($this->isPolicyWithin60Days($date)) {
+            if ($this->getUser()->isPreLaunchUser() || $this->getPromoCode() == self::PROMO_LAUNCH) {
+                return 15;
+            } else {
+                return 10;
+            }
         } else {
             return 2;
         }
     }
 
-    public function getMaxConnections()
+    public function getMaxConnections(\DateTime $date = null)
     {
-        return $this->getPremium()->getMaxConnections();
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+        if (!$this->getUser()) {
+            throw new \Exception('Policy is missing a user');
+        }
+
+        return (int) ceil($this->getMaxPot() / $this->getConnectionValue($date));
     }
 
     public function getMaxPot()
     {
-        return $this->getPremium()->getMaxPot();
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+        if (!$this->getUser()) {
+            throw new \Exception('Policy is missing a user');
+        }
+
+        if ($this->getUser()->isPreLaunchUser() || $this->getPromoCode() == self::PROMO_LAUNCH) {
+            // 100% of policy
+            return $this->getPremium()->getYearlyPolicyPrice();
+        } else {
+            return $this->getPremium()->getMaxPot();
+        }
     }
 
     public function toApiArray()
