@@ -28,11 +28,8 @@ class Phone
     /** @MongoDB\Field(type="float", nullable=true) */
     protected $memory;
 
-    /** @MongoDB\Field(type="float") */
-    protected $policyPrice;
-
-    /** @MongoDB\Field(type="float") */
-    protected $lossPrice;
+    /** @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePremium") */
+    protected $policyPremiums = array();
 
     public function __construct()
     {
@@ -50,8 +47,15 @@ class Phone
         $this->model = $model;
         $this->devices = $devices;
         $this->memory = $memory;
-        $this->policyPrice = $policyPrice;
-        $this->lossPrice = $lossPrice;
+
+        $policyPremium = $this->getCurrentPolicyPremium();
+        if (!$policyPremium) {
+            $policyPremium = new PhonePremium();
+            $policyPremium->setValidFrom(new \DateTime());
+            $this->addPolicyPremium($policyPremium);
+        }
+        $policyPremium->setPolicyPrice($policyPrice);
+        $policyPremium->setLossPrice($lossPrice);
     }
 
     public function getId()
@@ -89,46 +93,6 @@ class Phone
         $this->devices = $devices;
     }
 
-    public function getPolicyPrice()
-    {
-        return $this->toTwoDp($this->policyPrice);
-    }
-
-    public function setPolicyPrice($policyPrice)
-    {
-        $this->policyPrice = $policyPrice;
-    }
-
-    public function getYearlyPolicyPrice()
-    {
-        return $this->toTwoDp($this->policyPrice * 12);
-    }
-
-    public function getLossPrice()
-    {
-        return $this->toTwoDp($this->lossPrice);
-    }
-
-    public function setLossPrice($lossPrice)
-    {
-        $this->lossPrice = $lossPrice;
-    }
-
-    public function getYearlyLossPrice()
-    {
-        return $this->toTwoDp($this->lossPrice * 12);
-    }
-
-    public function getTotalPrice()
-    {
-        return $this->getPolicyPrice() + $this->getLossPrice();
-    }
-
-    public function getYearlyTotalPrice()
-    {
-        return $this->toTwoDp($this->getTotalPrice() * 12);
-    }
-
     public function getMemory()
     {
         return $this->memory;
@@ -139,19 +103,30 @@ class Phone
         $this->memory = $memory;
     }
 
-    public function getMaxPot()
+    public function getPolicyPremiums()
     {
-        return $this->toTwoDp($this->getYearlyTotalPrice() * 0.8);
+        return $this->policyPremiums;
     }
 
-    public function getConnectionValue()
+    public function addPolicyPremium($policyPremium)
     {
-        return 10;
+        $this->policyPremiums[] = $policyPremium;
     }
 
-    public function getMaxConnections()
+    public function getCurrentPolicyPremium(\DateTime $date = null)
     {
-        return (int) ceil($this->getMaxPot() / $this->getConnectionValue());
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        foreach ($this->getPolicyPremiums() as $policyPremium) {
+            if ($policyPremium->getValidFrom() <= $date &&
+                (!$policyPremium->getValidTo() || $policyPremium->getValidTo() > $date)) {
+                return $policyPremium;
+            }
+        }
+
+        return null;
     }
 
     public function __toString()

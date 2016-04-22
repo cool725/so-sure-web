@@ -93,6 +93,11 @@ abstract class Policy
     /** @MongoDB\Field(type="float", name="pot_value", nullable=false) */
     protected $potValue;
 
+    /**
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Premium")
+     */
+    protected $premium;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -253,6 +258,16 @@ abstract class Policy
         }
 
         return $this->getInvitations();
+    }
+
+    public function setPremium(Premium $premium)
+    {
+        $this->premium = $premium;
+    }
+
+    public function getPremium()
+    {
+        return $this->premium;
     }
 
     public function create($seq, $startDate = null)
