@@ -10,6 +10,8 @@ else
     echo "Non-production server - safe to run"
 fi
 
+set -e
+
 app/console --env=test redis:flushdb --client=default -n
 app/console --env=test doctrine:mongodb:schema:drop
 app/console --env=test doctrine:mongodb:fixtures:load
