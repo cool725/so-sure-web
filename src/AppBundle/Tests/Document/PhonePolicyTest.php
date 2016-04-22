@@ -62,9 +62,16 @@ class PhonePolicyTest extends WebTestCase
     {
         $policyA = new PhonePolicy();
         $policyA->setStart(new \DateTime("2016-01-01"));
+
         $this->assertTrue($policyA->isPolicyWithin60Days(new \DateTime("2016-01-02")));
-        $this->assertTrue($policyA->isPolicyWithin60Days(new \DateTime("2016-03-01")));
-        $this->assertFalse($policyA->isPolicyWithin60Days(new \DateTime("2016-03-02")));
+        $this->assertTrue($policyA->isPolicyWithin60Days(new \DateTime("2016-02-29 23:59:59")));
+        $this->assertFalse($policyA->isPolicyWithin60Days(new \DateTime("2016-03-01")));
+
+        $cliffDate = $policyA->getConnectionCliffDate();
+        $beforeCliffDate = clone $cliffDate;
+        $beforeCliffDate->sub(new \DateInterval('PT1S'));
+        $this->assertTrue($policyA->isPolicyWithin60Days($beforeCliffDate));
+        $this->assertFalse($policyA->isPolicyWithin60Days($cliffDate));
     }
 
     public function testGetLastestClaim()
@@ -93,7 +100,7 @@ class PhonePolicyTest extends WebTestCase
     {
         $policyA = new PhonePolicy();
         $this->assertFalse($policyA->hasClaimedInLast30Days());
-        
+
         $claimA = new Claim();
         $claimA->setDate(new \DateTime("2016-01-01"));
         $policyA->addClaim($claimA);
@@ -288,8 +295,29 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         $policy->setStart(new \DateTime('2016-01-01'));
-        $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-03-01')));
-        $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-02')));
+        $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+        $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
+    }
+
+    public function testConnectionValues()
+    {
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $policy->setStart(new \DateTime('2016-01-01'));
+        $foundHighValue = false;
+        $foundLowValue = false;
+        $connectionValues = $policy->getConnectionValues();
+        print_r($connectionValues);
+        foreach ($connectionValues as $connectionValue) {
+            if ($connectionValue['value'] == 10) {
+                $foundHighValue = true;
+            } elseif ($connectionValue['value'] == 2) {
+                $foundLowValue = true;
+            }
+        }
+
+        $this->assertTrue($foundHighValue);
+        $this->assertTrue($foundLowValue);
     }
 
     /**
