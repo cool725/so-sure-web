@@ -6,6 +6,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection;
 use AppBundle\Document\Phone;
+use AppBundle\Document\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -139,6 +140,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyConnectionsZeroPot()
     {
         $policyA = new PhonePolicy();
+        $policyA->setUser(new User());
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPhone(self::$phone);
@@ -153,6 +155,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyConnectionsNoClaims()
     {
         $policyA = new PhonePolicy();
+        $policyA->setUser(new User());
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPhone(self::$phone);
@@ -167,6 +170,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyConnectionsClaimedPre30()
     {
         $policyA = new PhonePolicy();
+        $policyA->setUser(new User());
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPhone(self::$phone);
@@ -185,6 +189,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyConnectionsClaimedPost30()
     {
         $policyA = new PhonePolicy();
+        $policyA->setUser(new User());
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPhone(self::$phone);
@@ -223,6 +228,7 @@ class PhonePolicyTest extends WebTestCase
     public function testCalculatePotValueOneConnection()
     {
         $policy = new PhonePolicy();
+        $policy->setUser(new User());
         $connection = new Connection();
         $connection->setValue(10);
         $policy->addConnection($connection);
@@ -232,6 +238,7 @@ class PhonePolicyTest extends WebTestCase
     public function testCalculatePotValueOneOldOneNewConnection()
     {
         $policy = new PhonePolicy();
+        $policy->setUser(new User());
         $connectionOld = new Connection();
         $connectionOld->setValue(10);
         $policy->addConnection($connectionOld);
@@ -244,6 +251,7 @@ class PhonePolicyTest extends WebTestCase
     public function testCalculatePotValueOneValidClaimFiveConnections()
     {
         $policy = new PhonePolicy();
+        $policy->setUser(new User());
         for ($i = 1; $i <= 5; $i++) {
             $connection = new Connection();
             $connection->setValue(10);
@@ -259,6 +267,7 @@ class PhonePolicyTest extends WebTestCase
     public function testCalculatePotValueTwoValidClaimsFiveConnections()
     {
         $policy = new PhonePolicy();
+        $policy->setUser(new User());
         for ($i = 1; $i <= 5; $i++) {
             $connection = new Connection();
             $connection->setValue(10);
@@ -276,6 +285,7 @@ class PhonePolicyTest extends WebTestCase
     public function testCalculatePotValueOneInvalidClaimFiveConnections()
     {
         $policy = new PhonePolicy();
+        $policy->setUser(new User());
         for ($i = 1; $i <= 5; $i++) {
             $connection = new Connection();
             $connection->setValue(10);
@@ -291,17 +301,41 @@ class PhonePolicyTest extends WebTestCase
     public function testConnectionValue()
     {
         $policy = new PhonePolicy();
-        $this->assertEquals(10, $policy->getConnectionValue());
+        $user = new User();
+        // Make sure user isn't a prelaunch user
+        $user->setCreated(new \DateTime('2017-01-01'));
+        $this->assertFalse($user->isPreLaunchUser());
+        $policy->setUser($user);
+        // Policy status is null
+        $this->assertEquals(0, $policy->getConnectionValue());
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         $policy->setStart(new \DateTime('2016-01-01'));
+
+        // Normal connections without PROMO's or launch users
         $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+        $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
+
+        // Launch Promo Policy (first 1000 policies)
+        $policy->setPromoCode(PhonePolicy::PROMO_LAUNCH);
+        $this->assertEquals(15, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+        $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
+
+        // PreLaunch User Policy
+        $policy->setPromoCode(null);
+        $user->setCreated(new \DateTime('2016-01-01'));
+        $this->assertTrue($user->isPreLaunchUser());
+        $this->assertEquals(15, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
         $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
     }
 
     public function testConnectionValues()
     {
         $policy = new PhonePolicy();
+        $user = new User();
+        // Most tests should be against non-prelaunch users
+        $user->setCreated(new \DateTime('2017-01-01'));
+        $policy->setUser($user);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         $policy->setStart(new \DateTime('2016-01-01'));
         $foundHighValue = false;
@@ -326,6 +360,44 @@ class PhonePolicyTest extends WebTestCase
     public function testSetPolicyValueExceeded()
     {
         $policyA = new PhonePolicy();
+        $user = new User();
+        // Most tests should be against non-prelaunch users
+        $user->setCreated(new \DateTime('2017-01-01'));
+
+        $policyA->setUser($user);
+        $policyA->create(rand(1, 999999));
+        $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPhone(self::$phone);
+        $policyA->setPotValue(80);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testSetPolicyLaunchValueExceeded()
+    {
+        $policyA = new PhonePolicy();
+        $user = new User();
+        // Most tests should be against non-prelaunch users
+        $user->setCreated(new \DateTime('2017-01-01'));
+        $policyA->setPromoCode(PhonePolicy::PROMO_LAUNCH);
+
+        $policyA->setUser($user);
+        $policyA->create(rand(1, 999999));
+        $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPhone(self::$phone);
+        $policyA->setPotValue(120);
+    }
+    
+    public function testSetPolicyLaunchValueOk()
+    {
+        $policyA = new PhonePolicy();
+        $user = new User();
+        // Most tests should be against non-prelaunch users
+        $user->setCreated(new \DateTime('2017-01-01'));
+        $policyA->setPromoCode(PhonePolicy::PROMO_LAUNCH);
+
+        $policyA->setUser($user);
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPhone(self::$phone);
@@ -335,6 +407,7 @@ class PhonePolicyTest extends WebTestCase
     public function testPolicyEndDate()
     {
         $policy = new PhonePolicy();
+        $policy->setUser(new User());
         $policy->create(rand(1, 999999), new \DateTime('2016-01-01 16:00'));
         $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $policy->getEnd());
     }
@@ -342,6 +415,7 @@ class PhonePolicyTest extends WebTestCase
     public function testPolicyEndDateBST()
     {
         $policy = new PhonePolicy();
+        $policy->setUser(new User());
         $policy->create(rand(1, 999999), new \DateTime('2016-07-01 16:00'));
         $this->assertEquals(new \DateTime('2017-06-30 23:59:59'), $policy->getEnd());
     }
@@ -349,6 +423,7 @@ class PhonePolicyTest extends WebTestCase
     public function testConnectionCliffDate()
     {
         $policy = new PhonePolicy();
+        $policy->setUser(new User());
         $policy->create(rand(1, 999999), new \DateTime('2016-04-19 16:00'));
         $this->assertEquals(new \DateTime('2016-06-18 16:00'), $policy->getConnectionCliffDate());
     }

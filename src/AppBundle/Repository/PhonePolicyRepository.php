@@ -19,4 +19,22 @@ class PhonePolicyRepository extends DocumentRepository
             ->execute()
             ->count() == 0;
     }
+
+    /**
+     * All policies that have been created
+     */
+    public function countAllPolicies()
+    {
+        return $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_PENDING,
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_CANCELLED,
+                Policy::STATUS_EXPIRED,
+                Policy::STATUS_UNPAID
+            ])
+            ->getQuery()
+            ->execute()
+            ->count();
+    }
 }

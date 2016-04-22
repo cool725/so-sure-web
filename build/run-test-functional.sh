@@ -12,6 +12,7 @@ fi
 
 set -e
 
+rm app/logs/test.log
 app/console --env=test redis:flushdb --client=default -n
 app/console --env=test doctrine:mongodb:schema:drop
 app/console --env=test doctrine:mongodb:fixtures:load

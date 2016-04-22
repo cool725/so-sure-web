@@ -22,20 +22,20 @@ class GocardlessService
     /** @var Client */
     protected $client;
 
-    /** @var SequenceService */
-    protected $sequence;
+    /** @var PolicyService */
+    protected $policyService;
 
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param SequenceService $sequence
+     * @param PolicyService   $policyService
      * @param string          $accessToken
      * @param boolean         $prod
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        SequenceService $sequence,
+        PolicyService $policyService,
         $accessToken,
         $prod
     ) {
@@ -45,7 +45,7 @@ class GocardlessService
             'access_token' => $accessToken,
             'environment' => $prod ? Environment::LIVE : Environment::SANDBOX
         ]);
-        $this->sequence = $sequence;
+        $this->policyService = $policyService;
     }
 
     /**
@@ -61,8 +61,7 @@ class GocardlessService
         $this->addBankAccount($policy->getUser(), $sortCode, $accountNumber);
         $this->createMandate($policy);
         $this->subscribe($policy);
-        $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE));
-        $this->dm->flush();
+        $this->policyService->create($policy);
     }
 
     /**
