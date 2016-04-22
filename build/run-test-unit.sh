@@ -11,3 +11,4 @@ else
 fi
 
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
+./vendor/phing/phing/bin/phing force:cs

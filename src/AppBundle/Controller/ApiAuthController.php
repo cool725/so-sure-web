@@ -119,7 +119,7 @@ class ApiAuthController extends BaseController
                 $invitationService->reinvite($invitation);
             }
 
-            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Invitation processed', 200);
+            return new JsonResponse($this->getUser()->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
