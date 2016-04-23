@@ -179,6 +179,7 @@ class AdminController extends BaseController
     public function claimsPolicyAction(Request $request, $id)
     {
         $policyService = $this->get('app.policy');
+        $fraudService = $this->get('app.fraud');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
@@ -196,10 +197,12 @@ class AdminController extends BaseController
 
             return $this->redirectToRoute('admin_users');
         }
+        $checks = $fraudService->runChecks($policy);
 
         return [
             'policy' => $policy,
             'form' => $form->createView(),
+            'fraud' => $checks,
         ];
     }
 }

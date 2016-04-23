@@ -13,6 +13,8 @@ use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 class PolicyVoterTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
+    use \AppBundle\Tests\UserClassTrait;
+
     protected static $container;
     protected static $policyVoter;
 
@@ -53,6 +55,7 @@ class PolicyVoterTest extends WebTestCase
     {
         $user = new User();
         $user->setId(1);
+        self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->setUser($user);
         $token = new PreAuthenticatedToken($user, '1', 'test');
@@ -64,6 +67,7 @@ class PolicyVoterTest extends WebTestCase
     {
         $user = new User();
         $user->setId(1);
+        self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->setUser($user);
 

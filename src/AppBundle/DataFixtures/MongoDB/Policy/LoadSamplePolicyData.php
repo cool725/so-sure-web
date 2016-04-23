@@ -8,6 +8,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
+use AppBundle\Document\Address;
 use AppBundle\Document\Connection;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -51,7 +52,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $user = new User();
             $user->setEmail(sprintf('user%d@policy.so-sure.net', $i));
             $user->setFirstName(sprintf('first-%d', $i));
-            $user->setLastName(sprintf('last-%d', $i));            
+            $user->setLastName(sprintf('last-%d', $i));
+            $address = new Address();
+            $address->setType(Address::TYPE_BILLING);
+            $address->setLine1($i);
+            $address->setCity('London');
+            $address->setPostcode('BX11LT');
+            $user->addAddress($address);
             $manager->persist($user);
             $users[] = $user;
         }
@@ -64,7 +71,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user = new User();
         $user->setEmail(sprintf('policy@policy.so-sure.net'));
         $user->setFirstName(sprintf('first'));
-        $user->setLastName(sprintf('last'));            
+        $user->setLastName(sprintf('last'));
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setLine1('123 Policy');
+        $address->setCity('London');
+        $address->setPostcode('BX11LT');
+        $user->addAddress($address);
         $manager->persist($user);
 
         $phoneRepo = $manager->getRepository(Phone::class);

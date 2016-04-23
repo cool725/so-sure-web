@@ -41,7 +41,7 @@ class User extends BaseUser
     protected $referred;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Address", mappedBy="user")
+     * @MongoDB\EmbedMany(targetDocument="Address")
      */
     protected $addresses;
 
@@ -192,7 +192,6 @@ class User extends BaseUser
 
     public function addAddress(Address $address)
     {
-        $address->setUser($this);
         $this->addresses[] = $address;
     }
 

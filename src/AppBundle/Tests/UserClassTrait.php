@@ -34,7 +34,7 @@ trait UserClassTrait
         return $user;
     }
 
-    public static function addAddress(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm)
+    public static function addAddress(User $user)
     {
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
@@ -42,8 +42,6 @@ trait UserClassTrait
         $address->setCity('London');
         $address->setPostcode('BX11LT');
         $user->addAddress($address);
-        $dm->persist($address);
-        $dm->flush();
     }
 
     public static function getRandomMobile()
@@ -53,6 +51,7 @@ trait UserClassTrait
     
     public static function createPolicy(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm)
     {
+        self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->setUser($user);
         $policy->setImei(self::generateRandomImei());

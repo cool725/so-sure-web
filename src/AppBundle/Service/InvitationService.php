@@ -245,6 +245,10 @@ class InvitationService
 
     public function reject(Invitation $invitation)
     {
+        if ($invitation->isProcessed()) {
+            throw new \Exception("Invitation has already been processed");
+        }
+
         $invitation->setRejected(new \DateTime());
         $this->dm->flush();
         // TODO: notify inviter
@@ -252,6 +256,10 @@ class InvitationService
 
     public function cancel(Invitation $invitation)
     {
+        if ($invitation->isProcessed()) {
+            throw new \Exception("Invitation has already been processed");
+        }
+
         $invitation->setCancelled(new \DateTime());
         $this->dm->flush();
         // TODO: notify invitee??
@@ -259,6 +267,10 @@ class InvitationService
 
     public function reinvite(Invitation $invitation)
     {
+        if ($invitation->isProcessed()) {
+            throw new \Exception("Invitation has already been processed");
+        }
+
         if (!$invitation->canReinvite()) {
             return false;
         }

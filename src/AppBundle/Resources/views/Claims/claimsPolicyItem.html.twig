@@ -1,3 +1,6 @@
+    <div class="text-center" style="background-color: {{ policy.riskColour }}; color: white;">
+      Risk: {{ policy.risk }}
+    </div>
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#policy">Policy</a></li>
       <li role="presentation"><a href="#claims">Claims <span class="badge" title="Number of claims">{{ policy.claims|length }}</span></a></li>
@@ -23,10 +26,9 @@
                         <td>Phone</td>
                         <td>{{ policy.phone }}</td>
                     </tr>
-                    <tr>
-                        <td>Risk</td>
-                        <td>{{ policy.risk }}</td>
-                    </tr>
+                </table>
+                <h3>Pot</h3>
+                <table class="table table-striped">
                     <tr>
                         <td>Connections</td>
                         <td>{{ policy.connections|length }}</td>
@@ -34,6 +36,33 @@
                     <tr>
                         <td>Pot Value</td>
                         <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
+                    </tr>
+                </table>
+                <h3>Anti Fraud Checks</h3>
+                <table class="table table-striped">
+                    <tr>
+                        <td>User Signup - Country of Ip</td>
+                        <td>{{ policy.user.signupCountry }}</td>
+                    </tr>
+                    <tr>
+                        <td>Other Users w/same postcode</td>
+                        <td>{{ fraud.duplicate_postcode }}</td>
+                    </tr>
+                    <tr>
+                        <td>Other Users w/same signup ips</td>
+                        <td>Not yet implemented</td>
+                    </tr>
+                    <tr>
+                        <td>Other Users w/same bank account</td>
+                        <td>Not yet implemented</td>
+                    </tr>
+                    <tr>
+                        <td>IMEI belonged to different user</td>
+                        <td>Not yet implemented</td>
+                    </tr>
+                    <tr>
+                        <td>Network Cancellations</td>
+                        <td>Not yet implemented</td>
                     </tr>
                 </table>
             {% else %}
@@ -79,10 +108,6 @@
                 <tr>
                     <td>Billing Address</td>
                     <td>{{ policy.user.billingAddress }}</td>
-                </tr>
-                <tr>
-                    <td>Signup Country</td>
-                    <td>{{ policy.user.signupCountry }}</td>
                 </tr>
             </table>
         </div>
