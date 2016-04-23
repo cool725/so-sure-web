@@ -31,7 +31,7 @@ class FraudService
     public function runChecks(Policy $policy)
     {
         return [
-            'duplicate_postcode' => count($this->getDuplicatePostcode($policy)),  
+            'duplicate_postcode' => count($this->getDuplicatePostcode($policy)),
         ];
     }
 
