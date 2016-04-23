@@ -14,6 +14,7 @@ class BaseControllerTest extends WebTestCase
     protected static $identity;
     protected static $jwt;
     protected static $router;
+    protected static $redis;
 
     public function tearDown()
     {
@@ -27,6 +28,7 @@ class BaseControllerTest extends WebTestCase
         self::$userManager = self::$client->getContainer()->get('fos_user.user_manager');
         self::$router = self::$client->getContainer()->get('router');
         self::$jwt = self::$client->getContainer()->get('app.jwt');
+        self::$redis = self::$container->get('snc_redis.default');
     }
 
     // helpers
