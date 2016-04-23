@@ -134,6 +134,10 @@ abstract class Policy
 
     public function setUser(User $user)
     {
+        if (!$user->getBillingAddress()) {
+            throw new \Exception('User must have a billing address');
+        }
+
         $this->user = $user;
     }
 
@@ -305,6 +309,18 @@ abstract class Policy
         $this->setStatus(self::STATUS_PENDING);
     }
 
+    public function getRiskColour()
+    {
+        $risk = $this->getRisk();
+        if ($risk == self::RISK_LOW) {
+            return 'green';
+        } elseif ($risk == self::RISK_MEDIUM) {
+            return 'yellow';
+        } elseif ($risk == self::RISK_HIGH) {
+            return 'red';
+        }
+    }
+
     public function getRisk($date = null)
     {
         if (!$this->isPolicy()) {
@@ -427,6 +443,12 @@ abstract class Policy
             $potValue = 0;
         }
 
+        /*
+        // Make sure pot value doesn't exceed the max pot
+        if ($potValue > $this->getMaxPot()) {
+            $potValue = $this->getMaxPot();
+        }
+        */
         return $potValue;
     }
 

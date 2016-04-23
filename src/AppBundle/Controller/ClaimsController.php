@@ -71,6 +71,7 @@ class ClaimsController extends BaseController
      */
     public function claimsPolicyAction(Request $request, $id)
     {
+        $fraudService = $this->get('app.fraud');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
@@ -89,10 +90,12 @@ class ClaimsController extends BaseController
 
             return $this->redirectToRoute('claims_policy', ['id' => $id]);
         }
+        $checks = $fraudService->runChecks($policy);
 
         return [
             'policy' => $policy,
             'form' => $form->createView(),
+            'fraud' => $checks,
         ];
     }
 }
