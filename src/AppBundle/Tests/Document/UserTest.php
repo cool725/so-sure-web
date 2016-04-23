@@ -6,12 +6,15 @@ use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Tests\UserClassTrait;
 
 /**
  * @group unit
  */
 class UserTest extends \PHPUnit_Framework_TestCase
 {
+    use UserClassTrait;
+
     public static function setUpBeforeClass()
     {
     }
@@ -68,6 +71,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testHasCancelledPolicy()
     {
         $user = new User();
+        self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
         $user->addPolicy($policy);
@@ -77,6 +81,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testHasUnpaidPolicy()
     {
         $user = new User();
+        self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->setStatus(PhonePolicy::STATUS_UNPAID);
         $user->addPolicy($policy);
@@ -86,6 +91,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testHasValidPolicy()
     {
         $user = new User();
+        self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         $user->addPolicy($policy);

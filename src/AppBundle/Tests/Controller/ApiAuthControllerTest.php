@@ -156,7 +156,8 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $this->clearRateLimit();
         $user = self::createUser(self::$userManager, self::generateEmail('policy', $this), 'foo', true);
-        self::addAddress($user, self::$dm);
+        self::addAddress($user);
+        self::$dm->flush();
         $cognitoIdentityId = $this->getAuthUser($user);
         $imei = self::generateRandomImei();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
