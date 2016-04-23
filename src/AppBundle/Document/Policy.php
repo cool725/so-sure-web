@@ -437,7 +437,7 @@ abstract class Policy
         }
 
         // TODO: Do we need to adjust for connections that occur post claim?
-        if ($claimCount == 1 && count($this->getConnections()) >= 4) {
+        if ($claimCount == 1 && $potValue >= 40) {
             $potValue = 10;
         } elseif ($claimCount > 0) {
             $potValue = 0;

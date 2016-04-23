@@ -281,6 +281,24 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(10, $policy->calculatePotValue());
     }
 
+    public function testCalculatePotValueOneValidClaimFourtyPot()
+    {
+        $user = new User();
+        self::addAddress($user);
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        for ($i = 1; $i <= 20; $i++) {
+            $connection = new Connection();
+            $connection->setValue(2);
+            $policy->addConnection($connection);
+        }
+
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
+        $this->assertEquals(10, $policy->calculatePotValue());
+    }
+
     public function testCalculatePotValueTwoValidClaimsFiveConnections()
     {
         $user = new User();
