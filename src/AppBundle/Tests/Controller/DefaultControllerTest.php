@@ -33,13 +33,31 @@ class DefaultControllerTest extends BaseControllerTest
         $this->assertGreaterThan(10, count($values));
     }
 
+    public function testQuotePhoneRouteMakeModelMemory()
+    {
+        $crawler = self::$client->request('GET', self::$router->generate('quote_make_model_memory', [
+            'make' => 'Apple',
+            'model' => 'iPhone 5',
+            'memory' => 64,
+        ]));
+        self::verifyResponse(200);
+    }
+
+    public function testQuotePhoneRouteMakeModel()
+    {
+        $crawler = self::$client->request('GET', self::$router->generate('quote_make_model', [
+            'make' => 'HTC',
+            'model' => 'Desire',
+        ]));
+        self::verifyResponse(200);
+    }
+
     public function testQuotePhone()
     {
         $repo = self::$dm->getRepository(Phone::class);
         $phone = $repo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
 
-        $url = sprintf('/quote/%s', $phone->getId());
-        $crawler = self::$client->request('GET', $url);
+        $crawler = self::$client->request('GET', self::$router->generate('quote', ['id' => $phone->getId()]));
         self::verifyResponse(200);
         $this->assertContains(
             sprintf("£%.2f", $phone->getCurrentPolicyPremium()->getPolicyPrice()),

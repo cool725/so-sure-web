@@ -75,7 +75,18 @@ class DefaultController extends BaseController
             } elseif ($request->request->has('launch_phone')) {
                 $formPhone->handleRequest($request);
                 if ($formPhone->isValid()) {
-                    return $this->redirectToRoute('quote_phone', ['id' => $policy->getPhone()->getId()]);
+                    if ($policy->getPhone()->getMemory()) {
+                        return $this->redirectToRoute('quote_make_model_memory', [
+                            'make' => $policy->getPhone()->getMake(),
+                            'model' => $policy->getPhone()->getModel(),
+                            'memory' => $policy->getPhone()->getMemory(),
+                        ]);
+                    } else {
+                        return $this->redirectToRoute('quote_make_model', [
+                            'make' => $policy->getPhone()->getMake(),
+                            'model' => $policy->getPhone()->getModel(),
+                        ]);
+                    }
                 }
             }
 
@@ -240,14 +251,23 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/quote/{id}", name="quote_phone")
+     * @Route("/quote/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
+     * @Route("/quote/{make}+{model}+{memory}+insurance", name="quote_make_model_memory")
+     * @Route("/quote/{make}+{model}+insurance", name="quote_make_model")
      * @Template
      */
-    public function quotePhoneAction(Request $request, $id)
+    public function quotePhoneAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $phone = $repo->find($id);
+        $phone = null;
+        if ($id) {
+            $phone = $repo->find($id);
+        } elseif ($memory) {
+            $phone = $repo->findOneBy(['make' => $make, 'model' => $model, 'memory' => (int) $memory]);
+        } else {
+            $phone = $repo->findOneBy(['make' => $make, 'model' => $model]);
+        }
         if (!$phone) {
             return new RedirectResponse($this->generateUrl('homepage'));
         }
