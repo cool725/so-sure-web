@@ -57,7 +57,9 @@ class DefaultControllerTest extends BaseControllerTest
         $repo = self::$dm->getRepository(Phone::class);
         $phone = $repo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
 
-        $crawler = self::$client->request('GET', self::$router->generate('quote', ['id' => $phone->getId()]));
+        $crawler = self::$client->request('GET', self::$router->generate('quote_phone', [
+            'id' => $phone->getId()
+        ]));
         self::verifyResponse(200);
         $this->assertContains(
             sprintf("£%.2f", $phone->getCurrentPolicyPremium()->getPolicyPrice()),
