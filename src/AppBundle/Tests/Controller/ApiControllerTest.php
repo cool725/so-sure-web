@@ -243,7 +243,7 @@ class ApiControllerTest extends BaseControllerTest
 
     public function testQuoteMemoryOptions()
     {
-        $crawler = self::$client->request('GET', '/api/v1/quote?device=iPhone%206');
+        $crawler = self::$client->request('GET', '/api/v1/quote?make=Apple&device=iPhone%206');
         $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertTrue(count($data['quotes']) > 1);
@@ -253,38 +253,59 @@ class ApiControllerTest extends BaseControllerTest
 
     public function testQuoteUnknownDevice()
     {
-        $crawler = self::$client->request('GET', '/api/v1/quote?device=foo&debug=true');
+        $crawler = self::$client->request('GET', '/api/v1/quote?make=One&device=foo&debug=true');
         $data = $this->verifyResponse(200);
         $this->assertEquals(false, $data['device_found']);
+        $this->assertEquals(false, $data['different_make']);
         $this->assertEquals(true, $data['memory_found']);
         $this->assertEquals(false, $data['rooted']);
     }
 
     public function testQuoteKnownDeviceKnownMemory()
     {
-        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&memory=15.5&debug=true');
+        $crawler = self::$client->request('GET', '/api/v1/quote?make=OnePlus&device=A0001&memory=15.5&debug=true');
         $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(true, $data['memory_found']);
+        $this->assertEquals(false, $data['different_make']);
         $this->assertEquals(false, $data['rooted']);
     }
     
     public function testQuoteKnownDeviceUnKnownMemory()
     {
-        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&memory=65&rooted=false&debug=true');
+        $crawler = self::$client->request(
+            'GET',
+            '/api/v1/quote?make=OnePlus&device=A0001&memory=65&rooted=false&debug=true'
+        );
         $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(false, $data['memory_found']);
+        $this->assertEquals(false, $data['different_make']);
         $this->assertEquals(false, $data['rooted']);
     }
 
     public function testQuoteKnownDeviceRooted()
     {
-        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&memory=65&rooted=true&debug=true');
+        $crawler = self::$client->request(
+            'GET',
+            '/api/v1/quote?make=OnePlus&device=A0001&memory=65&rooted=true&debug=true'
+        );
         $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(false, $data['memory_found']);
+        $this->assertEquals(false, $data['different_make']);
         $this->assertEquals(true, $data['rooted']);
+    }
+
+    public function testQuoteKnownDeviceDifferentMake()
+    {
+        $crawler = self::$client->request(
+            'GET',
+            '/api/v1/quote?make=Apple&device=A0001&memory=65&rooted=false&debug=true'
+        );
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertEquals(true, $data['different_make']);
     }
 
     public function testQuoteRecordsStats()

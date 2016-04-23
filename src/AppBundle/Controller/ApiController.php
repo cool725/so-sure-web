@@ -140,7 +140,7 @@ class ApiController extends BaseController
 
             $phones = $this->getQuotes($make, $device, true);
             $deviceFound = $phones[0]->getMake() != "ALL";
-            
+
             $stats = $this->get('app.stats');
             $cognitoId = $this->getCognitoIdentityId($request);
             $stats->quote(
@@ -179,6 +179,12 @@ class ApiController extends BaseController
                 $this->unknownDevice($device, $memory);
             }
 
+            $differentMake = false;
+            if ($deviceFound && strtolower($phones[0]->getMake()) != strtolower($make)) {
+                $differentMake = true;
+                $this->differentMake($make, $phones[0]->getMake());
+            }
+
             if ($rooted) {
                 $this->rootedDevice($device, $memory);
             }
@@ -191,6 +197,7 @@ class ApiController extends BaseController
             if ($request->get('debug')) {
                 $response['memory_found'] = $memoryFound;
                 $response['rooted'] = $rooted;
+                $response['different_make'] = $differentMake;
             }
 
             return new JsonResponse($response);
@@ -575,6 +582,25 @@ class ApiController extends BaseController
         $this->get('mailer')->send($message);
 
         return true;
+    }
+
+    /**
+     * @param string $dbMake
+     * @param string $phoneMake
+     */
+    private function differentMake($dbMake, $phoneMake)
+    {
+        $body = sprintf(
+            'Make in db is different than phone make. Db: %s Phone: %s',
+            $dbMake,
+            $phoneMake
+        );
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Make different in db')
+            ->setFrom('tech@so-sure.com')
+            ->setTo('tech@so-sure.com')
+            ->setBody($body, 'text/html');
+        $this->get('mailer')->send($message);
     }
 
     /**
