@@ -45,14 +45,18 @@ class RateLimitService
 
     protected $redis;
 
+    protected $environment;
+
     /**
      * @param                 $redis
      * @param LoggerInterface $logger
+     * @param string          $environment
      */
-    public function __construct($redis, LoggerInterface $logger)
+    public function __construct($redis, LoggerInterface $logger, $environment)
     {
         $this->redis = $redis;
         $this->logger = $logger;
+        $this->environment = $environment;
     }
 
     /**
@@ -81,6 +85,11 @@ class RateLimitService
 
         // ignore rate limiting for some ips
         if (in_array($ip, self::$excludedIps)) {
+            return true;
+        }
+
+        // rate limit only for prod, or test
+        if (!in_array($this->environment, ['prod', 'test'])) {
             return true;
         }
 

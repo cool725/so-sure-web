@@ -186,6 +186,7 @@ services:
         arguments:
             redis:          "@snc_redis.default"
             logger:         "@logger"
+            environment:    "%kernel.environment%"
 
     app.stats:
         class: AppBundle\Service\StatsService
