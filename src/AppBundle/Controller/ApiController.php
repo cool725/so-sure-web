@@ -140,6 +140,17 @@ class ApiController extends BaseController
 
             $phones = $this->getQuotes($make, $device, true);
             $deviceFound = $phones[0]->getMake() != "ALL";
+            
+            $stats = $this->get('app.stats');
+            $cognitoId = $this->getCognitoIdentityId($request);
+            $stats->quote(
+                $cognitoId,
+                new \DateTime(),
+                $device,
+                $memory,
+                $deviceFound,
+                $rooted
+            );
 
             $quotes = [];
             // Memory is only an issue if there are multiple phones

@@ -287,6 +287,23 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals(true, $data['rooted']);
     }
 
+    public function testQuoteRecordsStats()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('quote-stat', $this),
+            'barfoo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = '/api/v1/quote?device=A0001&memory=65&rooted=true&debug=true&_method=GET';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $date = new \DateTime();
+        $deviceKey = sprintf('stats:%s:query:%s', $date->format('Y-m-d'), 'A0001');
+        $this->assertGreaterThan(0, self::$redis->get($deviceKey));
+        $this->assertTrue(self::$redis->exists('stats:rooted:A0001'));
+    }
+
     // referral
     
     /**

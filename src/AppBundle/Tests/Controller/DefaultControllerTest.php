@@ -18,7 +18,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         
     }
-    
+
     public function testIndex()
     {
         $crawler = self::$client->request('GET', '/');
