@@ -187,6 +187,12 @@ services:
             redis:          "@snc_redis.default"
             logger:         "@logger"
 
+    app.stats:
+        class: AppBundle\Service\StatsService
+        arguments:
+            redis:          "@snc_redis.default"
+            logger:         "@logger"
+
     aws.credentials:
         class: Aws\Credentials\Credentials
         arguments:

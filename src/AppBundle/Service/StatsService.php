@@ -27,31 +27,35 @@ class StatsService
 
     public function quote($cognitoId, $date, $device, $memory, $found, $rooted)
     {
-        $queryName = 'query';
-        if (!$found) {
-            $queryName = 'missing';
-        }
-
-        // in theory should only be 1 device / cognito id
-        // so only incr query counts, etc once
-        $cognitoKey = sprintf(self::COGNITO_FORMAT, $cognitoId);
-        if ($this->redis->incr($cognitoKey) == 1) {
-            $deviceKey = sprintf(self::DEVICE_FORMAT, $date->format('Y-m-d'), $queryName, $device);
-            $this->redis->incr($deviceKey);
-
-            $deviceMemoryKey = sprintf(
-                self::DEVICE_MEMORY_FORMAT,
-                $date->format('Y-m-d'),
-                $queryName,
-                $device,
-                $memory
-            );
-            $this->redis->incr($deviceMemoryKey);
-
-            if ($rooted) {
-                $rootedKey = sprintf(self::ROOTED_FORMAT, $device);
-                $this->redis->incr($rootedKey);
+        try {
+            $queryName = 'query';
+            if (!$found) {
+                $queryName = 'missing';
             }
+
+            // in theory should only be 1 device / cognito id
+            // so only incr query counts, etc once
+            $cognitoKey = sprintf(self::COGNITO_FORMAT, $cognitoId);
+            if ($this->redis->incr($cognitoKey) == 1) {
+                $deviceKey = sprintf(self::DEVICE_FORMAT, $date->format('Y-m-d'), $queryName, $device);
+                $this->redis->incr($deviceKey);
+
+                $deviceMemoryKey = sprintf(
+                    self::DEVICE_MEMORY_FORMAT,
+                    $date->format('Y-m-d'),
+                    $queryName,
+                    $device,
+                    $memory
+                );
+                $this->redis->incr($deviceMemoryKey);
+
+                if ($rooted) {
+                    $rootedKey = sprintf(self::ROOTED_FORMAT, $device);
+                    $this->redis->incr($rootedKey);
+                }
+            }
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf('Error in stats quote Ex: %s', $e->getMessage()));
         }
     }
 }

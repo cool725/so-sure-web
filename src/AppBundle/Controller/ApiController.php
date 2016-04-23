@@ -142,8 +142,9 @@ class ApiController extends BaseController
             $deviceFound = $phones[0]->getMake() != "ALL";
             
             $stats = $this->get('app.stats');
+            $cognitoId = $this->getCognitoIdentityId($request);
             $stats->quote(
-                $this->getCognitoIdentityId($request),
+                $cognitoId,
                 new \DateTime(),
                 $device,
                 $memory,

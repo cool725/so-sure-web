@@ -289,7 +289,14 @@ class ApiControllerTest extends BaseControllerTest
 
     public function testQuoteRecordsStats()
     {
-        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&memory=65&rooted=true&debug=true');
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('quote-stat', $this),
+            'barfoo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = '/api/v1/quote?device=A0001&memory=65&rooted=true&debug=true&_method=GET';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
         $date = new \DateTime();
         $deviceKey = sprintf('stats:%s:query:%s', $date->format('Y-m-d'), 'A0001');
