@@ -10,15 +10,8 @@ use AppBundle\Service\RateLimitService;
 /**
  * @group functional-net
  */
-class ApiControllerTest extends WebTestCase
+class ApiControllerTest extends BaseControllerTest
 {
-    use \AppBundle\Tests\PhingKernelClassTrait;
-    use \AppBundle\Tests\UserClassTrait;
-
-    public function tearDown()
-    {
-    }
-
     // Manual test
 
     /**
@@ -28,8 +21,7 @@ class ApiControllerTest extends WebTestCase
     /*
     public function testManual()
     {
-        $client = static::createClient();
-        $crawler = $client->request(
+        $crawler = self::$client->request(
             'POST',
             '/api/v1/login',
             array(),
@@ -37,7 +29,7 @@ class ApiControllerTest extends WebTestCase
             array('CONTENT_TYPE' => 'application/json'),
             json_encode(array('body' => array('username' => 'foo', 'password' => 'bar')))
         );
-        $this->assertEquals(500, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(500);
     }
     */
 
@@ -48,63 +40,53 @@ class ApiControllerTest extends WebTestCase
      */
     public function testLoginNoUser()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
             'email' => 'foo',
             'password' => 'bar'
         ]));
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(101, $data['code']);
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_ABSENT);
     }
 
     public function testLoginMissingPasswordParam()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
             'email' => 'foo'
         ]));
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
     public function testLoginMissingUserParam()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
             'password' => 'bar'
         ]));
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
 
     public function testLoginBadPassword()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), 'badfoo@api.bar.com', 'bar');
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, 'badfoo@api.bar.com', 'bar');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
             'email' => 'badfoo@api.bar.com',
             'password' => 'barfoo'
         ]));
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(100, $data['code']);
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
     }
 
     public function testLoginOk()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), 'foo@api.bar.com', 'bar');
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, 'foo@api.bar.com', 'bar');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
             'email' => 'foo@api.bar.com',
             'password' => 'bar'
         ]));
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertEquals('foo@api.bar.com', $data['email']);
         $this->assertTrue(strlen($data['cognito_token']['id']) > 10);
         $this->assertTrue(strlen($data['cognito_token']['token']) > 10);
@@ -112,125 +94,106 @@ class ApiControllerTest extends WebTestCase
 
     public function testLoginNoUserType()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', []);
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', []);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
     public function testLoginFacebookMissingParam()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(
-            $this->getUserManager($client),
+            self::$userManager,
             static::generateEmail('facebook-missing', $this),
             'bar'
         );
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('facebook_user' => [
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('facebook_user' => [
             'facebook_id' => 'foo',
         ]));
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('facebook_user' => [
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('facebook_user' => [
             'facebook_access_token' => 'foo',
         ]));
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
     public function testLoginFacebookInvalidToken()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(
-            $this->getUserManager($client),
+            self::$userManager,
             static::generateEmail('facebook-invalid-token', $this),
             'bar'
         );
         $user->setFacebookId(rand(1, 999999));
-        $dm = $this->getManager($client);
-        $dm->flush();
+        self::$dm->flush();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('facebook_user' => [
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('facebook_user' => [
             'facebook_id' => '1',
             'facebook_access_token' => 'foo',
         ]));
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_ABSENT);
     }
 
     public function testLoginOkUserExpired()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), static::generateEmail('token1', $this), 'bar');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('token1', $this), 'bar');
 
         $user->setExpired(true);
-        $dm = $this->getManager($client);
-        $dm->flush();
+        self::$dm->flush();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
             'email' => static::generateEmail('login1', $this),
             'password' => 'bar'
         ]));
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_USER_ABSENT, $data['code']);
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_ABSENT);
     }
 
     public function testLoginOkUserDisabled()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), static::generateEmail('login2', $this), 'bar');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('login2', $this), 'bar');
 
         $user->setEnabled(false);
-        $dm = $this->getManager($client);
-        $dm->flush();
+        self::$dm->flush();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
             'email' => static::generateEmail('login2', $this),
             'password' => 'bar'
         ]));
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_USER_RESET_PASSWORD, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_RESET_PASSWORD);
     }
 
     public function testLoginOkUserLocked()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), static::generateEmail('login3', $this), 'bar');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('login3', $this), 'bar');
 
         $user->setLocked(true);
-        $dm = $this->getManager($client);
-        $dm->flush();
+        self::$dm->flush();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
             'email' => static::generateEmail('login3', $this),
             'password' => 'bar'
         ]));
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_USER_SUSPENDED, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
     }
 
     public function testLoginRateLimited()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
 
         for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::TYPE_LOGIN] + 1; $i++) {
-            $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
                 'email' => static::generateEmail('invalid-user', $this),
                 'password' => 'invalid'
             ]));
         }
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
 
     // ping
@@ -240,12 +203,9 @@ class ApiControllerTest extends WebTestCase
      */
     public function testPing()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $crawler = $client->request('GET', '/api/v1/ping');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(0, $data['code']);
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = self::$client->request('GET', '/api/v1/ping');
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
     // quote
@@ -255,11 +215,9 @@ class ApiControllerTest extends WebTestCase
      */
     public function testQuoteUnknown()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $crawler = $client->request('GET', '/api/v1/quote');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = self::$client->request('GET', '/api/v1/quote');
+        $data = $this->verifyResponse(200);
         $this->assertEquals(false, $data['device_found']);
         $this->assertTrue(count($data['quotes']) > 2);
         // Make sure we're not returning all the quotes
@@ -268,10 +226,8 @@ class ApiControllerTest extends WebTestCase
 
     public function testQuoteX3()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/quote?device=x3');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $crawler = self::$client->request('GET', '/api/v1/quote?device=x3');
+        $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(1, count($data['quotes']));
         $this->assertEquals(10, $data['quotes'][0]['connection_value']);
@@ -287,10 +243,8 @@ class ApiControllerTest extends WebTestCase
 
     public function testQuoteMemoryOptions()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/quote?device=iPhone%206');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $crawler = self::$client->request('GET', '/api/v1/quote?device=iPhone%206');
+        $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertTrue(count($data['quotes']) > 1);
         // Make sure we're not returning all the quotes
@@ -299,10 +253,8 @@ class ApiControllerTest extends WebTestCase
 
     public function testQuoteUnknownDevice()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/quote?device=foo&debug=true');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $crawler = self::$client->request('GET', '/api/v1/quote?device=foo&debug=true');
+        $data = $this->verifyResponse(200);
         $this->assertEquals(false, $data['device_found']);
         $this->assertEquals(true, $data['memory_found']);
         $this->assertEquals(false, $data['rooted']);
@@ -310,10 +262,8 @@ class ApiControllerTest extends WebTestCase
 
     public function testQuoteKnownDeviceKnownMemory()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/quote?device=A0001&memory=15.5&debug=true');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&memory=15.5&debug=true');
+        $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(true, $data['memory_found']);
         $this->assertEquals(false, $data['rooted']);
@@ -321,10 +271,8 @@ class ApiControllerTest extends WebTestCase
     
     public function testQuoteKnownDeviceUnKnownMemory()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/quote?device=A0001&memory=65&rooted=false&debug=true');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&memory=65&rooted=false&debug=true');
+        $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(false, $data['memory_found']);
         $this->assertEquals(false, $data['rooted']);
@@ -332,10 +280,8 @@ class ApiControllerTest extends WebTestCase
 
     public function testQuoteKnownDeviceRooted()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/quote?device=A0001&memory=65&rooted=true&debug=true');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&memory=65&rooted=true&debug=true');
+        $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(false, $data['memory_found']);
         $this->assertEquals(true, $data['rooted']);
@@ -348,38 +294,34 @@ class ApiControllerTest extends WebTestCase
      */
     public function testReferralInvalid()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/referral?email=abc');
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $crawler = self::$client->request('GET', '/api/v1/referral?email=abc');
+        $data = $this->verifyResponse(422);
     }
 
     public function testReferral()
     {
-        $client = static::createClient();
-        $user = static::createUser($this->getUserManager($client), 'referral@api.bar.com', 'bar');
+        $user = static::createUser(self::$userManager, 'referral@api.bar.com', 'bar');
 
-        $crawler = $client->request('GET', sprintf('/api/v1/referral?email=%s', $user->getEmail()));
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $crawler = self::$client->request('GET', sprintf('/api/v1/referral?email=%s', $user->getEmail()));
+        $data = $this->verifyResponse(200);
         $this->assertContains("http://goo.gl", $data['url']);
     }
 
     public function testReferralCreate()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), 'origin@api.bar.com', 'bar');
-        $userReferred = static::createUser($this->getUserManager($client), 'referred@api.bar.com', 'bar');
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/referral', array(
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, 'origin@api.bar.com', 'bar');
+        $userReferred = static::createUser(self::$userManager, 'referred@api.bar.com', 'bar');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/referral', array(
             'email' => $userReferred->getEmail(),
             'referral_code' => $user->getId(),
         ));
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertTrue(strlen($data['url']) > 0);
 
-        $dm = $this->getManager($client);
+        // For some reason, querying with the same client/dm is not updating getting the latest record
+        $client = static::createClient();
+        $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         $fooUser = $repo->findOneBy(['email' => 'referred@api.bar.com']);
         $this->assertTrue($fooUser->getReferred()->getId() === $user->getId());
@@ -387,13 +329,12 @@ class ApiControllerTest extends WebTestCase
 
     public function testReferralCreateInvalid()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/referral', array(
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/referral', array(
             'email' => 'foo',
             'referral_code' => 'foo',
         ));
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(422);
     }
 
     // sns
@@ -403,22 +344,20 @@ class ApiControllerTest extends WebTestCase
      */
     public function testSns()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/sns', array(
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/sns', array(
             // @codingStandardsIgnoreStart
             'endpoint' => 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e'
             // @codingStandardsIgnoreEnd
         ));
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(200);
     }
 
     public function testSnsMissingEndpoint()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/sns', array());
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/sns', array());
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
     // token
@@ -428,88 +367,72 @@ class ApiControllerTest extends WebTestCase
      */
     public function testTokenOk()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), static::generateEmail('token', $this), 'bar');
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('token', $this), 'bar');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
             'token' => $user->getToken()
         ));
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertTrue(strlen($data['token']) > 20);
     }
 
     public function testTokenBad()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), static::generateEmail('badtoken', $this), 'bar');
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('badtoken', $this), 'bar');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
             'token' => $user->getToken() + 'bad'
         ));
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(403);
     }
 
     public function testTokenMissing()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', []);
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', []);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
     public function testTokenOkUserExpired()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), static::generateEmail('token2', $this), 'bar');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('token2', $this), 'bar');
 
         $user->setExpired(true);
-        $dm = $this->getManager($client);
-        $dm->flush();
+        self::$dm->flush();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
             'token' => $user->getToken()
         ));
-        $this->assertEquals(403, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_USER_ABSENT, $data['code']);
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_ABSENT);
     }
 
     public function testTokenOkUserDisabled()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), static::generateEmail('token3', $this), 'bar');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('token3', $this), 'bar');
 
         $user->setEnabled(false);
-        $dm = $this->getManager($client);
-        $dm->flush();
+        self::$dm->flush();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
             'token' => $user->getToken()
         ));
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_USER_RESET_PASSWORD, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_RESET_PASSWORD);
     }
 
     public function testTokenOkUserLocked()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), static::generateEmail('token4', $this), 'bar');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('token4', $this), 'bar');
 
         $user->setLocked(true);
-        $dm = $this->getManager($client);
-        $dm->flush();
+        self::$dm->flush();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/token', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
             'token' => $user->getToken()
         ));
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_USER_SUSPENDED, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
     }
 
     // user
@@ -519,47 +442,39 @@ class ApiControllerTest extends WebTestCase
      */
     public function testUserDuplicate()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), 'dup-user@api.bar.com', 'bar');
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, 'dup-user@api.bar.com', 'bar');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => 'dup-user@api.bar.com'
         ));
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_EXISTS);
     }
 
     public function testUserFacebookDuplicate()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
-        $user = static::createUser($this->getUserManager($client), self::generateEmail('dup-fb', $this), 'bar');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, self::generateEmail('dup-fb', $this), 'bar');
         $user->setFacebookId(rand(1, 999999));
-        $dm = self::getManager($client);
-        $dm->flush();
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+        self::$dm->flush();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => self::generateEmail('dup-fb-diff', $this),
             'facebook_id' => $user->getFacebookId(),
             'facebook_access_token' => 'foo',
         ));
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_USER_EXISTS, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_EXISTS);
     }
 
     public function testUserCreate()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => 'api-new-user@api.bar.com'
         ));
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertEquals('api-new-user@api.bar.com', $data['email']);
 
-        $dm = $this->getManager($client);
-        $repo = $dm->getRepository(User::class);
+        $repo = self::$dm->getRepository(User::class);
         $fooUser = $repo->findOneBy(['email' => 'api-new-user@api.bar.com']);
         $this->assertTrue($fooUser !== null);
         $cognitoIdentityValue = sprintf("cognitoIdentityId=%s,", $fooUser->getCognitoId());
@@ -568,18 +483,15 @@ class ApiControllerTest extends WebTestCase
 
     public function testUserCreateIp()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => 'api-ip-user@api.bar.com'
         ));
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertEquals('api-ip-user@api.bar.com', $data['email']);
 
-        $dm = $this->getManager($client);
-        $repo = $dm->getRepository(User::class);
+        $repo = self::$dm->getRepository(User::class);
         $fooUser = $repo->findOneBy(['email' => 'api-ip-user@api.bar.com']);
         $this->assertTrue($fooUser !== null);
         $this->assertEquals('62.253.24.189', $fooUser->getSignupIp());
@@ -589,67 +501,55 @@ class ApiControllerTest extends WebTestCase
     
     public function testUserWithMobileCreate()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => 'api-new-user-mobile@api.bar.com',
             'mobile_number' => '+447700900000'
         ));
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertEquals('api-new-user-mobile@api.bar.com', $data['email']);
         $this->assertEquals('+447700900000', $data['mobile_number']);
     }
 
     public function testUserNoEmail()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
-        ));
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array());
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
     public function testUserInvalidEmail()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => 'abc'
         ));
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
     public function testUserInvalidMobile()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => static::generateEmail('invalid-mobile', $this),
             'mobile_number' => '+44770090000'
         ));
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
     public function testUserUkMobile()
     {
-        $client = static::createClient();
-        $cognitoIdentityId = $this->getUnauthIdentity($client);
+        $cognitoIdentityId = $this->getUnauthIdentity();
 
-        $crawler = static::postRequest($client, $cognitoIdentityId, '/api/v1/user', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => static::generateEmail('uk-mobile', $this),
             'mobile_number' => '07700 900000'
         ));
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertEquals('+447700900000', $data['mobile_number']);
     }
 
@@ -660,60 +560,30 @@ class ApiControllerTest extends WebTestCase
      */
     public function testVersionOk()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/version?platform=ios&version=0.0.1');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::SUCCESS, $data['code']);
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=0.0.1');
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
     public function testVersionMissingParam()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/version?platform=ios');
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios');
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
 
-        $crawler = $client->request('GET', '/api/v1/version?version=0.0.1');
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $crawler = self::$client->request('GET', '/api/v1/version?version=0.0.1');
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
     public function testVersionInvalid()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/version?platform=ios&version=0.0.0');
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_UPGRADE_APP, $data['code']);
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=0.0.0');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UPGRADE_APP);
     }
 
     public function testVersionNotRegulated()
     {
-        $client = static::createClient();
-        $redis = $client->getContainer()->get('snc_redis.default');
+        $redis = self::$client->getContainer()->get('snc_redis.default');
         $redis->set('ERROR_NOT_YET_REGULATED', 1);
-        $crawler = $client->request('GET', '/api/v1/version?platform=ios&version=0.0.0');
-        $this->assertEquals(422, $client->getResponse()->getStatusCode());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_NOT_YET_REGULATED, $data['code']);
-    }
-
-    // helpers
-
-    /**
-     *
-     */
-    protected function getUnauthIdentity($client)
-    {
-        return static::getIdentityString($client->getContainer()->get('app.cognito.identity')->getId());
-    }
-    
-    protected function getManager($client)
-    {
-        return $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-    }
-
-    protected function getUserManager($client)
-    {
-        return $client->getContainer()->get('fos_user.user_manager');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=0.0.0');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_YET_REGULATED);
     }
 }

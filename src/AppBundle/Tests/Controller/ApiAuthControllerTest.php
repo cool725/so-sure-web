@@ -11,11 +11,8 @@ use AppBundle\Service\RateLimitService;
 /**
  * @group functional-net
  */
-class ApiAuthControllerTest extends WebTestCase
+class ApiAuthControllerTest extends BaseControllerTest
 {
-    use \AppBundle\Tests\PhingKernelClassTrait;
-    use \AppBundle\Tests\UserClassTrait;
-
     const VALID_IMEI = '356938035643809';
     const INVALID_IMEI = '356938035643808';
     const BLACKLISTED_IMEI = '352000067704506';
@@ -24,12 +21,6 @@ class ApiAuthControllerTest extends WebTestCase
     protected static $testUser2;
     protected static $testUser3;
     protected static $testUserDisabled;
-    protected static $client;
-    protected static $userManager;
-    protected static $dm;
-    protected static $identity;
-    protected static $jwt;
-    protected static $router;
 
     public function tearDown()
     {
@@ -37,12 +28,7 @@ class ApiAuthControllerTest extends WebTestCase
 
     public static function setUpBeforeClass()
     {
-        self::$client = self::createClient();
-        self::$identity = self::$client->getContainer()->get('app.cognito.identity');
-        self::$dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        self::$userManager = self::$client->getContainer()->get('fos_user.user_manager');
-        self::$router = self::$client->getContainer()->get('router');
-        self::$jwt = self::$client->getContainer()->get('app.jwt');
+        parent::setUpBeforeClass();
         self::$testUser = self::createUser(
             self::$userManager,
             'foo@auth-api.so-sure.com',
@@ -70,8 +56,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $url = '/api/v1/auth/address?postcode=BX11LT&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertEquals("so-sure Test Address Line 1", $data['line1']);
         $this->assertEquals("so-sure Test Address Line 2", $data['line2']);
         $this->assertEquals("so-sure Test City", $data['city']);
@@ -88,9 +73,7 @@ class ApiAuthControllerTest extends WebTestCase
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         }
 
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
 
     /* TODO: Consider moving to a different type of test.
@@ -100,8 +83,8 @@ class ApiAuthControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/api/v1/auth/address?postcode=WR53DA');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), print_r($data, true));
         $this->assertEquals("Lock Keepers Cottage", $data['line1']);
         $this->assertEquals("Basin Road", $data['line2']);
         $this->assertEquals("Worcester", $data['city']);
@@ -117,7 +100,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $url = '/api/v1/auth/address?postcode=&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
     }
 
     // invitation/{id} cancel
@@ -128,21 +111,19 @@ class ApiAuthControllerTest extends WebTestCase
     public function testInvitationCancel()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $policyData = json_decode(self::$client->getResponse()->getContent(), true);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $policyData = $this->verifyResponse(200);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => self::generateEmail('invite-cancel', $this),
             'name' => 'invite cancel test',
         ]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $invitationData = json_decode(self::$client->getResponse()->getContent(), true);
+        $invitationData = $this->verifyResponse(200);
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'cancel']);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(200);
     }
 
     // ping / auth
@@ -153,7 +134,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testAuthRequiresIdentity()
     {
         $crawler = self::$client->request('POST', '/api/v1/auth/ping?_method=GET');
-        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(403);
     }
 
     /**
@@ -162,9 +143,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testGetAnonIsAnon()
     {
         $crawler = self::$client->request('GET', '/api/v1/ping');
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(0, $data['code']);
+        $data = $this->verifyResponse(200, 0);
     }
 
     // policy
@@ -189,9 +168,7 @@ class ApiAuthControllerTest extends WebTestCase
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
 
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode(), print_r($data, true));
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
 
         $this->assertTrue(strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
@@ -199,9 +176,8 @@ class ApiAuthControllerTest extends WebTestCase
         // Now make sure that the policy shows up against the user
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $userData = $this->verifyResponse(200);
 
-        $userData = json_decode(self::$client->getResponse()->getContent(), true);
         $foundPolicy = false;
         foreach ($userData['policies'] as $policy) {
             if ($policy['id'] == $data['id']) {
@@ -227,7 +203,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(403);
     }
 
     public function testNewPolicyExpiredUser()
@@ -246,7 +222,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(403);
     }
 
     public function testNewPolicyLockedUser()
@@ -265,16 +241,14 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(403);
     }
 
     public function testNewPolicyDuplicateImei()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $data = $this->verifyResponse(200);
 
         $imei = $data['phone_policy']['imei'];
 
@@ -287,30 +261,23 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI);
     }
 
     public function testNewPolicyRateLimited()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::TYPE_POLICY] + 1; $i++) {
-            $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser, false);
+            $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser, false);
         }
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
 
     public function testNewPolicyInvalidUser()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser2);
-        $crawler = $this->createPolicy($cognitoIdentityId, null);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-
-        $this->assertEquals(ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS, $data['code']);
+        $crawler = $this->generatePolicy($cognitoIdentityId, null);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS);
     }
 
     public function testNewPolicyMemoryExceeded()
@@ -326,8 +293,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
 
         $this->assertTrue(strlen($data['id']) > 5);
         $this->assertEquals('128', $data['phone_policy']['phone']['memory']);
@@ -346,8 +312,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(200);
 
         $this->assertTrue(strlen($data['id']) > 5);
         $this->assertEquals('64', $data['phone_policy']['phone']['memory']);
@@ -365,7 +330,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::INVALID_IMEI]),
         ]]);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_INVALID);
     }
 
     public function testNewPolicyBlacklistedImei()
@@ -380,9 +345,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::BLACKLISTED_IMEI]),
         ]]);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED);
     }
 
     public function testNewPolicyRooted()
@@ -398,9 +361,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => true,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED);
     }
 
     public function testNewPolicyMissingData()
@@ -416,7 +377,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::INVALID_IMEI]),
         ]]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
 
         // missing memory
         $this->clearRateLimit();
@@ -428,7 +389,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
 
         // missing device
         $this->clearRateLimit();
@@ -440,7 +401,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
 
         // missing make
         $this->clearRateLimit();
@@ -452,7 +413,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
 
         // missing rooted
         $this->clearRateLimit();
@@ -464,7 +425,7 @@ class ApiAuthControllerTest extends WebTestCase
             'memory' => 65,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
     }
 
     public function testNewPolicyUnknownPhone()
@@ -482,7 +443,7 @@ class ApiAuthControllerTest extends WebTestCase
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(404);
     }
 
     // policy/{id}
@@ -493,15 +454,13 @@ class ApiAuthControllerTest extends WebTestCase
     public function testGetNullPolicy()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $createData = json_decode(self::$client->getResponse()->getContent(), true);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $createData = $this->verifyResponse(200);
         $policyId = $createData['id'];
 
         $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $policyId);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $getData = json_decode(self::$client->getResponse()->getContent(), true);
+        $getData = $this->verifyResponse(200);
 
         $this->assertEquals($createData['id'], $getData['id']);
         $this->assertEquals($createData['phone_policy']['imei'], $getData['phone_policy']['imei']);
@@ -516,7 +475,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $url = sprintf('/api/v1/auth/policy/1?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(404);
     }
 
     public function testGetPolicyUnAuthUser()
@@ -525,7 +484,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getUnauthIdentity();
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(403);
     }
 
     // policy/{id}/dd
@@ -540,35 +499,35 @@ class ApiAuthControllerTest extends WebTestCase
             'sort_code' => '333333',
             'account_number' => '12345678',
         ]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
             'account_number' => '12345678',
             'first_name' => 'foo',
             'last_name' => 'bar',
         ]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
             'sort_code' => '12345678',
             'first_name' => 'foo',
             'last_name' => 'bar',
         ]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
             'account_number' => '12345678',
             'sort_code' => '12345678',
             'first_name' => 'foo',
         ]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
             'account_number' => '12345678',
             'sort_code' => '12345678',
             'last_name' => 'bar',
         ]);
-        $this->assertEquals(400, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(400);
     }
 
     public function testNewPolicyDdUnknownPolicy()
@@ -580,7 +539,7 @@ class ApiAuthControllerTest extends WebTestCase
             'first_name' => 'foo',
             'last_name' => 'bar',
         ]);
-        $this->assertEquals(404, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(404);
     }
 
     /**
@@ -601,12 +560,10 @@ class ApiAuthControllerTest extends WebTestCase
             'postcode' => 'BX11LT',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode(), print_r($data, true));
+        $data = $this->verifyResponse(200);
 
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode(), print_r($data, true));
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $data = $this->verifyResponse(200);
 
         $url = sprintf("/api/v1/auth/policy/%s/dd", $data['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -615,8 +572,7 @@ class ApiAuthControllerTest extends WebTestCase
             'first_name' => 'foo',
             'last_name' => 'bar',
         ]);
-        $policyData = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode(), print_r($data, true));
+        $policyData = $this->verifyResponse(200);
         $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
     }
@@ -629,25 +585,22 @@ class ApiAuthControllerTest extends WebTestCase
     public function testNewEmailAndDupInvitation()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $data = $this->verifyResponse(200);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => 'patrick@so-sure.com',
             'name' => 'functional test',
         ]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(200);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => 'patrick@so-sure.com',
             'name' => 'functional test',
         ]);
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $this->assertEquals(ApiErrorCode::ERROR_INVITATION_DUPLICATE, $data['code']);
-    }
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
+   }
 
     /**
      *
@@ -655,45 +608,39 @@ class ApiAuthControllerTest extends WebTestCase
     public function testNewSmsAndDupInvitation()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $data = $this->verifyResponse(200);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'mobile' => '+447700900002',
             'name' => 'functional test',
         ]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(200);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'mobile' => '+447700900002',
             'name' => 'functional test',
         ]);
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $this->assertEquals(ApiErrorCode::ERROR_INVITATION_DUPLICATE, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
     }
 
     public function testSentInvitationAppears()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $data = $this->verifyResponse(200);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => $this->generateEmail('invite-appears', $this),
             'name' => 'Invitation Name',
         ]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+        $this->verifyResponse(200);
 
         $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $data['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-
-        $policyData = json_decode(self::$client->getResponse()->getContent(), true);
+        $policyData = $this->verifyResponse(200);
         $this->assertTrue(count($policyData['sent_invitations']) > 0);
         $foundInvitation = false;
         foreach ($policyData['sent_invitations'] as $invitation) {
@@ -707,9 +654,8 @@ class ApiAuthControllerTest extends WebTestCase
     public function testReceivedInvitationAppears()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser2);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser2);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser2);
+        $data = $this->verifyResponse(200);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         //print sprintf("Invite from %s to %s", self::$testUser2->getName(), self::$testUser->getName());
@@ -717,15 +663,12 @@ class ApiAuthControllerTest extends WebTestCase
             'email' => self::$testUser->getEmail(),
             'name' => self::$testUser->getName(),
         ]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $invitationData = json_decode(self::$client->getResponse()->getContent(), true);
+        $invitationData = $this->verifyResponse(200);
 
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $url = sprintf('/api/v1/auth/user/%s?_method=GET&debug=true', self::$testUser->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-
-        $userData = json_decode(self::$client->getResponse()->getContent(), true);
+        $userData = $this->verifyResponse(200);
         $this->assertTrue(count($userData['received_invitations']) > 0);
         $foundInvitation = false;
         foreach ($userData['received_invitations'] as $invitation) {
@@ -740,7 +683,7 @@ class ApiAuthControllerTest extends WebTestCase
     public function testUnableToInviteSelf()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
         $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
         $data = json_decode(self::$client->getResponse()->getContent(), true);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
@@ -749,7 +692,7 @@ class ApiAuthControllerTest extends WebTestCase
             'email' => self::$testUser->getEmail(),
             'name' => 'Invitation Name',
         ]);
-        $this->assertEquals(500, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(500);
     }
 
     // policy/{id}/terms
@@ -760,15 +703,13 @@ class ApiAuthControllerTest extends WebTestCase
     public function testGetPolicyTerms()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->createPolicy($cognitoIdentityId, self::$testUser);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $createData = json_decode(self::$client->getResponse()->getContent(), true);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $createData = $this->verifyResponse(200);
         $policyId = $createData['id'];
 
         $url = sprintf('/api/v1/auth/policy/%s/terms?_method=GET', $policyId);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $getData = json_decode(self::$client->getResponse()->getContent(), true);
+        $getData = $this->verifyResponse(200);
         $policyUrl = self::$router->generate('policy_terms', ['id' => $policyId]);
         //print $getData["view_url"];
         $this->assertTrue(stripos($getData["view_url"], $policyUrl) >= 0);
@@ -783,8 +724,7 @@ class ApiAuthControllerTest extends WebTestCase
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/secret?_method=GET', []);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $data['secret']);
     }
 
@@ -798,9 +738,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertEquals(self::$testUser->getEmailCanonical(), $data['email']);
     }
 
@@ -814,9 +752,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', self::$testUser->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $data = $this->verifyResponse(200);
         $this->assertEquals(self::$testUser->getEmailCanonical(), $data['email']);
     }
 
@@ -825,7 +761,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', self::$testUser2->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+        $result = $this->verifyResponse(403);
     }
 
     public function testGetUnAuthUser()
@@ -834,7 +770,7 @@ class ApiAuthControllerTest extends WebTestCase
         $cognitoIdentityId = $this->getUnauthIdentity();
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+        $result = $this->verifyResponse(403);
     }
 
     // put user/{id}
@@ -855,9 +791,7 @@ class ApiAuthControllerTest extends WebTestCase
             'facebook_access_token' => 'zy',
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-
-        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $result = $this->verifyResponse(200);
         $this->assertEquals('barfoo@auth-api.so-sure.com', $result['email']);
         $this->assertEquals('bar', $result['first_name']);
         $this->assertEquals('foo', $result['last_name']);
@@ -878,29 +812,25 @@ class ApiAuthControllerTest extends WebTestCase
             'facebook_access_token' => 'zy',
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $result = $this->verifyResponse(200);
         $this->assertEquals('abcd', $result['facebook_id']);
 
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, ['last_name' => 'barfoo']);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $result = $this->verifyResponse(200);
         $this->assertEquals('abcd', $result['facebook_id']);
 
         // facebook update needs auth token as well
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, [
             'facebook_id' => 'barfoo'
         ]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $result = $this->verifyResponse(200);
         $this->assertEquals('abcd', $result['facebook_id']);
 
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, [
             'facebook_id' => 'barfoo',
             'facebook_access_token' => 'lala'
         ]);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $result = $this->verifyResponse(200);
         $this->assertEquals('barfoo', $result['facebook_id']);
     }
 
@@ -911,7 +841,7 @@ class ApiAuthControllerTest extends WebTestCase
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, [
             'first_name' => 'bar',
         ]);
-        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(403);
     }
 
     public function testUpdateUserInvalidEmail()
@@ -922,9 +852,7 @@ class ApiAuthControllerTest extends WebTestCase
             'email' => 'barfoo@',
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
     public function testUpdateUserInvalidMobile()
@@ -936,9 +864,7 @@ class ApiAuthControllerTest extends WebTestCase
             'mobile_number' => '+44770090000',
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $data['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
     // user/{id}/address
@@ -957,9 +883,7 @@ class ApiAuthControllerTest extends WebTestCase
             'postcode' => 'BX11LT',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-
-        $result = json_decode(self::$client->getResponse()->getContent(), true);
+        $result = $this->verifyResponse(200);
         $this->assertEquals(self::$testUser->getEmailCanonical(), $result['email']);
         $this->assertTrue(isset($result['addresses']));
         $this->assertTrue(isset($result['addresses'][0]));
@@ -979,7 +903,7 @@ class ApiAuthControllerTest extends WebTestCase
             'city' => 'London',
             'postcode' => 'BX11LT',
         ]);
-        $this->assertEquals(403, self::$client->getResponse()->getStatusCode());
+        $data = $this->verifyResponse(403);
     }
 
     public function testUserInvalidAddress()
@@ -993,10 +917,7 @@ class ApiAuthControllerTest extends WebTestCase
             'postcode' => 'ZZ99 3CZ',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $this->assertEquals(422, self::$client->getResponse()->getStatusCode());
-
-        $result = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals(ApiErrorCode::ERROR_USER_INVALID_ADDRESS, $result['code']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_INVALID_ADDRESS);
     }
 
     // helpers
@@ -1004,25 +925,7 @@ class ApiAuthControllerTest extends WebTestCase
     /**
      *
      */
-    protected function getAuthUser($user)
-    {
-        return static::authUser(self::$identity, $user);
-    }
-
-    protected function getUnauthIdentity()
-    {
-        return static::getIdentityString(self::$identity->getId());
-    }
-
-    protected function getValidationData($cognitoIdentityId, $validateData)
-    {
-        return static::$jwt->create(
-            $cognitoIdentityId,
-            $validateData
-        );
-    }
-
-    protected function createPolicy($cognitoIdentityId, $user, $clearRateLimit = true)
+    protected function generatePolicy($cognitoIdentityId, $user, $clearRateLimit = true)
     {
         if ($user) {
             $userUpdateUrl = sprintf('/api/v1/auth/user/%s', $user->getId());
@@ -1057,11 +960,5 @@ class ApiAuthControllerTest extends WebTestCase
         ]]);
 
         return $crawler;
-    }
-
-    protected function clearRateLimit()
-    {
-        // clear out redis rate limiting
-        self::$client->getContainer()->get('snc_redis.default')->flushdb();
     }
 }
