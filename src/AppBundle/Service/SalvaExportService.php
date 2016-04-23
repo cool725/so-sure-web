@@ -68,7 +68,7 @@ class SalvaExportService
                 'auth' => [$this->username, $this->password]
             ]);
             $body = (string) $res->getBody();
-            print_r($body);
+            //print_r($body);
 
             if (!$this->validate($body, self::SCHEMA_POLICY_IMPORT)) {
                 throw new \InvalidArgumentException("unable to validate response");

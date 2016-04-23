@@ -21,5 +21,9 @@ app/console --env=test doctrine:mongodb:schema:drop
 app/console --env=test doctrine:mongodb:fixtures:load
 app/console --env=test sosure:doctrine:index
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
-./vendor/phing/phing/bin/phing -f build/test.xml test:functional
+if [ "$1" == "" ]; then
+  ./vendor/phing/phing/bin/phing -f build/test.xml test:functional
+else
+  ./build/phpunit.sh --filter $1 --bootstrap vendor/autoload.php src/AppBundle/    
+fi
 ./vendor/phing/phing/bin/phing force:cs

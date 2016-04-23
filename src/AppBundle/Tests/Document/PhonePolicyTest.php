@@ -341,7 +341,7 @@ class PhonePolicyTest extends WebTestCase
         $foundHighValue = false;
         $foundLowValue = false;
         $connectionValues = $policy->getConnectionValues();
-        print_r($connectionValues);
+        // print_r($connectionValues);
         foreach ($connectionValues as $connectionValue) {
             if ($connectionValue['value'] == 10) {
                 $foundHighValue = true;
