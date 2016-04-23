@@ -7,7 +7,7 @@ use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\EmbeddedDocument
  */
 class Address
 {
@@ -39,11 +39,6 @@ class Address
 
     /** @MongoDB\String(name="postcode", nullable=false) */
     protected $postcode;
-
-    /**
-     * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="addresses")
-     */
-    protected $user;
 
     public function __construct()
     {
@@ -116,16 +111,6 @@ class Address
     public function getPostcode()
     {
         return $this->postcode;
-    }
-
-    public function setUser($user)
-    {
-        $this->user = $user;
-    }
-
-    public function getUser()
-    {
-        return $this->user;
     }
 
     public function __toString()
