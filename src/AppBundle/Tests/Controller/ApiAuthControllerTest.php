@@ -600,7 +600,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'name' => 'functional test',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
-   }
+    }
 
     /**
      *
