@@ -75,7 +75,7 @@ abstract class Price
         $this->setGwp($premium / (1 + $this->getIptRate($date)));
     }
 
-    abstract function createPremium();
+    abstract public function createPremium();
 
     protected function populatePremium(Premium $premium, \DateTime $date = null)
     {

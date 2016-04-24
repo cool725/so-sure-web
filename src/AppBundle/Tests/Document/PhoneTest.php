@@ -66,7 +66,7 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
     public function testMultipleGetCurrentPhonePrice()
     {
         $phone = new Phone();
-        $phonePriceA = new PhonePrice();        
+        $phonePriceA = new PhonePrice();
         $phonePriceA->setValidFrom(new \DateTime('2016-01-01'));
         $phonePriceA->setValidTo(new \DateTime('2016-01-02 23:59:59'));
         $phone->addPhonePrice($phonePriceA);

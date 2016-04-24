@@ -292,7 +292,7 @@ class DefaultController extends BaseController
 
         return array(
             'phone' => $phone,
-            'price' => $phone->getCurrentPhonePrice(),
+            'phone_price' => $phone->getCurrentPhonePrice(),
             'form' => $form->createView()
         );
     }
