@@ -154,7 +154,7 @@ class Phone
             'model' => $this->getModel(),
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
-            'policy_price' => $this->getCurrentPhonePrice(),
+            'gwp' => $this->getCurrentPhonePrice()->getGwp(),
         ];
     }
 }

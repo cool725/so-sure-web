@@ -65,15 +65,14 @@ class AdminController extends BaseController
         }
 
         $dm = $this->getManager();
-        $devices = explode(",", $request->get('devices'));
+        $devices = explode("|", $request->get('devices'));
         $devices = array_filter(array_map('trim', $devices));
         $phone = new Phone();
         $phone->setMake($request->get('make'));
         $phone->setModel($request->get('model'));
         $phone->setDevices($devices);
         $phone->setMemory($request->get('memory'));
-        //$phone->setPhonePrice($request->get('price'));
-        //$phone->setLossPrice($request->get('loss'));
+        $phone->getCurrentPhonePrice()->setGwp($request->get('gwp'));
         $dm->persist($phone);
         $dm->flush();
         $this->addFlash(
@@ -98,14 +97,13 @@ class AdminController extends BaseController
         $repo = $dm->getRepository(Phone::class);
         $phone = $repo->find($id);
         if ($phone) {
-            $devices = explode(",", $request->get('devices'));
+            $devices = explode("|", $request->get('devices'));
             $devices = array_filter(array_map('trim', $devices));
             $phone->setMake($request->get('make'));
             $phone->setModel($request->get('model'));
             $phone->setDevices($devices);
             $phone->setMemory($request->get('memory'));
-            //$phone->setPolicyPrice($request->get('policy'));
-            //$phone->setLossPrice($request->get('loss'));
+            $phone->getCurrentPhonePrice()->setGwp($request->get('gwp'));
             $dm->flush();
             $this->addFlash(
                 'notice',
