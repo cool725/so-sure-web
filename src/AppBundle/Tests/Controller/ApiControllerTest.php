@@ -308,6 +308,17 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals(true, $data['different_make']);
     }
 
+    public function testQuoteKnownDeviceSameMake()
+    {
+        $crawler = self::$client->request(
+            'GET',
+            '/api/v1/quote?make=Apple&device=iPhone5,3&memory=65&rooted=false&debug=true'
+        );
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertEquals(false, $data['different_make']);
+    }
+
     public function testQuoteRecordsStats()
     {
         $user = self::createUser(
@@ -481,7 +492,7 @@ class ApiControllerTest extends BaseControllerTest
     public function testTokenUnauthOk()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, static::generateEmail('token', $this), 'bar');
+        $user = static::createUser(self::$userManager, static::generateEmail('unauth-token', $this), 'bar');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token/unauth', array(
             'token' => $user->getToken(),
             'cognito_id' => self::$identity->getId(),
@@ -493,7 +504,7 @@ class ApiControllerTest extends BaseControllerTest
     public function testTokenUnauthBad()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, static::generateEmail('badtoken', $this), 'bar');
+        $user = static::createUser(self::$userManager, static::generateEmail('unauth-badtoken', $this), 'bar');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token/unauth', array(
             'token' => $user->getToken() + 'bad',
             'cognito_id' => self::$identity->getId(),
@@ -511,7 +522,7 @@ class ApiControllerTest extends BaseControllerTest
     public function testTokenUnauthOkUserExpired()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, static::generateEmail('token2', $this), 'bar');
+        $user = static::createUser(self::$userManager, static::generateEmail('unauth-token2', $this), 'bar');
 
         $user->setExpired(true);
         self::$dm->flush();
@@ -526,7 +537,7 @@ class ApiControllerTest extends BaseControllerTest
     public function testTokenUnauthOkUserDisabled()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, static::generateEmail('token3', $this), 'bar');
+        $user = static::createUser(self::$userManager, static::generateEmail('unauth-token3', $this), 'bar');
 
         $user->setEnabled(false);
         self::$dm->flush();
@@ -541,7 +552,7 @@ class ApiControllerTest extends BaseControllerTest
     public function testTokenUnauthOkUserLocked()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, static::generateEmail('token4', $this), 'bar');
+        $user = static::createUser(self::$userManager, static::generateEmail('unauth-token4', $this), 'bar');
 
         $user->setLocked(true);
         self::$dm->flush();

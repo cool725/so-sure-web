@@ -182,7 +182,7 @@ class ApiController extends BaseController
             $differentMake = false;
             if ($deviceFound && strtolower($phones[0]->getMake()) != strtolower($make)) {
                 $differentMake = true;
-                $this->differentMake($make, $phones[0]->getMake());
+                $this->differentMake($phones[0]->getMake(), $make);
             }
 
             if ($rooted) {
@@ -361,7 +361,7 @@ class ApiController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['token', 'coginto_id'])) {
+            if (!$this->validateFields($data, ['token', 'cognito_id'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -390,7 +390,8 @@ class ApiController extends BaseController
                 );
             }
 
-            list($identityId, $token) = $identity->getCognitoIdToken($user, $data['cognito_id']);
+            $cognitoIdentity = $this->get('app.cognito.identity');
+            list($identityId, $token) = $cognitoIdentity->getCognitoIdToken($user, $data['cognito_id']);
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (\Exception $e) {
