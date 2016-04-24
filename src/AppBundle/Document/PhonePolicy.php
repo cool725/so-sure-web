@@ -105,7 +105,7 @@ class PhonePolicy extends Policy
             // 100% of policy
             return $this->getPremium()->getYearlyPremiumPrice();
         } else {
-            return $this->getPremium()->getMaxPot();
+            return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() * 0.8);
         }
     }
 
