@@ -62,7 +62,7 @@ class DefaultControllerTest extends BaseControllerTest
         ]));
         self::verifyResponse(200);
         $this->assertContains(
-            sprintf("£%.2f", $phone->getCurrentPolicyPremium()->getPolicyPrice()),
+            sprintf("£%.2f", $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
             self::$client->getResponse()->getContent()
         );
     }

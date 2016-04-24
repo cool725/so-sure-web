@@ -159,19 +159,19 @@ class ApiController extends BaseController
                 if ($memory <= $phone->getMemory()) {
                     $memoryFound = true;
                 }
-                $currentPremium = $phone->getCurrentPolicyPremium();
-                if (!$currentPremium) {
+                $currentPhonePrice = $phone->getCurrentPhonePrice();
+                if (!$currentPhonePrice) {
                     continue;
                 }
                 $quotes[] = [
-                    'monthly_premium' => $currentPremium->getPolicyPrice(),
+                    'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
                     'monthly_loss' => 0,
-                    'yearly_premium' => $currentPremium->getYearlyPolicyPrice(),
+                    'yearly_premium' => $currentPhonePrice->getYearlyPremiumPrice(),
                     'yearly_loss' => 0,
                     'phone' => $phone->toApiArray(),
-                    'connection_value' => $currentPremium->getInitialConnectionValue(),
-                    'max_connections' => $currentPremium->getMaxConnections(),
-                    'max_pot' => $currentPremium->getMaxPot(),
+                    'connection_value' => $currentPhonePrice->getInitialConnectionValue(),
+                    'max_connections' => $currentPhonePrice->getMaxConnections(),
+                    'max_pot' => $currentPhonePrice->getMaxPot(),
                 ];
             }
             

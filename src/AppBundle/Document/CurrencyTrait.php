@@ -4,10 +4,17 @@ namespace AppBundle\Document;
 
 trait CurrencyTrait
 {
-    public function getIptRate()
+    public function getIptRate(\DateTime $date = null)
     {
-        // TODO - check date
-        return 0.095;
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if ($date < new \DateTime('2016-10-01')) {
+            return 0.095;
+        } else {
+            return 0.1;
+        }
     }
 
     protected function withIpt($basePrice)

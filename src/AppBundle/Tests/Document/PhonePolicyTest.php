@@ -480,4 +480,16 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), new \DateTime('2016-04-19 16:00'));
         $this->assertEquals(new \DateTime('2016-06-18 16:00'), $policy->getConnectionCliffDate());
     }
+
+    public function testCurrentIptRate()
+    {
+        $policy = new PhonePolicy();
+        $this->assertEquals(0.095, $policy->getIptRate(new \DateTime('2016-04-01')));
+    }
+
+    public function testNewIptRate()
+    {
+        $policy = new PhonePolicy();
+        $this->assertEquals(0.1, $policy->getIptRate(new \DateTime('2016-10-01')));
+    }
 }

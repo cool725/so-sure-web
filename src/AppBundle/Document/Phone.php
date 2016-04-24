@@ -28,8 +28,8 @@ class Phone
     /** @MongoDB\Field(type="float", nullable=true) */
     protected $memory;
 
-    /** @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePremium") */
-    protected $policyPremiums = array();
+    /** @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice") */
+    protected $phonePrices = array();
 
     public function __construct()
     {
@@ -38,7 +38,7 @@ class Phone
     public function init(
         $make,
         $model,
-        $policyPrice,
+        $premium,
         $memory = null,
         $devices = null
     ) {
@@ -47,13 +47,13 @@ class Phone
         $this->devices = $devices;
         $this->memory = $memory;
 
-        $policyPremium = $this->getCurrentPolicyPremium();
-        if (!$policyPremium) {
-            $policyPremium = new PhonePremium();
-            $policyPremium->setValidFrom(new \DateTime());
-            $this->addPolicyPremium($policyPremium);
+        $phonePrice = $this->getCurrentPhonePrice();
+        if (!$phonePrice) {
+            $phonePrice = new PhonePrice();
+            $phonePrice->setValidFrom(new \DateTime());
+            $this->addPhonePrice($phonePrice);
         }
-        $policyPremium->setPolicyPrice($policyPrice);
+        $phonePrice->setMonthlyPremiumPrice($premium);
     }
 
     public function getId()
@@ -101,26 +101,26 @@ class Phone
         $this->memory = $memory;
     }
 
-    public function getPolicyPremiums()
+    public function getPhonePrices()
     {
-        return $this->policyPremiums;
+        return $this->phonePrices;
     }
 
-    public function addPolicyPremium($policyPremium)
+    public function addPhonePrice(PhonePrice $phonePrice)
     {
-        $this->policyPremiums[] = $policyPremium;
+        $this->phonePrices[] = $phonePrice;
     }
 
-    public function getCurrentPolicyPremium(\DateTime $date = null)
+    public function getCurrentPhonePrice(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
         }
 
-        foreach ($this->getPolicyPremiums() as $policyPremium) {
-            if ($policyPremium->getValidFrom() <= $date &&
-                (!$policyPremium->getValidTo() || $policyPremium->getValidTo() > $date)) {
-                return $policyPremium;
+        foreach ($this->getPhonePrices() as $phonePrice) {
+            if ($phonePrice->getValidFrom() <= $date &&
+                (!$phonePrice->getValidTo() || $phonePrice->getValidTo() > $date)) {
+                return $phonePrice;
             }
         }
 
@@ -154,7 +154,7 @@ class Phone
             'model' => $this->getModel(),
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
-            'policy_price' => $this->getPolicyPrice(),
+            'gwp' => $this->getCurrentPhonePrice()->getGwp(),
         ];
     }
 }

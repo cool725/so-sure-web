@@ -2,16 +2,22 @@ $('#phoneModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   var update = button.data('update');
   var phone = button.data('phone');
+  var ipt_rate = 1 + button.data('ipt-rate');
   var modal = $(this);
   modal.find('#phone-update-form').attr("action", update);
   if (phone) {
     modal.find('.modal-title').text('Edit Phone');
     modal.find('#phone-make').val(phone.make);
     modal.find('#phone-model').val(phone.model);
-    modal.find('#phone-devices').val(phone.devices);
+    modal.find('#phone-devices').val(phone.devices.join('|'));
     modal.find('#phone-memory').val(phone.memory);
-    modal.find('#phone-policy').val(phone.policy_price);
-    modal.find('#phone-loss').val(phone.loss_price);
+    modal.find('#phone-gwp').val(phone.gwp);
+    
+    modal.find('#phone-gwp').keyup(function() {
+      monthly = modal.find('#phone-gwp').val() * ipt_rate;
+      modal.find('#phone-premium').val(monthly);
+    });
+    modal.find('#phone-gwp').keyup();
   }
 });
 

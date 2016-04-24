@@ -33,11 +33,11 @@ class PhonePolicy extends Policy
     public function setPhone(Phone $phone)
     {
         $this->phone = $phone;
-        if (!$phone->getCurrentPolicyPremium()) {
-            throw new \Exception('Phone must have a premium');
+        if (!$phone->getCurrentPhonePrice()) {
+            throw new \Exception('Phone must have a price');
         }
 
-        $this->setPremium($phone->getCurrentPolicyPremium());
+        $this->setPremium($phone->getCurrentPhonePrice()->createPremium());
     }
 
     public function getImei()
@@ -103,9 +103,9 @@ class PhonePolicy extends Policy
 
         if ($this->getUser()->isPreLaunchUser() || $this->getPromoCode() == self::PROMO_LAUNCH) {
             // 100% of policy
-            return $this->getPremium()->getYearlyPolicyPrice();
+            return $this->getPremium()->getYearlyPremiumPrice();
         } else {
-            return $this->getPremium()->getMaxPot();
+            return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() * 0.8);
         }
     }
 

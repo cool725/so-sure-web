@@ -176,7 +176,7 @@ class DefaultController extends BaseController
         }
 
         return new JsonResponse([
-            'price' => $phone->getPolicyPrice(),
+            'price' => $phone->getCurrentPhonePrice(),
         ]);
     }
 
@@ -292,7 +292,7 @@ class DefaultController extends BaseController
 
         return array(
             'phone' => $phone,
-            'premium' => $phone->getCurrentPolicyPremium(),
+            'phone_price' => $phone->getCurrentPhonePrice(),
             'form' => $form->createView()
         );
     }

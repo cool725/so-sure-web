@@ -13,9 +13,10 @@
                         <th>Model</th>
                         <th>Devices</th>
                         <th>Memory</th>
-                        <th>Policy</th>
-                        <th>Loss</th>
-                        <th>Yearly Total</th>
+                        <th>Monthly GWP</th>
+                        <th>Monthly IPT</th>
+                        <th>Monthly Premium</th>
+                        <th>Yearly Premium</th>
                         <th>Max Pot</th>
                         <th>Max Connections</th>
                     </tr>
@@ -27,14 +28,17 @@
                             <td>{{ phone.model }}</td>
                             <td><span title="{{ phone.devices|join(", ") }}">{{ phone.devices|length }}</span></td>
                             <td>{{ phone.memory }}</td>
-                            <td>{{ phone.policyPrice }}</td>
-                            <td>{{ phone.lossPrice }}</td>
-                            <td>{{ phone.yearlyTotalPrice }}</td>
-                            <td>{{ phone.maxPot }}</td>
-                            <td>{{ phone.maxConnections }}</td>
+                            <td>{{ phone.currentPhonePrice.gwp }}</td>
+                            <td>{{ phone.currentPhonePrice.ipt }}</td>
+                            <td>{{ phone.currentPhonePrice.monthlyPremiumPrice }}</td>
+                            <td>{{ phone.currentPhonePrice.yearlyPremiumPrice }}</td>
+                            <td>{{ phone.currentPhonePrice.maxPot }}</td>
+                            <td>{{ phone.currentPhonePrice.maxConnections }}</td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-                                    data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}" data-phone="{{ phone.toEditArray()|json_encode }}">Edit</button>
+                                    data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}"
+                                    data-ipt-rate="{{ phone.iptRate }}"
+                                    data-phone="{{ phone.toEditArray()|json_encode }}">Edit</button>
                                 <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
                                         data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}">Delete</button>
                             </td>
@@ -81,12 +85,12 @@
             <input type="text" class="form-control" id="phone-memory" name="memory">
           </div>
           <div class="form-group">
-            <label for="phone-policy" class="control-label">Policy:</label>
-            <input type="text" class="form-control" id="phone-policy" name="policy">
+            <label for="phone-gwp" class="control-label">GWP:</label>
+            <input type="text" class="form-control" id="phone-gwp" name="gwp">
           </div>
           <div class="form-group">
-            <label for="phone-loss" class="control-label">Loss:</label>
-            <input type="text" class="form-control" id="phone-loss" name="loss">
+            <label for="phone-premium" class="control-label">Monthly Premium Price:</label>
+            <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
           </div>
       </div>
       <div class="modal-footer">

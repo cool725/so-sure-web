@@ -3,7 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Phone;
-use AppBundle\Document\PhonePremium;
+use AppBundle\Document\PhonePrice;
 
 /**
  * @group unit
@@ -22,8 +22,8 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
     {
         $phoneA = $this->getSamplePhoneA();
         $phoneB = $this->getSamplePhoneB();
-        $this->assertEquals(95.88, $phoneA->getCurrentPolicyPremium()->getYearlyPolicyPrice());
-        $this->assertEquals(101.88, $phoneB->getCurrentPolicyPremium()->getYearlyPolicyPrice());
+        $this->assertEquals(95.88, $phoneA->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $this->assertEquals(101.88, $phoneB->getCurrentPhonePrice()->getYearlyPremiumPrice());
     }
 
     public function testMaxPot()
@@ -31,9 +31,9 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $phoneA = $this->getSamplePhoneA();
         $phoneB = $this->getSamplePhoneB();
         // 76.704
-        $this->assertEquals(76.70, $phoneA->getCurrentPolicyPremium()->getMaxPot());
+        $this->assertEquals(76.70, $phoneA->getCurrentPhonePrice()->getMaxPot());
         // 81.504
-        $this->assertEquals(81.50, $phoneB->getCurrentPolicyPremium()->getMaxPot());
+        $this->assertEquals(81.50, $phoneB->getCurrentPhonePrice()->getMaxPot());
     }
 
     public function testMaxConnections()
@@ -41,40 +41,40 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $phoneA = $this->getSamplePhoneA();
         $phoneB = $this->getSamplePhoneB();
         // 76.704
-        $this->assertEquals(8, $phoneA->getCurrentPolicyPremium()->getMaxConnections());
+        $this->assertEquals(8, $phoneA->getCurrentPhonePrice()->getMaxConnections());
         // 81.504
-        $this->assertEquals(9, $phoneB->getCurrentPolicyPremium()->getMaxConnections());
+        $this->assertEquals(9, $phoneB->getCurrentPhonePrice()->getMaxConnections());
     }
 
     public function testPolicy2dp()
     {
         $phone = new Phone();
         $phone->init('Apple', 'iPhone 6', 6.990001, 1.5);
-        $this->assertEquals(6.99, $phone->getCurrentPolicyPremium()->getPolicyPrice());
+        $this->assertEquals(6.99, $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
     }
     
-    public function testGetCurrentPolicyPremium()
+    public function testGetCurrentPhonePrice()
     {
         $phone = new Phone();
-        $premium = new PhonePremium();
-        $premium->setValidFrom(new \DateTime('2016-01-01'));
-        $phone->addPolicyPremium($premium);
+        $phonePrice = new PhonePrice();
+        $phonePrice->setValidFrom(new \DateTime('2016-01-01'));
+        $phone->addPhonePrice($phonePrice);
 
-        $this->assertEquals(new \DateTime('2016-01-01'), $phone->getCurrentPolicyPremium()->getValidFrom());
+        $this->assertEquals(new \DateTime('2016-01-01'), $phone->getCurrentPhonePrice()->getValidFrom());
     }
 
-    public function testMultipleGetCurrentPolicyPremium()
+    public function testMultipleGetCurrentPhonePrice()
     {
         $phone = new Phone();
-        $premiumA = new PhonePremium();
-        $premiumA->setValidFrom(new \DateTime('2016-01-01'));
-        $premiumA->setValidTo(new \DateTime('2016-01-02 23:59:59'));
-        $phone->addPolicyPremium($premiumA);
-        $premiumB = new PhonePremium();
-        $premiumB->setValidFrom(new \DateTime('2016-01-03'));
-        $phone->addPolicyPremium($premiumB);
+        $phonePriceA = new PhonePrice();
+        $phonePriceA->setValidFrom(new \DateTime('2016-01-01'));
+        $phonePriceA->setValidTo(new \DateTime('2016-01-02 23:59:59'));
+        $phone->addPhonePrice($phonePriceA);
+        $phonePriceB = new PhonePrice();
+        $phonePriceB->setValidFrom(new \DateTime('2016-01-03'));
+        $phone->addPhonePrice($phonePriceB);
 
-        $this->assertEquals(new \DateTime('2016-01-03'), $phone->getCurrentPolicyPremium()->getValidFrom());
+        $this->assertEquals(new \DateTime('2016-01-03'), $phone->getCurrentPhonePrice()->getValidFrom());
     }
 
     private function getSamplePhoneA()
