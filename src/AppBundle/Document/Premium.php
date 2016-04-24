@@ -12,33 +12,43 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 abstract class Premium
 {
-    /** @MongoDB\Date() */
-    protected $validFrom;
+    /** @MongoDB\Field(type="float") */
+    protected $gwp;
 
-    /** @MongoDB\Date() */
-    protected $validTo;
+    /** @MongoDB\Field(type="float") */
+    protected $ipt;
 
     public function __construct()
     {
     }
 
-    public function getValidFrom()
+    public function getGwp()
     {
-        return $this->validFrom;
+        return $this->toTwoDp($this->gwp);
     }
 
-    public function setValidFrom($validFrom)
+    public function setGwp($gwp)
     {
-        $this->validFrom = $validFrom;
+        $this->gwp = $gwp;
     }
 
-    public function getValidTo()
+    public function getIpt()
     {
-        return $this->validTo;
+        return $this->toTwoDp($this->ipt);
     }
 
-    public function setValidTo($validTo)
+    public function setIpt($ipt)
     {
-        $this->validTo = $validTo;
+        $this->ipt = $ipt;
+    }
+
+    public function getMonthlyPremiumPrice()
+    {
+        return $this->getGwp() + $this->getIpt();
+    }
+
+    public function getYearlyPremiumPrice()
+    {
+        return $this->toTwoDp($this->getMonthlyPremiumPrice() * 12);
     }
 }

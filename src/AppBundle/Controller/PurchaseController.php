@@ -167,7 +167,7 @@ class PurchaseController extends BaseController
         $webpay = $this->get('app.judopay')->webpay(
             $this->getUser(),
             $phone,
-            $phone->getPolicyPrice(),
+            $phone->getCurrentPhonePrice(),
             $request->getClientIp(),
             $request->headers->get('User-Agent')
         );

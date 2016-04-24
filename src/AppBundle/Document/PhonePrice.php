@@ -7,7 +7,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /**
  * @MongoDB\EmbeddedDocument
  */
-class PhonePremium extends Premium
+class PhonePrice extends Price
 {
     use CurrencyTrait;
 
@@ -28,5 +28,13 @@ class PhonePremium extends Premium
     public function getInitialConnectionValue()
     {
         return 10;
+    }
+
+    public function createPremium(\DateTime $date = null)
+    {
+        $premium = new PhonePremium();
+        $this->populatePremium($premium, $date);
+
+        return $premium;
     }
 }

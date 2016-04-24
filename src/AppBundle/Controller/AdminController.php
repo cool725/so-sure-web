@@ -72,8 +72,8 @@ class AdminController extends BaseController
         $phone->setModel($request->get('model'));
         $phone->setDevices($devices);
         $phone->setMemory($request->get('memory'));
-        $phone->setPolicyPrice($request->get('policy'));
-        $phone->setLossPrice($request->get('loss'));
+        //$phone->setPhonePrice($request->get('price'));
+        //$phone->setLossPrice($request->get('loss'));
         $dm->persist($phone);
         $dm->flush();
         $this->addFlash(
@@ -104,8 +104,8 @@ class AdminController extends BaseController
             $phone->setModel($request->get('model'));
             $phone->setDevices($devices);
             $phone->setMemory($request->get('memory'));
-            $phone->setPolicyPrice($request->get('policy'));
-            $phone->setLossPrice($request->get('loss'));
+            //$phone->setPolicyPrice($request->get('policy'));
+            //$phone->setLossPrice($request->get('loss'));
             $dm->flush();
             $this->addFlash(
                 'notice',

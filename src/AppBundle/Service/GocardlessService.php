@@ -232,7 +232,7 @@ class GocardlessService
 
         $mandate = $policy->getGocardlessMandate();
         // gocardless wants in pence
-        $priceInPence = $policy->getPremium()->getPolicyPrice() * 100;
+        $priceInPence = $policy->getPremium()->getMonthlyPremiumPrice() * 100;
         $data = [
             "amount" => $priceInPence,
             "count" => 12,
