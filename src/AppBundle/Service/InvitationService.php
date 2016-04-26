@@ -10,6 +10,8 @@ use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Exception\RateLimitException;
+use AppBundle\Exception\ProcessedException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -32,6 +34,9 @@ class InvitationService
     /** @var SmsService */
     protected $sms;
 
+    /** @var RateLimitService */
+    protected $rateLimit;
+
     /** @var boolean */
     protected $debug;
 
@@ -43,6 +48,7 @@ class InvitationService
      * @param                  $router
      * @param ShortLinkService $shortLink
      * @param SmsService       $sms
+     * @param RateLimitService $rateLimit
      */
     public function __construct(
         DocumentManager $dm,
@@ -51,7 +57,8 @@ class InvitationService
         $templating,
         $router,
         ShortLinkService $shortLink,
-        SmsService $sms
+        SmsService $sms,
+        RateLimitService $rateLimit
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -60,6 +67,7 @@ class InvitationService
         $this->router = $router->getRouter();
         $this->shortLink = $shortLink;
         $this->sms = $sms;
+        $this->rateLimit = $rateLimit;
     }
 
     public function setDebug($debug)
@@ -114,6 +122,7 @@ class InvitationService
         $invitation->setEmail($email);
         $invitation->setPolicy($policy);
         $invitation->setName($name);
+        $invitation->invite();
         $this->dm->persist($invitation);
         $this->dm->flush();
 
@@ -148,6 +157,7 @@ class InvitationService
         $invitation->setMobile($mobile);
         $invitation->setPolicy($policy);
         $invitation->setName($name);
+        $invitation->invite();
         $this->dm->persist($invitation);
         $this->dm->flush();
 
@@ -215,7 +225,7 @@ class InvitationService
     public function accept(Invitation $invitation, Policy $inviteePolicy)
     {
         if ($invitation->isProcessed()) {
-            throw new \Exception("Invitation has already been processed");
+            throw new ProcessedException("Invitation has already been processed");
         }
 
         $inviterPolicy = $invitation->getPolicy();
@@ -246,7 +256,7 @@ class InvitationService
     public function reject(Invitation $invitation)
     {
         if ($invitation->isProcessed()) {
-            throw new \Exception("Invitation has already been processed");
+            throw new ProcessedException("Invitation has already been processed");
         }
 
         $invitation->setRejected(new \DateTime());
@@ -257,7 +267,7 @@ class InvitationService
     public function cancel(Invitation $invitation)
     {
         if ($invitation->isProcessed()) {
-            throw new \Exception("Invitation has already been processed");
+            throw new ProcessedException("Invitation has already been processed");
         }
 
         $invitation->setCancelled(new \DateTime());
@@ -268,11 +278,13 @@ class InvitationService
     public function reinvite(Invitation $invitation)
     {
         if ($invitation->isProcessed()) {
-            throw new \Exception("Invitation has already been processed");
+            print 'processed';
+            throw new ProcessedException("Invitation has already been processed");
         }
 
         if (!$invitation->canReinvite()) {
-            return false;
+            print 'rate';
+            throw new RateLimitException('Reinvite limit exceeded');
         }
 
         if ($invitation instanceof EmailInvitation) {

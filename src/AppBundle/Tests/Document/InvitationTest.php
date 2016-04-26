@@ -33,16 +33,51 @@ class InvitationTest extends WebTestCase
     {
     }
 
+    public function testInviteSetsReinvite()
+    {
+        $invitation = new EmailInvitation();
+        $this->assertEquals(0, $invitation->getReinvitedCount());
+        $date = new \DateTime('2016-01-01');
+        $invitation->invite($date);
+        $date->add(new \DateInterval('P1D'));
+        $this->assertEquals($date, $invitation->getNextReinvited());
+    }
+
+    public function testInviteCannotImmediatelyReinvite()
+    {
+        $invitation = new EmailInvitation();
+        $invitation->invite();
+        $this->assertFalse($invitation->canReinvite());
+    }
+
     public function testReinvite()
     {
         $invitation = new EmailInvitation();
         $this->assertEquals(0, $invitation->getReinvitedCount());
+        $date = new \DateTime('2016-01-01');
         for ($i = 0; $i < $invitation->getMaxReinvitations(); $i++) {
-            $invitation->reinvite();
+            $invitation->reinvite($date);
             $this->assertTrue($invitation->canReinvite());
+            $this->assertEquals($date, $invitation->getLastReinvited());
+            $this->assertEquals($i+1, $invitation->getReinvitedCount());
+
+            $date->add(new \DateInterval('P1D'));
+            $this->assertEquals($date, $invitation->getNextReinvited());
         }
         $invitation->reinvite();
         $this->assertFalse($invitation->canReinvite());
+        $this->assertNull($invitation->getNextReinvited());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testTooManyReinvite()
+    {
+        $invitation = new EmailInvitation();
+        $this->assertEquals(0, $invitation->getReinvitedCount());
+        $invitation->reinvite();
+        $invitation->reinvite();
     }
 
     public function testMobileNumberIsNormalized()

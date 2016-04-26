@@ -20,6 +20,9 @@ use AppBundle\Document\Sns;
 use AppBundle\Document\User;
 use AppBundle\Document\Invitation\Invitation;
 
+use AppBundle\Exception\RateLimitException;
+use AppBundle\Exception\ProcessedException;
+
 use AppBundle\Service\RateLimitService;
 use AppBundle\Security\UserVoter;
 use AppBundle\Classes\ApiErrorCode;
@@ -44,8 +47,8 @@ class ApiAuthController extends BaseController
             }
 
             $rateLimit = $this->get('app.ratelimit');
-            if (!$rateLimit->allowed(
-                RateLimitService::TYPE_ADDRESS,
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_ADDRESS,
                 $this->getCognitoIdentityIp($request),
                 $this->getCognitoIdentityId($request)
             )) {
@@ -116,12 +119,31 @@ class ApiAuthController extends BaseController
                 $invitationService->cancel($invitation);
             } elseif ($data['action'] == 'reinvite') {
                 $this->denyAccessUnlessGranted('reinvite', $invitation);
+                //\Doctrine\Common\Util\Debug::dump($invitation);
                 $invitationService->reinvite($invitation);
+            } else {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                    'Unknown action',
+                    422
+                );
             }
 
             return new JsonResponse($this->getUser()->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (RateLimitException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_LIMIT,
+                'Too many reinvitations to that email/mobile',
+                422
+            );
+        } catch (ProcessedException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_PREVIOUSLY_PROCESSED,
+                'Invitation already processed',
+                422
+            );
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api processInvitation. %s', $e->getMessage()));
 
@@ -196,15 +218,15 @@ class ApiAuthController extends BaseController
             }
 
             $rateLimit = $this->get('app.ratelimit');
-            if (!$rateLimit->allowed(
-                RateLimitService::TYPE_IMEI,
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_IMEI,
                 $this->getCognitoIdentityIp($request),
                 $this->getCognitoIdentityId($request)
             )) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
-            if (!$rateLimit->allowed(
-                RateLimitService::TYPE_POLICY,
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_POLICY,
                 $this->getCognitoIdentityIp($request),
                 $this->getCognitoIdentityId($request)
             )) {

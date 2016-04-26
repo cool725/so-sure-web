@@ -36,6 +36,9 @@ abstract class Invitation
     /** @MongoDB\Date(name="last_reinvited") */
     protected $lastReinvited;
 
+    /** @MongoDB\Date(name="next_reinvited") */
+    protected $nextReinvited;
+
     /** @MongoDB\Field(type="integer", name="reinvited_count") */
     protected $reinvitedCount;
 
@@ -194,9 +197,37 @@ abstract class Invitation
         return $this->lastReinvited;
     }
 
-    public function canReinvite()
+    public function setLastReinvited($lastReinvited)
     {
-        return $this->getReinvitedCount() <= $this->getMaxReinvitations();
+        $this->lastReinvited = $lastReinvited;
+    }
+
+    public function getNextReinvited()
+    {
+        return $this->nextReinvited;
+    }
+
+    public function setNextReinvited($nextReinvited)
+    {
+        $this->nextReinvited = $nextReinvited;
+    }
+
+    public function canReinvite(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        return $this->getReinvitedCount() <= $this->getMaxReinvitations() &&
+            $this->getNextReinvited() < $date;
+    }
+
+    public function invite(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $this->setNextReinvited($date->add(new \DateInterval('P1D')));
     }
 
     public function reinvite(\DateTime $date = null)
@@ -208,7 +239,13 @@ abstract class Invitation
         if (!$date) {
             $date = new \DateTime();
         }
-        $this->lastReinvited = $date;
+        $this->setLastReinvited($date);
+        if ($this->getReinvitedCount() < $this->getMaxReinvitations()) {
+            $this->setNextReinvited($date->add(new \DateInterval('P1D')));
+        } else {
+            $this->setNextReinvited(null);
+        }
+
         $this->reinvitedCount++;
     }
 
@@ -232,6 +269,9 @@ abstract class Invitation
             'link' => $this->getLink(),
             'status' => $this->getStatus(),
             'created_date' => $this->getCreated() ? $this->getCreated()->format(\DateTime::ISO8601) : null,
+            'next_reinvite_date' =>  $this->getNextReinvited() ?
+                $this->getNextReinvited()->format(\DateTime::ISO8601) :
+                null,
         ];
 
         if ($debug) {

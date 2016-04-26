@@ -16,23 +16,25 @@ class RateLimitService
 {
     const IP_ADDRESS_MULTIPLIER = 7; // at most 7 users per ip address
     const KEY_FORMAT = 'rate:%s:%s';
-    const TYPE_ADDRESS = 'address'; // 5p / query
-    const TYPE_IMEI = 'imei'; // 10p / query
-    const TYPE_LOGIN = 'login';
-    const TYPE_POLICY = 'policy';
+    const USER_KEY_FORMAT = 'rate:%s:%s:%s';
+
+    const DEVICE_TYPE_ADDRESS = 'address'; // 5p / query
+    const DEVICE_TYPE_IMEI = 'imei'; // 10p / query
+    const DEVICE_TYPE_LOGIN = 'login';
+    const DEVICE_TYPE_POLICY = 'policy';
 
     public static $cacheTimes = [
-        self::TYPE_IMEI => 86400, // 1 day
-        self::TYPE_ADDRESS => 86400, // 1 day
-        self::TYPE_LOGIN => 3600, // 1 hour
-        self::TYPE_POLICY => 604800, // 7 days
+        self::DEVICE_TYPE_IMEI => 86400, // 1 day
+        self::DEVICE_TYPE_ADDRESS => 86400, // 1 day
+        self::DEVICE_TYPE_LOGIN => 3600, // 1 hour
+        self::DEVICE_TYPE_POLICY => 604800, // 7 days
     ];
 
     public static $maxRequests = [
-        self::TYPE_IMEI => 2,
-        self::TYPE_ADDRESS => 3,
-        self::TYPE_LOGIN => 3,
-        self::TYPE_POLICY => 8
+        self::DEVICE_TYPE_IMEI => 2,
+        self::DEVICE_TYPE_ADDRESS => 3,
+        self::DEVICE_TYPE_LOGIN => 3,
+        self::DEVICE_TYPE_POLICY => 8,
     ];
 
     public static $excludedIps = [
@@ -68,12 +70,10 @@ class RateLimitService
      *
      * @return boolean
      */
-    public function allowed($type, $ip, $cognitoId)
+    public function allowedByDevice($type, $ip, $cognitoId)
     {
         $ipKey = sprintf(self::KEY_FORMAT, $type, $ip);
         $cognitoIdKey = sprintf(self::KEY_FORMAT, $type, $cognitoId);
-
-        $allowed = true;
 
         $ipRequests = $this->redis->incr($ipKey);
         $maxIpRequests = self::$maxRequests[$type] * self::IP_ADDRESS_MULTIPLIER;
@@ -95,9 +95,49 @@ class RateLimitService
 
         // ip should always be higher as may be multiple users behind a nat
         if ($ipRequests > $maxIpRequests || $cognitoRequests > $maxCognitoRequests) {
-            $allowed = false;
+            return false;
         }
 
-        return $allowed;
+        return true;
     }
+
+    /**
+     * Unused for now, but may need similiar functionality in the future...
+     * Is the call allowed for a specific key
+     *
+     * @param User    $user
+     * @param string  $type
+     * @param string  $data          What is unique about the data - email/mobile
+     * @param boolean $increment
+     * @param boolean $slidingWindow Increment the expire date every time accessed?
+     *
+     * @return boolean
+     *
+    public function allowedByUser(User $user, $type, $data, $increment = true, $slidingWindow = true)
+    {
+        $redisKey = sprintf(self::USER_KEY_FORMAT, $user->getId(), $type, $data);
+        $maxRequests = self::$maxRequests[$type];
+        $cacheTime = self::$cacheTimes[$type];
+        $maxRequests = self::$maxRequests[$type];
+
+        if (!$increment) {
+            $requests = $this->redis->get($redisKey);
+            if ($request) {
+                return $requests <= $maxRequests;
+            } else {
+                return true;
+            }
+        }
+
+        $requests = $this->redis->incr($redisKey);
+        if ($cacheTime) {
+            // Only set expire if it doesn't exist for non-sliding windows
+            if ($slidingWindow || $this->redis->ttl($redisKey) == -1) {
+                $this->redis->expire($redisKey, $cacheTime);
+            }
+        }
+
+        return $requests <= $maxRequests;
+    }
+    */
 }

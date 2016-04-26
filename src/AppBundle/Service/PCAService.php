@@ -166,7 +166,7 @@ class PCAService
         //Make the request to Postcode Anywhere and parse the XML returned
         $file = simplexml_load_file($url);
         try {
-            $this->checkError($file);
+            $this->checkError($file, $postcode);
         } catch (\Exception $e) {
             return null;
         }
@@ -245,7 +245,7 @@ class PCAService
         return $address;
     }
 
-    private function checkError($file)
+    private function checkError($file, $postcode = null)
     {
         //Check for an error, if there is one then throw an exception
         if (isset($file->Columns) && $file->Columns->Column->attributes()->Name == "Error") {
@@ -256,7 +256,7 @@ class PCAService
                 $file->Rows->Row->attributes()->Cause,
                 $file->Rows->Row->attributes()->Resolution
             );
-            $this->logger->error(sprintf("Error checking postcode db Ex: %s", $err));
+            $this->logger->error(sprintf("Error checking postcode (%s) db Ex: %s", $postcode, $err));
 
             throw new \Exception();
         }

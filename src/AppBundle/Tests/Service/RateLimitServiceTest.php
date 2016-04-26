@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Service\RateLimitService;
+use AppBundle\Document\User;
 
 /**
  * @group functional-nonet
@@ -14,6 +15,7 @@ class RateLimitServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $rateLimit;
+    protected static $redis;
 
     public static function setUpBeforeClass()
     {
@@ -27,23 +29,24 @@ class RateLimitServiceTest extends WebTestCase
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
          self::$rateLimit = self::$container->get('app.ratelimit');
+         self::$redis = self::$container->get('snc_redis.default');
     }
 
     public function tearDown()
     {
     }
 
-    public function testRateLimits()
+    public function testDeviceRateLimits()
     {
         $rates = [
-            RateLimitService::TYPE_ADDRESS,
-            RateLimitService::TYPE_IMEI,
-            RateLimitService::TYPE_LOGIN,
-            RateLimitService::TYPE_POLICY
+            RateLimitService::DEVICE_TYPE_ADDRESS,
+            RateLimitService::DEVICE_TYPE_IMEI,
+            RateLimitService::DEVICE_TYPE_LOGIN,
+            RateLimitService::DEVICE_TYPE_POLICY
         ];
         foreach ($rates as $type) {
             for ($i = 1; $i < 100; $i++) {
-                $allowedIp = self::$rateLimit->allowed(
+                $allowedIp = self::$rateLimit->allowedByDevice(
                     $type,
                     '1.1.1.1',
                     sprintf('address-cog-%d', $i)
@@ -54,7 +57,7 @@ class RateLimitServiceTest extends WebTestCase
                     $this->assertFalse($allowedIp);
                 }
 
-                $allowedCognito = self::$rateLimit->allowed(
+                $allowedCognito = self::$rateLimit->allowedByDevice(
                     $type,
                     sprintf('1.1.2.%d', $i),
                     'address-cog-cog'
@@ -67,4 +70,66 @@ class RateLimitServiceTest extends WebTestCase
             }
         }
     }
+
+    /*
+    public function testUserKeyRateLimits()
+    {
+        $user = new User();
+        $user->setId(1);
+        $rates = [
+            RateLimitService::KEY_TYPE_DAILY_EMAIL_INVITATION,
+            RateLimitService::KEY_TYPE_DAILY_SMS_INVITATION,
+        ];
+        foreach ($rates as $type) {
+            for ($i = 1; $i < 10; $i++) {
+                $allowed = self::$rateLimit->allowedByUser(
+                    $user,
+                    $type,
+                    'foo',
+                    false
+                );
+                if ($i <= RateLimitService::$maxRequests[$type]) {
+                    $this->assertTrue($allowed);
+                } else {
+                    $this->assertFalse($allowed);
+                }
+            }
+        }
+    }
+    public function testUserKeyRateLimitsSlidingWindow()
+    {
+        $user = new User();
+        $user->setId(1);
+        self::$rateLimit->allowedByUser(
+            $user,
+            RateLimitService::KEY_TYPE_DAILY_EMAIL_INVITATION,
+            'bar',
+            true,
+            false
+        );
+        $expire = self::$redis->ttl(sprintf(
+            RateLimitService::USER_KEY_FORMAT,
+            1,
+            RateLimitService::KEY_TYPE_DAILY_EMAIL_INVITATION,
+            'bar'
+        ));
+        $this->assertGreaterThan(0, $expire);
+        sleep(2);
+
+        self::$rateLimit->allowedByUser(
+            $user,
+            RateLimitService::KEY_TYPE_DAILY_EMAIL_INVITATION,
+            'bar',
+            true,
+            false
+        );
+        $newExpire = self::$redis->ttl(sprintf(
+            RateLimitService::USER_KEY_FORMAT,
+            1,
+            RateLimitService::KEY_TYPE_DAILY_EMAIL_INVITATION,
+            'bar'
+        ));
+        $this->assertTrue($expire > $newExpire);
+    }
+    */
 }
