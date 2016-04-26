@@ -87,6 +87,7 @@ services:
             router:     "@api.router"
             shortLink:  "@app.shortlink"
             sms:        "@app.sms"
+            rateLimit:  "@app.ratelimit"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService

@@ -48,8 +48,8 @@ class ApiController extends BaseController
             }
 
             $rateLimit = $this->get('app.ratelimit');
-            if (!$rateLimit->allowed(
-                RateLimitService::TYPE_LOGIN,
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_LOGIN,
                 $this->getCognitoIdentityIp($request),
                 $this->getCognitoIdentityId($request)
             )) {
@@ -180,7 +180,8 @@ class ApiController extends BaseController
             }
 
             $differentMake = false;
-            if ($deviceFound && strtolower($phones[0]->getMake()) != strtolower($make)) {
+            // Google phones are known to report different...
+            if ($deviceFound && strtolower($phones[0]->getMake()) != strtolower($make) && $make != 'google') {
                 $differentMake = true;
                 $this->differentMake($phones[0]->getMake(), $make);
             }

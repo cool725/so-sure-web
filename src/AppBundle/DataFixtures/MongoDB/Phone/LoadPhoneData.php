@@ -80,6 +80,8 @@ class LoadPhoneData implements FixtureInterface
         $this->newPhone($manager, 'LG', 'Nexus 4', 5.79, 16, ['mako']);
         $this->newPhone($manager, 'LG', 'Nexus 5', 5.79, 8, ['hammerhead']);
         $this->newPhone($manager, 'LG', 'Nexus 5', 5.79, 16, ['hammerhead']);
+        $this->newPhone($manager, 'LG', 'Nexus 5X', 5.79, 16, ['bullhead']);
+        $this->newPhone($manager, 'LG', 'Nexus 5X', 5.79, 32, ['bullhead']);
         $this->newPhone($manager, 'LG', 'Optimus One', 5.79, null, ['thunderg']);
         $this->newPhone($manager, 'LG', 'Optimus 4x', 6.29, null, ['x3']);
         $this->newPhone($manager, 'LG', 'G Flex', 8.29, null, ['zee']);

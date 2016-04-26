@@ -14,6 +14,8 @@ use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Exception\RateLimitException;
+use AppBundle\Exception\ProcessedException;
 
 /**
  * @group functional-nonet
@@ -53,7 +55,8 @@ class InvitationServiceTest extends WebTestCase
             self::$container->get('templating'),
             self::$container->get('api.router'),
             self::$container->get('app.shortlink'),
-            self::$container->get('app.sms')
+            self::$container->get('app.sms'),
+            self::$container->get('app.ratelimit')
         );
 
         self::$invitationService->setDebug(true);
@@ -217,9 +220,59 @@ class InvitationServiceTest extends WebTestCase
         );
         $invitation = self::$invitationService->email($policy, static::generateEmail('invite5', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
+
+        // allow reinvitation
+        $invitation->setNextReinvited('2016-01-01');
         self::$invitationService->reinvite($invitation);
 
         $this->assertEquals(1, $invitation->getReinvitedCount());
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\ProcessedException
+     */
+    public function testEmailReinviteProcessed()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-processed', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-processed', $this),
+            'bar'
+        );
+        $invitation = self::$invitationService->email($policy, static::generateEmail('invite-processed', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        $invitation->setAccepted(new \DateTime());
+        self::$invitationService->reinvite($invitation);
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\RateLimitException
+     */
+    public function testEmailReinviteRateLimited()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-ratelimit', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-ratelimit', $this),
+            'bar'
+        );
+        $invitation = self::$invitationService->email($policy, static::generateEmail('invite-ratelimit', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        self::$invitationService->reinvite($invitation);
     }
 
     public function testEmailInvitationCancel()

@@ -7,6 +7,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
+use AppBundle\Document\Invitation\EmailInvitation;
 
 /**
  * @group functional-net
@@ -103,7 +104,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(400);
     }
 
-    // invitation/{id} cancel
+    // invitation/{id}
 
     /**
      *
@@ -124,6 +125,64 @@ class ApiAuthControllerTest extends BaseControllerTest
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'cancel']);
         $data = $this->verifyResponse(200);
+    }
+
+    public function testInvitationUnknown()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $policyData = $this->verifyResponse(200);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('invite-unknown', $this),
+            'name' => 'invite unknown action test',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'foo']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testInvitationMissingActionAction()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $policyData = $this->verifyResponse(200);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('invite-missing', $this),
+            'name' => 'invite missing action test',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testInvitationReinviteAction()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $policyData = $this->verifyResponse(200);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('invite-reinvite', $this),
+            'name' => 'invite revite test',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        $invitation = $emailRepo->find($invitationData['id']);
+        $this->assertFalse($invitation->canReinvite());
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'reinvite']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_LIMIT);
     }
 
     // ping / auth
@@ -268,7 +327,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     public function testNewPolicyRateLimited()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::TYPE_POLICY] + 1; $i++) {
+        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_POLICY] + 1; $i++) {
             $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser, false);
         }
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
