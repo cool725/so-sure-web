@@ -188,6 +188,7 @@ class ApiController extends BaseController
 
             if ($rooted) {
                 $this->rootedDevice($device, $memory);
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
             }
 
             $response = [

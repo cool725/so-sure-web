@@ -299,11 +299,7 @@ class ApiControllerTest extends BaseControllerTest
             'GET',
             '/api/v1/quote?make=OnePlus&device=A0001&memory=65&rooted=true&debug=true'
         );
-        $data = $this->verifyResponse(200);
-        $this->assertEquals(true, $data['device_found']);
-        $this->assertEquals(false, $data['memory_found']);
-        $this->assertEquals(false, $data['different_make']);
-        $this->assertEquals(true, $data['rooted']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE);
     }
 
     public function testQuoteKnownDeviceDifferentMake()
@@ -338,7 +334,7 @@ class ApiControllerTest extends BaseControllerTest
         $cognitoIdentityId = $this->getAuthUser($user);
         $url = '/api/v1/quote?device=A0001&memory=65&rooted=true&debug=true&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(200);
+        $data = $this->verifyResponse(422);
         $date = new \DateTime();
         $deviceKey = sprintf('stats:%s:query:%s', $date->format('Y-m-d'), 'A0001');
         $this->assertGreaterThan(0, self::$redis->get($deviceKey));
