@@ -260,7 +260,7 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue(count($data['quotes']) < 10);
     }
 
-    public function testQuoteUnknownDevice()
+    public function testQuoteUnknownDevicePreLaunch()
     {
         $crawler = self::$client->request('GET', '/api/v1/quote?make=One&device=foo&debug=true');
         $data = $this->verifyResponse(200);
@@ -268,6 +268,12 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals(false, $data['different_make']);
         $this->assertEquals(true, $data['memory_found']);
         $this->assertEquals(false, $data['rooted']);
+    }
+
+    public function testQuoteUnknownDeviceMvp()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/quote?make=One&device=foo&rooted=false&debug=true');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE);
     }
 
     public function testQuoteKnownDeviceKnownMemory()
@@ -342,7 +348,7 @@ class ApiControllerTest extends BaseControllerTest
     }
 
     // referral
-    
+
     /**
      *
      */

@@ -174,7 +174,7 @@ class ApiController extends BaseController
                     'max_pot' => $currentPhonePrice->getMaxPot(),
                 ];
             }
-            
+
             if (!$deviceFound || !$memoryFound) {
                 $this->unknownDevice($device, $memory);
             }
@@ -188,6 +188,12 @@ class ApiController extends BaseController
 
             if ($rooted) {
                 $this->rootedDevice($device, $memory);
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
+            }
+
+            // Rooted is missing in the pre-launch app where, which returns the MSRP pricing data if phone not found
+            // but for newer mobile versions, we should return an unable to insure if the phone isn't found
+            if (strlen(trim($request->get('rooted'))) > 0 && !$deviceFound) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
             }
 
