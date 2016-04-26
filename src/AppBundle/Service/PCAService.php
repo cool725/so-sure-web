@@ -108,6 +108,8 @@ class PCAService
         $postcode = $this->normalizePostcode($postcode);
         if ($postcode == "BX11LT") {
             return true;
+        } elseif ($postcode == "ZZ993CZ") {
+            return false;
         }
 
         if ($this->redis->hexists(self::REDIS_POSTCODE_KEY, $postcode)) {
