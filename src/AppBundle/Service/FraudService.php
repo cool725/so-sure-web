@@ -32,6 +32,7 @@ class FraudService
     {
         return [
             'duplicate_postcode' => count($this->getDuplicatePostcode($policy)),
+            'duplicate_bank_accounts' => count($this->getDuplicateBankAccounts($policy)),
         ];
     }
 
@@ -41,5 +42,13 @@ class FraudService
         $userRepo = $this->dm->getRepository(User::class);
 
         return $userRepo->findPostcode($user);
+    }
+
+    public function getDuplicateBankAccounts(Policy $policy)
+    {
+        $user = $policy->getUser();
+        $userRepo = $this->dm->getRepository(User::class);
+
+        return $userRepo->findBankAccount($user);
     }
 }
