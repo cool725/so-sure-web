@@ -864,6 +864,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policyUrl = self::$router->generate('policy_terms', ['id' => $policyId]);
         //print $getData["view_url"];
         $this->assertTrue(stripos($getData["view_url"], $policyUrl) >= 0);
+        $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
     }
 
     // secret
