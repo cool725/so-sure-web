@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @group functional-nonet
+ * @group functional-paid
  */
 class DeviceAtlasServiceTest extends WebTestCase
 {

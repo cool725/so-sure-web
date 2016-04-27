@@ -209,7 +209,7 @@ class ApiAuthController extends BaseController
             // We'll probably want to change this in the future, but for now, a user can only create 1 policy
             if ($user->hasPolicy()) {
                 return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_UNKNOWN,
+                    ApiErrorCode::ERROR_USER_POLICY_LIMIT,
                     'User can only have 1 policy',
                     422
                 );
@@ -464,14 +464,14 @@ class ApiAuthController extends BaseController
                 );
             } catch (InvalidPolicyException $e) {
                 return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_UNKNOWN,
-                    'Policy not yet paid',
+                    ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
+                    'Policy not yet been paid',
                     422
                 );
             } catch (SelfInviteException $e) {
                 return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_UNKNOWN,
-                    'Policy not yet paid',
+                    ApiErrorCode::ERROR_INVITATION_SELF_INVITATION,
+                    'User can not invite themself',
                     422
                 );
             } catch (FullPotException $e) {

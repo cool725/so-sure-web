@@ -388,13 +388,13 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertFalse(
             $policy->isPotCompletelyFilled(),
-            sprintf("%s =? %s", $policy->getMaxPot(), $policy->getPotValue()
-        ));
+            sprintf("%s =? %s", $policy->getMaxPot(), $policy->getPotValue())
+        );
         $policy->setPotValue($policy->getMaxPot());
         $this->assertTrue(
             $policy->isPotCompletelyFilled(),
-            sprintf("%s =? %s", $policy->getMaxPot(), $policy->getPotValue()
-        ));
+            sprintf("%s =? %s", $policy->getMaxPot(), $policy->getPotValue())
+        );
     }
 
     public function testConnectionValues()

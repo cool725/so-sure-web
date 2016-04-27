@@ -89,6 +89,6 @@ class Sns
 
     public function addOthers($key, $value)
     {
-        $this->others[$key] = $others;
+        $this->others[$key] = $value;
     }
 }

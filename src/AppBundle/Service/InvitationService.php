@@ -313,7 +313,7 @@ class InvitationService
 
         $inviterPolicy = $invitation->getPolicy();
         if ($inviterPolicy->isPotCompletelyFilled()) {
-            throw new \Exception('Inviters pot is full and cannot send invitation');
+            throw new FullPotException('Inviters pot is full and cannot send invitation');
         }
 
         if ($invitation instanceof EmailInvitation) {

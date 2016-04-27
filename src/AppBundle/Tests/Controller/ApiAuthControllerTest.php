@@ -838,7 +838,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'email' => self::generateEmail('invitation-notself', $this),
             'name' => 'Invitation Name',
         ]);
-        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UNKNOWN);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
     }
 
     // policy/{id}/terms
