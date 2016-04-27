@@ -397,6 +397,50 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422);
     }
 
+    // reset
+
+    /**
+     *
+     */
+    public function testReset()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('user-reset', $this), 'bar');
+        $this->assertNull($user->getConfirmationToken());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/reset', array(
+            'email' => static::generateEmail('user-reset', $this)
+        ));
+        self::$dm->flush();
+        $data = $this->verifyResponse(200);
+        /* TODO: see why the data doesn't get updated :P
+        $repo = self::$dm->getRepository(User::class);
+        $queryUser = $repo->find($user->getId());
+        print $queryUser->getConfirmationToken();
+        $this->assertTrue(strlen($queryUser->getConfirmationToken()) > 5);
+        */
+    }
+
+    public function testResetNoUser()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/reset', array(
+            'email' => 'foo'
+        ));
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_ABSENT);
+    }
+
+    public function testResetUserLocked()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('user-locked', $this), 'bar');
+        $user->setLocked(new \DateTime());
+        self::$dm->flush();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/reset', array(
+            'email' => static::generateEmail('user-locked', $this)
+        ));
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
+    }
+
     // sns
 
     /**

@@ -291,6 +291,65 @@ class ApiController extends BaseController
     }
 
     /**
+     * @Route("/reset", name="api_reset")
+     * @Method({"POST"})
+     */
+    public function resetAction(Request $request)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['email'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+            $email = strtolower($data['email']);
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->findOneBy(['emailCanonical' => $email]);
+            if (!$user) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_ABSENT,
+                    'Unable to locate user',
+                    422
+                );
+            }
+
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_RESET,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
+
+            if ($user->isLocked()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_SUSPENDED,
+                    'User account is suspended - contact us',
+                    422
+                );
+            }
+
+            if (null === $user->getConfirmationToken()) {
+                /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
+                $tokenGenerator = $this->get('fos_user.util.token_generator');
+                $user->setConfirmationToken($tokenGenerator->generateToken());
+            }
+
+            $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
+            $user->setPasswordRequestedAt(new \DateTime());
+            $this->get('fos_user.user_manager')->updateUser($user);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Reset password email sent', 200);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api referralAction. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/sns", name="api_sns")
      * @Method({"POST"})
      */

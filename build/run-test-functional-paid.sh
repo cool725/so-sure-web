@@ -22,7 +22,6 @@ app/console --env=test doctrine:mongodb:fixtures:load
 app/console --env=test sosure:doctrine:index
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
 if [ "$1" == "" ]; then
-  ./vendor/phing/phing/bin/phing -f build/test.xml test:functional
   ./vendor/phing/phing/bin/phing -f build/test.xml test:functional:paid
 else
   ./build/phpunit.sh --filter $1 --bootstrap vendor/autoload.php src/AppBundle/    

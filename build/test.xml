@@ -42,7 +42,7 @@
        </phpunit>
     </target>
 
-    <target name="test:functional:nonet" description="Run functional tests for payed services">
+    <target name="test:functional:paid" description="Run functional tests for payed services">
         <phpunit configuration="${dir.app}/phpunit.xml.dist"
         haltonfailure="true" haltonerror="true" groups="functional-paid">
           <formatter type="plain" usefile="false"/>
