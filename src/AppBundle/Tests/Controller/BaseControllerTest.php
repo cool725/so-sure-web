@@ -38,7 +38,7 @@ class BaseControllerTest extends WebTestCase
      */
     protected function getUnauthIdentity()
     {
-        return static::getIdentityString(self::$identity->getId());
+        return self::$identity->getId();
     }
 
     protected function getAuthUser($user)

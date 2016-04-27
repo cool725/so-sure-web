@@ -131,8 +131,8 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
 
     public function testGetCognitoIdentityId()
     {
-        $identity = static::getIdentityString("eu-west-1:85376078-5f1f-43b8-8529-9021bb2096a4");
-        $body = json_encode(["body" => [], "identity" => $identity]);
+        $identity = "eu-west-1:85376078-5f1f-43b8-8529-9021bb2096a4";
+        $body = json_encode(["body" => [], "cognitoIdentityId" => $identity, "sourceIp" => "62.253.24.189"]);
         $cognitoIdentityId = self::$auth->getCognitoIdentityId($body);
 
         $this->assertEquals("eu-west-1:85376078-5f1f-43b8-8529-9021bb2096a4", $cognitoIdentityId);
@@ -140,8 +140,8 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
 
     public function testGetCognitoIdentityIp()
     {
-        $identity = static::getIdentityString("eu-west-1:85376078-5f1f-43b8-8529-9021bb2096a4");
-        $body = json_encode(["body" => [], "identity" => $identity]);
+        $identity = "eu-west-1:85376078-5f1f-43b8-8529-9021bb2096a4";
+        $body = json_encode(["body" => [], "cognitoIdentityId" => $identity, "sourceIp" => "62.253.24.189"]);
         $ip = self::$auth->getCognitoIdentityIp($body);
 
         $this->assertEquals("62.253.24.189", $ip);
@@ -155,10 +155,7 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
     private function getRequest($cognitoIdentityId, $path = "/", $method = "GET")
     {
         $request = new Request();
-        // @codingStandardsIgnoreStart
-        $identity = sprintf('{cognitoIdentityPoolId=eu-west-1:e80351d5-1068-462e-9702-3c9f642507f5, accountId=812402538357, cognitoIdentityId=%s, caller=AROAIOCRWVZM5HTY5DI3E:CognitoIdentityCredentials, apiKey=null, sourceIp=62.253.24.189, cognitoAuthenticationType=unauthenticated, cognitoAuthenticationProvider=null, userArn=arn:aws:sts::812402538357:assumed-role/Cognito_sosureUnauth_Role/CognitoIdentityCredentials, userAgent=aws-sdk-iOS/2.3.5 iPhone-OS/9.2.1 en_GB, user=AROAIOCRWVZM5HTY5DI3E:CognitoIdentityCredentials}"', $cognitoIdentityId);
-        // @codingStandardsIgnoreEnd
-        $body = json_encode(["body" => [], "identity" => $identity]);
+        $body = json_encode(["body" => [], "cognitoIdentityId" => $cognitoIdentityId, "sourceIp" => "62.253.24.189"]);
         $request = Request::create(
             $path,
             $method,

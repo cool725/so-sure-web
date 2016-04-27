@@ -72,16 +72,7 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
     protected function parseIdentity($requestContent)
     {
         try {
-            $data = json_decode($requestContent, true);
-
-            $str = $data['identity'];
-            $str = str_replace(',', '&', $str);
-            $str = str_replace('{', '', $str);
-            $str = str_replace('}', '', $str);
-            $str = str_replace(' ', '', $str);
-            parse_str($str, $identity);
-            
-            return $identity;
+            return json_decode($requestContent, true);
         } catch (\Exception $e) {
             return null;
         }
