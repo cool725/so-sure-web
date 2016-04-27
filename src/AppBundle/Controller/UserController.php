@@ -43,6 +43,8 @@ class UserController extends BaseController
      */
     public function fbAction()
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         $facebook = $this->get('app.facebook');
         $facebook->init($this->getUser());
         if ($redirect = $this->ensureFacebookPermission(
@@ -70,6 +72,8 @@ class UserController extends BaseController
      */
     public function postAction($id)
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         $facebook = $this->get('app.facebook');
         $facebook->init($this->getUser());
         $facebook->postToFeed(
@@ -87,6 +91,8 @@ class UserController extends BaseController
      */
     public function trustAction($id)
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         $facebook = $this->get('app.facebook');
         $fb = $facebook->init($this->getUser());
         $fbNamespace = $this->getParameter('fb_og_namespace');

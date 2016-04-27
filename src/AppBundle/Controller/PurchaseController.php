@@ -24,6 +24,8 @@ class PurchaseController extends BaseController
      */
     public function indexAction()
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         $phone = $this->getSessionPhone();
         if (!$phone) {
             return $this->redirectToRoute('quote');
@@ -52,6 +54,8 @@ class PurchaseController extends BaseController
      */
     public function purchaseDdItemAction(Request $request)
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         $phone = $this->getSessionPhone();
         if (!$phone) {
             return $this->redirectToRoute('quote');
@@ -79,6 +83,8 @@ class PurchaseController extends BaseController
      */
     public function purchaseDdItemAddressAction(Request $request)
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         $phone = $this->getSessionPhone();
         if (!$phone) {
             return $this->redirectToRoute('quote');
@@ -114,6 +120,8 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPayReceiveSuccessAction(Request $request)
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         $policy = $this->get('app.judopay')->paymentSuccess(
             $request->get('Reference'),
             $request->get('ReceiptId'),
@@ -130,6 +138,8 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPaySuccessAction($id)
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
@@ -149,6 +159,8 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPayFailAction()
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         return array();
     }
 
@@ -158,6 +170,8 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPayAction(Request $request)
     {
+        throw $this->createAccessDeniedException('Coming soon');
+
         $phone = $this->getSessionPhone();
         if (!$phone) {
             return $this->redirectToRoute('quote');

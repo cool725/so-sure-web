@@ -302,12 +302,10 @@ class InvitationService
     public function reinvite(Invitation $invitation)
     {
         if ($invitation->isProcessed()) {
-            print 'processed';
             throw new ProcessedException("Invitation has already been processed");
         }
 
         if (!$invitation->canReinvite()) {
-            print 'rate';
             throw new RateLimitException('Reinvite limit exceeded');
         }
 
