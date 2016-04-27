@@ -512,10 +512,14 @@ class ApiAuthController extends BaseController
                 );
             }
             $this->denyAccessUnlessGranted('view', $policy);
-            $policyTermsUrl = $this->get('router')->generate('policy_terms', [
-                'id' => $policy->getId(),
-                'policy_key' => $this->getParameter('policy_key'),
-            ]);
+            $policyTermsUrl = $this->get('router')->generate(
+                'policy_terms',
+                [
+                    'id' => $policy->getId(),
+                    'policy_key' => $this->getParameter('policy_key'),
+                ],
+                true
+            );
 
             return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));
         } catch (AccessDeniedException $ade) {
