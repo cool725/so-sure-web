@@ -459,7 +459,7 @@ abstract class Policy
 
     public function isPolicy()
     {
-        return $this->getStatus() !== null;
+        return $this->getStatus() !== null && $this->getPremium() !== null;
     }
 
     public function getSentInvitations()
@@ -477,6 +477,14 @@ abstract class Policy
     abstract public function getMaxConnections();
     abstract public function getMaxPot();
     abstract public function getConnectionValue();
+
+    public function isPotCompletelyFilled()
+    {
+        if (!$this->isPolicy()) {
+            throw new \Exception('Not yet a policy - does not make sense to check this now.');
+        }
+        return $this->getPotValue() == $this->getMaxPot();
+    }
 
     public function getConnectionValues()
     {

@@ -298,13 +298,19 @@ class ApiController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            $endpoint = isset($data['endpoint']) ? $data['endpoint'] : null;
-            if (!$endpoint) {
+            if (!$this->validateFields($data, ['endpoint'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing endpoint', 400);
             }
 
+            $endpoint = $data['endpoint'];
+            $platform = isset($data['platform']) ? $data['platform'] : null;
+            $version = isset($data['version']) ? $data['version'] : null;
             $this->snsSubscribe('all', $endpoint);
             $this->snsSubscribe('unregistered', $endpoint);
+            if ($platform) {
+                $this->snsSubscribe($platform, $endpoint);
+                $this->snsSubscribe(sprintf('%s-%s', $platform, $version), $endpoint);
+            }
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Endpoint added', 200);
         } catch (\Exception $e) {
@@ -548,10 +554,15 @@ class ApiController extends BaseController
 
     private function snsSubscribe($topic, $endpoint)
     {
+        $topicArn = $this->getArnForTopic($topic);
+        if (!$topicArn) {
+            return;
+        }
+
         $client = $this->get('aws.sns');
         $result = $client->subscribe(array(
             // TopicArn is required
-            'TopicArn' => $this->getArnForTopic($topic),
+            'TopicArn' => $topicArn,
             // Protocol is required
             'Protocol' => 'application',
             'Endpoint' => $endpoint,
@@ -576,6 +587,8 @@ class ApiController extends BaseController
             case 'unregistered':
                 $sns->setUnregistered($subscriptionArn);
                 break;
+            default:
+                $sns->addOthers($topic, $subscriptionArn);
         }
 
         $dm->flush();

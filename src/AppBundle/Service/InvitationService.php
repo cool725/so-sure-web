@@ -12,6 +12,11 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
+use AppBundle\Exception\FullPotException;
+use AppBundle\Exception\DuplicateInvitationException;
+use AppBundle\Exception\OptOutException;
+use AppBundle\Exception\InvalidPolicyException;
+use AppBundle\Exception\SelfInviteException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -102,10 +107,14 @@ class InvitationService
 
     public function email(Policy $policy, $email, $name = null)
     {
+        if (!$policy->isPolicy()) {
+            throw new InvalidPolicyException('Policy must be pending/active before inviting');
+        }
+
         $invitationRepo = $this->dm->getRepository(EmailInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $email);
         if (count($prevInvitations) > 0) {
-            throw new \InvalidArgumentException('Email was already invited to this policy');
+            throw new DuplicateInvitationException('Email was already invited to this policy');
         }
 
         $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
@@ -115,7 +124,11 @@ class InvitationService
         }
 
         if ($policy->getUser()->getEmailCanonical() == strtolower($email)) {
-            throw new \Exception('User can not invite themself');
+            throw new SelfInviteException('User can not invite themself');
+        }
+
+        if ($policy->isPotCompletelyFilled()) {
+            throw new FullPotException('User pot is full and cannot invite anyone else');
         }
 
         $invitation = new EmailInvitation();
@@ -137,10 +150,14 @@ class InvitationService
 
     public function sms(Policy $policy, $mobile, $name = null)
     {
+        if (!$policy->isPolicy()) {
+            throw new InvalidPolicyException('Policy must be pending/active before inviting');
+        }
+
         $invitationRepo = $this->dm->getRepository(SmsInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $mobile);
         if (count($prevInvitations) > 0) {
-            throw new \InvalidArgumentException('Mobile was already invited to this policy');
+            throw new DuplicateInvitationException('Mobile was already invited to this policy');
         }
 
         $optOutRepo = $this->dm->getRepository(SmsOptOut::class);
@@ -150,7 +167,11 @@ class InvitationService
         }
 
         if ($policy->getUser()->getMobileNumber() == $mobile) {
-            throw new \Exception('User can not invite themself');
+            throw new SelfInviteException('User can not invite themself');
+        }
+
+        if ($policy->isPotCompletelyFilled()) {
+            throw new FullPotException('User pot is full and cannot invite anyone else');
         }
 
         $invitation = new SmsInvitation();
@@ -176,7 +197,7 @@ class InvitationService
      *
      * @param EmailInvitation $invitation
      */
-    public function sendEmail(EmailInvitation $invitation)
+    protected function sendEmail(EmailInvitation $invitation)
     {
         $message = \Swift_Message::newInstance()
             ->setSubject(sprintf('%s has invited you to so-sure', $invitation->getInviter()->getName()))
@@ -210,7 +231,7 @@ class InvitationService
      *
      * @param SmsInvitation $invitation
      */
-    public function sendSms(SmsInvitation $invitation)
+    protected function sendSms(SmsInvitation $invitation)
     {
         $message = $this->templating->render('AppBundle:Sms:invitation.txt.twig', ['invitation' => $invitation]);
         if (!$this->debug) {
@@ -229,6 +250,9 @@ class InvitationService
         }
 
         $inviterPolicy = $invitation->getPolicy();
+        if ($inviterPolicy->isPotCompletelyFilled()) {
+            throw new \Exception('Inviters pot is full and cannot connect');
+        }
 
         $connectionInviter = new Connection();
         $connectionInviter->setUser($invitation->getInviter());
@@ -285,6 +309,11 @@ class InvitationService
         if (!$invitation->canReinvite()) {
             print 'rate';
             throw new RateLimitException('Reinvite limit exceeded');
+        }
+
+        $inviterPolicy = $invitation->getPolicy();
+        if ($inviterPolicy->isPotCompletelyFilled()) {
+            throw new \Exception('Inviters pot is full and cannot send invitation');
         }
 
         if ($invitation instanceof EmailInvitation) {

@@ -49,13 +49,16 @@ trait UserClassTrait
         return sprintf('+4477009%.05d', rand(1, 99999));
     }
     
-    public static function createPolicy(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm)
+    public static function createPolicy(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm, $phone = null)
     {
         self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->setUser($user);
         $policy->setImei(self::generateRandomImei());
         $policy->create(rand(1, 999999));
+        if ($phone) {
+            $policy->setPhone($phone);
+        }
 
         $dm->persist($policy);
         $dm->flush();

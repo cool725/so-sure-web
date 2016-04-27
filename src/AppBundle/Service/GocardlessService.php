@@ -70,7 +70,10 @@ class GocardlessService
     public function createCustomer(User $user, $accountFirstName, $accountLastName, $idempotent = true)
     {
         if (!$user->hasValidGocardlessDetails()) {
-            throw new \InvalidArgumentException('User is missing details such as name or billing address');
+            throw new \InvalidArgumentException(sprintf(
+                'User is missing details such as name or billing address (User: %s)',
+                $user->getId()
+            ));
         }
 
         if ($user->hasGocardless() && $user->getGocardless()->getCustomerId()) {
@@ -129,7 +132,10 @@ class GocardlessService
     public function addBankAccount(User $user, $sortCode, $accountNumber, $idempotent = true)
     {
         if (!$user->hasGocardless() || !$user->getGocardless()->getCustomerId()) {
-            throw new \InvalidArgumentException('User requires a gocardless customer account');
+            throw new \InvalidArgumentException(sprintf(
+                'User requires a gocardless customer account (User: %s)',
+                $user->getId()
+            ));
         }
 
         // For now, only allow 1 account
@@ -176,7 +182,10 @@ class GocardlessService
     {
         $user = $policy->getUser();
         if (!$user->hasGocardless() || !$user->getGocardless()->hasPrimaryAccount()) {
-            throw new \InvalidArgumentException('Mandate requires a gocardless customer bank account');
+            throw new \InvalidArgumentException(sprintf(
+                'Mandate requires a gocardless customer bank account (Policy: %s)',
+                $policy->getId()
+            ));
         }
 
         // For now, only allow 1 mandate
@@ -222,7 +231,10 @@ class GocardlessService
     {
         $user = $policy->getUser();
         if (!$policy->getGocardlessMandate()) {
-            throw new \InvalidArgumentException('Subscription requires a gocardless mandate');
+            throw new \InvalidArgumentException(sprintf(
+                'Subscription requires a gocardless mandate (Policy: %s)',
+                $policy->getId()
+            ));
         }
 
         // For now, only allow 1 subscription

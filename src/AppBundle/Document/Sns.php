@@ -29,6 +29,9 @@ class Sns
     /** @MongoDB\Field(type="string") */
     protected $registered;
 
+    /** @MongoDB\Field(type="collection", name="others") */
+    protected $others = array();
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -77,5 +80,15 @@ class Sns
     public function setRegistered($registered)
     {
         $this->registered = $registered;
+    }
+
+    public function getOthers()
+    {
+        return $this->others;
+    }
+
+    public function addOthers($key, $value)
+    {
+        $this->others[$key] = $others;
     }
 }
