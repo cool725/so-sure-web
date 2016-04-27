@@ -259,6 +259,7 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $this->assertTrue(strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
+        $this->assertGreaterThan(0, $data['monthly_premium']);
 
         // Now make sure that the policy shows up against the user
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());

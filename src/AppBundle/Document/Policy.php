@@ -527,6 +527,7 @@ abstract class Policy
             'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ISO8601) : null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ISO8601) : null,
             'policy_number' => $this->getPolicyNumber(),
+            'monthly_premium' => $this->getPremium()->getMonthlyPremiumPrice(),
             'policy_terms_id' => $this->getPolicyTerms() ? $this->getPolicyTerms()->getId() : null,
             'pot' => [
                 'connections' => count($this->getConnections()),
