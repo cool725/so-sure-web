@@ -129,6 +129,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new PhonePolicy();
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPhone(self::$phone);
         $this->assertEquals(PhonePolicy::RISK_HIGH, $policyA->getRisk(new \DateTime("2016-01-10")));
     }
 
@@ -137,6 +138,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new PhonePolicy();
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPhone(self::$phone);
         $this->assertEquals(PhonePolicy::RISK_MEDIUM, $policyA->getRisk(new \DateTime("2016-02-10")));
     }
 
@@ -347,6 +349,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setCreated(new \DateTime('2017-01-01'));
         $this->assertFalse($user->isPreLaunchUser());
         $policy->setUser($user);
+        $policy->setPhone(static::$phone);
         // Policy status is null
         $this->assertEquals(0, $policy->getConnectionValue());
 
@@ -370,6 +373,30 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
     }
 
+    public function testPotFilled()
+    {
+        $user = new User();
+        self::addAddress($user);
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        // Make sure user isn't a prelaunch user
+        $user->setCreated(new \DateTime('2017-01-01'));
+        $this->assertFalse($user->isPreLaunchUser());
+        $policy->setUser($user);
+        $policy->setPhone(static::$phone);
+        $policy->create(rand(1, 999999));
+
+        $this->assertFalse(
+            $policy->isPotCompletelyFilled(),
+            sprintf("%s =? %s", $policy->getMaxPot(), $policy->getPotValue())
+        );
+        $policy->setPotValue($policy->getMaxPot());
+        $this->assertTrue(
+            $policy->isPotCompletelyFilled(),
+            sprintf("%s =? %s", $policy->getMaxPot(), $policy->getPotValue())
+        );
+    }
+
     public function testConnectionValues()
     {
         $user = new User();
@@ -379,6 +406,7 @@ class PhonePolicyTest extends WebTestCase
         // Most tests should be against non-prelaunch users
         $user->setCreated(new \DateTime('2017-01-01'));
         $policy->setUser($user);
+        $policy->setPhone(static::$phone);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         $policy->setStart(new \DateTime('2016-01-01'));
         $foundHighValue = false;

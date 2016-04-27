@@ -264,6 +264,17 @@ class User extends BaseUser
         return false;
     }
 
+    public function hasPolicy()
+    {
+        foreach ($this->getPolicies() as $policy) {
+            if ($policy->getStatus() != null) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function addSentInvitation(Invitation $invitation)
     {
         $invitation->setInviter($this);

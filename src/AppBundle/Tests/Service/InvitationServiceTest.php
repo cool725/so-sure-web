@@ -69,7 +69,7 @@ class InvitationServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException AppBundle\Exception\DuplicateInvitationException
      */
     public function testDuplicateEmailInvitation()
     {
@@ -78,7 +78,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user1', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
         $invitation = self::$invitationService->email($policy, static::generateEmail('invite1', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
 
@@ -92,7 +92,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user2', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $optOut = new EmailOptOut();
         $optOut->setEmail(static::generateEmail('invite2', $this));
@@ -111,7 +111,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user3', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $optOut = new EmailOptOut();
         $optOut->setEmail(static::generateEmail('invite3', $this));
@@ -130,14 +130,14 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user4', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $invitation = self::$invitationService->email($policy, static::generateEmail('invite4', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException AppBundle\Exception\DuplicateInvitationException
      */
     public function testDuplicateSmsInvitation()
     {
@@ -146,7 +146,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('smsuser1', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
         $invitation = self::$invitationService->sms($policy, '1123');
         $this->assertTrue($invitation instanceof SmsInvitation);
 
@@ -160,7 +160,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('smsuser2', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $optOut = new SmsOptOut();
         $optOut->setMobile('11234');
@@ -179,7 +179,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('smsuser3', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $optOut = new SmsOptOut();
         $optOut->setMobile('112345');
@@ -198,7 +198,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('smsuser4', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $invitation = self::$invitationService->sms($policy, '1123456');
         $this->assertTrue($invitation instanceof SmsInvitation);
@@ -211,7 +211,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user5', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -238,7 +238,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-processed', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -262,7 +262,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-ratelimit', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -282,7 +282,9 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user6', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $this->assertTrue($policy->isPolicy());
+
         $invitation = self::$invitationService->email($policy, static::generateEmail('invite6', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
         self::$invitationService->cancel($invitation);
@@ -297,7 +299,9 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user7', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $this->assertTrue($policy->isPolicy());
+
         $invitation = self::$invitationService->email($policy, static::generateEmail('invite7', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
         self::$invitationService->reject($invitation);
@@ -312,16 +316,15 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user8', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
-        $policy->setPhone(static::$phone);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $userInvitee = static::createUser(
             static::$userManager,
             static::generateEmail('invite8', $this),
             'bar'
         );
-        $policyInvitee = static::createPolicy($userInvitee, static::$dm);
-        $policyInvitee->setPhone(static::$phone);
+        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+
         $invitation = self::$invitationService->email($policy, static::generateEmail('invite8', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
         self::$invitationService->accept($invitation, $policyInvitee);
@@ -332,7 +335,7 @@ class InvitationServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException AppBundle\Exception\SelfInviteException
      */
     public function testEmailInvitationSelf()
     {
@@ -341,14 +344,30 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user9', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
-        $policy->setPhone(static::$phone);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $invitation = self::$invitationService->email($policy, static::generateEmail('user9', $this));
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException AppBundle\Exception\FullPotException
+     */
+    public function testEmailInvitationPotFilled()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-maxpot', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $this->assertTrue($policy->isPolicy());
+        $policy->setPotValue($policy->getMaxPot());
+
+        $invitation = self::$invitationService->email($policy, static::generateEmail('invite-maxpot', $this));
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\SelfInviteException
      */
     public function testMobileInvitationSelf()
     {
@@ -358,8 +377,7 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         $user->setMobileNumber('+447700900001');
-        $policy = static::createPolicy($user, static::$dm);
-        $policy->setPhone(static::$phone);
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $invitation = self::$invitationService->sms($policy, '+447700900001');
     }

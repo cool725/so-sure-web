@@ -22,6 +22,11 @@ use AppBundle\Document\Invitation\Invitation;
 
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
+use AppBundle\Exception\SelfInviteException;
+use AppBundle\Exception\FullPotException;
+use AppBundle\Exception\DuplicateInvitationException;
+use AppBundle\Exception\InvalidPolicyException;
+use AppBundle\Exception\OptOutException;
 
 use AppBundle\Service\RateLimitService;
 use AppBundle\Security\UserVoter;
@@ -197,6 +202,15 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
                     'User must have firstname/lastname, email & mobile number present before policy can be created',
+                    422
+                );
+            }
+
+            // We'll probably want to change this in the future, but for now, a user can only create 1 policy
+            if ($user->hasPolicy()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_POLICY_LIMIT,
+                    'User can only have 1 policy',
                     422
                 );
             }
@@ -435,19 +449,35 @@ class ApiAuthController extends BaseController
                     );
                 }
 
-                if (!$invitation) {
-                    return $this->getErrorJsonResponse(
-                        ApiErrorCode::ERROR_INVITATION_OPTOUT,
-                        'Person has opted out of invitations',
-                        422
-                    );
-                }
-
                 return new JsonResponse($invitation->toApiArray());
-            } catch (\InvalidArgumentException $argEx) {
+            } catch (DuplicateInvitationException $e) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_INVITATION_DUPLICATE,
                     'Duplicate invitation',
+                    422
+                );
+            } catch (OptOutException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_OPTOUT,
+                    'Person has opted out of invitations',
+                    422
+                );
+            } catch (InvalidPolicyException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
+                    'Policy not yet been paid',
+                    422
+                );
+            } catch (SelfInviteException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_SELF_INVITATION,
+                    'User can not invite themself',
+                    422
+                );
+            } catch (FullPotException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_LIMIT,
+                    'User has a full pot',
                     422
                 );
             } catch (\Exception $e) {

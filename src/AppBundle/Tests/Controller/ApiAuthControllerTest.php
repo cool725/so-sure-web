@@ -111,9 +111,16 @@ class ApiAuthControllerTest extends BaseControllerTest
      */
     public function testInvitationCancel()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-cancel', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -129,9 +136,16 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testInvitationUnknown()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-unknown', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -147,9 +161,16 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testInvitationMissingActionAction()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-missing', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -165,9 +186,16 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testInvitationReinviteAction()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-reinvite', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -212,7 +240,6 @@ class ApiAuthControllerTest extends BaseControllerTest
      */
     public function testNewPolicy()
     {
-
         $this->clearRateLimit();
         $user = self::createUser(self::$userManager, self::generateEmail('policy', $this), 'foo', true);
         self::addAddress($user);
@@ -327,8 +354,30 @@ class ApiAuthControllerTest extends BaseControllerTest
     public function testNewPolicyRateLimited()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_POLICY] + 1; $i++) {
-            $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser, false);
+        $limit = RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_POLICY]  *
+            RateLimitService::IP_ADDRESS_MULTIPLIER;
+        for ($i = 1; $i <= $limit + 1; $i++) {
+            $user = self::createUser(
+                self::$userManager,
+                self::generateEmail('rate-limit-email-' + $i, $this),
+                'foo'
+            );
+            $cognitoIdentityId = $this->getAuthUser($user);
+            $this->updateUserDetails($cognitoIdentityId, $user);
+            $imei = self::generateRandomImei();
+            $crawler = static::postRequest(
+                self::$client,
+                $cognitoIdentityId,
+                '/api/v1/auth/policy',
+                ['phone_policy' => [
+                    'imei' => $imei,
+                    'make' => 'OnePlus',
+                    'device' => 'A0001',
+                    'memory' => 65,
+                    'rooted' => false,
+                    'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+                ]]
+            );
         }
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
@@ -336,7 +385,15 @@ class ApiAuthControllerTest extends BaseControllerTest
     public function testNewPolicyInvalidUser()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser2);
-        $crawler = $this->generatePolicy($cognitoIdentityId, null);
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'OnePlus',
+            'device' => 'A0001',
+            'memory' => 65,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+        ]]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS);
     }
 
@@ -644,10 +701,17 @@ class ApiAuthControllerTest extends BaseControllerTest
      */
     public function testNewEmailAndDupInvitation()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
-        $data = $this->verifyResponse(200);
-        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-email', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => 'patrick@so-sure.com',
@@ -667,10 +731,17 @@ class ApiAuthControllerTest extends BaseControllerTest
      */
     public function testNewSmsAndDupInvitation()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
-        $data = $this->verifyResponse(200);
-        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-sms', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'mobile' => '+447700900002',
@@ -687,10 +758,17 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testSentInvitationAppears()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
-        $data = $this->verifyResponse(200);
-        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('sent-invitation', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => $this->generateEmail('invite-appears', $this),
@@ -698,7 +776,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $this->verifyResponse(200);
 
-        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $data['id']);
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $policyData['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $policyData = $this->verifyResponse(200);
         $this->assertTrue(count($policyData['sent_invitations']) > 0);
@@ -716,6 +794,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $cognitoIdentityId = $this->getAuthUser(self::$testUser2);
         $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser2);
         $data = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $data['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         //print sprintf("Invite from %s to %s", self::$testUser2->getName(), self::$testUser->getName());
@@ -742,17 +822,23 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testUnableToInviteSelf()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
-        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-notself', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'email' => self::$testUser->getEmail(),
+            'email' => self::generateEmail('invitation-notself', $this),
             'name' => 'Invitation Name',
         ]);
-        $data = $this->verifyResponse(500);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
     }
 
     // policy/{id}/terms
@@ -762,8 +848,13 @@ class ApiAuthControllerTest extends BaseControllerTest
      */
     public function testGetPolicyTerms()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-terms', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $createData = $this->verifyResponse(200);
         $policyId = $createData['id'];
 
@@ -988,22 +1079,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     protected function generatePolicy($cognitoIdentityId, $user, $clearRateLimit = true)
     {
         if ($user) {
-            $userUpdateUrl = sprintf('/api/v1/auth/user/%s', $user->getId());
-            static::putRequest(self::$client, $cognitoIdentityId, $userUpdateUrl, [
-                'first_name' => 'foo',
-                'last_name' => 'bar',
-                'mobile_number' => '+447700900000',
-            ]);
-
-            $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
-            $data = [
-                'type' => 'billing',
-                'line1' => 'address line 1',
-                'city' => 'London',
-                'postcode' => 'BX11LT',
-            ];
-            $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
-            $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
+            $this->updateUserDetails($cognitoIdentityId, $user);
         }
 
         if ($clearRateLimit) {
@@ -1018,7 +1094,42 @@ class ApiAuthControllerTest extends BaseControllerTest
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
+        $this->verifyResponse(200);
 
         return $crawler;
+    }
+
+    protected function updateUserDetails($cognitoIdentityId, $user)
+    {
+        $userUpdateUrl = sprintf('/api/v1/auth/user/%s', $user->getId());
+        static::putRequest(self::$client, $cognitoIdentityId, $userUpdateUrl, [
+            'first_name' => 'foo',
+            'last_name' => 'bar',
+            'mobile_number' => '+447700900000',
+        ]);
+
+        $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'city' => 'London',
+            'postcode' => 'BX11LT',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->verifyResponse(200);
+    }
+
+    protected function payPolicy($cognitoIdentityId, $policyId)
+    {
+        $url = sprintf("/api/v1/auth/policy/%s/dd", $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'sort_code' => '200000',
+            'account_number' => '55779911',
+            'first_name' => 'foo',
+            'last_name' => 'bar',
+        ]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
+        $this->assertEquals($policyId, $policyData['id']);
     }
 }
