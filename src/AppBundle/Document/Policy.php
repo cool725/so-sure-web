@@ -466,6 +466,10 @@ abstract class Policy
     {
         $userId = $this->getUser() ? $this->getUser()->getId() : null;
         return array_filter($this->getInvitationsAsArray(), function ($invitation) use ($userId) {
+            if ($invitation->isProcessed()) {
+                return false;
+            }
+
             if ($inviter = $invitation->getInviter()) {
                 return $inviter->getId() == $userId;
             }
