@@ -682,6 +682,25 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals([-0.13,51.5], $fooUser->getSignupLoc()->coordinates);
     }
     
+    public function testUserCreateCampaign()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('create-campaign', $this),
+            'campaign' => 'foo',
+        ));
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(strtolower(static::generateEmail('create-campaign', $this)), $data['email']);
+
+        $repo = self::$dm->getRepository(User::class);
+        $fooUser = $repo->findOneBy([
+            'emailCanonical' => strtolower(static::generateEmail('create-campaign', $this))
+        ]);
+        $this->assertTrue($fooUser !== null);
+        $this->assertEquals('foo', $fooUser->getCampaign());
+    }
+
     public function testUserWithMobileCreate()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();

@@ -112,6 +112,11 @@ class User extends BaseUser
     /** @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user") */
     protected $policies;
 
+    /**
+     * @MongoDB\String(name="campaign")
+     */
+    protected $campaign;
+
     public function __construct()
     {
         parent::__construct();
@@ -458,6 +463,16 @@ class User extends BaseUser
     public function setMobileNumber($mobile)
     {
         $this->mobileNumber = $this->normalizeUkMobile($mobile);
+    }
+
+    public function getCampaign()
+    {
+        return $this->campaign;
+    }
+
+    public function setCampaign($campaign)
+    {
+        $this->campaign = $campaign;
     }
 
     public function isPreLaunchUser($launchDate = null)
