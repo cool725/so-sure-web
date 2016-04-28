@@ -30,6 +30,11 @@ class SmsInvitation extends Invitation
         return 2;
     }
 
+    public function getInvitationDetail()
+    {
+        return $this->getMobile();
+    }
+
     public function getMobile()
     {
         return $this->mobile;

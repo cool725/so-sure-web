@@ -22,6 +22,12 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 class InvitationService
 {
+    const TYPE_EMAIL_ACCEPT = 'accept';
+    const TYPE_EMAIL_REJECT = 'reject';
+    const TYPE_EMAIL_CANCEL = 'cancel';
+    const TYPE_EMAIL_INVITE = 'invite';
+    const TYPE_EMAIL_REINVITE = 'reinvite';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -105,7 +111,7 @@ class InvitationService
         return $invitationUrl;
     }
 
-    public function email(Policy $policy, $email, $name = null)
+    public function inviteByEmail(Policy $policy, $email, $name = null)
     {
         if (!$policy->isPolicy()) {
             throw new InvalidPolicyException('Policy must be pending/active before inviting');
@@ -143,12 +149,12 @@ class InvitationService
         $invitation->setLink($link);
         $this->dm->flush();
 
-        $this->sendEmail($invitation);
+        $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
 
         return $invitation;
     }
 
-    public function sms(Policy $policy, $mobile, $name = null)
+    public function inviteBySms(Policy $policy, $mobile, $name = null)
     {
         if (!$policy->isPolicy()) {
             throw new InvalidPolicyException('Policy must be pending/active before inviting');
@@ -197,32 +203,60 @@ class InvitationService
      *
      * @param EmailInvitation $invitation
      */
-    protected function sendEmail(EmailInvitation $invitation)
+    protected function sendEmail(EmailInvitation $invitation, $type)
     {
+        if ($this->debug) {
+            return;
+        }
+
+        $to = null;
+        $subject = null;
+        $htmlTemplate = sprintf('AppBundle:Email:invitation/%s.html.twig', $type);
+        $textTemplate = sprintf('AppBundle:Email:invitation/%s.txt.twig', $type);
+        if ($type == self::TYPE_EMAIL_ACCEPT) {
+            $to = $invitation->getInviter()->getEmail();
+            $subject = sprintf('%s has accepted your invitation to so-sure', $invitation->getInviteeName());
+        } elseif ($type == self::TYPE_EMAIL_CANCEL) {
+            $to = $invitation->getEmail();
+            $subject = sprintf('Sorry, %s has cancelled your invitation to so-sure', $invitation->getInviterName());
+        } elseif ($type == self::TYPE_EMAIL_INVITE) {
+            $to = $invitation->getEmail();
+            $subject = sprintf('%s has invited you to so-sure', $invitation->getInviterName());
+        } elseif ($type == self::TYPE_EMAIL_REINVITE) {
+            $to = $invitation->getEmail();
+            $subject = sprintf('%s has re-invited you to so-sure', $invitation->getInviterName());
+        } elseif ($type == self::TYPE_EMAIL_REJECT) {
+            $to = $invitation->getInviter()->getEmail();
+            $subject = sprintf(
+                'Sorry, %s is not interested in your invitation to so-sure',
+                $invitation->getInviteeName()
+            );
+        } else {
+            throw new \InvalidArgumentException(sprintf('Unknown type %s', $type));
+        }
+
         $message = \Swift_Message::newInstance()
-            ->setSubject(sprintf('%s has invited you to so-sure', $invitation->getInviter()->getName()))
+            ->setSubject($subject)
             ->setFrom('hello@so-sure.com')
-            ->setTo($invitation->getEmail())
+            ->setTo($to)
             ->setBody(
-                $this->templating->render('AppBundle:Email:invitation.html.twig', ['invitation' => $invitation]),
+                $this->templating->render($htmlTemplate, ['invitation' => $invitation]),
                 'text/html'
             )
             ->addPart(
-                $this->templating->render('AppBundle:Email:invitation.txt.twig', ['invitation' => $invitation]),
+                $this->templating->render($textTemplate, ['invitation' => $invitation]),
                 'text/plain'
             );
-        if (!$this->debug) {
-            try {
-                $this->mailer->send($message);
-                $invitation->setStatus(EmailInvitation::STATUS_SENT);
-            } catch (\Exception $e) {
-                $invitation->setStatus(EmailInvitation::STATUS_FAILED);
-                $this->logger->error(sprintf(
-                    'Failed sending invite to %s Ex: %s',
-                    $invitation->getEmail(),
-                    $e->getMessage()
-                ));
-            }
+        try {
+            $this->mailer->send($message);
+            $invitation->setStatus(EmailInvitation::STATUS_SENT);
+        } catch (\Exception $e) {
+            $invitation->setStatus(EmailInvitation::STATUS_FAILED);
+            $this->logger->error(sprintf(
+                'Failed sending invite to %s Ex: %s',
+                $invitation->getEmail(),
+                $e->getMessage()
+            ));
         }
     }
 
@@ -274,7 +308,8 @@ class InvitationService
         // TODO: ensure transaction state for this one....
         $this->dm->flush();
 
-        // TODO: notify inviter (push? email?)
+        // Notify inviter of acceptance
+        $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
     }
 
     public function reject(Invitation $invitation)
@@ -285,7 +320,9 @@ class InvitationService
 
         $invitation->setRejected(new \DateTime());
         $this->dm->flush();
-        // TODO: notify inviter
+
+        // Notify inviter of rejection
+        $this->sendEmail($invitation, self::TYPE_EMAIL_REJECT);
     }
 
     public function cancel(Invitation $invitation)
@@ -296,7 +333,9 @@ class InvitationService
 
         $invitation->setCancelled(new \DateTime());
         $this->dm->flush();
-        // TODO: notify invitee??
+
+        // Notify invitee of cancellation
+        $this->sendEmail($invitation, self::TYPE_EMAIL_CANCEL);
     }
 
     public function reinvite(Invitation $invitation)
@@ -315,7 +354,8 @@ class InvitationService
         }
 
         if ($invitation instanceof EmailInvitation) {
-            $this->sendEmail($invitation);
+            // Send reinvitation
+            $this->sendEmail($invitation, self::TYPE_EMAIL_REINVITE);
             $invitation->reinvite();
             $this->dm->flush();
         } elseif ($invitation instanceof SmsInvitation) {
