@@ -46,7 +46,12 @@ trait UserClassTrait
 
     public static function generateRandomMobile()
     {
-        return sprintf('+4477009%.05d', rand(1, 99999));
+        $mobile = sprintf('+4477009%05d', rand(1, 99999));
+        if (strlen($mobile) != 13) {
+            throw new \Exception('Random mobile is not the right length');
+        }
+
+        return $mobile;
     }
     
     public static function createPolicy(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm, $phone = null)

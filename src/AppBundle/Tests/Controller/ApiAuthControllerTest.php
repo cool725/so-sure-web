@@ -1020,6 +1020,29 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    public function testUpdateUserEmailExists()
+    {
+        $originalUser = self::createUser(
+            self::$userManager,
+            self::generateEmail('update-user-email-exists', $this),
+            'foo'
+        );
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('update-user-email-new', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf('/api/v1/auth/user/%s', $user->getId());
+        $data = [
+            'email' => self::generateEmail('update-user-email-exists', $this),
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_EXISTS);
+    }
+
     // user/{id}/address
 
     /**
@@ -1107,8 +1130,9 @@ class ApiAuthControllerTest extends BaseControllerTest
         static::putRequest(self::$client, $cognitoIdentityId, $userUpdateUrl, [
             'first_name' => 'foo',
             'last_name' => 'bar',
-            'mobile_number' => '+447700900000',
+            'mobile_number' => static::generateRandomMobile(),
         ]);
+        $this->verifyResponse(200);
 
         $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
         $data = [

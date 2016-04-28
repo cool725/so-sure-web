@@ -618,10 +618,11 @@ class ApiAuthController extends BaseController
             }
 
             $this->denyAccessUnlessGranted('edit', $user);
+            $data = json_decode($request->getContent(), true)['body'];
 
-            $email = isset($data['email']) ? $data['email'] : null;
-            $facebookId = isset($data['facebook_id']) ? $data['facebook_id'] : null;
-            $mobileNumber = isset($data['mobile_number']) ? $data['mobile_number'] : null;
+            $email = isset($data['email']) ? trim($data['email']) : null;
+            $facebookId = isset($data['facebook_id']) ? trim($data['facebook_id']) : null;
+            $mobileNumber = isset($data['mobile_number']) ? trim($data['mobile_number']) : null;
             $userExists = $repo->existsAnotherUser($user, $email, $facebookId, $mobileNumber);
             if ($userExists) {
                 return $this->getErrorJsonResponse(
@@ -631,17 +632,15 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $data = json_decode($request->getContent(), true)['body'];
             $userChanged = false;
-
-            if (isset($data['mobile_number']) && strlen($data['mobile_number']) > 0) {
-                $user->setMobileNumber($data['mobile_number']);
+            if (strlen($mobileNumber) > 0) {
+                $user->setMobileNumber($mobileNumber);
                 $userChanged = true;
             }
 
-            if (isset($data['email']) && strlen($data['email']) > 0) {
+            if (strlen($email) > 0) {
                 // TODO: Send email to both old & new email addresses
-                $user->setEmail($data['email']);
+                $user->setEmail($email);
                 $userChanged = true;
             }
             if (isset($data['first_name']) && strlen($data['first_name']) > 0) {

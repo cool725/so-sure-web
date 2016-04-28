@@ -30,9 +30,16 @@ class UserRepository extends DocumentRepository
 
     public function existsAnotherUser(User $user, $email = null, $facebookId = null, $mobileNumber = null)
     {
+        // If there's nothing to query, then another user doesn't exist
+        if (!$email && !$facebookId && !$mobileNumber) {
+            return false;
+        }
+
         $qb = $this->createQueryBuilder();
-        $qb->addAnd($qb->expr()->field('id')->notEqual($user->getId()));
-        $qb->addOr($qb->expr()->field('emailCanonical')->equals(strtolower($email)));
+        $qb->field('id')->notEqual($user->getId());
+        if ($email) {
+            $qb->addOr($qb->expr()->field('emailCanonical')->equals(strtolower($email)));
+        }
         if ($facebookId) {
             $qb->addOr($qb->expr()->field('facebookId')->equals(trim($facebookId)));
         }
