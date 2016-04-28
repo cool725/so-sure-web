@@ -201,9 +201,9 @@ class InvitationService
     /**
      * Send an invitation email
      *
-     * @param EmailInvitation $invitation
+     * @param Invitation $invitation Invitation and not EmailInvitation as SmsInvitations can be accepted, etc
      */
-    protected function sendEmail(EmailInvitation $invitation, $type)
+    protected function sendEmail(Invitation $invitation, $type)
     {
         if ($this->debug) {
             return;
