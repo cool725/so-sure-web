@@ -70,7 +70,7 @@ class PhonePolicy extends Policy
         }
 
         if ($this->isPolicyWithin60Days($date)) {
-            if ($this->getUser()->isPreLaunchUser() || $this->getPromoCode() == self::PROMO_LAUNCH) {
+            if ($this->getUser()->isPreLaunch() || $this->getPromoCode() == self::PROMO_LAUNCH) {
                 return 15;
             } else {
                 return 10;
@@ -101,7 +101,7 @@ class PhonePolicy extends Policy
             throw new \Exception('Policy is missing a user');
         }
 
-        if ($this->getUser()->isPreLaunchUser() || $this->getPromoCode() == self::PROMO_LAUNCH) {
+        if ($this->getUser()->isPreLaunch() || $this->getPromoCode() == self::PROMO_LAUNCH) {
             // 100% of policy
             return $this->getPremium()->getYearlyPremiumPrice();
         } else {

@@ -492,6 +492,19 @@ class ApiController extends BaseController
             $mobileNumber = isset($data['mobile_number']) ? $data['mobile_number'] : null;
             $userExists = $repo->existsUser($data['email'], $facebookId, $mobileNumber);
             if ($userExists) {
+                // Special case for prelaunch users - allow them to 'create' an account without
+                // being recreated in account in the db.  This is only allowed once per user
+                // and is only because the prelaunch app didn't do anything other than record email address
+                $user = $repo->findOneBy(['emailCanonical' => strtolower($data['email'])]);
+                if ($user && $user->isPreLaunch() && !$user->getLastLogin() && count($user->getPolicies()) == 0) {
+                    $user->resetToken();
+                    $user->setLastLogin(new \DateTime());
+                    $dm->flush();
+                    list($identityId, $token) = $this->getCognitoIdToken($user, $request);
+
+                    return new JsonResponse($user->toApiArray($identityId, $token));
+                }
+
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_EXISTS,
                     'User already exists',

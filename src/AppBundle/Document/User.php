@@ -112,6 +112,9 @@ class User extends BaseUser
     /** @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user") */
     protected $policies;
 
+    /** @MongoDB\Field(type="boolean", nullable=true) */
+    protected $preLaunch = false;
+
     /**
      * @MongoDB\String(name="campaign")
      */
@@ -126,6 +129,11 @@ class User extends BaseUser
         $this->receivedInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->policies = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = new \DateTime();
+        $this->resetToken();
+    }
+
+    public function resetToken()
+    {
         $this->token = bin2hex(openssl_random_pseudo_bytes(64));
     }
 
@@ -475,18 +483,14 @@ class User extends BaseUser
         $this->campaign = $campaign;
     }
 
-    public function isPreLaunchUser($launchDate = null)
+    public function isPreLaunch()
     {
-        if (!$launchDate) {
-            // TODO: Make sure we adjust based on launch date
-            $launchDate = new \DateTime('2016-05-09');
-        }
+        return $this->preLaunch;
+    }
 
-        if ($this->created < $launchDate) {
-            return true;
-        } else {
-            return false;
-        }
+    public function setPreLaunch($preLaunch)
+    {
+        $this->preLaunch = $preLaunch;
     }
 
     public function hasValidDetails()
