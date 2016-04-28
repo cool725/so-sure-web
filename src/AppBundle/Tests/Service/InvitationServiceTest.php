@@ -245,7 +245,10 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invite-processed', $this),
             'bar'
         );
-        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite-processed', $this));
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-processed', $this)
+        );
         $this->assertTrue($invitation instanceof EmailInvitation);
 
         $invitation->setAccepted(new \DateTime());
@@ -269,7 +272,10 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invite-ratelimit', $this),
             'bar'
         );
-        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite-ratelimit', $this));
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-ratelimit', $this)
+        );
         $this->assertTrue($invitation instanceof EmailInvitation);
 
         self::$invitationService->reinvite($invitation);

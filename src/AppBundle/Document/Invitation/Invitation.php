@@ -271,12 +271,21 @@ abstract class Invitation
         }
     }
 
+    public function getInviterName()
+    {
+        if ($this->getInviter()) {
+            return $this->getInviter()->getName();
+        } else {
+            return null;
+        }
+    }
+
     public function toApiArray($debug = false)
     {
         $data = [
             'id' => $this->getId(),
             'name' => $this->getName() ? $this->getName() : null,
-            'inviter_name' => $this->getInviter() ? $this->getInviter()->getName() : null,
+            'inviter_name' => $this->getInviterName(),
             'channel' => $this->getChannel(),
             'link' => $this->getLink(),
             'status' => $this->getStatus(),
@@ -290,7 +299,7 @@ abstract class Invitation
             $data = array_merge($data, [
                 'inviter_id' => $this->getInviter() ? $this->getInviter()->getId() : null,
                 'invitee_id' => $this->getInvitee() ? $this->getInvitee()->getId() : null,
-                'invitee_name' => $this->getInvitee() ? $this->getInvitee()->getName() : null,
+                'invitee_name' => $this->getInviteeName(),
             ]);
         }
 

@@ -215,19 +215,22 @@ class InvitationService
         $textTemplate = sprintf('AppBundle:Email:invitation/%s.txt.twig', $type);
         if ($type == self::TYPE_EMAIL_ACCEPT) {
             $to = $invitation->getInviter()->getEmail();
-            $subject = sprintf('%s has accepted your invitation to so-sure', $invitation->getInvitee()->getName());
+            $subject = sprintf('%s has accepted your invitation to so-sure', $invitation->getInviteeName());
         } elseif ($type == self::TYPE_EMAIL_CANCEL) {
             $to = $invitation->getEmail();
-            $subject = sprintf('Sorry, %s has cancelled your invitation to so-sure', $invitation->getInviter()->getName());
+            $subject = sprintf('Sorry, %s has cancelled your invitation to so-sure', $invitation->getInviterName());
         } elseif ($type == self::TYPE_EMAIL_INVITE) {
             $to = $invitation->getEmail();
-            $subject = sprintf('%s has invited you to so-sure', $invitation->getInviter()->getName());
+            $subject = sprintf('%s has invited you to so-sure', $invitation->getInviterName());
         } elseif ($type == self::TYPE_EMAIL_REINVITE) {
             $to = $invitation->getEmail();
-            $subject = sprintf('%s has re-invited you to so-sure', $invitation->getInviter()->getName());
+            $subject = sprintf('%s has re-invited you to so-sure', $invitation->getInviterName());
         } elseif ($type == self::TYPE_EMAIL_REJECT) {
             $to = $invitation->getInviter()->getEmail();
-            $subject = sprintf('Sorry, %s is not interested in your invitation to so-sure', $invitation->getInvitee()->getName());
+            $subject = sprintf(
+                'Sorry, %s is not interested in your invitation to so-sure',
+                $invitation->getInviteeName()
+            );
         } else {
             throw new \InvalidArgumentException(sprintf('Unknown type %s', $type));
         }
