@@ -63,6 +63,7 @@ abstract class Invitation
     abstract public function isSingleUse();
     abstract public function getChannel();
     abstract public function getMaxReinvitations();
+    abstract public function getInvitationDetail();
 
     public function __construct()
     {
@@ -257,6 +258,17 @@ abstract class Invitation
     public function isProcessed()
     {
         return $this->isAccepted() || $this->isRejected() || $this->isCancelled();
+    }
+
+    public function getInviteeName()
+    {
+        if ($this->getInvitee()) {
+            return $this->getInvitee()->getName();
+        } elseif ($this->getName()) {
+            return $this->getName();
+        } else {
+            return $this->getInvitationDetail();
+        }
     }
 
     public function toApiArray($debug = false)

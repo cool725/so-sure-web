@@ -27,6 +27,11 @@ class EmailInvitation extends Invitation
         return 5;
     }
 
+    public function getInvitationDetail()
+    {
+        return $this->getEmail();
+    }
+
     public function getEmail()
     {
         return $this->email;

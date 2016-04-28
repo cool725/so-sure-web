@@ -437,9 +437,9 @@ class ApiAuthController extends BaseController
             try {
                 $invitation  = null;
                 if ($email) {
-                    $invitation = $invitationService->email($policy, $email, $name);
+                    $invitation = $invitationService->inviteByEmail($policy, $email, $name);
                 } elseif ($mobile) {
-                    $invitation = $invitationService->sms($policy, $mobile, $name);
+                    $invitation = $invitationService->inviteBySms($policy, $mobile, $name);
                 } else {
                     // TODO: General
                     return $this->getErrorJsonResponse(
