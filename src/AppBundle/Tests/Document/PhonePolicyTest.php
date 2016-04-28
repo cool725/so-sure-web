@@ -347,7 +347,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setUser($user);
         // Make sure user isn't a prelaunch user
         $user->setCreated(new \DateTime('2017-01-01'));
-        $this->assertFalse($user->isPreLaunchUser());
+        $this->assertFalse($user->isPreLaunch());
         $policy->setUser($user);
         $policy->setPhone(static::$phone);
         // Policy status is null
@@ -368,7 +368,8 @@ class PhonePolicyTest extends WebTestCase
         // PreLaunch User Policy
         $policy->setPromoCode(null);
         $user->setCreated(new \DateTime('2016-01-01'));
-        $this->assertTrue($user->isPreLaunchUser());
+        $user->setPreLaunch(true);
+        $this->assertTrue($user->isPreLaunch());
         $this->assertEquals(15, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
         $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
     }
@@ -381,7 +382,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setUser($user);
         // Make sure user isn't a prelaunch user
         $user->setCreated(new \DateTime('2017-01-01'));
-        $this->assertFalse($user->isPreLaunchUser());
+        $this->assertFalse($user->isPreLaunch());
         $policy->setUser($user);
         $policy->setPhone(static::$phone);
         $policy->create(rand(1, 999999));

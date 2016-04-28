@@ -701,6 +701,72 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals('foo', $fooUser->getCampaign());
     }
 
+    public function testPreLaunchUserCanOverwrite()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('create-prelaunch', $this),
+        ));
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(strtolower(static::generateEmail('create-prelaunch', $this)), $data['email']);
+        $token = $data['user_token']['token'];
+
+        $repo = self::$dm->getRepository(User::class);
+        $user = $repo->findOneBy([
+            'emailCanonical' => strtolower(static::generateEmail('create-prelaunch', $this))
+        ]);
+        $this->assertTrue($user !== null);
+        $this->assertNull($user->getLastLogin());
+
+        $user->setPreLaunch(true);
+        self::$dm->flush();
+
+        // now duplicate the create
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('create-prelaunch', $this),
+        ));
+        $data = $this->verifyResponse(200);
+        // Token should have changed
+        $this->assertNotEquals($token, $data['user_token']['token']);
+
+        $userUpdated = $repo->findOneBy([
+            'emailCanonical' => strtolower(static::generateEmail('create-prelaunch', $this))
+        ]);
+        $this->assertTrue($userUpdated !== null);
+        // TODO: Another case where getting the user doesn't have an updated value, but is correct in the db
+        // $this->assertNotNull($userUpdated->getLastLogin());
+    }
+
+    public function testPreLaunchUserLoggedInWillNotOverwrite()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('create-prelaunch-loggedin', $this),
+        ));
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(strtolower(static::generateEmail('create-prelaunch-loggedin', $this)), $data['email']);
+        $token = $data['user_token']['token'];
+
+        $repo = self::$dm->getRepository(User::class);
+        $user = $repo->findOneBy([
+            'emailCanonical' => strtolower(static::generateEmail('create-prelaunch-loggedin', $this))
+        ]);
+        $this->assertTrue($user !== null);
+        $this->assertNull($user->getLastLogin());
+
+        $user->setLastLogin(new \DateTime());
+        $user->setPreLaunch(true);
+        self::$dm->flush();
+
+        // now duplicate the create
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('create-prelaunch', $this),
+        ));
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_EXISTS);
+    }
+
     public function testUserWithMobileCreate()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
@@ -767,8 +833,8 @@ class ApiControllerTest extends BaseControllerTest
         $cognitoIdentityId = $this->getUnauthIdentity();
 
         $extension = rand(1, 99999);
-        $ukMobile = sprintf('07700 9%.05d', $extension);
-        $normalizedMobile = sprintf('+4477009%.05d', $extension);
+        $ukMobile = sprintf('07700 9%05d', $extension);
+        $normalizedMobile = sprintf('+4477009%05d', $extension);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => static::generateEmail('uk-mobile', $this),
