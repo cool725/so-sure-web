@@ -24,7 +24,7 @@ trait UserClassTrait
         $user->setCreated(new \DateTime('2017-01-01'));
 
         if ($phone) {
-            $user->setMobileNumber(self::getRandomMobile());
+            $user->setMobileNumber(self::generateRandomMobile());
             $user->setFirstName('foo');
             $user->setLastName('bar');
         }
@@ -44,9 +44,14 @@ trait UserClassTrait
         $user->addAddress($address);
     }
 
-    public static function getRandomMobile()
+    public static function generateRandomMobile()
     {
-        return sprintf('+4477009%.05d', rand(1, 99999));
+        $mobile = sprintf('+4477009%05d', rand(1, 99999));
+        if (strlen($mobile) != 13) {
+            throw new \Exception('Random mobile is not the right length');
+        }
+
+        return $mobile;
     }
     
     public static function createPolicy(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm, $phone = null)

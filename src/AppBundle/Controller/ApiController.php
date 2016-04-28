@@ -489,7 +489,8 @@ class ApiController extends BaseController
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $facebookId = isset($data['facebook_id']) ? $data['facebook_id'] : null;
-            $userExists = $repo->existsUser($data['email'], $facebookId);
+            $mobileNumber = isset($data['mobile_number']) ? $data['mobile_number'] : null;
+            $userExists = $repo->existsUser($data['email'], $facebookId, $mobileNumber);
             if ($userExists) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_EXISTS,
@@ -510,7 +511,7 @@ class ApiController extends BaseController
                 isset($data['facebook_access_token']) ? $data['facebook_access_token'] : null
             );
             $user->setSnsEndpoint(isset($data['sns_endpoint']) ? $data['sns_endpoint'] : null);
-            $user->setMobileNumber(isset($data['mobile_number']) ? $data['mobile_number'] : null);
+            $user->setMobileNumber($mobileNumber);
             $user->setCampaign(isset($data['campaign']) ? $data['campaign'] : null);
 
             // NOTE: not completely secure, but as we're only using for an indication, it's good enough
