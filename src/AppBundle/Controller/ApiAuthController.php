@@ -619,6 +619,18 @@ class ApiAuthController extends BaseController
 
             $this->denyAccessUnlessGranted('edit', $user);
 
+            $email = isset($data['email']) ? $data['email'] : null;
+            $facebookId = isset($data['facebook_id']) ? $data['facebook_id'] : null;
+            $mobileNumber = isset($data['mobile_number']) ? $data['mobile_number'] : null;
+            $userExists = $repo->existsAnotherUser($user, $email, $facebookId, $mobileNumber);
+            if ($userExists) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_EXISTS,
+                    'Another user exists with those details',
+                    422
+                );
+            }
+
             $data = json_decode($request->getContent(), true)['body'];
             $userChanged = false;
 

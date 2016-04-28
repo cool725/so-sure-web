@@ -705,13 +705,32 @@ class ApiControllerTest extends BaseControllerTest
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
 
+        $mobile = static::generateRandomMobile();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
-            'email' => 'api-new-user-mobile@api.bar.com',
-            'mobile_number' => '+447700900000'
+            'email' => static::generateEmail('api-new-user-mobile', $this),
+            'mobile_number' => $mobile
         ));
         $data = $this->verifyResponse(200);
-        $this->assertEquals('api-new-user-mobile@api.bar.com', $data['email']);
-        $this->assertEquals('+447700900000', $data['mobile_number']);
+        $this->assertEquals(strtolower(static::generateEmail('api-new-user-mobile', $this)), $data['email']);
+        $this->assertEquals($mobile, $data['mobile_number']);
+    }
+
+    public function testUserCreateWithDupMobile()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $mobile = static::generateRandomMobile();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('user-create-dup-mobile', $this),
+            'mobile_number' => $mobile
+        ));
+        $data = $this->verifyResponse(200);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('user-create-dup-mobile2', $this),
+            'mobile_number' => $mobile
+        ));
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_EXISTS);
     }
 
     public function testUserNoEmail()
@@ -747,12 +766,16 @@ class ApiControllerTest extends BaseControllerTest
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
 
+        $extension = rand(1, 99999);
+        $ukMobile = sprintf('07700 9%.05d', $extension);
+        $normalizedMobile = sprintf('+4477009%.05d', $extension);
+
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => static::generateEmail('uk-mobile', $this),
-            'mobile_number' => '07700 900000'
+            'mobile_number' => $ukMobile,
         ));
         $data = $this->verifyResponse(200);
-        $this->assertEquals('+447700900000', $data['mobile_number']);
+        $this->assertEquals($normalizedMobile, $data['mobile_number']);
     }
 
     // version
