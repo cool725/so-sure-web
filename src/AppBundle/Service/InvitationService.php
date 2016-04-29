@@ -351,6 +351,7 @@ class InvitationService
             $this->sendEmail($invitation, self::TYPE_EMAIL_CANCEL);
         } else {
             // TODO: SMS Cancellation
+            \AppBundle\Classes\NoOp::noOp([null]);
         }
     }
 
