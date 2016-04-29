@@ -27,6 +27,7 @@ use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\OptOutException;
+use AppBundle\Exception\ClaimException;
 
 use AppBundle\Service\RateLimitService;
 use AppBundle\Security\UserVoter;
