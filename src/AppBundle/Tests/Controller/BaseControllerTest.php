@@ -41,6 +41,12 @@ class BaseControllerTest extends WebTestCase
         return self::$identity->getId();
     }
 
+    protected function getNewDocumentManager()
+    {
+        $client = self::createClient();
+        return $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+    }
+
     protected function getAuthUser($user)
     {
         return static::authUser(self::$identity, $user);
