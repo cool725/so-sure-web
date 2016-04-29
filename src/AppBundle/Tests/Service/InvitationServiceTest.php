@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -373,6 +374,25 @@ class InvitationServiceTest extends WebTestCase
     }
 
     /**
+     * @expectedException AppBundle\Exception\ClaimException
+     */
+    public function testEmailInvitationClaims()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-claims', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $this->assertTrue($policy->isPolicy());
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
+
+        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite-claims', $this));
+    }
+
+    /**
      * @expectedException AppBundle\Exception\SelfInviteException
      */
     public function testMobileInvitationSelf()
@@ -386,5 +406,69 @@ class InvitationServiceTest extends WebTestCase
         $policy = static::createPolicy($user, static::$dm, static::$phone);
 
         $invitation = self::$invitationService->inviteBySms($policy, '+447700900001');
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\FullPotException
+     */
+    public function testAcceptPotFilled()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-accept-fullpot', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $this->assertTrue($policy->isPolicy());
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-accept-maxpot', $this),
+            'bar'
+        );
+        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-accept-maxpot', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        $policy->setPotValue($policy->getMaxPot());
+
+        self::$invitationService->accept($invitation, $policyInvitee);
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\ClaimException
+     */
+    public function testAcceptClaims()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-accept-claims', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $this->assertTrue($policy->isPolicy());
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-accept-claims', $this),
+            'bar'
+        );
+        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-accept-claims', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
+
+        self::$invitationService->accept($invitation, $policyInvitee);
     }
 }

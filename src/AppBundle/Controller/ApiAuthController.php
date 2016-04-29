@@ -149,6 +149,18 @@ class ApiAuthController extends BaseController
                 'Invitation already processed',
                 422
             );
+        } catch (FullPotException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_LIMIT,
+                'User has a full pot',
+                422
+            );
+        } catch (ClaimException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
+                'User has previously claimed',
+                422
+            );
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api processInvitation. %s', $e->getMessage()));
 
@@ -478,6 +490,12 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_INVITATION_LIMIT,
                     'User has a full pot',
+                    422
+                );
+            } catch (ClaimException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
+                    'User has previously claimed',
                     422
                 );
             } catch (\Exception $e) {
