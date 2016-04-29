@@ -238,105 +238,146 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(0, $policy->calculatePotValue());
     }
 
-    public function testCalculatePotValueOneConnection()
+    protected function createUserPolicy()
     {
         $user = new User();
         self::addAddress($user);
-        $policyA = new PhonePolicy();
-        $policyA->setUser($user);
-        $connection = new Connection();
-        $connection->setValue(10);
-        $policyA->addConnection($connection);
+
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+
+        return $policy;
+    }
+
+    protected function createLinkedConnections($policyA, $policyB, $valueA, $valueB)
+    {
+        $connectionA = new Connection();
+        $connectionA->setValue($valueA);
+        $connectionA->setUser($policyB->getUser());
+        $connectionA->setPolicy($policyB);
+        $policyA->addConnection($connectionA);
+
+        $connectionB = new Connection();
+        $connectionB->setValue($valueB);
+        $connectionB->setUser($policyA->getUser());
+        $connectionB->setPolicy($policyA);
+        $policyB->addConnection($connectionB);
+
+        return [$connectionA, $connectionB];
+    }
+
+    public function testCalculatePotValueOneConnection()
+    {
+        $policyA = $this->createUserPolicy();
+        $policyB = $this->createUserPolicy();
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
         $this->assertEquals(10, $policyA->calculatePotValue());
     }
 
-    public function testCalculatePotValueOneOldOneNewConnection()
+    public function testCalculatePotValueOneInitialOnePostCliffConnection()
     {
-        $user = new User();
-        self::addAddress($user);
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
-        $connectionOld = new Connection();
-        $connectionOld->setValue(10);
-        $policy->addConnection($connectionOld);
-        $connectionNew = new Connection();
-        $connectionNew->setValue(2);
-        $policy->addConnection($connectionNew);
-        $this->assertEquals(12, $policy->calculatePotValue());
+        $policyA = $this->createUserPolicy();
+        $policyB = $this->createUserPolicy();
+        list($connectionInitialA, $connectionInitialB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+        list($connectionPostCliffA, $connectionPostCliffB) = $this->createLinkedConnections($policyA, $policyB, 2, 2);
+
+        $this->assertEquals(12, $policyA->calculatePotValue());
     }
 
-    public function testCalculatePotValueOneValidClaimFiveConnections()
+    public function testCalculatePotValueOneValidNetworkClaimThirtyPot()
     {
-        $user = new User();
-        self::addAddress($user);
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
-        for ($i = 1; $i <= 5; $i++) {
-            $connection = new Connection();
-            $connection->setValue(10);
-            $policy->addConnection($connection);
+        $policy = $this->createUserPolicy();
+
+        $linkedPolicies = [];
+        for ($i = 1; $i <= 3; $i++) {
+            $linkedPolicy = $this->createUserPolicy();
+            list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
+            $linkedPolicies[] = $linkedPolicy;
         }
+        $this->assertEquals(30, $policy->calculatePotValue());
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
-        $policy->addClaim($claim);
+        $linkedPolicies[0]->addClaim($claim);
+        $this->assertEquals(0, $policy->calculatePotValue());
+    }
+
+    public function testCalculatePotValueOneValidNetworkClaimFourtyPot()
+    {
+        $policy = $this->createUserPolicy();
+
+        $linkedPolicies = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $linkedPolicy = $this->createUserPolicy();
+            list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
+            $linkedPolicies[] = $linkedPolicy;
+        }
+        $this->assertEquals(40, $policy->calculatePotValue());
+
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $linkedPolicies[0]->addClaim($claim);
         $this->assertEquals(10, $policy->calculatePotValue());
     }
 
     public function testCalculatePotValueOneValidClaimFourtyPot()
     {
-        $user = new User();
-        self::addAddress($user);
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
-        for ($i = 1; $i <= 20; $i++) {
-            $connection = new Connection();
-            $connection->setValue(2);
-            $policy->addConnection($connection);
+        $policy = $this->createUserPolicy();
+
+        $linkedPolicies = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $linkedPolicy = $this->createUserPolicy();
+            list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
+            $linkedPolicies[] = $linkedPolicy;
         }
+        $this->assertEquals(40, $policy->calculatePotValue());
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
-        $this->assertEquals(10, $policy->calculatePotValue());
+        $this->assertEquals(0, $policy->calculatePotValue());
     }
 
-    public function testCalculatePotValueTwoValidClaimsFiveConnections()
+    public function testCalculatePotValueTwoValidNetworkClaimFourtyPot()
     {
-        $user = new User();
-        self::addAddress($user);
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
-        for ($i = 1; $i <= 5; $i++) {
-            $connection = new Connection();
-            $connection->setValue(10);
-            $policy->addConnection($connection);
-        }
+        $policy = $this->createUserPolicy();
 
-        for ($i = 1; $i <= 2; $i++) {
-            $claim = new Claim();
-            $claim->setType(Claim::TYPE_LOSS);
-            $policy->addClaim($claim);
+        $linkedPolicies = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $linkedPolicy = $this->createUserPolicy();
+            list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
+            $linkedPolicies[] = $linkedPolicy;
         }
-        $this->assertEquals(00, $policy->calculatePotValue());
+        $this->assertEquals(40, $policy->calculatePotValue());
+
+        $claimA = new Claim();
+        $claimA->setType(Claim::TYPE_LOSS);
+        $linkedPolicies[0]->addClaim($claimA);
+
+        $claimB = new Claim();
+        $claimB->setType(Claim::TYPE_LOSS);
+        $linkedPolicies[1]->addClaim($claimB);
+
+        $this->assertEquals(0, $policy->calculatePotValue());
     }
 
-    public function testCalculatePotValueOneInvalidClaimFiveConnections()
+    public function testCalculatePotValueOneInvalidNetworkClaimFourtyPot()
     {
-        $user = new User();
-        self::addAddress($user);
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
-        for ($i = 1; $i <= 5; $i++) {
-            $connection = new Connection();
-            $connection->setValue(10);
-            $policy->addConnection($connection);
+        $policy = $this->createUserPolicy();
+
+        $linkedPolicies = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $linkedPolicy = $this->createUserPolicy();
+            list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
+            $linkedPolicies[] = $linkedPolicy;
         }
+        $this->assertEquals(40, $policy->calculatePotValue());
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_WITHDRAWN);
-        $policy->addClaim($claim);
-        $this->assertEquals(50, $policy->calculatePotValue());
+        $linkedPolicies[0]->addClaim($claim);
+        $this->assertEquals(40, $policy->calculatePotValue());
     }
 
     public function testConnectionValue()

@@ -68,17 +68,27 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
     private function newPolicy($manager, $users)
     {
-        $user = new User();
-        $user->setEmail(sprintf('policy@policy.so-sure.net'));
-        $user->setFirstName(sprintf('first'));
-        $user->setLastName(sprintf('last'));
+        $userA = new User();
+        $userA->setEmail(sprintf('policyA@policy.so-sure.net'));
+        $userA->setFirstName(sprintf('firstA'));
+        $userA->setLastName(sprintf('lastA'));
+
+        $userB = new User();
+        $userB->setEmail(sprintf('policyB@policy.so-sure.net'));
+        $userB->setFirstName(sprintf('firstB'));
+        $userB->setLastName(sprintf('lastB'));
+
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
         $address->setLine1('123 Policy');
         $address->setCity('London');
         $address->setPostcode('BX11LT');
-        $user->addAddress($address);
-        $manager->persist($user);
+
+        $userA->addAddress($address);
+        $manager->persist($userA);
+
+        $userB->addAddress($address);
+        $manager->persist($userB);
 
         $phoneRepo = $manager->getRepository(Phone::class);
         $phone = $phoneRepo->findOneBy(['model' => 'iPhone 5', 'memory' => 64]);
@@ -88,23 +98,42 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         //\Doctrine\Common\Util\Debug::dump($phone);
         //\Doctrine\Common\Util\Debug::dump($phone->getPhonePrices());
         //\Doctrine\Common\Util\Debug::dump($phone->getCurrentPhonePrice());
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
-        $policy->setPhone($phone);
-        $policy->create(-5000);
+        $policyA = new PhonePolicy();
+        $policyA->setUser($userA);
+        $policyA->setPhone($phone);
+        $policyA->create(-5000);
+
+        $policyB = new PhonePolicy();
+        $policyB->setUser($userB);
+        $policyB->setPhone($phone);
+        $policyB->create(-4999);
 
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
-        $policy->setPolicyTerms($latestTerms);
+        $policyA->setPolicyTerms($latestTerms);
+        $policyB->setPolicyTerms($latestTerms);
 
-        $connection = new Connection();
-        $connection->setUser($users[0]);
-        $connection->setValue(10);
-        $policy->addConnection($connection);
-        $policy->updatePotValue();
-        $manager->persist($connection);
+        $connectionA = new Connection();
+        $connectionA->setUser($userB);
+        $connectionA->setPolicy($policyB);
+        $connectionA->setValue(10);
+
+        $connectionB = new Connection();
+        $connectionB->setUser($userA);
+        $connectionB->setPolicy($policyA);
+        $connectionB->setValue(10);
+
+        $policyA->addConnection($connectionA);
+        $policyA->updatePotValue();
+
+        $policyB->addConnection($connectionB);
+        $policyB->updatePotValue();
+
+        $manager->persist($connectionA);
+        $manager->persist($connectionB);
         //\Doctrine\Common\Util\Debug::dump($policy);
-        $manager->persist($policy);
+        $manager->persist($policyA);
+        $manager->persist($policyB);
     }
 }
