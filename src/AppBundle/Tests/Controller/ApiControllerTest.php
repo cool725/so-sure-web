@@ -415,7 +415,6 @@ class ApiControllerTest extends BaseControllerTest
         // New DM required as some type of caching is occurring
         $repo = $this->getNewDocumentManager()->getRepository(User::class);
         $queryUser = $repo->find($user->getId());
-        print $queryUser->getConfirmationToken();
         $this->assertTrue(strlen($queryUser->getConfirmationToken()) > 5);
     }
 
