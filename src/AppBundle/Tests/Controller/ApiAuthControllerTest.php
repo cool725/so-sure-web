@@ -340,7 +340,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'action' => 'accept',
             'policy_id' => $inviteePolicyData['id']
         ]);
-        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_LIMIT);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_MAXPOT);
     }
 
     // ping / auth
