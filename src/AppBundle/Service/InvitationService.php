@@ -217,12 +217,24 @@ class InvitationService
             $to = $invitation->getInviter()->getEmail();
             $subject = sprintf('%s has accepted your invitation to so-sure', $invitation->getInviteeName());
         } elseif ($type == self::TYPE_EMAIL_CANCEL) {
+            // Only able to do for EmailInvitations
+            if (!$invitation instanceof EmailInvitation) {
+                return;
+            }
             $to = $invitation->getEmail();
             $subject = sprintf('Sorry, %s has cancelled your invitation to so-sure', $invitation->getInviterName());
         } elseif ($type == self::TYPE_EMAIL_INVITE) {
+            // Only able to do for EmailInvitations
+            if (!$invitation instanceof EmailInvitation) {
+                return;
+            }
             $to = $invitation->getEmail();
             $subject = sprintf('%s has invited you to so-sure', $invitation->getInviterName());
         } elseif ($type == self::TYPE_EMAIL_REINVITE) {
+            // Only able to do for EmailInvitations
+            if (!$invitation instanceof EmailInvitation) {
+                return;
+            }
             $to = $invitation->getEmail();
             $subject = sprintf('%s has re-invited you to so-sure', $invitation->getInviterName());
         } elseif ($type == self::TYPE_EMAIL_REJECT) {
@@ -335,7 +347,11 @@ class InvitationService
         $this->dm->flush();
 
         // Notify invitee of cancellation
-        $this->sendEmail($invitation, self::TYPE_EMAIL_CANCEL);
+        if ($invitation instanceof EmailInvitation) {
+            $this->sendEmail($invitation, self::TYPE_EMAIL_CANCEL);
+        } else {
+            // TODO: SMS Cancellation
+        }
     }
 
     public function reinvite(Invitation $invitation)
