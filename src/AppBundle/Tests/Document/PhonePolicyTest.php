@@ -562,4 +562,22 @@ class PhonePolicyTest extends WebTestCase
         $policy = new PhonePolicy();
         $this->assertEquals(0.1, $policy->getIptRate(new \DateTime('2016-10-01')));
     }
+
+    public function testHasMonetaryClaimed()
+    {
+        $policy = new PhonePolicy();
+        $this->assertFalse($policy->hasMonetaryClaimed());
+
+        $claimA = new Claim();
+        $claimA->setDate(new \DateTime("2016-01-01"));
+        $claimA->setType(Claim::TYPE_WITHDRAWN);
+        $policy->addClaim($claimA);
+        $this->assertFalse($policy->hasMonetaryClaimed());
+
+        $claimB = new Claim();
+        $claimB->setDate(new \DateTime("2016-01-02"));
+        $claimB->setType(Claim::TYPE_DAMAGE);
+        $policy->addClaim($claimB);
+        $this->assertTrue($policy->hasMonetaryClaimed());
+    }
 }

@@ -27,6 +27,7 @@ use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\OptOutException;
+use AppBundle\Exception\ClaimException;
 
 use AppBundle\Service\RateLimitService;
 use AppBundle\Security\UserVoter;
@@ -147,6 +148,18 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_INVITATION_PREVIOUSLY_PROCESSED,
                 'Invitation already processed',
+                422
+            );
+        } catch (FullPotException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_LIMIT,
+                'User has a full pot',
+                422
+            );
+        } catch (ClaimException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
+                'User has previously claimed',
                 422
             );
         } catch (\Exception $e) {
@@ -478,6 +491,12 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_INVITATION_LIMIT,
                     'User has a full pot',
+                    422
+                );
+            } catch (ClaimException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
+                    'User has previously claimed',
                     422
                 );
             } catch (\Exception $e) {

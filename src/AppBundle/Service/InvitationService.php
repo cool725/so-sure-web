@@ -10,6 +10,8 @@ use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
+
+use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\FullPotException;
@@ -17,6 +19,7 @@ use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\OptOutException;
 use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\SelfInviteException;
+
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -113,9 +116,7 @@ class InvitationService
 
     public function inviteByEmail(Policy $policy, $email, $name = null)
     {
-        if (!$policy->isPolicy()) {
-            throw new InvalidPolicyException('Policy must be pending/active before inviting');
-        }
+        $this->validatePolicy($policy);
 
         $invitationRepo = $this->dm->getRepository(EmailInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $email);
@@ -133,9 +134,7 @@ class InvitationService
             throw new SelfInviteException('User can not invite themself');
         }
 
-        if ($policy->isPotCompletelyFilled()) {
-            throw new FullPotException('User pot is full and cannot invite anyone else');
-        }
+        $this->validatePolicy($policy);
 
         $invitation = new EmailInvitation();
         $invitation->setEmail($email);
@@ -156,9 +155,7 @@ class InvitationService
 
     public function inviteBySms(Policy $policy, $mobile, $name = null)
     {
-        if (!$policy->isPolicy()) {
-            throw new InvalidPolicyException('Policy must be pending/active before inviting');
-        }
+        $this->validatePolicy($policy);
 
         $invitationRepo = $this->dm->getRepository(SmsInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $mobile);
@@ -174,10 +171,6 @@ class InvitationService
 
         if ($policy->getUser()->getMobileNumber() == $mobile) {
             throw new SelfInviteException('User can not invite themself');
-        }
-
-        if ($policy->isPotCompletelyFilled()) {
-            throw new FullPotException('User pot is full and cannot invite anyone else');
         }
 
         $invitation = new SmsInvitation();
@@ -291,6 +284,19 @@ class InvitationService
         }
     }
 
+    protected function validatePolicy(Policy $policy)
+    {
+        if (!$policy->isPolicy()) {
+            throw new InvalidPolicyException('Policy must be pending/active before inviting/connecting');
+        }
+        if ($policy->isPotCompletelyFilled()) {
+            throw new FullPotException('Pot is full and no longer able to invite/connect');
+        }
+        if ($policy->hasMonetaryClaimed()) {
+            throw new ClaimException('Policy has had a monetary claimed and is no longer able to invite/connect');
+        }
+    }
+
     public function accept(Invitation $invitation, Policy $inviteePolicy)
     {
         if ($invitation->isProcessed()) {
@@ -298,9 +304,9 @@ class InvitationService
         }
 
         $inviterPolicy = $invitation->getPolicy();
-        if ($inviterPolicy->isPotCompletelyFilled()) {
-            throw new \Exception('Inviters pot is full and cannot connect');
-        }
+
+        $this->validatePolicy($inviterPolicy);
+        $this->validatePolicy($inviteePolicy);
 
         $connectionInviter = new Connection();
         $connectionInviter->setUser($invitation->getInviter());

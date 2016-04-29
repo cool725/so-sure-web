@@ -391,12 +391,24 @@ abstract class Policy
         return $cliffDate;
     }
 
+    public function hasMonetaryClaimed()
+    {
+        foreach ($this->claims as $claim) {
+            if ($claim->isMonetaryClaim()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function hasClaimedInLast30Days($date = null)
     {
         if ($date == null) {
             $date = new \DateTime();
         }
 
+        // TODO: Adjust this - should ignore non-monitary claims
         if (!$latestClaim = $this->getLatestClaim()) {
             return false;
         }
@@ -429,30 +441,21 @@ abstract class Policy
             $potValue += $connection->getValue();
         }
 
-        $claimCount = 0;
-        foreach ($this->claims as $claim) {
-            if ($claim->isMonetaryClaim()) {
-                $claimCount++;
-            }
-        }
-
         $networkClaimCount = 0;
         foreach ($this->getConnections() as $connection) {
             $policy = $connection->getPolicy();
             if (!$policy) {
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
-            foreach ($policy->getClaims() as $claim) {
-                if ($claim->isMonetaryClaim()) {
-                    $networkClaimCount++;
-                }
+            if ($policy->hasMonetaryClaimed()) {
+                $networkClaimCount++;
             }
         }
 
         // Pot is 0 if you claim
         // Pot is £10 if you don't claim, but there's only 1 claim in your network and your pot is >= £40
         // Pot is 0 if networks claims > 1 or if network claims is 1 and your pot < £40
-        if ($claimCount > 0) {
+        if ($this->hasMonetaryClaimed()) {
             $potValue = 0;
         } elseif ($networkClaimCount == 1 && $potValue >= 40) {
             $potValue = 10;

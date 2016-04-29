@@ -4,6 +4,8 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\Claim;
+use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -210,6 +212,134 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'reinvite']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_LIMIT);
+    }
+
+    public function testInvitationAccept()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-accept-invitee', $this),
+            'foo'
+        );
+        $inviteeCognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($inviteeCognitoIdentityId, $user);
+        $inviteePolicyData = $this->verifyResponse(200);
+        $this->payPolicy($inviteeCognitoIdentityId, $inviteePolicyData['id']);
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-accept', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('user-accept-invitee', $this),
+            'name' => 'invite accept test',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $inviteeCognitoIdentityId, $url, [
+            'action' => 'accept',
+            'policy_id' => $inviteePolicyData['id']
+        ]);
+        $data = $this->verifyResponse(200);
+    }
+
+    public function testInvitationAcceptWithClaims()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-claimaccept-invitee', $this),
+            'foo'
+        );
+        $inviteeCognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($inviteeCognitoIdentityId, $user);
+        $inviteePolicyData = $this->verifyResponse(200);
+        $this->payPolicy($inviteeCognitoIdentityId, $inviteePolicyData['id']);
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-claimaccept', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('user-claimaccept-invitee', $this),
+            'name' => 'invite claimaccept test',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        // Add claim to policy
+        $policyRepo = self::$dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyData['id']);
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_THEFT);
+        $policy->addClaim($claim);
+        self::$dm->flush();
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $inviteeCognitoIdentityId, $url, [
+            'action' => 'accept',
+            'policy_id' => $inviteePolicyData['id']
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM);
+    }
+
+    public function testInvitationAcceptWithPotFull()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-fullpotaccept-invitee', $this),
+            'foo'
+        );
+        $inviteeCognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($inviteeCognitoIdentityId, $user);
+        $inviteePolicyData = $this->verifyResponse(200);
+        $this->payPolicy($inviteeCognitoIdentityId, $inviteePolicyData['id']);
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-fullpotaccept', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('user-fullpotaccept-invitee', $this),
+            'name' => 'invite fullpotaccept test',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        // set policy to max pot value
+        $policyRepo = self::$dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($inviteePolicyData['id']);
+        $policy->setPotValue($policy->getMaxPot());
+        self::$dm->flush();
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $inviteeCognitoIdentityId, $url, [
+            'action' => 'accept',
+            'policy_id' => $inviteePolicyData['id']
+        ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_LIMIT);
     }
 
