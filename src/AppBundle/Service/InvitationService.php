@@ -134,8 +134,6 @@ class InvitationService
             throw new SelfInviteException('User can not invite themself');
         }
 
-        $this->validatePolicy($policy);
-
         $invitation = new EmailInvitation();
         $invitation->setEmail($email);
         $invitation->setPolicy($policy);
@@ -376,9 +374,7 @@ class InvitationService
         }
 
         $inviterPolicy = $invitation->getPolicy();
-        if ($inviterPolicy->isPotCompletelyFilled()) {
-            throw new FullPotException('Inviters pot is full and cannot send invitation');
-        }
+        $this->validatePolicy($inviterPolicy);
 
         if ($invitation instanceof EmailInvitation) {
             // Send reinvitation

@@ -152,7 +152,7 @@ class ApiAuthController extends BaseController
             );
         } catch (FullPotException $e) {
             return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_INVITATION_LIMIT,
+                ApiErrorCode::ERROR_INVITATION_MAXPOT,
                 'User has a full pot',
                 422
             );
@@ -489,7 +489,7 @@ class ApiAuthController extends BaseController
                 );
             } catch (FullPotException $e) {
                 return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_INVITATION_LIMIT,
+                    ApiErrorCode::ERROR_INVITATION_MAXPOT,
                     'User has a full pot',
                     422
                 );
