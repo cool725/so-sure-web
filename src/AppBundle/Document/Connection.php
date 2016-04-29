@@ -12,6 +12,11 @@ class Connection
      */
     protected $user;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Policy")
+     */
+    protected $policy;
+
     /** @MongoDB\Date() */
     protected $date;
 
@@ -31,6 +36,16 @@ class Connection
     public function setUser($user)
     {
         $this->user = $user;
+    }
+
+    public function getPolicy()
+    {
+        return $this->policy;
+    }
+
+    public function setPolicy($policy)
+    {
+        $this->policy = $policy;
     }
 
     public function getDate()

@@ -436,19 +436,30 @@ abstract class Policy
             }
         }
 
-        // TODO: Do we need to adjust for connections that occur post claim?
-        if ($claimCount == 1 && $potValue >= 40) {
+        $networkClaimCount = 0;
+        foreach ($this->getConnections() as $connection) {
+            $policy = $connection->getPolicy();
+            if (!$policy) {
+                throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
+            }
+            foreach ($policy->getClaims() as $claim) {
+                if ($claim->isMonetaryClaim()) {
+                    $networkClaimCount++;
+                }
+            }
+        }
+
+        // Pot is 0 if you claim
+        // Pot is £10 if you don't claim, but there's only 1 claim in your network and your pot is >= £40
+        // Pot is 0 if networks claims > 1 or if network claims is 1 and your pot < £40
+        if ($claimCount > 0) {
+            $potValue = 0;
+        } elseif ($networkClaimCount == 1 && $potValue >= 40) {
             $potValue = 10;
-        } elseif ($claimCount > 0) {
+        } elseif ($networkClaimCount > 0) {
             $potValue = 0;
         }
 
-        /*
-        // Make sure pot value doesn't exceed the max pot
-        if ($potValue > $this->getMaxPot()) {
-            $potValue = $this->getMaxPot();
-        }
-        */
         return $potValue;
     }
 
