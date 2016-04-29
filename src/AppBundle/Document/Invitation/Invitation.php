@@ -285,6 +285,7 @@ abstract class Invitation
         $data = [
             'id' => $this->getId(),
             'name' => $this->getName() ? $this->getName() : null,
+            'invitation_detail' => $this->getInvitationDetail(),
             'inviter_name' => $this->getInviterName(),
             'channel' => $this->getChannel(),
             'link' => $this->getLink(),
