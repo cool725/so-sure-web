@@ -279,13 +279,15 @@ class InvitationService
      */
     protected function sendSms(SmsInvitation $invitation)
     {
+        if ($this->debug) {
+            return;
+        }
+
         $message = $this->templating->render('AppBundle:Sms:invitation.txt.twig', ['invitation' => $invitation]);
-        if (!$this->debug) {
-            if ($this->sms->send($invitation->getMobile(), $message)) {
-                $invitation->setStatus(SmsInvitation::STATUS_SENT);
-            } else {
-                $invitation->setStatus(SmsInvitation::STATUS_FAILED);
-            }
+        if ($this->sms->send($invitation->getMobile(), $message)) {
+            $invitation->setStatus(SmsInvitation::STATUS_SENT);
+        } else {
+            $invitation->setStatus(SmsInvitation::STATUS_FAILED);
         }
     }
 

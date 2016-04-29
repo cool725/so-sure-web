@@ -410,14 +410,13 @@ class ApiControllerTest extends BaseControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/reset', array(
             'email' => static::generateEmail('user-reset', $this)
         ));
-        self::$dm->flush();
         $data = $this->verifyResponse(200);
-        /* TODO: see why the data doesn't get updated :P
-        $repo = self::$dm->getRepository(User::class);
+
+        // New DM required as some type of caching is occurring
+        $repo = $this->getNewDocumentManager()->getRepository(User::class);
         $queryUser = $repo->find($user->getId());
         print $queryUser->getConfirmationToken();
         $this->assertTrue(strlen($queryUser->getConfirmationToken()) > 5);
-        */
     }
 
     public function testResetNoUser()
@@ -730,12 +729,13 @@ class ApiControllerTest extends BaseControllerTest
         // Token should have changed
         $this->assertNotEquals($token, $data['user_token']['token']);
 
+        // New DM required as some type of caching is occurring
+        $repo = $this->getNewDocumentManager()->getRepository(User::class);
         $userUpdated = $repo->findOneBy([
             'emailCanonical' => strtolower(static::generateEmail('create-prelaunch', $this))
         ]);
         $this->assertTrue($userUpdated !== null);
-        // TODO: Another case where getting the user doesn't have an updated value, but is correct in the db
-        // $this->assertNotNull($userUpdated->getLastLogin());
+        $this->assertNotNull($userUpdated->getLastLogin());
     }
 
     public function testPreLaunchUserLoggedInWillNotOverwrite()
