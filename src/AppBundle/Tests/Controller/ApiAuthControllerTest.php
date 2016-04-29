@@ -849,6 +849,8 @@ class ApiAuthControllerTest extends BaseControllerTest
             'name' => 'functional test',
         ]);
         $data = $this->verifyResponse(200);
+        $this->assertEquals('patrick@so-sure.com', $data['invitation_detail']);
+        $this->assertEquals('functional test', $data['name']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => 'patrick@so-sure.com',
@@ -879,6 +881,8 @@ class ApiAuthControllerTest extends BaseControllerTest
             'name' => 'functional test',
         ]);
         $data = $this->verifyResponse(200);
+        $this->assertEquals('+447700900002', $data['invitation_detail']);
+        $this->assertEquals('functional test', $data['name']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'mobile' => '+447700900002',
