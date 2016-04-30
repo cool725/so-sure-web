@@ -556,6 +556,7 @@ abstract class Policy
             ],
             'connections' => $this->eachApiArray($this->getConnections()),
             'sent_invitations' => $this->eachApiArray($this->getSentInvitations()),
+            'promo_code' => $this->getPromoCode(),
         ];
     }
 }
