@@ -42,7 +42,9 @@ class RateLimitServiceTest extends WebTestCase
             RateLimitService::DEVICE_TYPE_ADDRESS,
             RateLimitService::DEVICE_TYPE_IMEI,
             RateLimitService::DEVICE_TYPE_LOGIN,
-            RateLimitService::DEVICE_TYPE_POLICY
+            RateLimitService::DEVICE_TYPE_POLICY,
+            RateLimitService::DEVICE_TYPE_RESET,
+            RateLimitService::DEVICE_TYPE_TOKEN,
         ];
         foreach ($rates as $type) {
             for ($i = 1; $i < 100; $i++) {

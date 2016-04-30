@@ -23,6 +23,7 @@ class RateLimitService
     const DEVICE_TYPE_LOGIN = 'login';
     const DEVICE_TYPE_POLICY = 'policy';
     const DEVICE_TYPE_RESET = 'reset';
+    const DEVICE_TYPE_TOKEN = 'token';
 
     public static $cacheTimes = [
         self::DEVICE_TYPE_IMEI => 86400, // 1 day
@@ -30,6 +31,7 @@ class RateLimitService
         self::DEVICE_TYPE_LOGIN => 3600, // 1 hour
         self::DEVICE_TYPE_POLICY => 604800, // 7 days
         self::DEVICE_TYPE_RESET => 3600, // 1 hour
+        self::DEVICE_TYPE_TOKEN => 600, // 10 minutes
     ];
 
     public static $maxRequests = [
@@ -38,6 +40,7 @@ class RateLimitService
         self::DEVICE_TYPE_LOGIN => 3,
         self::DEVICE_TYPE_POLICY => 8,
         self::DEVICE_TYPE_RESET => 2,
+        self::DEVICE_TYPE_TOKEN => 10,
     ];
 
     public static $excludedIps = [
