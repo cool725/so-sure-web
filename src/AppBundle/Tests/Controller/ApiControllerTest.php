@@ -540,6 +540,7 @@ class ApiControllerTest extends BaseControllerTest
     public function testTokenRateLimited()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('token-ratelimit', $this), 'bar');
 
         for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_TOKEN] + 1; $i++) {
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', [
@@ -556,6 +557,7 @@ class ApiControllerTest extends BaseControllerTest
      */
     public function testTokenUnauthOk()
     {
+        $this->clearRateLimit();
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('unauth-token', $this), 'bar');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token/unauth', array(
@@ -632,6 +634,7 @@ class ApiControllerTest extends BaseControllerTest
     public function testTokenUnauthRateLimited()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('unauth-ratelimit', $this), 'bar');
 
         for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_TOKEN] + 1; $i++) {
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token/unauth', [
