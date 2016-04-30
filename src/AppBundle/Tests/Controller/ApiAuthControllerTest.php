@@ -186,6 +186,35 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
+    public function testInvitationReinviteLimitedAction()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-reinvite-limited', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('invite-reinvite-limited', $this),
+            'name' => 'invite revite test',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        $invitation = $emailRepo->find($invitationData['id']);
+        $this->assertFalse($invitation->canReinvite());
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'reinvite']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_LIMIT);
+    }
+
     public function testInvitationReinviteAction()
     {
         $user = self::createUser(
@@ -208,11 +237,85 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $emailRepo = self::$dm->getRepository(EmailInvitation::class);
         $invitation = $emailRepo->find($invitationData['id']);
-        $this->assertFalse($invitation->canReinvite());
+        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
+        self::$dm->flush();
+        $this->assertTrue($invitation->canReinvite());
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'reinvite']);
-        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_LIMIT);
+        $data = $this->verifyResponse(200);
+    }
+
+    public function testInvitationReinviteFullPotAction()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-reinvite-maxpot', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('invite-reinvite-maxpot', $this),
+            'name' => 'invite revite test',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        $invitation = $emailRepo->find($invitationData['id']);
+        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
+
+        $policyRepo = self::$dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyData['id']);
+        $policy->setPotValue($policy->getMaxPot());
+        self::$dm->flush();
+        $this->assertTrue($invitation->canReinvite());
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'reinvite']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_MAXPOT);
+    }
+
+    public function testInvitationReinviteClaimsAction()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-reinvite-claims', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('invite-reinvite-claims', $this),
+            'name' => 'invite revite test',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        $invitation = $emailRepo->find($invitationData['id']);
+        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
+
+        $policyRepo = self::$dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyData['id']);
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
+        self::$dm->flush();
+        $this->assertTrue($invitation->canReinvite());
+
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'reinvite']);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM);
     }
 
     public function testInvitationAccept()

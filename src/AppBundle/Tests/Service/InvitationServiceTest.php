@@ -17,6 +17,8 @@ use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
+use AppBundle\Exception\FullPotException;
+use AppBundle\Exception\ClaimException;
 
 /**
  * @group functional-nonet
@@ -470,5 +472,68 @@ class InvitationServiceTest extends WebTestCase
         $policy->addClaim($claim);
 
         self::$invitationService->accept($invitation, $policyInvitee);
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\FullPotException
+     */
+    public function testEmailInvitationReinviteMaxPot()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-reinvite-maxpot', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-reinvite-maxpot', $this),
+            'bar'
+        );
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-reinvite-maxpot', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        // allow reinvitation
+        $invitation->setNextReinvited('2016-01-01');
+        // but set pot value to maxpot
+        $policy->setPotValue($policy->getMaxPot());
+
+        self::$invitationService->reinvite($invitation);
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\ClaimException
+     */
+    public function testEmailInvitationReinviteClaim()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-reinvite-claim', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-reinvite-claim', $this),
+            'bar'
+        );
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-reinvite-claim', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        // allow reinvitation
+        $invitation->setNextReinvited('2016-01-01');
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
+
+        self::$invitationService->reinvite($invitation);
     }
 }
