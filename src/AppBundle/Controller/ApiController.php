@@ -416,6 +416,15 @@ class ApiController extends BaseController
                 );
             }
 
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_RESET,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
+
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
@@ -461,6 +470,15 @@ class ApiController extends BaseController
                     'User account is suspended - contact us',
                     422
                 );
+            }
+
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_RESET,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
             $cognitoIdentity = $this->get('app.cognito.identity');

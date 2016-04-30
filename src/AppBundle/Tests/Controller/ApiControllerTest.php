@@ -537,6 +537,19 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
     }
 
+    public function testTokenRateLimited()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('token-ratelimit', $this), 'bar');
+
+        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_TOKEN] + 1; $i++) {
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', [
+                'token' => $user->getToken()
+            ]);
+        }
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
+    }
+
     // token unauth
 
     /**
@@ -544,6 +557,7 @@ class ApiControllerTest extends BaseControllerTest
      */
     public function testTokenUnauthOk()
     {
+        $this->clearRateLimit();
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('unauth-token', $this), 'bar');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token/unauth', array(
@@ -615,6 +629,20 @@ class ApiControllerTest extends BaseControllerTest
             'cognito_id' => self::$identity->getId(),
         ));
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
+    }
+
+    public function testTokenUnauthRateLimited()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('unauth-ratelimit', $this), 'bar');
+
+        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_TOKEN] + 1; $i++) {
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token/unauth', [
+                'token' => $user->getToken(),
+                'cognito_id' => self::$identity->getId(),
+            ]);
+        }
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
 
     // user
