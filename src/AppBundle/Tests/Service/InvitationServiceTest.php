@@ -17,6 +17,8 @@ use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
+use AppBundle\Exception\FullPotException;
+use AppBundle\Exception\ClaimException;
 
 /**
  * @group functional-nonet
@@ -473,7 +475,7 @@ class InvitationServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException AppBundle\Exception\MaxPotException
+     * @expectedException AppBundle\Exception\FullPotException
      */
     public function testEmailInvitationReinviteMaxPot()
     {
