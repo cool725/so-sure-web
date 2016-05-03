@@ -1192,7 +1192,7 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $userRepo = self::$dm->getRepository(User::class);
         $user = $userRepo->find($result['id']);
-        $this->assertEquals($birthday, $user->getBirthday());        
+        $this->assertEquals($birthday, $user->getBirthday());
     }
 
     public function testUpdateFacebook()
