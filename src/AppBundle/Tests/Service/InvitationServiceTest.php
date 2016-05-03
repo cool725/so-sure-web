@@ -34,6 +34,7 @@ class InvitationServiceTest extends WebTestCase
     protected static $userManager;
     protected static $invitationService;
     protected static $phone;
+    protected static $policyService;
 
     public static function setUpBeforeClass()
     {
@@ -61,6 +62,7 @@ class InvitationServiceTest extends WebTestCase
             self::$container->get('app.sms'),
             self::$container->get('app.ratelimit')
         );
+        self::$policyService = self::$container->get('app.policy');
 
         self::$invitationService->setDebug(true);
         $phoneRepo = self::$dm->getRepository(Phone::class);
@@ -472,6 +474,108 @@ class InvitationServiceTest extends WebTestCase
         $policy->addClaim($claim);
 
         self::$invitationService->accept($invitation, $policyInvitee);
+    }
+
+    public function testAccept()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-accept', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, static::$phone, new \DateTime('2016-01-01'));
+        $this->assertTrue($policy->isPolicy());
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-accept', $this),
+            'bar'
+        );
+        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone, new \DateTime('2016-04-01'));
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-accept', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        self::$invitationService->accept($invitation, $policyInvitee);
+
+        $repo = static::$dm->getRepository(Policy::class);
+        $inviterPolicy = $repo->find($policy->getId());
+        $connectionFound = false;
+        foreach ($inviterPolicy->getConnections() as $connection) {
+            if ($connection->getPolicy()->getId() == $policyInvitee->getId()) {
+                $connectionFound = true;
+                $this->assertEquals(2, $connection->getValue());
+            }
+        }
+        $this->assertTrue($connectionFound);
+
+        $inviteePolicy = $repo->find($policyInvitee->getId());
+        $connectionFound = false;
+        foreach ($inviteePolicy->getConnections() as $connection) {
+            if ($connection->getPolicy()->getId() == $inviterPolicy->getId()) {
+                $connectionFound = true;
+                $this->assertEquals(10, $connection->getValue());
+            }
+        }
+        $this->assertTrue($connectionFound);
+    }
+
+    public function testAcceptWithCancelled30days()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-accept-cancel', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, static::$phone, new \DateTime('2016-01-01'));
+        $this->assertTrue($policy->isPolicy());
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-accept-cancel-before', $this),
+            'bar'
+        );
+        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone, new \DateTime('2016-02-01'));
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-accept-cancel-before', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-02-01'));
+
+        // Now Cancel policy
+        self::$policyService->cancel($policyInvitee, new \DateTime('2016-04-03'));
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-accept-cancel-after', $this),
+            'bar'
+        );
+        $policyInviteeAfter = static::createPolicy($userInvitee, static::$dm, static::$phone, new \DateTime('2016-04-10'));
+
+        $invitationAfter = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-accept-cancel-after', $this)
+        );
+        $this->assertTrue($invitationAfter instanceof EmailInvitation);
+
+        self::$invitationService->accept($invitationAfter, $policyInviteeAfter, new \DateTime('2016-04-10'));
+
+        $repo = static::$dm->getRepository(Policy::class);
+        $inviterPolicy = $repo->find($policy->getId());
+        $connectionFound = false;
+        foreach ($inviterPolicy->getConnections() as $connection) {
+            if ($connection->getPolicy()->getId() == $policyInviteeAfter->getId()) {
+                $connectionFound = true;
+                $this->assertEquals(10, $connection->getValue());
+            }
+        }
+        $this->assertTrue($connectionFound);
     }
 
     /**

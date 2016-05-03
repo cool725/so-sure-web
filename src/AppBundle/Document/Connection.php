@@ -23,6 +23,14 @@ class Connection
     /** @MongoDB\Field(type="float") */
     protected $value;
 
+    /** @MongoDB\Field(type="float") */
+    protected $initialValue;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="User", name="replacement_user")
+     */
+    protected $replacementUser;
+
     public function __construct()
     {
         $this->date = new \DateTime();
@@ -66,6 +74,29 @@ class Connection
     public function setValue($value)
     {
         $this->value = $value;
+        if (!$this->getInitialValue()) {
+            $this->initialValue = $value;
+        }
+    }
+
+    public function clearValue()
+    {
+        $this->value = 0;
+    }
+
+    public function getInitialValue()
+    {
+        return $this->initialValue;
+    }
+
+    public function getReplacementUser()
+    {
+        return $this->replacementUser;
+    }
+
+    public function setReplacementUser($replacementUser)
+    {
+        $this->replacementUser = $replacementUser;
     }
 
     public function toApiArray()

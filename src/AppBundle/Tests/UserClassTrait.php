@@ -54,13 +54,17 @@ trait UserClassTrait
         return $mobile;
     }
     
-    public static function createPolicy(User $user, \Doctrine\ODM\MongoDB\DocumentManager $dm, $phone = null)
-    {
+    public static function createPolicy(
+        User $user,
+        \Doctrine\ODM\MongoDB\DocumentManager $dm,
+        $phone = null,
+        $date = null
+    ) {
         self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->setUser($user);
         $policy->setImei(self::generateRandomImei());
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), $date);
         if ($phone) {
             $policy->setPhone($phone);
         }

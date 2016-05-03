@@ -402,6 +402,38 @@ abstract class Policy
         return false;
     }
 
+    public function isCancelled()
+    {
+        return $this->getStatus() == self::STATUS_CANCELLED;
+    }
+
+    public function hasEndedInLast30Days($date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $this->getEnd()->diff($date)->days < 30;
+    }
+
+    public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)
+    {
+        foreach ($this->getConnections() as $connection) {
+            if ($connection->getReplacementUser()) {
+                continue;
+            }
+            $policy = $connection->getPolicy();
+            if (!$policy) {
+                throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
+            }
+            if ($policy->isCancelled() && $policy->hasEndedInLast30Days($date)) {
+                return $connection;
+            }
+        }
+
+        return null;
+    }
+
     public function hasClaimedInLast30Days($date = null)
     {
         if ($date == null) {

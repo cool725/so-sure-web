@@ -295,8 +295,12 @@ class InvitationService
         }
     }
 
-    public function accept(Invitation $invitation, Policy $inviteePolicy)
+    public function accept(Invitation $invitation, Policy $inviteePolicy, \DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         if ($invitation->isProcessed()) {
             throw new ProcessedException("Invitation has already been processed");
         }
@@ -306,30 +310,33 @@ class InvitationService
         $this->validatePolicy($inviterPolicy);
         $this->validatePolicy($inviteePolicy);
 
-        $connectionInviter = new Connection();
-        $connectionInviter->setUser($invitation->getInviter());
-        $connectionInviter->setPolicy($inviteePolicy);
-        // connection value is based on that user's policy date
-        $connectionInviter->setValue($inviterPolicy->getAllowedConnectionValue());
-        // TODO: Validate connection with same user doesn't already exist
-        $inviteePolicy->addConnection($connectionInviter);
-        $inviteePolicy->updatePotValue();
+        // If there was a concellation in the network, new connection should replace the cancelled connection
+        $this->addConnection($inviteePolicy, $invitation->getInviter(), $inviterPolicy, $date);
+        $this->addConnection($inviterPolicy, $invitation->getInvitee(), $inviteePolicy, $date);
 
-        $connectionInvitee = new Connection();
-        $connectionInvitee->setUser($invitation->getInvitee());
-        $connectionInvitee->setPolicy($inviterPolicy);
-        // connection value is based on that user's policy date
-        $connectionInvitee->setValue($inviteePolicy->getAllowedConnectionValue());
-        $inviterPolicy->addConnection($connectionInvitee);
-        $inviterPolicy->updatePotValue();
-
-        $invitation->setAccepted(new \DateTime());
+        $invitation->setAccepted($date);
 
         // TODO: ensure transaction state for this one....
         $this->dm->flush();
 
         // Notify inviter of acceptance
         $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
+    }
+
+    protected function addConnection(Policy $policy, User $linkedUser, Policy $linkedPolicy, \DateTime $date = null)
+    {
+        $connectionValue = $policy->getAllowedConnectionValue($date);
+        // If there was a concellation in the network, new connection should replace the cancelled connection
+        if ($replacementConnection = $policy->getUnreplacedConnectionCancelledPolicyInLast30Days($date)) {
+            $connectionValue = $replacementConnection->getInitialValue();
+            $replacementConnection->setReplacementUser($linkedUser);
+        }
+        $connection = new Connection();
+        $connection->setUser($linkedUser);
+        $connection->setPolicy($linkedPolicy);
+        $connection->setValue($connectionValue);
+        $policy->addConnection($connection);
+        $policy->updatePotValue();
     }
 
     public function reject(Invitation $invitation)

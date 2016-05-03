@@ -52,14 +52,32 @@ class PolicyService
         $this->dm->flush();
     }
 
-    public function cancel(Policy $policy)
+    public function cancel(Policy $policy, \DateTime $date = null)
     {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
         $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->setEnd($date);
+
+        // For now, just lock the user.  May want to allow the user to login in the future though...
+        $user = $policy->getUser();
+        $user->setLocked(true);
+
+        // zero out the connection value for connections bound to this policy
+        foreach ($policy->getConnections() as $networkConnection) {
+            $networkConnection->clearValue();
+            foreach ($networkConnection->getPolicy()->getConnections() as $otherConnection) {
+                if ($otherConnection->getPolicy()->getId() == $policy->getId()) {
+                    // TODO - notify network?
+                    $otherConnection->clearValue();
+                }
+            }
+        }
         $this->dm->flush();
         // TODO - email user
         // TODO - cancel dd
-        // TODO - adjust network pots
         // TODO - notify network?
-        // TODO - do we want to lock user account?
+        // TODO - cancellation reason
     }
 }
