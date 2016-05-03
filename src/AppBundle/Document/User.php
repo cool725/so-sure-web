@@ -120,6 +120,9 @@ class User extends BaseUser
      */
     protected $campaign;
 
+    /** @MongoDB\Date() */
+    protected $birthday;
+
     public function __construct()
     {
         parent::__construct();
@@ -493,13 +496,24 @@ class User extends BaseUser
         $this->preLaunch = $preLaunch;
     }
 
+    public function getBirthday()
+    {
+        return $this->birthday;
+    }
+
+    public function setBirthday($birthday)
+    {
+        $this->birthday = $birthday;
+    }
+
     public function hasValidDetails()
     {
         // TODO: Improve validation
         if (strlen($this->getFirstName()) == 0 ||
             strlen($this->getLastName()) == 0 ||
             strlen($this->getEmail()) == 0 ||
-            strlen($this->getMobileNumber()) == 0) {
+            strlen($this->getMobileNumber()) == 0 ||
+            !$this->getBirthday()) {
             return false;
         }
 

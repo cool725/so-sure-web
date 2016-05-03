@@ -27,6 +27,7 @@ trait UserClassTrait
             $user->setMobileNumber(self::generateRandomMobile());
             $user->setFirstName('foo');
             $user->setLastName('bar');
+            $user->setBirthday(new \DateTime('1980-01-01'));
         }
 
         $userManager->updateUser($user, true);

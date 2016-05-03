@@ -678,16 +678,20 @@ class ApiControllerTest extends BaseControllerTest
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
 
+        $birthday = new \DateTime('1980-01-01');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
-            'email' => 'api-new-user@api.bar.com'
+            'email' => 'api-new-user@api.bar.com',
+            'birthday' => $birthday->format(\DateTime::ISO8601),
         ));
         $data = $this->verifyResponse(200);
         $this->assertEquals('api-new-user@api.bar.com', $data['email']);
 
-        $repo = self::$dm->getRepository(User::class);
-        $fooUser = $repo->findOneBy(['email' => 'api-new-user@api.bar.com']);
-        $this->assertTrue($fooUser !== null);
-        $this->assertEquals($cognitoIdentityId, $fooUser->getCognitoId());
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->findOneBy(['email' => 'api-new-user@api.bar.com']);
+        $this->assertTrue($user !== null);
+        $this->assertEquals($cognitoIdentityId, $user->getCognitoId());
+        $this->assertEquals($birthday->format(\DateTime::ISO8601), $user->getBirthday()->format(\DateTime::ISO8601));
     }
 
     public function testUserCreateIp()

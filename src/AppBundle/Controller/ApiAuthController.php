@@ -214,7 +214,7 @@ class ApiAuthController extends BaseController
             if (!$user->hasValidDetails()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
-                    'User must have firstname/lastname, email & mobile number present before policy can be created',
+                    'User needs first/last name, email, birthday & mobile number before policy can be created',
                     422
                 );
             }
@@ -675,6 +675,11 @@ class ApiAuthController extends BaseController
                 isset($data['facebook_access_token']) && strlen($data['facebook_access_token']) > 0 ) {
                 $user->setFacebookId($data['facebook_id']);
                 $user->setFacebookAccessToken($data['facebook_access_token']);
+                $userChanged = true;
+            }
+
+            if (isset($data['birthday']) && strlen($data['birthday']) > 0) {
+                $user->setBirthday(\DateTime::createFromFormat(\DateTime::ISO8601, $data['birthday']));
                 $userChanged = true;
             }
 
