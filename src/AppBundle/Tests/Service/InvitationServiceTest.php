@@ -556,7 +556,12 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invite-accept-cancel-after', $this),
             'bar'
         );
-        $policyInviteeAfter = static::createPolicy($userInvitee, static::$dm, static::$phone, new \DateTime('2016-04-10'));
+        $policyInviteeAfter = static::createPolicy(
+            $userInvitee,
+            static::$dm,
+            static::$phone,
+            new \DateTime('2016-04-10')
+        );
 
         $invitationAfter = self::$invitationService->inviteByEmail(
             $policy,
