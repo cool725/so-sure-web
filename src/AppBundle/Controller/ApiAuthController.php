@@ -65,7 +65,9 @@ class ApiAuthController extends BaseController
             $number = trim($request->get('number'));
 
             $lookup = $this->get('app.address');
-            $address = $lookup->getAddress($postcode, $number);
+            if (!$address = $lookup->getAddress($postcode, $number)) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
 
             return new JsonResponse($address->toApiArray());
         } catch (\Exception $e) {
