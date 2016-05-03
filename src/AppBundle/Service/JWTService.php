@@ -27,7 +27,7 @@ class JWTService
         $this->logger = $logger;
         $this->signer = new Sha256();
 
-        $this->setSecret($secret);
+        $this->setSecret(sprintf('%sI@ms0sur3', $secret));
     }
 
     public function setSecret($secret, $transform = true)
