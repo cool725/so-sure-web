@@ -678,8 +678,10 @@ class ApiControllerTest extends BaseControllerTest
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
 
+        $birthday = new \DateTime('1980-01-01');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
-            'email' => 'api-new-user@api.bar.com'
+            'email' => 'api-new-user@api.bar.com',
+            'birthday' => $birthday->format(\DateTime::ISO8601),
         ));
         $data = $this->verifyResponse(200);
         $this->assertEquals('api-new-user@api.bar.com', $data['email']);
@@ -688,6 +690,7 @@ class ApiControllerTest extends BaseControllerTest
         $fooUser = $repo->findOneBy(['email' => 'api-new-user@api.bar.com']);
         $this->assertTrue($fooUser !== null);
         $this->assertEquals($cognitoIdentityId, $fooUser->getCognitoId());
+        $this->assertEquals($birthday, $fooUser->getBirthday());
     }
 
     public function testUserCreateIp()

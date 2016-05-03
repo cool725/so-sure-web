@@ -1172,6 +1172,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
         $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $birthday = new \DateTime('1980-01-01');
         $data = [
             'first_name' => 'bar',
             'last_name' => 'foo',
@@ -1179,6 +1180,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'mobile_number' => '+447700900000',
             'facebook_id' => 'abcd',
             'facebook_access_token' => 'zy',
+            'birthday' => $birthday->format(\DateTime::ISO8601),
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
@@ -1187,6 +1189,10 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('foo', $result['last_name']);
         $this->assertEquals('+447700900000', $result['mobile_number']);
         $this->assertEquals('abcd', $result['facebook_id']);
+
+        $userRepo = self::$dm->getRepository(User::class);
+        $user = $userRepo->find($result['id']);
+        $this->assertEquals($birthday, $user->getBirthday());        
     }
 
     public function testUpdateFacebook()

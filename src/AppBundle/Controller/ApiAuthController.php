@@ -678,6 +678,11 @@ class ApiAuthController extends BaseController
                 $userChanged = true;
             }
 
+            if (isset($data['birthday']) && strlen($data['birthday']) > 0) {
+                $user->setBirthday(\DateTime::createFromFormat(\DateTime::ISO8601, $data['birthday']));
+                $userChanged = true;
+            }
+
             $validator = $this->get('validator');
             $errors = $validator->validate($user);
             if (count($errors) > 0) {
