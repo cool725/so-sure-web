@@ -80,6 +80,29 @@ class PhonePolicy extends Policy
         }
     }
 
+    public function getAllowedConnectionValue(\DateTime $date = null)
+    {
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+
+        $connectionValue = $this->getConnectionValue($date);
+
+        // If its the last connection, then may be less than the full £15/£10/£2
+        $potValue = $this->getPotValue();
+        $maxPot = $this->getMaxPot();
+        if ($potValue + $connectionValue > $maxPot) {
+            $connectionValue = $maxPot - $potValue;
+        }
+
+        // Should never be the case, but ensure connectionValue isn't negative
+        if ($connectionValue < 0) {
+            $connectionValue = 0;
+        }
+
+        return $connectionValue;
+    }
+
     public function getMaxConnections(\DateTime $date = null)
     {
         if (!$this->isPolicy()) {

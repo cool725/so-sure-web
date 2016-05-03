@@ -310,7 +310,7 @@ class InvitationService
         $connectionInviter->setUser($invitation->getInviter());
         $connectionInviter->setPolicy($inviteePolicy);
         // connection value is based on that user's policy date
-        $connectionInviter->setValue($inviterPolicy->getConnectionValue());
+        $connectionInviter->setValue($inviterPolicy->getAllowedConnectionValue());
         // TODO: Validate connection with same user doesn't already exist
         $inviteePolicy->addConnection($connectionInviter);
         $inviteePolicy->updatePotValue();
@@ -319,7 +319,7 @@ class InvitationService
         $connectionInvitee->setUser($invitation->getInvitee());
         $connectionInvitee->setPolicy($inviterPolicy);
         // connection value is based on that user's policy date
-        $connectionInvitee->setValue($inviteePolicy->getConnectionValue());
+        $connectionInvitee->setValue($inviteePolicy->getAllowedConnectionValue());
         $inviterPolicy->addConnection($connectionInvitee);
         $inviterPolicy->updatePotValue();
 
