@@ -53,6 +53,11 @@ trait UserClassTrait
 
         return $mobile;
     }
+
+    public static function transformMobile($mobile)
+    {
+        return str_replace("+44", "0", $mobile);
+    }
     
     public static function createPolicy(
         User $user,

@@ -821,7 +821,7 @@ class ApiControllerTest extends BaseControllerTest
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => static::generateEmail('user-create-dup-mobile2', $this),
-            'mobile_number' => $mobile
+            'mobile_number' => self::transformMobile($mobile)
         ));
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_EXISTS);
     }

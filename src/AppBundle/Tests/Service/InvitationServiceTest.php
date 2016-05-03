@@ -151,11 +151,12 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('smsuser1', $this),
             'bar'
         );
+        $mobile = static::generateRandomMobile();
         $policy = static::createPolicy($user, static::$dm, static::$phone);
-        $invitation = self::$invitationService->inviteBySms($policy, '1123');
+        $invitation = self::$invitationService->inviteBySms($policy, $mobile);
         $this->assertTrue($invitation instanceof SmsInvitation);
 
-        self::$invitationService->inviteBySms($policy, '1123');
+        self::$invitationService->inviteBySms($policy, self::transformMobile($mobile));
     }
     
     public function testOptOutCatIntivationsSmsInvitation()
