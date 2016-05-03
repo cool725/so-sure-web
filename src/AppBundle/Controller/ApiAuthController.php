@@ -214,7 +214,7 @@ class ApiAuthController extends BaseController
             if (!$user->hasValidDetails()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
-                    'User must have firstname/lastname, email & mobile number present before policy can be created',
+                    'User needs first/last name, email, birthday & mobile number before policy can be created',
                     422
                 );
             }

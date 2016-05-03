@@ -512,7 +512,8 @@ class User extends BaseUser
         if (strlen($this->getFirstName()) == 0 ||
             strlen($this->getLastName()) == 0 ||
             strlen($this->getEmail()) == 0 ||
-            strlen($this->getMobileNumber()) == 0) {
+            strlen($this->getMobileNumber()) == 0 ||
+            !$this->getBirthday()) {
             return false;
         }
 

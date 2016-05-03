@@ -1190,7 +1190,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('+447700900000', $result['mobile_number']);
         $this->assertEquals('abcd', $result['facebook_id']);
 
-        $userRepo = self::$dm->getRepository(User::class);
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
         $user = $userRepo->find($result['id']);
         $this->assertEquals($birthday, $user->getBirthday());
     }
@@ -1370,10 +1371,12 @@ class ApiAuthControllerTest extends BaseControllerTest
     protected function updateUserDetails($cognitoIdentityId, $user)
     {
         $userUpdateUrl = sprintf('/api/v1/auth/user/%s', $user->getId());
+        $birthday = new \DateTime('1980-01-01');
         static::putRequest(self::$client, $cognitoIdentityId, $userUpdateUrl, [
             'first_name' => 'foo',
             'last_name' => 'bar',
             'mobile_number' => static::generateRandomMobile(),
+            'birthday' => $birthday->format(\DateTime::ISO8601),
         ]);
         $this->verifyResponse(200);
 

@@ -544,7 +544,10 @@ class ApiController extends BaseController
             $user->setSnsEndpoint(isset($data['sns_endpoint']) ? $data['sns_endpoint'] : null);
             $user->setMobileNumber($mobileNumber);
             $user->setCampaign(isset($data['campaign']) ? $data['campaign'] : null);
-            $user->setBirthday(isset($data['birthday']) ? $data['birthday'] : null);
+            $birthday = isset($data['birthday']) ?
+                \DateTime::createFromFormat(\DateTime::ISO8601, $data['birthday']) :
+                null;
+            $user->setBirthday($birthday);
 
             // NOTE: not completely secure, but as we're only using for an indication, it's good enough
             // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
