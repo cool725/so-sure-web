@@ -415,6 +415,32 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
     }
 
+    public function testAllowedConnectionValue()
+    {
+        $user = new User();
+        self::addAddress($user);
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        // Make sure user isn't a prelaunch user
+        $user->setCreated(new \DateTime('2017-01-01'));
+        $this->assertFalse($user->isPreLaunch());
+        $policy->setUser($user);
+        $policy->setPhone(static::$phone);
+        // Policy status is null
+        $this->assertEquals(0, $policy->getAllowedConnectionValue());
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $policy->setStart(new \DateTime('2016-01-01'));
+
+        // Normal connections without PROMO's or launch users
+        $this->assertEquals(10, $policy->getAllowedConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+        $this->assertEquals(2, $policy->getAllowedConnectionValue(new \DateTime('2016-03-01')));
+
+        // last policy value should be fractional of the £10
+        $policy->setPotValue($policy->getMaxPot() - 2.75);
+        $this->assertEquals(2.75, $policy->getAllowedConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+    }
+
     public function testPotFilled()
     {
         $user = new User();
