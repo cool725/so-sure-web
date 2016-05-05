@@ -216,6 +216,12 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
         }
 
         $devices = str_getcsv($data[4], ",", "'");
+        foreach ($devices as $device) {
+            if (stripos($device, "‘") !== false || stripos($device, "’") !== false) {
+                throw new \Exception(sprintf('Invalid apple quote for device %s', $device));
+            }
+        }
+
         $phone = new Phone();
         $phone->init(
             $data[0], // $make

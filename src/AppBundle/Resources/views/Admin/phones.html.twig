@@ -33,6 +33,7 @@
                         <th>Monthly Premium</th>
                         <th>Yearly Premium</th>
                         <th>Policy Profit</th>
+                        <th>Age</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -44,6 +45,7 @@
                             <td>{{ phone.currentPhonePrice.monthlyPremiumPrice }}</td>
                             <td>{{ phone.currentPhonePrice.yearlyPremiumPrice }}</td>
                             <td>{{ phone.policyProfit(0.25) }}</td>
+                            <td><span class="{% if phone.age > 48 %}text-danger{% else %}text-muted{% endif %}">{{ phone.age }} months</span></td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
                                     data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}"
@@ -144,7 +146,7 @@
   </form>
 
     <div class="modal fade" id="alternativeModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog" role="document" style="width: 90%">
         <div class="modal-content">
         <form id="phone-alternative-form" method="post">
           <div class="modal-header">

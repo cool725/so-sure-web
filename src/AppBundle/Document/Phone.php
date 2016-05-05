@@ -284,6 +284,20 @@ class Phone
         return $this->toTwoDp($this->replacementPrice);
     }
 
+    public function getReleaseDate()
+    {
+        return $this->releaseDate;
+    }
+
+    public function getAge()
+    {
+        if (!$this->getReleaseDate()) {
+            return null;
+        }
+
+        return ceil($this->getReleaseDate()->diff(new \DateTime())->days / 30.4);
+    }
+
     public function policyProfit($claimFrequency)
     {
         if (!$this->getReplacementPrice()) {

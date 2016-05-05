@@ -21,19 +21,37 @@ $('#phoneModal').on('show.bs.modal', function (event) {
   }
 });
 
-var phoneToRow = function(item) {
+var compareValue = function(key, check, source, compare) {
+  if (!source) {
+    return check[key];
+  }
+  var color = 'text-danger';
+  if (compare == 'gte') {
+    if (check[key] >= source[key]) {
+      color = 'text-success';
+    }
+  } else if (compare == 'eq') {
+    if (check[key] == source[key]) {
+      color = 'text-success';
+    }    
+  }
+  
+  return '<span class="' + color + '">' + check[key] + '</span>';
+}
+
+var phoneToRow = function(item, compare) {
   var row_data = [
     item['name'],
     item['replacement_price'],
     item['os'],
-    item['processor_speed'],
-    item['processor_cores'],
-    item['ram'],
-    item['ssd'],
+    compareValue('processor_speed', item, compare, 'gte'),
+    compareValue('processor_cores', item, compare, 'gte'),
+    compareValue('ram', item, compare, 'gte'),
+    compareValue('ssd', item, compare, 'eq'),
     item['screen_physical'],
     item['screen_resolution'],
-    item['camera'],
-    item['lte']
+    compareValue('camera', item, compare, 'gte'),
+    compareValue('lte', item, compare, 'eq')
   ];
   var row = "<tr><td>" + row_data.join('</td><td>') + "</td></tr>";
 
@@ -58,7 +76,7 @@ $('#alternativeModal').on('show.bs.modal', function (event) {
     var table_body = modal.find('#alternative-table-body');
     table_body.empty();
     $.each( data['alternatives'], function( key, item ) {
-      table_body.append(phoneToRow(item));
+      table_body.append(phoneToRow(item, phone));
     });
   });
 });
