@@ -288,7 +288,8 @@ class Phone
             return null;
         }
 
-        $profit = $this->getCurrentPhonePrice()->getYearlyPremiumPrice() - $this->getReplacementPrice() * $claimFrequency;
+        $profit = $this->getCurrentPhonePrice()->getYearlyPremiumPrice() -
+            $this->getReplacementPrice() * $claimFrequency;
 
         return $this->toTopTwoDp($profit);
     }

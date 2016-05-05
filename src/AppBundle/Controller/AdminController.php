@@ -126,7 +126,7 @@ class AdminController extends BaseController
         $alternatives = $repo->alternatives($phone);
 
         $data = [];
-        foreach($alternatives as $alternative) {
+        foreach ($alternatives as $alternative) {
             $data[] = $alternative->toAlternativeArray();
         }
 
