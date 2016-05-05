@@ -5,11 +5,52 @@ namespace AppBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\Phone;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // @codingStandardsIgnoreFile
-class LoadPhoneData implements FixtureInterface
+class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     public function load(ObjectManager $manager)
+    {
+        $this->loadCsv($manager);
+        // $this->loadPreLaunch($manager);
+    }
+
+    protected function loadCsv(ObjectManager $manager)
+    {
+        $row = 0;
+        $file = sprintf(
+            "%s/../src/AppBundle/DataFixtures/devices.csv",
+            $this->container->getParameter('kernel.root_dir')
+        );
+        if (($handle = fopen($file, "r")) !== FALSE) {
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                if ($row > 0) {
+                    $this->newPhoneFromRow($manager, $data);
+                }
+                if ($row % 1000 == 0) {
+                    $manager->flush();
+                }
+                $row = $row + 1;
+            }
+            fclose($handle);
+        }
+
+        $manager->flush();
+    }
+
+    protected function loadPreLaunch(ObjectManager $manager)
     {
         $this->newPhone($manager, 'ALL', 'MSRP £150 or less', 4.29);
         $this->newPhone($manager, 'ALL', 'MSRP £151 to £250', 5.29);
@@ -166,6 +207,49 @@ class LoadPhoneData implements FixtureInterface
         */
 
         $manager->flush();
+    }
+
+    private function newPhoneFromRow($manager, $data)
+    {
+        if (!$data[5]) {
+            return;
+        }
+
+        $devices = str_getcsv($data[4], ",", "'");
+        $phone = new Phone();
+        $phone->init(
+            $data[0], // $make
+            $data[1], // $model
+            $data[5] + 1.5, // $premium
+            $data[3], // $memory
+            $devices, // $devices
+            str_replace('£', '', $data[7]), // $initialPrice
+            str_replace('£', '', $data[6]), // $replacementPrice
+            $data[8] // $initialPriceUrl
+        );
+
+        $resolution = explode('x', str_replace(' ', '', $data[17]));
+        $releaseDate = \DateTime::createFromFormat('m/y', $data[20]);
+        $phone->setDetails(
+            $data[9], // $os,
+            $data[10], // $initialOsVersion,
+            $data[11], // $upgradeOsVersion,
+            $data[12], // $processorSpeed,
+            $data[13], // $processorCores,
+            $data[14], // $ram,
+            $data[15] == 'Y' ? true : false, // $ssd,
+            round($data[16]), // $screenPhysical,
+            $resolution[0], // $screenResolutionWidth,
+            $resolution[1], // $screenResolutionHeight,
+            round($data[18]), // $camera
+            $data[19] == 'Y' ? true : false, // $lte
+            $releaseDate // $releaseDate
+        );
+
+        $manager->persist($phone);
+        if (!$phone->getCurrentPhonePrice()) {
+            throw new \Exception('Failed to init phone');
+        }
     }
 
     private function newPhone($manager, $make, $model, $policyPrice, $memory = null, $devices = null)

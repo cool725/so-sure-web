@@ -115,6 +115,25 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/phone/{id}/alternatives", name="admin_phone_alternatives")
+     * @Method({"GET"})
+     */
+    public function phoneAlternativesAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        $alternatives = $repo->alternatives($phone);
+
+        $data = [];
+        foreach($alternatives as $alternative) {
+            $data[] = $alternative->toAlternativeArray();
+        }
+
+        return new JsonResponse(['alternatives' => $data]);
+    }
+
+    /**
      * @Route("/phone/{id}", name="admin_phone_delete")
      * @Method({"DELETE"})
      */

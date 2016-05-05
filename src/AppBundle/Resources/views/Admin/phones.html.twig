@@ -1,22 +1,118 @@
 {% extends 'base.html.twig' %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/tabs.js'
+        '@AppBundle/Resources/public/js/Admin/phone.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
 {% block body %}
+
 <div class="container">
-    <form>
-    <div class="row-fluid">
-        <div class="col-md-11">
+  <form>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
+                data-update="{{ path('admin_phone_add') }}">Add new phone</button>
+    <ul class="nav nav-tabs nav-justified">
+      <li role="presentation" class="active"><a href="#financial">Financial</a></li>
+      <li role="presentation"><a href="#device">Device</a></li>
+      <li role="presentation"><a href="#pot">Pot</a></li>
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="financial">
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
                     <tr>
-                        <th>Make</th>
-                        <th>Model</th>
-                        <th>Devices</th>
-                        <th>Memory</th>
-                        <th>Monthly GWP</th>
-                        <th>Monthly IPT</th>
+                        <th>Phone</th>
+                        <th>Initial Price</th>
+                        <th>Replacement Price</th>
                         <th>Monthly Premium</th>
                         <th>Yearly Premium</th>
+                        <th>Policy Profit</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for phone in phones %}
+                        <tr>
+                            <td>{{ phone }}</td>
+                            <td>{{ phone.initialPrice }}</td>
+                            <td>{{ phone.replacementPrice }}</td>
+                            <td>{{ phone.currentPhonePrice.monthlyPremiumPrice }}</td>
+                            <td>{{ phone.currentPhonePrice.yearlyPremiumPrice }}</td>
+                            <td>{{ phone.policyProfit(0.25) }}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
+                                    data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}"
+                                    data-ipt-rate="{{ phone.iptRate }}"
+                                    data-phone="{{ phone.toEditArray()|json_encode }}">Edit</button>
+                                <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
+                                        data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}">Delete</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>        
+            <div class="pagerfanta">
+                {{ pagerfanta(pager, 'twitter_bootstrap3') }}
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="device">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Phone</th>
+                        <th>Devices</th>
+                        <th>Os</th>
+                        <th>Processor</th>
+                        <th>Ram</th>
+                        <th>SSD Slot</th>
+                        <th>Physical Screen</th>
+                        <th>Screen Resolution</th>
+                        <th>Camera</th>
+                        <th>4G</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for phone in phones %}
+                        <tr>
+                            <td>{{ phone }}</td>
+                            <td><span title="{{ phone.devices|join(", ") }}">{{ phone.devices|length }}</span></td>
+                            <td>{{ phone.osString }}</td>
+                            <td>{{ phone.processorSpeed }}Mhz ({{ phone.processorCores }} cores)</td>
+                            <td>{{ phone.ram }} MB</td>
+                            <td>{% if phone.ssd %}Yes{%else%}No{%endif%}</td>
+                            <td>{{ phone.screenPhysicalInch }}" ({{ phone.screenPhysical }} mm)</td>
+                            <td>{{ phone.screenResolution }}</td>
+                            <td>{{ phone.camera }} MP</td>
+                            <td>{% if phone.lte %}Yes{%else%}No{%endif%}</td>
+                            <td>
+                                <button type="button" class="btn {% if phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
+                                    data-query="{{ path('admin_phone_alternatives', {'id': phone.id}) }}"
+                                    data-phone="{{ phone.toAlternativeArray()|json_encode }}"
+                                    {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
+                                    >Suggest Alternatives</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>        
+            <div class="pagerfanta">
+                {{ pagerfanta(pager, 'twitter_bootstrap3') }}
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="pot">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Phone</th>
                         <th>Max Pot</th>
                         <th>Max Connections</th>
                     </tr>
@@ -24,14 +120,7 @@
                     <tbody>
                     {% for phone in phones %}
                         <tr>
-                            <td>{{ phone.make }}</td>
-                            <td>{{ phone.model }}</td>
-                            <td><span title="{{ phone.devices|join(", ") }}">{{ phone.devices|length }}</span></td>
-                            <td>{{ phone.memory }}</td>
-                            <td>{{ phone.currentPhonePrice.gwp }}</td>
-                            <td>{{ phone.currentPhonePrice.ipt }}</td>
-                            <td>{{ phone.currentPhonePrice.monthlyPremiumPrice }}</td>
-                            <td>{{ phone.currentPhonePrice.yearlyPremiumPrice }}</td>
+                            <td>{{ phone }}</td>
                             <td>{{ phone.currentPhonePrice.maxPot }}</td>
                             <td>{{ phone.currentPhonePrice.maxConnections }}</td>
                             <td>
@@ -50,66 +139,114 @@
             <div class="pagerfanta">
                 {{ pagerfanta(pager, 'twitter_bootstrap3') }}
             </div>
-
-        </div>
-        <div class="col-md-1">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-                data-update="{{ path('admin_phone_add') }}">Add new phone</button>
         </div>
     </div>
-    </form>
+  </form>
 
-<div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-    <form id="phone-update-form" method="post">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="exampleModalLabel">New phone</h4>
+    <div class="modal fade" id="alternativeModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <form id="phone-alternative-form" method="post">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Alternatives</h4>
+          </div>
+          <div class="modal-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Phone</th>
+                        <th>Replacement Price</th>
+                        <th>OS</th>
+                        <th>Processor Speed</th>
+                        <th>Processor Cores</th>
+                        <th>Ram</th>
+                        <th>SSD Slot</th>
+                        <th>Screen size</th>
+                        <th>Screen resolution</th>
+                        <th>Camera</th>
+                        <th>4G</th>
+                    </tr>
+                    </thead>
+                    <tbody id="current-table-body">
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Phone</th>
+                        <th>Replacement Price</th>
+                        <th>OS</th>
+                        <th>Processor Speed</th>
+                        <th>Processor Cores</th>
+                        <th>Ram</th>
+                        <th>SSD Slot</th>
+                        <th>Screen size</th>
+                        <th>Screen resolution</th>
+                        <th>Camera</th>
+                        <th>4G</th>
+                    </tr>
+                    </thead>
+                    <tbody id="alternative-table-body">
+                    </tbody>
+                </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <input type="hidden" name="token" value="{{ token }}" />
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+        </div>
       </div>
-      <div class="modal-body">
-          <div class="form-group">
-            <label for="phone-make" class="control-label">Make:</label>
-            <input type="text" class="form-control" id="phone-make" name="make">
-          </div>
-          <div class="form-group">
-            <label for="phone-model" class="control-label">Model:</label>
-            <input type="text" class="form-control" id="phone-model" name="model">
-          </div>
-          <div class="form-group">
-            <label for="phone-devices" class="control-label">Devices:</label>
-            <input type="text" class="form-control" id="phone-devices" name="devices">
-          </div>
-          <div class="form-group">
-            <label for="phone-memory" class="control-label">Memory:</label>
-            <input type="text" class="form-control" id="phone-memory" name="memory">
-          </div>
-          <div class="form-group">
-            <label for="phone-gwp" class="control-label">GWP:</label>
-            <input type="text" class="form-control" id="phone-gwp" name="gwp">
-          </div>
-          <div class="form-group">
-            <label for="phone-premium" class="control-label">Monthly Premium Price:</label>
-            <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
-          </div>
-      </div>
-      <div class="modal-footer">
-        <input type="hidden" name="token" value="{{ token }}" />
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save</button>
-      </div>
-    </form>
     </div>
-  </div>
-</div>
-</div>
-{% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/phone.js'
-    %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}            
+    <div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <form id="phone-update-form" method="post">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="exampleModalLabel">New phone</h4>
+          </div>
+          <div class="modal-body">
+              <div class="form-group">
+                <label for="phone-make" class="control-label">Make:</label>
+                <input type="text" class="form-control" id="phone-make" name="make">
+              </div>
+              <div class="form-group">
+                <label for="phone-model" class="control-label">Model:</label>
+                <input type="text" class="form-control" id="phone-model" name="model">
+              </div>
+              <div class="form-group">
+                <label for="phone-devices" class="control-label">Devices:</label>
+                <input type="text" class="form-control" id="phone-devices" name="devices">
+              </div>
+              <div class="form-group">
+                <label for="phone-memory" class="control-label">Memory:</label>
+                <input type="text" class="form-control" id="phone-memory" name="memory">
+              </div>
+              <div class="form-group">
+                <label for="phone-gwp" class="control-label">GWP:</label>
+                <input type="text" class="form-control" id="phone-gwp" name="gwp">
+              </div>
+              <div class="form-group">
+                <label for="phone-premium" class="control-label">Monthly Premium Price:</label>
+                <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
+              </div>
+          </div>
+          <div class="modal-footer">
+            <input type="hidden" name="token" value="{{ token }}" />
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+</div>
 {% endblock %}
