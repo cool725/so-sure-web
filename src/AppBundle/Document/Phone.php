@@ -76,6 +76,8 @@ class Phone
     /** @MongoDB\Field(type="boolean", name="lte") */
     protected $lte;
 
+    /** @MongoDB\Date(name="release_date", nullable=true) */
+    protected $releaseDate;
 
     public function __construct()
     {
@@ -135,7 +137,7 @@ class Phone
         $this->screenResolutionHeight = $screenResolutionHeight;
         $this->camera = $camera;
         $this->lte = $lte;
-        //$this->releaseDate = $releaseDate;
+        $this->releaseDate = $releaseDate;
     }
 
     public function getOs()

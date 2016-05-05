@@ -118,7 +118,7 @@ class AdminController extends BaseController
      * @Route("/phone/{id}/alternatives", name="admin_phone_alternatives")
      * @Method({"GET"})
      */
-    public function phoneAlternativesAction(Request $request, $id)
+    public function phoneAlternativesAction($id)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);

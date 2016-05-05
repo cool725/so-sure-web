@@ -229,7 +229,14 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
         );
 
         $resolution = explode('x', str_replace(' ', '', $data[17]));
-        $releaseDate = \DateTime::createFromFormat('m/y', $data[20]);
+        $releaseDate = null;
+        $releaseDateText = str_replace(' ', '', $data[21]);
+        if (strlen($releaseDateText) > 0) {
+            $releaseDate = \DateTime::createFromFormat('m/y', $releaseDateText);
+            $releaseDate->setTime(0, 0);
+            // otherwise is current day
+            $releaseDate->modify('first day of this month');
+        }
         $phone->setDetails(
             $data[9], // $os,
             $data[10], // $initialOsVersion,
