@@ -41,9 +41,13 @@
 
         {% include '::footer.html.twig' %}
 
-        <!-- jQuery -->
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        {% if use_cdn %}
+            <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        {% else %}
+            <script src="/components/jquery/jquery.min.js"></script>
+            <script src="/components/bootstrap/bootstrap.js"></script>
+        {% endif %}
         <script src="//cdn.optimizely.com/js/4833800075.js"></script>
         <script src="https://cdn.smooch.io/smooch.min.js"></script>
         {% block javascripts %}
