@@ -537,6 +537,7 @@ class User extends BaseUser
           'has_cancelled_policy' => $this->hasCancelledPolicy(),
           'has_unpaid_policy' => $this->hasUnpaidPolicy(),
           'has_valid_policy' => $this->hasValidPolicy(),
+          'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ISO8601) : null
         ];
     }
 }
