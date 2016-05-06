@@ -29,11 +29,11 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
 
     protected function loadCsv(ObjectManager $manager)
     {
-        $row = 0;
         $file = sprintf(
             "%s/../src/AppBundle/DataFixtures/devices.csv",
             $this->container->getParameter('kernel.root_dir')
         );
+        $row = 0;
         if (($handle = fopen($file, "r")) !== FALSE) {
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                 if ($row > 0) {
@@ -49,6 +49,7 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
 
         $manager->flush();
 
+        $row = 0;
         if (($handle = fopen($file, "r")) !== FALSE) {
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                 if ($row > 0) {
@@ -229,17 +230,22 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
 
     private function setSuggestedReplacement($manager, $data)
     {
+        if (!$data[24]) {
+            return;
+        }
+
         $phoneRepo = $manager->getRepository(Phone::class);
-        $phone = $phoneRepo->findOneBy(['make' => $data[0], 'model' => $data[1], 'memory' => $data[3]]);
-        $replacement = $phoneRepo->findOneBy(['make' => $data[24], 'model' => $data[25], 'memory' => $data[26]]);
+        $replacementQuery = ['make' => trim($data[24]), 'model' => trim($data[25]), 'memory' => (int)trim($data[26])];
+        $replacement = $phoneRepo->findOneBy($replacementQuery);
         if ($replacement) {
+            $phone = $phoneRepo->findOneBy(['make' => $data[0], 'model' => $data[1], 'memory' => (int)$data[3]]);
             $phone->setSuggestedReplacement($replacement);
         }
     }
 
     private function newPhoneFromRow($manager, $data)
     {
-        if (!$data[5]) {
+        if (!$data[4]) {
             return;
         }
 

@@ -299,7 +299,7 @@ class Phone
         return $this->suggestedReplacement;
     }
 
-    public function setSuggestedReplacment($suggestedReplacement)
+    public function setSuggestedReplacement($suggestedReplacement)
     {
         $this->suggestedReplacement = $suggestedReplacement;
     }
@@ -315,12 +315,15 @@ class Phone
 
     public function policyProfit($claimFrequency)
     {
-        if (!$this->getReplacementPrice()) {
+        $price = $this->getReplacementPrice();
+        if (!$price && $this->getSuggestedReplacement()) {
+            $price = $this->getSuggestedReplacement()->getReplacementPrice();
+        }
+        if (!$price) {
             return null;
         }
 
-        $profit = $this->getCurrentPhonePrice()->getYearlyPremiumPrice() -
-            $this->getReplacementPrice() * $claimFrequency;
+        $profit = $this->getCurrentPhonePrice()->getYearlyPremiumPrice() - $price * $claimFrequency;
 
         return $this->toTopTwoDp($profit);
     }
@@ -385,10 +388,13 @@ class Phone
             'processor_cores' => $this->getProcessorCores(),
             'ram' => $this->getRam(),
             'ssd' => $this->getSsd(),
-            'screen_physical' => $this->getScreenPhysicalInch(),
+            'screen_physical_inch' => $this->getScreenPhysicalInch(),
+            'screen_physical' => $this->getScreenPhysical(),
             'screen_resolution' => $this->getScreenResolution(),
             'camera' => $this->getCamera(),
             'lte' => $this->getLte(),
+            'age' => $this->getAge(),
+            'initial_price' => $this->getInitialPrice(),
         ];
     }
 }

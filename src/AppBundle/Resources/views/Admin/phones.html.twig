@@ -49,7 +49,7 @@
                             </td>
                             <td>
                                 {% if phone.suggestedReplacement %}
-                                    {{ phone.suggestedReplacement.replacementPrice }}
+                                    {{ phone.suggestedReplacement.replacementPrice }} <i class="fa fa-info-circle" title="Suggested Replacement Price"></i>
                                 {% elseif phone.replacementPrice > 0 %}
                                     {{ phone.replacementPrice }}
                                 {% endif %}
@@ -106,7 +106,7 @@
                             <td>{{ phone.camera }} MP</td>
                             <td>{% if phone.lte %}Yes{%else%}No{%endif%}</td>
                             <td>
-                                <button type="button" class="btn {% if phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
+                                <button type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
                                     data-query="{{ path('admin_phone_alternatives', {'id': phone.id}) }}"
                                     data-phone="{{ phone.toAlternativeArray()|json_encode }}"
                                     {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
@@ -181,6 +181,8 @@
                         <th>Screen resolution</th>
                         <th>Camera</th>
                         <th>4G</th>
+                        <th>Age</th>
+                        <th>Initial Price</th>
                     </tr>
                     </thead>
                     <tbody id="current-table-body">
@@ -202,6 +204,8 @@
                         <th>Screen resolution</th>
                         <th>Camera</th>
                         <th>4G</th>
+                        <th>Age</th>
+                        <th>Initial Price</th>
                     </tr>
                     </thead>
                     <tbody id="alternative-table-body">

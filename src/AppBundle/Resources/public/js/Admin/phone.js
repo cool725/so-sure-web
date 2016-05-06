@@ -21,10 +21,15 @@ $('#phoneModal').on('show.bs.modal', function (event) {
   }
 });
 
-var compareValue = function(key, check, source, compare) {
-  if (!source) {
-    return check[key];
+var compareValue = function(key, check, source, compare, display, offset) {
+  if (!display) {
+    display = check[key];
   }
+
+  if (!source) {
+    return display;
+  }
+
   var color = 'text-danger';
   if (compare == 'gte') {
     if (check[key] >= source[key]) {
@@ -34,9 +39,17 @@ var compareValue = function(key, check, source, compare) {
     if (check[key] == source[key]) {
       color = 'text-success';
     }    
+  } else if (compare == 'lte') {
+    if (check[key] <= source[key]) {
+      color = 'text-success';
+    }    
+  } else if (compare == 'within') {
+    if (check[key] >= source[key] - offset && check[key] <= source[key] + offset) {
+      color = 'text-success';
+    }    
   }
-  
-  return '<span class="' + color + '">' + check[key] + '</span>';
+
+  return '<span class="' + color + '">' + display + '</span>';
 }
 
 var phoneToRow = function(item, compare) {
@@ -48,10 +61,12 @@ var phoneToRow = function(item, compare) {
     compareValue('processor_cores', item, compare, 'gte'),
     compareValue('ram', item, compare, 'gte'),
     compareValue('ssd', item, compare, 'eq'),
-    item['screen_physical'],
+    compareValue('screen_physical', item, compare, 'within', item['screen_physical_inch'], 13),
     item['screen_resolution'],
     compareValue('camera', item, compare, 'gte'),
-    compareValue('lte', item, compare, 'eq')
+    compareValue('lte', item, compare, 'eq'),
+    compareValue('age', item, compare, 'lte'),
+    compareValue('initial_price', item, compare, 'within', null, 100)
   ];
   var row = "<tr><td>" + row_data.join('</td><td>') + "</td></tr>";
 
