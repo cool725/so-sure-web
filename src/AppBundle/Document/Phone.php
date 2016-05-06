@@ -79,6 +79,11 @@ class Phone
     /** @MongoDB\Date(name="release_date", nullable=true) */
     protected $releaseDate;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Phone", name="suggested_replacment")
+     */
+    protected $suggestedReplacement;
+
     public function __construct()
     {
     }
@@ -287,6 +292,16 @@ class Phone
     public function getReleaseDate()
     {
         return $this->releaseDate;
+    }
+
+    public function getSuggestedReplacement()
+    {
+        return $this->suggestedReplacement;
+    }
+
+    public function setSuggestedReplacment($suggestedReplacement)
+    {
+        $this->suggestedReplacement = $suggestedReplacement;
     }
 
     public function getAge()

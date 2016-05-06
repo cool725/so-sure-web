@@ -29,6 +29,7 @@
                     <tr>
                         <th>Phone</th>
                         <th>Initial Price</th>
+                        <th>Suggested Replacement Phone</th>
                         <th>Replacement Price</th>
                         <th>Monthly Premium</th>
                         <th>Yearly Premium</th>
@@ -41,7 +42,18 @@
                         <tr>
                             <td>{{ phone }}</td>
                             <td>{{ phone.initialPrice }}</td>
-                            <td>{{ phone.replacementPrice }}</td>
+                            <td>
+                                {% if phone.suggestedReplacement %}
+                                    {{ phone.suggestedReplacement }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if phone.suggestedReplacement %}
+                                    {{ phone.suggestedReplacement.replacementPrice }}
+                                {% elseif phone.replacementPrice > 0 %}
+                                    {{ phone.replacementPrice }}
+                                {% endif %}
+                            </td>
                             <td>{{ phone.currentPhonePrice.monthlyPremiumPrice }}</td>
                             <td>{{ phone.currentPhonePrice.yearlyPremiumPrice }}</td>
                             <td>{{ phone.policyProfit(0.25) }}</td>
