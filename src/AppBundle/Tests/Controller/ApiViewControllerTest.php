@@ -21,10 +21,10 @@ class ApiViewControllerTest extends BaseControllerTest
 
     public function testPolicyTerms()
     {
-        $crawler = self::$client->request('GET', '/api/view/policy/terms');
+        $crawler = self::$client->request('GET', '/view/policy/terms');
         self::verifyResponse(404);
         $policyKey = self::$client->getContainer()->getParameter('policy_key');
-        $url = sprintf('/api/view/policy/terms?policy_key=%s', $policyKey);
+        $url = sprintf('/view/policy/terms?policy_key=%s', $policyKey);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(404);
     }
