@@ -25,7 +25,7 @@ class InvitationController extends BaseController
         
         // TODO: Change to more friendly templates
         if (!$invitation) {
-            return $this->createNotFoundException('Unable to find invitation');
+            throw $this->createNotFoundException('Unable to find invitation');
         } elseif ($invitation->isSingleUse() && $invitation->hasAccepted()) {
             return $this->render('AppBundle:Invitation:accepted.html.twig');
         } elseif ($this->getUser() !== null) {

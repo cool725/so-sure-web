@@ -19,13 +19,27 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
- * @Route("/api/view")
+ * @Route("/view")
  */
 class ApiViewController extends BaseController
 {
     /**
-     * @Route("/policy/{id}/terms", name="policy_terms")
+     * @Route("/policy/terms", name="latest_policy_terms")
      * @Template
+     */
+    public function policyLatestTermsAction(Request $request)
+    {
+        $policyKey = $this->getParameter('policy_key');
+        if ($request->get('policy_key') != $policyKey) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        return array();
+    }
+
+    /**
+     * @Route("/policy/{id}/terms", name="policy_terms")
+     * @Template("AppBundle::ApiView/policyLatestTerms.html.twig")
      */
     public function policyTermsAction(Request $request, $id)
     {
@@ -33,24 +47,15 @@ class ApiViewController extends BaseController
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
         if (!$policy) {
-            return $this->createNotFoundException('Policy not found');
+            throw $this->createNotFoundException('Policy not found');
         }
         $policyKey = $this->getParameter('policy_key');
         if ($request->get('policy_key') != $policyKey) {
-            return $this->createNotFoundException('Policy not found');
+            throw $this->createNotFoundException('Policy not found');
         }
 
         // TODO: Later would determine which terms to display
 
-        return array();
-    }
-
-    /**
-     * @Route("/terms", name="latest_terms")
-     * @Template
-     */
-    public function apiTermsAction(Request $request, $id)
-    {
         return array();
     }
 }

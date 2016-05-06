@@ -380,10 +380,10 @@ class ApiController extends BaseController
     }
 
     /**
-     * @Route("/terms", name="api_get_terms")
+     * @Route("/policy/terms", name="api_get_policy_terms")
      * @Method({"GET"})
      */
-    public function getTermsAction($id)
+    public function getLatestTermsAction()
     {
         try {
             $dm = $this->getManager();
@@ -396,19 +396,15 @@ class ApiController extends BaseController
                     404
                 );
             }
-            $this->denyAccessUnlessGranted('view', $policy);
             $policyTermsUrl = $this->get('router')->generate(
-                'policy_terms',
+                'latest_policy_terms',
                 [
-                    'id' => $policy->getId(),
                     'policy_key' => $this->getParameter('policy_key'),
                 ],
                 true
             );
 
             return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));
-        } catch (AccessDeniedException $ade) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api getPolicyTerms. %s', $e->getMessage()));
 
