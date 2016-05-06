@@ -48,6 +48,7 @@ twig:
         google_analytics: %google_analytics%
         branch_key: %branch_key%
         smooch_key: %smooch_key%
+        use_cdn: true
 
 doctrine_mongodb:
     connections:
