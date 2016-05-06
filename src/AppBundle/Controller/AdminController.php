@@ -182,7 +182,7 @@ class AdminController extends BaseController
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
         if (!$policy) {
-            return $this->createNotFoundException('Policy not found');
+            throw $this->createNotFoundException('Policy not found');
         }
         $form = $this->createForm(CancelPolicyType::class);
         $form->handleRequest($request);

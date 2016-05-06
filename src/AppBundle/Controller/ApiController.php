@@ -15,6 +15,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
+use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -374,6 +375,39 @@ class ApiController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Endpoint added', 200);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api snsAction. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/terms", name="api_get_policy_terms")
+     * @Method({"GET"})
+     */
+    public function getLatestTermsAction()
+    {
+        try {
+            $dm = $this->getManager();
+            $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+            if (!$latestTerms) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find terms',
+                    404
+                );
+            }
+            $policyTermsUrl = $this->get('router')->generate(
+                'latest_policy_terms',
+                [
+                    'policy_key' => $this->getParameter('policy_key'),
+                ],
+                true
+            );
+
+            return new JsonResponse($latestTerms->toApiArray($policyTermsUrl));
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api getLatestPolicyTerms. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

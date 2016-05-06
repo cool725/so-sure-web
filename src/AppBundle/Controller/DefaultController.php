@@ -199,28 +199,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/policy/{id}/terms", name="policy_terms")
-     * @Template
-     */
-    public function policyTermsAction(Request $request, $id)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($id);
-        if (!$policy) {
-            return $this->createNotFoundException('Policy not found');
-        }
-        $policyKey = $this->getParameter('policy_key');
-        if ($request->get('policy_key') != $policyKey) {
-            return $this->createNotFoundException('Policy not found');
-        }
-
-        // TODO: Later would determine which terms to display
-
-        return array();
-    }
-
-    /**
      * @Route("/phone/{make}/{model}", name="phone_make_model")
      * @Template
      */

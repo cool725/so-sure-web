@@ -208,6 +208,23 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
+    // policy/terms
+
+    /**
+     *
+     */
+    public function testGetPolicyTerms()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = '/api/v1/policy/terms?_method=GET';
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(200);
+        $policyTermsUrl = self::$router->generate('latest_policy_terms');
+        $this->assertTrue(stripos($getData["view_url"], $policyTermsUrl) >= 0);
+        $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
+    }
+
     // quote
     
     /**
