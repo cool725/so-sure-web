@@ -15,6 +15,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
+use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -404,9 +405,9 @@ class ApiController extends BaseController
                 true
             );
 
-            return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));
+            return new JsonResponse($latestTerms->toApiArray($policyTermsUrl));
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api getPolicyTerms. %s', $e->getMessage()));
+            $this->get('logger')->error(sprintf('Error in api getLatestPolicyTerms. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
