@@ -380,6 +380,43 @@ class ApiController extends BaseController
     }
 
     /**
+     * @Route("/terms", name="api_get_terms")
+     * @Method({"GET"})
+     */
+    public function getTermsAction($id)
+    {
+        try {
+            $dm = $this->getManager();
+            $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+            if (!$latestTerms) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find terms',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted('view', $policy);
+            $policyTermsUrl = $this->get('router')->generate(
+                'policy_terms',
+                [
+                    'id' => $policy->getId(),
+                    'policy_key' => $this->getParameter('policy_key'),
+                ],
+                true
+            );
+
+            return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api getPolicyTerms. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/token", name="api_token")
      * @Method({"POST"})
      */
