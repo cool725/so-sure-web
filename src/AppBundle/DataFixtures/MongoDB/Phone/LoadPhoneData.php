@@ -5,11 +5,65 @@ namespace AppBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\Phone;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // @codingStandardsIgnoreFile
-class LoadPhoneData implements FixtureInterface
+class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     public function load(ObjectManager $manager)
+    {
+        $this->loadCsv($manager);
+        // $this->loadPreLaunch($manager);
+    }
+
+    protected function loadCsv(ObjectManager $manager)
+    {
+        $file = sprintf(
+            "%s/../src/AppBundle/DataFixtures/devices.csv",
+            $this->container->getParameter('kernel.root_dir')
+        );
+        $row = 0;
+        if (($handle = fopen($file, "r")) !== FALSE) {
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                if ($row > 0) {
+                    $this->newPhoneFromRow($manager, $data);
+                }
+                if ($row % 1000 == 0) {
+                    $manager->flush();
+                }
+                $row = $row + 1;
+            }
+            fclose($handle);
+        }
+
+        $manager->flush();
+
+        $row = 0;
+        if (($handle = fopen($file, "r")) !== FALSE) {
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                if ($row > 0) {
+                    $this->setSuggestedReplacement($manager, $data);
+                }
+                $row = $row + 1;
+            }
+            fclose($handle);
+        }
+
+        $manager->flush();
+    }
+
+    protected function loadPreLaunch(ObjectManager $manager)
     {
         $this->newPhone($manager, 'ALL', 'MSRP £150 or less', 4.29);
         $this->newPhone($manager, 'ALL', 'MSRP £151 to £250', 5.29);
@@ -82,8 +136,6 @@ class LoadPhoneData implements FixtureInterface
         $this->newPhone($manager, 'LG', 'Nexus 5', 5.79, 16, ['hammerhead']);
         $this->newPhone($manager, 'LG', 'Nexus 5X', 5.79, 16, ['bullhead']);
         $this->newPhone($manager, 'LG', 'Nexus 5X', 5.79, 32, ['bullhead']);
-        $this->newPhone($manager, 'LG', 'Optimus One', 5.79, null, ['thunderg']);
-        $this->newPhone($manager, 'LG', 'Optimus 4x', 6.29, null, ['x3']);
         $this->newPhone($manager, 'LG', 'G Flex', 8.29, null, ['zee']);
         $this->newPhone($manager, 'LG', 'G Flex 2', 6.29, null, ['z2']);
         $this->newPhone($manager, 'LG', 'G 2', 5.79, null, ['g2']);
@@ -94,11 +146,8 @@ class LoadPhoneData implements FixtureInterface
         $this->newPhone($manager, 'Sony', 'Xperia E3', 4.29, null, ['D2202', 'D2203', 'D2206', 'D2243', 'D2212']);
         $this->newPhone($manager, 'Sony', 'Xperia L', 4.29, null, ['C2104']);
         $this->newPhone($manager, 'Sony', 'Xperia M', 4.29, null, ['C1904', 'C1905', 'C2004']);
-        $this->newPhone($manager, 'Sony', 'Xperia M2 Aqua', 5.29, null, ['D2403', 'D2406']);
         $this->newPhone($manager, 'Sony', 'Xperia M2', 5.29, null, ['D2303', 'D2305', 'D2306']);
         $this->newPhone($manager, 'Sony', 'Xperia SP', 5.29, null, ['C5302', 'C5303', 'C5306', 'M35h', 'M35t']);
-        $this->newPhone($manager, 'Sony', 'Xperia T2 Ultra', 5.29, null, ['D5303', 'D5306', 'D5316', 'D5316N', 'D5322', 'D5322']);
-        $this->newPhone($manager, 'Sony', 'Xperia T3', 5.79, null, ['D5102', 'D5103', 'D5106']);
         $this->newPhone($manager, 'Sony', 'Xperia Z Ultra', 5.79, null, ['C6802', 'C6806', 'C6833', 'C6843', 'SGP412', 'SOL24', 'XL39h']);
         $this->newPhone($manager, 'Sony', 'Xperia Z', 5.79, null, ['C6602', 'C6603', 'C6606', 'C6616', 'L36h', 'SO-02E']);
         $this->newPhone($manager, 'Sony', 'Xperia Z1 Compact', 5.79, null, ['D5503', 'M51w']);
@@ -107,30 +156,41 @@ class LoadPhoneData implements FixtureInterface
         $this->newPhone($manager, 'Sony', 'Xperia Z3 Compact', 6.29, null, ['D5803', 'D5833', 'SO-02G']);
         $this->newPhone($manager, 'Sony', 'Xperia Z5', 7.29, null, ['501SO', 'E6603', 'E6653', 'SO-01H', 'SOV32']);
         $this->newPhone($manager, 'Sony', 'Xperia Z5 Compact', 6.29, null, ['E5803', 'E5823', 'SO-02H']);
+        $this->newPhone($manager, 'Sony', 'Xperia M2 Aqua', 5.29, null, ['D2403', 'D2406']);        
+        $this->newPhone($manager, 'Sony', 'Xperia T2 Ultra', 5.29, null, ['D5303', 'D5306', 'D5316', 'D5316N', 'D5322', 'D5322']);
+        $this->newPhone($manager, 'Sony', 'Xperia T3', 5.79, null, ['D5102', 'D5103', 'D5106']);
         $this->newPhone($manager, 'HTC', 'One M9', 7.29, null, ['htc_himauhl', 'htc_himaul', 'htc_himaulatt', 'htc_himawhl', 'htc_himawl']);
         $this->newPhone($manager, 'HTC', 'One M8s', 6.29, null, ['htc_m8qlul']);
         $this->newPhone($manager, 'HTC', 'One M8', 7.29, null, ['htc_m8', 'htc_m8dug', 'htc_m8dwg', 'htc_m8whl', 'htc_m8wl', 'htc_m8dug']);
         $this->newPhone($manager, 'HTC', 'One Mini 2', 5.79, null, ['htc_memul']);
-        $this->newPhone($manager, 'HTC', 'One Dual Sim', 7.29, null, ['m7cdwg']);
-        $this->newPhone($manager, 'HTC', 'One Max', 7.29, null, ['t6ul', 't6whl']);
         $this->newPhone($manager, 'HTC', 'One Mini', 5.79, null, ['htc_m4', 'm4']);
         $this->newPhone($manager, 'HTC', 'One X', 6.29, null, ['endeavoru']);
-        $this->newPhone($manager, 'HTC', 'M7', 5.79, null, ['m7', 'm7cdtu', 'm7cdug', 'm7cdwg', 'm7wls']);
-        $this->newPhone($manager, 'HTC', 'Desire', 5.79, null, ['bravo']);
+        $this->newPhone($manager, 'HTC', 'One Max', 7.29, null, ['t6ul', 't6whl']);
         $this->newPhone($manager, 'HTC', 'Desire Eye', 5.79, null, ['htc_eyetuhl', 'htc_eyeul', 'htc_eyeul_att']);
-        $this->newPhone($manager, 'HTC', 'Desire 620', 5.29, null, ['htc_a31dtul']);
-        $this->newPhone($manager, 'HTC', 'Desire 510', 5.29, null, ['htc_a11ul8x26', 'htc_a11chl', 'htc_a11ul']);
-        $this->newPhone($manager, 'HTC', 'Desire 816', 5.79, null, ['htc_a5chl', 'htc_a5ul', 'htc_a5dug']);
-        $this->newPhone($manager, 'HTC', 'Desire 610', 5.29, null, ['htc_a3qhdul', 'htc_a3ul']);
+        $this->newPhone($manager, 'HTC', 'M7', 5.79, null, ['m7', 'm7cdtu', 'm7cdug', 'm7cdwg', 'm7wls']);
         $this->newPhone($manager, 'HTC', 'Desire 500', 5.29, null, ['z4u', 'z4dug']);
+        $this->newPhone($manager, 'HTC', 'Desire 510', 5.29, null, ['htc_a11ul8x26', 'htc_a11chl', 'htc_a11ul']);
+        $this->newPhone($manager, 'HTC', 'Desire 620', 5.29, null, ['htc_a31dtul']);
+        $this->newPhone($manager, 'HTC', 'Desire 610', 5.29, null, ['htc_a3qhdul', 'htc_a3ul']);
+        $this->newPhone($manager, 'HTC', 'Desire 816', 5.79, null, ['htc_a5chl', 'htc_a5ul', 'htc_a5dug']);
         $this->newPhone($manager, 'HTC', 'Desire 820', 5.79, null, ['htc_a51ul', 'htc_a51dtul']);
         $this->newPhone($manager, 'Motorola', 'Moto X', 5.79, null, ['ghost', 'victara']);
-        $this->newPhone($manager, 'Motorola', 'Razr HD', 6.29, null, ['vanquish']);
         $this->newPhone($manager, 'Motorola', 'Moto G', 4.29, null, ['falcon_cdma', 'falcon_umts', 'falcon_umtsds', 'titan_udstv', 'titan_umts', 'titan_umtsds', 'osprey_cdma', 'osprey_u2', 'osprey_uds', 'osprey_udstv', 'osprey_umts']);
         $this->newPhone($manager, 'Motorola', 'Moto E', 4.29, null, ['condor_cdma', 'condor_udstv', 'condor_umts', 'condor_umtsds', 'otus', 'otus_ds']);
         $this->newPhone($manager, 'OnePlus', 'One', 5.29, 16, ['A0001']);
         $this->newPhone($manager, 'OnePlus', 'One', 5.79, 64, ['A0001']);
 
+        // 10/10
+        // $this->newPhone($manager, 'LG', 'Optimus One', 5.79, null, ['thunderg']);
+        // 6/12
+        // $this->newPhone($manager, 'LG', 'Optimus 4x', 6.29, null, ['x3']);
+        // 10/12
+        // $this->newPhone($manager, 'Motorola', 'Razr HD', 6.29, null, ['vanquish']);
+        // dual sim
+        // $this->newPhone($manager, 'HTC', 'One Dual Sim', 7.29, null, ['m7cdwg']);
+        // 3/10
+        // $this->newPhone($manager, 'HTC', 'Desire', 5.79, null, ['bravo']);
+        
         /*
         $this->newPhone($manager, 'Amazon', 'Fire', 5.79, 32);
         $this->newPhone($manager, 'Amazon', 'Fire', 6.29, 64);
@@ -166,6 +226,77 @@ class LoadPhoneData implements FixtureInterface
         */
 
         $manager->flush();
+    }
+
+    private function setSuggestedReplacement($manager, $data)
+    {
+        if (!$data[24]) {
+            return;
+        }
+
+        $phoneRepo = $manager->getRepository(Phone::class);
+        $replacementQuery = ['make' => trim($data[24]), 'model' => trim($data[25]), 'memory' => (int)trim($data[26])];
+        $replacement = $phoneRepo->findOneBy($replacementQuery);
+        if ($replacement) {
+            $phone = $phoneRepo->findOneBy(['make' => $data[0], 'model' => $data[1], 'memory' => (int)$data[3]]);
+            $phone->setSuggestedReplacement($replacement);
+        }
+    }
+
+    private function newPhoneFromRow($manager, $data)
+    {
+        if (!$data[4]) {
+            return;
+        }
+
+        $devices = str_getcsv($data[4], ",", "'");
+        foreach ($devices as $device) {
+            if (stripos($device, "‘") !== false || stripos($device, "’") !== false) {
+                throw new \Exception(sprintf('Invalid apple quote for device %s', $device));
+            }
+        }
+
+        $phone = new Phone();
+        $phone->init(
+            $data[0], // $make
+            $data[1], // $model
+            $data[5] + 1.5, // $premium
+            $data[3], // $memory
+            $devices, // $devices
+            str_replace('£', '', $data[7]), // $initialPrice
+            str_replace('£', '', $data[6]), // $replacementPrice
+            $data[8] // $initialPriceUrl
+        );
+
+        $resolution = explode('x', str_replace(' ', '', $data[17]));
+        $releaseDate = null;
+        $releaseDateText = str_replace(' ', '', $data[21]);
+        if (strlen($releaseDateText) > 0) {
+            $releaseDate = \DateTime::createFromFormat('m/y', $releaseDateText);
+            $releaseDate->setTime(0, 0);
+            // otherwise is current day
+            $releaseDate->modify('first day of this month');
+        }
+        $phone->setDetails(
+            $data[9], // $os,
+            $data[10], // $initialOsVersion,
+            $data[11], // $upgradeOsVersion,
+            $data[12], // $processorSpeed,
+            $data[13], // $processorCores,
+            $data[14], // $ram,
+            $data[15] == 'Y' ? true : false, // $ssd,
+            round($data[16]), // $screenPhysical,
+            $resolution[0], // $screenResolutionWidth,
+            $resolution[1], // $screenResolutionHeight,
+            round($data[18]), // $camera
+            $data[19] == 'Y' ? true : false, // $lte
+            $releaseDate // $releaseDate
+        );
+
+        $manager->persist($phone);
+        if (!$phone->getCurrentPhonePrice()) {
+            throw new \Exception('Failed to init phone');
+        }
     }
 
     private function newPhone($manager, $make, $model, $policyPrice, $memory = null, $devices = null)

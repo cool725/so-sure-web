@@ -24,6 +24,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
     public function load(ObjectManager $manager)
     {
         $this->newUser('patrick@so-sure.com', 'test', ['ROLE_ADMIN']);
+        $this->newUser('dylan@so-sure.com', 'w3ares0sure!', ['ROLE_ADMIN']);
         $this->newUser('claims@so-sure.com', 'w3ares0sure!', ['ROLE_CLAIMS']);
         $manager->flush();
     }
