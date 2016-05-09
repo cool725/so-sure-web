@@ -4,5 +4,11 @@
 {% block title %}so-sure - Invitation{% endblock %}
 
 {% block body %}
-    Please join us
+    <div class="container">
+        Please join us
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+    </div>
 {% endblock %}

@@ -10,6 +10,7 @@ use AppBundle\Document\Invitation\Invitation;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class InvitationController extends BaseController
 {
@@ -17,7 +18,7 @@ class InvitationController extends BaseController
      * @Route("/invitation/{id}", name="invitation")
      * @Template
      */
-    public function invitationAction($id)
+    public function invitationAction(Request $request, $id)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Invitation::class);
@@ -26,14 +27,29 @@ class InvitationController extends BaseController
         // TODO: Change to more friendly templates
         if (!$invitation) {
             throw $this->createNotFoundException('Unable to find invitation');
-        } elseif ($invitation->isSingleUse() && $invitation->hasAccepted()) {
-            return $this->render('AppBundle:Invitation:accepted.html.twig');
+        } elseif ($invitation->isSingleUse() && $invitation->isProcessed()) {
+            return $this->render('AppBundle:Invitation:processed.html.twig');
         } elseif ($this->getUser() !== null) {
             return $this->redirectToRoute('user_invitation', ['id' => $id]);
         }
 
-        
-        return array('invitation' => $invitation);
+        $form = $this->createFormBuilder()
+            ->add('decline', SubmitType::class, array(
+                'label' => "I'm not interested",
+                'attr' => ['class' => 'btn btn-danger'],
+            ))
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $invitationService = $this->get('app.invitation');
+            $invitationService->reject($invitation);
+
+            return $this->render('AppBundle:Invitation:processed.html.twig');
+        }
+        return array(
+            'invitation' => $invitation,
+            'form' => $form->createView(),
+        );
     }
 
     /**
