@@ -6,12 +6,14 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
+//use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Faker;
 
 // @codingStandardsIgnoreFile
 class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
@@ -21,6 +23,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
      */
     private $container;
 
+    private $faker;
+
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -28,14 +32,33 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
     public function load(ObjectManager $manager)
     {
+        $this->faker = Faker\Factory::create('en_GB');
+
+        //$this->newPolicyKeyFacts($manager);
         $this->newPolicyTerms($manager);
         $manager->flush();
 
         $users = $this->newUsers($manager);
         $manager->flush();
 
-        $this->newPolicy($manager, $users);
+        $count = 0;
+        foreach ($users as $user) {
+            $this->newPolicy($manager, $user, $count);
+            $count++;
+        }
+
+        foreach ($users as $user) {
+            $this->addConnections($manager, $user, $users);
+        }
+
         $manager->flush();
+    }
+
+    private function newPolicyKeyFacts($manager)
+    {
+        $policyKeyFacts = new PolicyKeyFacts();
+        $policyKeyFacts->setLatest(true);
+        $manager->persist($policyKeyFacts);
     }
 
     private function newPolicyTerms($manager)
@@ -48,16 +71,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     private function newUsers($manager)
     {
         $users = [];
-        for ($i = 1; $i <= 8; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $user = new User();
-            $user->setEmail(sprintf('user%d@policy.so-sure.net', $i));
-            $user->setFirstName(sprintf('first-%d', $i));
-            $user->setLastName(sprintf('last-%d', $i));
+            $user->setEmail($this->faker->email);
+            $user->setFirstName($this->faker->firstName);
+            $user->setLastName($this->faker->lastName);
+            $user->setMobileNumber($this->faker->mobileNumber);
+
             $address = new Address();
             $address->setType(Address::TYPE_BILLING);
-            $address->setLine1($i);
-            $address->setCity('London');
-            $address->setPostcode('BX11LT');
+            $address->setLine1($this->faker->streetAddress);
+            $address->setCity($this->faker->city);
+            $address->setPostcode($this->faker->address);
+
             $user->addAddress($address);
             $manager->persist($user);
             $users[] = $user;
@@ -65,8 +91,70 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         return $users;
     }
+    
+    private function newPolicy($manager, $user, $count)
+    {
+        $phoneRepo = $manager->getRepository(Phone::class);
+        $phones = $phoneRepo->findAll();
+        $phone = null;
+        while ($phone == null) {
+            $phone = $phones[rand(0, count($phones) - 1)];
+            if (!$phone->getCurrentPhonePrice()) {
+                $phone = null;
+            }
+        }
+        $policy = new PhonePolicy();
+        $policy->setPhone($phone);
+        $policy->create(-5000 + $count);
+        $user->addPolicy($policy);
+        
+        $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
 
-    private function newPolicy($manager, $users)
+        $policy->setPolicyTerms($latestTerms);
+        /*
+        $policy->addPolicyDocument($latestTerms);
+
+        $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
+        $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
+
+        $policy->addPolicyDocument($latestKeyFacts);
+        */
+        $manager->persist($policy);
+    }
+
+    private function addConnections($manager, $userA, $users)
+    {
+        $policyA = $userA->getPolicies()[0];
+        $connections = rand(0, $policyA->getMaxConnections());
+        $connections = rand(0, 4);
+        for ($i = 0; $i < $connections; $i++) {
+            $userB = $users[rand(0, count($users) - 1)];
+            $policyB = $userB->getPolicies()[0];
+
+            $connectionA = new Connection();
+            $connectionA->setUser($userA);
+            $connectionA->setPolicy($policyA);
+            $connectionA->setValue($policyB->getAllowedConnectionValue());
+
+            $connectionB = new Connection();
+            $connectionB->setUser($userB);
+            $connectionB->setPolicy($policyB);
+            $connectionB->setValue($policyA->getAllowedConnectionValue());
+    
+            $policyA->addConnection($connectionB);
+            $policyA->updatePotValue();
+    
+            $policyB->addConnection($connectionA);
+            $policyB->updatePotValue();
+    
+            $manager->persist($connectionA);
+            $manager->persist($connectionB);            
+        }
+    }
+
+    private function createPolicies($manager, $users)
     {
         $userA = new User();
         $userA->setEmail(sprintf('policyA@policy.so-sure.net'));
@@ -111,8 +199,15 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
-        $policyA->setPolicyTerms($latestTerms);
-        $policyB->setPolicyTerms($latestTerms);
+
+        $policyA->addPolicyDocument($latestTerms);
+        $policyB->addPolicyDocument($latestTerms);
+
+        $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
+        $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
+
+        $policyA->addPolicyDocument($latestKeyFacts);
+        $policyB->addPolicyDocument($latestKeyFacts);
 
         $connectionA = new Connection();
         $connectionA->setUser($userB);
