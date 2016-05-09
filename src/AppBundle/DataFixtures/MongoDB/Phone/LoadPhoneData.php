@@ -245,9 +245,16 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
 
     private function newPhoneFromRow($manager, $data)
     {
+        // price
+        if (!$data[5]) {
+            return;
+        }
+        /*
+        // devices
         if (!$data[4]) {
             return;
         }
+        */
 
         $devices = str_getcsv($data[4], ",", "'");
         foreach ($devices as $device) {
