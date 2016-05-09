@@ -10,13 +10,19 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use AppBundle\Document\Claim;
+use AppBundle\Document\Policy;
 
 class CancelPolicyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('cancelledReason', ChoiceType::class, ['choices' => [
+                Policy::CANCELLED_UNPAID => Policy::CANCELLED_UNPAID,
+                Policy::CANCELLED_FRAUD => Policy::CANCELLED_FRAUD,
+                Policy::CANCELLED_GOODWILL => Policy::CANCELLED_GOODWILL,
+                Policy::CANCELLED_COOLOFF => Policy::CANCELLED_COOLOFF,
+            ]])
             ->add('cancel', SubmitType::class)
         ;
     }

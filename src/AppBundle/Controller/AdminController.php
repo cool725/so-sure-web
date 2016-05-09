@@ -217,7 +217,7 @@ class AdminController extends BaseController
         $form = $this->createForm(CancelPolicyType::class);
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $policyService->cancel($policy);
+            $policyService->cancel($policy, $form->get('cancelledReason')->getData());
             $this->addFlash(
                 'success',
                 sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
