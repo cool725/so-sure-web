@@ -15,6 +15,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
@@ -326,7 +327,11 @@ class ApiAuthController extends BaseController
 
             $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
-            $policy->setPolicyTerms($latestTerms);
+            $policy->addPolicyDocument($latestTerms);
+
+            $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
+            $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
+            $policy->addPolicyDocument($latestKeyFacts);
 
             $policy->setPhoneData(json_encode([
                 'make' => $data['phone_policy']['make'],
@@ -516,6 +521,46 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/policy/{id}/keyfacts", name="api_auth_get_policy_keyfacts")
+     * @Method({"GET"})
+     */
+    public function getPolicyKeyFactsAction($id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+            if (!$policy->getPolicyKeyFacts()) {
+                throw new \Exception('Policy is missing keyfacts');
+            }
+            $this->denyAccessUnlessGranted('view', $policy);
+            $policyKeyFactsUrl = $this->get('router')->generate(
+                'policy_keyfacts',
+                [
+                    'id' => $policy->getId(),
+                    'policy_key' => $this->getParameter('policy_key'),
+                ],
+                true
+            );
+
+            return new JsonResponse($policy->getPolicyKeyFacts()->toApiArray($policyKeyFactsUrl));
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api getPolicyKeyFacts. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/policy/{id}/terms", name="api_auth_get_policy_terms")
      * @Method({"GET"})
      */
@@ -531,6 +576,9 @@ class ApiAuthController extends BaseController
                     'Unable to find policy',
                     404
                 );
+            }
+            if (!$policy->getPolicyTerms()) {
+                throw new \Exception('Policy is missing terms');
             }
             $this->denyAccessUnlessGranted('view', $policy);
             $policyTermsUrl = $this->get('router')->generate(

@@ -7,6 +7,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /**
  * @MongoDB\Document
  */
-class PolicyTerms extends PolicyDocument
+class PolicyKeyFacts extends PolicyDocument
 {
 }

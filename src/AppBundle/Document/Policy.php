@@ -70,9 +70,9 @@ abstract class Policy
     protected $invitations;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\PolicyTerms")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\PolicyDocument")
      */
-    protected $policyTerms;
+    protected $policyDocuments;
 
     /**
      * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Connection")
@@ -109,6 +109,7 @@ abstract class Policy
         $this->created = new \DateTime();
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->policyDocuments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -245,14 +246,40 @@ abstract class Policy
         $this->potValue = $potValue;
     }
 
-    public function getPolicyTerms()
+    public function getPolicyDocuments()
     {
-        return $this->policyTerms;
+        return $this->policyDocuments;
     }
 
-    public function setPolicyTerms(PolicyTerms $policyTerms)
+    public function getPolicyKeyFacts()
     {
-        $this->policyTerms = $policyTerms;
+        return null;
+        $policyDocuments = $this->getPolicyDocuments();
+        foreach ($policyDocuments as $policyDocument) {
+            if ($policyDocument instanceof PolicyKeyFacts) {
+                return $policyDocument;
+            }
+        }
+
+        return null;
+    }
+
+    public function getPolicyTerms()
+    {
+        return null;
+        $policyDocuments = $this->getPolicyDocuments();
+        foreach ($policyDocuments as $policyDocument) {
+            if ($policyDocument instanceof PolicyTerms) {
+                return $policyDocument;
+            }
+        }
+
+        return null;
+    }
+
+    public function addPolicyDocument(PolicyDocument $policyDocument)
+    {
+        $this->policyDocuments[] = $policyDocument;
     }
 
     public function getPromoCode()
