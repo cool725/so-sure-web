@@ -4,10 +4,12 @@
         {% if invalid_username is defined %}
             <p>Invalid email address</p>
         {% endif %}
-        <label for="username">Email</label>
-        <input type="text" id="username" name="username" required="required" />
-    </div>
-    <div>
-        <input type="submit" value="Reset my pasword" />
+        <div class="form-group">
+            <label for="username">Email</label>
+            <input type="text" id="username" name="username" required="required" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Reset my pasword" class="btn btn-success" />
+        </div>
     </div>
 </form>
