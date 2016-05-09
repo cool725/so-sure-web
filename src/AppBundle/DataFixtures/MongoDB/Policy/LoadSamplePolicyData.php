@@ -6,7 +6,7 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
-use AppBundle\Document\PolicyKeyFacts;
+//use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -34,7 +34,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        $this->newPolicyKeyFacts($manager);
+        //$this->newPolicyKeyFacts($manager);
         $this->newPolicyTerms($manager);
         $manager->flush();
 
