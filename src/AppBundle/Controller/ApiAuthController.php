@@ -327,18 +327,16 @@ class ApiAuthController extends BaseController
 
             $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
-            $policy->addPolicyDocument($latestTerms);
 
             $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
             $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
-            $policy->addPolicyDocument($latestKeyFacts);
 
+            $policy->init($user, $latestTerms, $latestKeyFacts);
             $policy->setPhoneData(json_encode([
                 'make' => $data['phone_policy']['make'],
                 'device' => $data['phone_policy']['device'],
                 'memory' => $data['phone_policy']['memory'],
             ]));
-            $user->addPolicy($policy);
 
             $dm->persist($policy);
             $dm->flush();

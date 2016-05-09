@@ -66,6 +66,26 @@ class ClaimsController extends BaseController
     }
 
     /**
+     * @Route("/user/{id}", name="claims_user")
+     */
+    public function claimsUserAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->find($id);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+        foreach ($user->getPolicies() as $policy) {
+            if ($policy->isPolicy()) {
+                return $this->redirectToRoute('claims_policy', ['id' => $policy->getId()]);
+            }
+        }
+
+        throw $this->createNotFoundException('User does not have an active policy');
+    }
+
+    /**
      * @Route("/policy/{id}", name="claims_policy")
      * @Template
      */

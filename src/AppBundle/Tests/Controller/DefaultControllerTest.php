@@ -46,8 +46,8 @@ class DefaultControllerTest extends BaseControllerTest
     public function testQuotePhoneRouteMakeModel()
     {
         $crawler = self::$client->request('GET', self::$router->generate('quote_make_model', [
-            'make' => 'HTC',
-            'model' => 'Desire',
+            'make' => 'Apple',
+            'model' => 'iPhone 5',
         ]));
         self::verifyResponse(200);
     }

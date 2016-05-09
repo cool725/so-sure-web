@@ -6,7 +6,7 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
-//use AppBundle\Document\PolicyKeyFacts;
+use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -34,7 +34,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        //$this->newPolicyKeyFacts($manager);
+        $this->newPolicyKeyFacts($manager);
         $this->newPolicyTerms($manager);
         $manager->flush();
 
@@ -103,24 +103,18 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $phone = null;
             }
         }
-        $policy = new PhonePolicy();
-        $policy->setPhone($phone);
-        $policy->create(-5000 + $count);
-        $user->addPolicy($policy);
-        
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
 
-        $policy->setPolicyTerms($latestTerms);
-        /*
-        $policy->addPolicyDocument($latestTerms);
-
         $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
         $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
 
-        $policy->addPolicyDocument($latestKeyFacts);
-        */
+        $policy = new PhonePolicy();
+        $policy->setPhone($phone);
+        $policy->init($user, $latestTerms, $latestKeyFacts);
+        $policy->create(-5000 + $count);
+
         $manager->persist($policy);
     }
 
@@ -132,6 +126,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         for ($i = 0; $i < $connections; $i++) {
             $userB = $users[rand(0, count($users) - 1)];
             $policyB = $userB->getPolicies()[0];
+
+            // only 1 connection for user
+            foreach ($policyA->getConnections() as $connection) {
+                if ($connection->getPolicy()->getId() == $policyB->getId()) {
+                    continue;
+                }
+            }
 
             $connectionA = new Connection();
             $connectionA->setUser($userA);
@@ -186,28 +187,22 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         //\Doctrine\Common\Util\Debug::dump($phone);
         //\Doctrine\Common\Util\Debug::dump($phone->getPhonePrices());
         //\Doctrine\Common\Util\Debug::dump($phone->getCurrentPhonePrice());
-        $policyA = new PhonePolicy();
-        $policyA->setUser($userA);
-        $policyA->setPhone($phone);
-        $policyA->create(-5000);
-
-        $policyB = new PhonePolicy();
-        $policyB->setUser($userB);
-        $policyB->setPhone($phone);
-        $policyB->create(-4999);
-
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
 
-        $policyA->addPolicyDocument($latestTerms);
-        $policyB->addPolicyDocument($latestTerms);
-
         $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
         $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
 
-        $policyA->addPolicyDocument($latestKeyFacts);
-        $policyB->addPolicyDocument($latestKeyFacts);
+        $policyA = new PhonePolicy();
+        $policyA->setPhone($phone);
+        $policyA->init($userA, $latestTerms, $latestKeyFacts);
+        $policyA->create(-5000);
+
+        $policyB = new PhonePolicy();
+        $policyB->setPhone($phone);
+        $policyB->init($userB, $latestTerms, $latestKeyFacts);
+        $policyB->create(-4999);
 
         $connectionA = new Connection();
         $connectionA->setUser($userB);

@@ -5,6 +5,8 @@ namespace AppBundle\Tests;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Address;
+use AppBundle\Document\PolicyKeyFacts;
+use AppBundle\Document\PolicyTerms;
 
 trait UserClassTrait
 {
@@ -59,7 +61,7 @@ trait UserClassTrait
     {
         return str_replace("+44", "0", $mobile);
     }
-    
+
     public static function createPolicy(
         User $user,
         \Doctrine\ODM\MongoDB\DocumentManager $dm,
@@ -67,9 +69,10 @@ trait UserClassTrait
         $date = null
     ) {
         self::addAddress($user);
+
         $policy = new PhonePolicy();
-        $policy->setUser($user);
         $policy->setImei(self::generateRandomImei());
+        $policy->init($user, self::getLatestPolicyTerms($dm), self::getLatestPolicyKeyFacts($dm));
         $policy->create(rand(1, 999999), $date);
         if ($phone) {
             $policy->setPhone($phone);
@@ -79,6 +82,22 @@ trait UserClassTrait
         $dm->flush();
 
         return $policy;
+    }
+
+    public static function getLatestPolicyTerms(\Doctrine\ODM\MongoDB\DocumentManager $dm)
+    {
+        $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+
+        return $latestTerms;
+    }
+
+    public static function getLatestPolicyKeyFacts(\Doctrine\ODM\MongoDB\DocumentManager $dm)
+    {
+        $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
+        $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
+
+        return $latestKeyFacts;
     }
 
     public static function generateRandomImei()

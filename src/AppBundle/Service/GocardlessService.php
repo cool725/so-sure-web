@@ -61,7 +61,7 @@ class GocardlessService
         $this->addBankAccount($policy->getUser(), $sortCode, $accountNumber);
         $this->createMandate($policy);
         $this->subscribe($policy);
-        $this->policyService->create($policy);
+        $this->policyService->create($policy, $policy->getUser());
     }
 
     /**
