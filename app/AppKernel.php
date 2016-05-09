@@ -26,6 +26,7 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new Staffim\RollbarBundle\StaffimRollbarBundle(),
             new Snc\RedisBundle\SncRedisBundle(),
+            new CometCult\BraintreeBundle\CometCultBraintreeBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

@@ -46,6 +46,8 @@ class GocardlessServiceTest extends WebTestCase
         $user = static::createUser(self::$userManager, $email, 'foo');
         $user->setFirstName('foo');
         $user->setLastName('bar');
+        $user->setMobileNumber(static::generateRandomMobile());
+        $user->setBirthday(new \DateTime('1980-01-01'));
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
         $address->setLine1('10 Finsbury Square');

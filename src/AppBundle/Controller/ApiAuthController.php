@@ -231,7 +231,7 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            if (!$user->hasValidGocardlessDetails()) {
+            if (!$user->hasValidBillingDetails()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
                     'User must have billing address set before policy can be created',
@@ -381,49 +381,6 @@ class ApiAuthController extends BaseController
     }
 
     /**
-     * @Route("/policy/{id}/dd", name="api_auth_new_policy_dd")
-     * @Method({"POST"})
-     */
-    public function newPolicyDdAction(Request $request, $id)
-    {
-        try {
-            $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['sort_code', 'account_number', 'first_name', 'last_name'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(Policy::class);
-            $policy = $repo->find($id);
-            if (!$policy) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_NOT_FOUND,
-                    'Unable to find policy',
-                    404
-                );
-            }
-            $this->denyAccessUnlessGranted('edit', $policy);
-
-            $gocardless = $this->get('app.gocardless');
-            $gocardless->add(
-                $policy,
-                $data['first_name'],
-                $data['last_name'],
-                $data['sort_code'],
-                $data['account_number']
-            );
-
-            return new JsonResponse($policy->toApiArray());
-        } catch (AccessDeniedException $ade) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api newPolicyDD. %s', $e->getMessage()));
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
-    }
-
-    /**
      * @Route("/policy/{id}/invitation", name="api_auth_new_invitation")
      * @Method({"POST"})
      */
@@ -553,6 +510,65 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api getPolicyKeyFacts. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/pay", name="api_auth_policy_pay")
+     * @Method({"POST"})
+     */
+    public function payPolicyAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (isset($data['bank_account'])) {
+                if (!$this->validateFields(
+                    $data['bank_account'],
+                    ['sort_code', 'account_number', 'first_name', 'last_name']
+                )) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+            } elseif (isset($data['braintree'])) {
+                if (!$this->validateFields($data['braintree'], ['nonce'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted('edit', $policy);
+
+            if (isset($data['bank_account'])) {
+                $gocardless = $this->get('app.gocardless');
+                $gocardless->add(
+                    $policy,
+                    $data['bank_account']['first_name'],
+                    $data['bank_account']['last_name'],
+                    $data['bank_account']['sort_code'],
+                    $data['bank_account']['account_number']
+                );
+            } elseif (isset($data['braintree'])) {
+                $braintree = $this->get('app.braintree');
+                $braintree->add($policy, $data['braintree']['nonce']);
+            }
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api newPolicyDD. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

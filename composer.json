@@ -39,7 +39,9 @@
         "snc/redis-bundle": "^1.1",
         "predis/predis": "^1.0",
         "egulias/email-validator": "~1.2",
-        "fzaninotto/faker": "^1.6"
+        "fzaninotto/faker": "^1.6",
+        "braintree/braintree_php": "^3.11",
+        "cometcult/braintree-bundle": "^0.1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

@@ -153,3 +153,9 @@ snc_redis:
     session:
         client: session
         ttl: 1200
+
+comet_cult_braintree:
+  environment: %braintree_env%
+  merchant_id: %braintree_merchant_id%
+  public_key:  %braintree_public_key%
+  private_key: %braintree_private_key%

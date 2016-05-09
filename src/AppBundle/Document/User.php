@@ -452,12 +452,8 @@ class User extends BaseUser
         return $this->getGocardless() !== null;
     }
 
-    public function hasValidGocardlessDetails()
+    public function hasValidBillingDetails()
     {
-        if (!$this->getFirstName() || !$this->getLastName()) {
-            return false;
-        }
-
         $billing = $this->getBillingAddress();
         if (!$billing || !$billing->getLine1() || !$billing->getPostcode() || !$billing->getCity()) {
             return false;
