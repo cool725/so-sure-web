@@ -33,6 +33,11 @@ abstract class Policy
     const STATUS_EXPIRED = 'expired';
     const STATUS_UNPAID = 'unpaid';
 
+    const CANCELLED_UNPAID = 'unpaid';
+    const CANCELLED_FRAUD = 'fraud';
+    const CANCELLED_GOODWILL = 'goodwill';
+    const CANCELLED_COOLOFF = 'cooloff';
+
     // First 1000 policies
     const PROMO_LAUNCH = 'launch';
 
@@ -64,6 +69,9 @@ abstract class Policy
 
     /** @MongoDB\Field(type="string") */
     protected $status;
+
+    /** @MongoDB\Field(type="string", name="cancelled_reason") */
+    protected $cancelledReason;
 
     /**
      * @MongoDB\Field(type="string", name="policy_number")
@@ -187,7 +195,17 @@ abstract class Policy
     {
         $this->status = $status;
     }
-    
+
+    public function getCancelledReason()
+    {
+        return $this->cancelledReason;
+    }
+
+    public function setCancelledReason($cancelledReason)
+    {
+        $this->cancelledReason = $cancelledReason;
+    }
+
     public function getPolicyNumber()
     {
         return $this->policyNumber;

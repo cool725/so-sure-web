@@ -58,10 +58,11 @@ class PolicyServiceTest extends WebTestCase
             'bar'
         );
         $policy = static::createPolicy($user, static::$dm);
-        static::$policyService->cancel($policy);
+        static::$policyService->cancel($policy, Policy::CANCELLED_GOODWILL);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::STATUS_CANCELLED, $policy->getStatus());
+        $this->assertEquals(Policy::CANCELLED_GOODWILL, $policy->getCancelledReason());
     }
 
     public function testCreatePolicyHasPromoCode()

@@ -16,7 +16,12 @@
                     </tr>
                     <tr>
                         <td>Policy Status</td>
-                        <td>{{ policy.status }}</td>
+                        <td>
+                          {{ policy.status }}
+                          {% if policy.cancelledReason %}
+                            / {{ policy.cancelledReason }}
+                          {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <td>Policy Dates</td>

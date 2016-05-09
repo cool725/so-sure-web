@@ -14,7 +14,12 @@
 <div class="container">
     <h2>so-sure Claims - {{policy.user.name }}</h2>
     <div class="bg-danger text-right" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-        {{ form_start(form) }}
+        {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
+        <div class="form-group">
+            {{ form_label(form.cancelledReason, 'Reason') }}
+            {{ form_errors(form.cancelledReason) }}
+            {{ form_widget(form.cancelledReason) }}
+        </div>
         {{ form_widget(form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
         {{ form_end(form) }}
     </div>

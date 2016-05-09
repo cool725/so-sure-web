@@ -61,12 +61,13 @@ class PolicyService
         $this->dm->flush();
     }
 
-    public function cancel(Policy $policy, \DateTime $date = null)
+    public function cancel(Policy $policy, $reason, \DateTime $date = null)
     {
         if ($date == null) {
             $date = new \DateTime();
         }
         $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->setCancelledReason($reason);
         $policy->setEnd($date);
 
         // For now, just lock the user.  May want to allow the user to login in the future though...
