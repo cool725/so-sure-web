@@ -172,11 +172,18 @@ abstract class BaseController extends Controller
         return new JsonResponse(['code' => $errorCode, 'description' => $description], $httpCode);
     }
 
-    protected function formToMongoSearch($form, $qb, $formField, $mongoField)
+    protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false)
     {
         $data = $form->get($formField)->getData();
-        if (strlen($data) > 0) {
-            $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/", $data)));
+        if (strlen($data) == 0) {
+            return null;
         }
+
+        $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/", $data)));
+        if ($run) {
+            return $qb->getQuery()->execute();
+        }
+
+        return null;
     }
 }
