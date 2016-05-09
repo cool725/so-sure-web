@@ -74,7 +74,7 @@ parameters:
     plivo_authtoken:     ''
     plivo_sendingnumber: ''
 
-    braintree_env:         ''
+    braintree_env:         'sandbox'
     braintree_merchant_id: 'ChangeMe'
-    braintree_public_key:  ''
-    braintree_private_key: ''
+    braintree_public_key:  'ChangeMe'
+    braintree_private_key: 'ChangeMe'
