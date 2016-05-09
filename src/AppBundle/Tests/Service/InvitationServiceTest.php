@@ -301,7 +301,7 @@ class InvitationServiceTest extends WebTestCase
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite6', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
-        self::$invitationService->cancel($invitation);
+        self::$invitationService->cancel($invitation, Policy::CANCELLED_FRAUD);
 
         $this->assertTrue($invitation->isCancelled());
     }
@@ -552,7 +552,7 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-02-01'));
 
         // Now Cancel policy
-        self::$policyService->cancel($policyInvitee, new \DateTime('2016-04-03'));
+        self::$policyService->cancel($policyInvitee, Policy::CANCELLED_FRAUD, new \DateTime('2016-04-03'));
 
         $userInvitee = static::createUser(
             static::$userManager,
