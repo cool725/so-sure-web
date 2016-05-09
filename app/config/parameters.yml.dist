@@ -75,6 +75,6 @@ parameters:
     plivo_sendingnumber: ''
 
     braintree_env:         ''
-    braintree_merchant_id: ''
+    braintree_merchant_id: 'ChangeMe'
     braintree_public_key:  ''
     braintree_private_key: ''
