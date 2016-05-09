@@ -20,6 +20,9 @@ class PolicyDocument
     /** @MongoDB\Field(type="boolean") */
     protected $latest;
 
+    /** @MongoDB\Field(type="string") */
+    protected $version;
+
     public function __construct()
     {
     }
@@ -39,11 +42,22 @@ class PolicyDocument
         $this->latest = $latest;
     }
 
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    public function setVersion($version)
+    {
+        $this->version = $version;
+    }
+
     public function toApiArray($viewUrl)
     {
         return [
             'id' => $this->getId(),
             'view_url' => $viewUrl,
+            'version' => $this->getVersion()
         ];
     }
 }

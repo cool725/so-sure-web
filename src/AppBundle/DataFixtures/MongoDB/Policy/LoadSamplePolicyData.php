@@ -58,6 +58,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $policyKeyFacts = new PolicyKeyFacts();
         $policyKeyFacts->setLatest(true);
+        $policyKeyFacts->setVersion('Version 1 May 2016');
         $manager->persist($policyKeyFacts);
     }
 
@@ -65,6 +66,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $policyTerms = new PolicyTerms();
         $policyTerms->setLatest(true);
+        $policyTerms->setVersion('Version 1 May 2016');
         $manager->persist($policyTerms);
     }
 
