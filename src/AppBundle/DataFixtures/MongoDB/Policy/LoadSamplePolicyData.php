@@ -71,7 +71,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     private function newUsers($manager)
     {
         $users = [];
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 200; $i++) {
             $user = new User();
             $user->setEmail($this->faker->email);
             $user->setFirstName($this->faker->firstName);
@@ -110,10 +110,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
         $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
 
+        $startDate = new \DateTime();
+        $startDate->sub(new \DateInterval(sprintf("P%dD", rand(0, 120))));
         $policy = new PhonePolicy();
         $policy->setPhone($phone);
         $policy->init($user, $latestTerms, $latestKeyFacts);
-        $policy->create(-5000 + $count);
+        $policy->create(-5000 + $count, $startDate);
 
         $manager->persist($policy);
     }
