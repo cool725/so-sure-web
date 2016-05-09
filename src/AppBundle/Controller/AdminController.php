@@ -220,6 +220,7 @@ class AdminController extends BaseController
             'policy' => $policy,
             'form' => $form->createView(),
             'fraud' => $checks,
+            'policy_route' => 'admin_policy',
         ];
     }
 }

@@ -116,6 +116,7 @@ class ClaimsController extends BaseController
             'policy' => $policy,
             'form' => $form->createView(),
             'fraud' => $checks,
+            'policy_route' => 'claims_policy',
         ];
     }
 }

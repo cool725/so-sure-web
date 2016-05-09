@@ -240,6 +240,7 @@ class ApiControllerTest extends BaseControllerTest
         $policyTermsUrl = self::$router->generate('latest_policy_terms');
         $this->assertTrue(stripos($getData["view_url"], $policyTermsUrl) >= 0);
         $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
+        $this->assertTrue(stripos($getData["view_url"], 'Version') >= 0);
     }
 
     // quote
