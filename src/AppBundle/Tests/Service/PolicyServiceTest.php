@@ -7,6 +7,8 @@ use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PolicyKeyFacts;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\OptOut\EmailOptOut;
@@ -70,7 +72,7 @@ class PolicyServiceTest extends WebTestCase
             'bar'
         );
         $policy = static::createPolicy($user, static::$dm);
-        static::$policyService->create($policy);
+        static::$policyService->create($policy, $user);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::PROMO_LAUNCH, $policy->getPromoCode());

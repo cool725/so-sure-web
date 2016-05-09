@@ -208,6 +208,23 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
+    // policy/keyfacts
+
+    /**
+     *
+     */
+    public function testGetPolicyKeyFacts()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = '/api/v1/policy/keyfacts?_method=GET';
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(200);
+        $policyKeyFactsUrl = self::$router->generate('latest_policy_keyfacts');
+        $this->assertTrue(stripos($getData["view_url"], $policyKeyFactsUrl) >= 0);
+        $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
+    }
+
     // policy/terms
 
     /**
@@ -241,12 +258,12 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue(count($data['quotes']) < 10);
     }
 
-    public function testQuoteX3()
+    public function testQuoteA0001()
     {
-        $crawler = self::$client->request('GET', '/api/v1/quote?device=x3');
+        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001');
         $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
-        $this->assertEquals(1, count($data['quotes']));
+        $this->assertEquals(2, count($data['quotes']));
         $this->assertEquals(10, $data['quotes'][0]['connection_value']);
         $this->assertEquals(0, $data['quotes'][0]['monthly_loss']);
         $this->assertEquals(0, $data['quotes'][0]['yearly_loss']);

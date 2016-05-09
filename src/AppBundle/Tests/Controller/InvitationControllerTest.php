@@ -20,6 +20,7 @@ class InvitationControllerTest extends BaseControllerTest
     {
         $invitationRepo = self::$dm->getRepository(EmailInvitation::class);
         $invitation = $invitationRepo->findOneBy([]);
+        $this->assertNotNull($invitation);
         $url = sprintf('/invitation/%s', $invitation->getId());
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);

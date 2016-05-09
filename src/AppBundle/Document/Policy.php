@@ -16,9 +16,16 @@ abstract class Policy
     use ArrayToApiArrayTrait;
     use CurrencyTrait;
 
-    const RISK_HIGH = 'high';
-    const RISK_MEDIUM = 'medium';
-    const RISK_LOW = 'low';
+    const RISK_LEVEL_HIGH = 'high';
+    const RISK_LEVEL_MEDIUM = 'medium';
+    const RISK_LEVEL_LOW = 'low';
+
+    const RISK_CONNECTED_POT_ZERO = 'connected pot £0';
+    const RISK_CONNECTED_RECENT_NETWORK_CLAIM = 'connected w/recent claim';
+    const RISK_CONNECTED_ESTABLISHED_NETWORK_CLAIM = 'connected w/established claim (>30 days)';
+    const RISK_CONNECTED_NO_CLAIM = 'connected w/no claim';
+    const RISK_NOT_CONNECTED_NEW_POLICY = 'not connected w/new policy';
+    const RISK_NOT_CONNECTED_ESTABLISHED_POLICY = 'not connected w/established polish (>30 days)';
 
     const STATUS_PENDING = 'pending';
     const STATUS_ACTIVE = 'active';
@@ -30,6 +37,15 @@ abstract class Policy
     const PROMO_LAUNCH = 'launch';
 
     const PAYMENT_DD_MONTHLY = 'gocardless_monthly';
+
+    public static $riskLevels = [
+        self::RISK_CONNECTED_POT_ZERO => self::RISK_LEVEL_HIGH,
+        self::RISK_CONNECTED_RECENT_NETWORK_CLAIM => self::RISK_LEVEL_MEDIUM,
+        self::RISK_CONNECTED_ESTABLISHED_NETWORK_CLAIM => self::RISK_LEVEL_LOW,
+        self::RISK_CONNECTED_NO_CLAIM => self::RISK_LEVEL_LOW,
+        self::RISK_NOT_CONNECTED_NEW_POLICY => self::RISK_LEVEL_HIGH,
+        self::RISK_NOT_CONNECTED_ESTABLISHED_POLICY => self::RISK_LEVEL_MEDIUM,
+    ];
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -70,9 +86,9 @@ abstract class Policy
     protected $invitations;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\PolicyTerms")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\PolicyDocument")
      */
-    protected $policyTerms;
+    protected $policyDocuments;
 
     /**
      * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Connection")
@@ -109,6 +125,7 @@ abstract class Policy
         $this->created = new \DateTime();
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->policyDocuments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -245,14 +262,38 @@ abstract class Policy
         $this->potValue = $potValue;
     }
 
-    public function getPolicyTerms()
+    public function getPolicyDocuments()
     {
-        return $this->policyTerms;
+        return $this->policyDocuments;
     }
 
-    public function setPolicyTerms(PolicyTerms $policyTerms)
+    public function getPolicyKeyFacts()
     {
-        $this->policyTerms = $policyTerms;
+        $policyDocuments = $this->getPolicyDocuments();
+        foreach ($policyDocuments as $policyDocument) {
+            if ($policyDocument instanceof PolicyKeyFacts) {
+                return $policyDocument;
+            }
+        }
+
+        return null;
+    }
+
+    public function getPolicyTerms()
+    {
+        $policyDocuments = $this->getPolicyDocuments();
+        foreach ($policyDocuments as $policyDocument) {
+            if ($policyDocument instanceof PolicyTerms) {
+                return $policyDocument;
+            }
+        }
+
+        return null;
+    }
+
+    public function addPolicyDocument(PolicyDocument $policyDocument)
+    {
+        $this->policyDocuments[] = $policyDocument;
     }
 
     public function getPromoCode()
@@ -290,6 +331,13 @@ abstract class Policy
         return $this->premium;
     }
 
+    public function init(User $user, PolicyDocument $terms, PolicyDocument $keyfacts)
+    {
+        $user->addPolicy($this);
+        $this->addPolicyDocument($terms);
+        $this->addPolicyDocument($keyfacts);
+    }
+
     public function create($seq, $startDate = null)
     {
         if (!$startDate) {
@@ -312,16 +360,25 @@ abstract class Policy
     public function getRiskColour()
     {
         $risk = $this->getRisk();
-        if ($risk == self::RISK_LOW) {
+        if ($risk == self::RISK_LEVEL_LOW) {
             return 'green';
-        } elseif ($risk == self::RISK_MEDIUM) {
+        } elseif ($risk == self::RISK_LEVEL_MEDIUM) {
             return 'yellow';
-        } elseif ($risk == self::RISK_HIGH) {
+        } elseif ($risk == self::RISK_LEVEL_HIGH) {
             return 'red';
         }
     }
 
     public function getRisk($date = null)
+    {
+        if (!isset(static::$riskLevels[$this->getRiskReason($date)])) {
+            return null;
+        }
+
+        return static::$riskLevels[$this->getRiskReason($date)];
+    }
+
+    public function getRiskReason($date = null)
     {
         if (!$this->isPolicy()) {
             return null;
@@ -334,29 +391,35 @@ abstract class Policy
         if (count($this->getConnections()) > 0) {
             // Connected and value of their pot is zero
             if ($this->getPotValue() == 0) {
-                return self::RISK_HIGH;
+                return self::RISK_CONNECTED_POT_ZERO;
+                // return self::RISK_LEVEL_HIGH;
             }
 
             if ($this->getLatestClaim()) {
                 // Connected and value of their pot is £10 following a claim in the past month
                 if ($this->hasClaimedInLast30Days($date)) {
-                    return self::RISK_MEDIUM;
+                    return self::RISK_CONNECTED_RECENT_NETWORK_CLAIM;
+                    // return self::RISK_LEVEL_MEDIUM;
                 } else {
                     // Connected and value of their pot is £10 following a claim which took place over a month ago
-                    return self::RISK_LOW;
+                    return self::RISK_CONNECTED_ESTABLISHED_NETWORK_CLAIM;
+                    //return self::RISK_LEVEL_LOW;
                 }
             }
 
             // Connected and no claims in their network
-            return self::RISK_LOW;
+            return self::RISK_CONNECTED_NO_CLAIM;
+            // return self::RISK_LEVEL_LOW;
         }
 
         // Claim within first month of buying policy, has no connections and has made no attempts to make connections
         if ($this->isPolicyWithin30Days($date)) {
-            return self::RISK_HIGH;
+            return self::RISK_NOT_CONNECTED_NEW_POLICY;
+            //return self::RISK_LEVEL_HIGH;
         } else {
             // No connections & claiming after the 1st month
-            return self::RISK_MEDIUM;
+            return self::RISK_NOT_CONNECTED_ESTABLISHED_POLICY;
+            // return self::RISK_LEVEL_MEDIUM;
         }
     }
 
@@ -569,6 +632,9 @@ abstract class Policy
         if ($this->isPolicy() && !$this->getPolicyTerms()) {
             throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
         }
+        if ($this->isPolicy() && !$this->getPolicyKeyFacts()) {
+            throw new \Exception(sprintf('Policy %s is missing keyfacts', $this->getId()));
+        }
 
         return [
             'id' => $this->getId(),
@@ -579,6 +645,7 @@ abstract class Policy
             'policy_number' => $this->getPolicyNumber(),
             'monthly_premium' => $this->getPremium()->getMonthlyPremiumPrice(),
             'policy_terms_id' => $this->getPolicyTerms() ? $this->getPolicyTerms()->getId() : null,
+            'policy_keyfacts_id' => $this->getPolicyKeyFacts() ? $this->getPolicyKeyFacts()->getId() : null,
             'pot' => [
                 'connections' => count($this->getConnections()),
                 'max_connections' => $this->getMaxConnections(),

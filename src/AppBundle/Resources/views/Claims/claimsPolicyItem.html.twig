@@ -1,5 +1,5 @@
-    <div class="text-center" style="background-color: {{ policy.riskColour }}; color: white;">
-      Risk: {{ policy.risk }}
+    <div class="text-center" style="background-color: {{ policy.riskColour }}; color: black;">
+      Risk: {{ policy.riskReason }} ({{ policy.risk }})
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#policy">Policy</a></li>
@@ -31,7 +31,12 @@
                 <table class="table table-striped">
                     <tr>
                         <td>Connections</td>
-                        <td>{{ policy.connections|length }}</td>
+                        <td>
+                          <strong>{{ policy.connections|length }}</strong>&nbsp;:&nbsp;
+                          {% for connection in policy.connections %}
+                            <a href="{{ path('claims_policy', {'id': connection.policy.id }) }}">{{ connection.user.name }}</a>;
+                          {% endfor %}
+                        </td>
                     </tr>
                     <tr>
                         <td>Pot Value</td>

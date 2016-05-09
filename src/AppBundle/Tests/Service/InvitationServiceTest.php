@@ -9,6 +9,8 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PolicyKeyFacts;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\OptOut\EmailOptOut;

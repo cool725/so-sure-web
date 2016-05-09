@@ -4,6 +4,8 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PolicyKeyFacts;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -39,8 +41,15 @@ class PolicyService
         $this->sequence = $sequence;
     }
 
-    public function create(Policy $policy)
+    public function create(Policy $policy, User $user)
     {
+        $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+
+        $policyKeyFactsRepo = $this->dm->getRepository(PolicyKeyFacts::class);
+        $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
+
+        $policy->init($user, $latestTerms, $latestKeyFacts);
         $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE));
         if ($policy instanceof PhonePolicy) {
             $repo = $this->dm->getRepository(PhonePolicy::class);

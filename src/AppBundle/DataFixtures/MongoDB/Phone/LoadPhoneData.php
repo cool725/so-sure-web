@@ -23,6 +23,7 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
 
     public function load(ObjectManager $manager)
     {
+        $this->loadPreLaunchMSRP($manager);
         $this->loadCsv($manager);
         // $this->loadPreLaunch($manager);
     }
@@ -63,7 +64,7 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
     }
 
-    protected function loadPreLaunch(ObjectManager $manager)
+    protected function loadPreLaunchMSRP(ObjectManager $manager)
     {
         $this->newPhone($manager, 'ALL', 'MSRP £150 or less', 4.29);
         $this->newPhone($manager, 'ALL', 'MSRP £151 to £250', 5.29);
@@ -74,6 +75,11 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
         $this->newPhone($manager, 'ALL', 'MSRP £751 to £1000', 9.29);
         $this->newPhone($manager, 'ALL', 'MSRP £1001 to £1500', 10.29);
         $this->newPhone($manager, 'ALL', 'MSRP £1501 to £2500', 15.29);
+    }
+
+    protected function loadPreLaunch(ObjectManager $manager)
+    {
+        $this->loadPreLaunchMSRP($manager);
 
         $this->newPhone($manager, 'Apple', 'iPhone SE', 7.29, 16, ['iPhone8,4']);
         $this->newPhone($manager, 'Apple', 'iPhone SE', 7.29, 64, ['iPhone8,4']);
