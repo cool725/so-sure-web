@@ -846,37 +846,47 @@ class ApiAuthControllerTest extends BaseControllerTest
     public function testNewPolicyDdMissingData()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
-            'sort_code' => '333333',
-            'account_number' => '12345678',
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
+            'bank_account' => [
+                'sort_code' => '333333',
+                'account_number' => '12345678',
+            ]
         ]);
         $data = $this->verifyResponse(400);
 
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
-            'account_number' => '12345678',
-            'first_name' => 'foo',
-            'last_name' => 'bar',
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
+            'bank_account' => [
+                'account_number' => '12345678',
+                'first_name' => 'foo',
+                'last_name' => 'bar',
+            ]
         ]);
         $data = $this->verifyResponse(400);
 
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
-            'sort_code' => '12345678',
-            'first_name' => 'foo',
-            'last_name' => 'bar',
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
+            'bank_account' => [
+                'sort_code' => '12345678',
+                'first_name' => 'foo',
+                'last_name' => 'bar',
+            ]
         ]);
         $data = $this->verifyResponse(400);
 
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
-            'account_number' => '12345678',
-            'sort_code' => '12345678',
-            'first_name' => 'foo',
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
+            'bank_account' => [
+                'account_number' => '12345678',
+                'sort_code' => '12345678',
+                'first_name' => 'foo',
+            ]
         ]);
         $data = $this->verifyResponse(400);
 
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
-            'account_number' => '12345678',
-            'sort_code' => '12345678',
-            'last_name' => 'bar',
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
+            'bank_account' => [
+                'account_number' => '12345678',
+                'sort_code' => '12345678',
+                'last_name' => 'bar',
+            ]
         ]);
         $data = $this->verifyResponse(400);
     }
@@ -884,11 +894,13 @@ class ApiAuthControllerTest extends BaseControllerTest
     public function testNewPolicyDdUnknownPolicy()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/dd', [
-            'sort_code' => '200000',
-            'account_number' => '12345678',
-            'first_name' => 'foo',
-            'last_name' => 'bar',
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
+            'bank_account' => [
+                'sort_code' => '200000',
+                'account_number' => '12345678',
+                'first_name' => 'foo',
+                'last_name' => 'bar',
+            ]
         ]);
         $data = $this->verifyResponse(404);
     }
@@ -916,13 +928,13 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
         $data = $this->verifyResponse(200);
 
-        $url = sprintf("/api/v1/auth/policy/%s/dd", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
             'sort_code' => '200000',
             'account_number' => '55779911',
             'first_name' => 'foo',
             'last_name' => 'bar',
-        ]);
+        ]]);
         $policyData = $this->verifyResponse(200);
         $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
@@ -1419,13 +1431,13 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     protected function payPolicy($cognitoIdentityId, $policyId)
     {
-        $url = sprintf("/api/v1/auth/policy/%s/dd", $policyId);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
             'sort_code' => '200000',
             'account_number' => '55779911',
             'first_name' => 'foo',
             'last_name' => 'bar',
-        ]);
+        ]]);
         $policyData = $this->verifyResponse(200);
         $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
         $this->assertEquals($policyId, $policyData['id']);

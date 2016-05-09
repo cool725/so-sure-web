@@ -73,3 +73,8 @@ parameters:
     plivo_authid:        ''
     plivo_authtoken:     ''
     plivo_sendingnumber: ''
+
+    braintree_env:         ''
+    braintree_merchant_id: ''
+    braintree_public_key:  ''
+    braintree_private_key: ''

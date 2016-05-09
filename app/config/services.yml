@@ -277,3 +277,23 @@ services:
             dm: "@doctrine_mongodb.odm.default_document_manager"
         tags:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserEvent }
+
+    braintree.customer:
+        class:            Braintree_Customer
+        factory_service:  comet_cult_braintree.factory
+        factory_method:   get
+        arguments: ["customer"]
+
+    braintree.transaction:
+        class:            Braintree_Transaction
+        factory_service:  comet_cult_braintree.factory
+        factory_method:   get
+        arguments: ["transaction"]
+
+    app.braintree:
+        class: AppBundle\Service\BraintreeService
+        arguments:
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
+            logger:      "@logger"
+            policy:      "@app.policy"
+            transaction: "@braintree.transaction"

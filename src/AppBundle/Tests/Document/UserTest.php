@@ -23,30 +23,43 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    public function testHasValidGocardlessDetails()
+    public function testHasValidDetails()
     {
         $user = new User();
-        $this->assertFalse($user->hasValidGocardlessDetails());
+        $this->assertFalse($user->hasValidDetails());
 
         $user->setFirstName('foo');
-        $this->assertFalse($user->hasValidGocardlessDetails());
+        $this->assertFalse($user->hasValidDetails());
 
         $user->setLastName('bar');
-        $this->assertFalse($user->hasValidGocardlessDetails());
+        $this->assertFalse($user->hasValidDetails());
 
+        $user->setMobileNumber('+447777711111');
+        $this->assertFalse($user->hasValidDetails());
+
+        $user->setBirthday(new \DateTime("1980-01-01"));
+        $this->assertFalse($user->hasValidDetails());
+
+        $user->setEmail('foo@bar.com');
+        $this->assertTrue($user->hasValidDetails());
+    }
+
+    public function testHasValidBillingDetails()
+    {
+        $user = new User();
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
         $user->addAddress($address);
-        $this->assertFalse($user->hasValidGocardlessDetails());
+        $this->assertFalse($user->hasValidBillingDetails());
 
         $address->setLine1('123 foo rd');
-        $this->assertFalse($user->hasValidGocardlessDetails());
+        $this->assertFalse($user->hasValidBillingDetails());
 
         $address->setCity('London');
-        $this->assertFalse($user->hasValidGocardlessDetails());
+        $this->assertFalse($user->hasValidBillingDetails());
 
         $address->setPostcode('ec1v 1rx');
-        $this->assertTrue($user->hasValidGocardlessDetails());
+        $this->assertTrue($user->hasValidBillingDetails());
     }
 
     public function testReplaceBillingAddress()
