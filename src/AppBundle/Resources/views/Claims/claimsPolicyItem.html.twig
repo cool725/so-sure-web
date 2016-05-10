@@ -109,6 +109,7 @@
                 <table class="table table-striped">
                     <tr>
                         <th>Date</th>
+                        <th>Policy Number</th>
                         <th>Claims Number</th>
                         <th>Claims Type</th>
                         <th>Claims Status</th>
@@ -117,6 +118,7 @@
                     {% for claim in policy.networkClaims %}
                     <tr>
                         <td>{{ claim.date|date }}</td>
+                        <td><a href="{{ path(policy_route, {'id': claim.policy.id }) }}">{{ claim.policy.policyNumber }}</a></td>
                         <td>{{ claim.number }}</td>
                         <td>{{ claim.type }}</td>
                         <td>{{ claim.status }}</td>
