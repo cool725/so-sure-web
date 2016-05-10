@@ -43,6 +43,9 @@ class Claim
     /** @MongoDB\Field(type="string") */
     protected $status;
 
+    /** @MongoDB\Field(type="string") */
+    protected $notes;
+
     /** @MongoDB\Field(type="boolean", name="suspected_fraud") */
     protected $suspectedFraud;
 
@@ -124,6 +127,16 @@ class Claim
     public function setSuspectedFraud($suspectedFraud)
     {
         $this->suspectedFraud = $suspectedFraud;
+    }
+
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
     }
 
     public function isMonetaryClaim()

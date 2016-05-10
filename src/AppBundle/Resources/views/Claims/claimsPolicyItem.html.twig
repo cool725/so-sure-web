@@ -89,6 +89,7 @@
                         <th>Claims Type</th>
                         <th>Claims Status</th>
                         <th>Suspected Fraud</th>
+                        <th>Notes</th>
                     </tr>
                     {% for claim in policy.claims %}
                     <tr>
@@ -97,6 +98,7 @@
                         <td>{{ claim.type }}</td>
                         <td>{{ claim.status }}</td>
                         <td>{{ claim.suspectedFraud }}</td>
+                        <td>{{ claim.notes }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -114,6 +116,7 @@
                         <th>Claims Type</th>
                         <th>Claims Status</th>
                         <th>Suspected Fraud</th>
+                        <th>Notes</th>
                     </tr>
                     {% for claim in policy.networkClaims %}
                     <tr>
@@ -123,6 +126,7 @@
                         <td>{{ claim.type }}</td>
                         <td>{{ claim.status }}</td>
                         <td>{{ claim.suspectedFraud }}</td>
+                        <td>{{ claim.notes }}</td>
                     </tr>
                     {% endfor %}
                 </table>
