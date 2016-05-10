@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
@@ -30,6 +31,7 @@ class ClaimType extends AbstractType
                 Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,
             ]])
             ->add('suspected_fraud', CheckboxType::class, ['required' => false])
+            ->add('notes', TextareaType::class, ['required' => false])
             ->add('record', SubmitType::class)
         ;
     }

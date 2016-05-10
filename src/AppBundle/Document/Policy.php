@@ -104,7 +104,7 @@ abstract class Policy
     protected $connections = array();
 
     /**
-     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Claim")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim", cascade={"persist"})
      */
     protected $claims = array();
 
@@ -258,6 +258,7 @@ abstract class Policy
 
     public function addClaim(Claim $claim)
     {
+        $claim->setPolicy($this);
         $this->claims[] = $claim;
     }
 

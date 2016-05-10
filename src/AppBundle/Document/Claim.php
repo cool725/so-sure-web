@@ -4,7 +4,7 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
-/** @MongoDB\EmbeddedDocument */
+/** @MongoDB\Document */
 class Claim
 {
     const TYPE_LOSS = 'loss';
@@ -15,6 +15,16 @@ class Claim
     const STATUS_SETTLED = 'settled';
     const STATUS_DECLINED = 'declined';
     const STATUS_WITHDRAWN = 'withdrawn';
+
+    /**
+     * @MongoDB\Id(strategy="auto")
+     */
+    protected $id;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
+     */
+    protected $policy;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="User")
@@ -33,12 +43,20 @@ class Claim
     /** @MongoDB\Field(type="string") */
     protected $status;
 
+    /** @MongoDB\Field(type="string") */
+    protected $notes;
+
     /** @MongoDB\Field(type="boolean", name="suspected_fraud") */
     protected $suspectedFraud;
 
     public function __construct()
     {
         $this->date = new \DateTime();
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function getDate()
@@ -49,6 +67,16 @@ class Claim
     public function setDate($date)
     {
         $this->date = $date;
+    }
+
+    public function getPolicy()
+    {
+        return $this->policy;
+    }
+
+    public function setPolicy($policy)
+    {
+        $this->policy = $policy;
     }
 
     public function getHandler()
@@ -99,6 +127,16 @@ class Claim
     public function setSuspectedFraud($suspectedFraud)
     {
         $this->suspectedFraud = $suspectedFraud;
+    }
+
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
     }
 
     public function isMonetaryClaim()
