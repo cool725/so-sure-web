@@ -24,6 +24,7 @@ app/console --env=test sosure:doctrine:index
 if [ "$1" == "" ]; then
   ./vendor/phing/phing/bin/phing -f build/test.xml test:functional
 else
-  ./build/phpunit.sh --filter $1 --bootstrap vendor/autoload.php src/AppBundle/    
+  echo ./build/phpunit.sh --filter "$1" --bootstrap vendor/autoload.php src/AppBundle/    
+  ./build/phpunit.sh --filter "$1" --bootstrap vendor/autoload.php src/AppBundle/    
 fi
 ./vendor/phing/phing/bin/phing force:cs

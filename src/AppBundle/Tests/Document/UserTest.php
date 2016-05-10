@@ -42,6 +42,13 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
         $user->setEmail('foo@bar.com');
         $this->assertTrue($user->hasValidDetails());
+
+        $user->setBirthday(new \DateTime("1800-01-01"));
+        $this->assertFalse($user->hasValidDetails());
+
+        $now = new \DateTime();
+        $user->setBirthday(new \DateTime(sprintf("%d-01-01", $now->format('Y'))));
+        $this->assertFalse($user->hasValidDetails());
     }
 
     public function testHasValidBillingDetails()

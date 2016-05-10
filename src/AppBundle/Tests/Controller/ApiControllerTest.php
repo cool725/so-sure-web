@@ -894,6 +894,28 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    public function testUserInvalidBirthday()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('invalid-birthday', $this),
+            'birthday' => '+44770'
+        ));
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testUserTooYoung()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $now = new \DateTime();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('young-birthday', $this),
+            'birthday' => sprintf('%d-01-01T00:00:00Z', $now->format('Y')),
+        ));
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_TOO_YOUNG);
+    }
+
     public function testUserUkMobile()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();

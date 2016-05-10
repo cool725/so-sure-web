@@ -34,6 +34,7 @@ use AppBundle\Service\RateLimitService;
 use AppBundle\Security\UserVoter;
 use AppBundle\Classes\ApiErrorCode;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -743,7 +744,11 @@ class ApiAuthController extends BaseController
             }
 
             if (isset($data['birthday']) && strlen($data['birthday']) > 0) {
-                $user->setBirthday(\DateTime::createFromFormat(\DateTime::ISO8601, $data['birthday']));
+                $birthday = $this->validateBirthday($data);
+                if ($birthday instanceof Response) {
+                    return $birthday;
+                }
+                $user->setBirthday($birthday);
                 $userChanged = true;
             }
 

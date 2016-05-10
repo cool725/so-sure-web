@@ -22,6 +22,7 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Route("/api/v1")
@@ -615,9 +616,10 @@ class ApiController extends BaseController
             $user->setSnsEndpoint(isset($data['sns_endpoint']) ? $data['sns_endpoint'] : null);
             $user->setMobileNumber($mobileNumber);
             $user->setCampaign(isset($data['campaign']) ? $data['campaign'] : null);
-            $birthday = isset($data['birthday']) ?
-                \DateTime::createFromFormat(\DateTime::ISO8601, $data['birthday']) :
-                null;
+            $birthday = $this->validateBirthday($data);
+            if ($birthday instanceof Response) {
+                return $birthday;
+            }
             $user->setBirthday($birthday);
 
             // NOTE: not completely secure, but as we're only using for an indication, it's good enough

@@ -797,6 +797,27 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(404);
     }
 
+    public function testNewPolicyYoungUser()
+    {
+        $this->clearRateLimit();
+        $userYoung = self::createUser(self::$userManager, self::generateEmail('young', $this), 'foo');
+
+        $now = new \DateTime();
+        $userYoung->setBirthday(new \DateTime(sprintf("%d-01-01", $now->format('Y'))));
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($userYoung);
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'Apple',
+            'device' => 'iPhone 6',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+        ]]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS);
+    }
+
     // policy/{id}
 
     /**
@@ -1323,6 +1344,40 @@ class ApiAuthControllerTest extends BaseControllerTest
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_EXISTS);
+    }
+
+    public function testUpdateUserInvalidBirthday()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $data = [
+            'birthday' => 'abc',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testUpdateUserTooOld()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $data = [
+            'birthday' => '1800-01-01T00:00:00Z',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testUpdateUserTooYoung()
+    {
+        $now = new \DateTime();
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $data = [
+            'birthday' => sprintf('%d-01-01T00:00:00Z', $now->format('Y')),
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_TOO_YOUNG);
     }
 
     // user/{id}/address
