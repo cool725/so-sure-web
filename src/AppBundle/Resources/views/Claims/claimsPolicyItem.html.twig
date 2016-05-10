@@ -4,6 +4,7 @@
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#policy">Policy</a></li>
       <li role="presentation"><a href="#claims">Claims <span class="badge" title="Number of claims">{{ policy.claims|length }}</span></a></li>
+      <li role="presentation"><a href="#network">Network Claims <span class="badge" title="Number of network claims">{{ policy.networkClaims|length }}</span></a></li>
       <li role="presentation"><a href="#user">User</a></li>
     </ul>
     <div class="tab-content">
@@ -86,6 +87,7 @@
                         <th>Date</th>
                         <th>Claims Number</th>
                         <th>Claims Type</th>
+                        <th>Claims Status</th>
                         <th>Suspected Fraud</th>
                     </tr>
                     {% for claim in policy.claims %}
@@ -93,12 +95,37 @@
                         <td>{{ claim.date|date }}</td>
                         <td>{{ claim.number }}</td>
                         <td>{{ claim.type }}</td>
+                        <td>{{ claim.status }}</td>
                         <td>{{ claim.suspectedFraud }}</td>
                     </tr>
                     {% endfor %}
                 </table>
             {% else %}
             <h4>No claims</h4>
+            {% endif %}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="network">
+            {% if policy.networkClaims|length > 0 %}
+                <table class="table table-striped">
+                    <tr>
+                        <th>Date</th>
+                        <th>Claims Number</th>
+                        <th>Claims Type</th>
+                        <th>Claims Status</th>
+                        <th>Suspected Fraud</th>
+                    </tr>
+                    {% for claim in policy.networkClaims %}
+                    <tr>
+                        <td>{{ claim.date|date }}</td>
+                        <td>{{ claim.number }}</td>
+                        <td>{{ claim.type }}</td>
+                        <td>{{ claim.status }}</td>
+                        <td>{{ claim.suspectedFraud }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+            <h4>No network claims</h4>
             {% endif %}
         </div>
         <div role="tabpanel" class="tab-pane" id="user">

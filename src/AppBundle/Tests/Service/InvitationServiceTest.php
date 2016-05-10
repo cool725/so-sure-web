@@ -394,6 +394,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($policy->isPolicy());
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite-claims', $this));
@@ -474,6 +475,7 @@ class InvitationServiceTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
 
         self::$invitationService->accept($invitation, $policyInvitee);
@@ -644,6 +646,7 @@ class InvitationServiceTest extends WebTestCase
         $invitation->setNextReinvited('2016-01-01');
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
 
         self::$invitationService->reinvite($invitation);

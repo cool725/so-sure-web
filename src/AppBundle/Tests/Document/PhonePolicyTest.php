@@ -307,6 +307,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
         $this->assertEquals(0, $policy->calculatePotValue());
     }
@@ -325,6 +326,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
         $this->assertEquals(10, $policy->calculatePotValue());
     }
@@ -343,6 +345,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
         $this->assertEquals(0, $policy->calculatePotValue());
     }
@@ -361,10 +364,12 @@ class PhonePolicyTest extends WebTestCase
 
         $claimA = new Claim();
         $claimA->setType(Claim::TYPE_LOSS);
+        $claimA->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claimA);
 
         $claimB = new Claim();
         $claimB->setType(Claim::TYPE_LOSS);
+        $claimB->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[1]->addClaim($claimB);
 
         $this->assertEquals(0, $policy->calculatePotValue());
@@ -383,7 +388,8 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(40, $policy->calculatePotValue());
 
         $claim = new Claim();
-        $claim->setType(Claim::TYPE_WITHDRAWN);
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_WITHDRAWN);
         $linkedPolicies[0]->addClaim($claim);
         $this->assertEquals(40, $policy->calculatePotValue());
     }
@@ -605,13 +611,15 @@ class PhonePolicyTest extends WebTestCase
 
         $claimA = new Claim();
         $claimA->setDate(new \DateTime("2016-01-01"));
-        $claimA->setType(Claim::TYPE_WITHDRAWN);
+        $claimA->setType(Claim::TYPE_LOSS);
+        $claimA->setStatus(Claim::STATUS_WITHDRAWN);
         $policy->addClaim($claimA);
         $this->assertFalse($policy->hasMonetaryClaimed());
 
         $claimB = new Claim();
         $claimB->setDate(new \DateTime("2016-01-02"));
-        $claimB->setType(Claim::TYPE_DAMAGE);
+        $claimA->setType(Claim::TYPE_DAMAGE);
+        $claimB->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claimB);
         $this->assertTrue($policy->hasMonetaryClaimed());
     }
