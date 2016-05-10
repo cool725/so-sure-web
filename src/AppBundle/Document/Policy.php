@@ -414,9 +414,9 @@ abstract class Policy
                 // return self::RISK_LEVEL_HIGH;
             }
 
-            if ($this->getLatestClaim()) {
+            if ($this->hasNetworkClaim(true)) {
                 // Connected and value of their pot is £10 following a claim in the past month
-                if ($this->hasClaimedInLast30Days($date)) {
+                if ($this->hasNetworkClaimedInLast30Days($date)) {
                     return self::RISK_CONNECTED_RECENT_NETWORK_CLAIM;
                     // return self::RISK_LEVEL_MEDIUM;
                 } else {
@@ -516,38 +516,27 @@ abstract class Policy
         return null;
     }
 
-    public function hasClaimedInLast30Days($date = null)
+    public function hasNetworkClaimedInLast30Days($date = null)
     {
         if ($date == null) {
             $date = new \DateTime();
         }
 
-        // TODO: Adjust this - should ignore non-monitary claims
-        if (!$latestClaim = $this->getLatestClaim()) {
-            return false;
+        foreach ($this->getNetworkClaims(true) as $claim) {
+            if ($claim->isWithin30Days($date)) {
+                return true;
+            }
         }
 
-        return $latestClaim->getDate()->diff($date)->days < 30;
+        return false;
     }
 
-    public function getLatestClaim()
+    public function hasNetworkClaim($monitaryOnly = false)
     {
-        if (!$this->getClaims() || count($this->getClaims()) == 0) {
-            return null;
-        }
-
-        $claims = $this->getClaims();
-        if ($claims instanceof PersistentCollection) {
-            $claims = $claims->getValues();
-        }
-        uasort($claims, function ($a, $b) {
-            return $a->getDate() < $b->getDate();
-        });
-
-        return array_values($claims)[0];
+        return count($this->getNetworkClaims($monitaryOnly)) > 0;
     }
 
-    public function getNetworkClaims()
+    public function getNetworkClaims($monitaryOnly = false)
     {
         $claims = [];
         foreach ($this->getConnections() as $connection) {
@@ -556,7 +545,9 @@ abstract class Policy
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
             foreach ($policy->getClaims() as $claim) {
-                $claims[] = $claim;
+                if (!$monitaryOnly || $claim->isMonetaryClaim()) {
+                    $claims[] = $claim;
+                }
             }
         }
 
@@ -571,16 +562,7 @@ abstract class Policy
             $potValue += $connection->getValue();
         }
 
-        $networkClaimCount = 0;
-        foreach ($this->getConnections() as $connection) {
-            $policy = $connection->getPolicy();
-            if (!$policy) {
-                throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
-            }
-            if ($policy->hasMonetaryClaimed()) {
-                $networkClaimCount++;
-            }
-        }
+        $networkClaimCount = count($this->getNetworkClaims(true));
 
         // Pot is 0 if you claim
         // Pot is £10 if you don't claim, but there's only 1 claim in your network and your pot is >= £40

@@ -107,7 +107,7 @@
             {% endif %}
         </div>
         <div role="tabpanel" class="tab-pane" id="network">
-            {% if policy.networkClaims|length > 0 %}
+            {% if policy.hasNetworkClaim %}
                 <table class="table table-striped">
                     <tr>
                         <th>Date</th>
