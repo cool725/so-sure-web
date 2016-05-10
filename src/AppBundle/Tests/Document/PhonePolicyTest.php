@@ -17,6 +17,7 @@ use AppBundle\Tests\UserClassTrait;
  */
 class PhonePolicyTest extends WebTestCase
 {
+    use \AppBundle\Tests\PhingKernelClassTrait;
     use UserClassTrait;
 
     protected static $container;
@@ -80,43 +81,26 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policyA->isPolicyWithin60Days($cliffDate));
     }
 
-    public function testGetLastestClaim()
+    public function testHasNetworkClaimedInLast30Days()
     {
-        $policyA = new PhonePolicy();
-        $this->assertNull($policyA->getLatestClaim());
-        
-        $claimA = new Claim();
-        $claimA->setDate(new \DateTime("2016-01-01"));
-        $policyA->addClaim($claimA);
-        $this->assertNotNull($policyA->getLatestClaim());
-        $this->assertEquals($claimA->getDate(), $policyA->getLatestClaim()->getDate());
-        
-        $claimB = new Claim();
-        $claimB->setDate(new \DateTime("2016-02-01"));
-        $policyA->addClaim($claimB);
-        $this->assertEquals($claimB->getDate(), $policyA->getLatestClaim()->getDate());
+        $policyA = $this->createUserPolicy(true);
+        $policyB = $this->createUserPolicy(true);
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
-        $claimC = new Claim();
-        $claimC->setDate(new \DateTime("2016-01-15"));
-        $policyA->addClaim($claimC);
-        $this->assertEquals($claimB->getDate(), $policyA->getLatestClaim()->getDate());
-    }
-
-    public function testHasClaimedInLast30Days()
-    {
-        $policyA = new PhonePolicy();
-        $this->assertFalse($policyA->hasClaimedInLast30Days());
+        $this->assertFalse($policyA->hasNetworkClaimedInLast30Days());
 
         $claimA = new Claim();
         $claimA->setDate(new \DateTime("2016-01-01"));
+        $claimA->setStatus(Claim::STATUS_SETTLED);
         $policyA->addClaim($claimA);
-        $this->assertFalse($policyA->hasClaimedInLast30Days(new \DateTime("2016-02-01")));
-        $this->assertTrue($policyA->hasClaimedInLast30Days(new \DateTime("2016-01-15")));
+        $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-01")));
+        $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-01-15")));
         
         $claimB = new Claim();
         $claimB->setDate(new \DateTime("2016-02-01"));
+        $claimB->setStatus(Claim::STATUS_SETTLED);
         $policyA->addClaim($claimB);
-        $this->assertTrue($policyA->hasClaimedInLast30Days(new \DateTime("2016-02-21")));
+        $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21")));
     }
 
     public function testGetRiskNoPolicy()
@@ -169,61 +153,70 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskPolicyConnectionsNoClaims()
     {
-        $user = new User();
-        self::addAddress($user);
-        $policyA = new PhonePolicy();
-        $policyA->init($user, self::getLatestPolicyTerms(static::$dm), self::getLatestPolicyKeyFacts(static::$dm));
-        $policyA->create(rand(1, 999999));
-        $policyA->setStart(new \DateTime("2016-01-01"));
-        $policyA->setPhone(self::$phone);
-        $policyA->setPotValue(20);
+        $policyConnected = $this->createUserPolicy(true);
+        $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $connectionA = new Connection();
-        $policyA->addConnection($connectionA);
+        $policyClaim = $this->createUserPolicy(true);
+        $policyClaim->setStart(new \DateTime("2016-01-01"));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 10, 10);
+        $policyClaim->updatePotValue();
+        $policyConnected->updatePotValue();
 
-        $this->assertEquals(PhonePolicy::RISK_LEVEL_LOW, $policyA->getRisk());
+        $this->assertEquals(PhonePolicy::RISK_LEVEL_LOW, $policyConnected->getRisk());
     }
 
     public function testGetRiskPolicyConnectionsClaimedPre30()
     {
-        $user = new User();
-        self::addAddress($user);
-        $policyA = new PhonePolicy();
-        $policyA->init($user, self::getLatestPolicyTerms(static::$dm), self::getLatestPolicyKeyFacts(static::$dm));
-        $policyA->create(rand(1, 999999));
-        $policyA->setStart(new \DateTime("2016-01-01"));
-        $policyA->setPhone(self::$phone);
-        $policyA->setPotValue(20);
+        $policyConnected = $this->createUserPolicy(true);
+        $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $connectionA = new Connection();
-        $policyA->addConnection($connectionA);
+        $policyClaim = $this->createUserPolicy(true);
+        $policyClaim->setStart(new \DateTime("2016-01-01"));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 10, 10);
+        $policyClaim->updatePotValue();
+        $policyConnected->updatePotValue();
 
-        $claimA = new Claim();
-        $claimA->setDate(new \DateTime("2016-01-10"));
-        $policyA->addClaim($claimA);
+        for ($i = 1; $i < 6; $i++) {
+            $policy = $this->createUserPolicy(true);
+            $policy->setStart(new \DateTime("2016-01-01"));
+            list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policy, 10, 10);
+            $policy->updatePotValue();
+            $policyConnected->updatePotValue();
+        }
 
-        $this->assertEquals(PhonePolicy::RISK_LEVEL_MEDIUM, $policyA->getRisk(new \DateTime("2016-01-20")));
+        $claim = new Claim();
+        $claim->setDate(new \DateTime("2016-01-10"));
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $policyClaim->addClaim($claim);
+
+        $this->assertEquals(PhonePolicy::RISK_LEVEL_MEDIUM, $policyConnected->getRisk(new \DateTime("2016-01-20")));
     }
 
     public function testGetRiskPolicyConnectionsClaimedPost30()
     {
-        $user = new User();
-        self::addAddress($user);
-        $policyA = new PhonePolicy();
-        $policyA->init($user, self::getLatestPolicyTerms(static::$dm), self::getLatestPolicyKeyFacts(static::$dm));
-        $policyA->create(rand(1, 999999));
-        $policyA->setStart(new \DateTime("2016-01-01"));
-        $policyA->setPhone(self::$phone);
-        $policyA->setPotValue(20);
+        $policyConnected = $this->createUserPolicy(true);
+        $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $connectionA = new Connection();
-        $policyA->addConnection($connectionA);
+        $policyClaim = $this->createUserPolicy(true);
+        $policyClaim->setStart(new \DateTime("2016-01-01"));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 10, 10);
+        $policyClaim->updatePotValue();
+        $policyConnected->updatePotValue();
 
-        $claimA = new Claim();
-        $claimA->setDate(new \DateTime("2016-01-10"));
-        $policyA->addClaim($claimA);
+        for ($i = 1; $i < 6; $i++) {
+            $policy = $this->createUserPolicy(true);
+            $policy->setStart(new \DateTime("2016-01-01"));
+            list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policy, 10, 10);
+            $policy->updatePotValue();
+            $policyConnected->updatePotValue();
+        }
 
-        $this->assertEquals(PhonePolicy::RISK_LEVEL_LOW, $policyA->getRisk(new \DateTime("2016-02-20")));
+        $claim = new Claim();
+        $claim->setDate(new \DateTime("2016-01-10"));
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $policyClaim->addClaim($claim);
+
+        $this->assertEquals(PhonePolicy::RISK_LEVEL_LOW, $policyConnected->getRisk(new \DateTime("2016-02-20")));
     }
 
     /**
@@ -246,13 +239,19 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(0, $policy->calculatePotValue());
     }
 
-    protected function createUserPolicy()
+    protected function createUserPolicy($init = false)
     {
         $user = new User();
         self::addAddress($user);
 
         $policy = new PhonePolicy();
         $policy->setUser($user);
+
+        if ($init) {
+            $policy->init($user, self::getLatestPolicyTerms(static::$dm), self::getLatestPolicyKeyFacts(static::$dm));
+            $policy->create(rand(1, 999999));
+            $policy->setPhone(self::$phone);
+        }
 
         return $policy;
     }
@@ -314,11 +313,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneValidNetworkClaimFourtyPot()
     {
-        $policy = $this->createUserPolicy();
+        $policy = $this->createUserPolicy(true);
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 4; $i++) {
-            $linkedPolicy = $this->createUserPolicy();
+            $linkedPolicy = $this->createUserPolicy(true);
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }

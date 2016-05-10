@@ -69,6 +69,11 @@ class Claim
         $this->date = $date;
     }
 
+    public function isWithin30Days($date)
+    {
+        return $this->getDate()->diff($date)->days < 30;
+    }
+
     public function getPolicy()
     {
         return $this->policy;
