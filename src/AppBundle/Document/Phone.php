@@ -304,13 +304,14 @@ class Phone
         $this->suggestedReplacement = $suggestedReplacement;
     }
 
-    public function getAge()
+    public function getMonthAge()
     {
         if (!$this->getReleaseDate()) {
             return null;
         }
 
-        return ceil($this->getReleaseDate()->diff(new \DateTime())->days / 30.4);
+        $diff = $this->getReleaseDate()->diff(new \DateTime());
+        return $diff->y * 12 + $diff->m;
     }
 
     public function policyProfit($claimFrequency)
@@ -393,7 +394,7 @@ class Phone
             'screen_resolution' => $this->getScreenResolution(),
             'camera' => $this->getCamera(),
             'lte' => $this->getLte(),
-            'age' => $this->getAge(),
+            'age' => $this->getMonthAge(),
             'initial_price' => $this->getInitialPrice(),
         ];
     }
