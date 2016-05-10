@@ -41,6 +41,15 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
+                    {{ form_label(form.status, '', {'label_attr': {'class': 'col-sm-4'}}) }}
+                    {{ form_errors(form.status) }}
+                    {{ form_widget(form.status, {'attr': {'class': 'col-sm-3'}}) }}
+                </div>                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 col-md-offset-5">
+                <div class="form-group">
                     {{ form_widget(form.record, {'label': 'Record claim', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>                
             </div>

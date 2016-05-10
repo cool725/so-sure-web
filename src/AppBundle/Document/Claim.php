@@ -10,8 +10,11 @@ class Claim
     const TYPE_LOSS = 'loss';
     const TYPE_THEFT = 'theft';
     const TYPE_DAMAGE = 'damage';
-    const TYPE_DECLINED = 'declined';
-    const TYPE_WITHDRAWN = 'withdrawn';
+
+    const STATUS_OPEN = 'open';
+    const STATUS_SETTLED = 'settled';
+    const STATUS_DECLINED = 'declined';
+    const STATUS_WITHDRAWN = 'withdrawn';
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="User")
@@ -26,6 +29,9 @@ class Claim
 
     /** @MongoDB\Field(type="string") */
     protected $type;
+
+    /** @MongoDB\Field(type="string") */
+    protected $status;
 
     /** @MongoDB\Field(type="boolean", name="suspected_fraud") */
     protected $suspectedFraud;
@@ -65,6 +71,16 @@ class Claim
         $this->type = $type;
     }
 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
     public function getNumber()
     {
         return $this->number;
@@ -87,6 +103,6 @@ class Claim
 
     public function isMonetaryClaim()
     {
-        return in_array($this->getType(), [self::TYPE_DAMAGE, self::TYPE_LOSS, self::TYPE_THEFT]);
+        return in_array($this->getStatus(), [self::STATUS_SETTLED]);
     }
 }

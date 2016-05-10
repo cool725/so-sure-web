@@ -22,8 +22,12 @@ class ClaimType extends AbstractType
                 Claim::TYPE_LOSS => Claim::TYPE_LOSS,
                 Claim::TYPE_THEFT => Claim::TYPE_THEFT,
                 Claim::TYPE_DAMAGE => Claim::TYPE_DAMAGE,
-                Claim::TYPE_WITHDRAWN => Claim::TYPE_WITHDRAWN,
-                Claim::TYPE_DECLINED => Claim::TYPE_DECLINED,
+            ]])
+            ->add('status', ChoiceType::class, ['choices' => [
+                Claim::STATUS_OPEN => Claim::STATUS_OPEN,
+                Claim::STATUS_WITHDRAWN => Claim::STATUS_WITHDRAWN,
+                Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
+                Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,
             ]])
             ->add('suspected_fraud', CheckboxType::class, ['required' => false])
             ->add('record', SubmitType::class)

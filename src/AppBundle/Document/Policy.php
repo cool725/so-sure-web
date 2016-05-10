@@ -546,6 +546,22 @@ abstract class Policy
         return array_values($claims)[0];
     }
 
+    public function getNetworkClaims()
+    {
+        $claims = [];
+        foreach ($this->getConnections() as $connection) {
+            $policy = $connection->getPolicy();
+            if (!$policy) {
+                throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
+            }
+            foreach ($policy->getClaims() as $claim) {
+                $claims[] = $claim;
+            }
+        }
+
+        return $claims;
+    }
+
     public function calculatePotValue()
     {
         $potValue = 0;

@@ -309,6 +309,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policy = $policyRepo->find($policyData['id']);
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
         self::$dm->flush();
         $this->assertTrue($invitation->canReinvite());
@@ -391,6 +392,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policy = $policyRepo->find($policyData['id']);
         $claim = new Claim();
         $claim->setType(Claim::TYPE_THEFT);
+        $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
         self::$dm->flush();
 
