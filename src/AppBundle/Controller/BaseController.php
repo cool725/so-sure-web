@@ -4,11 +4,16 @@ namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
+
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use AppBundle\Classes\ApiErrorCode;
+
 use MongoRegex;
 
 abstract class BaseController extends Controller
@@ -185,5 +190,43 @@ abstract class BaseController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return \DateTime|Response|null
+     */
+    protected function validateBirthday($data)
+    {
+        if (!isset($data['birthday'])) {
+            return null;
+        }
+        $birthday = \DateTime::createFromFormat(\DateTime::ISO8601, $data['birthday']);
+        if (!$birthday) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                'Unable to parse birthday',
+                422
+            );
+        }
+        $now = new \DateTime();
+        $diff = $now->diff($birthday);
+        if ($diff->y > 150) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                '150 years old not possible for quite some time',
+                422
+            );
+        }
+        if ($diff->y < 18) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_USER_TOO_YOUNG,
+                'Must be over 18',
+                422
+            );
+        }
+
+        return $birthday;
     }
 }

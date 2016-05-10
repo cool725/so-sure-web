@@ -513,6 +513,12 @@ class User extends BaseUser
             return false;
         }
 
+        $now = new \DateTime();
+        $diff = $now->diff($this->getBirthday());
+        if ($diff->y > 150 || $diff->y < 18) {
+            return false;
+        }
+
         return true;
     }
 
