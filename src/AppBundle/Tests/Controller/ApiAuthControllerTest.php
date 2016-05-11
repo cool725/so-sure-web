@@ -646,10 +646,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
-        $data = $this->verifyResponse(200);
-
-        $this->assertTrue(strlen($data['id']) > 5);
-        $this->assertEquals('128', $data['phone_policy']['phone']['memory']);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
     public function testNewPolicyMemoryStandard()
@@ -1454,7 +1451,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'imei' => $imei,
             'make' => 'OnePlus',
             'device' => 'A0001',
-            'memory' => 65,
+            'memory' => 63,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
