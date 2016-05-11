@@ -615,7 +615,7 @@ class ApiController extends BaseController
             );
             $user->setSnsEndpoint(isset($data['sns_endpoint']) ? $data['sns_endpoint'] : null);
             $user->setMobileNumber($mobileNumber);
-            $user->setCampaign(isset($data['campaign']) ? $data['campaign'] : null);
+            $user->setReferer(isset($data['referer']) ? $data['referer'] : null);
             $birthday = $this->validateBirthday($data);
             if ($birthday instanceof Response) {
                 return $birthday;
