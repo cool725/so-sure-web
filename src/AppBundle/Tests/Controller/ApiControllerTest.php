@@ -753,7 +753,7 @@ class ApiControllerTest extends BaseControllerTest
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => static::generateEmail('create-campaign', $this),
-            'campaign' => 'foo',
+            'referer' => 'foo',
         ));
         $data = $this->verifyResponse(200);
         $this->assertEquals(strtolower(static::generateEmail('create-campaign', $this)), $data['email']);
@@ -763,7 +763,7 @@ class ApiControllerTest extends BaseControllerTest
             'emailCanonical' => strtolower(static::generateEmail('create-campaign', $this))
         ]);
         $this->assertTrue($fooUser !== null);
-        $this->assertEquals('foo', $fooUser->getCampaign());
+        $this->assertEquals('foo', $fooUser->getReferer());
     }
 
     public function testPreLaunchUserCanOverwrite()

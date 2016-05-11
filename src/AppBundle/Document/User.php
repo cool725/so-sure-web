@@ -116,9 +116,9 @@ class User extends BaseUser
     protected $preLaunch = false;
 
     /**
-     * @MongoDB\String(name="campaign")
+     * @MongoDB\String(name="referer")
      */
-    protected $campaign;
+    protected $referer;
 
     /** @MongoDB\Date() */
     protected $birthday;
@@ -472,14 +472,14 @@ class User extends BaseUser
         $this->mobileNumber = $this->normalizeUkMobile($mobile);
     }
 
-    public function getCampaign()
+    public function getReferer()
     {
-        return $this->campaign;
+        return $this->referer;
     }
 
-    public function setCampaign($campaign)
+    public function setReferer($referer)
     {
-        $this->campaign = $campaign;
+        $this->referer = $referer;
     }
 
     public function isPreLaunch()
