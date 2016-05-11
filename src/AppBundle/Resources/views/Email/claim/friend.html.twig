@@ -1,0 +1,11 @@
+<p>
+    Your friend {{ claim.policy.user.name }} has claimed on their so-sure policy.
+</p>
+{% if policy.potValue > 0 %}
+    Your pot has been used to help out your mate.  You still have £{{ policy.potValue }} in your pot, which you can get back at the end of your policy year if you
+    and your connection(s) do not claim for the rest of your policy.
+{% else %}
+<p>
+    Your pot has been completely used to help out your mate.
+</p>
+{% endif %}

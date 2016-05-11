@@ -115,8 +115,8 @@ class ClaimsController extends BaseController
         $form->handleRequest($request);
         if ($form->isValid()) {
             $claim->setHandler($this->getUser());
-            $policy->addClaim($claim);
-            $dm->flush();
+            $claimsService = $this->get('app.claims');
+            $claimsService->addClaim($policy, $claim);
             $this->addFlash('success', sprintf('Claim %s is added', $claim->getNumber()));
 
             return $this->redirectToRoute('claims_policy', ['id' => $id]);

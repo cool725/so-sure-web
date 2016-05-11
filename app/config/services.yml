@@ -89,6 +89,15 @@ services:
             sms:        "@app.sms"
             rateLimit:  "@app.ratelimit"
 
+    app.claims:
+        class: AppBundle\Service\ClaimsService
+        arguments:
+            dm:         "@doctrine_mongodb.odm.default_document_manager"
+            logger:     "@logger"
+            mailer:     "@swiftmailer.mailer.invite"
+            templating: "@templating"
+            router:     "@api.router"
+
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
         arguments:
