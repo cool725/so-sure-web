@@ -168,9 +168,11 @@ services:
     app.davies:
         class: AppBundle\Service\DaviesService
         arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
             logger:         "@logger"
             excel:          "@app.excel"
             s3:             "@aws.s3"
+            claims:         "@app.claims"
 
     app.jwt:
         class: AppBundle\Service\JWTService

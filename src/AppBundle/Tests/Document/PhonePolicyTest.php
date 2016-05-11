@@ -90,14 +90,14 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policyA->hasNetworkClaimedInLast30Days());
 
         $claimA = new Claim();
-        $claimA->setDate(new \DateTime("2016-01-01"));
+        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $policyA->addClaim($claimA);
         $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-01")));
         $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-01-15")));
         
         $claimB = new Claim();
-        $claimB->setDate(new \DateTime("2016-02-01"));
+        $claimB->setRecordedDate(new \DateTime("2016-02-01"));
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $policyA->addClaim($claimB);
         $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21")));
@@ -185,7 +185,7 @@ class PhonePolicyTest extends WebTestCase
         }
 
         $claim = new Claim();
-        $claim->setDate(new \DateTime("2016-01-10"));
+        $claim->setRecordedDate(new \DateTime("2016-01-10"));
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policyClaim->addClaim($claim);
 
@@ -212,7 +212,7 @@ class PhonePolicyTest extends WebTestCase
         }
 
         $claim = new Claim();
-        $claim->setDate(new \DateTime("2016-01-10"));
+        $claim->setRecordedDate(new \DateTime("2016-01-10"));
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policyClaim->addClaim($claim);
 
@@ -609,15 +609,15 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->hasMonetaryClaimed());
 
         $claimA = new Claim();
-        $claimA->setDate(new \DateTime("2016-01-01"));
+        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_WITHDRAWN);
         $policy->addClaim($claimA);
         $this->assertFalse($policy->hasMonetaryClaimed());
 
         $claimB = new Claim();
-        $claimB->setDate(new \DateTime("2016-01-02"));
-        $claimA->setType(Claim::TYPE_DAMAGE);
+        $claimB->setRecordedDate(new \DateTime("2016-01-02"));
+        $claimB->setType(Claim::TYPE_DAMAGE);
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claimB);
         $this->assertTrue($policy->hasMonetaryClaimed());
