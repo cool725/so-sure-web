@@ -4,12 +4,17 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
 use AppBundle\Classes\DaviesClaim;
+use AppBundle\Document\Claim;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 class DaviesService
 {
     const PROCESSED_FOLDER = 'processed';
     const UNPROCESSED_FOLDER = 'unprocessed';
     const FAILED_FOLDER = 'failed';
+
+    /** @var DocumentManager */
+    protected $dm;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -26,17 +31,30 @@ class DaviesService
     /** @var string */
     protected $path;
 
+    /** @var ClaimsService */
+    protected $claimsService;
+
     /**
+     * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param ExcelService    $excel
+     * @param S3Client        $s3
+     * @param ClaimsService   $claimsService
      */
-    public function __construct(LoggerInterface $logger, ExcelService $excel, S3Client $s3)
-    {
+    public function __construct(
+        DocumentManager  $dm,
+        LoggerInterface $logger,
+        ExcelService $excel,
+        S3Client $s3,
+        ClaimsService $claimsService
+    ) {
+        $this->dm = $dm;
         $this->logger = $logger;
         $this->excel = $excel;
         $this->s3 = $s3;
         $this->bucket = 'ops.so-sure.com';
         $this->path = 'claims-report/prod';
+        $this->claimsService = $claimsService;
     }
 
     public function import()
@@ -48,7 +66,7 @@ class DaviesService
                 $emailFile = $this->downloadEmail($key);
                 if ($excelFile = $this->extractExcelFromEmail($emailFile)) {
                     $claims = $this->parseExcel($excelFile);
-                    $processed = $this->saveClaims($claims);
+                    $processed = $this->saveClaims($key, $claims);
                 }
             } catch (\Exception $e) {
                 $processed = false;
@@ -191,14 +209,101 @@ class DaviesService
         return $claims;
     }
 
-    public function saveClaims(array $claims)
+    public function saveClaims($key, array $daviesClaims)
     {
-        foreach ($claims as $claim) {
-            // todo
-            print "TODO";
-            print_r($claim);
+        $success = true;
+        foreach ($daviesClaims as $daviesClaim) {
+            try {
+                $repo = $this->dm->getRepository(Claims::class);
+                $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
+                if (!$claim) {
+                    throw new \Exception(sprintf('Unable to locate claim %s', $daviesClaim->claimNumber));
+                }
+
+                $this->validateClaimDetails($claim, $daviesClaim);
+
+                $claim->setType($daviesClaim->getClaimType());
+                $claim->setStatus($daviesClaim->getClaimStatus());
+
+                $claim->setExcess($this->excess);
+                $claim->setIncurred($this->incurred);
+
+                $claim->setReplacementPhone($this->getReplacementPhone($daviesClaim));
+                $claim->setReplacementImei($daviesClaim->replacementImei);
+
+                $claim->setDescription($daviesClaim->lossDescription);
+                $claim->setLocation($daviesClaim->location);
+
+                $claim->setClosedDate($daviesClaim->dateClosed);
+                $claim->setCreatedDate($daviesClaim->dateCreated);
+                $claim->setNotificationDate($daviesClaim->notificationDate);
+                $claim->setLossDate($daviesClaim->lossDate);
+
+                $claim->setShippingAddress($daviesClaim->shippingAddress);
+
+                $this->updatePolicy($claim);
+                $this->dm->flush();
+
+                $this->claimsService->processClaim($claim);
+            } catch (\Exception $e) {
+                $success = false;
+                $this->logger->error('Error processing file %s', $key, $e->getMessage());
+            }
         }
 
-        return true;
+        return $success;
+    }
+
+    public function validateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
+    {
+        if ($claim->getPolicy()->getPolicyNumber() != $daviesClaim->policyNumber) {
+            throw new \Exception(sprintf(
+                'Claim %s does not match policy number %s',
+                $daviesClaim->claimNumber,
+                $daviesClaim->policyNumber
+            ));
+        }
+
+        if ($claim->getPolicy()->getUser()->getName() != $daviesClaim->insuredName) {
+            throw new \Exception(sprintf(
+                'Claim %s does not match insuredName %s',
+                $daviesClaim->claimNumber,
+                $daviesClaim->insuredName
+            ));
+        }
+
+        if ($claim->getPolicy()->getUser()->getBillingAddress()->getPostCode() != $daviesClaim->riskPostCode) {
+            throw new \Exception(sprintf(
+                'Claim %s does not match postcode %s',
+                $daviesClaim->claimNumber,
+                $daviesClaim->riskPostCode
+            ));
+        }
+    }
+
+    public function getReplacementPhone(DaviesClaim $daviesClaim)
+    {
+        \AppBundle\Classes\NoOp::noOp([$daviesClaim]);
+        $repo = $this->dm->getRepository(Phone::class);
+        // TODO: Can we get the brightstar product numbers?
+        // $phone = $repo->findOneBy(['brightstar_number' => $daviesClaim->brightstarProductNumber]);
+
+        // TODO: If not brightstar, should be able to somehow parse these....
+        // $daviesClaim->replacementMake $daviesClaim->replacementModel
+        $phone = null;
+
+        return $phone;
+    }
+
+    public function updatePolicy(Claim $claim)
+    {
+        $policy = $claim->getPolicy();
+        // We've replaced their phone with a new imei number
+        if ($claim->getReplacementImei() && $claim->getReplacementPhone() &&
+            $claim->getReplacementImei() != $policy->getImei()) {
+            // Phone & Imei have changed, but we can't change their policy premium, which is fixed
+            $policy->setPhone($claim->getReplacementPhone());
+            $policy->setImei($claim->getReplacementImei());
+        }
     }
 }

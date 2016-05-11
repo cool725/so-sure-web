@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Classes;
 
+use AppBundle\Document\Claim;
+
 class DaviesClaim
 {
     public $client;
@@ -11,11 +13,18 @@ class DaviesClaim
     public $lossDate;
     public $startDate;
     public $endDate;
+
+    // losss, theft, damage??
     public $lossType;
     public $lossDescription;
     public $location;
+
+    // Open, Closed, ReOpen, ReClosed
     public $status;
+
+    // settled, repudiated (declined), and withdrawn
     public $miStatus;
+
     public $brightstarProductNumber;
     public $replacementMake;
     public $replacementModel;
@@ -27,6 +36,32 @@ class DaviesClaim
     public $notificationDate;
     public $dateCreated;
     public $dateClosed;
+
+    public function getClaimType()
+    {
+        if ($this->lossType == "loss") {
+            return Claim::TYPE_LOSS;
+        } elseif ($this->lossType == "theft") {
+            return Claim::TYPE_THEFT;
+        } elseif ($this->lossType == "daamge") {
+            return Claim::TYPE_DAMAGE;
+        } else {
+            return null;
+        }
+    }
+
+    public function getClaimStatus()
+    {
+        if ($this->status == "Open") {
+            return Claim::STATUS_OPEN;
+        } elseif ($this->status == "Closed" && $this->miStatus == "settled") {
+            return Claim::STATUS_SETTLED;
+        } elseif ($this->status == "Closed" && $this->miStatus == "repudiated") {
+            return Claim::STATUS_DECLINED;
+        } elseif ($this->status == "Closed" && $this->miStatus == "withdrawn") {
+            return Claim::STATUS_WITHDRAWN;
+        }
+    }
 
     public function fromArray($data)
     {

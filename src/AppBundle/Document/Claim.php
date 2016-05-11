@@ -31,11 +31,37 @@ class Claim
      */
     public $handler;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Phone")
+     */
+    public $replacementPhone;
+
+    /** @MongoDB\Field(type="string") */
+    protected $replacementImei;
+
     /** @MongoDB\Date() */
-    protected $date;
+    protected $recordedDate;
+
+    /** @MongoDB\Date() */
+    protected $lossDate;
+
+    /** @MongoDB\Date() */
+    protected $notificationDate;
+
+    /** @MongoDB\Date() */
+    protected $createdDate;
+
+    /** @MongoDB\Date() */
+    protected $closedDate;
 
     /** @MongoDB\Field(type="string") */
     protected $number;
+
+    /** @MongoDB\Field(type="string") */
+    protected $description;
+
+    /** @MongoDB\Field(type="string") */
+    protected $location;
 
     /** @MongoDB\Field(type="string") */
     protected $type;
@@ -49,9 +75,18 @@ class Claim
     /** @MongoDB\Field(type="boolean", name="suspected_fraud") */
     protected $suspectedFraud;
 
+    /** @MongoDB\Field(type="boolean") */
+    protected $processed;
+
+    /** @MongoDB\Field(type="float") */
+    protected $excess;
+
+    /** @MongoDB\Field(type="float") */
+    protected $incurred;
+
     public function __construct()
     {
-        $this->date = new \DateTime();
+        $this->recordedDate = new \DateTime();
     }
 
     public function getId()
@@ -59,19 +94,19 @@ class Claim
         return $this->id;
     }
 
-    public function getDate()
+    public function getRecordedDate()
     {
-        return $this->date;
+        return $this->recordedDate;
     }
 
-    public function setDate($date)
+    public function setRecordedDate($recordedDate)
     {
-        $this->date = $date;
+        $this->recordedDate = $recordedDate;
     }
 
     public function isWithin30Days($date)
     {
-        return $this->getDate()->diff($date)->days < 30;
+        return $this->getRecordedDate()->diff($date)->days < 30;
     }
 
     public function getPolicy()
@@ -101,6 +136,12 @@ class Claim
 
     public function setType($type)
     {
+        if ($this->type && $this->type != $type) {
+            throw new \Exception('Unable to change claim type');
+        } elseif (!$type) {
+            throw new \Exception('Type must be defined');
+        }
+
         $this->type = $type;
     }
 
@@ -111,7 +152,31 @@ class Claim
 
     public function setStatus($status)
     {
+        if (!$status) {
+            throw new \Exception('Status must be defined');
+        }
+
         $this->status = $status;
+    }
+
+    public function getReplacementPhone()
+    {
+        return $this->replacementPhone;
+    }
+
+    public function setReplacementPhone($replacementPhone)
+    {
+        $this->replacementPhone = $replacementPhone;
+    }
+
+    public function getReplacementImei()
+    {
+        return $this->replacementImei;
+    }
+
+    public function setReplacementImei($replacementImei)
+    {
+        $this->replacementImei = $replacementImei;
     }
 
     public function getNumber()
@@ -121,6 +186,10 @@ class Claim
 
     public function setNumber($number)
     {
+        if ($this->number && $this->number != $number) {
+            throw new \Exception('Unable to change claim number');
+        }
+
         $this->number = $number;
     }
 
@@ -142,6 +211,96 @@ class Claim
     public function setNotes($notes)
     {
         $this->notes = $notes;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function getLocation()
+    {
+        return $this->location;
+    }
+
+    public function setLocation($location)
+    {
+        $this->location = $location;
+    }
+
+    public function getLossDate()
+    {
+        return $this->lossDate;
+    }
+
+    public function setLossDate($lossDate)
+    {
+        $this->lossDate = $lossDate;
+    }
+
+    public function getNotificationDate()
+    {
+        return $this->notificationDate;
+    }
+
+    public function setNotificationDate($notificationDate)
+    {
+        $this->notificationDate = $notificationDate;
+    }
+
+    public function getCreatedDate()
+    {
+        return $this->createdDate;
+    }
+
+    public function setCreatedDate($createdDate)
+    {
+        $this->createdDate = $createdDate;
+    }
+
+    public function getClosedDate()
+    {
+        return $this->closedDate;
+    }
+
+    public function setClosedDate($closedDate)
+    {
+        $this->closedDate = $closedDate;
+    }
+
+    public function getExcess()
+    {
+        return $this->excess;
+    }
+
+    public function setExcess($excess)
+    {
+        $this->excess = $excess;
+    }
+
+    public function getIncurred()
+    {
+        return $this->incurred;
+    }
+
+    public function setIncurred($incurred)
+    {
+        $this->incurred = $incurred;
+    }
+
+    public function getProcessed()
+    {
+        return $this->processed;
+    }
+
+    public function setProcessed($processed)
+    {
+        $this->processed = $processed;
     }
 
     public function isMonetaryClaim()

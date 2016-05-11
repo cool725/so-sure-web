@@ -52,6 +52,10 @@ class ClaimsService
 
     public function processClaim(Claim $claim)
     {
+        if ($claim->getProcessed()) {
+            return;
+        }
+
         if ($claim->isMonetaryClaim()) {
             $claim->getPolicy()->updatePotValue();
             $this->dm->flush();
@@ -62,6 +66,9 @@ class ClaimsService
                 $this->dm->flush();
                 $this->notifyMonetaryClaim($networkConnection->getPolicy(), $claim, false);
             }
+
+            $claim->setProcessed(true);
+            $this->dm->flush();
         }
     }
 
