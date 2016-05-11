@@ -77,11 +77,6 @@ abstract class BaseController extends Controller
             return null;
         }
 
-        // most phones don't care about memory - only 1 entry to return
-        if (count($phones) == 1) {
-            return $phones[0];
-        }
-
         // sort low to high
         usort($phones, function ($a, $b) {
             return $a->getMemory() > $b->getMemory();
@@ -92,12 +87,12 @@ abstract class BaseController extends Controller
         // standard - phone memory is somewhere in the middle
         // high - phone exceeds all cases (new device with more memory?)
         foreach ($phones as $phone) {
-            if ($memory < $phone->getMemory()) {
+            if ($memory <= $phone->getMemory()) {
                 return $phone;
             }
         }
 
-        return $phones[count($phones) - 1];
+        return null;
     }
 
     /**

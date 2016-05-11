@@ -321,7 +321,7 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals(false, $data['rooted']);
     }
     
-    public function testQuoteKnownDeviceUnKnownMemory()
+    public function testQuoteKnownDeviceTooMuchMemory()
     {
         $crawler = self::$client->request(
             'GET',
@@ -338,7 +338,7 @@ class ApiControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request(
             'GET',
-            '/api/v1/quote?make=OnePlus&device=A0001&memory=65&rooted=true&debug=true'
+            '/api/v1/quote?make=OnePlus&device=A0001&memory=63&rooted=true&debug=true'
         );
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE);
     }
@@ -347,7 +347,7 @@ class ApiControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request(
             'GET',
-            '/api/v1/quote?make=Apple&device=A0001&memory=65&rooted=false&debug=true'
+            '/api/v1/quote?make=Apple&device=A0001&memory=63&rooted=false&debug=true'
         );
         $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
@@ -358,7 +358,7 @@ class ApiControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request(
             'GET',
-            '/api/v1/quote?make=Apple&device=iPhone5,3&memory=65&rooted=false&debug=true'
+            '/api/v1/quote?make=Apple&device=iPhone5,3&memory=63&rooted=false&debug=true'
         );
         $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
@@ -373,7 +373,7 @@ class ApiControllerTest extends BaseControllerTest
             'barfoo'
         );
         $cognitoIdentityId = $this->getAuthUser($user);
-        $url = '/api/v1/quote?device=A0001&memory=65&rooted=true&debug=true&_method=GET';
+        $url = '/api/v1/quote?device=A0001&memory=63&rooted=true&debug=true&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(422);
         $date = new \DateTime();
