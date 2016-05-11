@@ -29,7 +29,12 @@ monolog:
             type:  console
 
 swiftmailer:
-    delivery_address: "tech+envmail@so-sure.com"
+    default_mailer: default
+    mailers:
+        default:
+            delivery_address: "tech+envmail@so-sure.com"
+        invite:
+            delivery_address: "tech+envmail@so-sure.com"
 
 staffim_rollbar:
     # Rollbar access token

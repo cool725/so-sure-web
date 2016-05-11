@@ -83,6 +83,7 @@ class PolicyService
                     $otherConnection->clearValue();
                 }
             }
+            $networkConnection->getPolicy()->updatePotValue();
         }
         $this->dm->flush();
         // TODO - email user
