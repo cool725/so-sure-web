@@ -24,9 +24,9 @@ class ClaimsService
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param \Swift_Mailer    $mailer
-     * @param                  $templating
-     * @param                  $router
+     * @param \Swift_Mailer   $mailer
+     * @param                 $templating
+     * @param                 $router
      */
     public function __construct(
         DocumentManager $dm,
@@ -68,13 +68,19 @@ class ClaimsService
     public function notifyMonetaryClaim(Policy $policy, Claim $claim, $isClaimer)
     {
         try {
-            $subject = sprintf('Your friend %s has claimed on their so-sure policy', $claim->getPolicy()->getUser()->getName());
+            $subject = sprintf(
+                'Your friend %s has claimed on their so-sure policy',
+                $claim->getPolicy()->getUser()->getName()
+            );
             $templateHtml = "AppBundle:Email:claim/friend.html.twig";
             $templateText = "AppBundle:Email:claim/friend.txt.twig";
             if ($isClaimer) {
-                $subject = sprintf("You've claimed on your so-sure policy", $claim->getPolicy()->getUser()->getName());
+                $subject = sprintf(
+                    "You've claimed on your so-sure policy",
+                    $claim->getPolicy()->getUser()->getName()
+                );
                 $templateHtml = "AppBundle:Email:claim/self.html.twig";
-                $templateText = "AppBundle:Email:claim/self.txt.twig";                
+                $templateText = "AppBundle:Email:claim/self.txt.twig";
             }
 
             $message = \Swift_Message::newInstance()
