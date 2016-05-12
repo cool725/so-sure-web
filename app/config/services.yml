@@ -189,9 +189,12 @@ services:
     app.policy:
         class: AppBundle\Service\PolicyService
         arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            logger:         "@logger"
-            sequence:    "@app.sequence"
+            dm:         "@doctrine_mongodb.odm.default_document_manager"
+            logger:     "@logger"
+            sequence:   "@app.sequence"
+            mailer:     "@mailer"
+            templating: "@templating"
+            router:     "@api.router"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService
