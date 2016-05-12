@@ -273,14 +273,6 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            if (!$imeiValidator->checkImei($imei)) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED,
-                    'Imei is blacklisted',
-                    422
-                );
-            }
-
             $phone = $this->getPhone(
                 $data['phone_policy']['make'],
                 $data['phone_policy']['device'],
@@ -293,8 +285,6 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
-
-            // TODO: check we're not already insuring the same imei (only for policy state active,pending)
 
             try {
                 $jwtValidator->validate(
@@ -318,6 +308,15 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI,
                     'Imei is already registered for a policy',
+                    422
+                );
+            }
+
+            // Checking against blacklist should be last check to possible avoid costs
+            if (!$imeiValidator->checkImei($imei)) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED,
+                    'Imei is blacklisted',
                     422
                 );
             }
