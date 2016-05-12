@@ -26,19 +26,33 @@ class PolicyService
     /** @var SequenceService */
     protected $sequence;
 
+    /** @var \Swift_Mailer */
+    protected $mailer;
+    protected $templating;
+    protected $router;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param SequenceService $sequence
+     * @param \Swift_Mailer   $mailer
+     * @param                 $templating
+     * @param                 $router
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        SequenceService $sequence
+        SequenceService $sequence,
+        \Swift_Mailer $mailer,
+        $templating,
+        $router
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->sequence = $sequence;
+        $this->mailer = $mailer;
+        $this->templating = $templating;
+        $this->router = $router->getRouter();
     }
 
     public function create(Policy $policy, User $user)
@@ -59,6 +73,8 @@ class PolicyService
         }
 
         $this->dm->flush();
+
+        $this->email($policy);
     }
 
     public function cancel(Policy $policy, $reason, \DateTime $date = null)
@@ -90,5 +106,26 @@ class PolicyService
         // TODO - cancel dd
         // TODO - notify network?
         // TODO - cancellation reason
+    }
+
+    /**
+     * @param Policy $policy
+     */
+    public function email(Policy $policy)
+    {
+        $message = \Swift_Message::newInstance()
+            ->setSubject(sprintf('Your so-sure policy %s', $policy->getPolicyNumber()))
+            ->setFrom('hello@so-sure.com')
+            //->setTo($policy->getUser()->getEmail())
+            ->setTo('patrick@so-sure.com')
+            ->setBody(
+                $this->templating->render('AppBundle:Email:policy.html.twig', ['policy' => $policy]),
+                'text/html'
+            )
+            ->addPart(
+                $this->templating->render('AppBundle:Email:policy.txt.twig', ['policy' => $policy]),
+                'text/plain'
+            );
+        $this->mailer->send($message);
     }
 }
