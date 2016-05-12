@@ -1,8 +1,17 @@
-Your friend {{ claim.policy.user.name }} has claimed on their so-sure policy.
+Your friend, {{ claim.policy.user.name }}, has made a claim.
 
-{% if policy.potValue > 0 %}
-Your pot has been used to help out your mate.  You still have £{{ policy.potValue }} in your pot, which you can get back at the end of your policy year if you
-and your connection(s) do not claim for the rest of your policy.
-{% else %}
-Your pot has been completely used to help out your mate.
-{% endif %}
+**
+------------------------------------------------------------
+Sad news - your friend, {{ claim.policy.user.name }}, has made a claim and your Reward Pot has been reduced.
+
+{% if policy.potValue > 0 %}Good news – Your helped your friend get their phone back and you still have £{{ policy.potValue }} left! {% else %}
+
+Good news – you helped your friend get their phone back! Instant karma points!{% endif %}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright © 2016 so-sure, All rights reserved.
