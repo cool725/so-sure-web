@@ -605,7 +605,6 @@ class ApiController extends BaseController
             $userManager = $this->get('fos_user.user_manager');
             $user = $userManager->createUser();
             $user->setEnabled(true);
-            $user->setCognitoId($this->getCognitoIdentityId($request));
             $user->setEmail($data['email']);
             $user->setFirstName(isset($data['first_name']) ? $data['first_name'] : null);
             $user->setLastName(isset($data['last_name']) ? $data['last_name'] : null);
@@ -621,17 +620,7 @@ class ApiController extends BaseController
                 return $birthday;
             }
             $user->setBirthday($birthday);
-
-            // NOTE: not completely secure, but as we're only using for an indication, it's good enough
-            // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
-            // https://forums.aws.amazon.com/thread.jspa?messageID=673393
-            $clientIp = $this->getCognitoIdentityIp($request);
-            $user->setSignupIp($clientIp);
-
-            $geoip = $this->get('app.geoip');
-            $data = $geoip->find($clientIp);
-            $user->setSignupCountry($geoip->getCountry());
-            $user->setSignupLoc($geoip->getCoordinates());
+            $user->setIdentityLog($this->getIdentityLog($request));
 
             $validator = $this->get('validator');
             $errors = $validator->validate($user);

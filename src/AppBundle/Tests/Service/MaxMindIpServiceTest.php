@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\IdentityLog;
 use GeoJson\Geometry\Point;
 
 /**
@@ -62,7 +63,9 @@ class MaxMindServiceIpTest extends WebTestCase
         $user = static::createUser(self::$userManager, 'geo@security.so-sure.com', 'foo');
 
         self::$geoip->find('62.253.24.186');
-        $user->setSignupLoc(self::$geoip->getCoordinates());
+        $identityLog = new IdentityLog();
+        $identityLog->setLoc(self::$geoip->getCoordinates());
+        $user->setIdentityLog($identityLog);
         self::$dm->flush();
 
         // This will search with the correct query, which can be logged
@@ -70,7 +73,7 @@ class MaxMindServiceIpTest extends WebTestCase
         // db.runCommand({ geoNear: "User", near: { type: "Point", coordinates: [ 1, 60 ] }, spherical: true, distanceMultiplier: 0.001, query: {} })
             // @codingStandardsIgnoreEnd
         $searchUserQuery = self::$dm->createQueryBuilder('AppBundle:User')
-            ->field('signupLoc')
+            ->field('identity_log.loc')
             ->geoNear(new Point([1, 60]))
             ->spherical(true)
             // in meters

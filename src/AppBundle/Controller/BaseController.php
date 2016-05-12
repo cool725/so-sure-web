@@ -224,4 +224,16 @@ abstract class BaseController extends Controller
 
         return $birthday;
     }
+
+    protected function getIdentityLog(Request $request)
+    {
+        // NOTE: not completely secure, but as we're only using for an indication, it's good enough
+        // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
+        // https://forums.aws.amazon.com/thread.jspa?messageID=673393
+        $clientIp = $this->getCognitoIdentityIp($request);
+
+        $geoip = $this->get('app.geoip');
+
+        return $geoip->getIdentityLog($clientIp, $this->getCognitoIdentityId($request));
+    }
 }

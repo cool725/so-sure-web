@@ -325,6 +325,7 @@ class ApiAuthController extends BaseController
             $policy = new PhonePolicy();
             $policy->setImei($imei);
             $policy->setPhone($phone);
+            $policy->setIdentityLog($this->getIdentityLog($request));
 
             $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);

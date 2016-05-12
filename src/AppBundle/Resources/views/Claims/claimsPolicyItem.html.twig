@@ -53,7 +53,12 @@
                 <table class="table table-striped">
                     <tr>
                         <td>User Signup - Country of Ip</td>
-                        <td>{{ policy.user.signupCountry }}</td>
+                        <td>{% if policy.user.identityLog %}
+                              {{ policy.user.identityLog.country }}
+                            {% else %}
+                              Unknown
+                          {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <td>Other Users w/same postcode</td>

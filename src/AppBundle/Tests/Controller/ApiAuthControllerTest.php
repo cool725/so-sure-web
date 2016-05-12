@@ -508,6 +508,13 @@ class ApiAuthControllerTest extends BaseControllerTest
             }
         }
         $this->assertTrue($foundPolicy);
+
+        $repo = self::$dm->getRepository(Policy::class);
+        $policy = $repo->find($data['id']);
+        $this->assertTrue($policy !== null);
+        $this->assertEquals('62.253.24.189', $policy->getIdentityLog()->getIp());
+        $this->assertEquals('GB', $policy->getIdentityLog()->getCountry());
+        $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
     }
 
     public function testNewPolicyDisabledUser()
@@ -590,8 +597,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     public function testNewPolicyRateLimited()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $limit = RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_POLICY]  *
-            RateLimitService::IP_ADDRESS_MULTIPLIER;
+        $limit = RateLimitService::$maxIpRequests[RateLimitService::DEVICE_TYPE_POLICY];
         for ($i = 1; $i <= $limit + 1; $i++) {
             $user = self::createUser(
                 self::$userManager,
