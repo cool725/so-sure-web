@@ -691,13 +691,16 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testNewPolicyBlacklistedImei()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $user = self::createUser(self::$userManager, self::generateEmail('policy-blacklist', $this), 'foo', true);
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
         $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => self::BLACKLISTED_IMEI,
             'make' => 'OnePlus',
             'device' => 'A0001',
-            'memory' => 65,
+            'memory' => 63,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::BLACKLISTED_IMEI]),
         ]]);
