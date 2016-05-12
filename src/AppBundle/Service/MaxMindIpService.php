@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use GeoIp2\Database\Reader;
 use AppBundle\Document\Coordinates;
+use AppBundle\Document\IdentityLog;
 use GeoJson\Geometry\Point;
 
 class MaxMindIpService
@@ -13,6 +14,7 @@ class MaxMindIpService
 
     protected $reader;
 
+    protected $ip;
     protected $data;
 
     /**
@@ -34,6 +36,8 @@ class MaxMindIpService
      */
     public function find($ip)
     {
+        $this->ip = $ip;
+
         // reset data in case city throws exception
         $this->data = null;
 
@@ -73,5 +77,17 @@ class MaxMindIpService
         $coordinates->coordinates = [$this->data->location->longitude, $this->data->location->latitude];
 
         return $coordinates;
+    }
+
+    public function getIdentityLog($ip, $cognitoId)
+    {
+        $this->find($ip);
+        $identityLog = new IdentityLog();
+        $identityLog->setIp($this->ip);
+        $identityLog->setCountry($this->getCountry());
+        $identityLog->setLoc($this->getCoordinates());
+        $identityLog->setCognitoId($cognitoId);
+
+        return $identityLog;
     }
 }

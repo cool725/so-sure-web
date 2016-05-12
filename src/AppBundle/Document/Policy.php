@@ -128,6 +128,9 @@ abstract class Policy
      */
     protected $premium;
 
+    /** @MongoDB\EmbedOne(targetDocument="IdentityLog", name="identity_log") */
+    protected $identityLog;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -348,6 +351,16 @@ abstract class Policy
     public function getPremium()
     {
         return $this->premium;
+    }
+
+    public function getIdentityLog()
+    {
+        return $this->identityLog;
+    }
+
+    public function setIdentityLog($identityLog)
+    {
+        $this->identityLog = $identityLog;
     }
 
     public function init(User $user, PolicyDocument $terms, PolicyDocument $keyfacts)

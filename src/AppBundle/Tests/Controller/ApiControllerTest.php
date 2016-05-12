@@ -725,7 +725,7 @@ class ApiControllerTest extends BaseControllerTest
         $userRepo = $dm->getRepository(User::class);
         $user = $userRepo->findOneBy(['email' => 'api-new-user@api.bar.com']);
         $this->assertTrue($user !== null);
-        $this->assertEquals($cognitoIdentityId, $user->getCognitoId());
+        $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
         $this->assertEquals($birthday->format(\DateTime::ISO8601), $user->getBirthday()->format(\DateTime::ISO8601));
     }
 
@@ -742,9 +742,9 @@ class ApiControllerTest extends BaseControllerTest
         $repo = self::$dm->getRepository(User::class);
         $fooUser = $repo->findOneBy(['email' => 'api-ip-user@api.bar.com']);
         $this->assertTrue($fooUser !== null);
-        $this->assertEquals('62.253.24.189', $fooUser->getSignupIp());
-        $this->assertEquals('GB', $fooUser->getSignupCountry());
-        $this->assertEquals([-0.13,51.5], $fooUser->getSignupLoc()->coordinates);
+        $this->assertEquals('62.253.24.189', $fooUser->getIdentityLog()->getIp());
+        $this->assertEquals('GB', $fooUser->getIdentityLog()->getCountry());
+        $this->assertEquals([-0.13,51.5], $fooUser->getIdentityLog()->getLoc()->coordinates);
     }
     
     public function testUserCreateCampaign()

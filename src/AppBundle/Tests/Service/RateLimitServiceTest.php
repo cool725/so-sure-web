@@ -53,7 +53,7 @@ class RateLimitServiceTest extends WebTestCase
                     '1.1.1.1',
                     sprintf('address-cog-%d', $i)
                 );
-                if ($i <= RateLimitService::$maxRequests[$type] * RateLimitService::IP_ADDRESS_MULTIPLIER) {
+                if ($i <= RateLimitService::$maxIpRequests[$type]) {
                     $this->assertTrue($allowedIp);
                 } else {
                     $this->assertFalse($allowedIp);

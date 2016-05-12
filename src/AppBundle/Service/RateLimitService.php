@@ -14,7 +14,6 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 class RateLimitService
 {
-    const IP_ADDRESS_MULTIPLIER = 7; // at most 7 users per ip address
     const KEY_FORMAT = 'rate:%s:%s';
     const USER_KEY_FORMAT = 'rate:%s:%s:%s';
 
@@ -38,9 +37,18 @@ class RateLimitService
         self::DEVICE_TYPE_IMEI => 2,
         self::DEVICE_TYPE_ADDRESS => 3,
         self::DEVICE_TYPE_LOGIN => 3,
-        self::DEVICE_TYPE_POLICY => 8,
+        self::DEVICE_TYPE_POLICY => 1,
         self::DEVICE_TYPE_RESET => 2,
         self::DEVICE_TYPE_TOKEN => 10,
+    ];
+
+    public static $maxIpRequests = [
+        self::DEVICE_TYPE_IMEI => 14,
+        self::DEVICE_TYPE_ADDRESS => 21,
+        self::DEVICE_TYPE_LOGIN => 21,
+        self::DEVICE_TYPE_POLICY => 50,
+        self::DEVICE_TYPE_RESET => 14,
+        self::DEVICE_TYPE_TOKEN => 100,
     ];
 
     public static $excludedIps = [
@@ -82,7 +90,7 @@ class RateLimitService
         $cognitoIdKey = sprintf(self::KEY_FORMAT, $type, $cognitoId);
 
         $ipRequests = $this->redis->incr($ipKey);
-        $maxIpRequests = self::$maxRequests[$type] * self::IP_ADDRESS_MULTIPLIER;
+        $maxIpRequests = self::$maxIpRequests[$type];
         $cognitoRequests = $this->redis->incr($cognitoIdKey);
         $maxCognitoRequests = self::$maxRequests[$type];
 

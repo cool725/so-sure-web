@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
- * @MongoDB\Index(keys={"signup_loc"="2dsphere"}, sparse="true")
+ * @MongoDB\Index(keys={"identity_log.loc"="2dsphere"}, sparse="true")
  */
 class User extends BaseUser
 {
@@ -85,20 +85,8 @@ class User extends BaseUser
     /** @MongoDB\String(name="sns_endpoint", nullable=true) */
     protected $snsEndpoint;
 
-    /** @MongoDB\String(name="cognito_id", nullable=true) */
-    protected $cognitoId;
-
-    /** @MongoDB\String(name="signup_ip", nullable=true) */
-    protected $signupIp;
-
-    /** @MongoDB\String(name="signup_country", nullable=true) */
-    protected $signupCountry;
-
-    /** @MongoDB\EmbedOne(targetDocument="Coordinates", name="signup_loc") */
-    protected $signupLoc;
-
-    /** @MongoDB\Distance */
-    public $signupDistance;
+    /** @MongoDB\EmbedOne(targetDocument="IdentityLog", name="identity_log") */
+    protected $identityLog;
 
     /** @MongoDB\EmbedOne(targetDocument="Gocardless", name="gocardless") */
     protected $gocardless;
@@ -158,16 +146,6 @@ class User extends BaseUser
     public function setCreated($created)
     {
         $this->created = $created;
-    }
-
-    public function getCognitoId()
-    {
-        return $this->cognitoId;
-    }
-
-    public function setCognitoId($cognitoId)
-    {
-        $this->cognitoId = $cognitoId;
     }
 
     public function setFacebookId($facebookId)
@@ -407,34 +385,14 @@ class User extends BaseUser
         $this->snsEndpoint = $snsEndpoint;
     }
 
-    public function getSignupIp()
+    public function getIdentityLog()
     {
-        return $this->signupIp;
+        return $this->identityLog;
     }
 
-    public function setSignupIp($signupIp)
+    public function setIdentityLog($identityLog)
     {
-        $this->signupIp = $signupIp;
-    }
-
-    public function getSignupCountry()
-    {
-        return $this->signupCountry;
-    }
-
-    public function setSignupCountry($signupCountry)
-    {
-        $this->signupCountry = $signupCountry;
-    }
-
-    public function getSignupLoc()
-    {
-        return $this->signupLoc;
-    }
-
-    public function setSignupLoc($signupLoc)
-    {
-        $this->signupLoc = $signupLoc;
+        $this->identityLog = $identityLog;
     }
 
     public function getGocardless()
