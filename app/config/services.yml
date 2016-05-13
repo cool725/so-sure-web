@@ -129,11 +129,11 @@ services:
             identityPoolId: "%aws_cognito_identitypoolid%"
 
     app.imei:
-        class: AppBundle\Service\ImeiService
+        class: AppBundle\Service\ReceperioService
         arguments:
-            logger:   "@logger"
-            apiKey:   "%gsma_apikey%"
-            username: "%gsma_username%"
+            logger:    "@logger"
+            secretKey: "%receperio_secretkey%"
+            storeId:   "%receperio_storeid%"
 
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService
