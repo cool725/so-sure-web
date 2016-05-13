@@ -76,15 +76,14 @@ class ClaimsService
     {
         try {
             $subject = sprintf(
-                'Your friend %s has claimed on their so-sure policy',
+                'Your friend, %s, has made a claim.',
                 $claim->getPolicy()->getUser()->getName()
             );
             $templateHtml = "AppBundle:Email:claim/friend.html.twig";
             $templateText = "AppBundle:Email:claim/friend.txt.twig";
             if ($isClaimer) {
                 $subject = sprintf(
-                    "You've claimed on your so-sure policy",
-                    $claim->getPolicy()->getUser()->getName()
+                    "Sorry to hear something happened to your phone. We hope you're okay."
                 );
                 $templateHtml = "AppBundle:Email:claim/self.html.twig";
                 $templateText = "AppBundle:Email:claim/self.txt.twig";
