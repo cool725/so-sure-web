@@ -106,4 +106,21 @@ class ApiUnauthControllerTest extends BaseControllerTest
         }
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
+
+    // token unauth
+
+    /**
+     *
+     */
+    public function testZendeskOk()
+    {
+        $this->clearRateLimit();
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('zendesk', $this), 'bar');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/unauth/zendesk', array(
+            'user_token' => $user->getId(),
+        ));
+        $data = $this->verifyResponse(200);
+        $this->assertTrue(strlen($data['jwt']) > 20);
+    }
 }

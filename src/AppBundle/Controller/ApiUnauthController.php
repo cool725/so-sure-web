@@ -24,6 +24,11 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\ValidationData;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
+
 /**
  * @Route("/api/v1/unauth")
  */
@@ -81,6 +86,41 @@ class ApiUnauthController extends BaseController
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api tokenAction. %s', $e->getMessage()));
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/zendesk", name="api_unauth_zendesk")
+     * @Method({"POST"})
+     */
+    public function unauthZendeskAction(Request $request)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['user_token'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($data['user_token']);
+            if (!$user || $user->isExpired() || $user->isLocked()) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 422);
+            }
+
+            $token = (new Builder())->setIssuedAt(time());
+            $token->setId(uniqid('', true));
+            $token->set('Email', $user->getEmailCanonical());
+            $token->set('Name', $user->getName());
+
+            $secret = $this->getParameter('zendesk_jwt_secret');
+            $jwt = (string) $token->sign(new Sha256(), $secret)->getToken();
+
+            return new JsonResponse(['jwt' => $jwt]);
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Error in api zenddesk. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

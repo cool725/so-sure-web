@@ -58,6 +58,7 @@ parameters:
     pca_apikey: ''
     branch_key: ''
     smooch_key: ''
+    zendesk_jwt_secret: ''
     geoip_db: ''
 
     gsma_apikey:  ''
