@@ -94,7 +94,7 @@ class ReceperioService
     
     protected function sign($body)
     {
-        return sha1(sprintf("%s%s", $this->secretKey, $body));        
+        return sha1(sprintf("%s%s", $this->secretKey, $body));
     }
 
     /**
