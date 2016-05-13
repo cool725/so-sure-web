@@ -59,8 +59,11 @@ parameters:
     branch_key: ''
     smooch_key: ''
     geoip_db: ''
+
     gsma_apikey:  ''
     gsma_username: ''
+    receperio_secretkey: ''
+    receperio_storeid: ''
 
     salva_url: ''
     salva_username: ''

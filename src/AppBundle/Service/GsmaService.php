@@ -4,7 +4,7 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 
-class ImeiService
+class GsmaService
 {
     const BASE_URL = "https://devicecheck.gsma.com/imeirtl";
 
