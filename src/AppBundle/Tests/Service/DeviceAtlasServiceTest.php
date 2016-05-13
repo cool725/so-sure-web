@@ -81,6 +81,18 @@ class DeviceAtlasServiceTest extends WebTestCase
         $this->assertEquals("Galaxy S6 Edge", $phone->getModel());
     }
     
+    public function testOnePlus()
+    {
+        // @codingStandardsIgnoreStart
+        // Mozilla/5.0 (Linux; Android 6.0.1; A0001 Build/MMB29X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.89 Mobile Safari/537.36
+        $userAgent = "Mozilla/5.0 (Linux; Android 6.0.1; A0001 Build/MMB29X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.89 Mobile Safari/537.36";
+        // @codingStandardsIgnoreEnd
+
+        $phone = self::$deviceAtlas->getPhone($this->getRequest($userAgent));
+        $this->assertTrue($phone !== null);
+        $this->assertEquals("One", $phone->getModel());
+    }
+
     private function getRequest($userAgent)
     {
         $request = Request::create(

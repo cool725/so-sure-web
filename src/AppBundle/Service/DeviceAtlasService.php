@@ -41,7 +41,6 @@ class DeviceAtlasService
 
             return null;
         }
-        // print_r($result);
         if (!isset($result['properties']) ||
             !isset($result['properties']['isMobilePhone']) ||
             $result['properties']['isMobilePhone'] != 1) {
@@ -69,8 +68,14 @@ class DeviceAtlasService
         $playRepo = $this->dm->getRepository(PlayDevice::class);
         $phoneRepo = $this->dm->getRepository(Phone::class);
 
-        $playDevices = $playRepo->findBy(['marketingName' => $marketingName]);
+        $names = [
+            sprintf("%s %s", $manufacturer, $marketingName),
+            $marketingName,
+        ];
         $devices = [];
+        $playDevices = $playRepo->createQueryBuilder()
+            ->field('marketingName')->in($names)
+            ->getQuery()->execute();
         foreach ($playDevices as $playDevice) {
             $devices[] = $playDevice->getDevice();
         }
@@ -83,7 +88,7 @@ class DeviceAtlasService
         }
 
         // Known issue where iphones are not detectable
-        if ($manufacturer != "Apple" && $model == "iPhone") {
+        if ($manufacturer != "Apple" && $model != "iPhone") {
             $missing = sprintf("%s %s %s %s", $manufacturer, $marketingName, $model, $osVersion);
             $this->logger->warning(sprintf('Unable to find phone for device %s', $missing));
         }
