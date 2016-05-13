@@ -7,18 +7,20 @@ Thank you for joining so-sure.  We're excited to have you onboard.
 Your policy is for {{ policy.phone }} and runs from {{ policy.start|date }} to {{ policy.end|date }}.
 
 We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
-{# TODO: Add logic to show message depending on whether or not they are in the first 1,000 customers #}
+
+{% if policy.promoCode != 'launch' %}
 Want up to 80% of your money back?
 
-For each friend that also buys insurance, we'll add up to £10 to your Reward Pot (we'll also do the same for them).
+For each friend that also buys insurance, we'll add up to £{{ policy.connectionValue }} to your Reward Pot (we'll also do the same for them).
 
-Connect with 9 friends and provided none of you make a claim you'll get 80% of your money back at the end of the year.
-{# Message for first 1,000 customers #}
+Connect with {{ policy.maxConnections }} friends and provided none of you make a claim you'll get 80% of your money back at the end of the year.
+{% else %}
 Want your insurance for free?
 
-As one of first 1,000 customers, we'd like to reward you! For each friend that also buys insurance, we'll add up to £15 to your Reward Pot (rather than the usual £10).
+As one of first 1,000 customers, we'd like to reward you! For each friend that also buys insurance, we'll add up to {{ policy.connectionValue }} to your Reward Pot (rather than the usual £10).
 
-Connect with X friends and provided none of you make a claim you'll get all your money back at the end of the year!
+Connect with {{ policy.maxConnections }} friends and provided none of you make a claim you'll get all your money back at the end of the year!
+{% endif %}
 
 ============================================================
 ** (http://www.twitter.com/wearesosure)
