@@ -84,7 +84,7 @@ class ReceperioService
                 'headers' => ['Accept' => 'application/json'],
             ]);
             $body = (string) $res->getBody();
-            print_r($body);
+            //print_r($body);
 
             return $body;
         } catch (\Exception $e) {
