@@ -54,9 +54,9 @@
                                     {{ phone.replacementPrice }}
                                 {% endif %}
                             </td>
-                            <td>{{ phone.currentPhonePrice.monthlyPremiumPrice }}</td>
-                            <td>{{ phone.currentPhonePrice.yearlyPremiumPrice }}</td>
-                            <td>{{ phone.policyProfit(0.25) }}</td>
+                            <td>{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                            <td>{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                            <td>{{ phone.policyProfit(0.25)|number_format(2, '.', ',') }}</td>
                             <td><span class="{% if phone.monthAge > 48 %}text-danger{% else %}text-muted{% endif %}">{{ phone.monthAge }} months</span></td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
@@ -135,7 +135,7 @@
                     {% for phone in phones %}
                         <tr>
                             <td>{{ phone }}</td>
-                            <td>{{ phone.currentPhonePrice.maxPot }}</td>
+                            <td>{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }}</td>
                             <td>{{ phone.currentPhonePrice.maxConnections }}</td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"

@@ -52,11 +52,11 @@ var setConnectionText = function() {
         save_value = maxpot_value;
     }
     var potential_value = roundToTwo(maxpot_value - save_value);
-    var connectionText = "With " + slider.getValue() + " connection(s), you could get £" + save_value + " back at the end of the year if you and your friend(s) don't claim.";
+    var connectionText = "With " + slider.getValue() + " connection(s), you could get £" + save_value.toFixed(2) + " back at the end of the year if you and your friend(s) don't claim.";
     $('#connectionLegend').text(connectionText);
-    var potText = $('#connectionChartLegend-0').text().replace(/£.*/, '£' + save_value);
+    var potText = $('#connectionChartLegend-0').text().replace(/£.*/, '£' + save_value.toFixed(2));
     $('#connectionChartLegend-0').text(potText);
-    var potentialText = $('#connectionChartLegend-1').text().replace(/£.*/, '£' + potential_value);
+    var potentialText = $('#connectionChartLegend-1').text().replace(/£.*/, '£' + potential_value.toFixed(2));
     $('#connectionChartLegend-1').text(potentialText);
 }
 
