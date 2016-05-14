@@ -49,6 +49,9 @@ twig:
         branch_key: %branch_key%
         smooch_key: %smooch_key%
         use_cdn: true
+        branch_pot_url: %branch_pot_url%
+        branch_share_url: %branch_share_url%
+        branch_policy_url: %branch_policy_url%
 
 doctrine_mongodb:
     connections:

@@ -82,3 +82,7 @@ parameters:
     braintree_merchant_id: 'ChangeMe'
     braintree_public_key:  'ChangeMe'
     braintree_private_key: 'ChangeMe'
+
+    branch_pot_url: ''
+    branch_share_url: ''
+    branch_policy_url: ''
