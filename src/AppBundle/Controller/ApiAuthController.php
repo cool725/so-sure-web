@@ -312,8 +312,12 @@ class ApiAuthController extends BaseController
                 );
             }
 
+            $serialNumber = isset($data['phone_policy']['serial_number']) ?
+                isset($data['phone_policy']['serial_number']) :
+                null;
+
             // Checking against blacklist should be last check to possible avoid costs
-            if (!$imeiValidator->checkImei($imei)) {
+            if (!$imeiValidator->checkImei($phone, $imei)) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED,
                     'Imei is blacklisted',
@@ -321,8 +325,17 @@ class ApiAuthController extends BaseController
                 );
             }
 
+            if ($serialNumber && !$imeiValidator->checkSerial($phone, $serialNumber)) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_IMEI_PHONE_MISMATCH,
+                    'Imei/Phone mismatch',
+                    422
+                );
+            }
+
             $policy = new PhonePolicy();
             $policy->setImei($imei);
+            $policy->setSerialNumber($serialNumber);
             $policy->setPhone($phone);
             $policy->setIdentityLog($this->getIdentityLog($request));
 

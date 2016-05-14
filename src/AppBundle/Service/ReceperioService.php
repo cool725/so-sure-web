@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
+use AppBundle\Document\Phone;
 
 class ReceperioService
 {
@@ -33,16 +34,20 @@ class ReceperioService
     /**
      * Checks imei against a blacklist
      *
+     * @param Phone  $phone
+     * @param string $imei
+     *
      * @return boolean True if imei is ok
      */
-    public function checkImei($imei)
+    public function checkImei(Phone $phone, $imei)
     {
+        \AppBundle\Classes\NoOp::noOp([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == "352000067704506") {
             return false;
         }
 
-        $this->send("/claimscheck/search", [
+        $response = $this->send("/claimscheck/search", [
             'serial' => $imei,
             'storeid' => $this->storeId,
         ]);
@@ -52,19 +57,22 @@ class ReceperioService
     }
 
     /**
-     * Checks imei against a blacklist
+     * Validate that the serial number matches the expected phone details
+     *
+     * @param Phone  $phone
+     * @param string $serialNumber
      *
      * @return boolean True if imei is ok
      */
-    public function makeModel($imei)
+    public function checkSerial(Phone $phone, $serialNumber)
     {
-        // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
-        if ($imei == "352000067704506") {
+        \AppBundle\Classes\NoOp::noOp([$phone]);
+        if ($serialNumber == "111111") {
             return false;
         }
 
-        $this->send("/makemodelext", [
-            'serials' => [$imei],
+        $response = $this->send("/makemodelext", [
+            'serials' => [$serialNumber],
             'storeid' => $this->storeId,
         ]);
 

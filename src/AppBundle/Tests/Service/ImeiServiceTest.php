@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\Phone;
 use GeoJson\Geometry\Point;
 
 /**
@@ -50,6 +51,6 @@ class ImeiServiceTest extends WebTestCase
 
     public function testCheckImei()
     {
-        $this->assertTrue(self::$imei->checkImei(356938035643809));
+        $this->assertTrue(self::$imei->checkImei(new Phone(), 356938035643809));
     }
 }
