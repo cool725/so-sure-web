@@ -25,6 +25,9 @@ class PhonePolicy extends Policy
     /** @MongoDB\Field(type="string", nullable=false) */
     protected $imei;
 
+    /** @MongoDB\Field(type="string", name="serial_number") */
+    protected $serialNumber;
+
     public function getPhone()
     {
         return $this->phone;
@@ -48,6 +51,16 @@ class PhonePolicy extends Policy
     public function setImei($imei)
     {
         $this->imei = $imei;
+    }
+
+    public function getSerialNumber()
+    {
+        return $this->serialNumber;
+    }
+
+    public function setSerialNumber($serialNumber)
+    {
+        $this->serialNumber = $serialNumber;
     }
 
     public function getPhoneData()

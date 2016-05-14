@@ -19,6 +19,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     const VALID_IMEI = '356938035643809';
     const INVALID_IMEI = '356938035643808';
     const BLACKLISTED_IMEI = '352000067704506';
+    const MISMATCH_SERIALNUMBER = '111111';
 
     protected static $testUser;
     protected static $testUser2;
@@ -705,6 +706,25 @@ class ApiAuthControllerTest extends BaseControllerTest
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::BLACKLISTED_IMEI]),
         ]]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED);
+    }
+
+    public function testNewPolicyMismatchPhone()
+    {
+        $user = self::createUser(self::$userManager, self::generateEmail('policy-mismatch', $this), 'foo', true);
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->clearRateLimit();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => self::BLACKLISTED_IMEI,
+            'make' => 'OnePlus',
+            'device' => 'A0001',
+            'memory' => 63,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::BLACKLISTED_IMEI]),
+            'serial_number' => self::MISMATCH_SERIALNUMBER,
+        ]]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_PHONE_MISMATCH);
     }
 
     public function testNewPolicyRooted()
