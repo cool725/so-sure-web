@@ -41,9 +41,10 @@ class ReceperioService
      */
     public function checkImei(Phone $phone, $imei)
     {
+        \AppBundle\Classes\NoOp::noOp([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == "352000067704506") {
-            //return false;
+            return false;
         }
 
         $response = $this->send("/claimscheck/search", [
@@ -65,6 +66,7 @@ class ReceperioService
      */
     public function checkSerial(Phone $phone, $serialNumber)
     {
+        \AppBundle\Classes\NoOp::noOp([$phone]);
         if ($serialNumber == "111111") {
             return false;
         }
