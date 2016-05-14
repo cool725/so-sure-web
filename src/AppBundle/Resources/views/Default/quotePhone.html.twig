@@ -59,8 +59,8 @@
             <p>Estimated monthly price:</p>
           </div>
           <div class="col-md-7" id="quote-info">
-              <p>£{{ phone_price.monthlyPremiumPrice }}</p>
-              <p>You could <strong>get £{{ phone_price.maxPot }} back at the end of every year</strong> if you and your friends don't claim</p>
+              <p>£{{ phone_price.monthlyPremiumPrice|number_format(2, '.', ',') }}</p>
+              <p>You could <strong>get £{{ phone_price.maxPot|number_format(2, '.', ',') }} back at the end of every year</strong> if you and your friends don't claim</p>
           </div>
         </div>
         </div>
