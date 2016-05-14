@@ -715,13 +715,14 @@ class ApiAuthControllerTest extends BaseControllerTest
         self::$dm->flush();
         $cognitoIdentityId = $this->getAuthUser($user);
         $this->clearRateLimit();
+        $imei = self::generateRandomImei();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
-            'imei' => self::BLACKLISTED_IMEI,
+            'imei' => $imei,
             'make' => 'OnePlus',
             'device' => 'A0001',
             'memory' => 63,
             'rooted' => false,
-            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::BLACKLISTED_IMEI]),
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
             'serial_number' => self::MISMATCH_SERIALNUMBER,
         ]]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_PHONE_MISMATCH);
