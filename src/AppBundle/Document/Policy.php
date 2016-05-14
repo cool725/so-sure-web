@@ -120,6 +120,9 @@ abstract class Policy
     /** @MongoDB\Field(type="float", name="pot_value", nullable=false) */
     protected $potValue;
 
+    /** @MongoDB\Field(type="float", name="historical_max_pot_value", nullable=false) */
+    protected $historicalMaxPotValue;
+
     /** @MongoDB\Field(type="string") */
     protected $promoCode;
 
@@ -282,6 +285,15 @@ abstract class Policy
         }
 
         $this->potValue = $potValue;
+
+        if (!$this->getHistoricalMaxPotValue() || $potValue > $this->getHistoricalMaxPotValue()) {
+            $this->historicalMaxPotValue = $potValue;
+        }
+    }
+
+    public function getHistoricalMaxPotValue()
+    {
+        return $this->historicalMaxPotValue;
     }
 
     public function getPolicyDocuments()
@@ -681,11 +693,14 @@ abstract class Policy
                 'max_connections' => $this->getMaxConnections(),
                 'value' => $this->getPotValue(),
                 'max_value' => $this->getMaxPot(),
+                'historical_max_value' => $this->getHistoricalMaxPotValue(),
                 'connection_values' => $this->getConnectionValues(),
             ],
             'connections' => $this->eachApiArray($this->getConnections()),
             'sent_invitations' => $this->eachApiArray($this->getSentInvitations()),
             'promo_code' => $this->getPromoCode(),
+            'has_claim' => $this->hasMonetaryClaimed(),
+            'has_network_claim' => $this->hasNetworkClaim(true),
         ];
     }
 }

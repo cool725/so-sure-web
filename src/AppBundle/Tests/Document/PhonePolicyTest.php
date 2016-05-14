@@ -622,4 +622,25 @@ class PhonePolicyTest extends WebTestCase
         $policy->addClaim($claimB);
         $this->assertTrue($policy->hasMonetaryClaimed());
     }
+
+    public function testHistoricalMaxPotValue()
+    {
+        $user = new User();
+        self::addAddress($user);
+
+        $policy = new PhonePolicy();
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setPhone(self::$phone);
+
+        $policy->setPotValue(20);
+        $this->assertEquals(20, $policy->getHistoricalMaxPotValue());
+
+        $policy->setPotValue(30);
+        $this->assertEquals(30, $policy->getHistoricalMaxPotValue());
+
+        $policy->setPotValue(10);
+        $this->assertEquals(30, $policy->getHistoricalMaxPotValue());
+    }
 }
