@@ -120,12 +120,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
         $crawler =  static::$client->request(
             "POST",
             '/api/v1/unauth/zendesk',
-            array(),
-            array(),
-            array(
-                'CONTENT_TYPE' => 'text/html',
-            ),
-            json_encode(['user_token' => $user->getId()])
+            ['user_token' => $user->getId()]
         );
         
         $data = $this->verifyResponse(200);
