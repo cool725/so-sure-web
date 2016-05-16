@@ -1,3 +1,5 @@
+{% extends '@AppBundle/Resources/Email/base.txt.twig' %}
+{% block body %}
 Welcome {{ policy.user.name }}.
 
 **
@@ -21,12 +23,4 @@ As one of first 1,000 customers, we'd like to reward you! For each friend that a
 
 Connect with {{ policy.maxConnections }} friends and provided none of you make a claim you'll get all your money back at the end of the year!
 {% endif %}
-
-============================================================
-** (http://www.twitter.com/wearesosure)
-** (https://www.facebook.com/wearesosure)
-** (http://wearesosure.com)
-** (http://blog.wearesosure.com)
-** (mailto:hello@wearesosure.com)
-
-Copyright © 2016 so-sure, All rights reserved.
+{% endblock body %}
