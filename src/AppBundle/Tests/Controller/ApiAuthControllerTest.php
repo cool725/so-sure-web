@@ -730,7 +730,7 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testNewPolicyOkPhone()
     {
-        $user = self::createUser(self::$userManager, self::generateEmail('policy-mismatch', $this), 'foo', true);
+        $user = self::createUser(self::$userManager, self::generateEmail('policy-ok-phone', $this), 'foo', true);
         self::addAddress($user);
         self::$dm->flush();
         $cognitoIdentityId = $this->getAuthUser($user);

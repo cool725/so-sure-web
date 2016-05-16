@@ -85,7 +85,7 @@ class ApiUnauthController extends BaseController
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api tokenAction. %s', $e->getMessage()));
+            $this->get('logger')->error(sprintf('Error in api unauthTokenAction. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

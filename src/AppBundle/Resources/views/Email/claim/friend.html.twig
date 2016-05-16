@@ -1,9 +1,9 @@
 {% set logo_image = 'unhappy' %}
-{% extends 'base.html.twig' %}
-{% import "macros.html" as macros %}
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
 {% block title %}Your friend, {{ claim.policy.user.name }}, has made a claim.{% endblock %}
 {% block body %}
-	{{ macros.start_table }}
+	{{ macros.start_table() }}
 	<h1>
 	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 	</h1>
@@ -16,6 +16,6 @@
 		  <em>Good news</em> – you helped your friend get their phone back! Instant <a href="http://www.urbandictionary.com/define.php?term=Karma%20Points" target="_blank"><span style="color:#3399ff">karma points</span></a>!{% endif %}
 	   </div>
 	</div>
-	{{ macros.end_table }}
+	{{ macros.end_table() }}
 	{{ macros.email_button_table(branch_pot_url, "View your Reward Pot", "View your Reward Pot")}}
 {% endblock %}
