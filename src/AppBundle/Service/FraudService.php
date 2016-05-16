@@ -30,10 +30,22 @@ class FraudService
 
     public function runChecks(Policy $policy)
     {
-        return [
+        $data = [
             'duplicate_postcode' => count($this->getDuplicatePostcode($policy)),
             'duplicate_bank_accounts' => count($this->getDuplicateBankAccounts($policy)),
+            'network_cancellations' => count($policy->getNetworkCancellations()),
         ];
+
+        $user = $policy->getUser();
+        if (!$user->getIdentityLog()) {
+            $data['duplicate_ip'] = 'Unknown signup ip';
+            $data['signup_country'] = 'Unknown signup ip';
+        } else {
+            $data['duplicate_ip'] = $this->getDuplicateIp($policy);
+            $data['signup_country'] = $user->getIdentityLog()->getCountry();
+        }
+
+        return $data;
     }
 
     public function getDuplicatePostcode(Policy $policy)
@@ -50,5 +62,16 @@ class FraudService
         $userRepo = $this->dm->getRepository(User::class);
 
         return $userRepo->findBankAccount($user);
+    }
+
+    public function getDuplicateIp(Policy $policy)
+    {
+        $user = $policy->getUser();
+        if (!$user->getIdentityLog()) {
+            return null;
+        }
+        $userRepo = $this->dm->getRepository(User::class);
+
+        return $userRepo->findIp($user);
     }
 }
