@@ -98,7 +98,7 @@ class ApiUnauthController extends BaseController
     public function unauthZendeskAction(Request $request)
     {
         try {
-            $data = json_decode($request->getContent(), true)['body'];
+            $data = json_decode($request->getContent(), true);
             if (!$this->validateFields($data, ['user_token'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
@@ -107,7 +107,8 @@ class ApiUnauthController extends BaseController
             $repo = $dm->getRepository(User::class);
             $user = $repo->find($data['user_token']);
             if (!$user || $user->isExpired() || $user->isLocked()) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 422);
+                // https://support.zendesk.com/hc/en-us/articles/218278138-Building-a-dedicated-JWT-endpoint-for-the-Zendesk-SDK
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Unauthorized', 401);
             }
 
             $token = (new Builder())->setIssuedAt(time());

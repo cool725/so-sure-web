@@ -115,11 +115,19 @@ class ApiUnauthControllerTest extends BaseControllerTest
     public function testZendeskOk()
     {
         $this->clearRateLimit();
-        $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('zendesk', $this), 'bar');
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/unauth/zendesk', array(
-            'user_token' => $user->getId(),
-        ));
+        
+        $crawler =  static::$client->request(
+            "POST",
+            '/api/v1/unauth/zendesk',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'text/html',
+            ),
+            json_encode(['user_token' => $user->getId()])
+        );
+        
         $data = $this->verifyResponse(200);
         $this->assertTrue(strlen($data['jwt']) > 20);
     }
