@@ -728,6 +728,26 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_PHONE_MISMATCH);
     }
 
+    public function testNewPolicyOkPhone()
+    {
+        $user = self::createUser(self::$userManager, self::generateEmail('policy-mismatch', $this), 'foo', true);
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->clearRateLimit();
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'OnePlus',
+            'device' => 'A0001',
+            'memory' => 63,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+            'serial_number' => "23423423342",
+        ]]);
+        $data = $this->verifyResponse(200);
+    }
+
     public function testNewPolicyRooted()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
