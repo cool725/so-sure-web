@@ -1,3 +1,5 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
 {{ invitation.inviteeName }} has accepted your invitation!
 
 **
@@ -7,11 +9,4 @@ Your friend, {{ invitation.inviterName }}, just accepted your invitation and you
 View your Reward Pot: {{ }} #}
 
 Need more information? Visit wearesosure.com or contact hello@wearesosure.com.
-
-============================================================
-** (http://www.twitter.com/wearesosure)
-** (https://www.facebook.com/wearesosure)
-** (http://wearesosure.com)
-** (mailto:hello@wearesosure.com)
-
-Copyright © 2016 so-sure, All rights reserved.
+{% endblock body %}

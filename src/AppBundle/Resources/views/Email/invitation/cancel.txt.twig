@@ -1,2 +1,5 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
 {{ invitation.inviter.name }} has cancelled your invite to so-sure.
 
+{% endblock body %}

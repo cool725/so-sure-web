@@ -74,7 +74,7 @@ class PolicyService
 
         $this->dm->flush();
 
-        $this->email($policy);
+        $this->newPolicyEmail($policy);
     }
 
     public function cancel(Policy $policy, $reason, \DateTime $date = null)
@@ -102,16 +102,15 @@ class PolicyService
             $networkConnection->getPolicy()->updatePotValue();
         }
         $this->dm->flush();
-        // TODO - email user
+        //$this->cancelledPolicyEmail($policy);
         // TODO - cancel dd
         // TODO - notify network?
-        // TODO - cancellation reason
     }
 
     /**
      * @param Policy $policy
      */
-    public function email(Policy $policy)
+    public function newPolicyEmail(Policy $policy)
     {
         $message = \Swift_Message::newInstance()
             ->setSubject(sprintf('Your so-sure policy %s', $policy->getPolicyNumber()))
@@ -124,6 +123,27 @@ class PolicyService
             )
             ->addPart(
                 $this->templating->render('AppBundle:Email:policy.txt.twig', ['policy' => $policy]),
+                'text/plain'
+            );
+        $this->mailer->send($message);
+    }
+
+    /**
+     * @param Policy $policy
+     */
+    public function cancelledPolicyEmail(Policy $policy)
+    {
+        $message = \Swift_Message::newInstance()
+            ->setSubject(sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()))
+            ->setFrom('hello@so-sure.com')
+            //->setTo($policy->getUser()->getEmail())
+            ->setTo('patrick@so-sure.com')
+            ->setBody(
+                $this->templating->render('AppBundle:Email:policy/cancelled.html.twig', ['policy' => $policy]),
+                'text/html'
+            )
+            ->addPart(
+                $this->templating->render('AppBundle:Email:policy/cancelled.txt.twig', ['policy' => $policy]),
                 'text/plain'
             );
         $this->mailer->send($message);
