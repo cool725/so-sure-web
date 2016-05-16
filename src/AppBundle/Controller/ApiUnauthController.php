@@ -107,7 +107,9 @@ class ApiUnauthController extends BaseController
             $repo = $dm->getRepository(User::class);
             $user = $repo->find($userToken);
             if (!$user || $user->isExpired() || $user->isLocked()) {
+                // @codingStandardsIgnoreStart
                 // https://support.zendesk.com/hc/en-us/articles/218278138-Building-a-dedicated-JWT-endpoint-for-the-Zendesk-SDK
+                // @codingStandardsIgnoreEnd
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Unauthorized', 401);
             }
 
