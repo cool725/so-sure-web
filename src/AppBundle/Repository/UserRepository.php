@@ -77,4 +77,15 @@ class UserRepository extends DocumentRepository
             ->getQuery()
             ->execute();
     }
+
+    public function findIp(User $user)
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->field('id')->notEqual($user->getId());
+        $qb->field('identity_log.ip')->equals($user->getIdentityLog()->getIp());
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
 }

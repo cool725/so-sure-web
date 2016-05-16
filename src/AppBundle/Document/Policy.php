@@ -579,6 +579,22 @@ abstract class Policy
         return $claims;
     }
 
+    public function getNetworkCancellations()
+    {
+        $policies = [];
+        foreach ($this->getConnections() as $connection) {
+            $policy = $connection->getPolicy();
+            if (!$policy) {
+                throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
+            }
+            if ($policy->isCancelled()) {
+                $policies[] = $policy;
+            }
+        }
+
+        return $policies;
+    }
+
     public function calculatePotValue()
     {
         $potValue = 0;

@@ -53,20 +53,15 @@
                 <table class="table table-striped">
                     <tr>
                         <td>User Signup - Country of Ip</td>
-                        <td>{% if policy.user.identityLog %}
-                              {{ policy.user.identityLog.country }}
-                            {% else %}
-                              Unknown
-                          {% endif %}
-                        </td>
+                        <td>{{ fraud.signup_country }}</td>
+                    </tr>
+                    <tr>
+                        <td>Other Users w/same signup ips</td>
+                        <td>{{ fraud.duplicate_ip }}</td>
                     </tr>
                     <tr>
                         <td>Other Users w/same postcode</td>
                         <td>{{ fraud.duplicate_postcode }}</td>
-                    </tr>
-                    <tr>
-                        <td>Other Users w/same signup ips</td>
-                        <td>Not yet implemented</td>
                     </tr>
                     <tr>
                         <td>Other Users w/same bank account</td>
@@ -78,7 +73,7 @@
                     </tr>
                     <tr>
                         <td>Network Cancellations</td>
-                        <td>Not yet implemented</td>
+                      <td>{{ fraud.network_cancellations }}</td>
                     </tr>
                 </table>
             {% else %}
