@@ -313,7 +313,7 @@ class ApiAuthController extends BaseController
             }
 
             $serialNumber = isset($data['phone_policy']['serial_number']) ?
-                isset($data['phone_policy']['serial_number']) :
+                $data['phone_policy']['serial_number'] :
                 null;
 
             // Checking against blacklist should be last check to possible avoid costs
