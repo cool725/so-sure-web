@@ -79,27 +79,7 @@ class PolicyService
 
     public function cancel(Policy $policy, $reason, \DateTime $date = null)
     {
-        if ($date == null) {
-            $date = new \DateTime();
-        }
-        $policy->setStatus(Policy::STATUS_CANCELLED);
-        $policy->setCancelledReason($reason);
-        $policy->setEnd($date);
-
-        // For now, just lock the user.  May want to allow the user to login in the future though...
-        $user = $policy->getUser();
-        $user->setLocked(true);
-
-        // zero out the connection value for connections bound to this policy
-        foreach ($policy->getConnections() as $networkConnection) {
-            $networkConnection->clearValue();
-            foreach ($networkConnection->getPolicy()->getConnections() as $otherConnection) {
-                if ($otherConnection->getPolicy()->getId() == $policy->getId()) {
-                    $otherConnection->clearValue();
-                }
-            }
-            $networkConnection->getPolicy()->updatePotValue();
-        }
+        $policy->cancel($reason, $date);
         $this->dm->flush();
         $this->cancelledPolicyEmail($policy);
         $this->networkCancelledPolicyEmails($policy);
