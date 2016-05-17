@@ -650,6 +650,45 @@ abstract class Policy
         });
     }
 
+    /**
+     * Update the policy itself, however, this should be done via the policy server in order to
+     * send out all the emails, etc
+     *
+     * @param string    $reason CANCELLED_*
+     * @param \DateTime $date
+     *
+     */
+    public function cancel($reason, \DateTime $date = null)
+    {
+        if (!$this->getId()) {
+            throw new \Exception('Unable to cancel a policy that is missing an id');
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+        $this->setStatus(Policy::STATUS_CANCELLED);
+        $this->setCancelledReason($reason);
+        $this->setEnd($date);
+
+        // For now, just lock the user.  May want to allow the user to login in the future though...
+        $user = $this->getUser();
+        $user->setLocked(true);
+
+        // zero out the connection value for connections bound to this policy
+        foreach ($this->getConnections() as $networkConnection) {
+            $networkConnection->clearValue();
+            foreach ($networkConnection->getPolicy()->getConnections() as $otherConnection) {
+                if ($otherConnection->getPolicy()->getId() == $this->getId()) {
+                    $otherConnection->clearValue();
+                }
+            }
+            $networkConnection->getPolicy()->updatePotValue();
+        }
+
+        $this->updatePotValue();
+    }
+
     abstract public function getMaxConnections();
     abstract public function getMaxPot();
     abstract public function getConnectionValue();

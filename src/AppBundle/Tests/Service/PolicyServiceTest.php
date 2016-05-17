@@ -62,10 +62,6 @@ class PolicyServiceTest extends WebTestCase
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::STATUS_CANCELLED, $updatedPolicy->getStatus());
-        $this->assertEquals(Policy::CANCELLED_GOODWILL, $updatedPolicy->getCancelledReason());
-        $now = new \DateTime();
-        $this->assertEquals($now->format('y-M-d'), $updatedPolicy->getEnd()->format('y-M-d'));
-        $this->assertTrue($updatedPolicy->getUser()->isLocked());
     }
 
     public function testCreatePolicyHasPromoCode()

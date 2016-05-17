@@ -643,4 +643,86 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPotValue(10);
         $this->assertEquals(30, $policy->getHistoricalMaxPotValue());
     }
+
+    public function testUnreplacedConnectionCancelledPolicyInLast30Days()
+    {
+        $policyA = $this->createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('replace-a', $this));
+        $policyB = $this->createUserPolicy(true);
+        $policyB->getUser()->setEmail(static::generateEmail('replace-b', $this));
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB);
+        static::$dm->persist($policyB->getUser());
+        static::$dm->flush();
+
+        list($connectionAB, $connectionBA) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $this->assertNull($policyA->getUnreplacedConnectionCancelledPolicyInLast30Days());
+
+        $policyA->cancel(PhonePolicy::CANCELLED_UNPAID);
+        static::$dm->flush();
+
+        $this->assertNotNull($policyB->getUnreplacedConnectionCancelledPolicyInLast30Days());
+        $connectionB = $policyB->getUnreplacedConnectionCancelledPolicyInLast30Days();
+        $this->assertTrue($connectionB->getPolicy()->isCancelled());
+        $this->assertTrue($connectionB->getPolicy()->hasEndedInLast30Days());
+
+        $this->assertNull($policyB->getUnreplacedConnectionCancelledPolicyInLast30Days(new \DateTime('2016-01-01')));
+    }
+
+    public function testCancelPolicy()
+    {
+        $policyA = $this->createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('cancel-a', $this));
+        $policyB = $this->createUserPolicy(true);
+        $policyB->getUser()->setEmail(static::generateEmail('cancel-b', $this));
+        $policyC = $this->createUserPolicy(true);
+        $policyC->getUser()->setEmail(static::generateEmail('cancel-c', $this));
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB);
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyC);
+        static::$dm->persist($policyC->getUser());
+        static::$dm->flush();
+        list($connectionAB, $connectionBA) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+        list($connectionAC, $connectionCA) = $this->createLinkedConnections($policyA, $policyC, 10, 10);
+        list($connectionBC, $connectionCB) = $this->createLinkedConnections($policyB, $policyC, 10, 10);
+        $policyA->updatePotValue();
+        $policyB->updatePotValue();
+        $policyC->updatePotValue();
+
+        $this->assertEquals(20, $policyA->getPotValue());
+        $this->assertEquals(20, $policyB->getPotValue());
+        $this->assertEquals(20, $policyC->getPotValue());
+
+        $policyA->cancel(PhonePolicy::CANCELLED_GOODWILL);
+
+        $this->assertEquals(PhonePolicy::STATUS_CANCELLED, $policyA->getStatus());
+        $this->assertEquals(PhonePolicy::CANCELLED_GOODWILL, $policyA->getCancelledReason());
+        $now = new \DateTime();
+        $this->assertEquals($now->format('y-M-d'), $policyA->getEnd()->format('y-M-d'));
+        $this->assertTrue($policyA->getUser()->isLocked());
+
+        $this->assertEquals(0, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+        $this->assertEquals(10, $policyC->getPotValue());
+
+        $this->assertEquals(2, count($policyA->getConnections()));
+        // All connections for the cancelled policy should be zero
+        foreach ($policyA->getConnections() as $networkConnection) {
+            $this->assertEquals(0, $networkConnection->getValue());
+        }
+
+        $this->assertEquals(2, count($policyB->getConnections()));
+        // All connections to the cancelled policy should be zero; other connections should remain at value
+        foreach ($policyB->getConnections() as $networkConnection) {
+            if ($networkConnection->getPolicy()->getId() == $policyA->getId()) {
+                $this->assertEquals(0, $networkConnection->getValue());
+            } else {
+                $this->assertGreaterThan(0, $networkConnection->getValue());
+            }
+        }
+    }
 }
