@@ -647,13 +647,28 @@ class PhonePolicyTest extends WebTestCase
     public function testUnreplacedConnectionCancelledPolicyInLast30Days()
     {
         $policyA = $this->createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('replace-a', $this));
         $policyB = $this->createUserPolicy(true);
-        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+        $policyB->getUser()->setEmail(static::generateEmail('replace-b', $this));
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB);
+        static::$dm->persist($policyB->getUser());
+        static::$dm->flush();
+
+        list($connectionAB, $connectionBA) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
         $this->assertNull($policyA->getUnreplacedConnectionCancelledPolicyInLast30Days());
+
         $policyA->cancel(PhonePolicy::CANCELLED_UNPAID);
         static::$dm->flush();
+
         $this->assertNotNull($policyB->getUnreplacedConnectionCancelledPolicyInLast30Days());
+        $connectionB = $policyB->getUnreplacedConnectionCancelledPolicyInLast30Days();
+        $this->assertTrue($connectionB->getPolicy()->isCancelled());
+        $this->assertTrue($connectionB->getPolicy()->hasEndedInLast30Days());
+
+        $this->assertNull($policyB->getUnreplacedConnectionCancelledPolicyInLast30Days(new \DateTime('2016-01-01')));
     }
 
     public function testCancelPolicy()
