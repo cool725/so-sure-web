@@ -314,6 +314,22 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
 
     private function newPhone($manager, $make, $model, $policyPrice, $memory = null, $devices = null)
     {
+        // Validate that the regex for quote make model is working for all the data
+        if ($make != "ALL") {
+            if ($memory) {
+                $this->container->get('router')->generate('quote_make_model_memory', [
+                    'make' => $make,
+                    'model' => $model,
+                    'memory' => $memory,
+                ]);
+            } else {
+                $this->container->get('router')->generate('quote_make_model', [
+                    'make' => $make,
+                    'model' => $model,
+                ]);
+            }
+        }
+
         $phone = new Phone();
         $phone->init($make, $model, $policyPrice + 1.5, $memory, $devices);
         $manager->persist($phone);
