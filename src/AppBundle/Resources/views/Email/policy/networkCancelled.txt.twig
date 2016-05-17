@@ -1,0 +1,10 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your friend, {{ cancelledUser.name }}, cancelled their so-sure policy.
+
+**
+------------------------------------------------------------
+Unfortunately, {{ cancelledUser.name }} had to cancel their policy and your pot has been affected.
+However, you do have 30 days to replace that connection.  
+
+{% endblock body %}

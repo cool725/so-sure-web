@@ -561,6 +561,11 @@ abstract class Policy
         return count($this->getNetworkClaims($monitaryOnly)) > 0;
     }
 
+    public function hasMonetaryNetworkClaim()
+    {
+        return $this->hasNetworkClaim(true);
+    }
+
     public function getNetworkClaims($monitaryOnly = false)
     {
         $claims = [];
