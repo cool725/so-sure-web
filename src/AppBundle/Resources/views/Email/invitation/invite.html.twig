@@ -1,6 +1,6 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}{{ invitation.inviteeName }} has cancelled your invite to so-sure{% endblock %}
+{% block title %}{{ invitation.inviterName }} invited you to join so-sure - join today and we’ll reward both of you{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 		<h1>
