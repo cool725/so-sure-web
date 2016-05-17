@@ -230,8 +230,10 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/quote/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
-     * @Route("/quote/{make}+{model}+{memory}+insurance", name="quote_make_model_memory")
-     * @Route("/quote/{make}+{model}+insurance", name="quote_make_model")
+     * @Route("/quote/{make}+{model}+{memory}+insurance", name="quote_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     * @Route("/quote/{make}+{model}+insurance", name="quote_make_model",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-a-zA-Z0-9() ]+"})
      * @Template
      */
     public function quotePhoneAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
