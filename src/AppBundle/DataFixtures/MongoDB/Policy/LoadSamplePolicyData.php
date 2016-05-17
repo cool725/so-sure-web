@@ -72,10 +72,15 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
     private function newUsers($manager)
     {
+        $userRepo = $manager->getRepository(User::class);
         $users = [];
         for ($i = 1; $i <= 200; $i++) {
+            $email = $this->faker->email;
+            while ($userRepo->findOneBy(['emailCanonical' => $email])) {
+                $email = $this->faker->email;
+            }
             $user = new User();
-            $user->setEmail($this->faker->email);
+            $user->setEmail($email);
             $user->setFirstName($this->faker->firstName);
             $user->setLastName($this->faker->lastName);
             $user->setMobileNumber($this->faker->mobileNumber);
