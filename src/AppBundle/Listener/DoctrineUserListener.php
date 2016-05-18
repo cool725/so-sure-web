@@ -38,7 +38,14 @@ class DoctrineUserListener
                 $eventArgs->getNewValue('confirmationToken') == null &&
                 $eventArgs->hasChangedField('passwordRequestedAt') &&
                 $eventArgs->getNewValue('passwordRequestedAt') == null) {
-                $this->triggerEvent($document, UserEvent::EVENT_EMAIL_VERIFIED);
+
+                $document->setEmailVerified(true);
+
+                // Email Verified probably isn't in the original changeset, so recalculate
+                $dm = $eventArgs->getDocumentManager();
+                $uow = $dm->getUnitOfWork();
+                $meta = $dm->getClassMetadata(get_class($document));
+                $uow->recomputeSingleDocumentChangeSet($meta, $document);
             }
         }
     }

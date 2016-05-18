@@ -8,7 +8,6 @@ use AppBundle\Document\User;
 class UserEvent extends Event
 {
     const EVENT_UPDATED = 'event.user.updated';
-    const EVENT_EMAIL_VERIFIED = 'event.user.email_verified';
 
     /** @var User */
     protected $user;

@@ -46,11 +46,14 @@ class DoctrineUserListenerTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail(static::generateEmail('pre', $this));
-        $listener = $this->createListener($user, $this->once(), UserEvent::EVENT_EMAIL_VERIFIED);
+        static::$dm->persist($user);
+        $listener = new DoctrineUserListener(null);
 
         $changeSet = ['confirmationToken' => ['123', null], 'passwordRequestedAt' => [new \DateTime(), null]];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
+
+        $this->assertTrue($events->getDocument()->getEmailVerified());
     }
 
     public function testPostUpdate()

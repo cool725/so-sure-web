@@ -54,14 +54,4 @@ class UserListener
             $this->dm->flush();
         }
     }
-
-    /**
-     * @param UserEvent $event
-     */
-    public function onUserEmailVerifiedEvent(UserEvent $event)
-    {
-        $user = $event->getUser();
-        $user->setEmailVerified(true);
-        $this->dm->flush();
-    }
 }

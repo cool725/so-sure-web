@@ -135,22 +135,4 @@ class UserListenerTest extends WebTestCase
         $user = self::$userRepo->find($user->getId());
         $this->assertTrue($user->hasReceivedInvitations());
     }
-
-    public function testUserEmailVerified()
-    {
-        $user = static::createUser(
-            self::$userManager,
-            self::generateEmail('validate', $this),
-            'validate'
-        );
-
-        $this->assertNull($user->getEmailVerified());
-        $event = new UserEvent($user);
-
-        $listener = new UserListener(self::$dm);
-        $listener->onUserEmailVerifiedEvent($event);
-
-        $updatedUser = self::$userRepo->find($user->getId());
-        $this->assertTrue($updatedUser->getEmailVerified());
-    }
 }
