@@ -25,7 +25,7 @@ class UserListener
     /**
      * @param UserEvent $event
      */
-    public function onUserEvent(UserEvent $event)
+    public function onUserUpdatedEvent(UserEvent $event)
     {
         $user = $event->getUser();
         $email = $user->getEmailCanonical();
@@ -53,5 +53,15 @@ class UserListener
         if ($flush) {
             $this->dm->flush();
         }
+    }
+
+    /**
+     * @param UserEvent $event
+     */
+    public function onUserEmailVerifiedEvent(UserEvent $event)
+    {
+        $user = $event->getUser();
+        $user->setEmailVerified(true);
+        $this->dm->flush();
     }
 }

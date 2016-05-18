@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Listener\DoctrineUserListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
+use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use AppBundle\Event\UserEvent;
 use AppBundle\Document\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,11 +42,22 @@ class DoctrineUserListenerTest extends WebTestCase
     {
     }
 
+    public function testPreUpdate()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('pre', $this));
+        $listener = $this->createListener($user, $this->once(), UserEvent::EVENT_EMAIL_VERIFIED);
+
+        $changeSet = ['confirmationToken' => ['123', null], 'passwordRequestedAt' => [new \DateTime(), null]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
     public function testPostUpdate()
     {
         $user = new User();
         $user->setEmail('dul1@listener.so-sure.com');
-        $listener = $this->createListener($user, $this->once());
+        $listener = $this->createListener($user, $this->once(), UserEvent::EVENT_UPDATED);
     
         $events = new LifecycleEventArgs($user, self::$dm);
         $listener->postUpdate($events);
@@ -55,13 +67,13 @@ class DoctrineUserListenerTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail('dul2@listener.so-sure.com');
-        $listener = $this->createListener($user, $this->once());
+        $listener = $this->createListener($user, $this->once(), UserEvent::EVENT_UPDATED);
     
         $events = new LifecycleEventArgs($user, self::$dm);
         $listener->postPersist($events);
     }
 
-    private function createListener($user, $count)
+    private function createListener($user, $count, $eventType)
     {
         $event = new UserEvent($user);
 
@@ -70,9 +82,8 @@ class DoctrineUserListenerTest extends WebTestCase
                          ->getMock();
         $dispatcher->expects($count)
                      ->method('dispatch')
-                     ->with(UserEvent::EVENT_UPDATED, $event);
+                     ->with($eventType, $event);
 
-        $events = new LifecycleEventArgs($user, self::$dm);
         $listener = new DoctrineUserListener($dispatcher);
 
         return $listener;

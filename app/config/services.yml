@@ -276,6 +276,7 @@ services:
             dispatcher: "@event_dispatcher"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
+            -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
 
     app.listener.invitation:
@@ -290,7 +291,8 @@ services:
         arguments:
             dm: "@doctrine_mongodb.odm.default_document_manager"
         tags:
-            -  { name: kernel.event_listener, event: event.user.updated, method: onUserEvent }
+            -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.user.email_verified, method: onUserEmailVerifiedEvent }
 
     braintree.customer:
         class:            Braintree_Customer

@@ -119,6 +119,18 @@ class User extends BaseUser
     protected $mobileNumber;
 
     /**
+     * @MongoDB\Field(type="boolean", name="mobile_verified")
+     * @Gedmo\Versioned
+     */
+    protected $mobileVerified;
+
+    /**
+     * @MongoDB\Field(type="boolean", name="email_verified")
+     * @Gedmo\Versioned
+     */
+    protected $emailVerified;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user")
      */
     protected $policies;
@@ -361,6 +373,26 @@ class User extends BaseUser
     public function getFacebookId()
     {
         return $this->facebookId;
+    }
+
+    public function getMobileVerified()
+    {
+        return $this->mobileVerified;
+    }
+
+    public function setMobileVerified($mobileVerified)
+    {
+        $this->mobileVerified = $mobileVerified;
+    }
+
+    public function getEmailVerified()
+    {
+        return $this->emailVerified;
+    }
+
+    public function setEmailVerified($emailVerified)
+    {
+        $this->emailVerified = $emailVerified;
     }
 
     public function getFirstName()
