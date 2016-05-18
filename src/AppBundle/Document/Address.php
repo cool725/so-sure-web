@@ -5,9 +5,11 @@ namespace AppBundle\Document;
 
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\EmbeddedDocument
+ * @Gedmo\Loggable
  */
 class Address
 {
@@ -19,13 +21,22 @@ class Address
      */
     protected $id;
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $created;
 
-    /** @MongoDB\String(name="type", nullable=false) */
+    /**
+     * @MongoDB\String(name="type", nullable=false)
+     * @Gedmo\Versioned
+     */
     protected $type;
 
-    /** @MongoDB\String(name="line1", nullable=false) */
+    /**
+     * @MongoDB\String(name="line1", nullable=false)
+     * @Gedmo\Versioned
+     */
     protected $line1;
 
     /** @MongoDB\String(name="line2", nullable=true) */

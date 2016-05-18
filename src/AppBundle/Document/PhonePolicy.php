@@ -3,29 +3,38 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
+ * @Gedmo\Loggable
  */
 class PhonePolicy extends Policy
 {
     use ArrayToApiArrayTrait;
 
     /**
-     * @MongoDB\Id(strategy="auto")
+     * @MongoDB\ReferenceOne(targetDocument="Phone")
+     * @Gedmo\Versioned
      */
-    protected $id;
-
-    /** @MongoDB\ReferenceOne(targetDocument="Phone") */
     protected $phone;
 
-    /** @MongoDB\Field(type="string", name="phone_data") */
+    /**
+     * @MongoDB\Field(type="string", name="phone_data")
+     * @Gedmo\Versioned
+     */
     protected $phoneData;
 
-    /** @MongoDB\Field(type="string", nullable=false) */
+    /**
+     * @MongoDB\Field(type="string", nullable=false)
+     * @Gedmo\Versioned
+     */
     protected $imei;
 
-    /** @MongoDB\Field(type="string", name="serial_number") */
+    /**
+     * @MongoDB\Field(type="string", name="serial_number")
+     * @Gedmo\Versioned
+     */
     protected $serialNumber;
 
     public function getPhone()

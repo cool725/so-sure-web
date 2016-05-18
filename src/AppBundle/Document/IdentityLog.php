@@ -3,20 +3,36 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Gedmo\Mapping\Annotation as Gedmo;
 
-/** @MongoDB\EmbeddedDocument */
+/**
+ * @MongoDB\EmbeddedDocument
+ * @Gedmo\Loggable
+ */
 class IdentityLog
 {
-    /** @MongoDB\String(name="cognito_id", nullable=true) */
+    /**
+     * @MongoDB\String(name="cognito_id", nullable=true)
+     * @Gedmo\Versioned
+     */
     protected $cognitoId;
 
-    /** @MongoDB\String(name="ip", nullable=true) */
+    /**
+     * @MongoDB\String(name="ip", nullable=true)
+     * @Gedmo\Versioned
+     */
     protected $ip;
 
-    /** @MongoDB\String(name="country", nullable=true) */
+    /**
+     * @MongoDB\String(name="country", nullable=true)
+     * @Gedmo\Versioned
+     */
     protected $country;
 
-    /** @MongoDB\EmbedOne(targetDocument="Coordinates", name="loc") */
+    /**
+     * @MongoDB\EmbedOne(targetDocument="Coordinates", name="loc")
+     * @Gedmo\Versioned
+     */
     protected $loc;
 
     /** @MongoDB\Distance */

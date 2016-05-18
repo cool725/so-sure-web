@@ -41,7 +41,8 @@
         "egulias/email-validator": "~1.2",
         "fzaninotto/faker": "^1.6",
         "braintree/braintree_php": "^3.11",
-        "cometcult/braintree-bundle": "^0.1.0"
+        "cometcult/braintree-bundle": "^0.1.0",
+        "stof/doctrine-extensions-bundle": "^1.2"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

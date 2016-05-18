@@ -3,8 +3,12 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Gedmo\Mapping\Annotation as Gedmo;
 
-/** @MongoDB\Document */
+/**
+ * @MongoDB\Document
+ * @Gedmo\Loggable
+ */
 class Claim
 {
     const TYPE_LOSS = 'loss';
@@ -23,65 +27,116 @@ class Claim
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
+     * @Gedmo\Versioned
      */
     protected $policy;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="User")
+     * @Gedmo\Versioned
      */
     public $handler;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="Phone")
+     * @Gedmo\Versioned
      */
     public $replacementPhone;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $replacementImei;
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $recordedDate;
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $lossDate;
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $notificationDate;
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $createdDate;
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $closedDate;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $number;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $description;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $location;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $type;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $status;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $notes;
 
-    /** @MongoDB\Field(type="boolean", name="suspected_fraud") */
+    /**
+     * @MongoDB\Field(type="boolean", name="suspected_fraud")
+     * @Gedmo\Versioned
+     */
     protected $suspectedFraud;
 
-    /** @MongoDB\Field(type="boolean") */
+    /**
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
     protected $processed;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
     protected $excess;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
     protected $incurred;
 
     public function __construct()

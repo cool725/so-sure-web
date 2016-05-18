@@ -12,9 +12,11 @@ use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\ApiErrorCode;
 
 use MongoRegex;
+use Gedmo\Loggable\Document\LogEntry;
 
 abstract class BaseController extends Controller
 {
@@ -235,5 +237,30 @@ abstract class BaseController extends Controller
         $geoip = $this->get('app.geoip');
 
         return $geoip->getIdentityLog($clientIp, $this->getCognitoIdentityId($request));
+    }
+
+    protected function getUserHistory($userId)
+    {
+        $dm = $this->getManager();
+        $logRepo = $dm->getRepository(LogEntry::class);
+        $userHistory = $logRepo->findBy(['objectClass' => User::class, 'objectId' => $userId]);
+        foreach ($userHistory as $item) {
+            $data = $item->getData();
+            if (isset($data['token'])) {
+                $data['token'] = "**Redacted**";
+                $item->setData($data);
+            }
+        }
+
+        return $userHistory;
+    }
+
+    protected function getPhonePolicyHistory($policyId)
+    {
+        $dm = $this->getManager();
+        $logRepo = $dm->getRepository(LogEntry::class);
+        $policyHistory = $logRepo->findBy(['objectClass' => PhonePolicy::class, 'objectId' => $policyId]);
+
+        return $policyHistory;
     }
 }

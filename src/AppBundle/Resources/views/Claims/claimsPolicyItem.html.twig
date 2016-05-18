@@ -6,6 +6,7 @@
       <li role="presentation"><a href="#claims">Claims <span class="badge" title="Number of claims">{{ policy.claims|length }}</span></a></li>
       <li role="presentation"><a href="#network">Network Claims <span class="badge" title="Number of network claims">{{ policy.networkClaims|length }}</span></a></li>
       <li role="presentation"><a href="#user">User</a></li>
+      <li role="presentation"><a href="#history">History</a></li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="policy">
@@ -137,6 +138,10 @@
         <div role="tabpanel" class="tab-pane" id="user">
             <table class="table table-striped">
                 <tr>
+                    <td>Id</td>
+                    <td>{{ policy.user.id }}</td>
+                </tr>
+                <tr>
                     <td>Name</td>
                     <td>{{ policy.user.name }}</td>
                 </tr>
@@ -153,5 +158,33 @@
                     <td>{{ policy.user.billingAddress }}</td>
                 </tr>
             </table>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="history">
+            <h3>User History</h3>
+            <table>
+            {% for item in user_history %}
+              <tr>
+                <td width="10%">{{ item.action }}</td>
+                <td width="10%">{{ item.loggedAt|date }}</td>
+                <td width="80%">{{ dump(item.data)}}</td>
+              </tr>
+            {% endfor %}
+            </table>
+            {% if user_history|length == 0 %}
+              <p>No history is present</p>
+            {% endif %}
+            <h3>Policy History</h3>
+            <table>
+            {% for item in policy_history %}
+              <tr>
+                <td width="10%">{{ item.action }}</td>
+                <td width="10%">{{ item.loggedAt|date }}</td>
+                <td width="80%">{{ dump(item.data)}}</td>
+              </tr>
+            {% endfor %}
+            </table>
+            {% if policy_history|length == 0 %}
+              <p>No history is present</p>
+            {% endif %}
         </div>
     </div>
