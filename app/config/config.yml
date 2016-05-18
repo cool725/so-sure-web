@@ -62,6 +62,13 @@ doctrine_mongodb:
     document_managers:
         default:
             auto_mapping: true
+            mappings:
+                gedmo_loggable:
+                    type: annotation
+                    prefix: Gedmo\Loggable\Document
+                    dir: "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Loggable/Document"
+                    alias: GedmoLoggable
+                    is_bundle: false
     default_commit_options:
         timeout: 1000  # integer >= -1
 
@@ -162,3 +169,8 @@ comet_cult_braintree:
   merchant_id: %braintree_merchant_id%
   public_key:  %braintree_public_key%
   private_key: %braintree_private_key%
+
+stof_doctrine_extensions:
+  mongodb:
+    default:
+      loggable: true

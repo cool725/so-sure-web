@@ -128,6 +128,8 @@ class ClaimsController extends BaseController
             'form' => $form->createView(),
             'fraud' => $checks,
             'policy_route' => 'claims_policy',
+            'policy_history' => $this->getPhonePolicyHistory($policy->getId()),
+            'user_history' => $this->getUserHistory($policy->getUser()->getId()),
         ];
     }
 }

@@ -4,12 +4,14 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\PersistentCollection;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
  * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy"})
+ * @Gedmo\Loggable
  */
 abstract class Policy
 {
@@ -64,28 +66,43 @@ abstract class Policy
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="policies")
+     * @Gedmo\Versioned
      */
     protected $user;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $status;
 
-    /** @MongoDB\Field(type="string", name="cancelled_reason") */
+    /**
+     * @MongoDB\Field(type="string", name="cancelled_reason")
+     * @Gedmo\Versioned
+     */
     protected $cancelledReason;
 
     /**
      * @MongoDB\Field(type="string", name="policy_number")
      * @MongoDB\Index(unique=true, sparse=true)
+     * @Gedmo\Versioned
      */
     protected $policyNumber;
 
-    /** @MongoDB\Field(type="string", name="payment_type", nullable=true) */
+    /**
+     * @MongoDB\Field(type="string", name="payment_type", nullable=true)
+     * @Gedmo\Versioned
+     */
     protected $paymentType;
 
-    /** @MongoDB\Field(type="string", name="gocardless_mandate", nullable=true) */
+    /**
+     * @MongoDB\Field(type="string", name="gocardless_mandate", nullable=true)
+     */
     protected $gocardlessMandate;
 
-    /** @MongoDB\Field(type="string", name="gocardless_subscription", nullable=true) */
+    /**
+     * @MongoDB\Field(type="string", name="gocardless_subscription", nullable=true)
+     */
     protected $gocardlessSubscription;
 
     /**
@@ -108,30 +125,52 @@ abstract class Policy
      */
     protected $claims = array();
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $created;
 
-    /** @MongoDB\Date(nullable=true) */
+    /**
+     * @MongoDB\Date(nullable=true)
+     * @Gedmo\Versioned
+     */
     protected $start;
 
-    /** @MongoDB\Date(nullable=true) */
+    /**
+     * @MongoDB\Date(nullable=true)
+     * @Gedmo\Versioned
+     */
     protected $end;
 
-    /** @MongoDB\Field(type="float", name="pot_value", nullable=false) */
+    /**
+     * @MongoDB\Field(type="float", name="pot_value", nullable=false)
+     * @Gedmo\Versioned
+     */
     protected $potValue;
 
-    /** @MongoDB\Field(type="float", name="historical_max_pot_value", nullable=false) */
+    /**
+     * @MongoDB\Field(type="float", name="historical_max_pot_value", nullable=false)
+     * @Gedmo\Versioned
+     */
     protected $historicalMaxPotValue;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $promoCode;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Premium")
+     * @Gedmo\Versioned
      */
     protected $premium;
 
-    /** @MongoDB\EmbedOne(targetDocument="IdentityLog", name="identity_log") */
+    /**
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog", name="identity_log")
+     * @Gedmo\Versioned
+     */
     protected $identityLog;
 
     public function __construct()

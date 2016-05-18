@@ -232,6 +232,8 @@ class AdminController extends BaseController
             'form' => $form->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
+            'policy_history' => $this->getPhonePolicyHistory($policy->getId()),
+            'user_history' => $this->getUserHistory($policy->getUser()->getId()),
         ];
     }
 }

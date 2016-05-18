@@ -5,6 +5,15 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class AppKernel extends Kernel
 {
+    public function getCacheDir()
+    {
+        if (in_array($this->getEnvironment(), array('test', 'vagrant'), true)) {
+            return '/dev/shm/cache/'.$this->environment.'/cache';
+        } else {
+            return parent::getCacheDir();
+        }
+    }
+
     public function registerBundles()
     {
         $bundles = array(
@@ -27,6 +36,7 @@ class AppKernel extends Kernel
             new Staffim\RollbarBundle\StaffimRollbarBundle(),
             new Snc\RedisBundle\SncRedisBundle(),
             new CometCult\BraintreeBundle\CometCultBraintreeBundle(),
+            new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

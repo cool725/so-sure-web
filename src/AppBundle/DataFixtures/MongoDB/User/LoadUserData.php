@@ -23,17 +23,30 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
 
     public function load(ObjectManager $manager)
     {
-        $this->newUser('patrick@so-sure.com', 'test', ['ROLE_ADMIN']);
-        $this->newUser('dylan@so-sure.com', 'w3ares0sure!', ['ROLE_ADMIN']);
-        $this->newUser('claims@so-sure.com', 'w3ares0sure!', ['ROLE_CLAIMS']);
+        $this->newUser('patrick@so-sure.com', 'w3ares0sure!', 'Patrick', 'McAndrew', ['ROLE_ADMIN']);
+        $this->newUser('dylan@so-sure.com', 'w3ares0sure!', 'Dylan', 'Bourguignon', ['ROLE_ADMIN']);
+        $this->newUser('jamie@so-sure.com', 'w3ares0sure!', 'Jamie', 'Gunson', ['ROLE_ADMIN']);
+        $this->newUser('claims@so-sure.com', 'w3ares0sure!', 'Claims', '', ['ROLE_CLAIMS']);
+        $manager->flush();
+        // $this->valdiateGedmoLogging();
+    }
+
+    private function valdiateGedmoLogging()
+    {
+        $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->findOneBy(['email' => 'patrick@so-sure.com']);
+        $user->setFirstName('patrick');
         $manager->flush();
     }
 
-    private function newUser($email, $password, $roles)
+    private function newUser($email, $password, $firstName, $lastName, $roles)
     {
         $userManager = $this->container->get('fos_user.user_manager');
         $user = $userManager->createUser();
         $user->setEmail($email);
+        $user->setFirstName($firstName);
+        $user->setLastName($lastName);
         $user->setPlainPassword($password);
         $user->setEnabled(true);
         $user->setRoles($roles);

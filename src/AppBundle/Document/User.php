@@ -8,10 +8,13 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use GeoJson\Geometry\Point;
 use AppBundle\Document\Invitation\Invitation;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
  * @MongoDB\Index(keys={"identity_log.loc"="2dsphere"}, sparse="true")
+ * @Gedmo\Loggable
+ *
  */
 class User extends BaseUser
 {
@@ -25,6 +28,7 @@ class User extends BaseUser
 
     /**
      * @Assert\Email(strict=true)
+     * @Gedmo\Versioned
      */
     protected $email;
 
@@ -37,6 +41,7 @@ class User extends BaseUser
     
     /**
      * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="referrals")
+     * @Gedmo\Versioned
      */
     protected $referred;
 
@@ -64,51 +69,76 @@ class User extends BaseUser
     /** @MongoDB\Date() */
     protected $created;
 
-    /** @MongoDB\String(name="first_name", nullable=true) */
+    /**
+     * @MongoDB\String(name="first_name", nullable=true)
+     * @Gedmo\Versioned
+     */
     protected $firstName;
 
-    /** @MongoDB\String(name="last_name", nullable=true) */
+    /**
+     * @MongoDB\String(name="last_name", nullable=true)
+     * @Gedmo\Versioned
+     */
     protected $lastName;
 
     /**
      * @MongoDB\String(name="facebook_id")
      * @MongoDB\Index(unique=true, sparse=true)
+     * @Gedmo\Versioned
      */
     protected $facebookId;
 
     /** @MongoDB\String(name="facebook_access_token", nullable=true) */
     protected $facebookAccessToken;
 
-    /** @MongoDB\String(name="token", nullable=true) @MongoDB\Index(unique=true, sparse=true) */
+    /**
+     * @MongoDB\String(name="token", nullable=true) @MongoDB\Index(unique=true, sparse=true)
+     * @Gedmo\Versioned
+     */
     protected $token;
 
     /** @MongoDB\String(name="sns_endpoint", nullable=true) */
     protected $snsEndpoint;
 
-    /** @MongoDB\EmbedOne(targetDocument="IdentityLog", name="identity_log") */
+    /**
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog", name="identity_log")
+     * @Gedmo\Versioned
+     */
     protected $identityLog;
 
-    /** @MongoDB\EmbedOne(targetDocument="Gocardless", name="gocardless") */
+    /**
+     * @MongoDB\EmbedOne(targetDocument="Gocardless", name="gocardless")
+     */
     protected $gocardless;
 
     /**
      * @Assert\Regex(pattern="/^(00447[1-9]\d{8,8}|\+447[1-9]\d{8,8})$/")
      * @MongoDB\String(name="mobile_number", nullable=true)
+     * @Gedmo\Versioned
      */
     protected $mobileNumber;
 
-    /** @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user") */
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user")
+     */
     protected $policies;
 
-    /** @MongoDB\Field(type="boolean", nullable=true) */
+    /**
+     * @MongoDB\Field(type="boolean", nullable=true)
+     * @Gedmo\Versioned
+     */
     protected $preLaunch = false;
 
     /**
      * @MongoDB\String(name="referer")
+     * @Gedmo\Versioned
      */
     protected $referer;
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $birthday;
 
     public function __construct()
