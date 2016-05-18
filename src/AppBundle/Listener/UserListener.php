@@ -25,7 +25,7 @@ class UserListener
     /**
      * @param UserEvent $event
      */
-    public function onUserEvent(UserEvent $event)
+    public function onUserUpdatedEvent(UserEvent $event)
     {
         $user = $event->getUser();
         $email = $user->getEmailCanonical();

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Listener;
 
+use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
@@ -21,7 +22,30 @@ class DoctrineUserListener
     {
         $document = $eventArgs->getDocument();
         if ($document instanceof User) {
-            $this->triggerEvent($document);
+            $this->triggerEvent($document, UserEvent::EVENT_UPDATED);
+        }
+    }
+
+    public function preUpdate(PreUpdateEventArgs $eventArgs)
+    {
+        $document = $eventArgs->getDocument();
+        if ($document instanceof User) {
+            // If both confirmationToken & passwordRequestAt are changing to null,
+            // then the user has reset their password using their token.
+            // This was most likely received by email and if so, then their email should be valid
+            // TODO: Figure out how to handle a manual process
+            if ($eventArgs->hasChangedField('confirmationToken') &&
+                $eventArgs->getNewValue('confirmationToken') == null &&
+                $eventArgs->hasChangedField('passwordRequestedAt') &&
+                $eventArgs->getNewValue('passwordRequestedAt') == null) {
+                $document->setEmailVerified(true);
+
+                // Email Verified probably isn't in the original changeset, so recalculate
+                $dm = $eventArgs->getDocumentManager();
+                $uow = $dm->getUnitOfWork();
+                $meta = $dm->getClassMetadata(get_class($document));
+                $uow->recomputeSingleDocumentChangeSet($meta, $document);
+            }
         }
     }
 
@@ -29,13 +53,13 @@ class DoctrineUserListener
     {
         $document = $eventArgs->getDocument();
         if ($document instanceof User) {
-            $this->triggerEvent($document);
+            $this->triggerEvent($document, UserEvent::EVENT_UPDATED);
         }
     }
 
-    private function triggerEvent(User $user)
+    private function triggerEvent(User $user, $eventType)
     {
         $event = new UserEvent($user);
-        $this->dispatcher->dispatch(UserEvent::EVENT_UPDATED, $event);
+        $this->dispatcher->dispatch($eventType, $event);
     }
 }
