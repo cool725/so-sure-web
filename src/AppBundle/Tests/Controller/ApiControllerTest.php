@@ -261,13 +261,21 @@ class ApiControllerTest extends BaseControllerTest
 
     public function testQuoteA0001()
     {
+        $start = new \DateTime();
+        $start->add(new \DateInterval('P1D'));
         $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001');
+        $end = new \DateTime();
+        $end->add(new \DateInterval('P1D'));
+
         $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(2, count($data['quotes']));
         $this->assertEquals(10, $data['quotes'][0]['connection_value']);
         $this->assertEquals(0, $data['quotes'][0]['monthly_loss']);
         $this->assertEquals(0, $data['quotes'][0]['yearly_loss']);
+        $validTo = new \DateTime($data['quotes'][0]['valid_to']);
+        $this->assertGreaterThanOrEqual($start, $validTo);
+        $this->assertLessThanOrEqual($end, $validTo);
         
         $monthlyPremium = $data['quotes'][0]['monthly_premium'];
         $yearlyPremium = $data['quotes'][0]['yearly_premium'];

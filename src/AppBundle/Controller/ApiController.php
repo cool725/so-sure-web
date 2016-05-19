@@ -169,6 +169,14 @@ class ApiController extends BaseController
                 if (!$currentPhonePrice) {
                     continue;
                 }
+
+                // If there is an end date, then quote should be valid until then
+                $quoteValidTo = $currentPhonePrice->getValidTo();
+                if (!$quoteValidTo) {
+                    $quoteValidTo = new \DateTime();
+                    $quoteValidTo->add(new \DateInterval('P1D'));
+                }
+
                 $quotes[] = [
                     'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
                     'monthly_loss' => 0,
@@ -178,6 +186,7 @@ class ApiController extends BaseController
                     'connection_value' => $currentPhonePrice->getInitialConnectionValue(),
                     'max_connections' => $currentPhonePrice->getMaxConnections(),
                     'max_pot' => $currentPhonePrice->getMaxPot(),
+                    'valid_to' => $quoteValidTo->format(\DateTime::ISO8601),
                 ];
             }
 
