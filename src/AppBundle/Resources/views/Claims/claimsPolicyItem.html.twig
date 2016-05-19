@@ -166,7 +166,11 @@
               <tr>
                 <td width="10%">{{ item.action }}</td>
                 <td width="10%">{{ item.loggedAt|date }}</td>
-                <td width="80%">{{ dump(item.data)}}</td>
+                <td width="80%">
+                  {% for key, value in item.data %}
+                    {{ key }} => {{ value|json_encode }}<br />
+                  {% endfor %}
+                </td>
               </tr>
             {% endfor %}
             </table>
@@ -179,7 +183,11 @@
               <tr>
                 <td width="10%">{{ item.action }}</td>
                 <td width="10%">{{ item.loggedAt|date }}</td>
-                <td width="80%">{{ dump(item.data)}}</td>
+                <td width="80%">
+                  {% for key, value in item.data %}
+                    {{ key }} => {{ value|json_encode }}<br />
+                  {% endfor %}
+                </td>
               </tr>
             {% endfor %}
             </table>
