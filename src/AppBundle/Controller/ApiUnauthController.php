@@ -115,8 +115,8 @@ class ApiUnauthController extends BaseController
 
             $token = (new Builder())->setIssuedAt(time());
             $token->setId(uniqid('', true));
-            $token->set('Email', $user->getEmailCanonical());
-            $token->set('Name', $user->getName());
+            $token->set('email', $user->getEmailCanonical());
+            $token->set('name', $user->getName());
 
             $secret = $this->getParameter('zendesk_jwt_secret');
             $jwt = (string) $token->sign(new Sha256(), $secret)->getToken();
