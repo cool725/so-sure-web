@@ -46,9 +46,16 @@ class User extends BaseUser
     protected $referred;
 
     /**
-     * @MongoDB\EmbedMany(targetDocument="Address")
+     * @MongoDB\EmbedOne(targetDocument="Address")
+     * @Gedmo\Versioned
      */
-    protected $addresses;
+    protected $policyAddress;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="Address")
+     * @Gedmo\Versioned
+     */
+    protected $billingAddress;
 
     /**
      * @MongoDB\ReferenceMany(
@@ -157,7 +164,6 @@ class User extends BaseUser
     {
         parent::__construct();
         $this->referrals = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->addresses = new \Doctrine\Common\Collections\ArrayCollection();
         $this->sentInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->receivedInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->policies = new \Doctrine\Common\Collections\ArrayCollection();
@@ -226,34 +232,24 @@ class User extends BaseUser
         return $this->referrals;
     }
 
-    public function addAddress(Address $address)
-    {
-        $this->addresses[] = $address;
-    }
-
-    public function getAddresses()
-    {
-        return $this->addresses;
-    }
-
-    public function removeAddress($type)
-    {
-        foreach ($this->addresses as $check) {
-            if ($check->getType() == $type) {
-                $this->addresses->removeElement($check);
-            }
-        }
-    }
-
     public function getBillingAddress()
     {
-        foreach ($this->addresses as $address) {
-            if ($address->getType() == Address::TYPE_BILLING) {
-                return $address;
-            }
-        }
+        return $this->billingAddress;
+    }
 
-        return null;
+    public function setBillingAddress(Address $billingAddress)
+    {
+        $this->billingAddress = $billingAddress;
+    }
+
+    public function getPolicyAddress()
+    {
+        return $this->policyAddress;
+    }
+
+    public function setPolicyAddress(Address $policyAddress)
+    {
+        $this->policyAddress = $policyAddress;
     }
 
     public function addPolicy(Policy $policy)
@@ -544,6 +540,13 @@ class User extends BaseUser
 
     public function toApiArray($identityId = null, $token = null, $debug = false)
     {
+        $addresses = [];
+        if ($this->getBillingAddress()) {
+            $addresses[] = $this->getBillingAddress()->toApiArray();
+        }
+        if ($this->getPolicyAddress()) {
+            $addresses[] = $this->getPolicyAddress()->toApiArray();
+        }
         return [
           'id' => $this->getId(),
           'email' => $this->getEmailCanonical(),
@@ -552,7 +555,7 @@ class User extends BaseUser
           'facebook_id' => $this->getFacebookId(),
           'cognito_token' => [ 'id' => $identityId, 'token' => $token ],
           'user_token' => ['token' => $this->getToken()],
-          'addresses' => $this->eachApiArray($this->addresses),
+          'addresses' => $addresses,
           'mobile_number' => $this->getMobileNumber(),
           'policies' => $this->eachApiArray($this->policies),
           'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), $debug),

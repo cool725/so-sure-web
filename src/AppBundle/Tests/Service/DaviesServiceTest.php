@@ -120,7 +120,7 @@ class DaviesServiceTest extends WebTestCase
         $address->setType(Address::TYPE_BILLING);
         $address->setPostCode('AAA');
         $user = new User();
-        $user->addAddress($address);
+        $user->setBillingAddress($address);
         $user->setFirstName('foo');
         $user->setLastName('bar');
         $policy = new PhonePolicy();
@@ -143,7 +143,7 @@ class DaviesServiceTest extends WebTestCase
         $address->setType(Address::TYPE_BILLING);
         $address->setPostCode('AAA');
         $user = new User();
-        $user->addAddress($address);
+        $user->setBillingAddress($address);
         $user->setFirstName('foo');
         $user->setLastName('bar');
         $policy = new PhonePolicy();
