@@ -111,9 +111,16 @@ abstract class Policy
     protected $invitations;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\PolicyDocument")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\PolicyTerms")
+     * @Gedmo\Versioned
      */
-    protected $policyDocuments;
+    protected $policyTerms;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\PolicyKeyFacts")
+     * @Gedmo\Versioned
+     */
+    protected $policyKeyFacts;
 
     /**
      * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Connection")
@@ -178,7 +185,6 @@ abstract class Policy
         $this->created = new \DateTime();
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->policyDocuments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -335,38 +341,24 @@ abstract class Policy
         return $this->historicalMaxPotValue;
     }
 
-    public function getPolicyDocuments()
-    {
-        return $this->policyDocuments;
-    }
-
     public function getPolicyKeyFacts()
     {
-        $policyDocuments = $this->getPolicyDocuments();
-        foreach ($policyDocuments as $policyDocument) {
-            if ($policyDocument instanceof PolicyKeyFacts) {
-                return $policyDocument;
-            }
-        }
+        return $this->policyKeyFacts;
+    }
 
-        return null;
+    public function setPolicyKeyFacts(PolicyKeyFacts $policyKeyFacts)
+    {
+        $this->policyKeyFacts = $policyKeyFacts;
     }
 
     public function getPolicyTerms()
     {
-        $policyDocuments = $this->getPolicyDocuments();
-        foreach ($policyDocuments as $policyDocument) {
-            if ($policyDocument instanceof PolicyTerms) {
-                return $policyDocument;
-            }
-        }
-
-        return null;
+        return $this->policyTerms;
     }
 
-    public function addPolicyDocument(PolicyDocument $policyDocument)
+    public function setPolicyTerms(PolicyTerms $policyTerms)
     {
-        $this->policyDocuments[] = $policyDocument;
+        $this->policyTerms = $policyTerms;
     }
 
     public function getPromoCode()
@@ -417,8 +409,8 @@ abstract class Policy
     public function init(User $user, PolicyDocument $terms, PolicyDocument $keyfacts)
     {
         $user->addPolicy($this);
-        $this->addPolicyDocument($terms);
-        $this->addPolicyDocument($keyfacts);
+        $this->setPolicyTerms($terms);
+        $this->setPolicyKeyFacts($keyfacts);
     }
 
     public function create($seq, $startDate = null)
