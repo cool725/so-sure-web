@@ -135,23 +135,23 @@ class PolicyService
         foreach ($policy->getConnections() as $networkConnection) {
             // if that user has already claimed, there's no point in telling them that their friend cancelled,
             // as they can't do anything to improve their pot
-            if ($networkConnection->getPolicy()->hasMonetaryClaimed()) {
+            if ($networkConnection->getLinkedPolicy()->hasMonetaryClaimed()) {
                 continue;
             }
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('Your friend, %s, cancelled their so-sure policy', $cancelledUser->getName()))
                 ->setFrom('hello@so-sure.com')
-                ->setTo($networkConnection->getUser()->getEmail())
+                ->setTo($networkConnection->getLinkedUser()->getEmail())
                 ->setBody(
                     $this->templating->render('AppBundle:Email:policy/networkCancelled.html.twig', [
-                        'policy' => $networkConnection->getPolicy(),
+                        'policy' => $networkConnection->getLinkedPolicy(),
                         'cancelledUser' => $cancelledUser
                     ]),
                     'text/html'
                 )
                 ->addPart(
                     $this->templating->render('AppBundle:Email:policy/networkCancelled.txt.twig', [
-                        'policy' => $networkConnection->getPolicy(),
+                        'policy' => $networkConnection->getLinkedPolicy(),
                         'cancelledUser' => $cancelledUser
                     ]),
                     'text/plain'

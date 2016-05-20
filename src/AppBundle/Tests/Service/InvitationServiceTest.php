@@ -510,7 +510,7 @@ class InvitationServiceTest extends WebTestCase
         $inviterPolicy = $repo->find($policy->getId());
         $connectionFound = false;
         foreach ($inviterPolicy->getConnections() as $connection) {
-            if ($connection->getPolicy()->getId() == $policyInvitee->getId()) {
+            if ($connection->getLinkedPolicy()->getId() == $policyInvitee->getId()) {
                 $connectionFound = true;
                 $this->assertEquals(2, $connection->getValue());
             }
@@ -520,7 +520,7 @@ class InvitationServiceTest extends WebTestCase
         $inviteePolicy = $repo->find($policyInvitee->getId());
         $connectionFound = false;
         foreach ($inviteePolicy->getConnections() as $connection) {
-            if ($connection->getPolicy()->getId() == $inviterPolicy->getId()) {
+            if ($connection->getLinkedPolicy()->getId() == $inviterPolicy->getId()) {
                 $connectionFound = true;
                 $this->assertEquals(10, $connection->getValue());
             }
@@ -580,7 +580,7 @@ class InvitationServiceTest extends WebTestCase
         $inviterPolicy = $repo->find($policy->getId());
         $connectionFound = false;
         foreach ($inviterPolicy->getConnections() as $connection) {
-            if ($connection->getPolicy()->getId() == $policyInviteeAfter->getId()) {
+            if ($connection->getLinkedPolicy()->getId() == $policyInviteeAfter->getId()) {
                 $connectionFound = true;
                 $this->assertEquals(10, $connection->getValue());
             }

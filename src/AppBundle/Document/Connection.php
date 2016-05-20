@@ -3,31 +3,58 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Gedmo\Mapping\Annotation as Gedmo;
 
-/** @MongoDB\EmbeddedDocument */
+/**
+ * @MongoDB\Document
+ * @Gedmo\Loggable
+ */
 class Connection
 {
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\Id(strategy="auto")
      */
-    protected $user;
+    protected $id;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @Gedmo\Versioned
+     */
+    protected $linkedUser;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="Policy")
+     * @Gedmo\Versioned
      */
-    protected $policy;
+    protected $sourcePolicy;
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Policy")
+     * @Gedmo\Versioned
+     */
+    protected $linkedPolicy;
+
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $date;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
     protected $value;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
     protected $initialValue;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="User", name="replacement_user")
+     * @Gedmo\Versioned
      */
     protected $replacementUser;
 
@@ -36,24 +63,39 @@ class Connection
         $this->date = new \DateTime();
     }
 
-    public function getUser()
+    public function getId()
     {
-        return $this->user;
+        return $this->id;
     }
 
-    public function setUser($user)
+    public function getLinkedUser()
     {
-        $this->user = $user;
+        return $this->linkedUser;
     }
 
-    public function getPolicy()
+    public function setLinkedUser(User $user)
     {
-        return $this->policy;
+        $this->linkedUser = $user;
     }
 
-    public function setPolicy($policy)
+    public function getSourcePolicy()
     {
-        $this->policy = $policy;
+        return $this->sourcePolicy;
+    }
+
+    public function setSourcePolicy(Policy $policy)
+    {
+        $this->sourcePolicy = $policy;
+    }
+
+    public function getLinkedPolicy()
+    {
+        return $this->linkedPolicy;
+    }
+
+    public function setLinkedPolicy(Policy $policy)
+    {
+        $this->linkedPolicy = $policy;
     }
 
     public function getDate()
@@ -102,7 +144,7 @@ class Connection
     public function toApiArray()
     {
         return [
-            'name' => $this->getUser() ? $this->getUser()->getName() : null,
+            'name' => $this->getLinkedUser() ? $this->getLinkedUser()->getName() : null,
             'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ISO8601) : null,
         ];
     }

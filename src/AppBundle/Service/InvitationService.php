@@ -332,8 +332,8 @@ class InvitationService
             $replacementConnection->setReplacementUser($linkedUser);
         }
         $connection = new Connection();
-        $connection->setUser($linkedUser);
-        $connection->setPolicy($linkedPolicy);
+        $connection->setLinkedUser($linkedUser);
+        $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);
         $policy->addConnection($connection);
         $policy->updatePotValue();

@@ -260,14 +260,14 @@ class PhonePolicyTest extends WebTestCase
     {
         $connectionA = new Connection();
         $connectionA->setValue($valueA);
-        $connectionA->setUser($policyB->getUser());
-        $connectionA->setPolicy($policyB);
+        $connectionA->setLinkedUser($policyB->getUser());
+        $connectionA->setLinkedPolicy($policyB);
         $policyA->addConnection($connectionA);
 
         $connectionB = new Connection();
         $connectionB->setValue($valueB);
-        $connectionB->setUser($policyA->getUser());
-        $connectionB->setPolicy($policyA);
+        $connectionB->setLinkedUser($policyA->getUser());
+        $connectionB->setLinkedPolicy($policyA);
         $policyB->addConnection($connectionB);
 
         return [$connectionA, $connectionB];
@@ -665,8 +665,8 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertNotNull($policyB->getUnreplacedConnectionCancelledPolicyInLast30Days());
         $connectionB = $policyB->getUnreplacedConnectionCancelledPolicyInLast30Days();
-        $this->assertTrue($connectionB->getPolicy()->isCancelled());
-        $this->assertTrue($connectionB->getPolicy()->hasEndedInLast30Days());
+        $this->assertTrue($connectionB->getLinkedPolicy()->isCancelled());
+        $this->assertTrue($connectionB->getLinkedPolicy()->hasEndedInLast30Days());
 
         $this->assertNull($policyB->getUnreplacedConnectionCancelledPolicyInLast30Days(new \DateTime('2016-01-01')));
     }
@@ -718,7 +718,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(2, count($policyB->getConnections()));
         // All connections to the cancelled policy should be zero; other connections should remain at value
         foreach ($policyB->getConnections() as $networkConnection) {
-            if ($networkConnection->getPolicy()->getId() == $policyA->getId()) {
+            if ($networkConnection->getLinkedPolicy()->getId() == $policyA->getId()) {
                 $this->assertEquals(0, $networkConnection->getValue());
             } else {
                 $this->assertGreaterThan(0, $networkConnection->getValue());
