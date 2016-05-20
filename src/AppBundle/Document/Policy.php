@@ -123,7 +123,7 @@ abstract class Policy
     protected $policyKeyFacts;
 
     /**
-     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Connection")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection", cascade={"persist"})
      */
     protected $connections = array();
 
@@ -299,6 +299,7 @@ abstract class Policy
 
     public function addConnection(Connection $connection)
     {
+        $connection->setSourcePolicy($this);
         $this->connections[] = $connection;
     }
 
@@ -560,7 +561,7 @@ abstract class Policy
             if ($connection->getReplacementUser()) {
                 continue;
             }
-            $policy = $connection->getPolicy();
+            $policy = $connection->getLinkedPolicy();
             if (!$policy) {
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
@@ -601,7 +602,7 @@ abstract class Policy
     {
         $claims = [];
         foreach ($this->getConnections() as $connection) {
-            $policy = $connection->getPolicy();
+            $policy = $connection->getLinkedPolicy();
             if (!$policy) {
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
@@ -619,7 +620,7 @@ abstract class Policy
     {
         $policies = [];
         foreach ($this->getConnections() as $connection) {
-            $policy = $connection->getPolicy();
+            $policy = $connection->getLinkedPolicy();
             if (!$policy) {
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
@@ -709,12 +710,12 @@ abstract class Policy
         // zero out the connection value for connections bound to this policy
         foreach ($this->getConnections() as $networkConnection) {
             $networkConnection->clearValue();
-            foreach ($networkConnection->getPolicy()->getConnections() as $otherConnection) {
-                if ($otherConnection->getPolicy()->getId() == $this->getId()) {
+            foreach ($networkConnection->getLinkedPolicy()->getConnections() as $otherConnection) {
+                if ($otherConnection->getLinkedPolicy()->getId() == $this->getId()) {
                     $otherConnection->clearValue();
                 }
             }
-            $networkConnection->getPolicy()->updatePotValue();
+            $networkConnection->getLinkedPolicy()->updatePotValue();
         }
 
         $this->updatePotValue();

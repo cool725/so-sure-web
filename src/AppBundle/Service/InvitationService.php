@@ -333,7 +333,7 @@ class InvitationService
         }
         $connection = new Connection();
         $connection->setUser($linkedUser);
-        $connection->setPolicy($linkedPolicy);
+        $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);
         $policy->addConnection($connection);
         $policy->updatePotValue();

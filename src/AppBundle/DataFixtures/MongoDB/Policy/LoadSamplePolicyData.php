@@ -138,19 +138,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
             // only 1 connection for user
             foreach ($policyA->getConnections() as $connection) {
-                if ($connection->getPolicy()->getId() == $policyB->getId()) {
+                if ($connection->getLinkedPolicy()->getId() == $policyB->getId()) {
                     continue;
                 }
             }
 
             $connectionA = new Connection();
             $connectionA->setUser($userA);
-            $connectionA->setPolicy($policyA);
+            $connectionA->setLinkedPolicy($policyA);
             $connectionA->setValue($policyB->getAllowedConnectionValue());
 
             $connectionB = new Connection();
             $connectionB->setUser($userB);
-            $connectionB->setPolicy($policyB);
+            $connectionB->setLinkedPolicy($policyB);
             $connectionB->setValue($policyA->getAllowedConnectionValue());
     
             $policyA->addConnection($connectionB);
@@ -215,12 +215,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $connectionA = new Connection();
         $connectionA->setUser($userB);
-        $connectionA->setPolicy($policyB);
+        $connectionA->setLinkedPolicy($policyB);
         $connectionA->setValue(10);
 
         $connectionB = new Connection();
         $connectionB->setUser($userA);
-        $connectionB->setPolicy($policyA);
+        $connectionB->setLinkedPolicy($policyA);
         $connectionB->setValue(10);
 
         $policyA->addConnection($connectionA);

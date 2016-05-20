@@ -62,9 +62,9 @@ class ClaimsService
             $this->notifyMonetaryClaim($claim->getPolicy(), $claim, true);
 
             foreach ($claim->getPolicy()->getConnections() as $networkConnection) {
-                $networkConnection->getPolicy()->updatePotValue();
+                $networkConnection->getLinkedPolicy()->updatePotValue();
                 $this->dm->flush();
-                $this->notifyMonetaryClaim($networkConnection->getPolicy(), $claim, false);
+                $this->notifyMonetaryClaim($networkConnection->getLinkedPolicy(), $claim, false);
             }
 
             $claim->setProcessed(true);
