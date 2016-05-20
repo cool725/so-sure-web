@@ -91,7 +91,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $address->setCity($this->faker->city);
             $address->setPostcode($this->faker->address);
 
-            $user->addAddress($address);
+            $user->setBillingAddress($address);
             $manager->persist($user);
             $users[] = $user;
         }
@@ -182,10 +182,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $address->setCity('London');
         $address->setPostcode('BX11LT');
 
-        $userA->addAddress($address);
+        $userA->setBillingAddress($address);
         $manager->persist($userA);
 
-        $userB->addAddress($address);
+        $userB->setBillingAddress($address);
         $manager->persist($userB);
 
         $phoneRepo = $manager->getRepository(Phone::class);

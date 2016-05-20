@@ -44,7 +44,7 @@ trait UserClassTrait
         $address->setLine1('123 s road');
         $address->setCity('London');
         $address->setPostcode('BX11LT');
-        $user->addAddress($address);
+        $user->setBillingAddress($address);
     }
 
     public static function generateRandomMobile()

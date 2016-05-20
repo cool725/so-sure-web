@@ -53,7 +53,7 @@ class GocardlessServiceTest extends WebTestCase
         $address->setLine1('10 Finsbury Square');
         $address->setCity('London');
         $address->setPostcode('EC1V 1RS');
-        $user->addAddress($address);
+        $user->setBillingAddress($address);
 
         static::$dm->persist($address);
         static::$dm->flush();

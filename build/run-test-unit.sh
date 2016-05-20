@@ -12,5 +12,7 @@ fi
 
 set -e
 
+sudo rm -rf /dev/shm/cache/test/
+
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
 ./vendor/phing/phing/bin/phing force:cs

@@ -812,11 +812,6 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            if ($existingAddress = $user->getBillingAddress()) {
-                $user->removeAddress($existingAddress);
-                $dm->remove($existingAddress);
-            }
-
             $address = new Address();
             $address->setType($data['type']);
             $address->setLine1($data['line1']);
@@ -824,7 +819,7 @@ class ApiAuthController extends BaseController
             $address->setLine3(isset($data['line3']) ? $data['line3'] : null);
             $address->setCity($data['city']);
             $address->setPostcode($data['postcode']);
-            $user->addAddress($address);
+            $user->setBillingAddress($address);
 
             $dm->persist($address);
             $dm->flush();

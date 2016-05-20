@@ -57,8 +57,7 @@ class UserRepository extends DocumentRepository
     {
         $qb = $this->createQueryBuilder();
         $qb->field('id')->notEqual($user->getId());
-        $qb->field('addresses.type')->equals(Address::TYPE_BILLING);
-        $qb->field('addresses.postcode')->equals($user->getBillingAddress()->getPostcode());
+        $qb->field('billingAddress.postcode')->equals($user->getBillingAddress()->getPostcode());
 
         return $qb
             ->getQuery()

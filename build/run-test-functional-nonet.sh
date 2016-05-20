@@ -8,6 +8,8 @@ if [ -f  app/logs/test.log ]; then
   rm app/logs/test.log
 fi
 
+sudo rm -rf /dev/shm/cache/test/
+
 app/console --env=test doctrine:mongodb:schema:drop
 app/console --env=test doctrine:mongodb:fixtures:load
 app/console --env=test sosure:doctrine:index

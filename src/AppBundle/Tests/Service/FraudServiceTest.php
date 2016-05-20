@@ -51,13 +51,13 @@ class FraudServiceTest extends WebTestCase
             static::generateEmail('user1', $this),
             'bar'
         );
-        $address = new Address();
-        $address->setType(Address::TYPE_BILLING);
-        $address->setPostcode('AB123');
-        $user->addAddress($address);
         self::$dm->persist($user);
 
         $policy = static::createPolicy($user, static::$dm);
+
+        // policy will set address
+        $address = $user->getBillingAddress();
+        $address->setPostcode('AB123');
 
         $user2 = static::createUser(
             static::$userManager,
@@ -67,7 +67,7 @@ class FraudServiceTest extends WebTestCase
         $address2 = new Address();
         $address2->setType(Address::TYPE_BILLING);
         $address2->setPostcode('AB123');
-        $user2->addAddress($address2);
+        $user2->setBillingAddress($address2);
         self::$dm->persist($user2);
         self::$dm->flush();
 
@@ -85,7 +85,7 @@ class FraudServiceTest extends WebTestCase
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
         $address->setPostcode('AB123');
-        $user->addAddress($address);
+        $user->setBillingAddress($address);
         self::$dm->persist($user);
         self::$dm->flush();
 
@@ -103,7 +103,7 @@ class FraudServiceTest extends WebTestCase
         $address2 = new Address();
         $address2->setType(Address::TYPE_BILLING);
         $address2->setPostcode('AB123');
-        $user2->addAddress($address2);
+        $user2->setBillingAddress($address2);
         $gocardless2 = new Gocardless();
         $gocardless2->addAccount('1', $account);
         $user2->setGocardless($gocardless2);
