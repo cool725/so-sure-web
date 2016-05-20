@@ -260,13 +260,13 @@ class PhonePolicyTest extends WebTestCase
     {
         $connectionA = new Connection();
         $connectionA->setValue($valueA);
-        $connectionA->setUser($policyB->getUser());
+        $connectionA->setLinkedUser($policyB->getUser());
         $connectionA->setLinkedPolicy($policyB);
         $policyA->addConnection($connectionA);
 
         $connectionB = new Connection();
         $connectionB->setValue($valueB);
-        $connectionB->setUser($policyA->getUser());
+        $connectionB->setLinkedUser($policyA->getUser());
         $connectionB->setLinkedPolicy($policyA);
         $policyB->addConnection($connectionB);
 

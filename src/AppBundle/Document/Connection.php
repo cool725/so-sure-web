@@ -144,7 +144,7 @@ class Connection
     public function toApiArray()
     {
         return [
-            'name' => $this->getUser() ? $this->getUser()->getName() : null,
+            'name' => $this->getLinkedUser() ? $this->getLinkedUser()->getName() : null,
             'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ISO8601) : null,
         ];
     }

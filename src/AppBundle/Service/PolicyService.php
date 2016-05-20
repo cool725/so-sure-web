@@ -141,7 +141,7 @@ class PolicyService
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('Your friend, %s, cancelled their so-sure policy', $cancelledUser->getName()))
                 ->setFrom('hello@so-sure.com')
-                ->setTo($networkConnection->getUser()->getEmail())
+                ->setTo($networkConnection->getLinkedUser()->getEmail())
                 ->setBody(
                     $this->templating->render('AppBundle:Email:policy/networkCancelled.html.twig', [
                         'policy' => $networkConnection->getLinkedPolicy(),

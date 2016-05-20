@@ -332,7 +332,7 @@ class InvitationService
             $replacementConnection->setReplacementUser($linkedUser);
         }
         $connection = new Connection();
-        $connection->setUser($linkedUser);
+        $connection->setLinkedUser($linkedUser);
         $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);
         $policy->addConnection($connection);
