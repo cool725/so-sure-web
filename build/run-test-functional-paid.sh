@@ -16,7 +16,9 @@ if [ -f  app/logs/test.log ]; then
   rm app/logs/test.log
 fi
 
-sudo rm -rf /dev/shm/cache/test/
+if [ -d /dev/shm/cache/test ]; then
+  sudo rm -rf /dev/shm/cache/test/
+fi
 
 app/console --env=test redis:flushdb --client=default -n
 app/console --env=test doctrine:mongodb:schema:drop

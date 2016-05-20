@@ -12,7 +12,9 @@ fi
 
 set -e
 
-sudo rm -rf /dev/shm/cache/test/
+if [ -d /dev/shm/cache/test ]; then
+  sudo rm -rf /dev/shm/cache/test/
+fi
 
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
 ./vendor/phing/phing/bin/phing force:cs
