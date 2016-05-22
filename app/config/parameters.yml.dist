@@ -54,6 +54,7 @@ parameters:
     aws_secret: ''
     aws_cognito_identitypoolid: ''
     policy_key: ''
+    zendesk_key: ''
 
     pca_apikey: ''
     branch_key: ''
