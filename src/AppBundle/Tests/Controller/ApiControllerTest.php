@@ -120,7 +120,7 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
-    public function testLoginFacebookInvalidToken()
+    public function testLoginFacebookInvalidId()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(
@@ -136,6 +136,24 @@ class ApiControllerTest extends BaseControllerTest
             'facebook_access_token' => 'foo',
         ]));
         $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_ABSENT);
+    }
+
+    public function testLoginFacebookInvalidToken()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('facebook-invalid-token', $this),
+            'bar'
+        );
+        $user->setFacebookId(rand(1, 999999));
+        self::$dm->flush();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('facebook_user' => [
+            'facebook_id' => $user->getFacebookId(),
+            'facebook_access_token' => 'foo',
+        ]));
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
     }
 
     public function testLoginOkUserExpired()

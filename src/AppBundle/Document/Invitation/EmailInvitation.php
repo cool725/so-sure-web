@@ -9,7 +9,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class EmailInvitation extends Invitation
 {
-    /** @MongoDB\Field(type="string") */
+    /** @MongoDB\Field(type="string", nullable=false) */
     protected $email;
 
     public function isSingleUse()

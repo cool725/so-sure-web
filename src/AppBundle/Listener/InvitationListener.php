@@ -36,7 +36,7 @@ class InvitationListener
                 $this->dm->flush();
             }
         } elseif ($invitation instanceof SmsInvitation) {
-            $user = $userRepo->findOneBy(['mobile_number' => $invitation->getMobile()]);
+            $user = $userRepo->findOneBy(['mobileNumber' => $invitation->getMobile()]);
             if ($user && $invitation->getInviter()->getId() != $user->getId()) {
                 $invitation->setInvitee($user);
                 $this->dm->flush();
