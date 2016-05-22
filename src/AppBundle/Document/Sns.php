@@ -29,7 +29,7 @@ class Sns
     /** @MongoDB\Field(type="string") */
     protected $registered;
 
-    /** @MongoDB\Field(type="collection", name="others") */
+    /** @MongoDB\Field(type="collection") */
     protected $others = array();
 
     public function __construct()

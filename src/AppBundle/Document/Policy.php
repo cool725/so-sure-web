@@ -77,31 +77,31 @@ abstract class Policy
     protected $status;
 
     /**
-     * @MongoDB\Field(type="string", name="cancelled_reason")
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $cancelledReason;
 
     /**
-     * @MongoDB\Field(type="string", name="policy_number")
+     * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $policyNumber;
 
     /**
-     * @MongoDB\Field(type="string", name="payment_type", nullable=true)
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $paymentType;
 
     /**
-     * @MongoDB\Field(type="string", name="gocardless_mandate", nullable=true)
+     * @MongoDB\Field(type="string")
      */
     protected $gocardlessMandate;
 
     /**
-     * @MongoDB\Field(type="string", name="gocardless_subscription", nullable=true)
+     * @MongoDB\Field(type="string")
      */
     protected $gocardlessSubscription;
 
@@ -139,25 +139,25 @@ abstract class Policy
     protected $created;
 
     /**
-     * @MongoDB\Date(nullable=true)
+     * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $start;
 
     /**
-     * @MongoDB\Date(nullable=true)
+     * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $end;
 
     /**
-     * @MongoDB\Field(type="float", name="pot_value", nullable=false)
+     * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */
     protected $potValue;
 
     /**
-     * @MongoDB\Field(type="float", name="historical_max_pot_value", nullable=false)
+     * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */
     protected $historicalMaxPotValue;
@@ -175,7 +175,7 @@ abstract class Policy
     protected $premium;
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="IdentityLog", name="identity_log")
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
      * @Gedmo\Versioned
      */
     protected $identityLog;

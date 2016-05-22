@@ -20,19 +20,19 @@ class PhonePolicy extends Policy
     protected $phone;
 
     /**
-     * @MongoDB\Field(type="string", name="phone_data")
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $phoneData;
 
     /**
-     * @MongoDB\Field(type="string", nullable=false)
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $imei;
 
     /**
-     * @MongoDB\Field(type="string", name="serial_number")
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $serialNumber;

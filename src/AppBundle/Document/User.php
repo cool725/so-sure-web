@@ -60,7 +60,6 @@ class User extends BaseUser
     /**
      * @MongoDB\ReferenceMany(
      *  targetDocument="AppBundle\Document\Invitation\Invitation",
-     *  name="sent_invitations",
      *  mappedBy="inviter")
      */
     protected $sentInvitations;
@@ -68,7 +67,6 @@ class User extends BaseUser
     /**
      * @MongoDB\ReferenceMany(
      *  targetDocument="AppBundle\Document\Invitation\Invitation",
-     *  name="received_invitations",
      *  mappedBy="invitee")
      */
     protected $receivedInvitations;
@@ -77,62 +75,63 @@ class User extends BaseUser
     protected $created;
 
     /**
-     * @MongoDB\String(name="first_name", nullable=true)
+     * @MongoDB\String()
      * @Gedmo\Versioned
      */
     protected $firstName;
 
     /**
-     * @MongoDB\String(name="last_name", nullable=true)
+     * @MongoDB\String()
      * @Gedmo\Versioned
      */
     protected $lastName;
 
     /**
-     * @MongoDB\String(name="facebook_id")
+     * @MongoDB\String()
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $facebookId;
 
-    /** @MongoDB\String(name="facebook_access_token", nullable=true) */
+    /** @MongoDB\String() */
     protected $facebookAccessToken;
 
     /**
-     * @MongoDB\String(name="token", nullable=true) @MongoDB\Index(unique=true, sparse=true)
+     * @MongoDB\String()
+     * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $token;
 
-    /** @MongoDB\String(name="sns_endpoint", nullable=true) */
+    /** @MongoDB\String() */
     protected $snsEndpoint;
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="IdentityLog", name="identity_log")
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
      * @Gedmo\Versioned
      */
     protected $identityLog;
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="Gocardless", name="gocardless")
+     * @MongoDB\EmbedOne(targetDocument="Gocardless")
      */
     protected $gocardless;
 
     /**
      * @Assert\Regex(pattern="/^(00447[1-9]\d{8,8}|\+447[1-9]\d{8,8})$/")
-     * @MongoDB\String(name="mobile_number", nullable=true)
+     * @MongoDB\String()
      * @Gedmo\Versioned
      */
     protected $mobileNumber;
 
     /**
-     * @MongoDB\Field(type="boolean", name="mobile_verified")
+     * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $mobileVerified;
 
     /**
-     * @MongoDB\Field(type="boolean", name="email_verified")
+     * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $emailVerified;
@@ -143,13 +142,13 @@ class User extends BaseUser
     protected $policies;
 
     /**
-     * @MongoDB\Field(type="boolean", nullable=true)
+     * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $preLaunch = false;
 
     /**
-     * @MongoDB\String(name="referer")
+     * @MongoDB\String()
      * @Gedmo\Versioned
      */
     protected $referer;

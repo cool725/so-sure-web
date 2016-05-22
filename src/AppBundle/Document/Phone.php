@@ -22,65 +22,68 @@ class Phone
     /** @MongoDB\Field(type="string") */
     protected $model;
 
-    /** @MongoDB\Field(type="collection") @MongoDB\Index(unique=false) */
+    /**
+     * @MongoDB\Field(type="collection")
+     * @MongoDB\Index(unique=false)
+     */
     protected $devices;
 
-    /** @MongoDB\Field(type="float", nullable=true) */
+    /** @MongoDB\Field(type="float") */
     protected $memory;
 
     /** @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice") */
     protected $phonePrices = array();
 
-    /** @MongoDB\Field(type="float", name="initial_price") */
+    /** @MongoDB\Field(type="float") */
     protected $initialPrice;
 
-    /** @MongoDB\Field(type="float", name="replacement_price") */
+    /** @MongoDB\Field(type="float") */
     protected $replacementPrice;
 
-    /** @MongoDB\Field(type="string", name="initial_price_url") */
+    /** @MongoDB\Field(type="string") */
     protected $initialPriceUrl;
 
     /** @MongoDB\Field(type="string") */
     protected $os;
 
-    /** @MongoDB\Field(type="string", name="initial_os_version") */
+    /** @MongoDB\Field(type="string") */
     protected $initialOsVersion;
 
-    /** @MongoDB\Field(type="string", name="upgrade_os_version") */
+    /** @MongoDB\Field(type="string") */
     protected $upgradeOsVersion;
 
-    /** @MongoDB\Field(type="int", name="processor_speed") */
+    /** @MongoDB\Field(type="int") */
     protected $processorSpeed;
 
-    /** @MongoDB\Field(type="int", name="processor_cores") */
+    /** @MongoDB\Field(type="int") */
     protected $processorCores;
 
-    /** @MongoDB\Field(type="int", name="ram") */
+    /** @MongoDB\Field(type="int") */
     protected $ram;
 
-    /** @MongoDB\Field(type="boolean", name="ssd") */
+    /** @MongoDB\Field(type="boolean") */
     protected $ssd;
 
-    /** @MongoDB\Field(type="int", name="screen_physical") */
+    /** @MongoDB\Field(type="int") */
     protected $screenPhysical;
 
-    /** @MongoDB\Field(type="int", name="screen_resolution_width") */
+    /** @MongoDB\Field(type="int") */
     protected $screenResolutionWidth;
 
-    /** @MongoDB\Field(type="int", name="screen_resolution_height") */
+    /** @MongoDB\Field(type="int") */
     protected $screenResolutionHeight;
 
-    /** @MongoDB\Field(type="int", name="camera") */
+    /** @MongoDB\Field(type="int") */
     protected $camera;
 
-    /** @MongoDB\Field(type="boolean", name="lte") */
+    /** @MongoDB\Field(type="boolean") */
     protected $lte;
 
-    /** @MongoDB\Date(name="release_date", nullable=true) */
+    /** @MongoDB\Date() */
     protected $releaseDate;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Phone", name="suggested_replacment")
+     * @MongoDB\ReferenceOne(targetDocument="Phone")
      */
     protected $suggestedReplacement;
 

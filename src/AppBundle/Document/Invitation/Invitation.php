@@ -33,13 +33,13 @@ abstract class Invitation
     /** @MongoDB\Date() */
     protected $rejected;
 
-    /** @MongoDB\Date(name="last_reinvited") */
+    /** @MongoDB\Date() */
     protected $lastReinvited;
 
-    /** @MongoDB\Date(name="next_reinvited") */
+    /** @MongoDB\Date() */
     protected $nextReinvited;
 
-    /** @MongoDB\Field(type="integer", name="reinvited_count") */
+    /** @MongoDB\Field(type="integer") */
     protected $reinvitedCount;
 
     /** @MongoDB\Field(type="string") */
@@ -54,10 +54,10 @@ abstract class Invitation
     /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="invitations") */
     protected $policy;
 
-    /** @MongoDB\String(name="link", nullable=true) */
+    /** @MongoDB\String() */
     protected $link;
 
-    /** @MongoDB\String(name="name", nullable=true) */
+    /** @MongoDB\String() */
     protected $name;
 
     abstract public function isSingleUse();

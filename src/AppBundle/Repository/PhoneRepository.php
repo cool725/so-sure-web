@@ -13,7 +13,7 @@ class PhoneRepository extends DocumentRepository
     public function alternatives(Phone $phone)
     {
         $qb = $this->createQueryBuilder();
-        $qb->addAnd($qb->expr()->field('replacement_price')->gt(0));
+        $qb->addAnd($qb->expr()->field('replacementPrice')->gt(0));
         $qb->addAnd($qb->expr()->field('os')->equals($phone->getOs()));
         $qb->addAnd($qb->expr()->field('memory')->gte($phone->getMemory()));
         $qb->addAnd($qb->expr()->field('processorCores')->gte($phone->getProcessorCores()));

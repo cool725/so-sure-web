@@ -53,7 +53,7 @@ class Connection
     protected $initialValue;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User", name="replacement_user")
+     * @MongoDB\ReferenceOne(targetDocument="User")
      * @Gedmo\Versioned
      */
     protected $replacementUser;

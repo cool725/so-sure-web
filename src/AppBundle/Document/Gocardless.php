@@ -7,20 +7,20 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /** @MongoDB\EmbeddedDocument */
 class Gocardless
 {
-    /** @MongoDB\Field(type="string", name="customerid", nullable=true) */
+    /** @MongoDB\Field(type="string") */
     protected $customerId;
 
     // TODO: Add ordering
-    /** @MongoDB\Field(type="hash", name="accounts", nullable=true) */
+    /** @MongoDB\Field(type="hash") */
     protected $accounts = array();
 
-    /** @MongoDB\Field(type="hash", name="mandates", nullable=true) */
+    /** @MongoDB\Field(type="hash") */
     protected $mandates = array();
 
-    /** @MongoDB\Field(type="hash", name="subscriptions", nullable=true) */
+    /** @MongoDB\Field(type="hash") */
     protected $subscriptions = array();
 
-    /** @MongoDB\Field(type="collection", name="account_hashes", nullable=true) */
+    /** @MongoDB\Field(type="collection") */
     protected $accountHashes = array();
 
     public function setCustomerId($customerId)
