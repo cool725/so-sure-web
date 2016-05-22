@@ -4,6 +4,7 @@
     {{ parent() }}
     {% javascripts
         '@AppBundle/Resources/public/js/tabs.js'
+        '@AppBundle/Resources/public/js/Claims/phoneAlternativesModal.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}            
@@ -64,5 +65,6 @@
         {{ form_end(form) }}
     </div>
     {% include 'AppBundle::Claims/claimsPolicyItem.html.twig' %}
+
 </div>
 {% endblock %}

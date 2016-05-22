@@ -5,6 +5,7 @@
     {% javascripts
         '@AppBundle/Resources/public/js/tabs.js'
         '@AppBundle/Resources/public/js/Admin/phone.js'
+        '@AppBundle/Resources/public/js/Claims/phoneAlternativesModal.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -107,7 +108,7 @@
                             <td>{% if phone.lte %}Yes{%else%}No{%endif%}</td>
                             <td>
                                 <button type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
-                                    data-query="{{ path('admin_phone_alternatives', {'id': phone.id}) }}"
+                                    data-query="{{ path('claims_phone_alternatives', {'id': phone.id}) }}"
                                     data-phone="{{ phone.toAlternativeArray()|json_encode }}"
                                     {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
                                     >Suggest Alternatives</button>
@@ -157,71 +158,7 @@
     </div>
   </form>
 
-    <div class="modal fade" id="alternativeModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 90%">
-        <div class="modal-content">
-        <form id="phone-alternative-form" method="post">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Alternatives</h4>
-          </div>
-          <div class="modal-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Phone</th>
-                        <th>Replacement Price</th>
-                        <th>OS</th>
-                        <th>Processor Speed</th>
-                        <th>Processor Cores</th>
-                        <th>Ram</th>
-                        <th>SSD Slot</th>
-                        <th>Screen size</th>
-                        <th>Screen resolution</th>
-                        <th>Camera</th>
-                        <th>4G</th>
-                        <th>Age</th>
-                        <th>Initial Price</th>
-                    </tr>
-                    </thead>
-                    <tbody id="current-table-body">
-                    </tbody>
-                </table>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Phone</th>
-                        <th>Replacement Price</th>
-                        <th>OS</th>
-                        <th>Processor Speed</th>
-                        <th>Processor Cores</th>
-                        <th>Ram</th>
-                        <th>SSD Slot</th>
-                        <th>Screen size</th>
-                        <th>Screen resolution</th>
-                        <th>Camera</th>
-                        <th>4G</th>
-                        <th>Age</th>
-                        <th>Initial Price</th>
-                    </tr>
-                    </thead>
-                    <tbody id="alternative-table-body">
-                    </tbody>
-                </table>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <input type="hidden" name="token" value="{{ token }}" />
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Save</button>
-          </div>
-        </form>
-        </div>
-      </div>
-    </div>
+    {% include 'AppBundle::Claims/phoneAlternativesModal.html.twig' %}
 
     <div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
