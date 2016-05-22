@@ -9,6 +9,7 @@ class BaseControllerTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $client;
+    protected static $container;
     protected static $userManager;
     protected static $dm;
     protected static $identity;
@@ -23,12 +24,13 @@ class BaseControllerTest extends WebTestCase
     public static function setUpBeforeClass()
     {
         self::$client = self::createClient();
-        self::$identity = self::$client->getContainer()->get('app.cognito.identity');
-        self::$dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        self::$userManager = self::$client->getContainer()->get('fos_user.user_manager');
-        self::$router = self::$client->getContainer()->get('router');
-        self::$jwt = self::$client->getContainer()->get('app.jwt');
-        self::$redis = self::$client->getContainer()->get('snc_redis.default');
+        self::$container = self::$client->getContainer();
+        self::$identity = self::$container->get('app.cognito.identity');
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$userManager = self::$container->get('fos_user.user_manager');
+        self::$router = self::$container->get('router');
+        self::$jwt = self::$container->get('app.jwt');
+        self::$redis = self::$container->get('snc_redis.default');
     }
 
     // helpers

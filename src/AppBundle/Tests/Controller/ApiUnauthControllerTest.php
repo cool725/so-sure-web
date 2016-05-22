@@ -119,11 +119,53 @@ class ApiUnauthControllerTest extends BaseControllerTest
         
         $crawler =  static::$client->request(
             "POST",
-            '/api/v1/unauth/zendesk',
+            sprintf('/api/v1/unauth/zendesk?zendesk_key=%s', static::$container->getParameter('zendesk_key')),
             ['user_token' => $user->getId()]
         );
         
         $data = $this->verifyResponse(200);
         $this->assertTrue(strlen($data['jwt']) > 20);
+    }
+
+    public function testZendeskUserNotFound()
+    {
+        $this->clearRateLimit();
+        $user = static::createUser(self::$userManager, static::generateEmail('zendesk', $this), 'bar');
+
+        $crawler =  static::$client->request(
+            "POST",
+            sprintf('/api/v1/unauth/zendesk?zendesk_key=%s', static::$container->getParameter('zendesk_key')),
+            ['user_token' => '12']
+        );
+
+        $data = $this->verifyResponse(401, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testZendeskMissingUserToken()
+    {
+        $this->clearRateLimit();
+        $user = static::createUser(self::$userManager, static::generateEmail('zendesk', $this), 'bar');
+
+        $crawler =  static::$client->request(
+            "POST",
+            sprintf('/api/v1/unauth/zendesk?zendesk_key=%s', static::$container->getParameter('zendesk_key')),
+            []
+        );
+
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testZendeskInvalidToken()
+    {
+        $this->clearRateLimit();
+        $user = static::createUser(self::$userManager, static::generateEmail('zendesk-token', $this), 'bar');
+
+        $crawler =  static::$client->request(
+            "POST",
+            '/api/v1/unauth/zendesk',
+            ['user_token' => $user->getId()]
+        );
+
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 }

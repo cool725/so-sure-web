@@ -98,6 +98,10 @@ class ApiUnauthController extends BaseController
     public function unauthZendeskAction(Request $request)
     {
         try {
+            $zendeskKey = $this->getParameter('zendesk_key');
+            if ($request->get('zendesk_key') != $zendeskKey) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Invalid key', 404);
+            }
             $userToken = trim($request->request->get('user_token'));
             if (strlen($userToken) == 0) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
