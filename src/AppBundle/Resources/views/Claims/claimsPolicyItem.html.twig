@@ -31,7 +31,13 @@
                     </tr>
                     <tr>
                         <td>Phone</td>
-                        <td>{{ policy.phone }}</td>
+                        <td>{{ policy.phone }}
+                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
+                                    data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
+                                    data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
+                                    >Show Alternatives</button>
+                        
+                        </td>
                     </tr>
                 </table>
                 <h3>Pot</h3>
@@ -196,3 +202,5 @@
             {% endif %}
         </div>
     </div>
+
+    {% include 'AppBundle::Claims/phoneAlternativesModal.html.twig' %}

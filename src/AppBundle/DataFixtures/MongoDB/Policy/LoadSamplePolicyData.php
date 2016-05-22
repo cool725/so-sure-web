@@ -106,7 +106,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $phone = null;
         while ($phone == null) {
             $phone = $phones[rand(0, count($phones) - 1)];
-            if (!$phone->getCurrentPhonePrice()) {
+            if (!$phone->getCurrentPhonePrice() || $phone->getMake() == "ALL") {
                 $phone = null;
             }
         }

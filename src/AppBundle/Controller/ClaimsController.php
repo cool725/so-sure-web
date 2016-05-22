@@ -132,4 +132,24 @@ class ClaimsController extends BaseController
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
         ];
     }
+
+
+    /**
+     * @Route("/phone/{id}/alternatives", name="claims_phone_alternatives")
+     * @Method({"GET"})
+     */
+    public function phoneAlternativesAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        $alternatives = $repo->alternatives($phone);
+
+        $data = [];
+        foreach ($alternatives as $alternative) {
+            $data[] = $alternative->toAlternativeArray();
+        }
+
+        return new JsonResponse(['alternatives' => $data]);
+    }
 }
