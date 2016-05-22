@@ -41,7 +41,7 @@
                         <td>
                           <strong>{{ policy.connections|length }}</strong>&nbsp;:&nbsp;
                           {% for connection in policy.connections %}
-                            <a href="{{ path(policy_route, {'id': connection.policy.id }) }}">{{ connection.user.name }}</a>;
+                            <a href="{{ path(policy_route, {'id': connection.linkedPolicy.id }) }}">{{ connection.linkedUser.name }}</a>;
                           {% endfor %}
                         </td>
                     </tr>
