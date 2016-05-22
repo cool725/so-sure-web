@@ -116,7 +116,7 @@ class Claim
     protected $notes;
 
     /**
-     * @MongoDB\Field(type="boolean", name="suspected_fraud")
+     * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $suspectedFraud;

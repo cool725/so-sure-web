@@ -14,10 +14,10 @@ class PlayDevice
      */
     protected $id;
 
-    /** @MongoDB\Field(type="string", name="retail_branding") */
+    /** @MongoDB\Field(type="string") */
     protected $retailBranding;
 
-    /** @MongoDB\Field(type="string", name="marketing_name") */
+    /** @MongoDB\Field(type="string") */
     protected $marketingName;
 
     /** @MongoDB\Field(type="string") */

@@ -9,9 +9,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class Sequence
 {
-    /** @MongoDB\Id(type="string", strategy="NONE", name="name") */
+    /** @MongoDB\Id(type="string", strategy="NONE") */
     protected $name;
 
-    /** @MongoDB\Field(type="int", name="seq") */
+    /** @MongoDB\Field(type="int") */
     protected $seq;
 }

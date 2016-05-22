@@ -28,27 +28,27 @@ class Address
     protected $created;
 
     /**
-     * @MongoDB\String(name="type", nullable=false)
+     * @MongoDB\String()
      * @Gedmo\Versioned
      */
     protected $type;
 
     /**
-     * @MongoDB\String(name="line1", nullable=false)
+     * @MongoDB\String()
      * @Gedmo\Versioned
      */
     protected $line1;
 
-    /** @MongoDB\String(name="line2", nullable=true) */
+    /** @MongoDB\String() */
     protected $line2;
 
-    /** @MongoDB\String(name="line3", nullable=true) */
+    /** @MongoDB\String() */
     protected $line3;
 
-    /** @MongoDB\String(name="city", nullable=false) */
+    /** @MongoDB\String() */
     protected $city;
 
-    /** @MongoDB\String(name="postcode", nullable=false) */
+    /** @MongoDB\String() */
     protected $postcode;
 
     public function __construct()

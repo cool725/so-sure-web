@@ -19,10 +19,13 @@ class Payment
     /** @MongoDB\Date() */
     protected $created;
     
-    /** @MongoDB\Float(name="amount", nullable=false) */
+    /** @MongoDB\Float() */
     protected $amount;
 
-    /** @MongoDB\String(name="refererce", nullable=true) @MongoDB\Index(unique=true, sparse=true)*/
+    /**
+     * @MongoDB\String()
+     * @MongoDB\Index(unique=true, sparse=true)
+     */
     protected $reference;
 
     /**
@@ -30,10 +33,10 @@ class Payment
      */
     protected $policy;
 
-    /** @MongoDB\String(name="token", nullable=true) */
+    /** @MongoDB\String() */
     protected $token;
 
-    /** @MongoDB\String(name="receipt", nullable=true) */
+    /** @MongoDB\String() */
     protected $receipt;
 
     /**

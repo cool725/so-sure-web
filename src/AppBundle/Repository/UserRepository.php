@@ -70,7 +70,7 @@ class UserRepository extends DocumentRepository
 
         $qb = $this->createQueryBuilder();
         $qb->field('id')->notEqual($user->getId());
-        $qb->field('gocardless.account_hashes')->in($accountHashes);
+        $qb->field('gocardless.accountHashes')->in($accountHashes);
 
         return $qb
             ->getQuery()
@@ -81,7 +81,7 @@ class UserRepository extends DocumentRepository
     {
         $qb = $this->createQueryBuilder();
         $qb->field('id')->notEqual($user->getId());
-        $qb->field('identity_log.ip')->equals($user->getIdentityLog()->getIp());
+        $qb->field('identityLog.ip')->equals($user->getIdentityLog()->getIp());
 
         return $qb
             ->getQuery()

@@ -12,25 +12,25 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class IdentityLog
 {
     /**
-     * @MongoDB\String(name="cognito_id", nullable=true)
+     * @MongoDB\String()
      * @Gedmo\Versioned
      */
     protected $cognitoId;
 
     /**
-     * @MongoDB\String(name="ip", nullable=true)
+     * @MongoDB\String()
      * @Gedmo\Versioned
      */
     protected $ip;
 
     /**
-     * @MongoDB\String(name="country", nullable=true)
+     * @MongoDB\String()
      * @Gedmo\Versioned
      */
     protected $country;
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="Coordinates", name="loc")
+     * @MongoDB\EmbedOne(targetDocument="Coordinates")
      * @Gedmo\Versioned
      */
     protected $loc;

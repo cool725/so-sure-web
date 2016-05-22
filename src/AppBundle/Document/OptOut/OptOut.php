@@ -23,7 +23,7 @@ abstract class OptOut
     /** @MongoDB\Date() */
     protected $created;
 
-    /** @MongoDB\String(name="category", nullable=true) */
+    /** @MongoDB\String() */
     protected $category;
 
     public function __construct()

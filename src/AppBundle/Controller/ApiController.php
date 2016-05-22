@@ -67,7 +67,7 @@ class ApiController extends BaseController
                 $user = $repo->findOneBy(['emailCanonical' => $email]);
             } elseif (isset($data['facebook_user'])) {
                 $facebookId = trim($data['facebook_user']['facebook_id']);
-                $user = $repo->findOneBy(['facebook_id' => $facebookId]);
+                $user = $repo->findOneBy(['facebookId' => $facebookId]);
             }
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
