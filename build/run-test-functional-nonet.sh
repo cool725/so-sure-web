@@ -13,7 +13,7 @@ if [ -d /dev/shm/cache/test ]; then
 fi
 
 app/console --env=test doctrine:mongodb:schema:drop
-app/console --env=test doctrine:mongodb:fixtures:load
+app/console --env=test doctrine:mongodb:fixtures:load --no-interaction
 app/console --env=test sosure:doctrine:index
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
 ./vendor/phing/phing/bin/phing -f build/test.xml test:functional:nonet

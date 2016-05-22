@@ -22,7 +22,7 @@ fi
 
 app/console --env=test redis:flushdb --client=default -n
 app/console --env=test doctrine:mongodb:schema:drop
-app/console --env=test doctrine:mongodb:fixtures:load
+app/console --env=test doctrine:mongodb:fixtures:load --no-interaction
 app/console --env=test sosure:doctrine:index
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
 if [ "$1" == "" ]; then

@@ -10,4 +10,4 @@ else
     echo "Non-production server - safe to run"
 fi
 
-sudo app/console --env=vagrant doctrine:mongodb:fixtures:load 
+sudo app/console --env=vagrant doctrine:mongodb:fixtures:load  --no-interaction
