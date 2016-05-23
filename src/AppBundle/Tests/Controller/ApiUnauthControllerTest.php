@@ -164,6 +164,9 @@ class ApiUnauthControllerTest extends BaseControllerTest
     }
     */
 
+    /**
+     *
+     */
     public function testZendeskMissingUserToken()
     {
         $this->clearRateLimit();
