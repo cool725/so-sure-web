@@ -1011,7 +1011,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     {
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('invitation-cancel', $this),
+            self::generateEmail('policy-judopay', $this),
             'foo'
         );
         $cognitoIdentityId = $this->getAuthUser($user);
