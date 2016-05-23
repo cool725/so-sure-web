@@ -62,6 +62,8 @@ doctrine_mongodb:
     document_managers:
         default:
             auto_mapping: true
+            retry_connect: 5
+            retry_query: 1
             mappings:
                 gedmo_loggable:
                     type: annotation
