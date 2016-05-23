@@ -63,13 +63,6 @@ class JudopayServiceTest extends WebTestCase
         return $user;
     }
     
-    public function testJudo()
-    {
-        $user = $this->createValidUser(static::generateEmail('judo', $this));
-        $policy = static::createPolicy($user, static::$dm);
-        self::$judopay->add($policy, 'a', 'b', 'c');
-    }
-
     public function testJudoReceipt()
     {
         $user = $this->createValidUser(static::generateEmail('judo-receipt', $this));
@@ -84,7 +77,7 @@ class JudopayServiceTest extends WebTestCase
 
         $receiptId = self::$judopay->testPay(
             $user,
-            '122',
+            $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
             '4976 0000 0000 3436',
             '12/20',
@@ -93,7 +86,7 @@ class JudopayServiceTest extends WebTestCase
         $payment = self::$judopay->validateReceipt($policy, 'token', $receiptId);
         $this->assertEquals($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(), $payment->getAmount());
         $this->assertEquals($receiptId, $payment->getReceipt());
-        $this->assertEquals('122', $payment->getReference());
+        $this->assertEquals($policy->getId(), $payment->getReference());
         $this->assertEquals('Success', $payment->getResult());
 
         $tokens = $user->getPaymentMethod()->getCardTokens();
@@ -120,7 +113,7 @@ class JudopayServiceTest extends WebTestCase
 
         $receiptId = self::$judopay->testPay(
             $user,
-            '122',
+            $policy->getId(),
             '1.01',
             '4976 0000 0000 3436',
             '12/20',
@@ -137,7 +130,7 @@ class JudopayServiceTest extends WebTestCase
 
         $receiptId = self::$judopay->testPay(
             $user,
-            '122',
+            $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
             '4976 0000 0000 3436',
             '12/20',
@@ -146,6 +139,6 @@ class JudopayServiceTest extends WebTestCase
         self::$judopay->add($policy, 'ctoken', 'token', $receiptId);
 
         $this->assertEquals(PhonePolicy::STATUS_PENDING, $policy->getStatus());
-        $this->assertGreaterThan(1, $policy->getPolicyNumber());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
     }
 }

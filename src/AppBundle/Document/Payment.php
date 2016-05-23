@@ -34,7 +34,7 @@ abstract class Payment
 
     /**
      * @MongoDB\String()
-     * @MongoDB\Index(unique=true, sparse=true)
+     * @MongoDB\Index(sparse=true)
      * @Gedmo\Versioned
      */
     protected $reference;
