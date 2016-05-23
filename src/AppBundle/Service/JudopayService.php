@@ -9,6 +9,7 @@ use AppBundle\Document\Payment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class JudopayService
@@ -25,24 +26,69 @@ class JudopayService
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var PolicyService */
+    protected $policyService;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
+     * @param PolicyService   $policyService
      * @param string          $apiToken
      * @param string          $apiSecret
      * @param string          $judoId
+     * @param boolean         $prod
      */
-    public function __construct(DocumentManager $dm, LoggerInterface $logger, $apiToken, $apiSecret, $judoId)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        LoggerInterface $logger,
+        PolicyService $policyService,
+        $apiToken,
+        $apiSecret,
+        $judoId,
+        $prod
+    ) {
         $this->dm = $dm;
         $this->logger = $logger;
+        $this->policyService = $policyService;
         $this->judoId = $judoId;
-        $this->client = new Judopay(array(
+        $data = array(
            'apiToken' => $apiToken,
            'apiSecret' => $apiSecret,
            'judoId' => $judoId,
-           'endpointUrl' => 'https://partnerapi.judopay-sandbox.com/',
-        ));
+        );
+        if ($prod) {
+            $data['endpointUrl'] = 'https://partnerapi.judopay-sandbox.com/';
+        } else {
+            $data['endpointUrl'] = 'https://partnerapi.judopay-sandbox.com/';
+        }
+        $this->client = new Judopay($data);
+    }
+
+    public function add(Policy $policy, $consumerToken, $cardToken, $receiptId)
+    {
+        $this->validateUser($policy->getUser());
+        // TODO: save details to user/policy
+        // TODO: void preauth
+        // TODO: create payment schedule
+        // TODO: charge first payment
+        $this->policyService->create($policy, $policy->getUser());
+    }
+
+    protected function validateUser($user)
+    {
+        if (!$user->hasValidDetails()) {
+            throw new \InvalidArgumentException(sprintf(
+                'User is missing details such as name or email address (User: %s)',
+                $user->getId()
+            ));
+        }
+
+        if (!$user->hasValidBillingDetails()) {
+            throw new \InvalidArgumentException(sprintf(
+                'User is missing details such as billing address (User: %s)',
+                $user->getId()
+            ));
+        }
     }
 
     /**

@@ -86,6 +86,5 @@ class BraintreeService
         ];
 
         $results = $this->transactionService->sale($data);
-        print_r($results);
     }
 }
