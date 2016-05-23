@@ -113,9 +113,10 @@ class User extends BaseUser
     protected $identityLog;
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="Gocardless")
+     * @MongoDB\EmbedOne(targetDocument="PaymentMethod")
+     * @Gedmo\Versioned
      */
-    protected $gocardless;
+    protected $paymentMethod;
 
     /**
      * @Assert\Regex(pattern="/^(00447[1-9]\d{8,8}|\+447[1-9]\d{8,8})$/")
@@ -452,19 +453,19 @@ class User extends BaseUser
         $this->identityLog = $identityLog;
     }
 
-    public function getGocardless()
+    public function getPaymentMethod()
     {
-        return $this->gocardless;
+        return $this->paymentMethod;
     }
 
-    public function setGocardless($gocardless)
+    public function setPaymentMethod($paymentMethod)
     {
-        $this->gocardless = $gocardless;
+        $this->paymentMethod = $paymentMethod;
     }
 
-    public function hasGocardless()
+    public function hasPaymentMethod()
     {
-        return $this->getGocardless() !== null;
+        return $this->getPaymentMethod() !== null;
     }
 
     public function hasValidBillingDetails()

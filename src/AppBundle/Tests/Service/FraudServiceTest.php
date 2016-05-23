@@ -5,7 +5,7 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
-use AppBundle\Document\Gocardless;
+use AppBundle\Document\GocardlessPaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -90,9 +90,9 @@ class FraudServiceTest extends WebTestCase
         self::$dm->flush();
 
         $account = json_encode(['account_hash' => '1234']);
-        $gocardless = new Gocardless();
+        $gocardless = new GocardlessPaymentMethod();
         $gocardless->addAccount('1', $account);
-        $user->setGocardless($gocardless);
+        $user->setPaymentMethod($gocardless);
         $policy = static::createPolicy($user, static::$dm);
 
         $user2 = static::createUser(
@@ -104,9 +104,9 @@ class FraudServiceTest extends WebTestCase
         $address2->setType(Address::TYPE_BILLING);
         $address2->setPostcode('AB123');
         $user2->setBillingAddress($address2);
-        $gocardless2 = new Gocardless();
+        $gocardless2 = new GocardlessPaymentMethod();
         $gocardless2->addAccount('1', $account);
-        $user2->setGocardless($gocardless2);
+        $user2->setPaymentMethod($gocardless2);
         $policy2 = static::createPolicy($user2, static::$dm);
         self::$dm->persist($user2);
         self::$dm->flush();

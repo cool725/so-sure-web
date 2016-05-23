@@ -5,7 +5,7 @@ use Psr\Log\LoggerInterface;
 use GoCardlessPro\Client;
 use GoCardlessPro\Environment;
 use AppBundle\Document\User;
-use AppBundle\Document\Gocardless;
+use AppBundle\Document\GocardlessPaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Service\SequenceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -83,7 +83,9 @@ class GocardlessService
             ));
         }
 
-        if ($user->hasGocardless() && $user->getGocardless()->getCustomerId()) {
+        if ($user->hasPaymentMethod() &&
+            $user->getPaymentMethod() instanceof GocardlessPaymentMethod &&
+            $user->getPaymentMethod()->getCustomerId()) {
             return;
         }
 
@@ -114,12 +116,12 @@ class GocardlessService
 
         // TODO: If $idempotent and 409 idempotent_creation_conflict occurs, query customer
 
-        if (!$user->hasGocardless()) {
-            $gocardless = new Gocardless();
-            $user->setGocardless($gocardless);
+        if (!$user->hasPaymentMethod()) {
+            $gocardless = new GocardlessPaymentMethod();
+            $user->setPaymentMethod($gocardless);
             $this->dm->persist($gocardless);
         }
-        $user->getGocardless()->setCustomerId($customer->id);
+        $user->getPaymentMethod()->setCustomerId($customer->id);
         $this->dm->flush();
         /*
         try {
@@ -138,7 +140,9 @@ class GocardlessService
      */
     public function addBankAccount(User $user, $sortCode, $accountNumber, $idempotent = true)
     {
-        if (!$user->hasGocardless() || !$user->getGocardless()->getCustomerId()) {
+        if (!$user->hasPaymentMethod() ||
+            !$user->getPaymentMethod() instanceof GocardlessPaymentMethod ||
+            !$user->getPaymentMethod()->getCustomerId()) {
             throw new \InvalidArgumentException(sprintf(
                 'User requires a gocardless customer account (User: %s)',
                 $user->getId()
@@ -146,7 +150,7 @@ class GocardlessService
         }
 
         // For now, only allow 1 account
-        if ($user->getGocardless()->hasPrimaryAccount()) {
+        if ($user->getPaymentMethod()->hasPrimaryAccount()) {
             return;
         }
 
@@ -156,7 +160,7 @@ class GocardlessService
             "account_holder_name" => $user->getName(),
             "country_code" => "GB",
             "links" => [
-                "customer" => $user->getGocardless()->getCustomerId(),
+                "customer" => $user->getPaymentMethod()->getCustomerId(),
             ],
         ];
         $headers = [];
@@ -171,7 +175,7 @@ class GocardlessService
 
         // TODO: If $idempotent and 409 idempotent_creation_conflict occurs, query customer bank accounts
 
-        $user->getGocardless()->addAccount($bankAccount->id, json_encode([
+        $user->getPaymentMethod()->addAccount($bankAccount->id, json_encode([
             'id' => $bankAccount->id,
             'account_holder_name' => $bankAccount->account_holder_name,
             'account_number_ending' => $bankAccount->account_number_ending,
@@ -188,7 +192,9 @@ class GocardlessService
     public function createMandate(Policy $policy, $idempotent = true)
     {
         $user = $policy->getUser();
-        if (!$user->hasGocardless() || !$user->getGocardless()->hasPrimaryAccount()) {
+        if (!$user->hasPaymentMethod() ||
+            !$user->getPaymentMethod() instanceof GocardlessPaymentMethod ||
+            !$user->getPaymentMethod()->hasPrimaryAccount()) {
             throw new \InvalidArgumentException(sprintf(
                 'Mandate requires a gocardless customer bank account (Policy: %s)',
                 $policy->getId()
@@ -196,11 +202,11 @@ class GocardlessService
         }
 
         // For now, only allow 1 mandate
-        if ($user->getGocardless()->hasMandates()) {
+        if ($user->getPaymentMethod()->hasMandates()) {
             return;
         }
 
-        $account = $user->getGocardless()->getPrimaryAccount();
+        $account = $user->getPaymentMethod()->getPrimaryAccount();
         $data = [
             "scheme" => "bacs",
             "links" => [
@@ -222,7 +228,7 @@ class GocardlessService
 
         // TODO: If $idempotent and 409 idempotent_creation_conflict occurs, query customer
 
-        $user->getGocardless()->addMandate($mandate->id, json_encode([
+        $user->getPaymentMethod()->addMandate($mandate->id, json_encode([
             'id' => $mandate->id,
             'customer_bank_account' => $mandate->links->customer_bank_account,
             'policy' => $policy->getId(),
@@ -245,7 +251,7 @@ class GocardlessService
         }
 
         // For now, only allow 1 subscription
-        if ($user->getGocardless()->hasSubscription()) {
+        if ($user->getPaymentMethod()->hasSubscription()) {
             return;
         }
 
@@ -276,7 +282,7 @@ class GocardlessService
 
         // TODO: If $idempotent and 409 idempotent_creation_conflict occurs, query customer
 
-        $user->getGocardless()->addSubscription($subscription->id, json_encode([
+        $user->getPaymentMethod()->addSubscription($subscription->id, json_encode([
             'id' => $subscription->id,
             'mandate' => $subscription->links->mandate,
             'policy' => $policy->getId(),

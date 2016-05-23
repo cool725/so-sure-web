@@ -5,15 +5,20 @@ use Psr\Log\LoggerInterface;
 use GoCardlessPro\Client;
 use \GoCardlessPro\Environment;
 use JudoPay;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Payment;
+use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Document\CurrencyTrait;
 
 class JudopayService
 {
+    use CurrencyTrait;
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -57,7 +62,7 @@ class JudopayService
            'judoId' => $judoId,
         );
         if ($prod) {
-            $data['endpointUrl'] = 'https://partnerapi.judopay-sandbox.com/';
+            $data['endpointUrl'] = 'https://partnerapi.judopay.com/';
         } else {
             $data['endpointUrl'] = 'https://partnerapi.judopay-sandbox.com/';
         }
@@ -66,12 +71,74 @@ class JudopayService
 
     public function add(Policy $policy, $consumerToken, $cardToken, $receiptId)
     {
-        $this->validateUser($policy->getUser());
-        // TODO: save details to user/policy
-        // TODO: void preauth
+        $user = $policy->getUser();
+
+        $judo = new JudoPaymentMethod();
+        $judo->setCustomerToken($consumerToken);
+        $judo->addCardToken($cardToken, null);
+        $user->setPaymentMethod($judo);
+
+        $payment = $this->validateReceipt($policy, $cardToken, $receiptId);
         // TODO: create payment schedule
-        // TODO: charge first payment
+        $this->validateUser($policy->getUser());
         $this->policyService->create($policy, $policy->getUser());
+    }
+
+    public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2)
+    {
+        $payment = $this->client->getModel('CardPayment');
+        $payment->setAttributeValues(
+            array(
+                'judoId' => $this->judoId,
+                'yourConsumerReference' => $user->getId(),
+                'yourPaymentReference' => $ref,
+                'amount' => $amount,
+                'currency' => 'GBP',
+                'cardNumber' => $cardNumber,
+                'expiryDate' => $expiryDate,
+                'cv2' => $cv2,
+            )
+        );
+        $details = $payment->create();
+
+        return $details['receiptId'];
+    }
+
+    public function validateReceipt(Policy $policy, $cardToken, $receiptId)
+    {
+        $transaction = $this->client->getModel('Transaction');
+        $transactionDetails = $transaction->find($receiptId);
+
+        $payment = new JudoPayment();
+        $payment->setReference($transactionDetails["yourPaymentReference"]);
+        $payment->setReceipt($transactionDetails["receiptId"]);
+        $payment->setAmount($transactionDetails["amount"]);
+        $payment->setResult($transactionDetails["result"]);
+        $payment->setMessage($transactionDetails["message"]);
+        $policy->addPayment($payment);
+
+        $judoPaymentMethod = $policy->getUser()->getPaymentMethod();
+        $tokens = $judoPaymentMethod->getCardTokens();
+        if (!$tokens[$cardToken]) {
+            $judoPaymentMethod->addCardToken($cardToken, json_encode($transactionDetails['cardDetails']));
+        }
+
+        $this->dm->persist($payment);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        if ($this->toTwoDp($policy->getPremium()->getMonthlyPremiumPrice()) != $this->toTwoDp($payment->getAmount())) {
+            $errMsg = sprintf(
+                'Expected %f, not %f for payment id: %s',
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                $payment->getAmount(),
+                $payment->getId()
+            );
+            $this->logger->error($errMsg);
+
+            throw new \Exception($errMsg);
+        }
+
+        return $payment;
     }
 
     protected function validateUser($user)
@@ -89,6 +156,60 @@ class JudopayService
                 $user->getId()
             ));
         }
+    }
+
+    protected function tokenPay(Policy $policy, $consumerToken, $cardToken)
+    {
+        // TODO: Validate we haven't already paid
+        $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+        $user = $policy->getUser();
+
+        $payment = new JudoPayment();
+        $payment->setAmount($amount);
+        $this->dm->persist($payment);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        // add payment
+        $tokenPayment = $this->client->getModel('TokenPayment');
+
+        // populate the required data fields.
+        $tokenPayment->setAttributeValues(
+            array(
+                'judoId' => $this->judoId,
+                'yourConsumerReference' => $user->getId(),
+                'yourPaymentReference' => $payment->getId(),
+                'amount' => $amount,
+                'currency' => 'GBP',
+                'consumerToken' => $consumerToken,
+                'cardToken' => $cardToken,
+                'emailAddress' => $user->getEmail(),
+                'mobileNumber' => $user->getMobileNumber(),
+            )
+        );
+
+        $tokenPaymentDetails = $tokenPayment->create();
+        $payment->setReceipt($tokenPaymentDetails["receiptId"]);
+        $payment->setAmount($tokenPaymentDetails["amount"]);
+        if ($tokenPaymentDetails["type"] != 'Payment') {
+            $errMsg = sprintf('Payment type mismatch - expected payment, not %s', $tokenPaymentDetails["type"]);
+            $this->logger->error($errMsg);
+            // save up to this point
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+        }
+        if ($payment->getId() != $tokenPaymentDetails["yourPaymentReference"]) {
+            $errMsg = sprintf(
+                'Payment ref mismatch. %s != %s',
+                $payment->getId(),
+                $tokenPaymentDetails["yourPaymentReference"]
+            );
+            $this->logger->error($errMsg);
+            // save up to this point
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+            throw new \Exception($errMsg);
+        }
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
     }
 
     /**

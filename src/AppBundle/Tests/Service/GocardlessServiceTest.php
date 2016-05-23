@@ -66,7 +66,7 @@ class GocardlessServiceTest extends WebTestCase
         $user = $this->createValidUser('user1@gocardless.so-sure.com');
 
         self::$gocardless->createCustomer($user, $user->getFirstName(), $user->getLastName());
-        $this->assertTrue(strlen($user->getGocardless()->getCustomerId()) > 5);
+        $this->assertTrue(strlen($user->getPaymentMethod()->getCustomerId()) > 5);
     }
 
     public function testAddBankAccount()
@@ -74,15 +74,15 @@ class GocardlessServiceTest extends WebTestCase
         $user = $this->createValidUser('user2@gocardless.so-sure.com');
 
         self::$gocardless->createCustomer($user, $user->getFirstName(), $user->getLastName());
-        $this->assertTrue(strlen($user->getGocardless()->getCustomerId()) > 5);
+        $this->assertTrue(strlen($user->getPaymentMethod()->getCustomerId()) > 5);
 
         self::$gocardless->addBankAccount($user, '200000', '55779911');
-        $this->assertTrue(count($user->getGocardless()->getAccounts()) > 0);
-        $this->assertTrue(count($user->getGocardless()->getAccountHashes()) > 0);
+        $this->assertTrue(count($user->getPaymentMethod()->getAccounts()) > 0);
+        $this->assertTrue(count($user->getPaymentMethod()->getAccountHashes()) > 0);
 
-        $accountDetail = $user->getGocardless()->getPrimaryAccount();
+        $accountDetail = $user->getPaymentMethod()->getPrimaryAccount();
         $this->assertEquals('11', $accountDetail->account_number_ending);
-        $this->assertTrue(in_array($accountDetail->account_hash, $user->getGocardless()->getAccountHashes()));
+        $this->assertTrue(in_array($accountDetail->account_hash, $user->getPaymentMethod()->getAccountHashes()));
     }
 
     public function testAddBankAccountWithHyphens()
@@ -90,12 +90,12 @@ class GocardlessServiceTest extends WebTestCase
         $user = $this->createValidUser('user3@gocardless.so-sure.com');
 
         self::$gocardless->createCustomer($user, $user->getFirstName(), $user->getLastName());
-        $this->assertTrue(strlen($user->getGocardless()->getCustomerId()) > 5);
+        $this->assertTrue(strlen($user->getPaymentMethod()->getCustomerId()) > 5);
 
         self::$gocardless->addBankAccount($user, '20-00-00', '55779911');
-        $this->assertTrue(count($user->getGocardless()->getAccounts()) > 0);
+        $this->assertTrue(count($user->getPaymentMethod()->getAccounts()) > 0);
 
-        $accountDetail = $user->getGocardless()->getPrimaryAccount();
+        $accountDetail = $user->getPaymentMethod()->getPrimaryAccount();
         $this->assertEquals('11', $accountDetail->account_number_ending);
     }
     

@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Phone;
+use AppBundle\Document\JudoPaymentMethod;
 
 /**
  * @group functional-net
@@ -61,10 +63,82 @@ class JudopayServiceTest extends WebTestCase
         return $user;
     }
     
-    public function testJudo()
+    public function testJudoReceipt()
     {
-        $user = $this->createValidUser(static::generateEmail('judo', $this));
-        $policy = static::createPolicy($user, static::$dm);
-        self::$judopay->add($policy, 'a', 'b', 'c');
+        $user = $this->createValidUser(static::generateEmail('judo-receipt', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $judo = new JudoPaymentMethod();
+        $judo->setCustomerToken('ctoken');
+        $judo->addCardToken('token', null);
+        $user->setPaymentMethod($judo);
+        static::$dm->flush();
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        $payment = self::$judopay->validateReceipt($policy, 'token', $receiptId);
+        $this->assertEquals($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(), $payment->getAmount());
+        $this->assertEquals($receiptId, $payment->getReceipt());
+        $this->assertEquals($policy->getId(), $payment->getReference());
+        $this->assertEquals('Success', $payment->getResult());
+
+        $tokens = $user->getPaymentMethod()->getCardTokens();
+        $this->assertEquals(1, count($tokens));
+        $data = json_decode($tokens['token']);
+        $this->assertEquals('3436', $data->cardLastfour);
+        $this->assertEquals('1220', $data->endDate);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testJudoReceiptPaymentDiffException()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-receipt-exception', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $judo = new JudoPaymentMethod();
+        $judo->setCustomerToken('ctoken');
+        $judo->addCardToken('token', null);
+        $user->setPaymentMethod($judo);
+        static::$dm->flush();
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            '1.01',
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        $payment = self::$judopay->validateReceipt($policy, 'token', $receiptId);
+    }
+
+    public function testJudoAdd()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-add', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        self::$judopay->add($policy, 'ctoken', 'token', $receiptId);
+
+        $this->assertEquals(PhonePolicy::STATUS_PENDING, $policy->getStatus());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
     }
 }

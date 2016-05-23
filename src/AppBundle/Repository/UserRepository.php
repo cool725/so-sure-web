@@ -66,11 +66,11 @@ class UserRepository extends DocumentRepository
 
     public function findBankAccount(User $user)
     {
-        $accountHashes = $user->getGocardless() ? $user->getGocardless()->getAccountHashes() : ['NotAHash'];
+        $accountHashes = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
 
         $qb = $this->createQueryBuilder();
         $qb->field('id')->notEqual($user->getId());
-        $qb->field('gocardless.accountHashes')->in($accountHashes);
+        $qb->field('paymentMethod.accountHashes')->in($accountHashes);
 
         return $qb
             ->getQuery()

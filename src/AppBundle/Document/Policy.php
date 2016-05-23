@@ -200,6 +200,7 @@ abstract class Policy
 
     public function addPayment($payment)
     {
+        $payment->setPolicy($this);
         $this->payments->add($payment);
     }
 
