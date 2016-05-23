@@ -5,7 +5,7 @@ namespace AppBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /** @MongoDB\EmbeddedDocument */
-class Gocardless
+class GocardlessPaymentMethod extends PaymentMethod
 {
     /** @MongoDB\Field(type="string") */
     protected $customerId;

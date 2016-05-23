@@ -1,46 +1,59 @@
 <?php
-// src/AppBundle/Document/User.php
 
 namespace AppBundle\Document;
 
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document
+ * @MongoDB\InheritanceType("SINGLE_COLLECTION")
+ * @MongoDB\DiscriminatorField("type")
+ * @MongoDB\DiscriminatorMap({"judo"="JudoPayment"})
+ * @Gedmo\Loggable
  */
-class Payment
+abstract class Payment
 {
     /**
      * @MongoDB\Id
      */
     protected $id;
 
-    /** @MongoDB\Date() */
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $created;
-    
-    /** @MongoDB\Float() */
+
+    /**
+     * @MongoDB\Float()
+     * @Gedmo\Versioned
+     */
     protected $amount;
 
     /**
      * @MongoDB\String()
      * @MongoDB\Index(unique=true, sparse=true)
+     * @Gedmo\Versioned
      */
     protected $reference;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="payments")
+     * @Gedmo\Versioned
      */
     protected $policy;
 
-    /** @MongoDB\String() */
-    protected $token;
-
-    /** @MongoDB\String() */
+    /**
+     * @MongoDB\String()
+     * @Gedmo\Versioned
+     */
     protected $receipt;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="payments")
+     * @Gedmo\Versioned
      */
     protected $user;
 

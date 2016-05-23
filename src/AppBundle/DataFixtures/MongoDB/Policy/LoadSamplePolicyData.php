@@ -76,7 +76,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $users = [];
         for ($i = 1; $i <= 200; $i++) {
             $email = $this->faker->email;
-            while ($userRepo->findOneBy(['emailCanonical' => $email])) {
+            while ($userRepo->findOneBy(['email' => $email])) {
                 $email = $this->faker->email;
             }
             $user = new User();

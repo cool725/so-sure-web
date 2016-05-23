@@ -3,6 +3,7 @@
 namespace AppBundle\Tests;
 
 use AppBundle\Document\User;
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Address;
 use AppBundle\Document\PolicyKeyFacts;
@@ -55,6 +56,21 @@ trait UserClassTrait
         }
 
         return $mobile;
+    }
+    
+    public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm)
+    {
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phones = $phoneRepo->findAll();
+        $phone = null;
+        while ($phone == null) {
+            $phone = $phones[rand(0, count($phones) - 1)];
+            if (!$phone->getCurrentPhonePrice() || $phone->getMake() == "ALL") {
+                $phone = null;
+            }
+        }
+
+        return $phone;
     }
 
     public static function transformMobile($mobile)
