@@ -116,10 +116,13 @@ class ApiUnauthControllerTest extends BaseControllerTest
     {
         $this->clearRateLimit();
         $user = static::createUser(self::$userManager, static::generateEmail('zendesk', $this), 'bar');
-        
+        $url = sprintf(
+            '/api/v1/unauth/zendesk?zendesk_key=%s&debug=true',
+            static::$container->getParameter('zendesk_key')
+        );
         $crawler =  static::$client->request(
             "POST",
-            sprintf('/api/v1/unauth/zendesk?zendesk_key=%s', static::$container->getParameter('zendesk_key')),
+            $url,
             ['user_token' => $user->getId()]
         );
         
@@ -130,25 +133,52 @@ class ApiUnauthControllerTest extends BaseControllerTest
     public function testZendeskUserNotFound()
     {
         $this->clearRateLimit();
-        $user = static::createUser(self::$userManager, static::generateEmail('zendesk', $this), 'bar');
+        $user = static::createUser(self::$userManager, static::generateEmail('zendesk-notfound', $this), 'bar');
+        $url = sprintf(
+            '/api/v1/unauth/zendesk?zendesk_key=%s&debug=true',
+            static::$container->getParameter('zendesk_key')
+        );
 
         $crawler =  static::$client->request(
             "POST",
-            sprintf('/api/v1/unauth/zendesk?zendesk_key=%s', static::$container->getParameter('zendesk_key')),
+            $url,
             ['user_token' => '12']
         );
 
         $data = $this->verifyResponse(401, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
-    public function testZendeskMissingUserToken()
+    /*
+    public function testZendeskInvalidIp()
     {
         $this->clearRateLimit();
-        $user = static::createUser(self::$userManager, static::generateEmail('zendesk', $this), 'bar');
+        $user = static::createUser(self::$userManager, static::generateEmail('zendesk-invalidip', $this), 'bar');
 
         $crawler =  static::$client->request(
             "POST",
             sprintf('/api/v1/unauth/zendesk?zendesk_key=%s', static::$container->getParameter('zendesk_key')),
+            ['user_token' => $user->getId()]
+        );
+
+        $data = $this->verifyResponse(401, ApiErrorCode::ERROR_ACCESS_DENIED);
+    }
+    */
+
+    /**
+     *
+     */
+    public function testZendeskMissingUserToken()
+    {
+        $this->clearRateLimit();
+        $user = static::createUser(self::$userManager, static::generateEmail('zendesk-missingtoken', $this), 'bar');
+        $url = sprintf(
+            '/api/v1/unauth/zendesk?zendesk_key=%s&debug=true',
+            static::$container->getParameter('zendesk_key')
+        );
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
             []
         );
 

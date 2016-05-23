@@ -1009,22 +1009,13 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testNewPolicyJudopayOk()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        self::$testUser->setFirstName('foo');
-        self::$testUser->setLastName('bar');
-        self::$dm->flush();
-
-        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
-        $data = [
-            'type' => 'billing',
-            'line1' => 'address line 1',
-            'city' => 'London',
-            'postcode' => 'BX11LT',
-        ];
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $data = $this->verifyResponse(200);
-
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-judopay', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
