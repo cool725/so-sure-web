@@ -125,7 +125,7 @@ class ApiControllerTest extends BaseControllerTest
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(
             self::$userManager,
-            static::generateEmail('facebook-invalid-token', $this),
+            static::generateEmail('facebook-invalid-id', $this),
             'bar'
         );
         $user->setFacebookId(rand(1, 999999));
