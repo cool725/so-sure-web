@@ -908,7 +908,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(403);
     }
 
-    // policy/{id}/dd
+    // policy/{id}/pay dd
 
     /**
      *
@@ -975,9 +975,6 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(404);
     }
 
-    /**
-     *
-     */
     public function testNewPolicyDdOk()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -1004,6 +1001,37 @@ class ApiAuthControllerTest extends BaseControllerTest
             'account_number' => '55779911',
             'first_name' => 'foo',
             'last_name' => 'bar',
+        ]]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
+        $this->assertEquals($data['id'], $policyData['id']);
+    }
+
+    public function testNewPolicyJudopayOk()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        self::$testUser->setFirstName('foo');
+        self::$testUser->setLastName('bar');
+        self::$dm->flush();
+
+        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'city' => 'London',
+            'postcode' => 'BX11LT',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(200);
+
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => '55779911',
+            'receipt_id' => 'foo',
         ]]);
         $policyData = $this->verifyResponse(200);
         $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);

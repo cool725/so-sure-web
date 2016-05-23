@@ -548,6 +548,10 @@ class ApiAuthController extends BaseController
                 if (!$this->validateFields($data['braintree'], ['nonce'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
+            } elseif (isset($data['judo'])) {
+                if (!$this->validateFields($data['judo'], ['consumer_token', 'card_token', 'receipt_id'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
@@ -576,6 +580,14 @@ class ApiAuthController extends BaseController
             } elseif (isset($data['braintree'])) {
                 $braintree = $this->get('app.braintree');
                 $braintree->add($policy, $data['braintree']['nonce']);
+            } elseif (isset($data['judo'])) {
+                $judo = $this->get('app.judopay');
+                $judo->add(
+                    $policy,
+                    $data['judo']['consumer_token'],
+                    $data['judo']['card_token'],
+                    $data['judo']['receipt_id']
+                );
             }
 
             return new JsonResponse($policy->toApiArray());
