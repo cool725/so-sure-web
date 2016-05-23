@@ -65,6 +65,6 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo', $this));
         $policy = static::createPolicy($user, static::$dm);
-        self::$judopay->add($policy, '', '', '', '');
+        self::$judopay->add($policy, 'a', 'b', 'c');
     }
 }

@@ -148,6 +148,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(401, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
+    /*
     public function testZendeskInvalidIp()
     {
         $this->clearRateLimit();
@@ -161,6 +162,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
 
         $data = $this->verifyResponse(401, ApiErrorCode::ERROR_ACCESS_DENIED);
     }
+    */
 
     public function testZendeskMissingUserToken()
     {
