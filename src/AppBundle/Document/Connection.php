@@ -50,7 +50,19 @@ class Connection
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
+    protected $promoValue;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
     protected $initialValue;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $initialPromoValue;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="User")
@@ -110,7 +122,7 @@ class Connection
 
     public function getValue()
     {
-        return $this->value;
+        return $this->value ? $this->value : 0;
     }
 
     public function setValue($value)
@@ -121,14 +133,38 @@ class Connection
         }
     }
 
+    public function getPromoValue()
+    {
+        return $this->promoValue ? $this->promoValue : 0;
+    }
+
+    public function setPromoValue($promoValue)
+    {
+        $this->promoValue = $promoValue;
+        if (!$this->getInitialPromoValue()) {
+            $this->initialPromoValue = $promoValue;
+        }
+    }
+
+    public function getTotalValue()
+    {
+        return $this->getValue() + $this->getPromoValue();
+    }
+
     public function clearValue()
     {
         $this->value = 0;
+        $this->promoValue = 0;
     }
 
     public function getInitialValue()
     {
         return $this->initialValue;
+    }
+
+    public function getInitialPromoValue()
+    {
+        return $this->initialPromoValue;
     }
 
     public function getReplacementUser()
