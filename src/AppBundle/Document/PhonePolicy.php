@@ -92,23 +92,51 @@ class PhonePolicy extends Policy
         }
 
         if ($this->isPolicyWithin60Days($date)) {
-            if ($this->getUser()->isPreLaunch() || $this->getPromoCode() == self::PROMO_LAUNCH) {
-                return 15;
-            } else {
-                return 10;
-            }
+            return 10;
         } else {
             return 2;
         }
     }
 
+    public function getPromoConnectionValue(\DateTime $date = null)
+    {
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+        if (!$this->getUser()) {
+            throw new \Exception('Policy is missing a user');
+        }
+
+        if ($this->isPolicyWithin60Days($date)) {
+            if ($this->getUser()->isPreLaunch() || $this->getPromoCode() == self::PROMO_LAUNCH) {
+                return 5;
+            }
+        }
+
+        return 0;
+    }
+
     public function getAllowedConnectionValue(\DateTime $date = null)
+    {
+        return $this->getAllowedStandardOrPromoConnectionValue(false, $date);
+    }
+
+    public function getAllowedPromoConnectionValue(\DateTime $date = null)
+    {
+        return $this->getAllowedStandardOrPromoConnectionValue(true, $date);
+    }
+
+    private function getAllowedStandardOrPromoConnectionValue($promoCodeOnly, \DateTime $date = null)
     {
         if (!$this->isPolicy()) {
             return 0;
         }
 
-        $connectionValue = $this->getConnectionValue($date);
+        if ($promoCodeOnly) {
+            $connectionValue = $this->getPromoConnectionValue($date);
+        } else {
+            $connectionValue = $this->getConnectionValue($date);
+        }
 
         // If its the last connection, then may be less than the full £15/£10/£2
         $potValue = $this->getPotValue();

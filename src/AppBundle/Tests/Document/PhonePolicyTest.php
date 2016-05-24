@@ -416,16 +416,20 @@ class PhonePolicyTest extends WebTestCase
 
         // Launch Promo Policy (first 1000 policies)
         $policy->setPromoCode(PhonePolicy::PROMO_LAUNCH);
-        $this->assertEquals(15, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+        $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+        $this->assertEquals(5, $policy->getPromoConnectionValue(new \DateTime('2016-02-29 23:59:59')));
         $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
+        $this->assertEquals(0, $policy->getPromoConnectionValue(new \DateTime('2016-03-01')));
 
         // PreLaunch User Policy
         $policy->setPromoCode(null);
         $user->setCreated(new \DateTime('2016-01-01'));
         $user->setPreLaunch(true);
         $this->assertTrue($user->isPreLaunch());
-        $this->assertEquals(15, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+        $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+        $this->assertEquals(5, $policy->getPromoConnectionValue(new \DateTime('2016-02-29 23:59:59')));
         $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
+        $this->assertEquals(0, $policy->getPromoConnectionValue(new \DateTime('2016-03-01')));
     }
 
     public function testAllowedConnectionValue()

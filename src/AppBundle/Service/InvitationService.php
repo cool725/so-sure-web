@@ -326,15 +326,18 @@ class InvitationService
     protected function addConnection(Policy $policy, User $linkedUser, Policy $linkedPolicy, \DateTime $date = null)
     {
         $connectionValue = $policy->getAllowedConnectionValue($date);
+        $promoConnectionValue = $policy->getAllowedPromoConnectionValue($date);
         // If there was a concellation in the network, new connection should replace the cancelled connection
         if ($replacementConnection = $policy->getUnreplacedConnectionCancelledPolicyInLast30Days($date)) {
             $connectionValue = $replacementConnection->getInitialValue();
+            $promoConnectionValue = $replacementConnection->getInitialPromoValue();
             $replacementConnection->setReplacementUser($linkedUser);
         }
         $connection = new Connection();
         $connection->setLinkedUser($linkedUser);
         $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);
+        $connection->setPromoValue($promoConnectionValue);
         $policy->addConnection($connection);
         $policy->updatePotValue();
     }

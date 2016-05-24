@@ -633,12 +633,16 @@ abstract class Policy
         return $policies;
     }
 
-    public function calculatePotValue()
+    public function calculatePotValue($promoValueOnly = false)
     {
         $potValue = 0;
         // TODO: How does a cancelled policy affect networked connections?  Would the connection be withdrawn?
         foreach ($this->connections as $connection) {
-            $potValue += $connection->getValue();
+            if ($promoValueOnly) {
+                $potValue += $connection->getPromoValue();
+            } else {
+                $potValue += $connection->getTotalValue();
+            }
         }
 
         $networkClaimCount = count($this->getNetworkClaims(true));
@@ -647,6 +651,9 @@ abstract class Policy
         // Pot is £10 if you don't claim, but there's only 1 claim in your network and your pot is >= £40
         // Pot is 0 if networks claims > 1 or if network claims is 1 and your pot < £40
         if ($this->hasMonetaryClaimed()) {
+            $potValue = 0;
+        } elseif ($networkClaimCount > 0 && $promoValueOnly) {
+            // we don't want marketing spend to be valuated in the case of a claim
             $potValue = 0;
         } elseif ($networkClaimCount == 1 && $potValue >= 40) {
             $potValue = 10;
