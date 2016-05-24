@@ -415,8 +415,11 @@ abstract class Policy
         $this->setPolicyKeyFacts($keyfacts);
     }
 
-    public function create($seq, $startDate = null)
+    public function create($seq, $prefix = null, $startDate = null)
     {
+        if (!$prefix) {
+            $prefix = 'Mob';
+        }
         if (!$startDate) {
             $startDate = new \DateTime();
         }
@@ -430,7 +433,12 @@ abstract class Policy
         $this->setEnd($midnight);
 
         $initialPolicyNumber = 5500000;
-        $this->setPolicyNumber(sprintf("Mob/%s/%d", $this->getStart()->format("Y"), $initialPolicyNumber + $seq));
+        $this->setPolicyNumber(sprintf(
+            "%s/%s/%d",
+            $prefix,
+            $this->getStart()->format("Y"),
+            $initialPolicyNumber + $seq
+        ));
         $this->setStatus(self::STATUS_PENDING);
     }
 

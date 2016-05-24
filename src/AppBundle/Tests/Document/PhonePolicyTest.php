@@ -611,7 +611,7 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
-        $policy->create(rand(1, 999999), new \DateTime('2016-01-01 16:00'));
+        $policy->create(rand(1, 999999), null, new \DateTime('2016-01-01 16:00'));
         $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $policy->getEnd());
     }
 
@@ -621,7 +621,7 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
-        $policy->create(rand(1, 999999), new \DateTime('2016-07-01 16:00'));
+        $policy->create(rand(1, 999999), null, new \DateTime('2016-07-01 16:00'));
         $this->assertEquals(new \DateTime('2017-06-30 23:59:59'), $policy->getEnd());
     }
 
@@ -631,7 +631,7 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
         $policy = new PhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
-        $policy->create(rand(1, 999999), new \DateTime('2016-04-19 16:00'));
+        $policy->create(rand(1, 999999), null, new \DateTime('2016-04-19 16:00'));
         $this->assertEquals(new \DateTime('2016-06-18 16:00'), $policy->getConnectionCliffDate());
     }
 

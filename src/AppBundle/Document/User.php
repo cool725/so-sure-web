@@ -518,6 +518,11 @@ class User extends BaseUser
         $this->birthday = $birthday;
     }
 
+    public function isTestUser()
+    {
+        return stripos($this->getEmailCanonical(), '@so-sure.com') !== false;
+    }
+
     public function hasValidDetails()
     {
         // TODO: Improve validation

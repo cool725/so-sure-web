@@ -122,7 +122,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy = new PhonePolicy();
         $policy->setPhone($phone);
         $policy->init($user, $latestTerms, $latestKeyFacts);
-        $policy->create(-5000 + $count, $startDate);
+        $policy->create(-5000 + $count, null, $startDate);
 
         $manager->persist($policy);
     }

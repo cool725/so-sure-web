@@ -64,7 +64,11 @@ class PolicyService
         $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
 
         $policy->init($user, $latestTerms, $latestKeyFacts);
-        $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE));
+        if ($user->isTestUser()) {
+            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_TEST), 'TEST');
+        } else {
+            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE));
+        }
         if ($policy instanceof PhonePolicy) {
             $repo = $this->dm->getRepository(PhonePolicy::class);
             if ($repo->countAllPolicies() < 1000) {

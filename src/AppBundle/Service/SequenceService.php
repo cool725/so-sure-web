@@ -9,6 +9,7 @@ use AppBundle\Document\Sequence;
 class SequenceService
 {
     const SEQUENCE_PHONE = 'phone-policy';
+    const SEQUENCE_PHONE_TEST = 'test-phone-policy';
 
     /** @var DocumentManager */
     protected $dm;

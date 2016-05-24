@@ -77,4 +77,32 @@ class PolicyServiceTest extends WebTestCase
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::PROMO_LAUNCH, $policy->getPromoCode());
     }
+
+    public function testCreatePolicyPolicyNumber()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('create-policyNumber', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm);
+        static::$policyService->create($policy, $user);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertTrue(stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false);
+    }
+
+    public function testCreatePolicySoSurePolicyNumber()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'create-policyNumber@so-sure.com',
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm);
+        static::$policyService->create($policy, $user);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertTrue(stripos($updatedPolicy->getPolicyNumber(), 'TEST/') !== false);
+    }
 }

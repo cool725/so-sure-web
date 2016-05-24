@@ -122,4 +122,15 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->addReceivedInvitation($invitiationB);
         $this->assertEquals(1, count($user->getUnprocessedReceivedInvitations()));
     }
+
+    public function testTestUser()
+    {
+        $user = new User();
+        $user->setEmailCanonical('foo@so-sure.com');
+        $this->assertTrue($user->isTestUser());
+
+        $user2 = new User();
+        $user2->setEmailCanonical('foo@notsosure.com');
+        $this->assertFalse($user2->isTestUser());
+    }
 }
