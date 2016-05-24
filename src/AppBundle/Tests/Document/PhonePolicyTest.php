@@ -432,7 +432,27 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(0, $policy->getPromoConnectionValue(new \DateTime('2016-03-01')));
     }
 
-    public function testConnectionValueWithClaim()
+    public function testConnectionValueWithSelfClaim()
+    {
+        $policy = $this->createUserPolicy(true);
+        $linkedPolicy = $this->createUserPolicy(true);
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
+        $this->assertEquals(10, $policy->calculatePotValue());
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $policy->setStart(new \DateTime('2016-01-01'));
+
+        $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+
+        $claimA = new Claim();
+        $claimA->setType(Claim::TYPE_LOSS);
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $policy->addClaim($claimA);
+
+        $this->assertEquals(0, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
+    }
+
+    public function testConnectionValueWithNetworkClaim()
     {
         $policy = $this->createUserPolicy(true);
         $linkedPolicy = $this->createUserPolicy(true);

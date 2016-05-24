@@ -91,9 +91,12 @@ class PhonePolicy extends Policy
             throw new \Exception('Policy is missing a user');
         }
 
-        if ($this->hasMonetaryNetworkClaim()) {
+        if ($this->hasMonetaryClaimed()) {
+            // should never occur, but just in case
+            return 0;
+        } elseif ($this->hasMonetaryNetworkClaim()) {
             return 2;
-        } if ($this->isPolicyWithin60Days($date)) {
+        } elseif ($this->isPolicyWithin60Days($date)) {
             return 10;
         } else {
             return 2;
