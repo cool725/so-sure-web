@@ -24,11 +24,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\ValidationData;
-use Lcobucci\JWT\Signer\Hmac\Sha256;
-
 /**
  * @Route("/api/v1/unauth")
  */
@@ -86,48 +81,6 @@ class ApiUnauthController extends BaseController
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api unauthTokenAction. %s', $e->getMessage()));
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
-    }
-
-    /**
-     * @Route("/zendesk", name="api_unauth_zendesk")
-     * @Method({"POST"})
-     */
-    public function unauthZendeskAction(Request $request)
-    {
-        try {
-            $zendeskKey = $this->getParameter('zendesk_key');
-            if ($request->get('zendesk_key') != $zendeskKey) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Invalid key', 404);
-            }
-            $userToken = trim($request->request->get('user_token'));
-            if (strlen($userToken) == 0) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(User::class);
-            $user = $repo->find($userToken);
-            if (!$user || $user->isExpired() || $user->isLocked()) {
-                // @codingStandardsIgnoreStart
-                // https://support.zendesk.com/hc/en-us/articles/218278138-Building-a-dedicated-JWT-endpoint-for-the-Zendesk-SDK
-                // @codingStandardsIgnoreEnd
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Unauthorized', 401);
-            }
-
-            $token = (new Builder())->setIssuedAt(time());
-            $token->setId(uniqid('', true));
-            $token->set('email', $user->getEmailCanonical());
-            $token->set('name', $user->getName());
-
-            $secret = $this->getParameter('zendesk_jwt_secret');
-            $jwt = (string) $token->sign(new Sha256(), $secret)->getToken();
-
-            return new JsonResponse(['jwt' => $jwt]);
-        } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api zenddesk. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
