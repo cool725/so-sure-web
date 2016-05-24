@@ -1039,6 +1039,36 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals($data['id'], $policyData['id']);
     }
 
+    public function testNewPolicyJudopayDeclined()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-judopay-declined', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $receiptId = $judopay->testPay(
+            $user,
+            $data['id'],
+            '6.99',
+            '4221 6900 0000 4963',
+            '12/20',
+            '125'
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => null,
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED);
+    }
+
     // policy/{id}/invitation
 
     /**

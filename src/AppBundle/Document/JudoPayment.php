@@ -11,6 +11,9 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class JudoPayment extends Payment
 {
+    const RESULT_SUCCESS = "Success";
+    const RESULT_DECLINED = "Declined";
+
     /**
      * @MongoDB\String()
      * @Gedmo\Versioned

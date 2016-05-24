@@ -69,19 +69,34 @@ class JudopayService
         $this->client = new Judopay($data);
     }
 
-    public function add(Policy $policy, $consumerToken, $cardToken, $receiptId)
+    /**
+     * @param Policy $policy
+     * @param string $receiptId
+     * @param string $consumerToken
+     * @param string $cardToken     Can be null if card is declined
+     */
+    public function add(Policy $policy, $receiptId, $consumerToken, $cardToken)
     {
         $user = $policy->getUser();
 
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken($consumerToken);
-        $judo->addCardToken($cardToken, null);
+        if ($cardToken) {
+            $judo->addCardToken($cardToken, null);
+        }
         $user->setPaymentMethod($judo);
 
-        $payment = $this->validateReceipt($policy, $cardToken, $receiptId);
+        $payment = $this->validateReceipt($policy, $receiptId, $cardToken);
+        if ($payment->getResult() != JudoPayment::RESULT_SUCCESS) {
+            // We've recorded the payment - can return error now
+            return false;
+        }
+
         // TODO: create payment schedule
         $this->validateUser($policy->getUser());
         $this->policyService->create($policy, $policy->getUser());
+
+        return true;
     }
 
     public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2)
@@ -104,7 +119,12 @@ class JudopayService
         return $details['receiptId'];
     }
 
-    public function validateReceipt(Policy $policy, $cardToken, $receiptId)
+    /**
+     * @param Policy $policy
+     * @param string $receiptId
+     * @param string $cardToken Can be null if card is declined
+     */
+    public function validateReceipt(Policy $policy, $receiptId, $cardToken)
     {
         $transaction = $this->client->getModel('Transaction');
         $transactionDetails = $transaction->find($receiptId);
@@ -118,9 +138,11 @@ class JudopayService
         $policy->addPayment($payment);
 
         $judoPaymentMethod = $policy->getUser()->getPaymentMethod();
-        $tokens = $judoPaymentMethod->getCardTokens();
-        if (!$tokens[$cardToken]) {
-            $judoPaymentMethod->addCardToken($cardToken, json_encode($transactionDetails['cardDetails']));
+        if ($cardToken) {
+            $tokens = $judoPaymentMethod->getCardTokens();
+            if (!isset($tokens[$cardToken]) || !$tokens[$cardToken]) {
+                $judoPaymentMethod->addCardToken($cardToken, json_encode($transactionDetails['cardDetails']));
+            }
         }
 
         $this->dm->persist($payment);

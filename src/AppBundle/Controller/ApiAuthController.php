@@ -549,7 +549,7 @@ class ApiAuthController extends BaseController
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
             } elseif (isset($data['judo'])) {
-                if (!$this->validateFields($data['judo'], ['consumer_token', 'card_token', 'receipt_id'])) {
+                if (!$this->validateFields($data['judo'], ['consumer_token', 'receipt_id'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
             } else {
@@ -582,12 +582,18 @@ class ApiAuthController extends BaseController
                 $braintree->add($policy, $data['braintree']['nonce']);
             } elseif (isset($data['judo'])) {
                 $judo = $this->get('app.judopay');
-                $judo->add(
+                if (!$judo->add(
                     $policy,
+                    $data['judo']['receipt_id'],
                     $data['judo']['consumer_token'],
-                    $data['judo']['card_token'],
-                    $data['judo']['receipt_id']
-                );
+                    isset($data['judo']['card_token']) ? $data['judo']['card_token'] : null
+                )) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
+                        'Payment was declined',
+                        422
+                    );
+                }
             }
 
             return new JsonResponse($policy->toApiArray());

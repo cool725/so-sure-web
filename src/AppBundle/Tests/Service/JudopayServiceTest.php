@@ -83,7 +83,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        $payment = self::$judopay->validateReceipt($policy, 'token', $receiptId);
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
         $this->assertEquals($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(), $payment->getAmount());
         $this->assertEquals($receiptId, $payment->getReceipt());
         $this->assertEquals($policy->getId(), $payment->getReference());
@@ -119,7 +119,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        $payment = self::$judopay->validateReceipt($policy, 'token', $receiptId);
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
     }
 
     public function testJudoAdd()
@@ -136,7 +136,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        self::$judopay->add($policy, 'ctoken', 'token', $receiptId);
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token');
 
         $this->assertEquals(PhonePolicy::STATUS_PENDING, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
