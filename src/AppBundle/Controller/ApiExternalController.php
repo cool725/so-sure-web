@@ -8,8 +8,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use AppBundle\Form\Type\LaunchType;
-use AppBundle\Form\Type\PhoneType;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
@@ -19,6 +18,11 @@ use AppBundle\Service\RateLimitService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+
+use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\ValidationData;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 /**
  * @Route("/external")

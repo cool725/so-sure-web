@@ -24,11 +24,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\ValidationData;
-use Lcobucci\JWT\Signer\Hmac\Sha256;
-
 /**
  * @Route("/api/v1/unauth")
  */
