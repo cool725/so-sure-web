@@ -5,13 +5,10 @@ use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use AppBundle\Document\Phone;
 
-class ReceperioService
+class ReceperioService extends BaseImeiService
 {
     const PARTNER_ID = 415;
     const BASE_URL = "http://gapi.checkmend.com";
-
-    /** @var LoggerInterface */
-    protected $logger;
 
     /** @var string */
     protected $secretKey;
@@ -20,14 +17,18 @@ class ReceperioService
     protected $storeId;
 
     /**
-     * @param LoggerInterface $logger
-     * @param string          $secretKey
-     * @param string          $storeId
+     * @param string $secretKey
      */
-    public function __construct(LoggerInterface $logger, $secretKey, $storeId)
+    public function setSecretKey($secretKey)
     {
-        $this->logger = $logger;
         $this->secretKey = $secretKey;
+    }
+
+    /**
+     * @param string $storeId
+     */
+    public function setStoreId($storeId)
+    {
         $this->storeId = $storeId;
     }
 
@@ -103,30 +104,5 @@ class ReceperioService
     protected function sign($body)
     {
         return sha1(sprintf("%s%s", $this->secretKey, $body));
-    }
-
-    /**
-     * @param string $imei
-     *
-     * @return boolean
-     */
-    public function isImei($imei)
-    {
-        return $this->isLuhn($imei) && strlen($imei) == 15;
-    }
-
-    /**
-     * @see http://stackoverflow.com/questions/4741580/imei-validation-function
-     * @param string $n
-     *
-     * @return boolean
-     */
-    protected function isLuhn($n)
-    {
-        $str = '';
-        foreach (str_split(strrev((string) $n)) as $i => $d) {
-            $str .= $i %2 !== 0 ? $d * 2 : $d;
-        }
-        return array_sum(str_split($str)) % 10 === 0;
     }
 }

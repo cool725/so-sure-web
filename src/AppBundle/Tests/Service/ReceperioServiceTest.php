@@ -10,7 +10,7 @@ use GeoJson\Geometry\Point;
 /**
  * @group functional-nonet
  */
-class ImeiServiceTest extends WebTestCase
+class BaseImeiServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
