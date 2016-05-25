@@ -97,6 +97,10 @@ class Connection
 
     public function setSourcePolicy(Policy $policy)
     {
+        if ($this->getId() && $this->getLinkedPolicy() && $this->getLinkedPolicy()->getId() == $policy->getId()) {
+            throw new \Exception('Policy can not be linked to itself');
+        }
+
         $this->sourcePolicy = $policy;
     }
 
@@ -107,6 +111,10 @@ class Connection
 
     public function setLinkedPolicy(Policy $policy)
     {
+        if ($this->getId() && $this->getSourcePolicy() && $this->getSourcePolicy()->getId() == $policy->getId()) {
+            throw new \Exception('Policy can not be linked to itself');
+        }
+
         $this->linkedPolicy = $policy;
     }
 

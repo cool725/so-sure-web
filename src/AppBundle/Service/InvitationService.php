@@ -19,12 +19,15 @@ use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\OptOutException;
 use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\SelfInviteException;
+use AppBundle\Document\PhoneTrait;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class InvitationService
 {
+    use PhoneTrait;
+
     const TYPE_EMAIL_ACCEPT = 'accept';
     const TYPE_EMAIL_REJECT = 'reject';
     const TYPE_EMAIL_CANCEL = 'cancel';
@@ -153,6 +156,7 @@ class InvitationService
 
     public function inviteBySms(Policy $policy, $mobile, $name = null)
     {
+        $mobile = $this->normalizeUkMobile($mobile);
         $this->validatePolicy($policy);
 
         $invitationRepo = $this->dm->getRepository(SmsInvitation::class);
@@ -325,6 +329,10 @@ class InvitationService
 
     protected function addConnection(Policy $policy, User $linkedUser, Policy $linkedPolicy, \DateTime $date = null)
     {
+        if ($policy->getId() == $linkedPolicy->getId()) {
+            throw new \Exception('Unable to connect to the same policy');
+        }
+
         $connectionValue = $policy->getAllowedConnectionValue($date);
         $promoConnectionValue = $policy->getAllowedPromoConnectionValue($date);
         // If there was a concellation in the network, new connection should replace the cancelled connection
