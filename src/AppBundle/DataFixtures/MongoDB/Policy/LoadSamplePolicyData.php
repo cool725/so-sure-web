@@ -18,6 +18,8 @@ use Faker;
 // @codingStandardsIgnoreFile
 class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 {
+    use \AppBundle\Tests\UserClassTrait;
+
      /**
      * @var ContainerInterface
      */
@@ -135,6 +137,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $startDate->sub(new \DateInterval(sprintf("P%dD", rand(0, 120))));
         $policy = new PhonePolicy();
         $policy->setPhone($phone);
+        $policy->setImei($this->generateRandomImei());
         $policy->init($user, $latestTerms, $latestKeyFacts);
         $policy->create(-5000 + $count, $startDate);
 
