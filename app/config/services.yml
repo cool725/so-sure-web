@@ -130,12 +130,19 @@ services:
             developerLogin: "%cognito_developer_login%"
             identityPoolId: "%aws_cognito_identitypoolid%"
 
+    base.imei:
+        abstract: true
+        class: AppBundle\Service\BaseImeiService
+        calls:
+            - [setLogger, ['@logger']]
+            - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
+
     app.imei:
+        parent: base.imei
         class: AppBundle\Service\ReceperioService
-        arguments:
-            logger:    "@logger"
-            secretKey: "%receperio_secretkey%"
-            storeId:   "%receperio_storeid%"
+        calls:
+            - [setSecretKey, ['%receperio_secretkey%']]
+            - [setStoreId, ['%receperio_storeid%']]
 
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService
