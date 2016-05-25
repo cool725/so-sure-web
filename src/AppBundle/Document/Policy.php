@@ -418,7 +418,7 @@ abstract class Policy
     public function create($seq, $prefix = null, $startDate = null)
     {
         if (!$prefix) {
-            $prefix = 'Mob';
+            $prefix = $this->getPolicyNumberPrefix();
         }
         if (!$startDate) {
             $startDate = new \DateTime();
@@ -682,6 +682,15 @@ abstract class Policy
         return $this->getStatus() !== null && $this->getPremium() !== null;
     }
 
+    public function isValidPolicy()
+    {
+        if (!$this->isPolicy()) {
+            return false;
+        }
+
+        return strpos($this->getPolicyNumber(), $this->getPolicyNumberPrefix()) === 0;
+    }
+
     public function getSentInvitations()
     {
         $userId = $this->getUser() ? $this->getUser()->getId() : null;
@@ -740,6 +749,7 @@ abstract class Policy
     abstract public function getMaxConnections();
     abstract public function getMaxPot();
     abstract public function getConnectionValue();
+    abstract public function getPolicyNumberPrefix();
 
     public function isPotCompletelyFilled()
     {

@@ -90,6 +90,7 @@ class PolicyServiceTest extends WebTestCase
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue(stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false);
+        $this->assertTrue($updatedPolicy->isValidPolicy());
     }
 
     public function testCreatePolicySoSurePolicyNumber()
@@ -103,6 +104,7 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, $user);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
-        $this->assertTrue(stripos($updatedPolicy->getPolicyNumber(), 'TEST/') !== false);
+        $this->assertTrue(stripos($updatedPolicy->getPolicyNumber(), 'INVALID/') !== false);
+        $this->assertTrue($updatedPolicy->isValidPolicy());
     }
 }

@@ -518,7 +518,7 @@ class User extends BaseUser
         $this->birthday = $birthday;
     }
 
-    public function isTestUser()
+    public function hasSoSureEmail()
     {
         return stripos($this->getEmailCanonical(), '@so-sure.com') !== false;
     }

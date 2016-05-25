@@ -64,8 +64,10 @@ class PolicyService
         $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
 
         $policy->init($user, $latestTerms, $latestKeyFacts);
-        if ($user->isTestUser()) {
-            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_TEST), 'TEST');
+
+        // any emails with @so-sure.com will generate an invalid policy
+        if ($user->hasSoSureEmail()) {
+            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), 'INVALID');
         } else {
             $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE));
         }
