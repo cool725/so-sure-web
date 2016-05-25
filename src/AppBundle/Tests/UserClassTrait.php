@@ -89,7 +89,7 @@ trait UserClassTrait
         $policy = new PhonePolicy();
         $policy->setImei(self::generateRandomImei());
         $policy->init($user, self::getLatestPolicyTerms($dm), self::getLatestPolicyKeyFacts($dm));
-        $policy->create(rand(1, 999999), $date);
+        $policy->create(rand(1, 999999), null, $date);
         if ($phone) {
             $policy->setPhone($phone);
         }

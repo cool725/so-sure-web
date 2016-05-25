@@ -415,8 +415,11 @@ abstract class Policy
         $this->setPolicyKeyFacts($keyfacts);
     }
 
-    public function create($seq, $startDate = null)
+    public function create($seq, $prefix = null, $startDate = null)
     {
+        if (!$prefix) {
+            $prefix = $this->getPolicyNumberPrefix();
+        }
         if (!$startDate) {
             $startDate = new \DateTime();
         }
@@ -430,7 +433,12 @@ abstract class Policy
         $this->setEnd($midnight);
 
         $initialPolicyNumber = 5500000;
-        $this->setPolicyNumber(sprintf("Mob/%s/%d", $this->getStart()->format("Y"), $initialPolicyNumber + $seq));
+        $this->setPolicyNumber(sprintf(
+            "%s/%s/%d",
+            $prefix,
+            $this->getStart()->format("Y"),
+            $initialPolicyNumber + $seq
+        ));
         $this->setStatus(self::STATUS_PENDING);
     }
 
@@ -674,6 +682,15 @@ abstract class Policy
         return $this->getStatus() !== null && $this->getPremium() !== null;
     }
 
+    public function isValidPolicy()
+    {
+        if (!$this->isPolicy()) {
+            return false;
+        }
+
+        return strpos($this->getPolicyNumber(), $this->getPolicyNumberPrefix()) === 0;
+    }
+
     public function getSentInvitations()
     {
         $userId = $this->getUser() ? $this->getUser()->getId() : null;
@@ -732,6 +749,7 @@ abstract class Policy
     abstract public function getMaxConnections();
     abstract public function getMaxPot();
     abstract public function getConnectionValue();
+    abstract public function getPolicyNumberPrefix();
 
     public function isPotCompletelyFilled()
     {

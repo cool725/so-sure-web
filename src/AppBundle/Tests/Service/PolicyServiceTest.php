@@ -77,4 +77,41 @@ class PolicyServiceTest extends WebTestCase
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::PROMO_LAUNCH, $policy->getPromoCode());
     }
+
+    public function testCreatePolicyPolicyNumber()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('create-policyNumber', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, $user);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
+        $this->assertTrue($updatedPolicy->isValidPolicy(), 'Policy must be valid');
+        $this->assertTrue(
+            stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
+            'Policy number must contain Mob'
+        );
+    }
+
+    public function testCreatePolicySoSurePolicyNumber()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'create-policyNumber@so-sure.com',
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, $user);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
+        $this->assertFalse($updatedPolicy->isValidPolicy());
+        $this->assertTrue(stripos($updatedPolicy->getPolicyNumber(), 'INVALID/') !== false);
+    }
 }

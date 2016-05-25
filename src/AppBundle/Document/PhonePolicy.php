@@ -187,6 +187,11 @@ class PhonePolicy extends Policy
         }
     }
 
+    public function getPolicyNumberPrefix()
+    {
+        return 'Mob';
+    }
+
     public function toApiArray()
     {
         return array_merge(parent::toApiArray(), [
