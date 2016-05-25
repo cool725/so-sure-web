@@ -51,6 +51,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $this->addConnections($manager, $user, $users);
         }
 
+        // Sample user for apple
+        $user = $this->newUser('julien+apple@so-sure.com');
+        $user->setPlainPassword('test');
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $this->newPolicy($manager, $user, $count);
+
         $manager->flush();
     }
 
@@ -79,19 +86,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             while ($userRepo->findOneBy(['email' => $email])) {
                 $email = $this->faker->email;
             }
-            $user = new User();
-            $user->setEmail($email);
-            $user->setFirstName($this->faker->firstName);
-            $user->setLastName($this->faker->lastName);
-            $user->setMobileNumber($this->faker->mobileNumber);
-
-            $address = new Address();
-            $address->setType(Address::TYPE_BILLING);
-            $address->setLine1($this->faker->streetAddress);
-            $address->setCity($this->faker->city);
-            $address->setPostcode($this->faker->address);
-
-            $user->setBillingAddress($address);
+            $user = $this->newUser($email);
             $manager->persist($user);
             $users[] = $user;
         }
@@ -99,6 +94,25 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $users;
     }
     
+    private function newUser($email)
+    {
+        $user = new User();
+        $user->setEmail($email);
+        $user->setFirstName($this->faker->firstName);
+        $user->setLastName($this->faker->lastName);
+        $user->setMobileNumber($this->faker->mobileNumber);
+
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setLine1($this->faker->streetAddress);
+        $address->setCity($this->faker->city);
+        $address->setPostcode($this->faker->address);
+
+        $user->setBillingAddress($address);
+
+        return $user;
+    }
+
     private function newPolicy($manager, $user, $count)
     {
         $phoneRepo = $manager->getRepository(Phone::class);

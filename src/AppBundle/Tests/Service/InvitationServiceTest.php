@@ -413,7 +413,7 @@ class InvitationServiceTest extends WebTestCase
         $user->setMobileNumber('+447700900001');
         $policy = static::createPolicy($user, static::$dm, static::$phone);
 
-        $invitation = self::$invitationService->inviteBySms($policy, '+447700900001');
+        $invitation = self::$invitationService->inviteBySms($policy, '07700900001');
     }
 
     /**
