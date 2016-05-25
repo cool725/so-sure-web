@@ -147,11 +147,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     private function addConnections($manager, $userA, $users)
     {
         $policyA = $userA->getPolicies()[0];
-        $connections = rand(0, $policyA->getMaxConnections());
+        //$connections = rand(0, $policyA->getMaxConnections());
         $connections = rand(0, 4);
         for ($i = 0; $i < $connections; $i++) {
             $userB = $users[rand(0, count($users) - 1)];
             $policyB = $userB->getPolicies()[0];
+            if ($policyA->getId() == $policyB->getId()) {
+                continue;
+            }
 
             // only 1 connection for user
             foreach ($policyA->getConnections() as $connection) {
