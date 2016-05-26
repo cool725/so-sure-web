@@ -272,7 +272,7 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
-            if (!$imeiValidator->isLostImei($imei)) {
+            if ($imeiValidator->isLostImei($imei)) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_IMEI_INVALID,
                     'Imei fails validation checks',
