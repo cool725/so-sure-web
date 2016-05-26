@@ -1066,7 +1066,37 @@ class ApiAuthControllerTest extends BaseControllerTest
             'card_token' => null,
             'receipt_id' => $receiptId,
         ]]);
-        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED);
+        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
+    }
+
+    public function testNewPolicyJudopayInvalidPremium()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-judopay-invalidpremium', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $receiptId = $judopay->testPay(
+            $user,
+            $data['id'],
+            '1.01',
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => '55779911',
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_INVALID_AMOUNT);
     }
 
     // policy/{id}/invitation
