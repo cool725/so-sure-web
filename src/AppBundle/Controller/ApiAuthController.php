@@ -29,6 +29,8 @@ use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\OptOutException;
 use AppBundle\Exception\ClaimException;
+use AppBundle\Exception\PaymentDeclinedException;
+use AppBundle\Exception\InvalidPremiumException;
 
 use AppBundle\Service\RateLimitService;
 use AppBundle\Security\UserVoter;
@@ -589,21 +591,23 @@ class ApiAuthController extends BaseController
                 $braintree->add($policy, $data['braintree']['nonce']);
             } elseif (isset($data['judo'])) {
                 $judo = $this->get('app.judopay');
-                if (!$judo->add(
+                $judo->add(
                     $policy,
                     $data['judo']['receipt_id'],
                     $data['judo']['consumer_token'],
                     isset($data['judo']['card_token']) ? $data['judo']['card_token'] : null
-                )) {
-                    return $this->getErrorJsonResponse(
-                        ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
-                        'Payment was declined',
-                        422
-                    );
-                }
+                );
             }
 
             return new JsonResponse($policy->toApiArray());
+        } catch (InvalidPremiumException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_PAYMENT_INVALID_AMOUNT,
+                'Invalid premium paid',
+                422
+            );
+        } catch (PaymentDeclinedException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {

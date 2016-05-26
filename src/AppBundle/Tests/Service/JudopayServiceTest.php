@@ -63,7 +63,7 @@ class JudopayServiceTest extends WebTestCase
         return $user;
     }
     
-    public function testJudoReceipt()
+    public function testJudoReceiptMonthly()
     {
         $user = $this->createValidUser(static::generateEmail('judo-receipt', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -96,8 +96,35 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals('1220', $data->endDate);
     }
 
+    public function testJudoReceiptYearly()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-receipt-yearly', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $judo = new JudoPaymentMethod();
+        $judo->setCustomerToken('ctoken');
+        $judo->addCardToken('token', null);
+        $user->setPaymentMethod($judo);
+        static::$dm->flush();
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        $this->assertEquals($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(), $payment->getAmount());
+        $this->assertEquals($receiptId, $payment->getReceipt());
+        $this->assertEquals($policy->getId(), $payment->getReference());
+        $this->assertEquals('Success', $payment->getResult());
+    }
+
     /**
-     * @expectedException \Exception
+     * @expectedException AppBundle\Exception\InvalidPremiumException
      */
     public function testJudoReceiptPaymentDiffException()
     {
@@ -118,6 +145,32 @@ class JudopayServiceTest extends WebTestCase
             '4976 0000 0000 3436',
             '12/20',
             '452'
+        );
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\PaymentDeclinedException
+     */
+    public function testJudoReceiptPaymentDeclinedException()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-receipt-declined-exception', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $judo = new JudoPaymentMethod();
+        $judo->setCustomerToken('ctoken');
+        $judo->addCardToken('token', null);
+        $user->setPaymentMethod($judo);
+        static::$dm->flush();
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4221 6900 0000 4963',
+            '12/20',
+            '125'
         );
         $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
     }

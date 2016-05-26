@@ -14,6 +14,8 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Exception\PaymentDeclinedException;
 
 class JudopayService
 {
@@ -87,10 +89,6 @@ class JudopayService
         $user->setPaymentMethod($judo);
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken);
-        if ($payment->getResult() != JudoPayment::RESULT_SUCCESS) {
-            // We've recorded the payment - can return error now
-            return false;
-        }
 
         // TODO: create payment schedule
         $this->validateUser($policy->getUser());
@@ -148,16 +146,27 @@ class JudopayService
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        if ($this->toTwoDp($policy->getPremium()->getMonthlyPremiumPrice()) != $this->toTwoDp($payment->getAmount())) {
+        // Ensure the correct amount is paid
+        // TODO: Should we issue a refund in this case??
+        $premium = $policy->getPremium();
+        if (!in_array($this->toTwoDp($payment->getAmount()), [
+                $this->toTwoDp($premium->getMonthlyPremiumPrice()),
+                $this->toTwoDp($premium->getYearlyPremiumPrice()),
+            ])) {
             $errMsg = sprintf(
-                'Expected %f, not %f for payment id: %s',
-                $policy->getPremium()->getMonthlyPremiumPrice(),
+                'REFUNDED NEEDED!! Expected %f or %f, not %f for payment id: %s',
+                $premium->getMonthlyPremiumPrice(),
+                $premium->getYearlyPremiumPrice(),
                 $payment->getAmount(),
                 $payment->getId()
             );
             $this->logger->error($errMsg);
 
-            throw new \Exception($errMsg);
+            throw new InvalidPremiumException($errMsg);
+        }
+        if ($payment->getResult() != JudoPayment::RESULT_SUCCESS) {
+            // We've recorded the payment - can return error now
+            throw new PaymentDeclinedException();
         }
 
         return $payment;
