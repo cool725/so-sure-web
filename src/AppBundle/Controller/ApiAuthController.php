@@ -276,8 +276,8 @@ class ApiAuthController extends BaseController
             }
             if ($imeiValidator->isLostImei($imei)) {
                 return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_IMEI_INVALID,
-                    'Imei fails validation checks',
+                    ApiErrorCode::ERROR_POLICY_IMEI_LOSTSTOLEN,
+                    'Imei was reported as lost/stolen',
                     422
                 );
             }

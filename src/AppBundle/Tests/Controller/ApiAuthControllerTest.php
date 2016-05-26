@@ -7,6 +7,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\LostPhone;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -19,6 +20,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     const VALID_IMEI = '356938035643809';
     const INVALID_IMEI = '356938035643808';
     const BLACKLISTED_IMEI = '352000067704506';
+    const LOSTSTOLEN_IMEI = '351451208401216';
     const MISMATCH_SERIALNUMBER = '111111';
 
     protected static $testUser;
@@ -706,6 +708,28 @@ class ApiAuthControllerTest extends BaseControllerTest
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::BLACKLISTED_IMEI]),
         ]]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED);
+    }
+
+    public function testNewPolicyLostStolenImei()
+    {
+        $lostPhone = new LostPhone();
+        $lostPhone->setImei(self::LOSTSTOLEN_IMEI);
+        self::$dm->persist($lostPhone);
+
+        $user = self::createUser(self::$userManager, self::generateEmail('policy-loststolen', $this), 'foo', true);
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->clearRateLimit();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => self::LOSTSTOLEN_IMEI,
+            'make' => 'OnePlus',
+            'device' => 'A0001',
+            'memory' => 63,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::LOSTSTOLEN_IMEI]),
+        ]]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_LOSTSTOLEN);
     }
 
     public function testNewPolicyMismatchPhone()
