@@ -14,7 +14,11 @@ class PhoneRepository extends DocumentRepository
     {
         $qb = $this->createQueryBuilder();
         $qb->addAnd($qb->expr()->field('replacementPrice')->gt(0));
-        $qb->addAnd($qb->expr()->field('os')->equals($phone->getOs()));
+        if ($phone->getOs() == Phone::OS_CYANOGEN) {
+            $qb->addAnd($qb->expr()->field('os')->in([Phone::OS_CYANOGEN, Phone::OS_ANDROID]));            
+        } else {
+            $qb->addAnd($qb->expr()->field('os')->equals($phone->getOs()));
+        }
         $qb->addAnd($qb->expr()->field('memory')->gte($phone->getMemory()));
         $qb->addAnd($qb->expr()->field('processorCores')->gte($phone->getProcessorCores()));
         //$qb->addAnd($qb->expr()->field('processorSpeed')->gte($phone->getProcessorSpeed() - 200));

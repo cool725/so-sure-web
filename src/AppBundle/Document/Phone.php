@@ -11,6 +11,24 @@ class Phone
 {
     use CurrencyTrait;
 
+    const OS_CYANOGEN = 'Cyanogen';
+    const OS_ANDROID = 'Android';
+    const OS_IOS = 'iOS';
+    const OS_FIRE = 'Fire';
+    const OS_WINDOWS = 'Windows';
+    const OS_BLACKBERRY = 'BlackBerry';
+
+    const MONTHS_RETIREMENT = 48;
+
+    public static $osTypes = [
+        self::OS_CYANOGEN => self::OS_CYANOGEN,
+        self::OS_ANDROID => self::OS_ANDROID,
+        self::OS_IOS => self::OS_IOS,
+        self::OS_FIRE => self::OS_FIRE,
+        self::OS_WINDOWS => self::OS_WINDOWS,
+        self::OS_BLACKBERRY => self::OS_BLACKBERRY,
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -311,6 +329,16 @@ class Phone
         $this->suggestedReplacement = $suggestedReplacement;
     }
 
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    public function setActive($active)
+    {
+        $this->active = $active;
+    }
+
     public function getMonthAge()
     {
         if (!$this->getReleaseDate()) {
@@ -319,6 +347,15 @@ class Phone
 
         $diff = $this->getReleaseDate()->diff(new \DateTime());
         return $diff->y * 12 + $diff->m;
+    }
+
+    public function shouldBeRetired()
+    {
+        if ($this->getMonthAge() > self::MONTHS_RETIREMENT) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function policyProfit($claimFrequency)
@@ -380,6 +417,7 @@ class Phone
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
             'gwp' => $this->getCurrentPhonePrice()->getGwp(),
+            'active' => $this->getActive(),
         ];
     }
 

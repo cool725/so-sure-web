@@ -12,7 +12,12 @@ $('#phoneModal').on('show.bs.modal', function (event) {
     modal.find('#phone-devices').val(phone.devices.join('|'));
     modal.find('#phone-memory').val(phone.memory);
     modal.find('#phone-gwp').val(phone.gwp);
-    
+    if (phone.active) {
+      modal.find('#phone-active-yes').prop('checked',true);
+    } else {
+      modal.find('#phone-active-no').prop('checked',true);
+    }
+
     modal.find('#phone-gwp').keyup(function() {
       monthly = modal.find('#phone-gwp').val() * ipt_rate;
       modal.find('#phone-premium').val(monthly);

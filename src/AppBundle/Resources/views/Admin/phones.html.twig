@@ -1,5 +1,19 @@
 {% extends 'base.html.twig' %}
 
+{% macro display_actions(phone, token) %}
+  <button type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
+      data-query="{{ path('claims_phone_alternatives', {'id': phone.id}) }}"
+      data-phone="{{ phone.toAlternativeArray()|json_encode }}"
+      {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
+      ><i class="fa fa-book"></i></button>
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
+      data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}"
+      data-ipt-rate="{{ phone.iptRate }}"
+      data-phone="{{ phone.toEditArray()|json_encode }}"><i class="fa fa-edit"></i></button>
+  <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
+          data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}"><i class="fa fa-trash"></i></button>
+{% endmacro display_actions %}
+
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
@@ -11,61 +25,90 @@
     {% endjavascripts %}
 {% endblock %}
 
+{% import _self as this %}
 {% block body %}
-
 <div class="container">
-  <form>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-                data-update="{{ path('admin_phone_add') }}">Add new phone</button>
+    <div class="bg-info" style="border-radius: 10px;">
+    <p class="text-center"><strong>Find phones</strong></p>
+    <div class="row">
+    {{ form_start(form) }}
+        <div class="form-group">
+            {{ form_label(form.os, 'Os', {'label_attr': {'class': 'col-sm-3'}}) }}
+            {{ form_errors(form.os) }}
+            {{ form_widget(form.os, {'attr': {'class': 'col-sm-6'}}) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.active, 'Active', {'label_attr': {'class': 'col-sm-1'}}) }}
+            {{ form_errors(form.active) }}
+            {{ form_widget(form.active, {'attr': {'class': 'col-sm-2'}}) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.rules, 'Business rules', {'label_attr': {'class': 'col-sm-3'}}) }}
+            {{ form_errors(form.rules) }}
+            {{ form_widget(form.rules, {'attr': {'class': 'col-sm-2'}}) }}
+        </div>
+        <div class="form-group">
+          <div class="col-sm-2 col-sm-offset-2 text-center">
+            {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success'}}) }}
+          </div>
+        </div>
+
+    {{ form_end(form) }}
+    </div>
+  </div>
+  <form style="margin-top: 20px;">
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#financial">Financial</a></li>
       <li role="presentation"><a href="#device">Device</a></li>
-      <li role="presentation"><a href="#pot">Pot</a></li>
+      <li role="presentation"><a href="#misc">Misc</a></li>
+      <li role="presentation">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
+                data-update="{{ path('admin_phone_add') }}">Add new phone</button>
+        
+      </li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="financial">
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped table-condensed">
                     <thead>
                     <tr>
                         <th>Phone</th>
-                        <th>Initial Price</th>
-                        <th>Suggested Replacement Phone</th>
-                        <th>Replacement Price</th>
                         <th>Monthly Premium</th>
                         <th>Yearly Premium</th>
+                        <th>Max Pot</th>
+                        <th>Max Connections</th>
+                        <th>Replacement Price</th>
                         <th>Policy Profit</th>
-                        <th>Age</th>
+                        <th>Initial Price</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for phone in phones %}
-                        <tr>
-                            <td>{{ phone }}</td>
-                            <td>{{ phone.initialPrice }}</td>
-                            <td>
-                                {% if phone.suggestedReplacement %}
-                                    {{ phone.suggestedReplacement }}
-                                {% endif %}
+                        <tr {% if not phone.active %}class="danger"{% endif %}>
+                            <td>{{ phone }}
+                            {% if phone.shouldBeRetired %}<span class="text-danger"><i class="glyphicon glyphicon-time" title="{{ phone.monthAge }} months old"></i></span>{% endif %}
                             </td>
+                            <td>£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                            <td>£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                            <td>£{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }}</td>
+                            <td>{{ phone.currentPhonePrice.maxConnections }}</td>
                             <td>
                                 {% if phone.suggestedReplacement %}
-                                    {{ phone.suggestedReplacement.replacementPrice }} <i class="fa fa-info-circle" title="Suggested Replacement Price"></i>
+                                    £{{ phone.suggestedReplacement.replacementPrice|number_format(2, '.', ',') }}
+                                    <i class="fa fa-info-circle" title="Replacement Price for suggested {{ phone.suggestedReplacement }}"></i>
                                 {% elseif phone.replacementPrice > 0 %}
-                                    {{ phone.replacementPrice }}
+                                    £{{ phone.replacementPrice|number_format(2, '.', ',') }}
                                 {% endif %}
                             </td>
-                            <td>{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</td>
-                            <td>{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</td>
-                            <td>{{ phone.policyProfit(0.25)|number_format(2, '.', ',') }}</td>
-                            <td><span class="{% if phone.monthAge > 48 %}text-danger{% else %}text-muted{% endif %}">{{ phone.monthAge }} months</span></td>
-                            <td>
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-                                    data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}"
-                                    data-ipt-rate="{{ phone.iptRate }}"
-                                    data-phone="{{ phone.toEditArray()|json_encode }}">Edit</button>
-                                <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
-                                        data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}">Delete</button>
+                            <td><span class="{% if phone.policyProfit(0.25) > 0 %}text-success{% else %}text-warning{%endif %}">
+                            £{{ phone.policyProfit(0.25)|number_format(2, '.', ',') }}
+                            </span>
+                            </td>
+                            <td>£{{ phone.initialPrice|number_format(2, '.', ',') }}</td>
+                            <td width="152px">
+                              {{ this.display_actions(phone, token) }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -78,7 +121,7 @@
         </div>
         <div role="tabpanel" class="tab-pane" id="device">
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped table-condensed">
                     <thead>
                     <tr>
                         <th>Phone</th>
@@ -91,11 +134,12 @@
                         <th>Screen Resolution</th>
                         <th>Camera</th>
                         <th>4G</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for phone in phones %}
-                        <tr>
+                        <tr {% if not phone.active %}class="danger"{% endif %}>
                             <td>{{ phone }}</td>
                             <td><span title="{{ phone.devices|join(", ") }}">{{ phone.devices|length }}</span></td>
                             <td>{{ phone.osString }}</td>
@@ -106,12 +150,8 @@
                             <td>{{ phone.screenResolution }}</td>
                             <td>{{ phone.camera }} MP</td>
                             <td>{% if phone.lte %}Yes{%else%}No{%endif%}</td>
-                            <td>
-                                <button type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
-                                    data-query="{{ path('claims_phone_alternatives', {'id': phone.id}) }}"
-                                    data-phone="{{ phone.toAlternativeArray()|json_encode }}"
-                                    {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
-                                    >Suggest Alternatives</button>
+                            <td width="152px">
+                              {{ this.display_actions(phone, token) }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -122,29 +162,29 @@
                 {{ pagerfanta(pager, 'twitter_bootstrap3') }}
             </div>
         </div>
-        <div role="tabpanel" class="tab-pane" id="pot">
+        <div role="tabpanel" class="tab-pane" id="misc">
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped table-condensed">
                     <thead>
                     <tr>
                         <th>Phone</th>
-                        <th>Max Pot</th>
-                        <th>Max Connections</th>
+                        <th>Suggested Replacement Phone</th>
+                        <th>Age</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for phone in phones %}
-                        <tr>
+                        <tr {% if not phone.active %}class="danger"{% endif %}>
                             <td>{{ phone }}</td>
-                            <td>{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }}</td>
-                            <td>{{ phone.currentPhonePrice.maxConnections }}</td>
                             <td>
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-                                    data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}"
-                                    data-ipt-rate="{{ phone.iptRate }}"
-                                    data-phone="{{ phone.toEditArray()|json_encode }}">Edit</button>
-                                <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
-                                        data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}">Delete</button>
+                                {% if phone.suggestedReplacement %}
+                                    {{ phone.suggestedReplacement }}
+                                {% endif %}
+                            </td>
+                            <td><span class="{% if phone.shouldBeRetired %}text-danger{% else %}text-muted{% endif %}">{{ phone.monthAge }} months</span></td>
+                            <td width="152px">
+                              {{ this.display_actions(phone, token) }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -192,6 +232,16 @@
               <div class="form-group">
                 <label for="phone-premium" class="control-label">Monthly Premium Price:</label>
                 <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
+              </div>
+              <div class="form-group">
+                <label for="phone-active" class="control-label">Active:</label><br />
+
+                <label class="radio-inline">
+                  <input type="radio" id="phone-active-yes" value="true" name="active">Yes
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" id="phone-active-no" value="false" name="active">No
+                </label>
               </div>
           </div>
           <div class="modal-footer">
