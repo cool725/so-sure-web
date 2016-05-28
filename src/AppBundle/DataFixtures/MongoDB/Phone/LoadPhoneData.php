@@ -244,7 +244,15 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
         $replacementQuery = ['make' => trim($data[24]), 'model' => trim($data[25]), 'memory' => (int)trim($data[26])];
         $replacement = $phoneRepo->findOneBy($replacementQuery);
         if ($replacement) {
-            $phone = $phoneRepo->findOneBy(['make' => $data[0], 'model' => $data[1], 'memory' => (int)$data[3]]);
+            $phone = $phoneRepo->findOneBy(['make' => $data[0], 'model' => $data[1], 'memory' => (float)$data[3]]);
+            if (!$phone) {
+                throw new \Exception(sprintf(
+                    'Unable to find %s %s %s',
+                    $data[0],
+                    $data[1],
+                    $data[3]
+                ));
+            }
             $phone->setSuggestedReplacement($replacement);
         }
     }

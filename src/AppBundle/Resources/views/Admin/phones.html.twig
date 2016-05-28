@@ -183,6 +183,8 @@
                             <td>
                                 {% if phone.suggestedReplacement %}
                                     {{ phone.suggestedReplacement }}
+                                {% elseif phone.replacementPrice %}
+                                  Direct replacement available
                                 {% endif %}
                             </td>
                             <td><span class="{% if phone.shouldBeRetired %}text-danger{% else %}text-muted{% endif %}">{{ phone.monthAge }} months</span></td>

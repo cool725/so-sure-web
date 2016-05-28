@@ -92,7 +92,8 @@ class AdminController extends BaseController
                 $phoneIds[] = $phone->getId();
             }
             foreach ($replacementPhones->getQuery()->execute() as $phone) {
-                if ($phone->getSuggestedReplacement() && $phone->getSuggestedReplacement()->getMemory() < $phone->getMemory()) {
+                if ($phone->getSuggestedReplacement() &&
+                    $phone->getSuggestedReplacement()->getMemory() < $phone->getMemory()) {
                     $phoneIds[] = $phone->getId();
                 }
             }
