@@ -98,6 +98,9 @@
                                 {% if phone.suggestedReplacement %}
                                     £{{ phone.suggestedReplacement.replacementPrice|number_format(2, '.', ',') }}
                                     <i class="fa fa-info-circle" title="Replacement Price for suggested {{ phone.suggestedReplacement }}"></i>
+                                    {% if phone.suggestedReplacement.initialPrice > phone.initialPrice + 30 %}
+                                      <i class="fa fa-warning" title="Suggested replacement phone is more than £30 than original (£{{ phone.suggestedReplacement.initialPrice - phone.initialPrice }})"></i>
+                                    {% endif %}
                                 {% elseif phone.replacementPrice > 0 %}
                                     £{{ phone.replacementPrice|number_format(2, '.', ',') }}
                                 {% endif %}

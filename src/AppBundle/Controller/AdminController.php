@@ -51,43 +51,41 @@ class AdminController extends BaseController
 
         $form = $this->createForm(PhoneSearchType::class);
         $form->handleRequest($request);
-        //if ($form->isValid()) {
-            $data = $form->get('os')->getData();
-            $phones = $phones->field('os')->in($data);
-            $data = filter_var($form->get('active')->getData(), FILTER_VALIDATE_BOOLEAN);
-            $phones = $phones->field('active')->equals($data);
-            $rules = $form->get('rules')->getData();
-            if ($rules == 'replacement') {
-                $phones = $phones->field('suggestedReplacement')->exists(false);
-                $phones = $phones->field('replacementPrice')->lte(0);
-            } elseif ($rules == 'retired') {
-                $retired = new \DateTime();
-                $retired->sub(new \DateInterval(sprintf('P%dM', Phone::MONTHS_RETIREMENT + 1)));
-                $phones = $phones->field('releaseDate')->lte($retired);
-            } elseif ($rules == 'loss') {
-                $phoneIds = [];
-                foreach ($phones->getQuery()->execute() as $phone) {
-                    if ($phone->policyProfit(0.25) < 0) {
-                        $phoneIds[] = $phone->getId();
-                    }
+        $data = $form->get('os')->getData();
+        $phones = $phones->field('os')->in($data);
+        $data = filter_var($form->get('active')->getData(), FILTER_VALIDATE_BOOLEAN);
+        $phones = $phones->field('active')->equals($data);
+        $rules = $form->get('rules')->getData();
+        if ($rules == 'replacement') {
+            $phones = $phones->field('suggestedReplacement')->exists(false);
+            $phones = $phones->field('replacementPrice')->lte(0);
+        } elseif ($rules == 'retired') {
+            $retired = new \DateTime();
+            $retired->sub(new \DateInterval(sprintf('P%dM', Phone::MONTHS_RETIREMENT + 1)));
+            $phones = $phones->field('releaseDate')->lte($retired);
+        } elseif ($rules == 'loss') {
+            $phoneIds = [];
+            foreach ($phones->getQuery()->execute() as $phone) {
+                if ($phone->policyProfit(0.25) < 0) {
+                    $phoneIds[] = $phone->getId();
                 }
-                $phones->field('id')->in($phoneIds);
-            } elseif ($rules == 'price') {
-                $phoneIds = [];
-                foreach ($phones->getQuery()->execute() as $phone) {
-                    if (abs($phone->policyProfit(0.25)) > 30) {
-                        $phoneIds[] = $phone->getId();
-                    }
-                }
-                $phones->field('id')->in($phoneIds);
-            } elseif ($rules == 'brightstar') {
-                $phones = $phones->field('replacementPrice')->lte(0);          
-                $phones = $phones->field('initialPrice')->gte(300);
-                $year = new \DateTime();
-                $year->sub(new \DateInterval('P1Y'));
-                $phones = $phones->field('releaseDate')->gte($year);
             }
-        //}
+            $phones->field('id')->in($phoneIds);
+        } elseif ($rules == 'price') {
+            $phoneIds = [];
+            foreach ($phones->getQuery()->execute() as $phone) {
+                if (abs($phone->policyProfit(0.25)) > 30) {
+                    $phoneIds[] = $phone->getId();
+                }
+            }
+            $phones->field('id')->in($phoneIds);
+        } elseif ($rules == 'brightstar') {
+            $phones = $phones->field('replacementPrice')->lte(0);
+            $phones = $phones->field('initialPrice')->gte(300);
+            $year = new \DateTime();
+            $year->sub(new \DateInterval('P1Y'));
+            $phones = $phones->field('releaseDate')->gte($year);
+        }
         $pager = $this->pager($request, $phones);
 
         return [

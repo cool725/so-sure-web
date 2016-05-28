@@ -15,7 +15,7 @@ class PhoneRepository extends DocumentRepository
         $qb = $this->createQueryBuilder();
         $qb->addAnd($qb->expr()->field('replacementPrice')->gt(0));
         if ($phone->getOs() == Phone::OS_CYANOGEN) {
-            $qb->addAnd($qb->expr()->field('os')->in([Phone::OS_CYANOGEN, Phone::OS_ANDROID]));            
+            $qb->addAnd($qb->expr()->field('os')->in([Phone::OS_CYANOGEN, Phone::OS_ANDROID]));
         } else {
             $qb->addAnd($qb->expr()->field('os')->equals($phone->getOs()));
         }
