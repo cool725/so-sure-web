@@ -34,11 +34,12 @@ class PhoneSearchType extends AbstractType
             ->add('rules', ChoiceType::class, [
                 'required' => false,
                 'choices' => [
-                    'replacement' => 'Missing profit',
+                    'missing' => 'Missing profit',
                     'retired' => 'Should be retired',
                     'loss' => 'Neg profit',
                     'price' => 'Mismatch pricing',
-                    'brightstar' => 'Problematic Replacements'
+                    'brightstar' => 'Problematic Replacements',
+                    'replacement' => 'Replacement phones'
                 ],
                 'expanded' => false,
             ])

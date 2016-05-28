@@ -36,7 +36,7 @@ var compareValue = function(key, check, source, compare, display, offset) {
 
 var phoneToRow = function(item, compare) {
   var row_data = [
-    item['name'],
+    compareValue('memory', item, compare, 'gte', item['name']),
     item['replacement_price'],
     item['os'],
     compareValue('processor_speed', item, compare, 'gte'),

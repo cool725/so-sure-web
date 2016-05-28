@@ -56,7 +56,7 @@ class AdminController extends BaseController
         $data = filter_var($form->get('active')->getData(), FILTER_VALIDATE_BOOLEAN);
         $phones = $phones->field('active')->equals($data);
         $rules = $form->get('rules')->getData();
-        if ($rules == 'replacement') {
+        if ($rules == 'missing') {
             $phones = $phones->field('suggestedReplacement')->exists(false);
             $phones = $phones->field('replacementPrice')->lte(0);
         } elseif ($rules == 'retired') {
@@ -80,11 +80,26 @@ class AdminController extends BaseController
             }
             $phones->field('id')->in($phoneIds);
         } elseif ($rules == 'brightstar') {
+            $replacementPhones = clone $phones;
             $phones = $phones->field('replacementPrice')->lte(0);
             $phones = $phones->field('initialPrice')->gte(300);
             $year = new \DateTime();
             $year->sub(new \DateInterval('P1Y'));
             $phones = $phones->field('releaseDate')->gte($year);
+
+            $phoneIds = [];
+            foreach ($phones->getQuery()->execute() as $phone) {
+                $phoneIds[] = $phone->getId();
+            }
+            foreach ($replacementPhones->getQuery()->execute() as $phone) {
+                if ($phone->getSuggestedReplacement() && $phone->getSuggestedReplacement()->getMemory() < $phone->getMemory()) {
+                    $phoneIds[] = $phone->getId();
+                }
+            }
+
+            $phones = $replacementPhones->field('id')->in($phoneIds);
+        } elseif ($rules == 'replacement') {
+            $phones = $phones->field('suggestedReplacement')->exists(true);
         }
         $pager = $this->pager($request, $phones);
 

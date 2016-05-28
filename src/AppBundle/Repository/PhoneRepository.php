@@ -19,7 +19,9 @@ class PhoneRepository extends DocumentRepository
         } else {
             $qb->addAnd($qb->expr()->field('os')->equals($phone->getOs()));
         }
-        $qb->addAnd($qb->expr()->field('memory')->gte($phone->getMemory()));
+        $device = $phone->getDevices()[0];
+        $qb->addOr($qb->expr()->field('memory')->gte($phone->getMemory()));
+        $qb->addOr($qb->expr()->field('devices')->equals($device));
         $qb->addAnd($qb->expr()->field('processorCores')->gte($phone->getProcessorCores()));
         //$qb->addAnd($qb->expr()->field('processorSpeed')->gte($phone->getProcessorSpeed() - 200));
         $qb->addAnd($qb->expr()->field('camera')->gte($phone->getCamera() - 3));
