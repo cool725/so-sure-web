@@ -82,6 +82,9 @@ class Phone
     /** @MongoDB\Date() */
     protected $releaseDate;
 
+    /** @MongoDB\Field(type="boolean") */
+    protected $active;
+
     /**
      * @MongoDB\ReferenceOne(targetDocument="Phone")
      */
@@ -101,6 +104,7 @@ class Phone
         $replacementPrice = null,
         $initialPriceUrl = null
     ) {
+        $this->active = true;
         $this->make = $make;
         $this->model = $model;
         $this->devices = $devices;

@@ -19,7 +19,9 @@ class PhoneType extends AbstractType
                     'class' => 'AppBundle:Phone',
                     'query_builder' => function (DocumentRepository $dr) {
                         return $dr->createQueryBuilder('p')
-                            ->field('make')->notEqual("ALL");
+                            ->field('make')->notEqual("ALL")
+                            ->field('active')->equals(true)
+                            ->field('os')->in(['Android', 'iOS', 'Cyanogen']);
                     }
             ])
             ->add('next', SubmitType::class)
