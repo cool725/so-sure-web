@@ -144,12 +144,19 @@ class ClaimsController extends BaseController
         $repo = $dm->getRepository(Phone::class);
         $phone = $repo->find($id);
         $alternatives = $repo->alternatives($phone);
+        $suggestedReplacement = null;
+        if ($phone->getSuggestedReplacement()) {
+            $suggestedReplacement = $repo->find($phone->getSuggestedReplacement()->getId());
+        }
 
         $data = [];
         foreach ($alternatives as $alternative) {
             $data[] = $alternative->toAlternativeArray();
         }
 
-        return new JsonResponse(['alternatives' => $data]);
+        return new JsonResponse([
+            'alternatives' => $data,
+            'suggestedReplacement' => $suggestedReplacement ? $suggestedReplacement->toAlternativeArray() : null,
+        ]);
     }
 }

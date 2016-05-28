@@ -16,6 +16,7 @@ use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\UserSearchType;
+use AppBundle\Form\Type\PhoneSearchType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Pagerfanta\Pagerfanta;
@@ -45,11 +46,68 @@ class AdminController extends BaseController
         $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $pager = $this->pager($request, $repo->createQueryBuilder());
+        $phones = $repo->createQueryBuilder();
+        $phones = $phones->field('make')->notEqual('ALL');
+
+        $form = $this->createForm(PhoneSearchType::class);
+        $form->handleRequest($request);
+        $data = $form->get('os')->getData();
+        $phones = $phones->field('os')->in($data);
+        $data = filter_var($form->get('active')->getData(), FILTER_VALIDATE_BOOLEAN);
+        $phones = $phones->field('active')->equals($data);
+        $rules = $form->get('rules')->getData();
+        if ($rules == 'missing') {
+            $phones = $phones->field('suggestedReplacement')->exists(false);
+            $phones = $phones->field('replacementPrice')->lte(0);
+        } elseif ($rules == 'retired') {
+            $retired = new \DateTime();
+            $retired->sub(new \DateInterval(sprintf('P%dM', Phone::MONTHS_RETIREMENT + 1)));
+            $phones = $phones->field('releaseDate')->lte($retired);
+        } elseif ($rules == 'loss') {
+            $phoneIds = [];
+            foreach ($phones->getQuery()->execute() as $phone) {
+                if ($phone->policyProfit(0.25) < 0) {
+                    $phoneIds[] = $phone->getId();
+                }
+            }
+            $phones->field('id')->in($phoneIds);
+        } elseif ($rules == 'price') {
+            $phoneIds = [];
+            foreach ($phones->getQuery()->execute() as $phone) {
+                if (abs($phone->policyProfit(0.25)) > 30) {
+                    $phoneIds[] = $phone->getId();
+                }
+            }
+            $phones->field('id')->in($phoneIds);
+        } elseif ($rules == 'brightstar') {
+            $replacementPhones = clone $phones;
+            $phones = $phones->field('replacementPrice')->lte(0);
+            $phones = $phones->field('initialPrice')->gte(300);
+            $year = new \DateTime();
+            $year->sub(new \DateInterval('P1Y'));
+            $phones = $phones->field('releaseDate')->gte($year);
+
+            $phoneIds = [];
+            foreach ($phones->getQuery()->execute() as $phone) {
+                $phoneIds[] = $phone->getId();
+            }
+            foreach ($replacementPhones->getQuery()->execute() as $phone) {
+                if ($phone->getSuggestedReplacement() &&
+                    $phone->getSuggestedReplacement()->getMemory() < $phone->getMemory()) {
+                    $phoneIds[] = $phone->getId();
+                }
+            }
+
+            $phones = $replacementPhones->field('id')->in($phoneIds);
+        } elseif ($rules == 'replacement') {
+            $phones = $phones->field('suggestedReplacement')->exists(true);
+        }
+        $pager = $this->pager($request, $phones);
 
         return [
             'phones' => $pager->getCurrentPageResults(),
             'token' => $csrf->generateCsrfToken('default'),
+            'form' => $form->createView(),
             'pager' => $pager
         ];
     }
@@ -103,6 +161,8 @@ class AdminController extends BaseController
             $phone->setModel($request->get('model'));
             $phone->setDevices($devices);
             $phone->setMemory($request->get('memory'));
+            $active = filter_var($request->get('active'), FILTER_VALIDATE_BOOLEAN);
+            $phone->setActive($active);
             $phone->getCurrentPhonePrice()->setGwp($request->get('gwp'));
             $dm->flush();
             $this->addFlash(
@@ -148,8 +208,6 @@ class AdminController extends BaseController
         $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
-        $users = $repo->createQueryBuilder();
-        $pager = $this->pager($request, $users);
 
         $users = $repo->createQueryBuilder();
         $form = $this->createForm(UserSearchType::class);

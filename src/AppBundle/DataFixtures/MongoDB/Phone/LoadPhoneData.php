@@ -244,71 +244,84 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
         $replacementQuery = ['make' => trim($data[24]), 'model' => trim($data[25]), 'memory' => (int)trim($data[26])];
         $replacement = $phoneRepo->findOneBy($replacementQuery);
         if ($replacement) {
-            $phone = $phoneRepo->findOneBy(['make' => $data[0], 'model' => $data[1], 'memory' => (int)$data[3]]);
+            $phone = $phoneRepo->findOneBy(['make' => $data[0], 'model' => $data[1], 'memory' => (float)$data[3]]);
+            if (!$phone) {
+                throw new \Exception(sprintf(
+                    'Unable to find %s %s %s',
+                    $data[0],
+                    $data[1],
+                    $data[3]
+                ));
+            }
             $phone->setSuggestedReplacement($replacement);
         }
     }
 
     private function newPhoneFromRow($manager, $data)
     {
-        // price
-        if (!$data[5]) {
-            return;
-        }
-        /*
-        // devices
-        if (!$data[4]) {
-            return;
-        }
-        */
-
-        $devices = str_getcsv($data[4], ",", "'");
-        foreach ($devices as $device) {
-            if (stripos($device, "‘") !== false || stripos($device, "’") !== false) {
-                throw new \Exception(sprintf('Invalid apple quote for device %s', $device));
+        try {
+            // price
+            if (!$data[5]) {
+                return;
             }
-        }
+            /*
+            // devices
+            if (!$data[4]) {
+                return;
+            }
+            */
 
-        $phone = new Phone();
-        $phone->init(
-            $data[0], // $make
-            $data[1], // $model
-            $data[5] + 1.5, // $premium
-            $data[3], // $memory
-            $devices, // $devices
-            str_replace('£', '', $data[7]), // $initialPrice
-            str_replace('£', '', $data[6]), // $replacementPrice
-            $data[8] // $initialPriceUrl
-        );
+            $devices = str_getcsv($data[4], ",", "'");
+            foreach ($devices as $device) {
+                if (stripos($device, "‘") !== false || stripos($device, "’") !== false) {
+                    throw new \Exception(sprintf('Invalid apple quote for device %s', $device));
+                }
+            }
 
-        $resolution = explode('x', str_replace(' ', '', $data[17]));
-        $releaseDate = null;
-        $releaseDateText = str_replace(' ', '', $data[21]);
-        if (strlen($releaseDateText) > 0) {
-            $releaseDate = \DateTime::createFromFormat('m/y', $releaseDateText);
-            $releaseDate->setTime(0, 0);
-            // otherwise is current day
-            $releaseDate->modify('first day of this month');
-        }
-        $phone->setDetails(
-            $data[9], // $os,
-            $data[10], // $initialOsVersion,
-            $data[11], // $upgradeOsVersion,
-            $data[12], // $processorSpeed,
-            $data[13], // $processorCores,
-            $data[14], // $ram,
-            $data[15] == 'Y' ? true : false, // $ssd,
-            round($data[16]), // $screenPhysical,
-            $resolution[0], // $screenResolutionWidth,
-            $resolution[1], // $screenResolutionHeight,
-            round($data[18]), // $camera
-            $data[19] == 'Y' ? true : false, // $lte
-            $releaseDate // $releaseDate
-        );
+            $phone = new Phone();
+            $phone->init(
+                $data[0], // $make
+                $data[1], // $model
+                $data[5] + 1.5, // $premium
+                $data[3], // $memory
+                $devices, // $devices
+                str_replace('£', '', $data[7]), // $initialPrice
+                str_replace('£', '', $data[6]), // $replacementPrice
+                $data[8] // $initialPriceUrl
+            );
 
-        $manager->persist($phone);
-        if (!$phone->getCurrentPhonePrice()) {
-            throw new \Exception('Failed to init phone');
+            $resolution = explode('x', str_replace(' ', '', $data[17]));
+            $releaseDate = null;
+            $releaseDateText = str_replace(' ', '', $data[21]);
+            if (strlen($releaseDateText) > 0) {
+                $releaseDate = \DateTime::createFromFormat('m/y', $releaseDateText);
+                $releaseDate->setTime(0, 0);
+                // otherwise is current day
+                $releaseDate->modify('first day of this month');
+            }
+            $phone->setDetails(
+                $data[9], // $os,
+                $data[10], // $initialOsVersion,
+                $data[11], // $upgradeOsVersion,
+                $data[12], // $processorSpeed,
+                $data[13], // $processorCores,
+                $data[14], // $ram,
+                $data[15] == 'Y' ? true : false, // $ssd,
+                round($data[16]), // $screenPhysical,
+                $resolution[0], // $screenResolutionWidth,
+                $resolution[1], // $screenResolutionHeight,
+                round($data[18]), // $camera
+                $data[19] == 'Y' ? true : false, // $lte
+                $releaseDate // $releaseDate
+            );
+
+            $manager->persist($phone);
+            if (!$phone->getCurrentPhonePrice()) {
+                throw new \Exception('Failed to init phone');
+            }
+        } catch (\Exception $e) {
+            print sprintf('Ex: %s. Failed to import %s', $e->getMessage(), print_r($data, true));
+            throw $e;
         }
     }
 
