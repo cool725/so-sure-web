@@ -3,7 +3,9 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
+use AppBundle\Document\LostPhone;
 use AppBundle\Document\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -68,8 +70,36 @@ class ClaimsService
             }
 
             $claim->setProcessed(true);
+            $this->recordLostPhone($policy, $claim);
             $this->dm->flush();
         }
+    }
+
+    public function recordLostPhone(Policy $policy, Claim $claim)
+    {
+        if (!$policy instanceof PhonePolicy) {
+            throw new \Exception('not policy');
+            return;
+        }
+
+        if (!$claim->isOwnershipTransferClaim()) {
+            throw new \Exception('not transfer');
+            return;
+        }
+
+        $repo = $this->dm->getRepository(LostPhone::class);
+        $phone = $repo->findOneBy(['imei' => $policy->getImei()]);
+        if ($phone) {
+            throw new \Exception('found imei');
+            return;
+        }
+
+        $phone = new LostPhone();
+        $phone->populate($policy);
+        $this->dm->persist($phone);
+        $this->dm->flush();
+
+        return $phone;
     }
 
     public function notifyMonetaryClaim(Policy $policy, Claim $claim, $isClaimer)
