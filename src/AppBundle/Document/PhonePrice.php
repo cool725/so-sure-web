@@ -10,6 +10,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 class PhonePrice extends Price
 {
     use CurrencyTrait;
+    const BROKER_FEE = 0.121;
 
     public function __construct()
     {

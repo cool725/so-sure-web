@@ -88,3 +88,5 @@ parameters:
     branch_pot_url: ''
     branch_share_url: ''
     branch_policy_url: ''
+
+    expected_claim_frequency: 0.2
