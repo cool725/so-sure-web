@@ -368,7 +368,8 @@ class Phone
             return null;
         }
 
-        $profit = $this->getCurrentPhonePrice()->getYearlyPremiumPrice() - $price * $claimFrequency;
+        $profit = $this->getCurrentPhonePrice()->getYearlyGwp() * (1 - PhonePrice::BROKER_FEE) -
+            ($price + Claim::HANDLING_FEE) * $claimFrequency;
 
         return $this->toTopTwoDp($profit);
     }

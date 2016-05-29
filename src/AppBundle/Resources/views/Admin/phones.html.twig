@@ -79,7 +79,7 @@
                         <th>Max Pot</th>
                         <th>Max Connections</th>
                         <th>Replacement Price</th>
-                        <th>Policy Profit</th>
+                        <th>Policy Profit ({{ expected_claim_frequency * 100 }}% Claims)</th>
                         <th>Initial Price</th>
                         <th>Actions</th>
                     </tr>
@@ -105,8 +105,8 @@
                                     £{{ phone.replacementPrice|number_format(2, '.', ',') }}
                                 {% endif %}
                             </td>
-                            <td><span class="{% if phone.policyProfit(0.25) > 0 %}text-success{% else %}text-warning{%endif %}">
-                            £{{ phone.policyProfit(0.25)|number_format(2, '.', ',') }}
+                            <td><span class="{% if phone.policyProfit(expected_claim_frequency) > 0 %}text-success{% else %}text-warning{%endif %}">
+                            £{{ phone.policyProfit(expected_claim_frequency)|number_format(2, '.', ',') }}
                             </span>
                             </td>
                             <td>£{{ phone.initialPrice|number_format(2, '.', ',') }}</td>

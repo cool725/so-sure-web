@@ -70,6 +70,11 @@ abstract class Price
         return $this->toTwoDp($this->getMonthlyPremiumPrice() * 12);
     }
 
+    public function getYearlyGwp()
+    {
+        return $this->toTwoDp($this->getGwp() * 12);
+    }
+
     public function setMonthlyPremiumPrice($premium, \DateTime $date = null)
     {
         $this->setGwp($premium / (1 + $this->getIptRate($date)));

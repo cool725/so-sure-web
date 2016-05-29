@@ -11,6 +11,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class Claim
 {
+    const HANDLING_FEE = 15;
+
     const TYPE_LOSS = 'loss';
     const TYPE_THEFT = 'theft';
     const TYPE_DAMAGE = 'damage';

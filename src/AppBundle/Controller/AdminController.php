@@ -44,6 +44,7 @@ class AdminController extends BaseController
     public function phonesAction(Request $request)
     {
         $csrf = $this->get('form.csrf_provider');
+        $expectedClaimFrequency = $this->getParameter('expected_claim_frequency');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phones = $repo->createQueryBuilder();
@@ -66,7 +67,7 @@ class AdminController extends BaseController
         } elseif ($rules == 'loss') {
             $phoneIds = [];
             foreach ($phones->getQuery()->execute() as $phone) {
-                if ($phone->policyProfit(0.25) < 0) {
+                if ($phone->policyProfit($expectedClaimFrequency) < 0) {
                     $phoneIds[] = $phone->getId();
                 }
             }
@@ -74,7 +75,7 @@ class AdminController extends BaseController
         } elseif ($rules == 'price') {
             $phoneIds = [];
             foreach ($phones->getQuery()->execute() as $phone) {
-                if (abs($phone->policyProfit(0.25)) > 30) {
+                if (abs($phone->policyProfit($expectedClaimFrequency)) > 30) {
                     $phoneIds[] = $phone->getId();
                 }
             }

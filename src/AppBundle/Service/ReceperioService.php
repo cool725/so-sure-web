@@ -56,7 +56,7 @@ class ReceperioService extends BaseImeiService
                 'storeid' => $this->storeId,
             ]);
             $this->logger->info(sprintf("Claimscheck search for %s -> %s", $imei, print_r($response, true)));
-            $data = json_decode($response, true );
+            $data = json_decode($response, true);
 
             // for now, always ok the imei until we purchase db
             return $data['checkmendstatus']['result'] == 'green';

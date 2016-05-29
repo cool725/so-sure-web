@@ -52,6 +52,7 @@ twig:
         branch_pot_url: %branch_pot_url%
         branch_share_url: %branch_share_url%
         branch_policy_url: %branch_policy_url%
+        expected_claim_frequency: %expected_claim_frequency%
 
 doctrine_mongodb:
     connections:
