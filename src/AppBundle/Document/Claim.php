@@ -362,4 +362,9 @@ class Claim
     {
         return in_array($this->getStatus(), [self::STATUS_SETTLED]);
     }
+
+    public function isOwnershipTransferClaim()
+    {
+        return in_array($this->getType(), [self::TYPE_LOSS, self::TYPE_THEFT]);
+    }
 }

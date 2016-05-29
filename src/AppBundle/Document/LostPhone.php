@@ -100,4 +100,13 @@ class LostPhone
     {
         $this->phoneData = $phoneData;
     }
+
+    public function populate(PhonePolicy $policy)
+    {
+        $this->setPolicy($policy);
+        $this->setPhone($policy->getPhone());
+        $this->setImei($policy->getImei());
+        $this->setSerialNumber($policy->getSerialNumber());
+        $this->setPhoneData($policy->getPhoneData());
+    }
 }
