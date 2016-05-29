@@ -22,13 +22,32 @@ class ImeiCommand extends ContainerAwareCommand
                 InputArgument::REQUIRED,
                 'Imei'
             )
+            ->addOption(
+                'serial',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'serial'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $imei = $input->getArgument('imei');
+        $serial = $input->getOption('serial');
         $imeiService = $this->getContainer()->get('app.imei');
-        $imeiService->checkImei(new Phone(), $imei);
+        if ($imeiService->checkImei(new Phone(), $imei)) {
+            print sprintf("Imei %s is good\n", $imei);
+        } else {
+            print sprintf("Imei %s failed validation\n", $imei);
+        }
+
+        if ($serial) {
+            if ($imeiService->checkSerial(new Phone(), $serial)) {
+                print sprintf("Serial %s is good\n", $serial);
+            } else {
+                print sprintf("Serial %s failed validation\n", $serial);
+            }
+        }
     }
 }
