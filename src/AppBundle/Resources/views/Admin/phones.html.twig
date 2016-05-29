@@ -208,45 +208,58 @@
     <div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-        <form id="phone-update-form" method="post">
+        <form id="phone-update-form" class="form-horizontal" method="post">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="exampleModalLabel">New phone</h4>
           </div>
           <div class="modal-body">
               <div class="form-group">
-                <label for="phone-make" class="control-label">Make:</label>
+                <label for="phone-make" class="control-label col-sm-2">Make:</label>
+                <div class="col-sm-10">
                 <input type="text" class="form-control" id="phone-make" name="make">
+                </div>
               </div>
               <div class="form-group">
-                <label for="phone-model" class="control-label">Model:</label>
+                <label for="phone-model" class="control-label col-sm-2">Model:</label>
+                <div class="col-sm-10">
                 <input type="text" class="form-control" id="phone-model" name="model">
+                </div>
               </div>
               <div class="form-group">
-                <label for="phone-devices" class="control-label">Devices:</label>
+                <label for="phone-devices" class="control-label col-sm-2">Devices:</label>
+                <div class="col-sm-10">
                 <input type="text" class="form-control" id="phone-devices" name="devices">
+                </div>
               </div>
               <div class="form-group">
-                <label for="phone-memory" class="control-label">Memory:</label>
+                <label for="phone-memory" class="control-label col-sm-2">Memory:</label>
+                <div class="col-sm-10">
                 <input type="text" class="form-control" id="phone-memory" name="memory">
+                </div>
               </div>
               <div class="form-group">
-                <label for="phone-gwp" class="control-label">GWP:</label>
-                <input type="text" class="form-control" id="phone-gwp" name="gwp">
+                <label for="phone-gwp" class="control-label col-sm-2">GWP:</label>
+                <div class="col-sm-10">
+                <input type="text" class="form-control" id="phone-gwp" name="gwp" readonly="true" disabled="disabled">
+                </div>
               </div>
               <div class="form-group">
-                <label for="phone-premium" class="control-label">Monthly Premium Price:</label>
+                <label for="phone-premium" class="control-label col-sm-2">Monthly Premium Price:</label>
+                <div class="col-sm-10">
                 <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
+                </div>
               </div>
               <div class="form-group">
-                <label for="phone-active" class="control-label">Active:</label><br />
-
+                <label for="phone-active" class="control-label col-sm-2">Active:</label>
+                <div class="col-sm-10">
                 <label class="radio-inline">
                   <input type="radio" id="phone-active-yes" value="true" name="active">Yes
                 </label>
                 <label class="radio-inline">
                   <input type="radio" id="phone-active-no" value="false" name="active">No
                 </label>
+                </div>
               </div>
           </div>
           <div class="modal-footer">
