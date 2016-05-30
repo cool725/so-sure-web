@@ -39,6 +39,17 @@
                         
                         </td>
                     </tr>
+                    <tr>
+                      <td>ClaimsCheck Cert Id</td>
+                      <td>
+                        {% if policy.checkmendCert %}
+                          <a href="https://www.checkmend.com/uk/verify/{{ policy.checkmendCert }}" target="_blank">{{ policy.checkmendCert }}</a>
+                        </form>
+                        {% else %}
+                          Cert not present
+                        {% endif %}
+                      </td>
+                    </tr>
                 </table>
                 <h3>Pot</h3>
                 <table class="table table-striped">
