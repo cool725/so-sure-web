@@ -17,6 +17,9 @@ class ReceperioService extends BaseImeiService
     /** @var string */
     protected $storeId;
 
+    /** @var string */
+    protected $certId;
+
     /**
      * @param string $secretKey
      */
@@ -31,6 +34,11 @@ class ReceperioService extends BaseImeiService
     public function setStoreId($storeId)
     {
         $this->storeId = $storeId;
+    }
+
+    public function getCertId()
+    {
+        return $this->certId;
     }
 
     /**
@@ -58,8 +66,8 @@ class ReceperioService extends BaseImeiService
             ]);
             $this->logger->info(sprintf("Claimscheck search for %s -> %s", $imei, print_r($response, true)));
             $data = json_decode($response, true);
+            $this->certId = $data['checkmendstatus']['certid'];
 
-            // for now, always ok the imei until we purchase db
             return $data['checkmendstatus']['result'] == 'green';
         } catch (\Exception $e) {
             // TODO: automate a future retry check

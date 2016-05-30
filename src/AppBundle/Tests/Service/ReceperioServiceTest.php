@@ -39,8 +39,10 @@ class ReceperioServiceTest extends WebTestCase
     {
         // Found on interenet, valid imei, but lost/stolen
         $this->assertFalse(self::$imei->checkImei(new Phone(), 356938035643809));
+        $this->assertTrue(strlen(self::$imei->getCertId()) > 0);
 
         // Patrick's imei
         $this->assertTrue(self::$imei->checkImei(new Phone(), 355424073417084));
+        $this->assertTrue(strlen(self::$imei->getCertId()) > 0);
     }
 }

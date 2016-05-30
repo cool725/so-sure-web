@@ -37,6 +37,12 @@ class PhonePolicy extends Policy
      */
     protected $serialNumber;
 
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $checkmendCert;
+
     public function getPhone()
     {
         return $this->phone;
@@ -80,6 +86,16 @@ class PhonePolicy extends Policy
     public function setPhoneData($phoneData)
     {
         $this->phoneData = $phoneData;
+    }
+
+    public function getCheckmendCert()
+    {
+        return $this->checkmendCert;
+    }
+
+    public function setCheckmendCert($checkmendCert)
+    {
+        $this->checkmendCert = $checkmendCert;
     }
 
     public function getConnectionValue(\DateTime $date = null)
