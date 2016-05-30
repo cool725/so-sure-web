@@ -9,7 +9,7 @@ use AppBundle\Service\ReceperioService;
 use GeoJson\Geometry\Point;
 
 /**
- * @group functional-nonet
+ * @group functional-paid
  */
 class BaseImeiServiceTest extends WebTestCase
 {

@@ -66,11 +66,16 @@ class UserRepository extends DocumentRepository
 
     public function findBankAccount(User $user)
     {
-        $accountHashes = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
-
         $qb = $this->createQueryBuilder();
         $qb->field('id')->notEqual($user->getId());
-        $qb->field('paymentMethod.accountHashes')->in($accountHashes);
+
+        if ($user->getPaymentMethod() instanceOf JudoPaymentMethod) {
+            $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getCardTokenHash() : ['NotAHash'];
+            $qb->field('paymentMethod.cardTokenHash')->equals($accountHash);
+        } elseif ($user->getPaymentMethod() instanceOf GocardlessPaymentMethod) {
+            $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
+            $qb->field('paymentMethod.accountHashes')->in($accountHashes);
+        }
 
         return $qb
             ->getQuery()
