@@ -69,10 +69,10 @@ class UserRepository extends DocumentRepository
         $qb = $this->createQueryBuilder();
         $qb->field('id')->notEqual($user->getId());
 
-        if ($user->getPaymentMethod() instanceOf JudoPaymentMethod) {
+        if ($user->getPaymentMethod() instanceof JudoPaymentMethod) {
             $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getCardTokenHash() : ['NotAHash'];
             $qb->field('paymentMethod.cardTokenHash')->equals($accountHash);
-        } elseif ($user->getPaymentMethod() instanceOf GocardlessPaymentMethod) {
+        } elseif ($user->getPaymentMethod() instanceof GocardlessPaymentMethod) {
             $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
             $qb->field('paymentMethod.accountHashes')->in($accountHashes);
         }
