@@ -6,6 +6,8 @@ use AppBundle\Document\Address;
 use AppBundle\Document\User;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use AppBundle\Document\GocardlessPaymentMethod;
+use AppBundle\Document\JudoPaymentMethod;
 
 class UserRepository extends DocumentRepository
 {
@@ -66,11 +68,18 @@ class UserRepository extends DocumentRepository
 
     public function findBankAccount(User $user)
     {
-        $accountHashes = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
-
         $qb = $this->createQueryBuilder();
         $qb->field('id')->notEqual($user->getId());
-        $qb->field('paymentMethod.accountHashes')->in($accountHashes);
+
+        if ($user->getPaymentMethod() instanceof JudoPaymentMethod) {
+            $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getCardTokenHash() : ['NotAHash'];
+            $qb->field('paymentMethod.cardTokenHash')->equals($accountHash);
+        } elseif ($user->getPaymentMethod() instanceof GocardlessPaymentMethod) {
+            $accountHashes = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
+            $qb->field('paymentMethod.accountHashes')->in($accountHashes);
+        } else {
+            throw new \Exception('User is missing a payment type');
+        }
 
         return $qb
             ->getQuery()

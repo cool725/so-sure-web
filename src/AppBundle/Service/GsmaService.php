@@ -52,7 +52,6 @@ class GsmaService
             ];
             $res = $client->request('POST', $url, ['json' => $data]);
             $body = (string) $res->getBody();
-            print_r($body);
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error in checkImei: %s', $e->getMessage()));
         }

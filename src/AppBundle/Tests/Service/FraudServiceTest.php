@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\GocardlessPaymentMethod;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -75,7 +76,7 @@ class FraudServiceTest extends WebTestCase
         $this->assertEquals(1, $data['duplicate_postcode']);
     }
 
-    public function testDuplicateBankAccounts()
+    public function testDuplicateGocardlessBankAccounts()
     {
         $user = static::createUser(
             static::$userManager,
@@ -107,6 +108,47 @@ class FraudServiceTest extends WebTestCase
         $gocardless2 = new GocardlessPaymentMethod();
         $gocardless2->addAccount('1', $account);
         $user2->setPaymentMethod($gocardless2);
+        $policy2 = static::createPolicy($user2, static::$dm);
+        self::$dm->persist($user2);
+        self::$dm->flush();
+
+        $data = self::$fraudService->runChecks($policy);
+        $this->assertEquals(1, $data['duplicate_bank_accounts']);
+    }
+
+    public function testDuplicateJudoBankAccounts()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('judo1', $this),
+            'bar'
+        );
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostcode('AB123');
+        $user->setBillingAddress($address);
+        self::$dm->persist($user);
+        self::$dm->flush();
+
+        $account = ['type' => '1', 'lastfour' => '1234', 'exp' => '1220'];
+        $judo = new JudoPaymentMethod();
+        $judo->addCardToken('1', $account);
+        $user->setPaymentMethod($judo);
+        $policy = static::createPolicy($user, static::$dm);
+
+        $user2 = static::createUser(
+            static::$userManager,
+            static::generateEmail('judo2', $this),
+            'bar'
+        );
+        $address2 = new Address();
+        $address2->setType(Address::TYPE_BILLING);
+        $address2->setPostcode('AB123');
+        $user2->setBillingAddress($address2);
+
+        $judo2 = new JudoPaymentMethod();
+        $judo2->addCardToken('1', $account);
+        $user2->setPaymentMethod($judo2);
         $policy2 = static::createPolicy($user2, static::$dm);
         self::$dm->persist($user2);
         self::$dm->flush();
