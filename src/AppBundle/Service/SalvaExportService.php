@@ -4,10 +4,16 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use DOMDocument;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 
 class SalvaExportService
 {
     const SCHEMA_POLICY_IMPORT = 'policy/import/policyImportV1.xsd';
+
+    /** @var DocumentManager */
+    protected $dm;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -25,14 +31,22 @@ class SalvaExportService
     protected $rootDir;
 
     /**
+     * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $baseUrl
      * @param string          $username
      * @param string          $password
      * @param string          $rootDir
      */
-    public function __construct(LoggerInterface $logger, $baseUrl, $username, $password, $rootDir)
-    {
+    public function __construct(
+        DocumentManager  $dm,
+        LoggerInterface $logger,
+        $baseUrl,
+        $username,
+        $password,
+        $rootDir
+    ) {
+        $this->dm = $dm;
         $this->logger = $logger;
         $this->baseUrl = $baseUrl;
         $this->username = $username;
@@ -42,7 +56,58 @@ class SalvaExportService
 
     public function export(Policy $policy)
     {
+    }
+
+    public function transformPolicy(PhonePolicy $policy = null)
+    {
+        if ($policy) {
+            $data = [
+                $policy->getPolicyNumber(),
+                $policy->getStatus(),
+                $policy->getStart()->format(\DateTime::ISO8601),
+                $policy->getEnd()->format(\DateTime::ISO8601),
+                $policy->getUser()->getId(),
+                $policy->getUser()->getFirstName(),
+                $policy->getUser()->getLastName(),
+                $policy->getPhone()->getMake(),
+                $policy->getPhone()->getModel(),
+                $policy->getImei(),
+                $policy->getPhone()->getInitialPrice(),
+                '12',
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                $policy->getPremium()->getYearlyPremiumPrice(),
+                $policy->getPremium()->getTotalIpt(),
+            ];
+        } else {
+            $data = [
+                'PolicyNumber',
+                'Status',
+                'InceptionDate',
+                'EndDate',
+                'CustomerId',
+                'FirstName',
+                'LastName',
+                'Make',
+                'Model',
+                'Imei',
+                'EstimatedPhonePrice',
+                'NumberInstallments',
+                'InstallmentAmount',
+                'TotalPremium',
+                'Ipt',
+            ];
+        }
         
+        return implode(',', $data);
+    }
+
+    public function exportPolicies()
+    {
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        print sprintf("%s\n", $this->transformPolicy(null));
+        foreach ($repo->findAll() as $policy) {
+            print sprintf("%s\n", $this->transformPolicy($policy));
+        }
     }
 
     public function validate($xml, $schemaType)
