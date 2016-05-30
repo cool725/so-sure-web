@@ -5,12 +5,13 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\Phone;
+use AppBundle\Service\ReceperioService;
 use GeoJson\Geometry\Point;
 
 /**
  * @group functional-nonet
  */
-class ReceperioServiceTest extends WebTestCase
+class BaseImeiServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
@@ -40,7 +41,7 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testCheckImei()
     {
-        $this->assertTrue(self::$imei->checkImei(new Phone(), 356938035643809));
+        $this->assertFalse(self::$imei->checkImei(new Phone(), ReceperioService::TEST_INVALID_IMEI));
     }
 
     public function testIsLostImeiInvalid()
@@ -60,5 +61,19 @@ class ReceperioServiceTest extends WebTestCase
         //$imeiService->setDm(static::$dm);
         //$this->assertTrue($imeiService->isLostImei($imeiNumber));
         $this->assertTrue(self::$imei->isLostImei($imeiNumber));
+    }
+
+    public function testIsImei()
+    {
+        $this->assertFalse(self::$imei->isImei(0));
+        $this->assertFalse(self::$imei->isImei('0'));
+
+        // 356938035643809 should be valid (from internet)
+        $this->assertTrue(self::$imei->isImei(356938035643809));
+        $this->assertTrue(self::$imei->isImei('356938035643809'));
+
+        // 356938035643809 is valid 356938035643808 changes check digit should invalidate luhn check
+        $this->assertFalse(self::$imei->isImei(356938035643808));
+        $this->assertFalse(self::$imei->isImei('356938035643808'));
     }
 }

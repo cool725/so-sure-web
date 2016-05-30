@@ -8,9 +8,9 @@ use AppBundle\Document\Phone;
 use GeoJson\Geometry\Point;
 
 /**
- * @group functional-nonet
+ * @group functional-paid
  */
-class BaseImeiServiceTest extends WebTestCase
+class ReceperioServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
@@ -35,22 +35,12 @@ class BaseImeiServiceTest extends WebTestCase
     {
     }
 
-    public function testIsImei()
+    public function testPaidCheckImei()
     {
-        $this->assertFalse(self::$imei->isImei(0));
-        $this->assertFalse(self::$imei->isImei('0'));
+        // Found on interenet, valid imei, but lost/stolen
+        $this->assertFalse(self::$imei->checkImei(new Phone(), 356938035643809));
 
-        // 356938035643809 should be valid (from internet)
-        $this->assertTrue(self::$imei->isImei(356938035643809));
-        $this->assertTrue(self::$imei->isImei('356938035643809'));
-
-        // 356938035643809 is valid 356938035643808 changes check digit should invalidate luhn check
-        $this->assertFalse(self::$imei->isImei(356938035643808));
-        $this->assertFalse(self::$imei->isImei('356938035643808'));
-    }
-
-    public function testCheckImei()
-    {
-        $this->assertTrue(self::$imei->checkImei(new Phone(), 356938035643809));
+        // Patrick's imei
+        $this->assertTrue(self::$imei->checkImei(new Phone(), 355424073417084));
     }
 }
