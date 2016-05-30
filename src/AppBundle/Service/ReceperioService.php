@@ -7,6 +7,7 @@ use AppBundle\Document\Phone;
 
 class ReceperioService extends BaseImeiService
 {
+    const TEST_INVALID_IMEI = "352000067704506";
     const PARTNER_ID = 415;
     const BASE_URL = "http://gapi.checkmend.com";
 
@@ -46,7 +47,7 @@ class ReceperioService extends BaseImeiService
 
         \AppBundle\Classes\NoOp::noOp([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
-        if ($imei == "352000067704506") {
+        if ($imei == self::TEST_INVALID_IMEI) {
             return false;
         }
 
