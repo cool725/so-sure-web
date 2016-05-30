@@ -32,7 +32,7 @@ class FraudService
     {
         $data = [
             'duplicate_postcode' => count($this->getDuplicatePostcode($policy)),
-            'duplicate_bank_accounts' => count($this->getDuplicateBankAccounts($policy)),
+            'duplicate_bank_accounts' => $this->getDuplicateBankAccounts($policy),
             'network_cancellations' => count($policy->getNetworkCancellations()),
         ];
 
@@ -58,10 +58,14 @@ class FraudService
 
     public function getDuplicateBankAccounts(Policy $policy)
     {
-        $user = $policy->getUser();
-        $userRepo = $this->dm->getRepository(User::class);
+        try {
+            $user = $policy->getUser();
+            $userRepo = $this->dm->getRepository(User::class);
 
-        return $userRepo->findBankAccount($user);
+            return count($userRepo->findBankAccount($user));
+        } catch (\Exception $e) {
+            return 'N/A (Unknown payment type)';
+        }
     }
 
     public function getDuplicateIp(Policy $policy)

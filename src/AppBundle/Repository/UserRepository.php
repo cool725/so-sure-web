@@ -6,6 +6,8 @@ use AppBundle\Document\Address;
 use AppBundle\Document\User;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use AppBundle\Document\GocardlessPaymentMethod;
+use AppBundle\Document\JudoPaymentMethod;
 
 class UserRepository extends DocumentRepository
 {
@@ -73,8 +75,10 @@ class UserRepository extends DocumentRepository
             $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getCardTokenHash() : ['NotAHash'];
             $qb->field('paymentMethod.cardTokenHash')->equals($accountHash);
         } elseif ($user->getPaymentMethod() instanceof GocardlessPaymentMethod) {
-            $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
+            $accountHashes = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
             $qb->field('paymentMethod.accountHashes')->in($accountHashes);
+        } else {
+            throw new \Exception('User is missing a payment type');
         }
 
         return $qb
