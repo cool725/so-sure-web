@@ -35,8 +35,7 @@ class ClaimsService
         LoggerInterface $logger,
         \Swift_Mailer $mailer,
         $templating,
-        $router,
-        $defaultEmail
+        $router
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
