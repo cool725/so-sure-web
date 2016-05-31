@@ -71,7 +71,7 @@ class PolicyServiceTest extends WebTestCase
             static::generateEmail('create', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         static::$policyService->create($policy, $user);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
@@ -85,7 +85,7 @@ class PolicyServiceTest extends WebTestCase
             static::generateEmail('create-policyNumber', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy, $user);
 
@@ -105,7 +105,7 @@ class PolicyServiceTest extends WebTestCase
             'create-policyNumber@so-sure.com',
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy, $user);
 

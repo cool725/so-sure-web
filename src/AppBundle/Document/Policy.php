@@ -60,7 +60,7 @@ abstract class Policy
     protected $id;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Payment", mappedBy="policy")
+     * @MongoDB\ReferenceMany(targetDocument="Payment", mappedBy="policy", cascade={"persist"})
      */
     protected $payments;
 
@@ -180,11 +180,17 @@ abstract class Policy
      */
     protected $identityLog;
 
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\ScheduledPayment", cascade={"persist"})
+     */
+    protected $scheduledPayments;
+
     public function __construct()
     {
         $this->created = new \DateTime();
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -406,6 +412,17 @@ abstract class Policy
     public function setIdentityLog($identityLog)
     {
         $this->identityLog = $identityLog;
+    }
+
+    public function getScheduledPayments()
+    {
+        return $this->scheduledPayments;
+    }
+
+    public function addScheduledPayment(ScheduledPayment $scheduledPayment)
+    {
+        $scheduledPayment->setPolicy($this);
+        $this->scheduledPayments[] = $scheduledPayment;
     }
 
     public function init(User $user, PolicyDocument $terms, PolicyDocument $keyfacts)

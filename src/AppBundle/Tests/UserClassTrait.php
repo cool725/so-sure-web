@@ -8,6 +8,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Address;
 use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\GocardlessPayment;
 
 trait UserClassTrait
 {
@@ -82,17 +83,26 @@ trait UserClassTrait
         User $user,
         \Doctrine\ODM\MongoDB\DocumentManager $dm,
         $phone = null,
-        $date = null
+        $date = null,
+        $addPayment = false
     ) {
         self::addAddress($user);
 
         $policy = new PhonePolicy();
         $policy->setImei(self::generateRandomImei());
         $policy->init($user, self::getLatestPolicyTerms($dm), self::getLatestPolicyKeyFacts($dm));
-        $policy->create(rand(1, 999999), null, $date);
+
         if ($phone) {
             $policy->setPhone($phone);
         }
+
+        if ($addPayment && $policy->getPhone()) {
+            $payment = new GocardlessPayment();
+            $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+            $policy->addPayment($payment);
+        }
+
+        $policy->create(rand(1, 999999), null, $date);
 
         $dm->persist($policy);
         $dm->flush();
