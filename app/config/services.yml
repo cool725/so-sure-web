@@ -168,6 +168,7 @@ services:
     app.salva:
         class: AppBundle\Service\SalvaExportService
         arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
             logger:         "@logger"
             baseUrl:        "%salva_url%"
             username:       "%salva_username%"
