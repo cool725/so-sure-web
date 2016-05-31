@@ -35,7 +35,8 @@ class ClaimsService
         LoggerInterface $logger,
         \Swift_Mailer $mailer,
         $templating,
-        $router
+        $router,
+        $defaultEmail
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -121,7 +122,7 @@ class ClaimsService
 
             $message = \Swift_Message::newInstance()
                 ->setSubject($subject)
-                ->setFrom('hello@so-sure.com')
+                ->setFrom('hello@wearesosure.com')
                 ->setTo($policy->getUser()->getEmail())
                 ->setBody(
                     $this->templating->render($templateHtml, ['claim' => $claim, 'policy' => $policy]),

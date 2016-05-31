@@ -244,7 +244,7 @@ class InvitationService
 
         $message = \Swift_Message::newInstance()
             ->setSubject($subject)
-            ->setFrom('hello@so-sure.com')
+            ->setFrom('hello@wearesosure.com')
             ->setTo($to)
             ->setBody(
                 $this->templating->render($htmlTemplate, ['invitation' => $invitation]),

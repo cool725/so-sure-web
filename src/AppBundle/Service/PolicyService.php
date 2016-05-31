@@ -99,7 +99,7 @@ class PolicyService
     {
         $message = \Swift_Message::newInstance()
             ->setSubject(sprintf('Your so-sure policy %s', $policy->getPolicyNumber()))
-            ->setFrom('hello@so-sure.com')
+            ->setFrom('hello@wearesosure.com')
             ->setTo($policy->getUser()->getEmail())
             ->setBody(
                 $this->templating->render('AppBundle:Email:policy/new.html.twig', ['policy' => $policy]),
@@ -119,7 +119,7 @@ class PolicyService
     {
         $message = \Swift_Message::newInstance()
             ->setSubject(sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()))
-            ->setFrom('hello@so-sure.com')
+            ->setFrom('hello@wearesosure.com')
             ->setTo($policy->getUser()->getEmail())
             ->setBody(
                 $this->templating->render('AppBundle:Email:policy/cancelled.html.twig', ['policy' => $policy]),
@@ -146,7 +146,7 @@ class PolicyService
             }
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('Your friend, %s, cancelled their so-sure policy', $cancelledUser->getName()))
-                ->setFrom('hello@so-sure.com')
+                ->setFrom('hello@wearesosure.com')
                 ->setTo($networkConnection->getLinkedUser()->getEmail())
                 ->setBody(
                     $this->templating->render('AppBundle:Email:policy/networkCancelled.html.twig', [
