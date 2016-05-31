@@ -15,6 +15,7 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Exception\InvalidPremiumException;
 
 class PolicyService
 {
@@ -56,9 +57,9 @@ class PolicyService
         $this->router = $router->getRouter();
     }
 
-    public function create(Policy $policy, User $user)
+    public function create(Policy $policy, User $user, $date = null)
     {
-        $this->generateScheduledPayments($policy);
+        $this->generateScheduledPayments($policy, $date);
 
         // any emails with @so-sure.com will generate an invalid policy
         if ($user->hasSoSureEmail()) {
@@ -109,7 +110,7 @@ class PolicyService
                 }
                 return;
             } else {
-                throw new \Exception(sprintf(
+                throw new InvalidPremiumException(sprintf(
                     'Invalid payment %f for policy %s',
                     $paymentItem->getAmount(),
                     $policy->getId()

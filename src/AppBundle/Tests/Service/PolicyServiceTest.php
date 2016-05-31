@@ -9,12 +9,15 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\GocardlessPayment;
+use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Exception\InvalidPremiumException;
 
 /**
  * @group functional-nonet
@@ -113,5 +116,131 @@ class PolicyServiceTest extends WebTestCase
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
         $this->assertFalse($updatedPolicy->isValidPolicy());
         $this->assertTrue(stripos($updatedPolicy->getPolicyNumber(), 'INVALID/') !== false);
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\InvalidPremiumException
+     */
+    public function testGenerateScheduledPaymentsInvalidAmount()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'scheduled-invalidamount@so-sure.com',
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
+
+        $payment = new GocardlessPayment();
+        $payment->setAmount(0.01);
+        $policy->addPayment($payment);
+        static::$policyService->create($policy, $user);
+    }
+
+    public function testGenerateScheduledPaymentsMonthlyPayments()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'scheduled-monthly@so-sure.com',
+            'bar'
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $payment = new GocardlessPayment();
+        $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $policy->addPayment($payment);
+
+        static::$policyService->create($policy, $user);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(11, count($updatedPolicy->getScheduledPayments()));
+    }
+
+    public function testGenerateScheduledPaymentsMonthlyPaymentsDates()
+    {
+        $dates = [
+            28 => 28,
+            29 => 28,
+            31 => 28,
+            1 => 1,
+        ];
+        foreach ($dates as $actualDay => $expectedDay) {
+            $user = static::createUser(
+                static::$userManager,
+                sprintf('scheduled-monthly-%d@so-sure.com', $actualDay),
+                'bar'
+            );
+            $phone = $this->getRandomPhone(static::$dm);
+            $date = new \DateTime(sprintf('2016-01-%d', $actualDay));
+            $policy = static::createPolicy($user, static::$dm, $phone, $date);
+
+            $payment = new GocardlessPayment();
+            $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+            $policy->addPayment($payment);
+
+            static::$policyService->create($policy, $user, $date);
+
+            $updatedPolicy = static::$policyRepo->find($policy->getId());
+            $this->assertEquals(11, count($updatedPolicy->getScheduledPayments()));
+            for ($i = 0; $i < 11; $i++) {
+                $scheduledDate = $updatedPolicy->getScheduledPayments()[$i]->getScheduled();
+                $this->assertEquals($expectedDay, $scheduledDate->format('d'));
+            }
+        }
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testGenerateScheduledPaymentsFailedMonthlyPayments()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'scheduled-failed-monthly@so-sure.com',
+            'bar'
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $policy->addPayment($payment);
+
+        static::$policyService->create($policy, $user);
+    }
+
+    public function testGenerateScheduledPaymentsYearlyPayment()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'scheduled-yearly@so-sure.com',
+            'bar'
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $payment = new GocardlessPayment();
+        $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $policy->addPayment($payment);
+
+        static::$policyService->create($policy, $user);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(0, count($updatedPolicy->getScheduledPayments()));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testGenerateScheduledPaymentsMissingPayment()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'scheduled-missing@so-sure.com',
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
+        static::$policyService->create($policy, $user);
     }
 }
