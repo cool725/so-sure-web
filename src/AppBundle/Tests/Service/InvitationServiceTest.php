@@ -504,7 +504,7 @@ class InvitationServiceTest extends WebTestCase
         );
         $this->assertTrue($invitation instanceof EmailInvitation);
 
-        self::$invitationService->accept($invitation, $policyInvitee);
+        self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-05-01'));
 
         $repo = static::$dm->getRepository(Policy::class);
         $inviterPolicy = $repo->find($policy->getId());
