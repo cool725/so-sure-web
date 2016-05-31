@@ -124,7 +124,7 @@ class LaunchUserService
         $referralUrl = $this->getShortLink($user->getId());
         $message = \Swift_Message::newInstance()
             ->setSubject('Welcome to so-sure')
-            ->setFrom('hello@so-sure.com')
+            ->setFrom('hello@wearesosure.com')
             ->setTo($user->getEmail())
             ->setBody(
                 $this->templating->render('AppBundle:Email:preLaunch.html.twig', ['referral_url' => $referralUrl]),
