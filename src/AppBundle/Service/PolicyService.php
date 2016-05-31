@@ -57,14 +57,6 @@ class PolicyService
 
     public function create(Policy $policy, User $user)
     {
-        $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
-        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
-
-        $policyKeyFactsRepo = $this->dm->getRepository(PolicyKeyFacts::class);
-        $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
-
-        $policy->init($user, $latestTerms, $latestKeyFacts);
-
         // any emails with @so-sure.com will generate an invalid policy
         if ($user->hasSoSureEmail()) {
             $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), 'INVALID');
