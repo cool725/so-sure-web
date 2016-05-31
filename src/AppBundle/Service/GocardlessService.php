@@ -10,6 +10,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Service\SequenceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use AppBundle\Document\GocardlessPayment;
 
 class GocardlessService
 {
@@ -288,6 +289,11 @@ class GocardlessService
             'policy' => $policy->getId(),
         ]));
         $policy->setGocardlessSubscription($subscription->id);
+
+        $payment = new GocardlessPayment();
+        $payment->setReference($subscription->links->mandate);
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $policy->addPayment($payment);
 
         $this->dm->flush();
     }

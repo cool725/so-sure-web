@@ -10,7 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @MongoDB\Document
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
- * @MongoDB\DiscriminatorMap({"judo"="JudoPayment"})
+ * @MongoDB\DiscriminatorMap({"judo"="JudoPayment","gocardless"="GocardlessPayment"})
  * @Gedmo\Loggable
  */
 abstract class Payment
@@ -57,10 +57,18 @@ abstract class Payment
      */
     protected $user;
 
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\ScheduledPayment")
+     */
+    protected $scheduledPayments;
+
     public function __construct()
     {
         $this->created = new \DateTime();
+        $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
     }
+
+    abstract public function isSuccess();
 
     public function getId()
     {
@@ -125,5 +133,16 @@ abstract class Payment
     public function setReceipt($receipt)
     {
         $this->receipt = $receipt;
+    }
+
+    public function getScheduledPayments()
+    {
+        return $this->scheduledPayments;
+    }
+
+    public function addScheduledPayment(ScheduledPayment $scheduledPayment)
+    {
+        $scheduledPayment->setPayment($this);
+        $this->scheduledPayments[] = $scheduledPayment;
     }
 }

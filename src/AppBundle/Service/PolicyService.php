@@ -6,6 +6,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -14,6 +15,7 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Exception\InvalidPremiumException;
 
 class PolicyService
 {
@@ -55,8 +57,10 @@ class PolicyService
         $this->router = $router->getRouter();
     }
 
-    public function create(Policy $policy, User $user)
+    public function create(Policy $policy, User $user, $date = null)
     {
+        $this->generateScheduledPayments($policy, $date);
+
         // any emails with @so-sure.com will generate an invalid policy
         if ($user->hasSoSureEmail()) {
             $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), 'INVALID');
@@ -73,6 +77,48 @@ class PolicyService
         $this->dm->flush();
 
         $this->newPolicyEmail($policy);
+    }
+
+    public function generateScheduledPayments(Policy $policy, $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        // To allow billing on same date every month, 28th is max allowable day on month
+        if ($date->format('d') > 28) {
+            $date->sub(new \DateInterval(sprintf('P%dD', $date->format('d') - 28)));
+        }
+
+        $payment = null;
+        foreach ($policy->getPayments() as $paymentItem) {
+            if (!$paymentItem->isSuccess()) {
+                continue;
+            }
+
+            if ($paymentItem->getAmount() == $policy->getPremium()->getYearlyPremiumPrice()) {
+                return;
+            } elseif ($paymentItem->getAmount() == $policy->getPremium()->getMonthlyPremiumPrice()) {
+                for ($i = 1; $i <= 11; $i++) {
+                    $scheduledDate = clone $date;
+                    $scheduledDate->add(new \DateInterval(sprintf('P%dM', $i)));
+
+                    $scheduledPayment = new ScheduledPayment();
+                    $scheduledPayment->setScheduled($scheduledDate);
+                    $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+                    $policy->addScheduledPayment($scheduledPayment);
+                }
+                return;
+            } else {
+                throw new InvalidPremiumException(sprintf(
+                    'Invalid payment %f for policy %s',
+                    $paymentItem->getAmount(),
+                    $policy->getId()
+                ));
+            }
+        }
+
+        throw new \Exception(sprintf('Missing payment for policy %s', $policy->getId()));
     }
 
     public function cancel(Policy $policy, $reason, \DateTime $date = null)
