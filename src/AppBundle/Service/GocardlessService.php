@@ -11,6 +11,7 @@ use AppBundle\Service\SequenceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use AppBundle\Document\GocardlessPayment;
+use AppBundle\Classes\Salva;
 
 class GocardlessService
 {
@@ -293,6 +294,7 @@ class GocardlessService
         $payment = new GocardlessPayment();
         $payment->setReference($subscription->links->mandate);
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
         $policy->addPayment($payment);
 
         $this->dm->flush();

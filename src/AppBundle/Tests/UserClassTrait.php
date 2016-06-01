@@ -9,6 +9,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
+use AppBundle\Classes\Salva;
 
 trait UserClassTrait
 {
@@ -99,6 +100,7 @@ trait UserClassTrait
         if ($addPayment && $policy->getPhone()) {
             $payment = new GocardlessPayment();
             $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
             $policy->addPayment($payment);
         }
 

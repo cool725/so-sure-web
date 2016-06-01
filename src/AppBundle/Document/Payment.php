@@ -33,6 +33,12 @@ abstract class Payment
     protected $amount;
 
     /**
+     * @MongoDB\Float()
+     * @Gedmo\Versioned
+     */
+    protected $brokerFee;
+
+    /**
      * @MongoDB\String()
      * @MongoDB\Index(sparse=true)
      * @Gedmo\Versioned
@@ -79,10 +85,20 @@ abstract class Payment
     {
         $this->amount = $amount;
     }
-    
+
     public function getAmount()
     {
         return $this->amount;
+    }
+
+    public function setBrokerFee($brokerFee)
+    {
+        $this->brokerFee = $brokerFee;
+    }
+
+    public function getBrokerFee()
+    {
+        return $this->brokerFee;
     }
 
     public function setReference($reference)

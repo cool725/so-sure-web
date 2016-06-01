@@ -331,7 +331,7 @@ abstract class Policy
 
     public function getPotValue()
     {
-        return $this->potValue;
+        return $this->toTwoDp($this->potValue);
     }
 
     public function setPotValue($potValue)
@@ -500,6 +500,22 @@ abstract class Policy
         }
 
         return $paid;
+    }
+
+    public function getBrokerFeePaid()
+    {
+        $brokerFee = 0;
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+
+        foreach ($this->getPayments() as $payment) {
+            if ($payment->isSuccess()) {
+                $brokerFee += $payment->getBrokerFee();
+            }
+        }
+
+        return $this->toFourDp($brokerFee);
     }
 
     public function getRiskColour()

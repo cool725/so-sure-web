@@ -12,6 +12,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Classes\Salva;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Faker;
@@ -144,6 +145,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (rand(0, 1) == 0) {
             $payment = new JudoPayment();
             $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+            $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $policy->addPayment($payment);
         } else {
@@ -152,6 +154,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             for ($i = 1; $i <= $months; $i++) {
                 $payment = new JudoPayment();
                 $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+                $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
                 $policy->addPayment($payment);
             }

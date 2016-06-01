@@ -7,9 +7,13 @@ use DOMDocument;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Classes\Salva;
+use AppBundle\Document\CurrencyTrait;
 
 class SalvaExportService
 {
+    use CurrencyTrait;
+
     const SCHEMA_POLICY_IMPORT = 'policy/import/policyImportV1.xsd';
 
     /** @var DocumentManager */
@@ -81,8 +85,8 @@ class SalvaExportService
                 $policy->getPremium()->getYearlyPremiumPrice(),
                 $policy->getPremiumPaid(),
                 $policy->getPremium()->getTotalIpt(),
-                'todo',
-                'todo',
+                $this->toTwoDp(Salva::YEARLY_BROKER_FEE),
+                $policy->getBrokerFeePaid(),
                 count($policy->getConnections()),
                 $policy->getPotValue(),
             ];
