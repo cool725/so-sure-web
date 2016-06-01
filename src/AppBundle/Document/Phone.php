@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use AppBundle\Classes\Salva;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhoneRepository")
@@ -368,8 +369,10 @@ class Phone
             return null;
         }
 
-        $profit = $this->getCurrentPhonePrice()->getYearlyGwp() * (1 - PhonePrice::BROKER_FEE) -
-            ($price + Claim::HANDLING_FEE) * $claimFrequency;
+        // Avg Excess + Expected Recycling - Claims handling fee - Claims Check fee - replacement phone price
+        $costOfClaims = 56 + 19 - 14 - 1 - $price;
+        $nwt = $this->getCurrentPhonePrice()->getYearlyGwp() - Salva::YEARLY_BROKER_FEE;
+        $profit = $nwt + $costOfClaims * $claimFrequency;
 
         return $this->toTopTwoDp($profit);
     }
