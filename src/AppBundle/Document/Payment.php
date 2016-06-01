@@ -27,6 +27,12 @@ abstract class Payment
     protected $created;
 
     /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $date;
+
+    /**
      * @MongoDB\Float()
      * @Gedmo\Versioned
      */
@@ -71,6 +77,7 @@ abstract class Payment
     public function __construct()
     {
         $this->created = new \DateTime();
+        $this->date = new \DateTime();
         $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -79,6 +86,16 @@ abstract class Payment
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTime $date)
+    {
+        $this->date = $date;
     }
 
     public function setAmount($amount)

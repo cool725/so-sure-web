@@ -142,21 +142,24 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setImei($this->generateRandomImei());
         $policy->init($user, $latestTerms, $latestKeyFacts);
 
+        $paymentDate = clone $startDate;
         if (rand(0, 1) == 0) {
             $payment = new JudoPayment();
+            $payment->setDate($paymentDate);
             $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
             $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $policy->addPayment($payment);
         } else {
             $months = rand(1, 12);
-            // TODO: Should adjust policy start date based on number of payments
             for ($i = 1; $i <= $months; $i++) {
                 $payment = new JudoPayment();
+                $payment->setDate(clone $paymentDate);
                 $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
                 $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
                 $policy->addPayment($payment);
+                $paymentDate->add(new \DateInterval('P1M'));
             }
         }
         $manager->persist($policy);

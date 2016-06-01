@@ -7,6 +7,7 @@ use DOMDocument;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\JudoPayment;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;
 
@@ -124,6 +125,37 @@ class SalvaExportService
         print sprintf("%s\n", $this->transformPolicy(null));
         foreach ($repo->getAllPoliciesForExport() as $policy) {
             print sprintf("%s\n", $this->transformPolicy($policy));
+        }
+    }
+
+    public function transformPayment(JudoPayment $payment = null)
+    {
+        if ($payment) {
+            if (!$payment->isSuccess()) {
+                throw new \Exception('Invalid payment');
+            }
+            $data = [
+                $payment->getPolicy()->getPolicyNumber(),
+                $payment->getDate()->format(\DateTime::ISO8601),
+                $this->toTwoDp($payment->getAmount()),
+            ];
+        } else {
+            $data = [
+                'PolicyNumber',
+                'PaymentDate',
+                'PaymentAmount',
+            ];
+        }
+
+        return implode(',', $data);
+    }
+
+    public function exportPayments($year, $month)
+    {
+        $repo = $this->dm->getRepository(JudoPayment::class);
+        print sprintf("%s\n", $this->transformPayment(null));
+        foreach ($repo->getAllPaymentsForExport($year, $month) as $payment) {
+            print sprintf("%s\n", $this->transformPayment($payment));
         }
     }
 
