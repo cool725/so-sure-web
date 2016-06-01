@@ -11,6 +11,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection;
+use AppBundle\Document\JudoPayment;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Faker;
@@ -139,9 +140,27 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setPhone($phone);
         $policy->setImei($this->generateRandomImei());
         $policy->init($user, $latestTerms, $latestKeyFacts);
+
+        if (rand(0, 1) == 0) {
+            $payment = new JudoPayment();
+            $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+            $payment->setResult(JudoPayment::RESULT_SUCCESS);
+            $policy->addPayment($payment);
+        } else {
+            $months = rand(1, 12);
+            // TODO: Should adjust policy start date based on number of payments
+            for ($i = 1; $i <= $months; $i++) {
+                $payment = new JudoPayment();
+                $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+                $payment->setResult(JudoPayment::RESULT_SUCCESS);
+                $policy->addPayment($payment);
+            }
+        }
+        $manager->persist($policy);
         $policy->create(-5000 + $count, null, $startDate);
 
-        $manager->persist($policy);
+        $policyService = $this->container->get('app.policy');
+        $policyService->generateScheduledPayments($policy, $startDate);
     }
 
     private function addConnections($manager, $userA, $users)

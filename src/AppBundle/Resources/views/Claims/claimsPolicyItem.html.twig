@@ -30,6 +30,14 @@
                         <td>{{ policy.start|date }} - {{ policy.end|date }}</td>
                     </tr>
                     <tr>
+                        <td>Policy Payments</td>
+                        <td>Paid £{{ policy.premiumPaid }} of £{{ policy.premium.yearlyPremiumPrice }}</td>
+                    </tr>
+                    <tr>
+                        <td>Policy Installments</td>
+                        <td>{{ policy.numberOfInstallments }} installment(s) of £{{ policy.installmentAmount }}</td>
+                    </tr>
+                    <tr>
                         <td>Phone</td>
                         <td>{{ policy.phone }}
                                 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"

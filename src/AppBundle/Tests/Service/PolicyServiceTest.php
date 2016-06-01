@@ -75,7 +75,7 @@ class PolicyServiceTest extends WebTestCase
             'bar'
         );
         $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->create($policy, $user);
+        static::$policyService->create($policy);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::PROMO_LAUNCH, $policy->getPromoCode());
@@ -90,7 +90,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->create($policy, $user);
+        static::$policyService->create($policy);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
@@ -110,7 +110,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->create($policy, $user);
+        static::$policyService->create($policy);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
@@ -133,7 +133,7 @@ class PolicyServiceTest extends WebTestCase
         $payment = new GocardlessPayment();
         $payment->setAmount(0.01);
         $policy->addPayment($payment);
-        static::$policyService->create($policy, $user);
+        static::$policyService->create($policy);
     }
 
     public function testGenerateScheduledPaymentsMonthlyPayments()
@@ -150,7 +150,7 @@ class PolicyServiceTest extends WebTestCase
         $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $policy->addPayment($payment);
 
-        static::$policyService->create($policy, $user);
+        static::$policyService->create($policy);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(11, count($updatedPolicy->getScheduledPayments()));
@@ -178,7 +178,7 @@ class PolicyServiceTest extends WebTestCase
             $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
             $policy->addPayment($payment);
 
-            static::$policyService->create($policy, $user, $date);
+            static::$policyService->create($policy, $date);
 
             $updatedPolicy = static::$policyRepo->find($policy->getId());
             $this->assertEquals(11, count($updatedPolicy->getScheduledPayments()));
@@ -207,7 +207,7 @@ class PolicyServiceTest extends WebTestCase
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $policy->addPayment($payment);
 
-        static::$policyService->create($policy, $user);
+        static::$policyService->create($policy);
     }
 
     public function testGenerateScheduledPaymentsYearlyPayment()
@@ -224,7 +224,7 @@ class PolicyServiceTest extends WebTestCase
         $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $policy->addPayment($payment);
 
-        static::$policyService->create($policy, $user);
+        static::$policyService->create($policy);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(0, count($updatedPolicy->getScheduledPayments()));
@@ -241,6 +241,6 @@ class PolicyServiceTest extends WebTestCase
             'bar'
         );
         $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
-        static::$policyService->create($policy, $user);
+        static::$policyService->create($policy);
     }
 }

@@ -46,7 +46,7 @@ class BraintreeService
     public function add(Policy $policy)
     {
         $this->sale($policy);
-        $this->policyService->create($policy, $policy->getUser());
+        $this->policyService->create($policy);
     }
 
     /**

@@ -106,7 +106,11 @@ abstract class Policy
     protected $gocardlessSubscription;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Invitation\Invitation", mappedBy="policy")
+     * @MongoDB\ReferenceMany(
+     *  targetDocument="AppBundle\Document\Invitation\Invitation",
+     *  mappedBy="policy",
+     *  cascade={"persist"}
+     * )
      */
     protected $invitations;
 
@@ -183,14 +187,13 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\ScheduledPayment", cascade={"persist"})
      */
-    protected $scheduledPayments;
+    protected $scheduledPayments = array();
 
     public function __construct()
     {
         $this->created = new \DateTime();
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -457,6 +460,46 @@ abstract class Policy
             $initialPolicyNumber + $seq
         ));
         $this->setStatus(self::STATUS_PENDING);
+    }
+
+    public function getNumberOfInstallments()
+    {
+        if (!$this->isPolicy() || count($this->getPayments()) == 0) {
+            return null;
+        }
+
+        return count($this->getScheduledPayments()) + 1;
+    }
+
+    public function getInstallmentAmount()
+    {
+        if (!$this->isPolicy() || count($this->getPayments()) == 0) {
+            return null;
+        }
+
+        if ($this->getNumberOfInstallments() == 1) {
+            return $this->getPremium()->getYearlyPremiumPrice();
+        } elseif ($this->getNumberOfInstallments() == 12) {
+            return $this->getPremium()->getMonthlyPremiumPrice();
+        } else {
+            return null;
+        }
+    }
+
+    public function getPremiumPaid()
+    {
+        $paid = 0;
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+
+        foreach ($this->getPayments() as $payment) {
+            if ($payment->isSuccess()) {
+                $paid += $payment->getAmount();
+            }
+        }
+
+        return $paid;
     }
 
     public function getRiskColour()
