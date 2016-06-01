@@ -158,6 +158,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $manager->persist($policy);
         $policy->create(-5000 + $count, null, $startDate);
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $policyService = $this->container->get('app.policy');
         $policyService->generateScheduledPayments($policy, $startDate);

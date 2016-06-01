@@ -191,7 +191,7 @@ class JudopayServiceTest extends WebTestCase
         );
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token');
 
-        $this->assertEquals(PhonePolicy::STATUS_PENDING, $policy->getStatus());
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
     }
 }
