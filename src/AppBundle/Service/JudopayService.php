@@ -90,9 +90,9 @@ class JudopayService
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken);
 
-        // TODO: create payment schedule
         $this->validateUser($policy->getUser());
         $this->policyService->create($policy);
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         return true;
     }

@@ -1059,7 +1059,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => $receiptId,
         ]]);
         $policyData = $this->verifyResponse(200);
-        $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
     }
 
