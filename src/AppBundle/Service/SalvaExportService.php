@@ -7,6 +7,7 @@ use DOMDocument;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Classes\Salva;
 
 class SalvaExportService
 {
@@ -81,8 +82,8 @@ class SalvaExportService
                 $policy->getPremium()->getYearlyPremiumPrice(),
                 $policy->getPremiumPaid(),
                 $policy->getPremium()->getTotalIpt(),
-                'todo',
-                'todo',
+                Salva::YEARLY_BROKER_FEE,
+                $policy->getBrokerFeePaid(),
                 count($policy->getConnections()),
                 $policy->getPotValue(),
             ];

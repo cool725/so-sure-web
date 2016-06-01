@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Service\SalvaExportService;
+use AppBundle\Classes\Salva;
 
 /**
  * @group functional-net

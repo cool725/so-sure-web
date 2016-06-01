@@ -18,6 +18,7 @@ use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Classes\Salva;
 
 /**
  * @group functional-nonet
@@ -148,6 +149,7 @@ class PolicyServiceTest extends WebTestCase
 
         $payment = new GocardlessPayment();
         $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
         $policy->addPayment($payment);
 
         static::$policyService->create($policy);
@@ -176,6 +178,7 @@ class PolicyServiceTest extends WebTestCase
 
             $payment = new GocardlessPayment();
             $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
             $policy->addPayment($payment);
 
             static::$policyService->create($policy, $date);
@@ -204,6 +207,7 @@ class PolicyServiceTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $policy->addPayment($payment);
 
@@ -222,6 +226,7 @@ class PolicyServiceTest extends WebTestCase
 
         $payment = new GocardlessPayment();
         $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
         $policy->addPayment($payment);
 
         static::$policyService->create($policy);

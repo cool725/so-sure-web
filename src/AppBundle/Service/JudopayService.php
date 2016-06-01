@@ -16,6 +16,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\PaymentDeclinedException;
+use AppBundle\Classes\Salva;
 
 class JudopayService
 {
@@ -169,6 +170,12 @@ class JudopayService
             throw new PaymentDeclinedException();
         }
 
+        if ($payment->getAmount() == $policy->getPremium()->getYearlyPremiumPrice()) {
+            $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        } elseif ($payment->getAmount() == $policy->getPremium()->getMonthlyPremiumPrice()) {
+            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        }
+
         return $payment;
     }
 
@@ -221,6 +228,7 @@ class JudopayService
         $tokenPaymentDetails = $tokenPayment->create();
         $payment->setReceipt($tokenPaymentDetails["receiptId"]);
         $payment->setAmount($tokenPaymentDetails["amount"]);
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
         if ($tokenPaymentDetails["type"] != 'Payment') {
             $errMsg = sprintf('Payment type mismatch - expected payment, not %s', $tokenPaymentDetails["type"]);
             $this->logger->error($errMsg);
