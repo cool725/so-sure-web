@@ -61,6 +61,9 @@ class SalvaExportService
     public function transformPolicy(PhonePolicy $policy = null)
     {
         if ($policy) {
+            if (!$policy->getNumberOfInstallments()) {
+                throw new \Exception('Invalid policy payment');
+            }
             $data = [
                 $policy->getPolicyNumber(),
                 $policy->getStatus(),
@@ -73,10 +76,15 @@ class SalvaExportService
                 $policy->getPhone()->getModel(),
                 $policy->getImei(),
                 $policy->getPhone()->getInitialPrice(),
-                '12',
-                $policy->getPremium()->getMonthlyPremiumPrice(),
+                $policy->getNumberOfInstallments(),
+                $policy->getInstallmentAmount(),
                 $policy->getPremium()->getYearlyPremiumPrice(),
+                $policy->getPremiumPaid(),
                 $policy->getPremium()->getTotalIpt(),
+                'todo',
+                'todo',
+                count($policy->getConnections()),
+                $policy->getPotValue(),
             ];
         } else {
             $data = [
@@ -94,7 +102,12 @@ class SalvaExportService
                 'NumberInstallments',
                 'InstallmentAmount',
                 'TotalPremium',
-                'Ipt',
+                'PaidPremium',
+                'TotalIpt',
+                'TotalBrokerFee',
+                'PaidBrokerFee',
+                'NumberConnections',
+                'PotValue',
             ];
         }
         
@@ -105,7 +118,7 @@ class SalvaExportService
     {
         $repo = $this->dm->getRepository(PhonePolicy::class);
         print sprintf("%s\n", $this->transformPolicy(null));
-        foreach ($repo->findAll() as $policy) {
+        foreach ($repo->getAllPoliciesForExport() as $policy) {
             print sprintf("%s\n", $this->transformPolicy($policy));
         }
     }

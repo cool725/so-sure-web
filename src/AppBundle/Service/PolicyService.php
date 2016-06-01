@@ -33,6 +33,11 @@ class PolicyService
     protected $templating;
     protected $router;
 
+    public function setMailer($mailer)
+    {
+        $this->mailer = $mailer;
+    }
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -57,8 +62,9 @@ class PolicyService
         $this->router = $router->getRouter();
     }
 
-    public function create(Policy $policy, User $user, $date = null)
+    public function create(Policy $policy, \DateTime $date = null)
     {
+        $user = $policy->getUser();
         $this->generateScheduledPayments($policy, $date);
 
         // any emails with @so-sure.com will generate an invalid policy
@@ -79,7 +85,7 @@ class PolicyService
         $this->newPolicyEmail($policy);
     }
 
-    public function generateScheduledPayments(Policy $policy, $date = null)
+    public function generateScheduledPayments(Policy $policy, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();

@@ -7,6 +7,8 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
+use AppBundle\Document\JudoPayment;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\PolicyKeyFacts;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -768,5 +770,125 @@ class PhonePolicyTest extends WebTestCase
                 $this->assertGreaterThan(0, $networkConnection->getValue());
             }
         }
+    }
+
+    public function testGetPremiumPaidNotPolicy()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+
+        $this->assertEquals(0, $policy->getPremiumPaid());
+    }
+
+    public function testGetPremiumPaidFailedPayment()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $policy->addPayment($payment);
+
+        $this->assertEquals(0, $policy->getPremiumPaid());
+    }
+
+    public function testGetPremiumPaid()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+
+        $this->assertEquals(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(), $policy->getPremiumPaid());
+    }
+
+    public function testNumberOfInstallmentsNonPolicy()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+
+        $this->assertNull($policy->getNumberOfInstallments());
+    }
+
+    public function testNumberOfInstallmentsNoPayments()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $this->assertNull($policy->getNumberOfInstallments());
+    }
+
+    public function testNumberOfInstallmentsNoScheduled()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+
+        $this->assertEquals(1, $policy->getNumberOfInstallments());
+    }
+
+    public function testNumberOfInstallments11Scheduled()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+
+        for ($i = 0; $i < 11; $i++) {
+            $policy->addScheduledPayment(new ScheduledPayment());
+        }
+
+        $this->assertEquals(12, $policy->getNumberOfInstallments());
     }
 }

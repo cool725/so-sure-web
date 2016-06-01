@@ -92,7 +92,7 @@ class JudopayService
 
         // TODO: create payment schedule
         $this->validateUser($policy->getUser());
-        $this->policyService->create($policy, $policy->getUser());
+        $this->policyService->create($policy);
 
         return true;
     }

@@ -4,6 +4,7 @@ namespace AppBundle\Repository;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 
 class PhonePolicyRepository extends DocumentRepository
 {
@@ -36,5 +37,21 @@ class PhonePolicyRepository extends DocumentRepository
             ->getQuery()
             ->execute()
             ->count();
+    }
+
+    public function getAllPoliciesForExport()
+    {
+        $policy = new PhonePolicy();
+        return $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_PENDING,
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_CANCELLED,
+                Policy::STATUS_EXPIRED,
+                Policy::STATUS_UNPAID
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
+            ->getQuery()
+            ->execute();
     }
 }

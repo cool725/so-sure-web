@@ -102,7 +102,7 @@ trait UserClassTrait
             $policy->addPayment($payment);
         }
 
-        $policy->create(rand(1, 999999), null, $date);
+        $policy->create(rand(1, 999999), 'TEST', $date);
 
         $dm->persist($policy);
         $dm->flush();
