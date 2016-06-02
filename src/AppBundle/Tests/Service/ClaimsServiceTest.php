@@ -59,7 +59,7 @@ class ClaimsServiceTest extends WebTestCase
         $policy = static::createPolicy($user, static::$dm, $phone, null, true);
         static::$policyService->create($policy);
         $claim = new Claim();
-        $claim->setStatus(Claim::STATUS_OPEN);
+        $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setType(Claim::TYPE_THEFT);
         $lostPhone = static::$claimsService->recordLostPhone($policy, $claim);
         $this->assertNotNull($lostPhone);

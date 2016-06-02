@@ -276,4 +276,23 @@ class AdminController extends BaseController
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
         ];
     }
+
+    /**
+     * @Route("/claims", name="admin_claims")
+     * @Template("AppBundle::Admin/claims.html.twig")
+     */
+    public function adminClaimsAction(Request $request)
+    {
+        $csrf = $this->get('form.csrf_provider');
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $qb = $repo->createQueryBuilder();
+        $pager = $this->pager($request, $qb);
+
+        return [
+            'claims' => $pager->getCurrentPageResults(),
+            'token' => $csrf->generateCsrfToken('default'),
+            'pager' => $pager,
+        ];
+    }
 }

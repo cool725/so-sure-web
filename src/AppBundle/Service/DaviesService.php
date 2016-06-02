@@ -223,7 +223,9 @@ class DaviesService
                 $this->validateClaimDetails($claim, $daviesClaim);
 
                 $claim->setType($daviesClaim->getClaimType());
-                $claim->setStatus($daviesClaim->getClaimStatus());
+                if ($daviesClaim->getClaimStatus()) {
+                    $claim->setStatus($daviesClaim->getClaimStatus());
+                }
 
                 $claim->setExcess($this->excess);
                 $claim->setIncurred($this->incurred);

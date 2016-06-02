@@ -12,6 +12,8 @@ use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Policy;
+use AppBundle\Document\Claim;
 use AppBundle\Classes\Salva;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -97,7 +99,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         return $users;
     }
-    
+
     private function newUser($email)
     {
         $user = new User();
@@ -117,7 +119,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $user;
     }
 
-    private function newPolicy($manager, $user, $count)
+    private function getRandomPhone($manager)
     {
         $phoneRepo = $manager->getRepository(Phone::class);
         $phones = $phoneRepo->findAll();
@@ -128,6 +130,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $phone = null;
             }
         }
+
+        return $phone;
+    }
+
+    private function newPolicy($manager, $user, $count)
+    {
+        $phone = $this->getRandomPhone($manager);
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
@@ -141,6 +150,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setPhone($phone);
         $policy->setImei($this->generateRandomImei());
         $policy->init($user, $latestTerms, $latestKeyFacts);
+        if (rand(0, 3) == 0) {
+            $this->addClaim($dm, $policy);
+        }
 
         $paymentDate = clone $startDate;
         if (rand(0, 1) == 0) {
@@ -210,75 +222,102 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
     }
 
-    private function createPolicies($manager, $users)
+    protected function addClaim($manager, Policy $policy)
     {
-        $userA = new User();
-        $userA->setEmail(sprintf('policyA@policy.so-sure.net'));
-        $userA->setFirstName(sprintf('firstA'));
-        $userA->setLastName(sprintf('lastA'));
+        $claim = new Claim();
+        $claim->setNumber(rand(1, 999999));
 
-        $userB = new User();
-        $userB->setEmail(sprintf('policyB@policy.so-sure.net'));
-        $userB->setFirstName(sprintf('firstB'));
-        $userB->setLastName(sprintf('lastB'));
+        $date = new \DateTime();
+        $date->sub(new \DateInterval(sprintf('P%dD', rand(5,15))));
+        $claim->setLossDate(clone $date);
+        $date->add(new \DateInterval(sprintf('P%dD', rand(0,4))));
+        $claim->setNotificationDate(clone $date);
 
-        $address = new Address();
-        $address->setType(Address::TYPE_BILLING);
-        $address->setLine1('123 Policy');
-        $address->setCity('London');
-        $address->setPostcode('BX11LT');
-
-        $userA->setBillingAddress($address);
-        $manager->persist($userA);
-
-        $userB->setBillingAddress($address);
-        $manager->persist($userB);
-
-        $phoneRepo = $manager->getRepository(Phone::class);
-        $phone = $phoneRepo->findOneBy(['model' => 'iPhone 5', 'memory' => 64]);
-        if (!$phone->getCurrentPhonePrice()) {
-            throw new \Exception('Failed to load phone price');
+        $claim->setType($this->getRandomClaimType());
+        $claim->setStatus($this->getRandomStatus());
+        if ($claim->isOpen()) {
+            $claim->setDaviesStatus('open');
+        } else {
+            $claim->setDaviesStatus('closed');
         }
-        //\Doctrine\Common\Util\Debug::dump($phone);
-        //\Doctrine\Common\Util\Debug::dump($phone->getPhonePrices());
-        //\Doctrine\Common\Util\Debug::dump($phone->getCurrentPhonePrice());
-        $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
-        $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
-        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $claim->setExcess($claim->getExpectedExcess());
+        if ($claim->getStatus() == Claim::STATUS_SETTLED &&
+            in_array($claim->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
+            $claim->setReplacementPhone($this->getRandomPhone($manager));
+            $claim->setReplacementImei($this->generateRandomImei());
+            if (rand(0, 1) == 0) {
+                $claim->setReplacementReceivedDate(new \DateTime());
+            }
+            $claim->setPhoneReplacementCost($claim->getReplacementPhone()->getReplacementPrice());
+            $claim->setUnauthorizedCalls(rand(0, 20000) / 100);
+            $claim->setAccessories(rand(0, 20000) / 100);
+            $claim->setReservedValue($claim->getReplacementPhone()->getReplacementPrice() + 15);
+        } else {
+            $phone = $this->getRandomPhone($manager);
+            $claim->setReservedValue($phone->getReplacementPrice() + 15);
+        }
+        $claim->setTransactionFees(rand(90,190) / 100);
+        $claim->setIncurred(abs($claim->getClaimHandlingFees()) + 15);
+        $claim->setDescription($this->getRandomDescription($claim));
 
-        $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
-        $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
+        $policy->addClaim($claim);
+        $manager->persist($claim);
+    }
 
-        $policyA = new PhonePolicy();
-        $policyA->setPhone($phone);
-        $policyA->init($userA, $latestTerms, $latestKeyFacts);
-        $policyA->create(-5000);
+    protected function getRandomDescription($claim)
+    {
+        $data = [];
+        if ($claim->getType() == Claim::TYPE_DAMAGE) {
+            $data = [
+                'Cracked Screen',
+                'Dropped in Water',
+                'Run over',
+                'Unknown'
+            ];
+        } elseif ($claim->getType() == Claim::TYPE_THEFT) {
+            $data = [
+                'Pick Pocket',
+                'From Car',
+                'From Home',
+            ];
+        } elseif ($claim->getType() == Claim::TYPE_LOSS) {
+            $data = [
+                'Loss from Pocket',
+                'Left on Table',
+                'Loss from Bag',
+            ];
+        } else {
+            return null;
+        }
 
-        $policyB = new PhonePolicy();
-        $policyB->setPhone($phone);
-        $policyB->init($userB, $latestTerms, $latestKeyFacts);
-        $policyB->create(-4999);
+        return sprintf('%s - %s', ucfirst($claim->getType()), $data[rand(0, count($data) - 1)]);
+    }
 
-        $connectionA = new Connection();
-        $connectionA->setLinkedUser($userB);
-        $connectionA->setLinkedPolicy($policyB);
-        $connectionA->setValue(10);
+    protected function getRandomStatus()
+    {
+        $random = rand(0, 4);
+        if ($random == 0) {
+            return Claim::STATUS_INREVIEW;
+        } elseif ($random == 1) {
+            return Claim::STATUS_APPROVED;
+        } elseif ($random == 2) {
+            return Claim::STATUS_SETTLED;
+        } elseif ($random == 3) {
+            return Claim::STATUS_DECLINED;
+        } elseif ($random == 4) {
+            return Claim::STATUS_WITHDRAWN;
+        }
+    }
 
-        $connectionB = new Connection();
-        $connectionB->setLinkedUser($userA);
-        $connectionB->setLinkedPolicy($policyA);
-        $connectionB->setValue(10);
-
-        $policyA->addConnection($connectionA);
-        $policyA->updatePotValue();
-
-        $policyB->addConnection($connectionB);
-        $policyB->updatePotValue();
-
-        $manager->persist($connectionA);
-        $manager->persist($connectionB);
-        //\Doctrine\Common\Util\Debug::dump($policy);
-        $manager->persist($policyA);
-        $manager->persist($policyB);
+    protected function getRandomClaimType()
+    {
+        $type = rand(0, 2);
+        if ($type == 0) {
+            return Claim::TYPE_LOSS;
+        } elseif ($type == 1) {
+            return Claim::TYPE_THEFT;
+        } elseif ($type == 2) {
+            return Claim::TYPE_DAMAGE;
+        }
     }
 }
