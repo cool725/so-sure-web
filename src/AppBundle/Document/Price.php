@@ -86,5 +86,6 @@ abstract class Price
     {
         $premium->setGwp($this->getGwp());
         $premium->setIpt($this->getIpt($date));
+        $premium->setIptRate($this->getIptRate($date));
     }
 }

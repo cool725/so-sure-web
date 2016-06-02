@@ -38,6 +38,9 @@ abstract class Payment
      */
     protected $amount;
 
+    /** @MongoDB\Field(type="float") */
+    protected $ipt;
+
     /**
      * @MongoDB\Float()
      * @Gedmo\Versioned
@@ -106,6 +109,21 @@ abstract class Payment
     public function getAmount()
     {
         return $this->amount;
+    }
+
+    public function setIpt($ipt)
+    {
+        $this->ipt = $ipt;
+    }
+
+    public function getIpt()
+    {
+        return $this->ipt;
+    }
+
+    public function calculateIpt()
+    {
+        $this->setIpt($this->getPolicy()->getPremium()->getIptRate() * $this->getAmount());
     }
 
     public function setBrokerFee($brokerFee)

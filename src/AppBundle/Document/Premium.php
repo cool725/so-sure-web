@@ -18,6 +18,9 @@ abstract class Premium
     /** @MongoDB\Field(type="float") */
     protected $ipt;
 
+    /** @MongoDB\Field(type="float") */
+    protected $iptRate;
+
     public function __construct()
     {
     }
@@ -40,6 +43,16 @@ abstract class Premium
     public function setIpt($ipt)
     {
         $this->ipt = $ipt;
+    }
+
+    public function getIptRate()
+    {
+        return $this->iptRate;
+    }
+
+    public function setIptRate($iptRate)
+    {
+        $this->iptRate = $iptRate;
     }
 
     public function getMonthlyPremiumPrice()
