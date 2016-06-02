@@ -85,6 +85,7 @@ class JudopayServiceTest extends WebTestCase
         );
         $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
         $this->assertEquals($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(), $payment->getAmount());
+        $this->assertEquals($payment->getAmount() * $policy->getPremium()->getIptRate(), $payment->getIpt());
         $this->assertEquals($receiptId, $payment->getReceipt());
         $this->assertEquals($policy->getId(), $payment->getReference());
         $this->assertEquals('Success', $payment->getResult());

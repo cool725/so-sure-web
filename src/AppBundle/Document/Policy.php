@@ -210,6 +210,7 @@ abstract class Policy
     public function addPayment($payment)
     {
         $payment->setPolicy($this);
+        $payment->calculateIpt();
         $this->payments->add($payment);
     }
 
