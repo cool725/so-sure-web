@@ -25,7 +25,8 @@ class ClaimType extends AbstractType
                 Claim::TYPE_DAMAGE => Claim::TYPE_DAMAGE,
             ]])
             ->add('status', ChoiceType::class, ['choices' => [
-                Claim::STATUS_OPEN => Claim::STATUS_OPEN,
+                Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,
+                Claim::STATUS_INREVIEW => Claim::STATUS_INREVIEW,
                 Claim::STATUS_WITHDRAWN => Claim::STATUS_WITHDRAWN,
                 Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
                 Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,

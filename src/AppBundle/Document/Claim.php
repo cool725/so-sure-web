@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\ClaimRepository")
  * @Gedmo\Loggable
  */
 class Claim
@@ -14,8 +14,11 @@ class Claim
     const TYPE_LOSS = 'loss';
     const TYPE_THEFT = 'theft';
     const TYPE_DAMAGE = 'damage';
+    const TYPE_WARRANTY = 'warranty';
+    const TYPE_EXTENDED_WARRANTY = 'extended-warranty';
 
-    const STATUS_OPEN = 'open';
+    const STATUS_INREVIEW = 'in-review';
+    const STATUS_APPROVED = 'approved';
     const STATUS_SETTLED = 'settled';
     const STATUS_DECLINED = 'declined';
     const STATUS_WITHDRAWN = 'withdrawn';
@@ -71,6 +74,12 @@ class Claim
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
+    protected $replacementReceivedDate;
+
+    /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $createdDate;
 
     /**
@@ -113,6 +122,12 @@ class Claim
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
+    protected $daviesStatus;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $notes;
 
     /**
@@ -132,6 +147,36 @@ class Claim
      * @Gedmo\Versioned
      */
     protected $excess;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $unauthorizedCalls = 0;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $accessories = 0;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $phoneReplacementCost;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $transactionFees;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $reservedValue;
 
     /**
      * @MongoDB\Field(type="float")
@@ -214,6 +259,25 @@ class Claim
         $this->status = $status;
     }
 
+    public function isOpen()
+    {
+        return in_array($this->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_INREVIEW]);
+    }
+
+    public function getDaviesStatus()
+    {
+        return $this->daviesStatus;
+    }
+
+    public function setDaviesStatus($daviesStatus)
+    {
+        if (!$daviesStatus) {
+            throw new \Exception('Status must be defined');
+        }
+
+        $this->daviesStatus = $daviesStatus;
+    }
+
     public function getReplacementPhone()
     {
         return $this->replacementPhone;
@@ -232,6 +296,16 @@ class Claim
     public function setReplacementImei($replacementImei)
     {
         $this->replacementImei = $replacementImei;
+    }
+
+    public function getReplacementReceivedDate()
+    {
+        return $this->replacementReceivedDate;
+    }
+
+    public function setReplacementReceivedDate($date)
+    {
+        $this->replacementReceivedDate = $date;
     }
 
     public function getNumber()
@@ -338,6 +412,27 @@ class Claim
         $this->excess = $excess;
     }
 
+    public function getExpectedExcess()
+    {
+        if ($this->getType() == Claim::TYPE_DAMAGE) {
+            return 50;
+        } elseif (in_array($this->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
+            return 75;
+        } else {
+            throw new \Exception(sprintf('Unknown type for expected excess: %s', $this->getType()));
+        }
+    }
+
+    public function getReservedValue()
+    {
+        return $this->reservedValue;
+    }
+
+    public function setReservedValue($reservedValue)
+    {
+        $this->reservedValue = $reservedValue;
+    }
+
     public function getIncurred()
     {
         return $this->incurred;
@@ -346,6 +441,46 @@ class Claim
     public function setIncurred($incurred)
     {
         $this->incurred = $incurred;
+    }
+
+    public function getUnauthorizedCalls()
+    {
+        return $this->unauthorizedCalls;
+    }
+
+    public function setUnauthorizedCalls($unauthorizedCalls)
+    {
+        $this->unauthorizedCalls = $unauthorizedCalls;
+    }
+
+    public function getAccessories()
+    {
+        return $this->accessories;
+    }
+
+    public function setAccessories($accessories)
+    {
+        $this->accessories = $accessories;
+    }
+
+    public function getPhoneReplacementCost()
+    {
+        return $this->phoneReplacementCost;
+    }
+
+    public function setPhoneReplacementCost($phoneReplacementCost)
+    {
+        $this->phoneReplacementCost = $phoneReplacementCost;
+    }
+
+    public function getTransactionFees()
+    {
+        return $this->transactionFees;
+    }
+
+    public function setTransactionFees($transactionFees)
+    {
+        $this->transactionFees = $transactionFees;
     }
 
     public function getProcessed()
@@ -366,5 +501,19 @@ class Claim
     public function isOwnershipTransferClaim()
     {
         return in_array($this->getType(), [self::TYPE_LOSS, self::TYPE_THEFT]);
+    }
+
+    public function getClaimHandlingFees()
+    {
+        if ($this->isOpen()) {
+            return 0;
+        }
+
+        if ($this->getStatus() == self::STATUS_WITHDRAWN || $this->getStatus() == self::STATUS_DECLINED) {
+            return $this->getIncurred();
+        } else {
+            return $this->getIncurred() - $this->getUnauthorizedCalls() - $this->getAccessories() -
+                $this->getPhoneReplacementCost() - $this->getExcess();
+        }
     }
 }

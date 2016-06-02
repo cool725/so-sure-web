@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container">
+    {% if claims.count == 0 %}
+    <div class="row-fluid">
+        <h2>No claims found</h2>
+    </div>
+    {% else %}
+    <div class="row-fluid">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Policy</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for claim in claims %}
+                        <tr>
+                            <td><a href="{{ path('admin_policy', {id: claim.policy.id}) }}">{{ claim.policy.policyNumber }}</a></td>
+                            <td>{{ claim.type }}</td>
+                            <td>{{ claim.status }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>        
+        </div>
+    </div>
+    {% endif %}
+    </form>
+    
+    {% if claims.count > 0 %}
+    <div class="pagerfanta">
+        {{ pagerfanta(pager, 'twitter_bootstrap3') }}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

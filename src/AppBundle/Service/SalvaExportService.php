@@ -7,6 +7,7 @@ use DOMDocument;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Claim;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;
@@ -150,12 +151,72 @@ class SalvaExportService
         return implode(',', $data);
     }
 
+    public function transformClaim(Claim $claim = null)
+    {
+        if ($claim) {
+            $data = [
+                $claim->getPolicy()->getPolicyNumber(),
+                $claim->getNumber(),
+                $claim->getDaviesStatus(),
+                $claim->getNotificationDate() ?
+                    $claim->getNotificationDate()->format(\DateTime::ISO8601) :
+                    '',
+                $claim->getLossDate() ?
+                    $claim->getLossDate()->format(\DateTime::ISO8601) :
+                    '',
+                $claim->getDescription(),
+                $this->toTwoDp($claim->getExcess()),
+                $this->toTwoDp($claim->getReservedValue()),
+                $claim->isOpen() ? '' : $this->toTwoDp($claim->getIncurred()),
+                $claim->isOpen() ? '' : $this->toTwoDp($claim->getClaimHandlingFees()),
+                $claim->getReplacementReceivedDate() ?
+                    $claim->getReplacementReceivedDate()->format(\DateTime::ISO8601) :
+                    '',
+                $claim->getReplacementPhone() ?
+                    $claim->getReplacementPhone()->getMake() :
+                    '',
+                $claim->getReplacementPhone() ?
+                    $claim->getReplacementPhone()->getModel() :
+                    '',
+                $claim->getReplacementImei(),
+            ];
+        } else {
+            $data = [
+                'PolicyNumber',
+                'ClaimNumber',
+                'Status',
+                'NotificationDate',
+                'EventDate',
+                'EventDescription',
+                'Excess',
+                'ReservedAmount',
+                'CostOfClaim',
+                'HandlingCost',
+                'ReplacementDeliveryDate',
+                'ReplacementMake',
+                'ReplacementModel',
+                'ReplacementImei',
+            ];
+        }
+
+        return implode(',', $data);
+    }
+
     public function exportPayments($year, $month)
     {
         $repo = $this->dm->getRepository(JudoPayment::class);
         print sprintf("%s\n", $this->transformPayment(null));
         foreach ($repo->getAllPaymentsForExport($year, $month) as $payment) {
             print sprintf("%s\n", $this->transformPayment($payment));
+        }
+    }
+
+    public function exportClaims(\DateTime $date)
+    {
+        $repo = $this->dm->getRepository(Claim::class);
+        print sprintf("%s\n", $this->transformClaim(null));
+        foreach ($repo->getAllClaimsForExport($date) as $claim) {
+            print sprintf("%s\n", $this->transformClaim($claim));
         }
     }
 

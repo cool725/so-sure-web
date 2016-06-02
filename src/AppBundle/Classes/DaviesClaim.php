@@ -29,9 +29,14 @@ class DaviesClaim
     public $replacementMake;
     public $replacementModel;
     public $replacementImei;
-    public $unauthorizedCalls;
+    public $replacementReceivedDate;
     public $incurred;
+    public $unauthorizedCalls;
+    public $accessories;
+    public $phoneReplacementCost;
+    public $transactionFees;
     public $excess;
+    public $reserved;
     public $policyNumber;
     public $notificationDate;
     public $dateCreated;
@@ -39,12 +44,16 @@ class DaviesClaim
 
     public function getClaimType()
     {
-        if ($this->lossType == "loss") {
+        if ($this->lossType == "Loss") {
             return Claim::TYPE_LOSS;
-        } elseif ($this->lossType == "theft") {
+        } elseif ($this->lossType == "Theft") {
             return Claim::TYPE_THEFT;
-        } elseif ($this->lossType == "daamge") {
+        } elseif ($this->lossType == "Damage") {
             return Claim::TYPE_DAMAGE;
+        } elseif ($this->lossType == "Warranty") {
+            return Claim::TYPE_WARRANTY;
+        } elseif ($this->lossType == "Extended Warranty") {
+            return Claim::TYPE_EXTENDED_WARRANTY;
         } else {
             return null;
         }
@@ -52,8 +61,9 @@ class DaviesClaim
 
     public function getClaimStatus()
     {
+        // open status should not update
         if ($this->status == "Open") {
-            return Claim::STATUS_OPEN;
+            return null;
         } elseif ($this->status == "Closed" && $this->miStatus == "settled") {
             return Claim::STATUS_SETTLED;
         } elseif ($this->status == "Closed" && $this->miStatus == "repudiated") {
@@ -88,14 +98,19 @@ class DaviesClaim
         $this->replacementMake = $data[13];
         $this->replacementModel = $data[14];
         $this->replacementImei = $data[15];
-        $this->unauthorizedCalls = $data[16];
+        $this->replacementReceivedDate = $this->excelDate($data[16]);
         $this->incurred = $data[17];
-        $this->excess = $data[18];
-        $this->policyNumber = $data[19];
-        $this->notificationDate = $this->excelDate($data[20]);
-        $this->dateCreated = $this->excelDate($data[21]);
-        $this->dateClosed = $this->excelDate($data[22]);
-        $this->shippingAddress = $data[23];
+        $this->unauthorizedCalls = $data[18];
+        $this->accessories = $data[19];
+        $this->phoneReplacementCost = $data[20];
+        $this->transactionFees = $data[21];
+        $this->excess = $data[22];
+        $this->reserved = $data[23];
+        $this->policyNumber = $data[24];
+        $this->notificationDate = $this->excelDate($data[25]);
+        $this->dateCreated = $this->excelDate($data[26]);
+        $this->dateClosed = $this->excelDate($data[27]);
+        $this->shippingAddress = $data[28];
     }
 
     public static function create($data)
