@@ -143,6 +143,7 @@ services:
         calls:
             - [setSecretKey, ['%receperio_secretkey%']]
             - [setStoreId, ['%receperio_storeid%']]
+            - [setEnvironment, ['%kernel.environment%']]
 
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService

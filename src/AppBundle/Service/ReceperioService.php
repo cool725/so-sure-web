@@ -20,6 +20,22 @@ class ReceperioService extends BaseImeiService
     /** @var string */
     protected $certId;
 
+    /** @var string */
+    protected $environment;
+
+    /**
+     * @param string $environment
+     */
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
+    }
+
+    public function getEnvironment()
+    {
+        return $this->environment;
+    }
+
     /**
      * @param string $secretKey
      */
@@ -59,6 +75,10 @@ class ReceperioService extends BaseImeiService
             return false;
         }
 
+        if ($this->getEnvironment() != 'prod') {
+            return true;
+        }
+
         try {
             $response = $this->send("/claimscheck/search", [
                 'serial' => $imei,
@@ -93,6 +113,10 @@ class ReceperioService extends BaseImeiService
         \AppBundle\Classes\NoOp::noOp([$phone]);
         if ($serialNumber == "111111") {
             return false;
+        }
+
+        if ($this->getEnvironment() != 'prod') {
+            return true;
         }
 
         try {
