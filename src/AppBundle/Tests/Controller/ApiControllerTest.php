@@ -895,5 +895,15 @@ class ApiControllerTest extends BaseControllerTest
         $redis->set('ERROR_NOT_YET_REGULATED', 1);
         $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=0.0.0');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_YET_REGULATED);
+        $redis->del('ERROR_NOT_YET_REGULATED');
+    }
+
+    public function testVersionUpgradeNeeded()
+    {
+        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $redis->sadd('UPGRADE_APP_VERSIONS_ios', '0.0.1');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=0.0.1');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UPGRADE_APP);
+        $redis->del('UPGRADE_APP_VERSIONS_ios');
     }
 }
