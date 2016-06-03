@@ -632,7 +632,8 @@ class ApiController extends BaseController
             }
 
             // Test version
-            if ($version == "0.0.0") {
+            $key = sprintf('UPGRADE_APP_VERSIONS_%s', $platform);
+            if ($version == "0.0.0" || $redis->sismember($key, $version)) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_UPGRADE_APP,
                     sprintf('%s %s is not allowed', $platform, $version),
