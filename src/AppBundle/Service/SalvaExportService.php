@@ -11,6 +11,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\User;
 
 class SalvaExportService
 {
@@ -220,6 +221,120 @@ class SalvaExportService
         }
     }
 
+    public function sendPolicy(PhonePolicy $phonePolicy)
+    {
+        $xml = $this->createXml($phonePolicy);
+        print $xml;
+        $this->send($xml);
+    }
+
+    public function createXml(PhonePolicy $phonePolicy)
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+
+        $root = $dom->createElement('ns3:serviceRequest');
+        $dom->appendChild($root);
+        $root->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ns3',
+            'http://sims.salva.ee/service/schema/policy/import/v1'
+        );
+        $root->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ns2',
+            'http://sims.salva.ee/service/schema/policy/v1'
+        );
+        $root->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ns1',
+            'http://sims.salva.ee/service/schema/v1'
+        );
+        $root->setAttribute('ns3:mode', 'policy');
+        $root->setAttribute('ns3:includeInvoiceRows', 'true');
+
+        $policy = $dom->createElement('ns3:policy');
+        $root->appendChild($policy);
+
+        $policy->appendChild($dom->createElement('ns2:renewable', 'false'));
+        $policy->appendChild($dom->createElement(
+            'ns2:insurancePeriodStart',
+            $phonePolicy->getStart()->format(\DateTime::ATOM)
+        ));
+        $policy->appendChild($dom->createElement(
+            'ns2:insurancePeriodEnd',
+            $phonePolicy->getEnd()->format(\DateTime::ATOM)
+        ));
+        $policy->appendChild($dom->createElement(
+            'ns2:paymentsPerYearCode',
+            $phonePolicy->getNumberOfInstallments()
+        ));
+        $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
+        $policy->appendChild($dom->createElement('ns2:policyNo', $phonePolicy->getPolicyNumber()));
+
+        $policyCustomers = $dom->createElement('ns2:policyCustomers');
+        $policy->appendChild($policyCustomers);
+        $policyCustomers->appendChild($this->createCustomer($dom, $phonePolicy->getUser(), 'policyholder'));
+
+        $insuredObjects = $dom->createElement('ns2:insuredObjects');
+        $policy->appendChild($insuredObjects);
+        $insuredObject = $dom->createElement('ns2:insuredObject');
+        $insuredObjects->appendChild($insuredObject);
+        $insuredObject->appendChild($dom->createElement('ns2:productObjectCode', 'ss_phone'));
+
+        $objectCustomers = $dom->createElement('ns2:objectCustomers');
+        $insuredObject->appendChild($objectCustomers);
+        $objectCustomers->appendChild($this->createCustomer($dom, $phonePolicy->getUser(), 'insured_person'));
+
+        $objectFields = $dom->createElement('ns2:objectFields');
+        $insuredObject->appendChild($objectFields);
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_make', $phonePolicy->getPhone()->getMake()));
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_model', $phonePolicy->getPhone()->getModel()));
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_imei', $phonePolicy->getImei()));
+        $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_value', $phonePolicy->getPhone()->getInitialPrice()));
+        $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_base_tariff', $phonePolicy->getPremium()->getYearlyPremiumPrice()));
+
+        return $dom->saveXML();
+    }
+
+    private function createObjectFieldText($dom, $code, $value)
+    {
+        $objectField = $dom->createElement('ns2:objectField');
+        $objectField->setAttribute('ns2:fieldCode', $code);
+        $objectField->setAttribute('ns2:fieldTypeCode', 'string');
+
+        $textValue = $dom->createElement('ns2:textValue', $value);
+        $objectField->appendChild($textValue);
+
+        return $objectField;
+    }
+
+    private function createObjectFieldMoney($dom, $code, $value)
+    {
+        $objectField = $dom->createElement('ns2:objectField');
+        $objectField->setAttribute('ns2:fieldCode', $code);
+        $objectField->setAttribute('ns2:fieldTypeCode', 'money');
+
+        $amountValue = $dom->createElement('ns2:amountValue', $value);
+        $amountValue->setAttribute('ns1:currency', 'GBP');
+        $objectField->appendChild($amountValue);
+
+        return $objectField;
+    }
+
+    private function createCustomer($dom, User $user, $role)
+    {
+        $customer = $dom->createElement('ns2:customer');
+        $customer->setAttribute('ns2:role', $role);
+
+        $customer->appendChild($dom->createElement('ns2:code', $user->getId()));
+        $customer->appendChild($dom->createElement('ns2:name', $user->getLastName()));
+        $customer->appendChild($dom->createElement('ns2:firstName', $user->getFirstName()));
+        $customer->appendChild($dom->createElement('ns2:countryCode', 'GB'));
+        $customer->appendChild($dom->createElement('ns2:personTypeCode', 'private'));
+
+        return $customer;
+    }
+
     public function validate($xml, $schemaType)
     {
         $dom = new DOMDocument();
@@ -243,7 +358,7 @@ class SalvaExportService
                 'auth' => [$this->username, $this->password]
             ]);
             $body = (string) $res->getBody();
-            //print_r($body);
+            print_r($body);
 
             if (!$this->validate($body, self::SCHEMA_POLICY_IMPORT)) {
                 throw new \InvalidArgumentException("unable to validate response");
