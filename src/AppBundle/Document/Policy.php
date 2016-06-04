@@ -875,9 +875,9 @@ abstract class Policy
         }
 
         $connectionValues[] = [
-            'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ISO8601) : null,
+            'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
             'end_date' => $this->getConnectionCliffDate() ?
-                $this->getConnectionCliffDate()->format(\DateTime::ISO8601) :
+                $this->getConnectionCliffDate()->format(\DateTime::ATOM) :
                 null,
             'value' => $this->getConnectionValue($this->getStart()),
         ];
@@ -886,9 +886,9 @@ abstract class Policy
         $afterCliffDate->add(new \DateInterval('PT1S'));
         $connectionValues[] = [
             'start_date' => $this->getConnectionCliffDate() ?
-                $this->getConnectionCliffDate()->format(\DateTime::ISO8601) :
+                $this->getConnectionCliffDate()->format(\DateTime::ATOM) :
                 null,
-            'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ISO8601) : null,
+            'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
             'value' => $this->getConnectionValue($afterCliffDate),
         ];
 
@@ -908,8 +908,8 @@ abstract class Policy
             'id' => $this->getId(),
             'status' => $this->getStatus(),
             'type' => 'phone',
-            'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ISO8601) : null,
-            'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ISO8601) : null,
+            'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
+            'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
             'policy_number' => $this->getPolicyNumber(),
             'monthly_premium' => $this->getPremium()->getMonthlyPremiumPrice(),
             'policy_terms_id' => $this->getPolicyTerms() ? $this->getPolicyTerms()->getId() : null,

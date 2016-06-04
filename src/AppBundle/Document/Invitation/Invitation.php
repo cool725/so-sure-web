@@ -290,9 +290,9 @@ abstract class Invitation
             'channel' => $this->getChannel(),
             'link' => $this->getLink(),
             'status' => $this->getStatus(),
-            'created_date' => $this->getCreated() ? $this->getCreated()->format(\DateTime::ISO8601) : null,
+            'created_date' => $this->getCreated() ? $this->getCreated()->format(\DateTime::ATOM) : null,
             'next_reinvite_date' =>  $this->getNextReinvited() ?
-                $this->getNextReinvited()->format(\DateTime::ISO8601) :
+                $this->getNextReinvited()->format(\DateTime::ATOM) :
                 null,
         ];
 

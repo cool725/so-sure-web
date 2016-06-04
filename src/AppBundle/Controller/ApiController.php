@@ -186,7 +186,7 @@ class ApiController extends BaseController
                     'connection_value' => $currentPhonePrice->getInitialConnectionValue(),
                     'max_connections' => $currentPhonePrice->getMaxConnections(),
                     'max_pot' => $currentPhonePrice->getMaxPot(),
-                    'valid_to' => $quoteValidTo->format(\DateTime::ISO8601),
+                    'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
                 ];
             }
 

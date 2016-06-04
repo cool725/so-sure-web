@@ -1401,7 +1401,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'mobile_number' => '+447700900000',
             'facebook_id' => 'abcd',
             'facebook_access_token' => 'zy',
-            'birthday' => $birthday->format(\DateTime::ISO8601),
+            'birthday' => $birthday->format(\DateTime::ATOM),
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
@@ -1631,7 +1631,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'first_name' => 'foo',
             'last_name' => 'bar',
             'mobile_number' => static::generateRandomMobile(),
-            'birthday' => $birthday->format(\DateTime::ISO8601),
+            'birthday' => $birthday->format(\DateTime::ATOM),
         ]);
         $this->verifyResponse(200);
 

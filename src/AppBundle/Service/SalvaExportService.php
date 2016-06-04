@@ -87,9 +87,9 @@ class SalvaExportService
             $data = [
                 $policy->getSalvaPolicyNumber($version),
                 $policy->getStatus(),
-                $policy->getStart()->format(\DateTime::ISO8601),
-                $policy->getEnd()->format(\DateTime::ISO8601),
-                $terminationDate ? $terminationDate->format(\DateTime::ISO8601) : '',
+                $policy->getStart()->format(\DateTime::ATOM),
+                $policy->getEnd()->format(\DateTime::ATOM),
+                $terminationDate ? $terminationDate->format(\DateTime::ATOM) : '',
                 $policy->getUser()->getId(),
                 $policy->getUser()->getFirstName(),
                 $policy->getUser()->getLastName(),
@@ -158,7 +158,7 @@ class SalvaExportService
             }
             $data = [
                 $payment->getPolicy()->getSalvaPolicyNumber($version),
-                $payment->getDate()->format(\DateTime::ISO8601),
+                $payment->getDate()->format(\DateTime::ATOM),
                 $this->toTwoDp($payment->getAmount()),
             ];
         } else {
@@ -180,10 +180,10 @@ class SalvaExportService
                 $claim->getNumber(),
                 $claim->getDaviesStatus(),
                 $claim->getNotificationDate() ?
-                    $claim->getNotificationDate()->format(\DateTime::ISO8601) :
+                    $claim->getNotificationDate()->format(\DateTime::ATOM) :
                     '',
                 $claim->getLossDate() ?
-                    $claim->getLossDate()->format(\DateTime::ISO8601) :
+                    $claim->getLossDate()->format(\DateTime::ATOM) :
                     '',
                 $claim->getDescription(),
                 $this->toTwoDp($claim->getExcess()),
@@ -191,7 +191,7 @@ class SalvaExportService
                 $claim->isOpen() ? '' : $this->toTwoDp($claim->getIncurred()),
                 $claim->isOpen() ? '' : $this->toTwoDp($claim->getClaimHandlingFees()),
                 $claim->getReplacementReceivedDate() ?
-                    $claim->getReplacementReceivedDate()->format(\DateTime::ISO8601) :
+                    $claim->getReplacementReceivedDate()->format(\DateTime::ATOM) :
                     '',
                 $claim->getReplacementPhone() ?
                     $claim->getReplacementPhone()->getMake() :
