@@ -398,9 +398,13 @@ class ApiController extends BaseController
      * @Route("/policy/keyfacts", name="api_get_policy_keyfacts")
      * @Method({"GET"})
      */
-    public function getLatestKeyFactsAction()
+    public function getLatestKeyFactsAction(Request $request)
     {
         try {
+            if (!$this->validateQueryFields($request, ['maxPotValue'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
             $dm = $this->getManager();
             $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
             $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
@@ -415,6 +419,7 @@ class ApiController extends BaseController
                 'latest_policy_keyfacts',
                 [
                     'policy_key' => $this->getParameter('policy_key'),
+                    'maxPotValue' => $request->get('maxPotValue'),
                 ],
                 true
             );
@@ -431,9 +436,13 @@ class ApiController extends BaseController
      * @Route("/policy/terms", name="api_get_policy_terms")
      * @Method({"GET"})
      */
-    public function getLatestTermsAction()
+    public function getLatestTermsAction(Request $request)
     {
         try {
+            if (!$this->validateQueryFields($request, ['maxPotValue'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
             $dm = $this->getManager();
             $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
@@ -448,6 +457,7 @@ class ApiController extends BaseController
                 'latest_policy_terms',
                 [
                     'policy_key' => $this->getParameter('policy_key'),
+                    'maxPotValue' => $request->get('maxPotValue'),
                 ],
                 true
             );

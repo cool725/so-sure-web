@@ -234,7 +234,7 @@ class ApiControllerTest extends BaseControllerTest
     public function testGetPolicyKeyFacts()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $url = '/api/v1/policy/keyfacts?_method=GET';
+        $url = '/api/v1/policy/keyfacts?maxPotValue=62.8&_method=GET';
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
@@ -251,7 +251,7 @@ class ApiControllerTest extends BaseControllerTest
     public function testGetPolicyTerms()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $url = '/api/v1/policy/terms?_method=GET';
+        $url = '/api/v1/policy/terms?maxPotValue=62.8&_method=GET';
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);

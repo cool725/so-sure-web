@@ -33,8 +33,18 @@ class ApiViewController extends BaseController
         if ($request->get('policy_key') != $policyKey) {
             throw $this->createNotFoundException('Policy Keyfacts not found');
         }
+        if (!$request->get('maxPotValue')) {
+            throw $this->createNotFoundException('Missing max pot value');
+        }
 
-        return array();
+        $maxPotVaue = $request->get('maxPotValue');
+        $maxConnections = ceil($maxPotVaue / 10);
+        $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
+        return array(
+            'maxPotValue' => $maxPotVaue,
+            'maxConnections' => $maxConnections,
+            'yearlyPremium' => $yearlyPremium,
+        );
     }
 
     /**
@@ -47,8 +57,18 @@ class ApiViewController extends BaseController
         if ($request->get('policy_key') != $policyKey) {
             throw $this->createNotFoundException('Policy Terms not found');
         }
+        if (!$request->get('maxPotValue')) {
+            throw $this->createNotFoundException('Missing max pot value');
+        }
 
-        return array();
+        $maxPotVaue = $request->get('maxPotValue');
+        $maxConnections = ceil($maxPotVaue / 10);
+        $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
+        return array(
+            'maxPotValue' => $maxPotVaue,
+            'maxConnections' => $maxConnections,
+            'yearlyPremium' => $yearlyPremium,
+        );
     }
 
     /**
@@ -69,8 +89,14 @@ class ApiViewController extends BaseController
         }
 
         // TODO: Later would determine which keyfacts to display
-
-        return array();
+        $maxPotVaue = $request->get('maxPotValue');
+        $maxConnections = ceil($maxPotVaue / 10);
+        $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
+        return array(
+            'maxPotValue' => $maxPotVaue,
+            'maxConnections' => $maxConnections,
+            'yearlyPremium' => $yearlyPremium,
+        );
     }
 
     /**
@@ -91,7 +117,13 @@ class ApiViewController extends BaseController
         }
 
         // TODO: Later would determine which terms to display
-
-        return array();
+        $maxPotVaue = $request->get('maxPotValue');
+        $maxConnections = ceil($maxPotVaue / 10);
+        $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
+        return array(
+            'maxPotValue' => $maxPotVaue,
+            'maxConnections' => $maxConnections,
+            'yearlyPremium' => $yearlyPremium,
+        );
     }
 }
