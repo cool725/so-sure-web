@@ -161,16 +161,20 @@ class PolicyService
      */
     public function cancelledPolicyEmail(Policy $policy)
     {
+        $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
         $message = \Swift_Message::newInstance()
             ->setSubject(sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()))
             ->setFrom('hello@wearesosure.com')
             ->setTo($policy->getUser()->getEmail())
             ->setBody(
-                $this->templating->render('AppBundle:Email:policy/cancelled.html.twig', ['policy' => $policy]),
+                $this->templating->render($htmlTemplate, ['policy' => $policy]),
                 'text/html'
             )
             ->addPart(
-                $this->templating->render('AppBundle:Email:policy/cancelled.txt.twig', ['policy' => $policy]),
+                $this->templating->render($textTemplate, ['policy' => $policy]),
                 'text/plain'
             );
         $this->mailer->send($message);
@@ -193,14 +197,14 @@ class PolicyService
                 ->setFrom('hello@wearesosure.com')
                 ->setTo($networkConnection->getLinkedUser()->getEmail())
                 ->setBody(
-                    $this->templating->render('AppBundle:Email:policy/networkCancelled.html.twig', [
+                    $this->templating->render('AppBundle:Email:policy-cancellation/network.html.twig', [
                         'policy' => $networkConnection->getLinkedPolicy(),
                         'cancelledUser' => $cancelledUser
                     ]),
                     'text/html'
                 )
                 ->addPart(
-                    $this->templating->render('AppBundle:Email:policy/networkCancelled.txt.twig', [
+                    $this->templating->render('AppBundle:Email:policy-cancellation/network.txt.twig', [
                         'policy' => $networkConnection->getLinkedPolicy(),
                         'cancelledUser' => $cancelledUser
                     ]),

@@ -39,6 +39,7 @@ abstract class Policy
     const CANCELLED_FRAUD = 'fraud';
     const CANCELLED_GOODWILL = 'goodwill';
     const CANCELLED_COOLOFF = 'cooloff';
+    const CANCELLED_BADRISK = 'badrisk';
 
     // First 1000 policies
     const PROMO_LAUNCH = 'launch';

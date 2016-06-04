@@ -1,0 +1,11 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Goodbye {{ policy.user.name }}.
+
+**
+------------------------------------------------------------
+Sorry that you're leaving us.  Your initial payment will be refunded to you.
+
+This email serves as official notice that your policy {{ policy.policyNumber }} is now cancelled and no longer in effect.
+
+{% endblock body %}
