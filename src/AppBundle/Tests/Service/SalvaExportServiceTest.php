@@ -56,7 +56,7 @@ class SalvaExportServiceTest extends WebTestCase
     public function testSend()
     {
         $xml = file_get_contents(self::$xmlFile);
-        $this->assertTrue(self::$salva->send($xml));
+        self::$salva->send($xml, SalvaExportService::SCHEMA_POLICY_IMPORT);
     }
 
     public function testCreateXml()
@@ -70,7 +70,7 @@ class SalvaExportServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy);
 
-        $dom = static::$salva->createXml($policy);
-        print $dom->saveXml();
+        $xml = static::$salva->createXml($policy);
+        $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
     }
 }

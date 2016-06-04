@@ -33,9 +33,17 @@ class PolicyService
     protected $templating;
     protected $router;
 
+    /** @var string */
+    protected $environment;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
+    }
+
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
     }
 
     /**
@@ -45,6 +53,7 @@ class PolicyService
      * @param \Swift_Mailer   $mailer
      * @param                 $templating
      * @param                 $router
+     * @param                 $environment
      */
     public function __construct(
         DocumentManager $dm,
@@ -52,7 +61,8 @@ class PolicyService
         SequenceService $sequence,
         \Swift_Mailer $mailer,
         $templating,
-        $router
+        $router,
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -60,6 +70,7 @@ class PolicyService
         $this->mailer = $mailer;
         $this->templating = $templating;
         $this->router = $router->getRouter();
+        $this->environment = $environment;
     }
 
     public function create(Policy $policy, \DateTime $date = null)
@@ -67,9 +78,16 @@ class PolicyService
         $user = $policy->getUser();
         $this->generateScheduledPayments($policy, $date);
 
-        // any emails with @so-sure.com will generate an invalid policy
-        if ($user->hasSoSureEmail()) {
-            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), 'INVALID');
+        $prefix = null;
+        if ($this->environment != 'prod') {
+            $prefix = strtoupper($this->environment);
+        } elseif ($user->hasSoSureEmail()) {
+            // any emails with @so-sure.com will generate an invalid policy
+            $prefix = 'INVALID';
+        }
+
+        if ($prefix) {
+            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), $prefix);
         } else {
             $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE));
         }
