@@ -91,7 +91,9 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
@@ -111,7 +113,9 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');

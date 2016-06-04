@@ -206,6 +206,7 @@ services:
             mailer:     "@mailer"
             templating: "@templating"
             router:     "@api.router"
+            environment:    "%kernel.environment%"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService
