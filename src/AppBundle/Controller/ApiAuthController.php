@@ -530,6 +530,8 @@ class ApiAuthController extends BaseController
                 [
                     'id' => $policy->getId(),
                     'policy_key' => $this->getParameter('policy_key'),
+                    'maxPotValue' => $policy->getMaxPot(),
+                    'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
                 ],
                 true
             );
@@ -649,6 +651,8 @@ class ApiAuthController extends BaseController
                 [
                     'id' => $policy->getId(),
                     'policy_key' => $this->getParameter('policy_key'),
+                    'maxPotValue' => $policy->getMaxPot(),
+                    'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
                 ],
                 true
             );

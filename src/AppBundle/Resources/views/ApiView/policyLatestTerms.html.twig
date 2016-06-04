@@ -263,30 +263,17 @@
     <td>£0</td>
     <td>0%</td>
   </tr>
+  {% for i in 1..maxConnections - 1 %}
   <tr>
-    <td>1</td>
-    <td>£10</td>
-    <td>17%</td>
+    <td>{{ i }}</td>
+    <td>£{{ i * 10 }}</td>
+    <td>{{ (100 * i * 10 / yearlyPremium) |number_format(0, '.', ',') }}%</td>
   </tr>
+  {% endfor %}
   <tr>
-    <td>2</td>
-    <td>£20</td>
-    <td>33%</td>
-  </tr>
-  <tr>
-    <td>3</td>
-    <td>£30</td>
-    <td>50%</td>
-  </tr>
-  <tr>
-    <td>4</td>
-    <td>£40</td>
-    <td>67%</td>
-  </tr>
-  <tr>
-    <td>5</td>
-    <td>£48</td>
-    <td>80%</td>
+    <td>{{ maxConnections }}</td>
+    <td>£{{ maxPotValue |number_format(2, '.', ',')}}</td>
+    <td>{{ (100 * maxPotValue / yearlyPremium) |number_format(0, '.', ',') }}%</td>
   </tr>
 </table>
 

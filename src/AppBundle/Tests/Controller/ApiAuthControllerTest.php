@@ -1291,7 +1291,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $createData = $this->verifyResponse(200);
         $policyId = $createData['id'];
 
-        $url = sprintf('/api/v1/auth/policy/%s/keyfacts?_method=GET', $policyId);
+        $url = sprintf('/api/v1/auth/policy/%s/keyfacts?maxPotValue=62.8&_method=GET', $policyId);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
         $policyUrl = self::$router->generate('policy_keyfacts', ['id' => $policyId]);
@@ -1317,7 +1317,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $createData = $this->verifyResponse(200);
         $policyId = $createData['id'];
 
-        $url = sprintf('/api/v1/auth/policy/%s/terms?_method=GET', $policyId);
+        $url = sprintf('/api/v1/auth/policy/%s/terms?maxPotValue=62.8&_method=GET', $policyId);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
         $policyUrl = self::$router->generate('policy_terms', ['id' => $policyId]);
