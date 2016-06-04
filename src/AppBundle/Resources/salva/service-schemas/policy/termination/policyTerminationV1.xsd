@@ -13,13 +13,14 @@
     <xs:element name="serviceRequest" type="serviceRequestType"/>
     <xs:element name="serviceResponse" type="serviceResponseType"/>
     
-	<xs:complexType name="serviceRequestType">
-		<xs:all>
-			<xs:element name="policyNo" type="xs:string" minOccurs="1" maxOccurs="1"/>
+    <xs:complexType name="serviceRequestType">
+        <xs:all>
+            <xs:element name="policyNo" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="terminationReasonCode" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="terminationTime" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
-		</xs:all>
-	</xs:complexType>
+            <xs:element name="terminationTime" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="usedFinalPremium" type="base:moneyType" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+    </xs:complexType>
     
     <xs:complexType name="serviceResponseType">
         <xs:complexContent>

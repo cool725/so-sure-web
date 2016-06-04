@@ -21,6 +21,7 @@
             <xs:element name="terminationTime" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="terminationReasonCode" type="xs:string" minOccurs="0"/>
             <xs:element name="paymentsPerYearCode" type="xs:int" minOccurs="0"/>
+            <xs:element name="agentLegalText" type="xs:string" minOccurs="0"/>
             <xs:element name="issuerContract" type="xs:string" minOccurs="0"/>
             <xs:element name="issuerDivision" type="xs:string" minOccurs="0"/>
             <xs:element name="issuerUser" type="xs:string" minOccurs="0"/>
@@ -55,6 +56,7 @@
 
     <xs:complexType name="insuredObjectType">
         <xs:sequence>
+            <xs:element name="tag" type="xs:string" minOccurs="0"/>
             <xs:element name="productObjectCode" type="base:nonEmptyString"/>
             <xs:element name="insurancePeriodStart" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="insurancePeriodEnd" type="xs:dateTime" minOccurs="0"/>

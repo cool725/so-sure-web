@@ -13,7 +13,7 @@
     <xs:complexType name="invoiceType">
         <xs:sequence>
             <xs:element name="invoiceNo" type="xs:string" />
-            <xs:element name="dueDate" type="xs:date" />
+            <xs:element name="dueDate" type="xs:date" minOccurs="0"/>
             <xs:element name="newDueDate" type="xs:date" minOccurs="0"/>
             <xs:element name="invoiceDate" type="xs:date" />
             <xs:element name="amount" type="base:moneyType" />

@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use DOMDocument;
+use DOMXPath;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
@@ -18,6 +19,7 @@ class SalvaExportService
     use CurrencyTrait;
 
     const SCHEMA_POLICY_IMPORT = 'policy/import/policyImportV1.xsd';
+    const SCHEMA_POLICY_TERMINATE = 'policy/termination/policyTerminationV1.xsd';
 
     /** @var DocumentManager */
     protected $dm;
@@ -224,8 +226,97 @@ class SalvaExportService
     public function sendPolicy(PhonePolicy $phonePolicy)
     {
         $xml = $this->createXml($phonePolicy);
-        print $xml;
-        $this->send($xml);
+        $this->logger->info($xml);
+        if (!$this->validate($xml, self::SCHEMA_POLICY_IMPORT)) {
+            throw new \Exception('Failed to validate policy');
+        }
+        $response = $this->send($xml, self::SCHEMA_POLICY_IMPORT);
+        $this->logger->info($response);
+        $responseId = $this->getResponseId($response);
+
+        return $responseId;
+    }
+
+    public function cancelPolicy(PhonePolicy $phonePolicy)
+    {
+        $xml = $this->cancelXml($phonePolicy);
+        $this->logger->info($xml);
+        print_r($xml);
+        if (!$this->validate($xml, self::SCHEMA_POLICY_TERMINATE)) {
+            throw new \Exception('Failed to validate cancel policy');
+        }
+        $response = $this->send($xml, self::SCHEMA_POLICY_TERMINATE);
+        print_r($response);
+        $this->logger->info($response);
+        $responseId = $this->getResponseId($response);
+
+        return $responseId;
+    }
+
+    protected function getResponseId($xml)
+    {
+        $dom = new DOMDocument();
+        $dom->loadXML($xml, LIBXML_NOBLANKS);
+
+        $xpath = new DOMXPath($dom);
+        $xpath->registerNamespace('ns1', "http://sims.salva.ee/service/schema/v1");
+        $xpath->registerNamespace('ns2', "http://sims.salva.ee/service/schema/policy/v1");
+        $xpath->registerNamespace('ns3', "http://sims.salva.ee/service/schema/policy/export/v1");
+        $xpath->registerNamespace('ns4', "http://sims.salva.ee/service/schema/policy/classifier/export/v1");
+        $xpath->registerNamespace('ns5', "http://sims.salva.ee/service/schema/invoice/v1");
+        $xpath->registerNamespace('ns6', "http://sims.salva.ee/service/schema/invoice/export/v1");
+        $xpath->registerNamespace('ns7', "http://sims.salva.ee/service/schema/policy/termination/v1");
+        $xpath->registerNamespace('ns8', "http://sims.salva.ee/service/schema/policy/import/v1");
+
+        $elementList = $xpath->query('//ns8:serviceResponse/ns8:policies/ns2:policy/ns2:recordId');
+        foreach($elementList as $element) {
+            return $element->nodeValue;
+        }
+
+        $elementList = $xpath->query('//ns1:errorResponse/ns1:errorList/ns1:constraint');
+        foreach($elementList as $element) {
+            $errMsg = sprintf(
+                "Error sending policy. Response: %s : %s",
+                $element->getAttribute('ns1:code'),
+                $element->nodeValue
+            );
+            print $errMsg;
+            $this->logger->error($errMsg);
+        }
+
+        throw new \Exception('Unable to get response');
+    }
+
+    public function cancelXml(PhonePolicy $phonePolicy)
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+
+        $root = $dom->createElement('n1:serviceRequest');
+        $dom->appendChild($root);
+        $root->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:n1',
+            'http://sims.salva.ee/service/schema/policy/termination/v1'
+        );
+        $root->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:n2',
+            'http://sims.salva.ee/service/schema/v1'
+        );
+        $root->appendChild($dom->createElement('n1:policyNo', $phonePolicy->getPolicyNumber()));
+        $root->appendChild($dom->createElement('n1:terminationReasonCode', 'other'));
+        // TODO: Change back to getStart() + format Atom
+        $date = new \DateTime('+4 hours');
+        $root->appendChild($dom->createElement(
+            'n1:terminationTime',
+            $date->format("Y-m-d\TH:i:00")
+        ));
+
+        $usedFinalPremium = $dom->createElement('n1:usedFinalPremium', 0);
+        $usedFinalPremium->setAttribute('n2:currency', 'GBP');
+        $root->appendChild($usedFinalPremium);
+
+        return $dom->saveXML();
     }
 
     public function createXml(PhonePolicy $phonePolicy)
@@ -256,19 +347,23 @@ class SalvaExportService
         $root->appendChild($policy);
 
         $policy->appendChild($dom->createElement('ns2:renewable', 'false'));
+        // TODO: Change back to getStart() + format Atom
+        $date = new \DateTime('+4 hours');
         $policy->appendChild($dom->createElement(
             'ns2:insurancePeriodStart',
-            $phonePolicy->getStart()->format(\DateTime::ATOM)
+            $date->format("Y-m-d\TH:i:00")
         ));
+        // TODO: Change back to format Atom
         $policy->appendChild($dom->createElement(
             'ns2:insurancePeriodEnd',
-            $phonePolicy->getEnd()->format(\DateTime::ATOM)
+            $phonePolicy->getEnd()->format("Y-m-d\TH:i:00")
         ));
         $policy->appendChild($dom->createElement(
             'ns2:paymentsPerYearCode',
             $phonePolicy->getNumberOfInstallments()
         ));
         $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
+        $policy->appendChild($dom->createElement('ns2:deliveryModeCode', 'undefined'));
         $policy->appendChild($dom->createElement('ns2:policyNo', $phonePolicy->getPolicyNumber()));
 
         $policyCustomers = $dom->createElement('ns2:policyCustomers');
@@ -348,7 +443,7 @@ class SalvaExportService
         return $dom->schemaValidate($schema);
     }
     
-    public function send($xml)
+    public function send($xml, $schema)
     {
         try {
             $client = new Client();
@@ -358,17 +453,17 @@ class SalvaExportService
                 'auth' => [$this->username, $this->password]
             ]);
             $body = (string) $res->getBody();
-            print_r($body);
+            // print_r($body);
 
-            if (!$this->validate($body, self::SCHEMA_POLICY_IMPORT)) {
+            if (!$this->validate($body, $schema)) {
                 throw new \InvalidArgumentException("unable to validate response");
             }
+
+            return $body;
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error in salva send: %s', $e->getMessage()));
 
-            return false;
+            throw $e;
         }
-
-        return true;
     }
 }
