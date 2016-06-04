@@ -42,10 +42,10 @@ class SalvaSendPolicyCommand extends ContainerAwareCommand
         $salva = $this->getContainer()->get('app.salva');
         if ($cancel) {
             $responseId = $salva->cancelPolicy($phonePolicy);
-            print sprintf('Policy %s was successfully cancelled. Response %s', $policyNumber, $responseId);
+            print sprintf("Policy %s was successfully cancelled. Response %s\n", $policyNumber, $responseId);
         } else {
             $responseId = $salva->sendPolicy($phonePolicy);
-            print sprintf('Policy %s was successfully send. Response %s', $policyNumber, $responseId);
+            print sprintf("Policy %s was successfully send. Response %s\n", $policyNumber, $responseId);
         }
     }
 }

@@ -269,12 +269,12 @@ class SalvaExportService
         $xpath->registerNamespace('ns8', "http://sims.salva.ee/service/schema/policy/import/v1");
 
         $elementList = $xpath->query('//ns8:serviceResponse/ns8:policies/ns2:policy/ns2:recordId');
-        foreach($elementList as $element) {
+        foreach ($elementList as $element) {
             return $element->nodeValue;
         }
 
         $elementList = $xpath->query('//ns1:errorResponse/ns1:errorList/ns1:constraint');
-        foreach($elementList as $element) {
+        foreach ($elementList as $element) {
             $errMsg = sprintf(
                 "Error sending policy. Response: %s : %s",
                 $element->getAttribute('ns1:code'),
@@ -382,11 +382,13 @@ class SalvaExportService
 
         $objectFields = $dom->createElement('ns2:objectFields');
         $insuredObject->appendChild($objectFields);
-        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_make', $phonePolicy->getPhone()->getMake()));
-        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_model', $phonePolicy->getPhone()->getModel()));
+        $phone = $phonePolicy->getPhone();
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_make', $phone->getMake()));
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_model', $phone->getModel()));
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_imei', $phonePolicy->getImei()));
-        $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_value', $phonePolicy->getPhone()->getInitialPrice()));
-        $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_base_tariff', $phonePolicy->getPremium()->getYearlyPremiumPrice()));
+        $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_value', $phone->getInitialPrice()));
+        $tariff = $phonePolicy->getPremium()->getYearlyPremiumPrice();
+        $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_base_tariff', $tariff));
 
         return $dom->saveXML();
     }
