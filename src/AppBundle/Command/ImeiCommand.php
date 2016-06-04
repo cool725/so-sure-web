@@ -28,6 +28,12 @@ class ImeiCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'serial'
             )
+            ->addOption(
+                'device',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'device'
+            )
         ;
     }
 
@@ -35,19 +41,41 @@ class ImeiCommand extends ContainerAwareCommand
     {
         $imei = $input->getArgument('imei');
         $serial = $input->getOption('serial');
+        $device = $input->getOption('device');
+        $phone = $this->getPhone($device);
         $imeiService = $this->getContainer()->get('app.imei');
-        if ($imeiService->checkImei(new Phone(), $imei)) {
+        if ($imeiService->checkImei($phone, $imei)) {
             print sprintf("Imei %s is good\n", $imei);
         } else {
             print sprintf("Imei %s failed validation\n", $imei);
         }
 
         if ($serial) {
-            if ($imeiService->checkSerial(new Phone(), $serial)) {
+            if ($imeiService->checkSerial($phone, $serial)) {
                 print sprintf("Serial %s is good\n", $serial);
             } else {
                 print sprintf("Serial %s failed validation\n", $serial);
             }
         }
+    }
+
+    private function getPhone($device)
+    {
+        $phone = null;
+        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $phoneRepo = $dm->getRepository(Phone::class);
+        if ($device) {
+            $phone = $phoneRepo->findOneBy(['devices' => $device]);
+        } else {
+            $phones = $phoneRepo->findAll();
+            while ($phone == null) {
+                $phone = $phones[rand(0, count($phones) - 1)];
+                if (!$phone->getCurrentPhonePrice() || $phone->getMake() == "ALL") {
+                    $phone = null;
+                }
+            }
+        }
+
+        return $phone;
     }
 }
