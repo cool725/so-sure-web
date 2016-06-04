@@ -39,11 +39,11 @@ class ApiViewController extends BaseController
 
         $maxPotVaue = $request->get('maxPotValue');
         $maxConnections = ceil($maxPotVaue / 10);
-        $yearlyPremium = $request->get('yearlyPremium');
+        $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
         return array(
             'maxPotValue' => $maxPotVaue,
             'maxConnections' => $maxConnections,
-            'yearlyPremium' => $yearlyPremium ? $yearlyPremium : ($maxPotValue / 0.8),
+            'yearlyPremium' => $yearlyPremium,
         );
     }
 
@@ -117,7 +117,13 @@ class ApiViewController extends BaseController
         }
 
         // TODO: Later would determine which terms to display
-
-        return array();
+        $maxPotVaue = $request->get('maxPotValue');
+        $maxConnections = ceil($maxPotVaue / 10);
+        $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
+        return array(
+            'maxPotValue' => $maxPotVaue,
+            'maxConnections' => $maxConnections,
+            'yearlyPremium' => $yearlyPremium,
+        );
     }
 }
