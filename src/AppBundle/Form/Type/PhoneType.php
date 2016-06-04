@@ -21,7 +21,10 @@ class PhoneType extends AbstractType
                         return $dr->createQueryBuilder('p')
                             ->field('make')->notEqual("ALL")
                             ->field('active')->equals(true)
-                            ->field('os')->in(['Android', 'iOS', 'Cyanogen']);
+                            ->field('os')->in(['Android', 'iOS', 'Cyanogen'])
+                            ->sort('make', 'asc')
+                            ->sort('model', 'asc')
+                            ->sort('memory', 'asc');
                     }
             ])
             ->add('next', SubmitType::class)
