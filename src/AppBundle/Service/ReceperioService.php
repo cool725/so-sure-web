@@ -23,6 +23,9 @@ class ReceperioService extends BaseImeiService
     /** @var string */
     protected $environment;
 
+    /** @var string */
+    protected $responseData;
+
     /**
      * @param string $environment
      */
@@ -57,6 +60,11 @@ class ReceperioService extends BaseImeiService
         return $this->certId;
     }
 
+    public function getResponseData()
+    {
+        return $this->responseData;
+    }
+
     /**
      * Checks imei against a blacklist
      *
@@ -86,6 +94,7 @@ class ReceperioService extends BaseImeiService
             ]);
             $this->logger->info(sprintf("Claimscheck search for %s -> %s", $imei, print_r($response, true)));
             $data = json_decode($response, true);
+            $this->responseData = $data;
             $this->certId = $data['checkmendstatus']['certid'];
 
             return $data['checkmendstatus']['result'] == 'green';
@@ -130,38 +139,9 @@ class ReceperioService extends BaseImeiService
                 print_r($response, true)
             ));
             $data = json_decode($response, true);
+            $this->responseData = $data;
 
-            if (count($data['makes']) != 1) {
-                $this->logger->error(sprintf(
-                    "Unable to check serial number %s. Data: %s",
-                    $serialNumber,
-                    print_r($data, true)
-                ));
-
-                return true;
-            }
-            $make = $data['makes'][0];
-            if (count($make['models']) != 1) {
-                $this->logger->error(sprintf(
-                    "Unable to check serial number %s. Data: %s",
-                    $serialNumber,
-                    print_r($data, true)
-                ));
-
-                return true;
-            }
-            $model = $make['models'][0];
-            if (!$model['storage']) {
-                $this->logger->error(sprintf(
-                    "Unable to check serial number %s. Data: %s",
-                    $serialNumber,
-                    print_r($data, true)
-                ));
-
-                return true;
-            }
-
-            return $model['storage'] == sprintf('%sGB', $phone->getMemory());
+            return $this->validateSamePhone($phone, $serialNumber, $data);
         } catch (\Exception $e) {
             // TODO: automate a future retry check
             $this->logger->error(sprintf("Unable to check serial number %s Ex: %s", $serialNumber, $e->getMessage()));
@@ -169,6 +149,75 @@ class ReceperioService extends BaseImeiService
             // For now, if there are any issues, assume true and run a manual retry later
             return true;
         }
+    }
+
+    public function validateSamePhone(Phone $phone, $serialNumber, $data)
+    {
+        if (!isset($data['makes']) || count($data['makes']) != 1) {
+            throw new \Exception(sprintf(
+                "Unable to check serial number (multiple makes) %s. Data: %s",
+                $serialNumber,
+                print_r($data, true)
+            ));
+        }
+        $makeData = $data['makes'][0];
+        $make = strtolower($makeData['make']);
+
+        if (!isset($makeData['models']) || count($makeData['models']) != 1) {
+            throw new \Exception(sprintf(
+                "Unable to check serial number (multiple models) %s. Data: %s",
+                $serialNumber,
+                print_r($data, true)
+            ));
+        }
+        $modelData = $makeData['models'][0];
+        $model = $modelData['name'];
+
+        // Non applce devices rely on on the modelreference special mapping
+        // we give reciperio and it really just a make/model check
+        if ($model != 'apple') {
+            if (isset($modelData['modelreference']) && $modelData['modelreference']) {
+                $device = $modelData['modelreference'];
+                if (!in_array(strtolower($device), $phone->getDevices())) {
+                    throw new \Exception(sprintf(
+                        "Mismatching make %s for serial number %s. Data: %s",
+                        $phone->getMake(),
+                        $serialNumber,
+                        print_r($data, true)
+                    ));
+                }
+            } else {
+                $this->logger->warning(sprintf('Need to contact reciperio to add modelreference for %s', $phone));
+            }
+
+            return true;
+        }
+
+        if (strtolower($model) != strtolower($phone->getModel())) {
+            throw new \Exception(sprintf(
+                "Mismatching model %s for serial number %s. Data: %s",
+                $phone->getModel(),
+                $serialNumber,
+                print_r($data, true)
+            ));
+        }
+
+        if (!isset($modelData['storage']) || !$modelData['storage']) {
+            throw new \Exception(sprintf(
+                "Unable to check serial number (missing storage) %s. Data: %s",
+                $serialNumber,
+                print_r($data, true)
+            ));
+        } elseif ($modelData['storage'] != sprintf('%sGB', $phone->getMemory())) {
+            $this->logger->error(sprintf(
+                "Error validating check serial number %s for memory %s. Data: %s",
+                $serialNumber,
+                $phone->getMemory(),
+                print_r($data, true)
+            ));
+        }
+
+        return true;
     }
 
     protected function send($url, $data)

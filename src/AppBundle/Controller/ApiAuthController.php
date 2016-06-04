@@ -334,7 +334,12 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            if ($serialNumber && !$imeiValidator->checkSerial($phone, $serialNumber)) {
+            // For phones without a serial number, run check on imei
+            if (!$serialNumber) {
+                $serialNumber = $imei;
+            }
+
+            if (!$imeiValidator->checkSerial($phone, $serialNumber)) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_IMEI_PHONE_MISMATCH,
                     'Imei/Phone mismatch',
