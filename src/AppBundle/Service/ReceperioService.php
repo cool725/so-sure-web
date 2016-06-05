@@ -7,6 +7,8 @@ use AppBundle\Document\Phone;
 
 class ReceperioService extends BaseImeiService
 {
+    // 1 day
+    const CLAIMSCHECK_CACHE_TIME = 84600;
     const TEST_INVALID_IMEI = "352000067704506";
     const PARTNER_ID = 415;
     const BASE_URL = "http://gapi.checkmend.com";
@@ -88,12 +90,22 @@ class ReceperioService extends BaseImeiService
         }
 
         try {
-            $response = $this->send("/claimscheck/search", [
-                'serial' => $imei,
-                'storeid' => $this->storeId,
-            ]);
-            $this->logger->info(sprintf("Claimscheck search for %s -> %s", $imei, print_r($response, true)));
-            $data = json_decode($response, true);
+            $key = sprintf("receperio:search:%s:%s", $phone->getId(), $imei);
+            if (($redisData = $this->redis->get($key)) != null) {
+                $data = unserialize($redisData);
+            } else {
+                $response = $this->send("/claimscheck/search", [
+                    'serial' => $imei,
+                    'storeid' => $this->storeId,
+                ]);
+                $this->logger->info(sprintf("Claimscheck search for %s -> %s", $imei, print_r($response, true)));
+                $now = new \DateTime();
+                $logKey = sprintf('receperio:search:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
+                $this->redis->zincrby($logKey, 1, $imei);
+
+                $data = json_decode($response, true);
+                $this->redis->setex($key, self::CLAIMSCHECK_CACHE_TIME, serialize($data));
+            }
             $this->responseData = $data;
             $this->certId = $data['checkmendstatus']['certid'];
 
@@ -129,16 +141,26 @@ class ReceperioService extends BaseImeiService
         }
 
         try {
-            $response = $this->send("/makemodelext", [
-                'serials' => [$serialNumber],
-                'storeid' => $this->storeId,
-            ]);
-            $this->logger->info(sprintf(
-                "Claimscheck serial verification for %s -> %s",
-                $serialNumber,
-                print_r($response, true)
-            ));
-            $data = json_decode($response, true);
+            $key = sprintf("receperio:makemodel:%s:%s", $phone->getId(), $serialNumber);
+            if (($redisData = $this->redis->get($key)) != null) {
+                $data = unserialize($redisData);
+            } else {
+                $response = $this->send("/makemodelext", [
+                    'serials' => [$serialNumber],
+                    'storeid' => $this->storeId,
+                ]);
+                $this->logger->info(sprintf(
+                    "Claimscheck serial verification for %s -> %s",
+                    $serialNumber,
+                    print_r($response, true)
+                ));
+                $now = new \DateTime();
+                $logKey = sprintf('receperio:makemodel:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
+                $this->redis->zincrby($logKey, 1, $serialNumber);
+
+                $data = json_decode($response, true);
+                $this->redis->setex($key, self::CLAIMSCHECK_CACHE_TIME, serialize($data));
+            }
             $this->responseData = $data;
 
             return $this->validateSamePhone($phone, $serialNumber, $data);

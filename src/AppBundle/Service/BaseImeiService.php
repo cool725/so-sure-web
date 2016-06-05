@@ -15,6 +15,8 @@ class BaseImeiService
     /** @var DocumentManager */
     protected $dm;
 
+    protected $redis;
+
     /**
      * @param LoggerInterface $logger
      */
@@ -29,6 +31,11 @@ class BaseImeiService
     public function setDm($dm)
     {
         $this->dm = $dm;
+    }
+
+    public function setRedis($redis)
+    {
+        $this->redis = $redis;
     }
 
     /**
