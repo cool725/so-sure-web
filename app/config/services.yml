@@ -136,6 +136,7 @@ services:
         calls:
             - [setLogger, ['@logger']]
             - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
+            - [setRedis, ['@snc_redis.default']]
 
     app.imei:
         parent: base.imei
