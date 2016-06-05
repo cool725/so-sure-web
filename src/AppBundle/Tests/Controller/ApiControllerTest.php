@@ -648,6 +648,8 @@ class ApiControllerTest extends BaseControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => 'api-new-user@api.bar.com',
             'birthday' => $birthday->format(\DateTime::ISO8601),
+            'first_name' => 'foo',
+            'last_name' => 'bar',
         ));
         $data = $this->verifyResponse(200);
         $this->assertEquals('api-new-user@api.bar.com', $data['email']);
@@ -658,6 +660,8 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue($user !== null);
         $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
         $this->assertEquals($birthday->format(\DateTime::ISO8601), $user->getBirthday()->format(\DateTime::ISO8601));
+        $this->assertEquals('Foo', $user->getFirstName());
+        $this->assertEquals('Bar', $user->getLastName());
     }
 
     public function testUserCreateIp()

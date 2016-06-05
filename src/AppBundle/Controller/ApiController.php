@@ -558,8 +558,8 @@ class ApiController extends BaseController
             $user = $userManager->createUser();
             $user->setEnabled(true);
             $user->setEmail($data['email']);
-            $user->setFirstName(isset($data['first_name']) ? $data['first_name'] : null);
-            $user->setLastName(isset($data['last_name']) ? $data['last_name'] : null);
+            $user->setFirstName(isset($data['first_name']) ? ucfirst($data['first_name']) : null);
+            $user->setLastName(isset($data['last_name']) ? ucfirst($data['last_name']) : null);
             $user->setFacebookId(isset($data['facebook_id']) ? $data['facebook_id'] : null);
             $user->setFacebookAccessToken(
                 isset($data['facebook_access_token']) ? $data['facebook_access_token'] : null
