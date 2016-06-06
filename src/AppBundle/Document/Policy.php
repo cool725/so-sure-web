@@ -457,7 +457,7 @@ abstract class Policy
 
     public function incrementSalvaPolicyNumber(\DateTime $date)
     {
-        $this->salvaPolicyNumbers[$this->getLatestSalvaPolicyNumberIdentifier()] = $date;
+        $this->salvaPolicyNumbers[$this->getLatestSalvaPolicyNumberVersion()] = $date;
     }
 
     public function init(User $user, PolicyDocument $terms, PolicyDocument $keyfacts)
