@@ -198,16 +198,24 @@ services:
             dm:             "@doctrine_mongodb.odm.default_document_manager"
             logger:         "@logger"
 
+    app.mpdf:
+        class: Peerj\Bundle\MpdfBundle\Service\PdfGenerator
+        arguments:
+            templating: "@templating"
+            logger:     "@logger"
+            cache_dir:  "%kernel.cache_dir%"
+
     app.policy:
         class: AppBundle\Service\PolicyService
         arguments:
-            dm:         "@doctrine_mongodb.odm.default_document_manager"
-            logger:     "@logger"
-            sequence:   "@app.sequence"
-            mailer:     "@mailer"
-            templating: "@templating"
-            router:     "@api.router"
-            environment:    "%kernel.environment%"
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
+            logger:      "@logger"
+            sequence:    "@app.sequence"
+            mailer:      "@mailer"
+            templating:  "@templating"
+            router:      "@api.router"
+            environment: "%kernel.environment%"
+            mpdf:        "@app.mpdf"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService

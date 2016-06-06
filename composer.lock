@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4f8547f2a2bb0a7d5e13675e96c37d5d",
-    "content-hash": "2b3185ab7ac3e4486cf9682407c118a2",
+    "hash": "573f9060b3d6601d3ef7428e0a28aa15",
+    "content-hash": "bf6e17bd0a097319088eb869c714514b",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -3361,6 +3361,51 @@
             "time": "2016-04-03 06:00:07"
         },
         {
+            "name": "peerj/mpdf",
+            "version": "5.7.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PeerJ/mpdf.git",
+                "reference": "5d05283ef5119cf1b8d9366f8acae74b5ed1355a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PeerJ/mpdf/zipball/5d05283ef5119cf1b8d9366f8acae74b5ed1355a",
+                "reference": "5d05283ef5119cf1b8d9366f8acae74b5ed1355a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=5.0.3"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "mpdf.php"
+                ]
+            },
+            "license": [
+                "GPL"
+            ],
+            "authors": [
+                {
+                    "name": "Ian Back"
+                }
+            ],
+            "description": "mPDF is a PHP class which generates PDF files from UTF-8 encoded HTML. It is based on FPDF and HTML2FPDF, with a number of enhancements. (V 5.7.2)",
+            "homepage": "http://www.mpdf1.com",
+            "keywords": [
+                "pdf",
+                "php",
+                "utf-8"
+            ],
+            "support": {
+                "source": "https://github.com/PeerJ/mpdf/tree/5.7.2.1",
+                "issues": "https://github.com/PeerJ/mpdf/issues"
+            },
+            "time": "2014-12-09 12:26:44"
+        },
+        {
             "name": "phpoffice/phpexcel",
             "version": "1.8.1",
             "source": {
@@ -5400,6 +5445,48 @@
                 "Symfony2"
             ],
             "time": "2016-05-10 22:04:27"
+        },
+        {
+            "name": "peerj/mpdf-bundle",
+            "version": "5.7.2.1",
+            "target-dir": "Peerj/Bundle/MpdfBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PeerJ/mpdf-bundle.git",
+                "reference": "398af10105e3f0f68dc82a4c4663b918cbff6003"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PeerJ/mpdf-bundle/zipball/398af10105e3f0f68dc82a4c4663b918cbff6003",
+                "reference": "398af10105e3f0f68dc82a4c4663b918cbff6003",
+                "shasum": ""
+            },
+            "require": {
+                "peerj/mpdf": ">=5.7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Peerj\\Bundle\\MpdfBundle": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Patrick McAndrew",
+                    "email": "patrick@peerj.com"
+                }
+            ],
+            "description": "Symofony2 Bundle wrapper around mdf",
+            "keywords": [
+                "bundle",
+                "mpdf",
+                "pdf"
+            ],
+            "time": "2014-12-09 14:26:56"
         },
         {
             "name": "phing/phing",
