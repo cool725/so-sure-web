@@ -190,6 +190,9 @@ abstract class Policy
      */
     protected $scheduledPayments = array();
 
+    /** @MongoDB\Field(type="hash") */
+    protected $salvaPolicyNumbers = array();
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -430,6 +433,33 @@ abstract class Policy
         $this->scheduledPayments[] = $scheduledPayment;
     }
 
+    public function getSalvaPolicyNumbers()
+    {
+        return $this->salvaPolicyNumbers;
+    }
+
+    public function getLatestSalvaPolicyNumberVersion()
+    {
+        return count($this->salvaPolicyNumbers) + 1;
+    }
+
+    public function getSalvaPolicyNumber($version = null)
+    {
+        if (!$this->getPolicyNumber()) {
+            return null;
+        }
+        if (!$version) {
+            $version = $this->getLatestSalvaPolicyNumberVersion();
+        }
+
+        return sprintf("%s/%d", $this->getPolicyNumber(), $version);
+    }
+
+    public function incrementSalvaPolicyNumber(\DateTime $date)
+    {
+        $this->salvaPolicyNumbers[$this->getLatestSalvaPolicyNumberIdentifier()] = $date;
+    }
+
     public function init(User $user, PolicyDocument $terms, PolicyDocument $keyfacts)
     {
         $user->addPolicy($this);
@@ -517,7 +547,7 @@ abstract class Policy
             }
         }
 
-        return $this->toFourDp($brokerFee);
+        return $this->toTwoDp($brokerFee);
     }
 
     public function getRiskColour()

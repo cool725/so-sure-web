@@ -954,4 +954,20 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertEquals(Salva::MONTHLY_BROKER_FEE * 2, $policy->getBrokerFeePaid());
     }
+
+    public function testGetSalvaPolicyNumber()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $this->assertEquals(sprintf('%s/1', $policy->getPolicyNumber()), $policy->getSalvaPolicyNumber());
+
+        $policy->incrementSalvaPolicyNumber(new \DateTime());
+        $this->assertEquals(sprintf('%s/2', $policy->getPolicyNumber()), $policy->getSalvaPolicyNumber());
+    }
 }

@@ -26,8 +26,8 @@ class SalvaSendPolicyCommand extends ContainerAwareCommand
             ->addOption(
                 'cancel',
                 null,
-                InputOption::VALUE_NONE,
-                'cancel'
+                InputOption::VALUE_REQUIRED,
+                'Cancellation reason'
             )
         ;
     }
