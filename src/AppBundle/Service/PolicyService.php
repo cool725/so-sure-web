@@ -120,7 +120,6 @@ class PolicyService
         if (file_exists($tmpFile)) {
             unlink($tmpFile);
         }
-        print $tmpFile;
 
         $this->mpdf->init('utf-8', 'A4', '', '', '25', '25', '15', '10');
         $this->mpdf->useTwigTemplate('AppBundle:Pdf:policySchedule.html.twig', ['policy' => $policy]);

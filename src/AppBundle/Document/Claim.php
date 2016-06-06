@@ -206,7 +206,11 @@ class Claim
 
     public function isWithin30Days($date)
     {
-        return $this->getRecordedDate()->diff($date)->days < 30;
+        $claimsDate = $this->getClosedDate();
+        if (!$claimsDate) {
+            $claimsDate = $this->getRecordedDate();
+        }
+        return $claimsDate->diff($date)->days < 30;
     }
 
     public function getPolicy()
