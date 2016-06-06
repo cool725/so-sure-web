@@ -140,14 +140,17 @@ class SalvaExportService
 
     public function exportPolicies()
     {
+        $lines = [];
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        print sprintf("%s\n", $this->transformPolicy(null));
+        $lines[] = sprintf("%s\n", $this->transformPolicy(null));
         foreach ($repo->getAllPoliciesForExport() as $policy) {
             foreach ($policy->getSalvaPolicyNumbers() as $version => $date) {
-                print sprintf("%s\n", $this->transformPolicy($policy, $version));
+                $lines[] =  sprintf("%s\n", $this->transformPolicy($policy, $version));
             }
-            print sprintf("%s\n", $this->transformPolicy($policy));
+            $lines[] =  sprintf("%s\n", $this->transformPolicy($policy));
         }
+
+        return $lines;
     }
 
     public function transformPayment(JudoPayment $payment = null, $version = null)
@@ -225,20 +228,26 @@ class SalvaExportService
 
     public function exportPayments($year, $month)
     {
+        $lines = [];
         $repo = $this->dm->getRepository(JudoPayment::class);
-        print sprintf("%s\n", $this->transformPayment(null));
+        $lines[] = sprintf("%s\n", $this->transformPayment(null));
         foreach ($repo->getAllPaymentsForExport($year, $month) as $payment) {
-            print sprintf("%s\n", $this->transformPayment($payment));
+            $lines[] = sprintf("%s\n", $this->transformPayment($payment));
         }
+
+        return $lines;
     }
 
     public function exportClaims(\DateTime $date)
     {
+        $lines = [];
         $repo = $this->dm->getRepository(Claim::class);
-        print sprintf("%s\n", $this->transformClaim(null));
+        $lines[] =  sprintf("%s\n", $this->transformClaim(null));
         foreach ($repo->getAllClaimsForExport($date) as $claim) {
-            print sprintf("%s\n", $this->transformClaim($claim));
+            $lines[] = sprintf("%s\n", $this->transformClaim($claim));
         }
+
+        return $lines;
     }
 
     public function sendPolicy(PhonePolicy $phonePolicy)
@@ -308,7 +317,6 @@ class SalvaExportService
                 $element->getAttribute('ns1:code'),
                 $element->nodeValue
             );
-            print $errMsg;
             $this->logger->error($errMsg);
         }
 

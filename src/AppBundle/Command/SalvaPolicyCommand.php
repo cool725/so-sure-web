@@ -23,6 +23,6 @@ class SalvaPolicyCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $salva = $this->getContainer()->get('app.salva');
-        $salva->exportPolicies();
+        $output->write($salva->exportPolicies());
     }
 }
