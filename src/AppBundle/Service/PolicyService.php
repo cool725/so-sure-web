@@ -193,19 +193,15 @@ class PolicyService
                 $this->templating->render('AppBundle:Email:policy/new.txt.twig', ['policy' => $policy]),
                 'text/plain'
             );
+            
+        // Make sure not to delete attachments as there's a timing issue
+        // leave to a cleanup /tmp folder process
         if ($attachmentFiles) {
             foreach ($attachmentFiles as $attachmentFile) {
                 $message->attach(\Swift_Attachment::fromPath($attachmentFile));
             }
         }
         $this->mailer->send($message);
-
-        // Delete any attachements locally
-        if ($attachmentFiles) {
-            foreach ($attachmentFiles as $attachmentFile) {
-                unlink($attachmentFile);
-            }
-        }
     }
 
     /**
