@@ -35,6 +35,6 @@ class SalvaPaymentCommand extends ContainerAwareCommand
         $year = $input->getArgument('year');
         $month = $input->getArgument('month');
         $salva = $this->getContainer()->get('app.salva');
-        $salva->exportPayments($year, $month);
+        $output->write($salva->exportPayments($year, $month));
     }
 }

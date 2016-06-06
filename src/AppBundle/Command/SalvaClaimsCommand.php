@@ -30,6 +30,6 @@ class SalvaClaimsCommand extends ContainerAwareCommand
     {
         $date = new \DateTime($input->getOption('date'));
         $salva = $this->getContainer()->get('app.salva');
-        $salva->exportClaims($date);
+        $output->write($salva->exportClaims($date));
     }
 }
