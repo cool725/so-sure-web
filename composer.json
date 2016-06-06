@@ -42,7 +42,8 @@
         "fzaninotto/faker": "^1.6",
         "braintree/braintree_php": "^3.11",
         "cometcult/braintree-bundle": "^0.1.0",
-        "stof/doctrine-extensions-bundle": "^1.2"
+        "stof/doctrine-extensions-bundle": "^1.2",
+        "peerj/mpdf": "5.7.2.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
@@ -53,6 +54,12 @@
         "doctrine/doctrine-fixtures-bundle": "^2.3",
         "squizlabs/php_codesniffer": "2.*"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:peerj/mpdf.git"
+        }
+    ],
     "scripts": {
         "post-install-cmd": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",

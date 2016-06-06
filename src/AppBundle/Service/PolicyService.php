@@ -32,6 +32,7 @@ class PolicyService
     protected $mailer;
     protected $templating;
     protected $router;
+    protected $mpdf;
 
     /** @var string */
     protected $environment;
@@ -54,6 +55,7 @@ class PolicyService
      * @param                 $templating
      * @param                 $router
      * @param                 $environment
+     * @param                 $mpdf
      */
     public function __construct(
         DocumentManager $dm,
@@ -62,7 +64,8 @@ class PolicyService
         \Swift_Mailer $mailer,
         $templating,
         $router,
-        $environment
+        $environment,
+        $mpdf
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -71,6 +74,7 @@ class PolicyService
         $this->templating = $templating;
         $this->router = $router->getRouter();
         $this->environment = $environment;
+        $this->mpdf = $mpdf;
     }
 
     public function create(Policy $policy, \DateTime $date = null)
@@ -100,7 +104,25 @@ class PolicyService
 
         $this->dm->flush();
 
-        $this->newPolicyEmail($policy);
+        $policySchedule = $this->generatePolicySchedule($policy);
+
+        $this->newPolicyEmail($policy, [$policySchedule]);
+    }
+
+    public function generatePolicySchedule(Policy $policy)
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'policy-schedule');
+        unlink($tmpFile);
+        $tmpFile = sprintf('%s.pdf', $tmpFile);
+        print $tmpFile;
+
+        $this->mpdf->init('utf-8', 'A4', '', '', '25', '25', '15', '10');
+        $this->mpdf->useTwigTemplate('AppBundle:Pdf:policySchedule.html.twig', ['policy' => $policy]);
+        file_put_contents($tmpFile, $this->mpdf->generate());
+
+        // TODO: Upload schedule to s3 and update policy
+
+        return $tmpFile;
     }
 
     public function generateScheduledPayments(Policy $policy, \DateTime $date = null)
@@ -157,7 +179,7 @@ class PolicyService
     /**
      * @param Policy $policy
      */
-    public function newPolicyEmail(Policy $policy)
+    public function newPolicyEmail(Policy $policy, $attachmentFiles = null)
     {
         $message = \Swift_Message::newInstance()
             ->setSubject(sprintf('Your so-sure policy %s', $policy->getPolicyNumber()))
@@ -171,7 +193,19 @@ class PolicyService
                 $this->templating->render('AppBundle:Email:policy/new.txt.twig', ['policy' => $policy]),
                 'text/plain'
             );
+        if ($attachmentFiles) {
+            foreach ($attachmentFiles as $attachmentFile) {
+                $message->attach(\Swift_Attachment::fromPath($attachmentFile));
+            }
+        }
         $this->mailer->send($message);
+
+        // Delete any attachements locally
+        if ($attachmentFiles) {
+            foreach ($attachmentFiles as $attachmentFile) {
+                unlink($attachmentFile);
+            }
+        }
     }
 
     /**
