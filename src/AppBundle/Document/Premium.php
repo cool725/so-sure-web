@@ -65,6 +65,11 @@ abstract class Premium
         return $this->toTwoDp($this->getMonthlyPremiumPrice() * 12);
     }
 
+    public function getYearlyGwp()
+    {
+        return $this->toTwoDp($this->getGwp() * 12);
+    }
+
     public function getTotalIpt()
     {
         return $this->toTwoDp($this->getIpt() * 12);

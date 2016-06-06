@@ -312,9 +312,11 @@ class SalvaExportService
             $date->format("Y-m-d\TH:i:00")
         ));
 
+        /*
         $usedFinalPremium = $dom->createElement('n1:usedFinalPremium', 0);
         $usedFinalPremium->setAttribute('n2:currency', 'GBP');
         $root->appendChild($usedFinalPremium);
+        */
 
         return $dom->saveXML();
     }
@@ -387,7 +389,7 @@ class SalvaExportService
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_model', $phone->getModel()));
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_imei', $phonePolicy->getImei()));
         $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_value', $phone->getInitialPrice()));
-        $tariff = $phonePolicy->getPremium()->getYearlyPremiumPrice();
+        $tariff = $phonePolicy->getPremium()->getYearlyGwp();
         $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_base_tariff', $tariff));
 
         return $dom->saveXML();
