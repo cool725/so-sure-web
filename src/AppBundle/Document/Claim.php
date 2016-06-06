@@ -417,7 +417,7 @@ class Claim
         if ($this->getType() == Claim::TYPE_DAMAGE) {
             return 50;
         } elseif (in_array($this->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
-            return 75;
+            return 70;
         } else {
             throw new \Exception(sprintf('Unknown type for expected excess: %s', $this->getType()));
         }
