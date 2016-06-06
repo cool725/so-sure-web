@@ -189,7 +189,7 @@ class Connection
     {
         return [
             'name' => $this->getLinkedUser() ? $this->getLinkedUser()->getName() : null,
-            'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ISO8601) : null,
+            'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ATOM) : null,
         ];
     }
 }

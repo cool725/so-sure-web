@@ -199,7 +199,7 @@ abstract class BaseController extends Controller
         if (!isset($data['birthday'])) {
             return null;
         }
-        $birthday = \DateTime::createFromFormat(\DateTime::ISO8601, $data['birthday']);
+        $birthday = \DateTime::createFromFormat(\DateTime::ATOM, $data['birthday']);
         if (!$birthday) {
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_INVALD_DATA_FORMAT,

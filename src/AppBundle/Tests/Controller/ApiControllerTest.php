@@ -647,7 +647,7 @@ class ApiControllerTest extends BaseControllerTest
         $birthday = new \DateTime('1980-01-01');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => 'api-new-user@api.bar.com',
-            'birthday' => $birthday->format(\DateTime::ISO8601),
+            'birthday' => $birthday->format(\DateTime::ATOM),
             'first_name' => 'foo',
             'last_name' => 'bar',
         ));
@@ -659,7 +659,7 @@ class ApiControllerTest extends BaseControllerTest
         $user = $userRepo->findOneBy(['email' => 'api-new-user@api.bar.com']);
         $this->assertTrue($user !== null);
         $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
-        $this->assertEquals($birthday->format(\DateTime::ISO8601), $user->getBirthday()->format(\DateTime::ISO8601));
+        $this->assertEquals($birthday->format(\DateTime::ATOM), $user->getBirthday()->format(\DateTime::ISO8601));
         $this->assertEquals('Foo', $user->getFirstName());
         $this->assertEquals('Bar', $user->getLastName());
     }
