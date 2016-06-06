@@ -228,6 +228,7 @@ class JudopayService
         $tokenPaymentDetails = $tokenPayment->create();
         $payment->setReceipt($tokenPaymentDetails["receiptId"]);
         $payment->setAmount($tokenPaymentDetails["amount"]);
+        // TODO: $payment->setBrokerFee(Salva::FINAL_MONTHLY_BROKER_FEE);
         $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
         if ($tokenPaymentDetails["type"] != 'Payment') {
             $errMsg = sprintf('Payment type mismatch - expected payment, not %s', $tokenPaymentDetails["type"]);

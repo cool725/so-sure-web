@@ -169,6 +169,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $payment->setDate(clone $paymentDate);
                 $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
                 $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+                if ($months == 12) {
+                    $payment->setBrokerFee(Salva::FINAL_MONTHLY_BROKER_FEE);
+                }
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
                 $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));

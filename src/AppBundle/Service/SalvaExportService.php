@@ -21,6 +21,13 @@ class SalvaExportService
     const SCHEMA_POLICY_IMPORT = 'policy/import/policyImportV1.xsd';
     const SCHEMA_POLICY_TERMINATE = 'policy/termination/policyTerminationV1.xsd';
 
+    const CANCELLED_REPLACE = 'new_cover_to_be_issued';
+    const CANCELLED_UNPAID = 'debt';
+    const CANCELLED_FRAUD = 'annulment';
+    const CANCELLED_GOODWILL = 'withdrawal_client';
+    const CANCELLED_COOLOFF = 'withdrawal';
+    const CANCELLED_BADRISK = 'claim';
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -67,22 +74,28 @@ class SalvaExportService
     {
     }
 
-    public function transformPolicy(PhonePolicy $policy = null)
+    public function transformPolicy(PhonePolicy $policy = null, $version = null)
     {
         if ($policy) {
             if (!$policy->getNumberOfInstallments()) {
                 throw new \Exception('Invalid policy payment');
             }
+            $terminationDate = null;
+            if ($version) {
+                $terminationDate = $policy->getSalvaPolicyNumbers()[$version];
+            }
             $data = [
-                $policy->getPolicyNumber(),
+                $policy->getSalvaPolicyNumber($version),
                 $policy->getStatus(),
                 $policy->getStart()->format(\DateTime::ISO8601),
                 $policy->getEnd()->format(\DateTime::ISO8601),
+                $terminationDate ? $terminationDate->format(\DateTime::ISO8601) : '',
                 $policy->getUser()->getId(),
                 $policy->getUser()->getFirstName(),
                 $policy->getUser()->getLastName(),
                 $policy->getPhone()->getMake(),
                 $policy->getPhone()->getModel(),
+                $policy->getPhone()->getMemory(),
                 $policy->getImei(),
                 $policy->getPhone()->getInitialPrice(),
                 $policy->getNumberOfInstallments(),
@@ -101,11 +114,13 @@ class SalvaExportService
                 'Status',
                 'InceptionDate',
                 'EndDate',
+                'TerminationDate',
                 'CustomerId',
                 'FirstName',
                 'LastName',
                 'Make',
                 'Model',
+                'Memory',
                 'Imei',
                 'EstimatedPhonePrice',
                 'NumberInstallments',
@@ -120,7 +135,7 @@ class SalvaExportService
             ];
         }
         
-        return implode(',', $data);
+        return sprintf('"%s"', implode('","', $data));
     }
 
     public function exportPolicies()
@@ -128,18 +143,21 @@ class SalvaExportService
         $repo = $this->dm->getRepository(PhonePolicy::class);
         print sprintf("%s\n", $this->transformPolicy(null));
         foreach ($repo->getAllPoliciesForExport() as $policy) {
+            foreach ($policy->getSalvaPolicyNumbers() as $version => $date) {
+                print sprintf("%s\n", $this->transformPolicy($policy, $version));
+            }
             print sprintf("%s\n", $this->transformPolicy($policy));
         }
     }
 
-    public function transformPayment(JudoPayment $payment = null)
+    public function transformPayment(JudoPayment $payment = null, $version = null)
     {
         if ($payment) {
             if (!$payment->isSuccess()) {
                 throw new \Exception('Invalid payment');
             }
             $data = [
-                $payment->getPolicy()->getPolicyNumber(),
+                $payment->getPolicy()->getSalvaPolicyNumber($version),
                 $payment->getDate()->format(\DateTime::ISO8601),
                 $this->toTwoDp($payment->getAmount()),
             ];
@@ -151,14 +169,14 @@ class SalvaExportService
             ];
         }
 
-        return implode(',', $data);
+        return sprintf('"%s"', implode('","', $data));
     }
 
-    public function transformClaim(Claim $claim = null)
+    public function transformClaim(Claim $claim = null, $version = null)
     {
         if ($claim) {
             $data = [
-                $claim->getPolicy()->getPolicyNumber(),
+                $claim->getPolicy()->getSalvaPolicyNumber($version),
                 $claim->getNumber(),
                 $claim->getDaviesStatus(),
                 $claim->getNotificationDate() ?
@@ -202,7 +220,7 @@ class SalvaExportService
             ];
         }
 
-        return implode(',', $data);
+        return sprintf('"%s"', implode('","', $data));
     }
 
     public function exportPayments($year, $month)
@@ -237,9 +255,9 @@ class SalvaExportService
         return $responseId;
     }
 
-    public function cancelPolicy(PhonePolicy $phonePolicy)
+    public function cancelPolicy(PhonePolicy $phonePolicy, $reason)
     {
-        $xml = $this->cancelXml($phonePolicy);
+        $xml = $this->cancelXml($phonePolicy, $reason);
         $this->logger->info($xml);
         print_r($xml);
         if (!$this->validate($xml, self::SCHEMA_POLICY_TERMINATE)) {
@@ -251,6 +269,16 @@ class SalvaExportService
         $responseId = $this->getResponseId($response);
 
         return $responseId;
+    }
+
+    public function updatePolicy(PhonePolicy $phonePolicy)
+    {
+        $this->cancelPolicy($phonePolicy, self::CANCELLED_REPLACE);
+
+        $phonePolicy->incrementSalvaPolicyNumber();
+        $this->dm->flush();
+
+        $this->sendPolicy($phonePolicy);
     }
 
     protected function getResponseId($xml)
@@ -287,7 +315,7 @@ class SalvaExportService
         throw new \Exception('Unable to get response');
     }
 
-    public function cancelXml(PhonePolicy $phonePolicy)
+    public function cancelXml(PhonePolicy $phonePolicy, $reason)
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
 
@@ -304,7 +332,7 @@ class SalvaExportService
             'http://sims.salva.ee/service/schema/v1'
         );
         $root->appendChild($dom->createElement('n1:policyNo', $phonePolicy->getPolicyNumber()));
-        $root->appendChild($dom->createElement('n1:terminationReasonCode', 'other'));
+        $root->appendChild($dom->createElement('n1:terminationReasonCode', $reason));
         // TODO: Change back to getStart() + format Atom
         $date = new \DateTime('+4 hours');
         $root->appendChild($dom->createElement(
@@ -349,16 +377,21 @@ class SalvaExportService
         $root->appendChild($policy);
 
         $policy->appendChild($dom->createElement('ns2:renewable', 'false'));
-        // TODO: Change back to getStart() + format Atom
-        $date = new \DateTime('+4 hours');
+        // TODO: Change back to getStart()
+        // $startDate = clone $phonePolicy->getEnd();
+        //$date = new \DateTime('+4 hours');
+        $startDate = new \DateTime('+5 minutes');
+        $startDate->setTimezone(new \DateTimeZone("UTC"));
         $policy->appendChild($dom->createElement(
             'ns2:insurancePeriodStart',
-            $date->format("Y-m-d\TH:i:00")
+            $startDate->format("Y-m-d\TH:i:00")
         ));
-        // TODO: Change back to format Atom
+
+        $endDate = clone $phonePolicy->getEnd();
+        $endDate->setTimezone(new \DateTimeZone("UTC"));
         $policy->appendChild($dom->createElement(
             'ns2:insurancePeriodEnd',
-            $phonePolicy->getEnd()->format("Y-m-d\TH:i:00")
+            $endDate->format("Y-m-d\TH:i:00")
         ));
         $policy->appendChild($dom->createElement(
             'ns2:paymentsPerYearCode',
@@ -387,6 +420,7 @@ class SalvaExportService
         $phone = $phonePolicy->getPhone();
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_make', $phone->getMake()));
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_model', $phone->getModel()));
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_memory', $phone->getMemory()));
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_imei', $phonePolicy->getImei()));
         $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_value', $phone->getInitialPrice()));
         $tariff = $phonePolicy->getPremium()->getYearlyGwp();
