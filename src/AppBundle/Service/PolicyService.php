@@ -111,9 +111,15 @@ class PolicyService
 
     public function generatePolicySchedule(Policy $policy)
     {
-        $tmpFile = tempnam(sys_get_temp_dir(), 'policy-schedule');
-        unlink($tmpFile);
-        $tmpFile = sprintf('%s.pdf', $tmpFile);
+        $tmpFile = sprintf(
+            "%s/%s-%s.pdf",
+            sys_get_temp_dir(),
+            "policy-schedule",
+            str_replace('/', '-', $policy->getPolicyNumber())
+        );
+        if (file_exists($tmpFile)) {
+            unlink($tmpFile);
+        }
         print $tmpFile;
 
         $this->mpdf->init('utf-8', 'A4', '', '', '25', '25', '15', '10');
@@ -181,27 +187,31 @@ class PolicyService
      */
     public function newPolicyEmail(Policy $policy, $attachmentFiles = null)
     {
-        $message = \Swift_Message::newInstance()
-            ->setSubject(sprintf('Your so-sure policy %s', $policy->getPolicyNumber()))
-            ->setFrom('hello@wearesosure.com')
-            ->setTo($policy->getUser()->getEmail())
-            ->setBody(
-                $this->templating->render('AppBundle:Email:policy/new.html.twig', ['policy' => $policy]),
-                'text/html'
-            )
-            ->addPart(
-                $this->templating->render('AppBundle:Email:policy/new.txt.twig', ['policy' => $policy]),
-                'text/plain'
-            );
-            
-        // Make sure not to delete attachments as there's a timing issue
-        // leave to a cleanup /tmp folder process
-        if ($attachmentFiles) {
-            foreach ($attachmentFiles as $attachmentFile) {
-                $message->attach(\Swift_Attachment::fromPath($attachmentFile));
+        try {
+            $message = \Swift_Message::newInstance()
+                ->setSubject(sprintf('Your so-sure policy %s', $policy->getPolicyNumber()))
+                ->setFrom('hello@wearesosure.com')
+                ->setTo($policy->getUser()->getEmail())
+                ->setBody(
+                    $this->templating->render('AppBundle:Email:policy/new.html.twig', ['policy' => $policy]),
+                    'text/html'
+                )
+                ->addPart(
+                    $this->templating->render('AppBundle:Email:policy/new.txt.twig', ['policy' => $policy]),
+                    'text/plain'
+                );
+
+            // Make sure not to delete attachments as there's a timing issue
+            // leave to a cleanup /tmp folder process
+            if ($attachmentFiles) {
+                foreach ($attachmentFiles as $attachmentFile) {
+                    $message->attach(\Swift_Attachment::fromPath($attachmentFile));
+                }
             }
+            $this->mailer->send($message);
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()));
         }
-        $this->mailer->send($message);
     }
 
     /**
