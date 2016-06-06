@@ -315,6 +315,10 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
                 $releaseDate // $releaseDate
             );
 
+            if ($phone->shouldBeRetired()) {
+                $phone->setActive(false);
+            }
+
             $manager->persist($phone);
             if (!$phone->getCurrentPhonePrice()) {
                 throw new \Exception('Failed to init phone');
