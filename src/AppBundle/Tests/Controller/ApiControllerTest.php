@@ -659,7 +659,7 @@ class ApiControllerTest extends BaseControllerTest
         $user = $userRepo->findOneBy(['email' => 'api-new-user@api.bar.com']);
         $this->assertTrue($user !== null);
         $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
-        $this->assertEquals($birthday->format(\DateTime::ATOM), $user->getBirthday()->format(\DateTime::ISO8601));
+        $this->assertEquals($birthday->format(\DateTime::ATOM), $user->getBirthday()->format(\DateTime::ATOM));
         $this->assertEquals('Foo', $user->getFirstName());
         $this->assertEquals('Bar', $user->getLastName());
     }
