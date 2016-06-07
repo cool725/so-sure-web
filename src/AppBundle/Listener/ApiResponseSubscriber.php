@@ -31,7 +31,7 @@ class ApiResponseSubscriber implements EventSubscriberInterface
                 $event->setResponse($this->generateJsonError($errorCode));
             } elseif (($random = $this->redis->get(self::KEY_RANDOM_FAILURE)) !== null) {
                 if (rand(0, 100) <= $random) {
-                    $event->setResponse($this->generateJsonError(500));                    
+                    $event->setResponse($this->generateJsonError(500));
                 }
             }
         }
@@ -42,7 +42,7 @@ class ApiResponseSubscriber implements EventSubscriberInterface
         return new JsonResponse([
             'code' => 1,
             'description' => 'ApiResponseSubscriber'
-        ], $errorCode);        
+        ], $errorCode);
     }
 
     public static function getSubscribedEvents()
