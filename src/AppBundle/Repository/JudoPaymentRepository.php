@@ -7,15 +7,15 @@ use AppBundle\Document\JudoPayment;
 
 class JudoPaymentRepository extends DocumentRepository
 {
-    public function getAllPaymentsForExport($year, $month)
+    public function getAllPaymentsForExport(\DateTime $date)
     {
-        $date = new \DateTime(sprintf('%d-%d-01 00:00:00', $year, $month));
-        $nextMonth = clone $date;
+        $startMonth = new \DateTime(sprintf('%d-%d-01 00:00:00', $date->format('Y'), $date->format('m')));
+        $nextMonth = clone $startMonth;
         $nextMonth->add(new \DateInterval('P1M'));
 
         return $this->createQueryBuilder()
             ->field('result')->equals(JudoPayment::RESULT_SUCCESS)
-            ->field('date')->gte($date)
+            ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
             ->getQuery()
             ->execute();

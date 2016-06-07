@@ -39,7 +39,7 @@ class PhonePolicyRepository extends DocumentRepository
             ->count();
     }
 
-    public function getAllPoliciesForExport()
+    public function getAllPoliciesForExport(\DateTime $date)
     {
         $policy = new PhonePolicy();
         return $this->createQueryBuilder()

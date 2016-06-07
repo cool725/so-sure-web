@@ -17,24 +17,19 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:salva:export:payment')
             ->setDescription('Export all payments to salva')
-            ->addArgument(
-                'year',
-                InputArgument::REQUIRED,
-                'Year'
-            )
-            ->addArgument(
-                'month',
-                InputArgument::REQUIRED,
-                'Month'
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'date'
             )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $year = $input->getArgument('year');
-        $month = $input->getArgument('month');
+        $date = new \DateTime($input->getOption('date'));
         $salva = $this->getContainer()->get('app.salva');
-        $output->write($salva->exportPayments($year, $month));
+        $output->write($salva->exportPayments($date));
     }
 }

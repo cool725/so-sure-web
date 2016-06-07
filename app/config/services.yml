@@ -178,6 +178,7 @@ services:
             rootDir:        "%kernel.root_dir%"
             redis:          "@snc_redis.default"
             s3:             "@aws.s3"
+            environment:    "%kernel.environment%"
 
     app.davies:
         class: AppBundle\Service\DaviesService

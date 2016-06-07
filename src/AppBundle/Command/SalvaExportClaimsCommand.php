@@ -23,6 +23,13 @@ class SalvaExportClaimsCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'date'
             )
+            ->addOption(
+                'days',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'date',
+                7
+            )
         ;
     }
 
