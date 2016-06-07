@@ -41,6 +41,8 @@ class PhonePolicyRepository extends DocumentRepository
 
     public function getAllPoliciesForExport(\DateTime $date)
     {
+        \AppBundle\Classes\NoOp::noOp([$date]);
+
         $policy = new PhonePolicy();
         return $this->createQueryBuilder()
             ->field('status')->in([
