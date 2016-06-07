@@ -28,6 +28,8 @@ class SalvaExportService
     const CANCELLED_COOLOFF = 'withdrawal';
     const CANCELLED_BADRISK = 'claim';
 
+    const KEY_POLICY_UPDATE = 'salva:policyid:updates';
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -46,6 +48,8 @@ class SalvaExportService
     /** @var string */
     protected $rootDir;
 
+    protected $redis;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -53,6 +57,7 @@ class SalvaExportService
      * @param string          $username
      * @param string          $password
      * @param string          $rootDir
+     * @param                 $redis
      */
     public function __construct(
         DocumentManager  $dm,
@@ -60,7 +65,8 @@ class SalvaExportService
         $baseUrl,
         $username,
         $password,
-        $rootDir
+        $rootDir,
+        $redis
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -68,6 +74,7 @@ class SalvaExportService
         $this->username = $username;
         $this->password = $password;
         $this->rootDir = $rootDir;
+        $this->redis = $redis;
     }
 
     public function export(Policy $policy)
@@ -295,6 +302,9 @@ class SalvaExportService
 
     public function cancelPolicy(PhonePolicy $phonePolicy, $reason)
     {
+        $phonePolicy->incrementSalvaPolicyNumber();
+        $this->dm->flush();
+
         $xml = $this->cancelXml($phonePolicy, $reason);
         $this->logger->info($xml);
         print_r($xml);
@@ -311,11 +321,50 @@ class SalvaExportService
 
     public function updatePolicy(PhonePolicy $phonePolicy)
     {
-        $phonePolicy->incrementSalvaPolicyNumber();
-        $this->dm->flush();
-
         $this->cancelPolicy($phonePolicy, self::CANCELLED_REPLACE);
         $this->sendPolicy($phonePolicy);
+    }
+
+    public function process($max)
+    {
+        $count = 0;
+        while ($count < $max) {
+            $policyId = null;
+            try {
+                $policyId = $this->redis->lpop(self::KEY_POLICY_UPDATE);
+                if (!$policyId) {
+                    return $count;
+                }
+                $repo = $this->dm->getRepository(PhonePolicy::class);
+                $policy = $repo->find($policyId);
+                if (!$policy) {
+                    throw new \Exception(sprintf('Unable to find policyId: %s', $policyId));
+                }
+                $this->cancelPolicy($policy, self::CANCELLED_REPLACE);
+                //$this->updatePolicy($policy);
+
+                $count = $count + 1;
+            } catch (\Exception $e) {
+                if ($policyId) { 
+                    $this->redis->rpush(self::KEY_POLICY_UPDATE, $policyId);
+                    $this->logger->error(sprintf('Error updating policy %s to salva (requeued). Ex: %s', $policyId, $e->getMessage()));
+                }
+                
+                throw $e;
+            }            
+        }
+        
+        return $count;
+    }
+
+    public function queue(PhonePolicy $policy)
+    {
+        $this->redis->rpush(self::KEY_POLICY_UPDATE, $policy->getId());
+    }
+
+    public function clearQueue()
+    {
+        $this->redis->del(self::KEY_POLICY_UPDATE);
     }
 
     protected function getResponseId($xml)
@@ -359,8 +408,20 @@ class SalvaExportService
         return $clonedDate->format("Y-m-d\TH:i:00");
     }
 
-    public function cancelXml(PhonePolicy $phonePolicy, $reason)
+    public function cancelXml(PhonePolicy $phonePolicy, $reason, $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+            // Termination time can be a bit in the future without issue
+            $date->add(new \DateInterval('PT5M'));
+        }
+
+        // Make sure policy is incremented prior to calling
+        $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
+        if (!isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
+            throw new \Exception(sprintf('Missing version %s for salva. Was version incremented prior to cancellation?', $version));
+        }
+
         $dom = new DOMDocument('1.0', 'UTF-8');
 
         $root = $dom->createElement('n1:serviceRequest');
@@ -375,16 +436,14 @@ class SalvaExportService
             'xmlns:n2',
             'http://sims.salva.ee/service/schema/v1'
         );
-        $root->appendChild($dom->createElement('n1:policyNo', $phonePolicy->getPolicyNumber()));
+        $root->appendChild($dom->createElement('n1:policyNo', $phonePolicy->getSalvaPolicyNumber($version)));
         $root->appendChild($dom->createElement('n1:terminationReasonCode', $reason));
         $root->appendChild($dom->createElement(
             'n1:terminationTime',
-            $this->adjustDate(new \DateTime())
+            $this->adjustDate($date)
         ));
 
-        // Make sure policy is incremented prior to calling
-        $version = $policy->getLatestSalvaPolicyNumberVersion() - 1;
-        $payments = $policy->getPaymentsForSalvaVersions()[$version];
+        $payments = $phonePolicy->getPaymentsForSalvaVersions()[$version];
         $usedPremium = $phonePolicy->getTotalPremiumPrice($payments);
 
         $usedFinalPremium = $dom->createElement('n1:usedFinalPremium', $usedPremium);
@@ -437,7 +496,7 @@ class SalvaExportService
         ));
         $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
         $policy->appendChild($dom->createElement('ns2:deliveryModeCode', 'undefined'));
-        $policy->appendChild($dom->createElement('ns2:policyNo', $phonePolicy->getPolicyNumber()));
+        $policy->appendChild($dom->createElement('ns2:policyNo', $phonePolicy->getSalvaPolicyNumber()));
 
         $policyCustomers = $dom->createElement('ns2:policyCustomers');
         $policy->appendChild($policyCustomers);

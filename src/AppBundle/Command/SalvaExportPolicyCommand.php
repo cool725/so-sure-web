@@ -10,31 +10,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 
-class SalvaPaymentCommand extends ContainerAwareCommand
+class SalvaExportPolicyCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('sosure:salva:payment')
-            ->setDescription('Export all payments to salva')
-            ->addArgument(
-                'year',
-                InputArgument::REQUIRED,
-                'Year'
-            )
-            ->addArgument(
-                'month',
-                InputArgument::REQUIRED,
-                'Month'
-            )
+            ->setName('sosure:salva:export:policy')
+            ->setDescription('Export all policies to salva')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $year = $input->getArgument('year');
-        $month = $input->getArgument('month');
         $salva = $this->getContainer()->get('app.salva');
-        $output->write($salva->exportPayments($year, $month));
+        $output->write($salva->exportPolicies());
     }
 }
