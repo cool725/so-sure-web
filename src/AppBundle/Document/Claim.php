@@ -176,6 +176,12 @@ class Claim
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
+    protected $claimHandlingFees = 0;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
     protected $reservedValue;
 
     /**
@@ -416,6 +422,16 @@ class Claim
         $this->excess = $excess;
     }
 
+    public function getClaimHandlingFees()
+    {
+        return $this->claimHandlingFees;
+    }
+
+    public function setClaimHandlingFees($claimHandlingFees)
+    {
+        $this->claimHandlingFees = $claimHandlingFees;
+    }
+
     public function getExpectedExcess()
     {
         if ($this->getType() == Claim::TYPE_DAMAGE) {
@@ -505,19 +521,5 @@ class Claim
     public function isOwnershipTransferClaim()
     {
         return in_array($this->getType(), [self::TYPE_LOSS, self::TYPE_THEFT]);
-    }
-
-    public function getClaimHandlingFees()
-    {
-        if ($this->isOpen()) {
-            return 0;
-        }
-
-        if ($this->getStatus() == self::STATUS_WITHDRAWN || $this->getStatus() == self::STATUS_DECLINED) {
-            return $this->getIncurred();
-        } else {
-            return $this->getIncurred() - $this->getUnauthorizedCalls() - $this->getAccessories() -
-                $this->getPhoneReplacementCost() - $this->getExcess();
-        }
     }
 }

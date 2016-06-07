@@ -177,6 +177,7 @@ services:
             password:       "%salva_password%"
             rootDir:        "%kernel.root_dir%"
             redis:          "@snc_redis.default"
+            s3:             "@aws.s3"
 
     app.davies:
         class: AppBundle\Service\DaviesService

@@ -49,6 +49,7 @@ class SalvaExportService
     protected $rootDir;
 
     protected $redis;
+    protected $s3;
 
     /**
      * @param DocumentManager $dm
@@ -58,6 +59,7 @@ class SalvaExportService
      * @param string          $password
      * @param string          $rootDir
      * @param                 $redis
+     * @param                 $s3
      */
     public function __construct(
         DocumentManager  $dm,
@@ -66,7 +68,8 @@ class SalvaExportService
         $username,
         $password,
         $rootDir,
-        $redis
+        $redis,
+        $s3
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -75,6 +78,7 @@ class SalvaExportService
         $this->password = $password;
         $this->rootDir = $rootDir;
         $this->redis = $redis;
+        $this->s3 = $s3;
     }
 
     public function export(Policy $policy)

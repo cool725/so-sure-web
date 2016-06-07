@@ -258,24 +258,25 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $claim->setDaviesStatus('closed');
         }
         $claim->setExcess($claim->getExpectedExcess());
+        $claim->setClaimHandlingFees(15);
+        $claim->setTransactionFees(rand(90,190) / 100);
+
+        $phone = $this->getRandomPhone($manager);
+        $claim->setReservedValue($phone->getReplacementPriceOrSuggestedReplacementPrice() + 15);
         if ($claim->getStatus() == Claim::STATUS_SETTLED &&
             in_array($claim->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
-            $claim->setReplacementPhone($this->getRandomPhone($manager));
+            $claim->setReplacementPhone($phone);
             $claim->setReplacementImei($this->generateRandomImei());
             if (rand(0, 1) == 0) {
                 $claim->setReplacementReceivedDate(new \DateTime());
             }
-            $claim->setPhoneReplacementCost($claim->getReplacementPhone()->getReplacementPrice());
+            $claim->setPhoneReplacementCost($phone->getReplacementPriceOrSuggestedReplacementPrice());
             $claim->setUnauthorizedCalls(rand(0, 20000) / 100);
             $claim->setAccessories(rand(0, 20000) / 100);
-            $claim->setReservedValue($claim->getReplacementPhone()->getReplacementPrice() + 15);
-        } else {
-            $phone = $this->getRandomPhone($manager);
-            $claim->setReservedValue($phone->getReplacementPrice() + 15);
         }
-        $claim->setTransactionFees(rand(90,190) / 100);
-        $claim->setIncurred(abs($claim->getClaimHandlingFees()) + 15);
         $claim->setDescription($this->getRandomDescription($claim));
+        $claim->setIncurred(array_sum([$claim->getClaimHandlingFees(), $claim->getTransactionFees(), $claim->getAccessories(),
+            $phone->getReplacementPriceOrSuggestedReplacementPrice(), $claim->getUnauthorizedCalls()]));
 
         $policy->addClaim($claim);
         $manager->persist($claim);
