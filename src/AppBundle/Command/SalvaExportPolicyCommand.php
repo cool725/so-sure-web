@@ -17,12 +17,19 @@ class SalvaExportPolicyCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:salva:export:policy')
             ->setDescription('Export all policies to salva')
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'date'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $date = new \DateTime($input->getOption('date'));
         $salva = $this->getContainer()->get('app.salva');
-        $output->write($salva->exportPolicies());
+        $output->write($salva->exportPolicies($date));
     }
 }

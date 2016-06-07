@@ -20,6 +20,7 @@ class SalvaExportService
 
     const SCHEMA_POLICY_IMPORT = 'policy/import/policyImportV1.xsd';
     const SCHEMA_POLICY_TERMINATE = 'policy/termination/policyTerminationV1.xsd';
+    const S3_BUCKET = 'salva.so-sure.com';
 
     const CANCELLED_REPLACE = 'new_cover_to_be_issued';
     const CANCELLED_UNPAID = 'debt';
@@ -50,6 +51,7 @@ class SalvaExportService
 
     protected $redis;
     protected $s3;
+    protected $environment;
 
     /**
      * @param DocumentManager $dm
@@ -60,6 +62,7 @@ class SalvaExportService
      * @param string          $rootDir
      * @param                 $redis
      * @param                 $s3
+     * @param                 $environment
      */
     public function __construct(
         DocumentManager  $dm,
@@ -69,7 +72,8 @@ class SalvaExportService
         $password,
         $rootDir,
         $redis,
-        $s3
+        $s3,
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -79,10 +83,7 @@ class SalvaExportService
         $this->rootDir = $rootDir;
         $this->redis = $redis;
         $this->s3 = $s3;
-    }
-
-    public function export(Policy $policy)
-    {
+        $this->environment = $environment;
     }
 
     public function transformPolicy(PhonePolicy $policy = null, $version = null)
@@ -174,21 +175,80 @@ class SalvaExportService
         return sprintf('"%s"', implode('","', $data));
     }
 
-    public function exportPolicies()
+    public function exportPolicies(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         $lines = [];
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $lines[] = sprintf("%s\n", $this->transformPolicy(null));
-        foreach ($repo->getAllPoliciesForExport() as $policy) {
-            foreach ($policy->getSalvaPolicyNumbers() as $version => $date) {
+        foreach ($repo->getAllPoliciesForExport($date) as $policy) {
+            foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
                 $lines[] =  sprintf("%s\n", $this->transformPolicy($policy, $version));
             }
             $lines[] =  sprintf("%s\n", $this->transformPolicy($policy));
         }
 
+        $filename = sprintf('policies-export-%d-%02d.csv', $date->format('Y'), $date->format('m'));
+        $this->uploadS3($lines, $filename, 'policies', $date->format('Y'));
+
         return $lines;
     }
 
+    public function exportPayments(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $lines = [];
+        $repo = $this->dm->getRepository(JudoPayment::class);
+        $lines[] = sprintf("%s\n", $this->transformPayment(null));
+        foreach ($repo->getAllPaymentsForExport($date) as $payment) {
+            $lines[] = sprintf("%s\n", $this->transformPayment($payment));
+        }
+
+        $filename = sprintf('payments-export-%d-%02d.csv', $date->format('Y'), $date->format('m'));
+        $this->uploadS3($lines, $filename, 'payments', $date->format('Y'));
+
+        return $lines;
+    }
+
+    public function exportClaims(\DateTime $date = null, $days = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $lines = [];
+        $repo = $this->dm->getRepository(Claim::class);
+        $lines[] =  sprintf("%s\n", $this->transformClaim(null));
+        foreach ($repo->getAllClaimsForExport($date, $days) as $claim) {
+            $lines[] = sprintf("%s\n", $this->transformClaim($claim));
+        }
+
+        $filename = sprintf('claims-export-%d-%02d-%02d.csv', $date->format('Y'), $date->format('m'), $date->format('d'));
+        $this->uploadS3($lines, $filename, 'claims', $date->format('Y'));
+
+        return $lines;
+    }
+
+    public function uploadS3($data, $filename, $type, $year)
+    {
+        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
+        file_put_contents($tmpFile, $data);
+        $s3Key = sprintf('%s/%s/%s/%s', $this->environment, $type, $year, $filename);
+
+        $result = $this->s3->putObject(array(
+            'Bucket' => self::S3_BUCKET,
+            'Key'    => $s3Key,
+            'SourceFile' => $tmpFile,
+        ));
+
+        unlink($tmpFile);
+    }
     public function transformPayment(JudoPayment $payment = null)
     {
         if ($payment) {
@@ -264,30 +324,6 @@ class SalvaExportService
         }
 
         return sprintf('"%s"', implode('","', $data));
-    }
-
-    public function exportPayments($year, $month)
-    {
-        $lines = [];
-        $repo = $this->dm->getRepository(JudoPayment::class);
-        $lines[] = sprintf("%s\n", $this->transformPayment(null));
-        foreach ($repo->getAllPaymentsForExport($year, $month) as $payment) {
-            $lines[] = sprintf("%s\n", $this->transformPayment($payment));
-        }
-
-        return $lines;
-    }
-
-    public function exportClaims(\DateTime $date)
-    {
-        $lines = [];
-        $repo = $this->dm->getRepository(Claim::class);
-        $lines[] =  sprintf("%s\n", $this->transformClaim(null));
-        foreach ($repo->getAllClaimsForExport($date) as $claim) {
-            $lines[] = sprintf("%s\n", $this->transformClaim($claim));
-        }
-
-        return $lines;
     }
 
     public function sendPolicy(PhonePolicy $phonePolicy)
