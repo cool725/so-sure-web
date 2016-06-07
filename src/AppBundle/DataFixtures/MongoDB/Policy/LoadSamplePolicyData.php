@@ -153,6 +153,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (rand(0, 3) == 0) {
             $this->addClaim($dm, $policy);
         }
+        if (rand(0, 1) == 0) {
+            $policy->setPromoCode(Policy::PROMO_LAUNCH);
+        }
 
         $paymentDate = clone $startDate;
         if (rand(0, 1) == 0) {
@@ -175,6 +178,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
                 $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));
+                if (rand(0, 3) == 0) {
+                    $tDate = clone $paymentDate;
+                    $tDate->add(new \DateInterval('P1D'));
+                    $policy->incrementSalvaPolicyNumber($tDate);
+                }
             }
         }
         $manager->persist($policy);
@@ -188,12 +196,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     private function addConnections($manager, $userA, $users)
     {
         $policyA = $userA->getPolicies()[0];
-        //$connections = rand(0, $policyA->getMaxConnections());
-        $connections = rand(0, 4);
+        $connections = rand(0, $policyA->getMaxConnections() - 2);
+        //$connections = rand(0, 3);
         for ($i = 0; $i < $connections; $i++) {
             $userB = $users[rand(0, count($users) - 1)];
             $policyB = $userB->getPolicies()[0];
-            if ($policyA->getId() == $policyB->getId()) {
+            if ($policyA->getId() == $policyB->getId() || count($policyB->getConnections()) > 0) {
                 continue;
             }
 
@@ -208,11 +216,17 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $connectionA->setLinkedUser($userA);
             $connectionA->setLinkedPolicy($policyA);
             $connectionA->setValue($policyB->getAllowedConnectionValue());
+            if ($policyB->getPromoCode() == PhonePolicy::PROMO_LAUNCH) {
+                $connectionA->setPromoValue($policyB->getAllowedPromoConnectionValue());
+            }
 
             $connectionB = new Connection();
             $connectionB->setLinkedUser($userB);
             $connectionB->setLinkedPolicy($policyB);
             $connectionB->setValue($policyA->getAllowedConnectionValue());
+            if ($policyA->getPromoCode() == PhonePolicy::PROMO_LAUNCH) {
+                $connectionB->setPromoValue($policyA->getAllowedPromoConnectionValue());
+            }
     
             $policyA->addConnection($connectionB);
             $policyA->updatePotValue();

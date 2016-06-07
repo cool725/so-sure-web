@@ -176,7 +176,7 @@ class PhonePolicy extends Policy
 
     public function getMaxConnections(\DateTime $date = null)
     {
-        if (!$this->isPolicy()) {
+        if (!$this->isPolicy() || $this->getConnectionValue($date) == 0) {
             return 0;
         }
         if (!$this->getUser()) {
