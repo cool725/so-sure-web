@@ -42,6 +42,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '1.30',
             '250',
             '0.75',
+            '275',
             '50',
             '220',
             '07123 456789',

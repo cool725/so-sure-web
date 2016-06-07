@@ -35,6 +35,7 @@ class DaviesClaim
     public $accessories;
     public $phoneReplacementCost;
     public $transactionFees;
+    public $handlingFees;
     public $excess;
     public $reserved;
     public $policyNumber;
@@ -104,13 +105,14 @@ class DaviesClaim
         $this->accessories = $data[19];
         $this->phoneReplacementCost = $data[20];
         $this->transactionFees = $data[21];
-        $this->excess = $data[22];
-        $this->reserved = $data[23];
-        $this->policyNumber = $data[24];
-        $this->notificationDate = $this->excelDate($data[25]);
-        $this->dateCreated = $this->excelDate($data[26]);
-        $this->dateClosed = $this->excelDate($data[27]);
-        $this->shippingAddress = $data[28];
+        $this->claimHandlingFees = $data[22];
+        $this->excess = $data[23];
+        $this->reserved = $data[24];
+        $this->policyNumber = $data[25];
+        $this->notificationDate = $this->excelDate($data[26]);
+        $this->dateCreated = $this->excelDate($data[27]);
+        $this->dateClosed = $this->excelDate($data[28]);
+        $this->shippingAddress = $data[29];
     }
 
     public static function create($data)

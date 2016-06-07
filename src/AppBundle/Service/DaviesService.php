@@ -229,6 +229,7 @@ class DaviesService
 
                 $claim->setExcess($this->excess);
                 $claim->setIncurred($this->incurred);
+                $claim->setClaimHandlingFees($daviesClaim->claimHandlingFees);
 
                 $claim->setReplacementPhone($this->getReplacementPhone($daviesClaim));
                 $claim->setReplacementImei($daviesClaim->replacementImei);

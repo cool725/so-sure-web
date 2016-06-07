@@ -315,6 +315,13 @@ class Phone
         return $this->toTwoDp($this->replacementPrice);
     }
 
+    public function getReplacementPriceOrSuggestedReplacementPrice()
+    {
+        return $this->getReplacementPrice() ?
+                $this->getReplacementPrice() :
+                $this->getSuggestedReplacement()->getReplacementPrice();
+    }
+
     public function getReleaseDate()
     {
         return $this->releaseDate;
