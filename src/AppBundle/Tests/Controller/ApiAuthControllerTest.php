@@ -1061,6 +1061,16 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policyData = $this->verifyResponse(200);
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
+        $this->assertEquals('launch', $policyData['promo_code']);
+        $this->assertEquals(9, $policyData['pot']['max_connections']);
+        $this->assertEquals(83.88, $policyData['pot']['max_value']);
+        $highConnectionValue = 0;
+        foreach ($policyData['pot']['connection_values'] as $connectionValue) {
+            if ($connectionValue['value'] > $highConnectionValue) {
+                $highConnectionValue = $connectionValue['value'];
+            }
+        }
+        $this->assertEquals(15, $highConnectionValue);
     }
 
     public function testNewPolicyJudopayDeclined()
