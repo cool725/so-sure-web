@@ -345,13 +345,17 @@ class SalvaExportService
 
                 $count = $count + 1;
             } catch (\Exception $e) {
-                if ($policyId) { 
+                if ($policyId) {
                     $this->redis->rpush(self::KEY_POLICY_UPDATE, $policyId);
-                    $this->logger->error(sprintf('Error updating policy %s to salva (requeued). Ex: %s', $policyId, $e->getMessage()));
+                    $this->logger->error(sprintf(
+                        'Error updating policy %s to salva (requeued). Ex: %s',
+                        $policyId,
+                        $e->getMessage()
+                    ));
                 }
-                
+
                 throw $e;
-            }            
+            }
         }
         
         return $count;
@@ -419,7 +423,10 @@ class SalvaExportService
         // Make sure policy is incremented prior to calling
         $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
         if (!isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
-            throw new \Exception(sprintf('Missing version %s for salva. Was version incremented prior to cancellation?', $version));
+            throw new \Exception(sprintf(
+                'Missing version %s for salva. Was version incremented prior to cancellation?',
+                $version
+            ));
         }
 
         $dom = new DOMDocument('1.0', 'UTF-8');

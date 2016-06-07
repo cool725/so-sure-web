@@ -67,7 +67,11 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
 
             if ($cancel) {
                 $responseId = $salva->cancelPolicy($phonePolicy, $cancel);
-                $output->writeln(sprintf("Policy %s was successfully cancelled. Response %s", $policyNumber, $responseId));
+                $output->writeln(sprintf(
+                    "Policy %s was successfully cancelled. Response %s",
+                    $policyNumber,
+                    $responseId
+                ));
             } elseif ($requeue) {
                 $salva->queue($phonePolicy);
                 $output->writeln(sprintf("Policy %s was successfully requeued.", $policyNumber));
