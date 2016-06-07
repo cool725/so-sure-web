@@ -93,6 +93,7 @@ class SalvaExportService
                 $brokerPaid = $policy->getBrokerFeePaid($payments);
                 $connections = 0;
                 $potValue = 0;
+                $promoPotValue = 0;
             } else {
                 $allPayments = $policy->getPaymentsForSalvaVersions(false);
 
@@ -104,6 +105,7 @@ class SalvaExportService
                 $brokerPaid = $policy->getRemainingBrokerFeePaid($allPayments);
                 $connections = count($policy->getConnections());
                 $potValue = $policy->getPotValue();
+                $promoPotValue = $policy->getPromoPotValue();
             }
             $data = [
                 $policy->getSalvaPolicyNumber($version),
@@ -128,6 +130,7 @@ class SalvaExportService
                 $brokerPaid,
                 $connections,
                 $potValue,
+                $promoPotValue
             ];
         } else {
             $data = [
@@ -153,9 +156,10 @@ class SalvaExportService
                 'PaidBrokerFee',
                 'NumberConnections',
                 'PotValue',
+                'MarkertingPotValue',
             ];
         }
-        
+
         return sprintf('"%s"', implode('","', $data));
     }
 

@@ -263,12 +263,20 @@ class PhonePolicyTest extends WebTestCase
     {
         $connectionA = new Connection();
         $connectionA->setValue($valueA);
+        if ($valueA > 10) {
+            $connectionA->setValue(10);
+            $connectionA->setPromoValue($valueA - 10);
+        }
         $connectionA->setLinkedUser($policyB->getUser());
         $connectionA->setLinkedPolicy($policyB);
         $policyA->addConnection($connectionA);
 
         $connectionB = new Connection();
         $connectionB->setValue($valueB);
+        if ($valueB > 10) {
+            $connectionB->setValue(10);
+            $connectionB->setPromoValue($valueB - 10);
+        }
         $connectionB->setLinkedUser($policyA->getUser());
         $connectionB->setLinkedPolicy($policyA);
         $policyB->addConnection($connectionB);
@@ -283,6 +291,24 @@ class PhonePolicyTest extends WebTestCase
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
         $this->assertEquals(10, $policyA->calculatePotValue());
+    }
+
+    public function testCalculatePromoPotValueOneConnection()
+    {
+        $policyA = $this->createUserPolicy();
+        $policyA->setPromoCode(PhonePolicy::PROMO_LAUNCH);
+        $policyA->setPhone(static::$phone);
+        $policyB = $this->createUserPolicy();
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 15, 10);
+        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
+        $policyA->setStart(new \DateTime('2016-01-01'));
+
+        $this->assertEquals(15, $policyA->calculatePotValue());
+        $this->assertEquals(5, $policyA->calculatePotValue(true));
+        $this->assertEquals(10, $policyB->calculatePotValue());
+        $policyA->updatePotValue();
+        $this->assertEquals(15, $policyA->getPotValue());
+        $this->assertEquals(5, $policyA->getPromoPotValue());
     }
 
     public function testCalculatePotValueOneInitialOnePostCliffConnection()
@@ -1056,6 +1082,9 @@ class PhonePolicyTest extends WebTestCase
             $policy->addPayment($payment);
         }
 
-        $this->assertEquals(Salva::YEARLY_BROKER_FEE - Salva::MONTHLY_BROKER_FEE, $policy->getRemainingTotalBrokerFee([$payment]));
+        $this->assertEquals(
+            Salva::YEARLY_BROKER_FEE - Salva::MONTHLY_BROKER_FEE,
+            $policy->getRemainingTotalBrokerFee([$payment])
+        );
     }
 }

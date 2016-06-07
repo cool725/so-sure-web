@@ -169,6 +169,12 @@ abstract class Policy
     protected $historicalMaxPotValue;
 
     /**
+     * @MongoDB\Field(type="float", nullable=false)
+     * @Gedmo\Versioned
+     */
+    protected $promoPotValue;
+
+    /**
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -356,6 +362,16 @@ abstract class Policy
     public function getHistoricalMaxPotValue()
     {
         return $this->historicalMaxPotValue;
+    }
+
+    public function getPromoPotValue()
+    {
+        return $this->toTwoDp($this->promoPotValue);
+    }
+
+    public function setPromoPotValue($promoPotValue)
+    {
+        $this->promoPotValue = $promoPotValue;
     }
 
     public function getPolicyKeyFacts()
@@ -589,7 +605,8 @@ abstract class Policy
             $payments[$version] = [];
             foreach ($this->getPayments() as $payment) {
                 if ($payment->isSuccess()) {
-                    if ($payment->getDate() < new \DateTime($versionDate) && !in_array($payment->getId(), $paymentsUsed)) {
+                    if ($payment->getDate() < new \DateTime($versionDate) &&
+                        !in_array($payment->getId(), $paymentsUsed)) {
                         $paymentsUsed[] = $payment->getId();
                         $payments[$version][] = $payment;
                         $flatPayments[] = $payment;
@@ -886,6 +903,7 @@ abstract class Policy
     public function updatePotValue()
     {
         $this->setPotValue($this->calculatePotValue());
+        $this->setPromoPotValue($this->calculatePotValue(true));
     }
 
     public function isPolicy()
