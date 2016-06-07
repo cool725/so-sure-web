@@ -178,14 +178,15 @@ class SalvaExportService
         return $lines;
     }
 
-    public function transformPayment(JudoPayment $payment = null, $version = null)
+    public function transformPayment(JudoPayment $payment = null)
     {
         if ($payment) {
             if (!$payment->isSuccess()) {
                 throw new \Exception('Invalid payment');
             }
+            $policy = $payment->getPolicy();
             $data = [
-                $payment->getPolicy()->getSalvaPolicyNumber($version),
+                $policy->getSalvaPolicyNumberByDate($payment->getDate()),
                 $this->adjustDate($payment->getDate()),
                 $this->toTwoDp($payment->getAmount()),
             ];
@@ -200,11 +201,12 @@ class SalvaExportService
         return sprintf('"%s"', implode('","', $data));
     }
 
-    public function transformClaim(Claim $claim = null, $version = null)
+    public function transformClaim(Claim $claim = null)
     {
         if ($claim) {
+            $policy = $claim->getPolicy();
             $data = [
-                $claim->getPolicy()->getSalvaPolicyNumber($version),
+                $policy->getSalvaPolicyNumberByDate($claim->getRecordedDate()),
                 $claim->getNumber(),
                 $claim->getDaviesStatus(),
                 $claim->getNotificationDate() ?
@@ -213,6 +215,7 @@ class SalvaExportService
                 $claim->getLossDate() ?
                     $this->adjustDate($claim->getLossDate()) :
                     '',
+                $claim->getType(),
                 $claim->getDescription(),
                 $this->toTwoDp($claim->getExcess()),
                 $this->toTwoDp($claim->getReservedValue()),
@@ -236,6 +239,7 @@ class SalvaExportService
                 'Status',
                 'NotificationDate',
                 'EventDate',
+                'EventType',
                 'EventDescription',
                 'Excess',
                 'ReservedAmount',
