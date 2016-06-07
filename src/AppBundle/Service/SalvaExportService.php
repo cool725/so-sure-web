@@ -229,7 +229,12 @@ class SalvaExportService
             $lines[] = sprintf("%s\n", $this->transformClaim($claim));
         }
 
-        $filename = sprintf('claims-export-%d-%02d-%02d.csv', $date->format('Y'), $date->format('m'), $date->format('d'));
+        $filename = sprintf(
+            'claims-export-%d-%02d-%02d.csv',
+            $date->format('Y'),
+            $date->format('m'),
+            $date->format('d')
+        );
         $this->uploadS3($lines, $filename, 'claims', $date->format('Y'));
 
         return $lines;
