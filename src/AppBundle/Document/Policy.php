@@ -1000,7 +1000,7 @@ abstract class Policy
             'end_date' => $this->getConnectionCliffDate() ?
                 $this->getConnectionCliffDate()->format(\DateTime::ATOM) :
                 null,
-            'value' => $this->getConnectionValue($this->getStart()),
+            'value' => $this->getTotalConnectionValue($this->getStart()),
         ];
 
         $afterCliffDate = clone $this->getConnectionCliffDate();

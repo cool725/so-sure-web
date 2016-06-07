@@ -98,6 +98,11 @@ class PhonePolicy extends Policy
         $this->checkmendCert = $checkmendCert;
     }
 
+    public function getTotalConnectionValue(\DateTime $date = null)
+    {
+        return $this->getConnectionValue($date) + $this->getPromoConnectionValue($date);
+    }
+
     public function getConnectionValue(\DateTime $date = null)
     {
         if (!$this->isPolicy()) {
@@ -126,6 +131,11 @@ class PhonePolicy extends Policy
         }
         if (!$this->getUser()) {
             throw new \Exception('Policy is missing a user');
+        }
+
+        // any claims should have a 0 value
+        if ($this->hasMonetaryClaimed() || $this->hasMonetaryNetworkClaim()) {
+            return 0;
         }
 
         if ($this->isPolicyWithin60Days($date)) {

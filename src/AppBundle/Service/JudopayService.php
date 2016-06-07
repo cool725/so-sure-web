@@ -94,6 +94,7 @@ class JudopayService
         $this->validateUser($policy->getUser());
         $this->policyService->create($policy);
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $this->dm->flush();
 
         return true;
     }
