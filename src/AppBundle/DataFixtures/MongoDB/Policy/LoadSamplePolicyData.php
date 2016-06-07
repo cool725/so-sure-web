@@ -175,6 +175,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
                 $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));
+                if (rand(0, 3) == 0) {
+                    $tDate = clone $paymentDate;
+                    $tDate->add(new \DateInterval('P1D'));
+                    $policy->incrementSalvaPolicyNumber($tDate);
+                }
             }
         }
         $manager->persist($policy);

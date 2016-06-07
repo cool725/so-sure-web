@@ -5,6 +5,7 @@ namespace AppBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\PersistentCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
+use AppBundle\Classes\Salva;
 
 /**
  * @MongoDB\Document
@@ -457,7 +458,25 @@ abstract class Policy
 
     public function incrementSalvaPolicyNumber(\DateTime $date)
     {
-        $this->salvaPolicyNumbers[$this->getLatestSalvaPolicyNumberVersion()] = $date;
+        $this->salvaPolicyNumbers[$this->getLatestSalvaPolicyNumberVersion()] = $date->format(\DateTime::ATOM);
+    }
+
+    public function getSalvaVersion(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $versions = $this->getSalvaPolicyNumbers();
+        ksort($versions);
+        foreach ($versions as $version => $versionDate) {
+            if (new \DateTime($versionDate) > $date) {
+                return $version;
+            }
+        }
+
+        // Current version null
+        return null;
     }
 
     public function init(User $user, PolicyDocument $terms, PolicyDocument $keyfacts)
@@ -518,14 +537,90 @@ abstract class Policy
         }
     }
 
-    public function getPremiumPaid()
+    public function getRemainingTotalPremiumPrice($payments)
+    {
+        return $this->toTwoDp($this->getTotalPremiumPrice() - $this->getTotalPremiumPrice($payments));
+    }
+
+    public function getTotalPremiumPrice($payments = null)
+    {
+        if ($payments === null) {
+            return $this->getPremium()->getYearlyPremiumPrice();
+        }
+
+        return $this->toTwoDp($this->getPremium()->getMonthlyPremiumPrice() * count($payments));
+    }
+
+    public function getRemainingTotalIpt($payments)
+    {
+        return $this->toTwoDp($this->getTotalIpt() - $this->getTotalIpt($payments));
+    }
+
+    public function getTotalIpt($payments = null)
+    {
+        if ($payments === null) {
+            return $this->getPremium()->getTotalIpt();
+        }
+
+        return $this->toTwoDp($this->getPremium()->getIpt() * count($payments));
+    }
+
+    public function getRemainingTotalBrokerFee($payments)
+    {
+        return $this->toTwoDp($this->getTotalBrokerFee() - $this->getTotalBrokerFee($payments));
+    }
+
+    public function getTotalBrokerFee($payments = null)
+    {
+        if ($payments === null) {
+            return Salva::YEARLY_BROKER_FEE;
+        }
+
+        return $this->toTwoDp(Salva::MONTHLY_BROKER_FEE * count($payments));
+    }
+
+    public function getPaymentsForSalvaVersions($multiArray = true)
+    {
+        $payments = [];
+        $flatPayments = [];
+        $paymentsUsed = [];
+        $salvaPolicyNumbers = $this->getSalvaPolicyNumbers();
+        foreach ($salvaPolicyNumbers as $version => $versionDate) {
+            $payments[$version] = [];
+            foreach ($this->getPayments() as $payment) {
+                if ($payment->isSuccess()) {
+                    if ($payment->getDate() < new \DateTime($versionDate) && !in_array($payment->getId(), $paymentsUsed)) {
+                        $paymentsUsed[] = $payment->getId();
+                        $payments[$version][] = $payment;
+                        $flatPayments[] = $payment;
+                    }
+                }
+            }
+        }
+
+        if ($multiArray) {
+            return $payments;
+        } else {
+            return $flatPayments;
+        }
+    }
+
+    public function getRemainingPremiumPaid($payments)
+    {
+        return $this->toTwoDp($this->getPremiumPaid() - $this->getPremiumPaid($payments));
+    }
+
+    public function getPremiumPaid($payments = null)
     {
         $paid = 0;
         if (!$this->isPolicy()) {
             return 0;
         }
+        if ($payments === null) {
+            $payments = $this->getPayments();
+        }
 
-        foreach ($this->getPayments() as $payment) {
+        foreach ($payments as $payment) {
             if ($payment->isSuccess()) {
                 $paid += $payment->getAmount();
             }
@@ -534,14 +629,22 @@ abstract class Policy
         return $paid;
     }
 
-    public function getBrokerFeePaid()
+    public function getRemainingBrokerFeePaid($payments)
+    {
+        return $this->toTwoDp($this->getBrokerFeePaid() - $this->getBrokerFeePaid($payments));
+    }
+
+    public function getBrokerFeePaid($payments = null)
     {
         $brokerFee = 0;
         if (!$this->isPolicy()) {
             return 0;
         }
+        if ($payments === null) {
+            $payments = $this->getPayments();
+        }
 
-        foreach ($this->getPayments() as $payment) {
+        foreach ($payments as $payment) {
             if ($payment->isSuccess()) {
                 $brokerFee += $payment->getBrokerFee();
             }

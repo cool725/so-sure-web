@@ -970,4 +970,92 @@ class PhonePolicyTest extends WebTestCase
         $policy->incrementSalvaPolicyNumber(new \DateTime());
         $this->assertEquals(sprintf('%s/2', $policy->getPolicyNumber()), $policy->getSalvaPolicyNumber());
     }
+
+    public function testGetSalvaVersion()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $this->assertNull($policy->getSalvaVersion(new \DateTime("2016-01-01")));
+
+        $policy->incrementSalvaPolicyNumber(new \DateTime("2016-01-03"));
+        $policy->incrementSalvaPolicyNumber(new \DateTime("2016-01-04"));
+        $policy->incrementSalvaPolicyNumber(new \DateTime("2016-01-05"));
+        $this->assertEquals(1, $policy->getSalvaVersion(new \DateTime("2016-01-01")));
+        $this->assertEquals(2, $policy->getSalvaVersion(new \DateTime("2016-01-03")));
+        $this->assertNull($policy->getSalvaVersion(new \DateTime("2016-02-01")));
+    }
+
+    public function testGetRemainingBrokerFeePaid()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setDate(new \DateTime('2016-01-01'));
+        $policy->addPayment($payment);
+
+        $policy->incrementSalvaPolicyNumber(new \DateTime("2016-01-03"));
+
+        for ($i = 2; $i < 4; $i ++) {
+            $payment = new JudoPayment();
+            $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+            $payment->setResult(JudoPayment::RESULT_SUCCESS);
+            $payment->setDate(new \DateTime(sprintf('2016-0%d-01', $i)));
+            $policy->addPayment($payment);
+        }
+
+        $this->assertEquals(Salva::MONTHLY_BROKER_FEE * 2, $policy->getRemainingBrokerFeePaid([$payment]));
+    }
+
+    public function testGetTotalBrokerFee()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setDate(new \DateTime('2016-01-01'));
+        $policy->addPayment($payment);
+
+        $this->assertEquals(Salva::YEARLY_BROKER_FEE, $policy->getTotalBrokerFee());
+        $this->assertEquals(0, $policy->getTotalBrokerFee([]));
+        $this->assertEquals(Salva::YEARLY_BROKER_FEE, $policy->getRemainingTotalBrokerFee([]));
+
+        $policy->incrementSalvaPolicyNumber(new \DateTime("2016-01-03"));
+
+        for ($i = 2; $i < 4; $i ++) {
+            $payment = new JudoPayment();
+            $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+            $payment->setResult(JudoPayment::RESULT_SUCCESS);
+            $payment->setDate(new \DateTime(sprintf('2016-0%d-01', $i)));
+            $policy->addPayment($payment);
+        }
+
+        $this->assertEquals(Salva::YEARLY_BROKER_FEE - Salva::MONTHLY_BROKER_FEE, $policy->getRemainingTotalBrokerFee([$payment]));
+    }
 }

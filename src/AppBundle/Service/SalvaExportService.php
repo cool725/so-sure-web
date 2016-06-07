@@ -82,14 +82,35 @@ class SalvaExportService
             }
             $terminationDate = null;
             if ($version) {
-                $terminationDate = $policy->getSalvaPolicyNumbers()[$version];
+                $terminationDate = new \DateTime($policy->getSalvaPolicyNumbers()[$version]);
+                $payments = $policy->getPaymentsForSalvaVersions()[$version];
+
+                $status = PhonePolicy::STATUS_CANCELLED;
+                $totalPremium = $policy->getTotalPremiumPrice($payments);
+                $premiumPaid = $policy->getPremiumPaid($payments);
+                $totalIpt = $policy->getTotalIpt($payments);
+                $totalBroker = $policy->getTotalBrokerFee($payments);
+                $brokerPaid = $policy->getBrokerFeePaid($payments);
+                $connections = 0;
+                $potValue = 0;
+            } else {
+                $allPayments = $policy->getPaymentsForSalvaVersions(false);
+
+                $status = $policy->getStatus();
+                $totalPremium = $policy->getRemainingTotalPremiumPrice($allPayments);
+                $premiumPaid = $policy->getRemainingPremiumPaid($allPayments);
+                $totalIpt = $policy->getRemainingTotalIpt($allPayments);
+                $totalBroker = $policy->getRemainingTotalBrokerFee($allPayments);
+                $brokerPaid = $policy->getRemainingBrokerFeePaid($allPayments);
+                $connections = count($policy->getConnections());
+                $potValue = $policy->getPotValue();
             }
             $data = [
                 $policy->getSalvaPolicyNumber($version),
-                $policy->getStatus(),
-                $policy->getStart()->format(\DateTime::ATOM),
-                $policy->getEnd()->format(\DateTime::ATOM),
-                $terminationDate ? $terminationDate->format(\DateTime::ATOM) : '',
+                $status,
+                $this->adjustDate($policy->getStart()),
+                $this->adjustDate($policy->getEnd()),
+                $terminationDate ? $this->adjustDate($terminationDate) : '',
                 $policy->getUser()->getId(),
                 $policy->getUser()->getFirstName(),
                 $policy->getUser()->getLastName(),
@@ -100,13 +121,13 @@ class SalvaExportService
                 $policy->getPhone()->getInitialPrice(),
                 $policy->getNumberOfInstallments(),
                 $policy->getInstallmentAmount(),
-                $policy->getPremium()->getYearlyPremiumPrice(),
-                $policy->getPremiumPaid(),
-                $policy->getPremium()->getTotalIpt(),
-                $this->toTwoDp(Salva::YEARLY_BROKER_FEE),
-                $policy->getBrokerFeePaid(),
-                count($policy->getConnections()),
-                $policy->getPotValue(),
+                $totalPremium,
+                $premiumPaid,
+                $totalIpt,
+                $totalBroker,
+                $brokerPaid,
+                $connections,
+                $potValue,
             ];
         } else {
             $data = [
@@ -161,7 +182,7 @@ class SalvaExportService
             }
             $data = [
                 $payment->getPolicy()->getSalvaPolicyNumber($version),
-                $payment->getDate()->format(\DateTime::ATOM),
+                $this->adjustDate($payment->getDate()),
                 $this->toTwoDp($payment->getAmount()),
             ];
         } else {
@@ -183,10 +204,10 @@ class SalvaExportService
                 $claim->getNumber(),
                 $claim->getDaviesStatus(),
                 $claim->getNotificationDate() ?
-                    $claim->getNotificationDate()->format(\DateTime::ATOM) :
+                    $this->adjustDate($claim->getNotificationDate()) :
                     '',
                 $claim->getLossDate() ?
-                    $claim->getLossDate()->format(\DateTime::ATOM) :
+                    $this->adjustDate($claim->getLossDate()) :
                     '',
                 $claim->getDescription(),
                 $this->toTwoDp($claim->getExcess()),
@@ -194,7 +215,7 @@ class SalvaExportService
                 $claim->isOpen() ? '' : $this->toTwoDp($claim->getIncurred()),
                 $claim->isOpen() ? '' : $this->toTwoDp($claim->getClaimHandlingFees()),
                 $claim->getReplacementReceivedDate() ?
-                    $claim->getReplacementReceivedDate()->format(\DateTime::ATOM) :
+                    $this->adjustDate($claim->getReplacementReceivedDate()) :
                     '',
                 $claim->getReplacementPhone() ?
                     $claim->getReplacementPhone()->getMake() :
@@ -282,11 +303,10 @@ class SalvaExportService
 
     public function updatePolicy(PhonePolicy $phonePolicy)
     {
-        $this->cancelPolicy($phonePolicy, self::CANCELLED_REPLACE);
-
         $phonePolicy->incrementSalvaPolicyNumber();
         $this->dm->flush();
 
+        $this->cancelPolicy($phonePolicy, self::CANCELLED_REPLACE);
         $this->sendPolicy($phonePolicy);
     }
 
@@ -323,6 +343,14 @@ class SalvaExportService
         throw new \Exception('Unable to get response');
     }
 
+    public function adjustDate(\DateTime $date)
+    {
+        $clonedDate = clone $date;
+        $clonedDate->setTimezone(new \DateTimeZone("UTC"));
+
+        return $clonedDate->format("Y-m-d\TH:i:00");
+    }
+
     public function cancelXml(PhonePolicy $phonePolicy, $reason)
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -341,18 +369,19 @@ class SalvaExportService
         );
         $root->appendChild($dom->createElement('n1:policyNo', $phonePolicy->getPolicyNumber()));
         $root->appendChild($dom->createElement('n1:terminationReasonCode', $reason));
-        // TODO: Change back to getStart() + format Atom
-        $date = new \DateTime('+4 hours');
         $root->appendChild($dom->createElement(
             'n1:terminationTime',
-            $date->format("Y-m-d\TH:i:00")
+            $this->adjustDate(new \DateTime())
         ));
 
-        /*
-        $usedFinalPremium = $dom->createElement('n1:usedFinalPremium', 0);
+        // Make sure policy is incremented prior to calling
+        $version = $policy->getLatestSalvaPolicyNumberVersion() - 1;
+        $payments = $policy->getPaymentsForSalvaVersions()[$version];
+        $usedPremium = $phonePolicy->getTotalPremiumPrice($payments);
+
+        $usedFinalPremium = $dom->createElement('n1:usedFinalPremium', $usedPremium);
         $usedFinalPremium->setAttribute('n2:currency', 'GBP');
         $root->appendChild($usedFinalPremium);
-        */
 
         return $dom->saveXML();
     }
@@ -385,21 +414,14 @@ class SalvaExportService
         $root->appendChild($policy);
 
         $policy->appendChild($dom->createElement('ns2:renewable', 'false'));
-        // TODO: Change back to getStart()
-        // $startDate = clone $phonePolicy->getEnd();
-        //$date = new \DateTime('+4 hours');
-        $startDate = new \DateTime('+5 minutes');
-        $startDate->setTimezone(new \DateTimeZone("UTC"));
         $policy->appendChild($dom->createElement(
             'ns2:insurancePeriodStart',
-            $startDate->format("Y-m-d\TH:i:00")
+            $this->adjustDate($phonePolicy->getStart())
         ));
 
-        $endDate = clone $phonePolicy->getEnd();
-        $endDate->setTimezone(new \DateTimeZone("UTC"));
         $policy->appendChild($dom->createElement(
             'ns2:insurancePeriodEnd',
-            $endDate->format("Y-m-d\TH:i:00")
+            $this->adjustDate($phonePolicy->getEnd())
         ));
         $policy->appendChild($dom->createElement(
             'ns2:paymentsPerYearCode',
