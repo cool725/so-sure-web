@@ -460,6 +460,11 @@ abstract class Policy
         return count($this->salvaPolicyNumbers) + 1;
     }
 
+    public function getSalvaPolicyNumberByDate(\DateTime $date)
+    {
+        return $this->getSalvaPolicyNumber($this->getSalvaVersion($date));
+    }
+
     public function getSalvaPolicyNumber($version = null)
     {
         if (!$this->getPolicyNumber()) {
@@ -472,8 +477,12 @@ abstract class Policy
         return sprintf("%s/%d", $this->getPolicyNumber(), $version);
     }
 
-    public function incrementSalvaPolicyNumber(\DateTime $date)
+    public function incrementSalvaPolicyNumber(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         $this->salvaPolicyNumbers[$this->getLatestSalvaPolicyNumberVersion()] = $date->format(\DateTime::ATOM);
     }
 

@@ -10,12 +10,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 
-class SalvaClaimsCommand extends ContainerAwareCommand
+class SalvaExportClaimsCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('sosure:salva:claims')
+            ->setName('sosure:salva:export:claims')
             ->setDescription('Export all open and recently closed claims to salva')
             ->addOption(
                 'date',

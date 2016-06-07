@@ -176,6 +176,7 @@ services:
             username:       "%salva_username%"
             password:       "%salva_password%"
             rootDir:        "%kernel.root_dir%"
+            redis:          "@snc_redis.default"
 
     app.davies:
         class: AppBundle\Service\DaviesService
@@ -300,6 +301,13 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
 
+    doctrine.listener.salva:
+        class:   AppBundle\Listener\DoctrineSalvaListener
+        arguments:
+            dispatcher: "@event_dispatcher"
+        tags:
+            -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
+
     app.listener.invitation:
         class:   AppBundle\Listener\InvitationListener
         arguments:
@@ -313,6 +321,13 @@ services:
             dm: "@doctrine_mongodb.odm.default_document_manager"
         tags:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
+
+    app.listener.salva:
+        class:   AppBundle\Listener\SalvaListener
+        arguments:
+            salva: "@app.salva"
+        tags:
+            -  { name: kernel.event_listener, event: event.salva.updated, method: onSalvaPolicyUpdatedEvent }
 
     braintree.customer:
         class:            Braintree_Customer
