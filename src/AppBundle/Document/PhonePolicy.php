@@ -198,7 +198,7 @@ class PhonePolicy extends Policy
             throw new \Exception('Policy is missing a user');
         }
 
-        return (int) ceil($this->getMaxPot() / $this->getConnectionValue($date));
+        return (int) ceil($this->getMaxPot() / $this->getTotalConnectionValue($date));
     }
 
     public function getMaxPot()
