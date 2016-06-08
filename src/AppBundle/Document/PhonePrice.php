@@ -15,19 +15,23 @@ class PhonePrice extends Price
     {
     }
 
-    public function getMaxPot()
+    public function getMaxPot($isPromoLaunch = false)
     {
-        return $this->toTwoDp($this->getYearlyPremiumPrice() * 0.8);
+        if ($isPromoLaunch) {
+            return $this->toTwoDp($this->getYearlyPremiumPrice());
+        } else {
+            return $this->toTwoDp($this->getYearlyPremiumPrice() * 0.8);
+        }
     }
 
-    public function getMaxConnections()
+    public function getMaxConnections($promoAddition = 0, $isPromoLaunch = false)
     {
-        return (int) ceil($this->getMaxPot() / $this->getInitialConnectionValue());
+        return (int) ceil($this->getMaxPot($isPromoLaunch) / $this->getInitialConnectionValue($promoAddition));
     }
 
-    public function getInitialConnectionValue()
+    public function getInitialConnectionValue($promoAddition = 0)
     {
-        return 10;
+        return PhonePolicy::STANDARD_VALUE + $promoAddition;
     }
 
     public function createPremium(\DateTime $date = null)
