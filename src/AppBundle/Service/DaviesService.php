@@ -200,7 +200,7 @@ class DaviesService
                     $claims[] = $claim;
                 }
             } catch (\Exception $e) {
-                $this->logger->error(sprintf("Error parsing line %s. Ex: %s", print_r($line), $e->getMessage()));
+                $this->logger->error(sprintf("Error parsing line %s. Ex: %s", json_encode($line), $e->getMessage()));
 
                 throw $e;
             }

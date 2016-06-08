@@ -53,13 +53,13 @@ class AddressCommand extends ContainerAwareCommand
         $address = $this->getContainer()->get('app.address');
         if ($id) {
             $addressData = $address->retreive($id);
-            print_r($addressData);
+            $output->writeln(json_encode($addressData));
         } elseif ($useAddress) {
             $addresses = $address->getAddress($postcode, $number);
-            print_r($addresses->toApiArray());
+            $output->writeon(json_encode($addresses->toApiArray()));
         } else {
             $addresses = $address->find($postcode, $number);
-            print_r($addresses);
+            $output->writeln(json_encode($addresses));
         }
     }
 }

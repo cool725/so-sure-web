@@ -91,7 +91,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
                     $user = $repo->find($userId);
                 }
             } elseif (in_array("graph.facebook.com", $logins)) {
-                $this->logger->error(sprintf('Logins map %s', print_r($logins, true)));
+                $this->logger->error(sprintf('Logins map %s', json_encode($logins)));
                 $this->fb->initToken($logins['graph.facebook.com']);
                 $facebookId = $this->fb->getUserId();
                 $user = $repo->findOneBy(['facebookId' => $facebookId]);

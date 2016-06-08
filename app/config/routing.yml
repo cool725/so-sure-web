@@ -38,21 +38,21 @@ facebook_login:
     path: /login/check-facebook
 
 redirect_homepage:
-    pattern: /index.html
+    path: /index.html
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /
         permanent: true
 
 redirect_terms:
-    pattern: /terms.html
+    path: /terms.html
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /terms
         permanent: true
 
 redirect_jobs:
-    pattern: /jobs.html
+    path: /jobs.html
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /jobs

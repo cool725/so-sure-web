@@ -79,7 +79,6 @@ class MaxMindServiceIpTest extends WebTestCase
             // in meters
             ->distanceMultiplier(0.001)
             ->getQuery();
-        // print_r( $searchUserQuery->debug());
         $searchUser = $searchUserQuery->getSingleResult();
         // \Doctrine\Common\Util\Debug::dump($searchUser);
 

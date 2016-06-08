@@ -352,12 +352,10 @@ class SalvaExportService
 
         $xml = $this->cancelXml($phonePolicy, $reason);
         $this->logger->info($xml);
-        print_r($xml);
         if (!$this->validate($xml, self::SCHEMA_POLICY_TERMINATE)) {
             throw new \Exception('Failed to validate cancel policy');
         }
         $response = $this->send($xml, self::SCHEMA_POLICY_TERMINATE);
-        print_r($response);
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
 
@@ -640,7 +638,6 @@ class SalvaExportService
                 'auth' => [$this->username, $this->password]
             ]);
             $body = (string) $res->getBody();
-            // print_r($body);
 
             if (!$this->validate($body, $schema)) {
                 throw new \InvalidArgumentException("unable to validate response");
