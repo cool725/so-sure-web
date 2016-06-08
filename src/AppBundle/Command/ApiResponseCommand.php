@@ -66,7 +66,7 @@ class ApiResponseCommand extends ContainerAwareCommand
             $output->writeln('Cleared');
         } else {
             $output->writeln(sprintf("Response %s%%", $redis->get(ApiResponseSubscriber::KEY_RANDOM_FAILURE)));
-            print_r($redis->hgetall(ApiResponseSubscriber::KEY_HASH_PATH));
+            $output->writeln(json_encode($redis->hgetall(ApiResponseSubscriber::KEY_HASH_PATH)));
         }
         
     }

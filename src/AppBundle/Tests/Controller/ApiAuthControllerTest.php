@@ -90,7 +90,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $client = static::createClient();
         $crawler = $client->request('GET', '/api/v1/auth/address?postcode=WR53DA');
         $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode(), print_r($data, true));
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), json_encode($data));
         $this->assertEquals("Lock Keepers Cottage", $data['line1']);
         $this->assertEquals("Basin Road", $data['line2']);
         $this->assertEquals("Worcester", $data['city']);

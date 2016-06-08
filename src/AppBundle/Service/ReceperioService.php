@@ -98,7 +98,7 @@ class ReceperioService extends BaseImeiService
                     'serial' => $imei,
                     'storeid' => $this->storeId,
                 ]);
-                $this->logger->info(sprintf("Claimscheck search for %s -> %s", $imei, print_r($response, true)));
+                $this->logger->info(sprintf("Claimscheck search for %s -> %s", $imei, json_encode($response)));
                 $now = new \DateTime();
                 $logKey = sprintf('receperio:search:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
                 $this->redis->zincrby($logKey, 1, $imei);
@@ -152,7 +152,7 @@ class ReceperioService extends BaseImeiService
                 $this->logger->info(sprintf(
                     "Claimscheck serial verification for %s -> %s",
                     $serialNumber,
-                    print_r($response, true)
+                    json_encode($response)
                 ));
                 $now = new \DateTime();
                 $logKey = sprintf('receperio:makemodel:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
@@ -179,7 +179,7 @@ class ReceperioService extends BaseImeiService
             throw new \Exception(sprintf(
                 "Unable to check serial number (multiple makes) %s. Data: %s",
                 $serialNumber,
-                print_r($data, true)
+                json_encode($data)
             ));
         }
         $makeData = $data['makes'][0];
@@ -189,7 +189,7 @@ class ReceperioService extends BaseImeiService
             throw new \Exception(sprintf(
                 "Unable to check serial number (multiple models) %s. Data: %s",
                 $serialNumber,
-                print_r($data, true)
+                json_encode($data)
             ));
         }
         $modelData = $makeData['models'][0];
@@ -205,7 +205,7 @@ class ReceperioService extends BaseImeiService
                         "Mismatching make %s for serial number %s. Data: %s",
                         $phone->getMake(),
                         $serialNumber,
-                        print_r($data, true)
+                        json_encode($data)
                     ));
                 }
             } else {
@@ -220,7 +220,7 @@ class ReceperioService extends BaseImeiService
                 "Mismatching model %s for serial number %s. Data: %s",
                 $phone->getModel(),
                 $serialNumber,
-                print_r($data, true)
+                json_encode($data)
             ));
         }
 
@@ -228,14 +228,14 @@ class ReceperioService extends BaseImeiService
             throw new \Exception(sprintf(
                 "Unable to check serial number (missing storage) %s. Data: %s",
                 $serialNumber,
-                print_r($data, true)
+                json_encode($data)
             ));
         } elseif ($modelData['storage'] != sprintf('%sGB', $phone->getMemory())) {
             $this->logger->error(sprintf(
                 "Error validating check serial number %s for memory %s. Data: %s",
                 $serialNumber,
                 $phone->getMemory(),
-                print_r($data, true)
+                json_encode($data)
             ));
         }
 
@@ -254,7 +254,6 @@ class ReceperioService extends BaseImeiService
                 'headers' => ['Accept' => 'application/json'],
             ]);
             $body = (string) $res->getBody();
-            //print_r($body);
 
             return $body;
         } catch (\Exception $e) {

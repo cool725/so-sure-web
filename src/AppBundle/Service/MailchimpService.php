@@ -53,7 +53,7 @@ class MailchimpService
                   'email_address' => $email,
                   'status'        => 'subscribed',
         ]);
-        $this->logger->debug(sprintf('Mailchimp Adding %s Resp: %s', $email, print_r($result, true)));
+        $this->logger->debug(sprintf('Mailchimp Adding %s Resp: %s', $email, json_encode($response)));
 
         return $result['status'] === 'subscribed';
     }

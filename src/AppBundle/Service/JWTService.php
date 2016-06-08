@@ -57,7 +57,7 @@ class JWTService
             $this->logger->error(sprintf(
                 'Failed to validate cognito Id %s %s',
                 $cognitoId,
-                print_r($token->getClaims(), true)
+                json_encode($token->getClaims())
             ));
 
             throw new \InvalidArgumentException("JWT Token cognito id does not match");
@@ -70,7 +70,7 @@ class JWTService
                         'Failed to validate data %s => %s %s',
                         $key,
                         $value,
-                        print_r($token->getClaims(), true)
+                        json_encode($token->getClaims())
                     ));
 
                     throw new \InvalidArgumentException(sprintf("JWT Token %s does not match", $key));

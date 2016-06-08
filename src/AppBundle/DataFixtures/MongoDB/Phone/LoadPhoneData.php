@@ -324,7 +324,7 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
                 throw new \Exception('Failed to init phone');
             }
         } catch (\Exception $e) {
-            print sprintf('Ex: %s. Failed to import %s', $e->getMessage(), print_r($data, true));
+            print sprintf('Ex: %s. Failed to import %s', $e->getMessage(), json_encode($data));
             throw $e;
         }
     }

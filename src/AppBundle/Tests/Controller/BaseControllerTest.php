@@ -57,7 +57,7 @@ class BaseControllerTest extends WebTestCase
     protected function verifyResponse($statusCode, $errorCode = null)
     {
         $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode(), print_r($data, true));
+        $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode(), json_encode($data));
         if ($errorCode) {
             $this->assertEquals($errorCode, $data['code']);
         }
