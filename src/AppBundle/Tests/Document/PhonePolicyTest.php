@@ -106,6 +106,32 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21")));
     }
 
+    public function testHasNetworkClaimedInLast30DaysWithOpenStatus()
+    {
+        $policyA = $this->createUserPolicy(true);
+        $policyB = $this->createUserPolicy(true);
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $this->assertFalse($policyA->hasNetworkClaimedInLast30Days(null, true));
+
+        $claimA = new Claim();
+        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setStatus(Claim::STATUS_APPROVED);
+        $policyA->addClaim($claimA);
+        $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-01")));
+        $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-01"), true));
+
+        $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-01-15")));
+        $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-01-15"), true));
+
+        $claimB = new Claim();
+        $claimB->setRecordedDate(new \DateTime("2016-02-01"));
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $policyA->addClaim($claimB);
+        $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21")));
+        $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21"), true));
+    }
+
     public function testGetRiskNoPolicy()
     {
         $policyA = new PhonePolicy();

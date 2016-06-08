@@ -24,6 +24,7 @@ abstract class Policy
     const RISK_LEVEL_LOW = 'low';
 
     const RISK_CONNECTED_POT_ZERO = 'connected pot £0';
+    const RISK_CONNECTED_SELF_CLAIM = 'claim on policy';
     const RISK_CONNECTED_RECENT_NETWORK_CLAIM = 'connected w/recent claim';
     const RISK_CONNECTED_ESTABLISHED_NETWORK_CLAIM = 'connected w/established claim (>30 days)';
     const RISK_CONNECTED_NO_CLAIM = 'connected w/no claim';
@@ -49,6 +50,7 @@ abstract class Policy
 
     public static $riskLevels = [
         self::RISK_CONNECTED_POT_ZERO => self::RISK_LEVEL_HIGH,
+        self::RISK_CONNECTED_SELF_CLAIM => self::RISK_LEVEL_HIGH,
         self::RISK_CONNECTED_RECENT_NETWORK_CLAIM => self::RISK_LEVEL_MEDIUM,
         self::RISK_CONNECTED_ESTABLISHED_NETWORK_CLAIM => self::RISK_LEVEL_LOW,
         self::RISK_CONNECTED_NO_CLAIM => self::RISK_LEVEL_LOW,
@@ -712,14 +714,17 @@ abstract class Policy
 
         if (count($this->getConnections()) > 0) {
             // Connected and value of their pot is zero
-            if ($this->getPotValue() == 0) {
-                return self::RISK_CONNECTED_POT_ZERO;
+            if ($this->hasMonetaryClaimed(true)) {
+                // a self claim can be before the pot is adjusted.  also a pot zero is not always due to a self claim
+                return self::RISK_CONNECTED_SELF_CLAIM;
                 // return self::RISK_LEVEL_HIGH;
+            } elseif ($this->getPotValue() == 0) {
+                return self::RISK_CONNECTED_POT_ZERO;
             }
 
-            if ($this->hasNetworkClaim(true)) {
+            if ($this->hasNetworkClaim(true, true)) {
                 // Connected and value of their pot is £10 following a claim in the past month
-                if ($this->hasNetworkClaimedInLast30Days($date)) {
+                if ($this->hasNetworkClaimedInLast30Days($date, true)) {
                     return self::RISK_CONNECTED_RECENT_NETWORK_CLAIM;
                     // return self::RISK_LEVEL_MEDIUM;
                 } else {
@@ -776,10 +781,10 @@ abstract class Policy
         return $cliffDate;
     }
 
-    public function hasMonetaryClaimed()
+    public function hasMonetaryClaimed($includeOpen = false)
     {
         foreach ($this->claims as $claim) {
-            if ($claim->isMonetaryClaim()) {
+            if ($claim->isMonetaryClaim($includeOpen)) {
                 return true;
             }
         }
@@ -819,13 +824,13 @@ abstract class Policy
         return null;
     }
 
-    public function hasNetworkClaimedInLast30Days($date = null)
+    public function hasNetworkClaimedInLast30Days($date = null, $includeOpen = false)
     {
         if ($date == null) {
             $date = new \DateTime();
         }
 
-        foreach ($this->getNetworkClaims(true) as $claim) {
+        foreach ($this->getNetworkClaims(true, $includeOpen) as $claim) {
             if ($claim->isWithin30Days($date)) {
                 return true;
             }
@@ -834,9 +839,9 @@ abstract class Policy
         return false;
     }
 
-    public function hasNetworkClaim($monitaryOnly = false)
+    public function hasNetworkClaim($monitaryOnly = false, $includeOpen = false)
     {
-        return count($this->getNetworkClaims($monitaryOnly)) > 0;
+        return count($this->getNetworkClaims($monitaryOnly, $includeOpen)) > 0;
     }
 
     public function hasMonetaryNetworkClaim()
@@ -844,7 +849,7 @@ abstract class Policy
         return $this->hasNetworkClaim(true);
     }
 
-    public function getNetworkClaims($monitaryOnly = false)
+    public function getNetworkClaims($monitaryOnly = false, $includeOpen = false)
     {
         $claims = [];
         foreach ($this->getConnections() as $connection) {
@@ -853,7 +858,7 @@ abstract class Policy
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
             foreach ($policy->getClaims() as $claim) {
-                if (!$monitaryOnly || $claim->isMonetaryClaim()) {
+                if (!$monitaryOnly || $claim->isMonetaryClaim($includeOpen)) {
                     $claims[] = $claim;
                 }
             }

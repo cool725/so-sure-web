@@ -513,9 +513,14 @@ class Claim
         $this->processed = $processed;
     }
 
-    public function isMonetaryClaim()
+    public function isMonetaryClaim($includeOpen = false)
     {
-        return in_array($this->getStatus(), [self::STATUS_SETTLED]);
+        $statuses = [self::STATUS_SETTLED];
+        if ($includeOpen) {
+            $statuses[] = self::STATUS_APPROVED;
+        }
+
+        return in_array($this->getStatus(), $statuses);
     }
 
     public function isOwnershipTransferClaim()
