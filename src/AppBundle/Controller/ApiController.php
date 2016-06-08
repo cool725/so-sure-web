@@ -194,7 +194,7 @@ class ApiController extends BaseController
                     'yearly_loss' => 0,
                     'phone' => $phone->toApiArray(),
                     'connection_value' => $currentPhonePrice->getInitialConnectionValue($promoAddition),
-                    'max_connections' => $currentPhonePrice->getMaxConnections($isPromoLaunch),
+                    'max_connections' => $currentPhonePrice->getMaxConnections($promoAddition, $isPromoLaunch),
                     'max_pot' => $currentPhonePrice->getMaxPot($isPromoLaunch),
                     'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
                 ];
