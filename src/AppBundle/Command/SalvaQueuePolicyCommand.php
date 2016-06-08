@@ -48,6 +48,12 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
                 'Max Number to process',
                 1
             )
+            ->addOption(
+                'show',
+                null,
+                InputOption::VALUE_NONE,
+                'Show items in the queue'
+            )
         ;
     }
 
@@ -58,6 +64,7 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
         $cancel = $input->getOption('cancel');
         $clear = true === $input->getOption('clear');
         $requeue = true === $input->getOption('requeue');
+        $show = true === $input->getOption('show');
         $process = $input->getOption('process');
 
         if ($policyNumber) {
@@ -82,6 +89,9 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
         } elseif ($clear) {
             $salva->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
+        } elseif ($show) {
+            $data = $salva->getQueueData($process);
+            $output->writeln(sprintf("Queue: %s", json_encode($data)));
         } else {
             $count = $salva->process($process);
             $output->writeln(sprintf("Sent %s policy updates", $count));

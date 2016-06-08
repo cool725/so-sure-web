@@ -21,10 +21,38 @@ class DoctrineSalvaListener
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
-        // TODO: Handle initial creation
-        // TODO: Handle cancellation
-
         $document = $eventArgs->getDocument();
+        if ($document instanceof PhonePolicy) {
+            if (!$document->isValidPolicy()) {
+                return;
+            }
+
+            // Cancellation is more imporant then any change args
+            if ($eventArgs->hasChangedField('status') &&
+                $eventArgs->getNewValue('status') == PhonePolicy::STATUS_CANCELLED) {
+                return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CANCELLED);
+            }
+
+            if ($eventArgs->hasChangedField('status') &&
+                $eventArgs->getNewValue('status') == PhonePolicy::STATUS_PENDING) {
+                return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CREATED);
+            }
+
+            $fields = [
+                'phone.make',
+                'phone.model',
+                'phone.memory',
+                'phone.imei',
+                'phone.initialPrice',
+                'premium.gwp',
+            ];
+            foreach ($fields as $field) {
+                if ($eventArgs->hasChangedField($field)) {
+                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_UPDATED);
+                }
+            }
+        }
+
         if ($document instanceof User) {
             if (!$document->hasValidPolicy()) {
                 return;
@@ -44,24 +72,6 @@ class DoctrineSalvaListener
             }
         }
 
-        if ($document instanceof PhonePolicy) {
-            if (!$document->isValidPolicy()) {
-                return;
-            }
-            $fields = [
-                'phone.make',
-                'phone.model',
-                'phone.memory',
-                'phone.imei',
-                'phone.initialPrice',
-                'premium.gwp',
-            ];
-            foreach ($fields as $field) {
-                if ($eventArgs->hasChangedField($field)) {
-                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_UPDATED);
-                }
-            }
-        }
     }
 
     private function triggerEvent(PhonePolicy $phonePolicy, $eventType)

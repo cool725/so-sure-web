@@ -7,7 +7,9 @@ use AppBundle\Document\PhonePolicy;
 
 class SalvaPolicyEvent extends Event
 {
+    const EVENT_CREATED = 'event.salva.created';
     const EVENT_UPDATED = 'event.salva.updated';
+    const EVENT_CANCELLED = 'event.salva.cancelled';
 
     /** @var PhonePolicy */
     protected $policy;
