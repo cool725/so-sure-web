@@ -11,6 +11,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class PhonePolicy extends Policy
 {
+    const STANDARD_VALUE = 10;
+    const AGED_VALUE = 2;
+    const NETWORK_CLAIM_VALUE = 2;
+    const PROMO_LAUNCH_VALUE = 5;
+
     use ArrayToApiArrayTrait;
 
     /**
@@ -116,11 +121,11 @@ class PhonePolicy extends Policy
             // should never occur, but just in case
             return 0;
         } elseif ($this->hasMonetaryNetworkClaim()) {
-            return 2;
+            return self::NETWORK_CLAIM_VALUE;
         } elseif ($this->isPolicyWithin60Days($date)) {
-            return 10;
+            return self::STANDARD_VALUE;
         } else {
-            return 2;
+            return self::AGED_VALUE;
         }
     }
 
@@ -140,7 +145,7 @@ class PhonePolicy extends Policy
 
         if ($this->isPolicyWithin60Days($date)) {
             if ($this->getUser()->isPreLaunch() || $this->getPromoCode() == self::PROMO_LAUNCH) {
-                return 5;
+                return self::PROMO_LAUNCH_VALUE;
             }
         }
 

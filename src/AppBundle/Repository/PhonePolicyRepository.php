@@ -22,10 +22,12 @@ class PhonePolicyRepository extends DocumentRepository
     }
 
     /**
-     * All policies that have been created
+     * All policies that have been created (excluding so-sure test ones)
      */
     public function countAllPolicies()
     {
+        $policy = new PhonePolicy();
+
         return $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_PENDING,
@@ -34,9 +36,15 @@ class PhonePolicyRepository extends DocumentRepository
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_UNPAID
             ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
             ->getQuery()
             ->execute()
             ->count();
+    }
+
+    public function isPromoLaunch()
+    {
+        return $this->countAllPolicies() < 1000;
     }
 
     public function getAllPoliciesForExport(\DateTime $date)
@@ -44,6 +52,7 @@ class PhonePolicyRepository extends DocumentRepository
         \AppBundle\Classes\NoOp::noOp([$date]);
 
         $policy = new PhonePolicy();
+
         return $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_PENDING,

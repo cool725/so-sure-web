@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 
@@ -281,34 +282,42 @@ class ApiControllerTest extends BaseControllerTest
     {
         $start = new \DateTime();
         $start->add(new \DateInterval('P1D'));
+
         $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001');
+
         $end = new \DateTime();
         $end->add(new \DateInterval('P1D'));
 
         $data = $this->verifyResponse(200);
+
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(2, count($data['quotes']));
-        $this->assertEquals(10, $data['quotes'][0]['connection_value']);
-        $this->assertEquals(0, $data['quotes'][0]['monthly_loss']);
-        $this->assertEquals(0, $data['quotes'][0]['yearly_loss']);
+
         $validTo = new \DateTime($data['quotes'][0]['valid_to']);
         $this->assertGreaterThanOrEqual($start, $validTo);
         $this->assertLessThanOrEqual($end, $validTo);
-        
-        $monthlyPremium = $data['quotes'][0]['monthly_premium'];
-        $yearlyPremium = $data['quotes'][0]['yearly_premium'];
-        $this->assertGreaterThan(5, $monthlyPremium);
-        $this->assertLessThan(10, $monthlyPremium);
-        $this->assertGreaterThan(70, $yearlyPremium);
-        $this->assertLessThan(130, $yearlyPremium);
+        $this->assertEquals(0, $data['quotes'][0]['monthly_loss']);
+        $this->assertEquals(0, $data['quotes'][0]['yearly_loss']);
 
-        $maxConnections = $data['quotes'][0]['max_connections'];
-        $maxPot = $data['quotes'][0]['max_pot'];
-        $this->assertTrue(5 <= $maxConnections);
-        $this->assertTrue(9 >= $maxConnections);
+        $this->assertEquals(6.49, $data['quotes'][0]['monthly_premium']);
+        $this->assertEquals(77.88, $data['quotes'][0]['yearly_premium']);
 
-        $this->assertTrue(50 <= $maxPot);
-        $this->assertTrue(90 >= $maxPot);
+        $connectionValue = 15;
+        $maxConnections = 6;
+        $maxPot = 77.88;
+        $this->assertEquals($connectionValue, $data['quotes'][0]['connection_value']);
+        $this->assertEquals($maxConnections, $data['quotes'][0]['max_connections']);
+        $this->assertEquals($maxPot, $data['quotes'][0]['max_pot']);
+
+        // And verify non-promo code values
+        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&debug=true');
+        $data = $this->verifyResponse(200);
+        $connectionValue = 10;
+        $maxConnections = 7;
+        $maxPot = 62.30;
+        $this->assertEquals($connectionValue, $data['quotes'][0]['connection_value']);
+        $this->assertEquals($maxConnections, $data['quotes'][0]['max_connections']);
+        $this->assertEquals($maxPot, $data['quotes'][0]['max_pot']);
     }
 
     public function testQuoteMemoryOptions()

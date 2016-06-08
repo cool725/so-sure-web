@@ -15,6 +15,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 
@@ -177,15 +178,24 @@ class ApiController extends BaseController
                     $quoteValidTo->add(new \DateInterval('P1D'));
                 }
 
+                $promoAddition = 0;
+                $isPromoLaunch = false;
+                $dm = $this->getManager();
+                $repo = $dm->getRepository(PhonePolicy::class);
+                if ($repo->isPromoLaunch() && !$request->get('debug')) {
+                    $promoAddition = PhonePolicy::PROMO_LAUNCH_VALUE;
+                    $isPromoLaunch = true;
+                }
+
                 $quotes[] = [
                     'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
                     'monthly_loss' => 0,
                     'yearly_premium' => $currentPhonePrice->getYearlyPremiumPrice(),
                     'yearly_loss' => 0,
                     'phone' => $phone->toApiArray(),
-                    'connection_value' => $currentPhonePrice->getInitialConnectionValue(),
-                    'max_connections' => $currentPhonePrice->getMaxConnections(),
-                    'max_pot' => $currentPhonePrice->getMaxPot(),
+                    'connection_value' => $currentPhonePrice->getInitialConnectionValue($promoAddition),
+                    'max_connections' => $currentPhonePrice->getMaxConnections($isPromoLaunch),
+                    'max_pot' => $currentPhonePrice->getMaxPot($isPromoLaunch),
                     'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
                 ];
             }
