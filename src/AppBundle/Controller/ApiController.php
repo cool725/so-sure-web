@@ -180,12 +180,16 @@ class ApiController extends BaseController
 
                 $promoAddition = 0;
                 $isPromoLaunch = false;
+                // We've decided not to include the promo values in the quote as wording might be too vague
+                // but might want to have a promo in the quote in the future, so leaving code commented out
+                /*
                 $dm = $this->getManager();
                 $repo = $dm->getRepository(PhonePolicy::class);
                 if ($repo->isPromoLaunch() && !$request->get('debug')) {
                     $promoAddition = PhonePolicy::PROMO_LAUNCH_VALUE;
                     $isPromoLaunch = true;
                 }
+                */
 
                 $quotes[] = [
                     'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
