@@ -8,6 +8,7 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\SalvaPolicyEvent;
+use AppBundle\Service\SalvaExportService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class SalvaListener
@@ -23,11 +24,32 @@ class SalvaListener
     }
 
     /**
-     * @param UserEvent $event
+     * @param SalvaPolicyEvent $event
+     */
+    public function onSalvaPolicyCreatedEvent(SalvaPolicyEvent $event)
+    {
+        $this->queue($event, SalvaExportService::QUEUE_CREATED);
+    }
+
+    /**
+     * @param SalvaPolicyEvent $event
      */
     public function onSalvaPolicyUpdatedEvent(SalvaPolicyEvent $event)
     {
+        $this->queue($event, SalvaExportService::QUEUE_UPDATED);
+    }
+
+    /**
+     * @param SalvaPolicyEvent $event
+     */
+    public function onSalvaPolicyCancelledEvent(SalvaPolicyEvent $event)
+    {
+        $this->queue($event, SalvaExportService::QUEUE_CANCELLED);
+    }
+
+    private function queue(SalvaPolicyEvent $event, $action)
+    {
         $policy = $event->getPhonePolicy();
-        $this->salvaService->queue($policy);
+        $this->salvaService->queue($policy, $action);
     }
 }

@@ -20,6 +20,7 @@ class SalvaExportService
 
     const SCHEMA_POLICY_IMPORT = 'policy/import/policyImportV1.xsd';
     const SCHEMA_POLICY_TERMINATE = 'policy/termination/policyTerminationV1.xsd';
+
     const S3_BUCKET = 'salva.so-sure.com';
 
     const CANCELLED_REPLACE = 'new_cover_to_be_issued';
@@ -28,8 +29,13 @@ class SalvaExportService
     const CANCELLED_GOODWILL = 'withdrawal_client';
     const CANCELLED_COOLOFF = 'withdrawal';
     const CANCELLED_BADRISK = 'claim';
+    const CANCELLED_OTHER = 'other';
 
-    const KEY_POLICY_UPDATE = 'salva:policyid:updates';
+    const KEY_POLICY_ACTION = 'salva:policyid:action';
+
+    const QUEUE_CREATED = 'created';
+    const QUEUE_UPDATED = 'updated';
+    const QUEUE_CANCELLED = 'cancelled';
 
     /** @var DocumentManager */
     protected $dm;
@@ -345,10 +351,26 @@ class SalvaExportService
         return $responseId;
     }
 
-    public function cancelPolicy(PhonePolicy $phonePolicy, $reason)
+    public function cancelPolicy(PhonePolicy $phonePolicy, $reason = null)
     {
         $phonePolicy->incrementSalvaPolicyNumber();
         $this->dm->flush();
+
+        if (!$reason) {
+            if ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_UNPAID) {
+                $reason = self::CANCELLED_UNPAID;
+            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_FRAUD) {
+                $reason = self::CANCELLED_FRAUD;
+            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_GOODWILL) {
+                $reason = self::CANCELLED_GOODWILL;
+            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_COOLOFF) {
+                $reason = self::CANCELLED_COOLOFF;
+            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_BADRISK) {
+                $reason = self::CANCELLED_BADRISK;
+            } else {
+                $reason = self::CANCELLED_OTHER;
+            }
+        }
 
         $xml = $this->cancelXml($phonePolicy, $reason);
         $this->logger->info($xml);
@@ -374,22 +396,39 @@ class SalvaExportService
         while ($count < $max) {
             $policyId = null;
             try {
-                $policyId = $this->redis->lpop(self::KEY_POLICY_UPDATE);
-                if (!$policyId) {
+                $queueItem = $this->redis->lpop(self::KEY_POLICY_ACTION);
+                if (!$queueItem) {
+                    return $count;
+                }
+                $data = unserialize($queueItem);
+
+                if (!isset($data['policyId']) || !$data['policyId'] || !isset($data['action']) || !$data['action']) {
                     return $count;
                 }
                 $repo = $this->dm->getRepository(PhonePolicy::class);
-                $policy = $repo->find($policyId);
+                $policy = $repo->find($data['policyId']);
                 if (!$policy) {
-                    throw new \Exception(sprintf('Unable to find policyId: %s', $policyId));
+                    throw new \Exception(sprintf('Unable to find policyId: %s', $data['policyId']));
                 }
-                $this->cancelPolicy($policy, self::CANCELLED_REPLACE);
-                //$this->updatePolicy($policy);
+
+                if ($data['action'] == self::QUEUE_CREATED) {
+                    $this->createXml($policy);
+                } elseif ($data['action'] == self::QUEUE_UPDATED) {
+                    $this->updatePolicy($policy);
+                } elseif ($data['action'] == self::QUEUE_CANCELLED) {
+                    $this->cancelPolicy($policy);
+                } else {
+                    throw new \Exception(sprintf(
+                        'Unknown action %s for policyId: %s',
+                        $data['action'],
+                        $data['policyId']
+                    ));
+                }
 
                 $count = $count + 1;
             } catch (\Exception $e) {
                 if ($policyId) {
-                    $this->redis->rpush(self::KEY_POLICY_UPDATE, $policyId);
+                    $this->redis->rpush(self::KEY_POLICY_ACTION, $policyId);
                     $this->logger->error(sprintf(
                         'Error updating policy %s to salva (requeued). Ex: %s',
                         $policyId,
@@ -404,14 +443,20 @@ class SalvaExportService
         return $count;
     }
 
-    public function queue(PhonePolicy $policy)
+    public function queue(PhonePolicy $policy, $action)
     {
-        $this->redis->rpush(self::KEY_POLICY_UPDATE, $policy->getId());
+        $data = ['policyId' => $policy->getId(), 'action' => $action];
+        $this->redis->rpush(self::KEY_POLICY_ACTION, serialize($data));
     }
 
     public function clearQueue()
     {
-        $this->redis->del(self::KEY_POLICY_UPDATE);
+        $this->redis->del(self::KEY_POLICY_ACTION);
+    }
+
+    public function getQueueData($max)
+    {
+        return $this->redis->lrange(self::KEY_POLICY_ACTION, 0, $max);
     }
 
     protected function getResponseId($xml)

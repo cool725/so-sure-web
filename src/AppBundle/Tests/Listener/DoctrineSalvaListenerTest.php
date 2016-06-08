@@ -61,6 +61,23 @@ class DoctrineSalvaListenerTest extends WebTestCase
 
         $this->assertTrue($policy->isValidPolicy());
 
+        // policy created
+        $this->runPreUpdate(
+            $policy,
+            $this->once(),
+            ['status' => ['null', PhonePolicy::STATUS_PENDING]],
+            SalvaPolicyEvent::EVENT_CREATED
+        );
+
+        // policy cancelled
+        $this->runPreUpdate(
+            $policy,
+            $this->once(),
+            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_CANCELLED]],
+            SalvaPolicyEvent::EVENT_CANCELLED
+        );
+
+        // policy updated
         $this->runPreUpdate($policy, $this->once(), ['phone.make' => ['Apple', 'Samsung']]);
         $this->runPreUpdate($policy, $this->once(), ['phone.model' => ['iPhone 5', 'iPhone 6']]);
         $this->runPreUpdate($policy, $this->once(), ['phone.memory' => ['16', '32']]);
@@ -69,14 +86,18 @@ class DoctrineSalvaListenerTest extends WebTestCase
         $this->runPreUpdate($policy, $this->once(), ['premium.gwp' => [1, 2]]);
         $this->runPreUpdate($policy, $this->never(), ['premium.ipt' => [1, 2]]);
 
+        // user updated
         $this->runPreUpdateUser($user, $policy, $this->once(), ['firstname' => ['foo', 'bar']]);
         $this->runPreUpdateUser($user, $policy, $this->once(), ['lastname' => ['foo', 'bar']]);
         $this->runPreUpdateUser($user, $policy, $this->never(), ['email' => ['foo@', 'bar@']]);
     }
     
-    private function runPreUpdate($policy, $count, $changeSet)
+    private function runPreUpdate($policy, $count, $changeSet, $event = null)
     {
-        $listener = $this->createListener($policy, $count, SalvaPolicyEvent::EVENT_UPDATED);
+        if (!$event) {
+            $event = SalvaPolicyEvent::EVENT_UPDATED;
+        }
+        $listener = $this->createListener($policy, $count, $event);
         $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
         $listener->preUpdate($events);
     }

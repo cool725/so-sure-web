@@ -53,11 +53,68 @@ class SalvaListenerTest extends WebTestCase
     {
     }
 
-    public function testSalvaQueue()
+    public function testSalvaQueueUpdated()
     {
+        static::$redis->del(SalvaExportService::KEY_POLICY_ACTION);
+        $this->assertEquals(0, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('salva-queue', $this),
+            static::generateEmail('salva-queue-updated', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        $listener = new SalvaListener(static::$salvaService);
+        $listener->onSalvaPolicyUpdatedEvent(new SalvaPolicyEvent($policy));
+
+        $this->assertEquals(1, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+        $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
+        $this->assertEquals($policy->getId(), $data['policyId']);
+        $this->assertEquals(SalvaExportService::QUEUE_UPDATED, $data['action']);
+    }
+
+    public function testSalvaQueueCreated()
+    {
+        static::$redis->del(SalvaExportService::KEY_POLICY_ACTION);
+        $this->assertEquals(0, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('salva-queue-created', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        $listener = new SalvaListener(static::$salvaService);
+        $listener->onSalvaPolicyCreatedEvent(new SalvaPolicyEvent($policy));
+
+        $this->assertEquals(1, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+        $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
+        $this->assertEquals($policy->getId(), $data['policyId']);
+        $this->assertEquals(SalvaExportService::QUEUE_CREATED, $data['action']);
+    }
+
+    public function testSalvaQueueCancelled()
+    {
+        static::$redis->del(SalvaExportService::KEY_POLICY_ACTION);
+        $this->assertEquals(0, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('salva-queue-cancelled', $this),
             'bar'
         );
         $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
@@ -68,12 +125,12 @@ class SalvaListenerTest extends WebTestCase
 
         $this->assertTrue($policy->isValidPolicy());
         
-        $this->assertEquals(0, static::$redis->llen(SalvaExportService::KEY_POLICY_UPDATE));
-        
         $listener = new SalvaListener(static::$salvaService);
-        $listener->onSalvaPolicyUpdatedEvent(new SalvaPolicyEvent($policy));
+        $listener->onSalvaPolicyCancelledEvent(new SalvaPolicyEvent($policy));
 
-        $this->assertEquals(1, static::$redis->llen(SalvaExportService::KEY_POLICY_UPDATE));
-        $this->assertEquals($policy->getId(), static::$redis->lpop(SalvaExportService::KEY_POLICY_UPDATE));
+        $this->assertEquals(1, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+        $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
+        $this->assertEquals($policy->getId(), $data['policyId']);
+        $this->assertEquals(SalvaExportService::QUEUE_CANCELLED, $data['action']);
     }
 }
