@@ -33,8 +33,6 @@ swiftmailer:
     mailers:
         default:
             delivery_address: "tech+envmail@so-sure.com"
-        invite:
-            delivery_address: "tech+envmail@so-sure.com"
 
 staffim_rollbar:
     # Rollbar access token

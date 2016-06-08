@@ -30,6 +30,3 @@ swiftmailer:
         default:
             transport:  null
             delivery_address: "tech+envmail@so-sure.com"
-        invite:
-            transport:  null
-            delivery_address: "tech+envmail@so-sure.com"
