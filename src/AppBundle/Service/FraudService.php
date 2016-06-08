@@ -75,7 +75,8 @@ class FraudService
             return null;
         }
         $userRepo = $this->dm->getRepository(User::class);
+        $users = $userRepo->findIp($user);
 
-        return $userRepo->findIp($user);
+        return count($users);
     }
 }
