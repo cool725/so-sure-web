@@ -65,7 +65,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
         $this->runPreUpdate(
             $policy,
             $this->once(),
-            ['status' => ['null', PhonePolicy::STATUS_PENDING]],
+            ['status' => [null, PhonePolicy::STATUS_PENDING]],
             SalvaPolicyEvent::EVENT_CREATED
         );
 
@@ -73,7 +73,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
         $this->runPreUpdate(
             $policy,
             $this->once(),
-            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_CANCELLED]],
+            ['status' => [null, PhonePolicy::STATUS_CANCELLED]],
             SalvaPolicyEvent::EVENT_CANCELLED
         );
 

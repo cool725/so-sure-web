@@ -27,15 +27,22 @@ class DoctrineSalvaListener
                 return;
             }
 
-            // Cancellation is more imporant then any change args
-            if ($eventArgs->hasChangedField('status') &&
-                $eventArgs->getNewValue('status') == PhonePolicy::STATUS_CANCELLED) {
-                return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CANCELLED);
-            }
+            // Status changes need to be done prior to any updates and make those update irrelivent anyway
+            if ($eventArgs->hasChangedField('status')) {
+                // Cancellation is more imporant then anything else
+                if ($eventArgs->getNewValue('status') == PhonePolicy::STATUS_CANCELLED) {
+                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CANCELLED);
+                }
 
-            if ($eventArgs->hasChangedField('status') &&
-                $eventArgs->getNewValue('status') == PhonePolicy::STATUS_PENDING) {
-                return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CREATED);
+                if ($eventArgs->getOldValue('status') == null &&
+                    $eventArgs->getNewValue('status') == PhonePolicy::STATUS_PENDING) {
+                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CREATED);
+                }
+
+                if ($eventArgs->getOldValue('status') == null &&
+                    $eventArgs->getNewValue('status') == PhonePolicy::STATUS_ACTIVE) {
+                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CREATED);
+                }
             }
 
             $fields = [
