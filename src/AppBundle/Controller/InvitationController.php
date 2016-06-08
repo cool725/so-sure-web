@@ -23,7 +23,7 @@ class InvitationController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(Invitation::class);
         $invitation = $repo->find($id);
-        
+
         // TODO: Change to more friendly templates
         if (!$invitation) {
             throw $this->createNotFoundException('Unable to find invitation');
@@ -35,7 +35,7 @@ class InvitationController extends BaseController
 
         $form = $this->createFormBuilder()
             ->add('decline', SubmitType::class, array(
-                'label' => "I'm not interested",
+                'label' => "No thanks, I prefer insurance that sucks.",
                 'attr' => ['class' => 'btn btn-danger'],
             ))
             ->getForm();

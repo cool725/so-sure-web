@@ -1,14 +1,38 @@
 {% set include_emoji = 1 %}
 {% extends 'base.html.twig' %}
 
-{% block title %}so-sure - Invitation{% endblock %}
+{% block title %}so-sure - Join today and we'll reward you!{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'bundles/app/css/Default/index.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
 
 {% block body %}
     <div class="container">
-        Please join us
+        <div class="row">
+            <div class="text-left">
+                <h4>Your friend, Jamie, just joined the Social Insurance revolution &amp; they'd like you to join them!</h4>
+                <p>We offer better and up to 80% cheaper phone insurance designed just for friends. Find out how much you could save by getting a quote below.</p>
+            </div>
+        </div>
+        <div class="row">
+            <!-- INSERT Form_Phone from Homepage -->
 
-        {{ form_start(form) }}
-        {{ form_widget(form) }}
-        {{ form_end(form) }}
-    </div>
-{% endblock %}
+            <p class="text-left">
+                <a href="mailto:hello@wearesosure.com">Don't see your device. Let us know</a>
+            </p>
+        </div>
+        <div class="row">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
+
+            <div class="text-left">
+                <p>Not sure why you've received this? <a href="mailto:support@wearesosure.com">Let us know</a>.</p>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
