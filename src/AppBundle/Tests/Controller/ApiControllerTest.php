@@ -302,6 +302,8 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals(6.49, $data['quotes'][0]['monthly_premium']);
         $this->assertEquals(77.88, $data['quotes'][0]['yearly_premium']);
 
+        /*
+         * no longer using promo codes for the quote
         $connectionValue = 15;
         $maxConnections = 6;
         $maxPot = 77.88;
@@ -312,6 +314,7 @@ class ApiControllerTest extends BaseControllerTest
         // And verify non-promo code values
         $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&debug=true');
         $data = $this->verifyResponse(200);
+        */
         $connectionValue = 10;
         $maxConnections = 7;
         $maxPot = 62.30;
