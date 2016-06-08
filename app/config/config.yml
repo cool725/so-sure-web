@@ -88,15 +88,7 @@ swiftmailer:
             username:   "%ses_mailer_user%"
             password:   "%ses_mailer_password%"
             encryption: "%ses_mailer_encryption%"
-            spool:      { type: memory }
-        invite:
-            transport:  "%ses_mailer_transport%"
-            host:       "%ses_mailer_host%"
-            port:       "%ses_mailer_port%"
-            username:   "%ses_mailer_user%"
-            password:   "%ses_mailer_password%"
-            encryption: "%ses_mailer_encryption%"
-            spool:      { type: memory }
+            spool:      { type: service, id: snc_redis.swiftmailer.spool }
 
 assetic:
     bundles:        [ AppBundle ]
@@ -164,10 +156,18 @@ snc_redis:
             type: predis
             alias: session
             dsn: %redis_session_dsn%
+        mailer:
+            type: predis
+            alias: mailer
+            dsn: %redis_mailer_dsn%
 
     session:
         client: session
         ttl: 1200
+
+    swiftmailer:
+        client: mailer
+        key: swiftmailer
 
 comet_cult_braintree:
   environment: %braintree_env%

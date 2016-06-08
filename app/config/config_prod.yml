@@ -26,15 +26,7 @@ swiftmailer:
             username:   "%ses_mailer_user%"
             password:   "%ses_mailer_password%"
             encryption: "%ses_mailer_encryption%"
-            spool:      { type: memory }
-        invite:
-            transport:  "%blue_mailer_transport%"
-            host:       "%blue_mailer_host%"
-            port:       "%blue_mailer_port%"
-            username:   "%blue_mailer_user%"
-            password:   "%blue_mailer_password%"
-            encryption: "%blue_mailer_encryption%"
-            spool:      { type: memory }
+            spool:      { type: service, id: snc_redis.swiftmailer.spool }
 
 monolog:
     handlers:

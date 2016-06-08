@@ -84,7 +84,7 @@ services:
         arguments:
             dm:         "@doctrine_mongodb.odm.default_document_manager"
             logger:     "@logger"
-            mailer:     "@swiftmailer.mailer.invite"
+            mailer:     "@mailer"
             templating: "@templating"
             router:     "@api.router"
             shortLink:  "@app.shortlink"
@@ -96,7 +96,7 @@ services:
         arguments:
             dm:         "@doctrine_mongodb.odm.default_document_manager"
             logger:     "@logger"
-            mailer:     "@swiftmailer.mailer.invite"
+            mailer:     "@mailer"
             templating: "@templating"
             router:     "@api.router"
 
