@@ -324,6 +324,7 @@ abstract class Policy
     public function addConnection(Connection $connection)
     {
         $connection->setSourcePolicy($this);
+        $connection->setSourceUser($this->getUser());
         $this->connections[] = $connection;
     }
 

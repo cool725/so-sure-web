@@ -28,6 +28,7 @@ use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\OptOutException;
+use AppBundle\Exception\ConnectedInvitationException;
 use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Exception\InvalidPremiumException;
@@ -154,6 +155,12 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_INVITATION_PREVIOUSLY_PROCESSED,
                 'Invitation already processed',
+                422
+            );
+        } catch (ConnectedInvitationException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_CONNECTED,
+                'Already connected invitation',
                 422
             );
         } catch (FullPotException $e) {
@@ -458,6 +465,12 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_INVITATION_DUPLICATE,
                     'Duplicate invitation',
+                    422
+                );
+            } catch (ConnectedInvitationException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_CONNECTED,
+                    'Already connected invitation',
                     422
                 );
             } catch (OptOutException $e) {
