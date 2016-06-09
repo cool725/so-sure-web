@@ -10,6 +10,7 @@ use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -101,6 +102,11 @@ class JudopayService
 
     public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2)
     {
+        return $this->testPayDetails($user, $ref, $amount, $cardNumber, $expiryDate, $cv2)['receiptId'];
+    }
+
+    public function testPayDetails(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2)
+    {
         $payment = $this->client->getModel('CardPayment');
         $payment->setAttributeValues(
             array(
@@ -116,7 +122,7 @@ class JudopayService
         );
         $details = $payment->create();
 
-        return $details['receiptId'];
+        return $details;
     }
 
     /**
@@ -149,8 +155,24 @@ class JudopayService
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         // Ensure the correct amount is paid
+        $this->validatePaymentResultAndAmount($payment);
+
+        // Only set broker fees if we know the amount
+        if ($payment->getAmount() == $policy->getPremium()->getYearlyPremiumPrice()) {
+            // Yearly broker will include the final monthly calc in the total
+            $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        } elseif ($payment->getAmount() == $policy->getPremium()->getMonthlyPremiumPrice()) {
+            // This is always the first payment, so shouldn't have to worry about the final one
+            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        }
+
+        return $payment;
+    }
+
+    protected function validatePaymentResultAndAmount(JudoPayment $payment)
+    {
         // TODO: Should we issue a refund in this case??
-        $premium = $policy->getPremium();
+        $premium = $payment->getPolicy()->getPremium();
         if (!in_array($this->toTwoDp($payment->getAmount()), [
                 $this->toTwoDp($premium->getMonthlyPremiumPrice()),
                 $this->toTwoDp($premium->getYearlyPremiumPrice()),
@@ -170,14 +192,6 @@ class JudopayService
             // We've recorded the payment - can return error now
             throw new PaymentDeclinedException();
         }
-
-        if ($payment->getAmount() == $policy->getPremium()->getYearlyPremiumPrice()) {
-            $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
-        } elseif ($payment->getAmount() == $policy->getPremium()->getMonthlyPremiumPrice()) {
-            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
-        }
-
-        return $payment;
     }
 
     protected function validateUser($user)
@@ -197,16 +211,38 @@ class JudopayService
         }
     }
 
-    protected function tokenPay(Policy $policy, $consumerToken, $cardToken)
+    public function scheduledPayment(ScheduledPayment $scheduledPayment)
     {
-        // TODO: Validate we haven't already paid
+        if ($scheduledPayment->getPayment() &&
+            $scheduledPayment->getPayment()->getResult() == JudoPayment::RESULT_SUCCESS) {
+            throw new \Exception(sprintf('Payment already received for scheduled payment %s', $scheduledPayment->getId()));
+        }
+
+        $policy = $scheduledPayment->getPolicy();
+        $paymentMethod = $policy->getUser()->getPaymentMethod();
+        if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
+            throw new \Exception(sprintf('Payment method not valid for scheduled payment %s', $scheduledPayment->getId()));
+        }
+        $payment = $this->tokenPay($policy, $policy->getUser()->getPaymentMethod());
+        $scheduledPayment->setPayment($payment);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+    }
+
+    protected function tokenPay(Policy $policy, JudoPaymentMethod $paymentMethod)
+    {
+        $consumerToken = $paymentMethod->getCustomerToken();
+        $cardToken = $paymentMethod->getCardToken();
+
         $amount = $policy->getPremium()->getMonthlyPremiumPrice();
         $user = $policy->getUser();
 
         $payment = new JudoPayment();
         $payment->setAmount($amount);
+        $policy->addPayment($payment);
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        // TODO - add judoshield data
 
         // add payment
         $tokenPayment = $this->client->getModel('TokenPayment');
@@ -217,6 +253,9 @@ class JudopayService
                 'judoId' => $this->judoId,
                 'yourConsumerReference' => $user->getId(),
                 'yourPaymentReference' => $payment->getId(),
+                'yourPaymentMetaData' => [
+                    'payment_id' => $payment->getId(),
+                ],
                 'amount' => $amount,
                 'currency' => 'GBP',
                 'consumerToken' => $consumerToken,
@@ -226,7 +265,14 @@ class JudopayService
             )
         );
 
-        $tokenPaymentDetails = $tokenPayment->create();
+        try {
+            $tokenPaymentDetails = $tokenPayment->create();
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf('Error running token payment %s. Ex: %s', $payment->getId(), $e));
+
+            throw $e;
+        }
+
         $payment->setReceipt($tokenPaymentDetails["receiptId"]);
         $payment->setAmount($tokenPaymentDetails["amount"]);
         // TODO: $payment->setBrokerFee(Salva::FINAL_MONTHLY_BROKER_FEE);
@@ -250,7 +296,7 @@ class JudopayService
             throw new \Exception($errMsg);
         }
 
-        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+        return $payment;
     }
 
     /**

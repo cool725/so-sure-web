@@ -195,4 +195,34 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
     }
+
+    public function testJudoScheduledPayment()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-scheduled', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken']
+        );
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+        $scheduledPayment = $policy->getScheduledPayments()[0];
+
+        self::$judopay->scheduledPayment($scheduledPayment);
+    }
 }
