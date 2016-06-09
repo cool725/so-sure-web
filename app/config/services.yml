@@ -219,6 +219,7 @@ services:
             router:      "@api.router"
             environment: "%kernel.environment%"
             mpdf:        "@app.mpdf"
+            dispatcher:  "@event_dispatcher"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService
