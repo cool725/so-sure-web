@@ -206,7 +206,7 @@ class InvitationServiceTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('connected-user', $this),
+            static::generateEmail('connected-mobile-user', $this),
             'bar'
         );
         $user->setMobileNumber(static::generateRandomMobile());
@@ -214,7 +214,7 @@ class InvitationServiceTest extends WebTestCase
 
         $userInvitee = static::createUser(
             static::$userManager,
-            static::generateEmail('invite-connected', $this),
+            static::generateEmail('invite-mobile-connected', $this),
             'bar'
         );
         $userInvitee->setMobileNumber(static::generateRandomMobile());
