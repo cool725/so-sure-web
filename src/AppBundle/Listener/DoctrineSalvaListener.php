@@ -34,12 +34,9 @@ class DoctrineSalvaListener
                     return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CANCELLED);
                 }
 
-                if ($eventArgs->getOldValue('status') == null &&
-                    $eventArgs->getNewValue('status') == PhonePolicy::STATUS_PENDING) {
-                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CREATED);
-                }
-
-                if ($eventArgs->getOldValue('status') == null &&
+                // Current implemention has a pending policy set in the create policy, followed later by a change
+                // to active
+                if ($eventArgs->getOldValue('status') == PhonePolicy::STATUS_PENDING &&
                     $eventArgs->getNewValue('status') == PhonePolicy::STATUS_ACTIVE) {
                     return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CREATED);
                 }
