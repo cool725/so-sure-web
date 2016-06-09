@@ -120,7 +120,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrineSalvaListener($dispatcher);
+        $listener = new DoctrineSalvaListener($dispatcher, 'test');
 
         return $listener;
     }
