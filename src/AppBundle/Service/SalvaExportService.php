@@ -18,6 +18,8 @@ class SalvaExportService
 {
     use CurrencyTrait;
 
+    const SALVA_TIMEZONE = "Europe/London";
+
     const SCHEMA_POLICY_IMPORT = 'policy/import/policyImportV1.xsd';
     const SCHEMA_POLICY_TERMINATE = 'policy/termination/policyTerminationV1.xsd';
 
@@ -98,9 +100,7 @@ class SalvaExportService
             if (!$policy->getNumberOfInstallments()) {
                 throw new \Exception('Invalid policy payment');
             }
-            $terminationDate = null;
             if ($version) {
-                $terminationDate = new \DateTime($policy->getSalvaPolicyNumbers()[$version]);
                 $payments = $policy->getPaymentsForSalvaVersions()[$version];
 
                 $status = PhonePolicy::STATUS_CANCELLED;
@@ -128,9 +128,11 @@ class SalvaExportService
             $data = [
                 $policy->getSalvaPolicyNumber($version),
                 $status,
-                $this->adjustDate($policy->getStart()),
+                $this->adjustDate($policy->getSalvaStartDate($version)),
                 $this->adjustDate($policy->getEnd()),
-                $terminationDate ? $this->adjustDate($terminationDate) : '',
+                $policy->getSalvaTerminationDate($version) ?
+                    $this->adjustDate($policy->getSalvaTerminationDate($version)) :
+                    '',
                 $policy->getUser()->getId(),
                 $policy->getUser()->getFirstName(),
                 $policy->getUser()->getLastName(),
@@ -181,7 +183,7 @@ class SalvaExportService
         return sprintf('"%s"', implode('","', $data));
     }
 
-    public function exportPolicies(\DateTime $date = null)
+    public function exportPolicies($s3, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -197,13 +199,15 @@ class SalvaExportService
             $lines[] =  sprintf("%s\n", $this->transformPolicy($policy));
         }
 
-        $filename = sprintf('policies-export-%d-%02d.csv', $date->format('Y'), $date->format('m'));
-        $this->uploadS3($lines, $filename, 'policies', $date->format('Y'));
+        if ($s3) {
+            $filename = sprintf('policies-export-%d-%02d.csv', $date->format('Y'), $date->format('m'));
+            $this->uploadS3($lines, $filename, 'policies', $date->format('Y'));
+        }
 
         return $lines;
     }
 
-    public function exportPayments(\DateTime $date = null)
+    public function exportPayments($s3, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -216,13 +220,15 @@ class SalvaExportService
             $lines[] = sprintf("%s\n", $this->transformPayment($payment));
         }
 
-        $filename = sprintf('payments-export-%d-%02d.csv', $date->format('Y'), $date->format('m'));
-        $this->uploadS3($lines, $filename, 'payments', $date->format('Y'));
+        if ($s3) {
+            $filename = sprintf('payments-export-%d-%02d.csv', $date->format('Y'), $date->format('m'));
+            $this->uploadS3($lines, $filename, 'payments', $date->format('Y'));
+        }
 
         return $lines;
     }
 
-    public function exportClaims(\DateTime $date = null, $days = null)
+    public function exportClaims($s3, \DateTime $date = null, $days = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -235,13 +241,15 @@ class SalvaExportService
             $lines[] = sprintf("%s\n", $this->transformClaim($claim));
         }
 
-        $filename = sprintf(
-            'claims-export-%d-%02d-%02d.csv',
-            $date->format('Y'),
-            $date->format('m'),
-            $date->format('d')
-        );
-        $this->uploadS3($lines, $filename, 'claims', $date->format('Y'));
+        if ($s3) {
+            $filename = sprintf(
+                'claims-export-%d-%02d-%02d.csv',
+                $date->format('Y'),
+                $date->format('m'),
+                $date->format('d')
+            );
+            $this->uploadS3($lines, $filename, 'claims', $date->format('Y'));
+        }
 
         return $lines;
     }
@@ -351,9 +359,15 @@ class SalvaExportService
         return $responseId;
     }
 
-    public function cancelPolicy(PhonePolicy $phonePolicy, $reason = null)
+    public function cancelPolicy(PhonePolicy $phonePolicy, $reason = null, \DateTime $date = null)
     {
-        $phonePolicy->incrementSalvaPolicyNumber();
+        if (!$date) {
+            $date = new \DateTime();
+            // Termination time can be a bit in the future without issue
+            $date->add(new \DateInterval('PT5M'));
+        }
+
+        $phonePolicy->incrementSalvaPolicyNumber($date);
         $this->dm->flush();
 
         if (!$reason) {
@@ -372,7 +386,7 @@ class SalvaExportService
             }
         }
 
-        $xml = $this->cancelXml($phonePolicy, $reason);
+        $xml = $this->cancelXml($phonePolicy, $reason, $date);
         $this->logger->info($xml);
         if (!$this->validate($xml, self::SCHEMA_POLICY_TERMINATE)) {
             throw new \Exception('Failed to validate cancel policy');
@@ -495,19 +509,13 @@ class SalvaExportService
     public function adjustDate(\DateTime $date)
     {
         $clonedDate = clone $date;
-        $clonedDate->setTimezone(new \DateTimeZone("UTC"));
+        $clonedDate->setTimezone(new \DateTimeZone(self::SALVA_TIMEZONE));
 
         return $clonedDate->format("Y-m-d\TH:i:00");
     }
 
-    public function cancelXml(PhonePolicy $phonePolicy, $reason, $date = null)
+    public function cancelXml(PhonePolicy $phonePolicy, $reason, $date)
     {
-        if (!$date) {
-            $date = new \DateTime();
-            // Termination time can be a bit in the future without issue
-            $date->add(new \DateInterval('PT5M'));
-        }
-
         // Make sure policy is incremented prior to calling
         $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
         if (!isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
@@ -578,7 +586,7 @@ class SalvaExportService
         $policy->appendChild($dom->createElement('ns2:renewable', 'false'));
         $policy->appendChild($dom->createElement(
             'ns2:insurancePeriodStart',
-            $this->adjustDate($phonePolicy->getStart())
+            $this->adjustDate($phonePolicy->getLatestSalvaStartDate())
         ));
 
         $policy->appendChild($dom->createElement(
