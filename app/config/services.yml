@@ -331,7 +331,7 @@ services:
         arguments:
             salva: "@app.salva"
         tags:
-            -  { name: kernel.event_listener, event: event.salva.create, method: onSalvaPolicyCreatedEvent }
+            -  { name: kernel.event_listener, event: event.salva.created, method: onSalvaPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.salva.updated, method: onSalvaPolicyUpdatedEvent }
             -  { name: kernel.event_listener, event: event.salva.cancelled, method: onSalvaPolicyCancelledEvent }
 
