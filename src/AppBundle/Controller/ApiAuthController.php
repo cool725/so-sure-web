@@ -573,6 +573,15 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
+            $redis = $this->get('snc_redis.default');
+            if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_YET_REGULATED,
+                    "Coming soon",
+                    422
+                );
+            }
+
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->find($id);
