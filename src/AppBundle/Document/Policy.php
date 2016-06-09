@@ -549,7 +549,7 @@ abstract class Policy
         }
         if (!$startDate) {
             $startDate = new \DateTime();
-            $startDate->add(new \DateInterval('P10M'));
+            $startDate->add(new \DateInterval('PT10M'));
         }
         $this->setStart($startDate);
         $nextYear = clone $this->getStart();
