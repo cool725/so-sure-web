@@ -21,6 +21,7 @@ use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\ClaimException;
+use AppBundle\Exception\OptOutException;
 
 /**
  * @group functional-nonet
@@ -92,6 +93,9 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->inviteByEmail($policy, static::generateEmail('invite1', $this));
     }
 
+    /**
+     * @expectedException AppBundle\Exception\OptOutException
+     */
     public function testOptOutCatIntivationsEmailInvitation()
     {
         $user = static::createUser(
@@ -108,9 +112,11 @@ class InvitationServiceTest extends WebTestCase
         static::$dm->flush();
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite2', $this));
-        $this->assertNull($invitation);
     }
 
+    /**
+     * @expectedException AppBundle\Exception\OptOutException
+     */
     public function testOptOutCatAllEmailInvitation()
     {
         $user = static::createUser(
@@ -127,7 +133,6 @@ class InvitationServiceTest extends WebTestCase
         static::$dm->flush();
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite3', $this));
-        $this->assertNull($invitation);
     }
 
     public function testNoOptOutEmailInvitation()
