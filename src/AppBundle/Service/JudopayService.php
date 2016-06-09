@@ -141,7 +141,12 @@ class JudopayService
         try {
             $transactionDetails = $transaction->find($receiptId);
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Error retrieving receipt %s (policy %s). Ex: %s', $receiptId, $policy->getId(), $e));
+            $this->logger->error(sprintf(
+                'Error retrieving receipt %s (policy %s). Ex: %s',
+                $receiptId,
+                $policy->getId(),
+                $e
+            ));
 
             throw $e;
         }
@@ -290,7 +295,7 @@ class JudopayService
                 'yourConsumerReference' => $user->getId(),
                 'yourPaymentReference' => $payment->getId(),
                 'yourPaymentMetaData' => [
-                    'payment_id' => $payment->getId(),
+                    'policy_id' => $policy->getId(),
                 ],
                 'amount' => $amount,
                 'currency' => 'GBP',
@@ -300,7 +305,7 @@ class JudopayService
                 'mobileNumber' => $user->getMobileNumber(),
         );
         if ($paymentMethod->getDecodedDeviceDna()) {
-            $data= array_merge($data, $paymentMethod->getDecodedDeviceDna());
+            $data = array_merge($data, $paymentMethod->getDecodedDeviceDna());
         }
 
         // populate the required data fields.
@@ -314,11 +319,11 @@ class JudopayService
             throw $e;
         }
 
-        $payment->setReference($transactionDetails["yourPaymentReference"]);
-        $payment->setReceipt($transactionDetails["receiptId"]);
-        $payment->setAmount($transactionDetails["amount"]);
-        $payment->setResult($transactionDetails["result"]);
-        $payment->setMessage($transactionDetails["message"]);
+        $payment->setReference($tokenPaymentDetails["yourPaymentReference"]);
+        $payment->setReceipt($tokenPaymentDetails["receiptId"]);
+        $payment->setAmount($tokenPaymentDetails["amount"]);
+        $payment->setResult($tokenPaymentDetails["result"]);
+        $payment->setMessage($tokenPaymentDetails["message"]);
 
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
