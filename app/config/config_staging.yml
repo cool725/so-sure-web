@@ -18,13 +18,10 @@ framework:
 monolog:
     handlers:
         main:
-            type:         fingers_crossed
-            action_level: warning
-            handler:      nested
-        nested:
-            type:  stream
-            path:  "%kernel.logs_dir%/%kernel.environment%.log"
-            level: debug
+            type:   stream
+            path:   "%kernel.logs_dir%/%kernel.environment%.log"
+            level:  info
+            channels: ["!event"]
         console:
             type:  console
 
