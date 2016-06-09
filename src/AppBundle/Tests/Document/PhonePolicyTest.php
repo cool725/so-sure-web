@@ -592,7 +592,6 @@ class PhonePolicyTest extends WebTestCase
         $foundHighValue = false;
         $foundLowValue = false;
         $connectionValues = $policy->getConnectionValues();
-        // print_r($connectionValues);
         foreach ($connectionValues as $connectionValue) {
             if ($connectionValue['value'] == 10) {
                 $foundHighValue = true;
@@ -667,7 +666,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new PhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
         $policy->create(rand(1, 999999), null, new \DateTime('2016-01-01 16:00'));
-        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $policy->getEnd());
+        $this->assertEquals(new \DateTime('2017-01-01 16:00'), $policy->getEnd());
     }
 
     public function testPolicyEndDateBST()
@@ -677,7 +676,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new PhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
         $policy->create(rand(1, 999999), null, new \DateTime('2016-07-01 16:00'));
-        $this->assertEquals(new \DateTime('2017-06-30 23:59:59'), $policy->getEnd());
+        $this->assertEquals(new \DateTime('2017-07-01 16:00'), $policy->getEnd());
     }
 
     public function testConnectionCliffDate()

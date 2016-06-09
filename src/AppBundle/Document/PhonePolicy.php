@@ -124,6 +124,9 @@ class PhonePolicy extends Policy
             return self::NETWORK_CLAIM_VALUE;
         } elseif ($this->isPolicyWithin60Days($date)) {
             return self::STANDARD_VALUE;
+        } elseif ($this->isBeforePolicyStarted($date)) {
+            // Case for Salva's 10 minute buffer
+            return self::STANDARD_VALUE;
         } else {
             return self::AGED_VALUE;
         }
