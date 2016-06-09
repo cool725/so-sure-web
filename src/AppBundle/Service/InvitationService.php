@@ -130,7 +130,7 @@ class InvitationService
         $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $optouts = $optOutRepo->findOptOut($email, EmailOptOut::OPTOUT_CAT_INVITATIONS);
         if (count($optouts) > 0) {
-            return null;
+            return new OptOutException(sprintf('Email %s has opted out', $email));
         }
 
         if ($policy->getUser()->getEmailCanonical() == strtolower($email)) {
