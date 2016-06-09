@@ -20,6 +20,11 @@ class JudoPaymentMethod extends PaymentMethod
     /**
      * @MongoDB\Field(type="string")
      */
+    protected $cardToken;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
     protected $cardTokenHash;
 
     public function setCustomerToken($customerToken)
@@ -34,8 +39,14 @@ class JudoPaymentMethod extends PaymentMethod
 
     public function addCardToken($key, $value)
     {
+        $this->cardToken = $key;
         $this->cardTokens[$key] = $value;
         $this->setCardTokenHash(md5(serialize($value)));
+    }
+
+    public function getCardToken()
+    {
+        return $this->cardToken;
     }
 
     public function getCardTokens()
