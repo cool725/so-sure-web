@@ -23,13 +23,20 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'date'
             )
+            ->addOption(
+                's3',
+                null,
+                InputOption::VALUE_NONE,
+                'Upload to s3'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $s3 = true === $input->getOption('s3');
         $date = new \DateTime($input->getOption('date'));
         $salva = $this->getContainer()->get('app.salva');
-        $output->write($salva->exportPayments($date));
+        $output->write($salva->exportPayments($s3, $date));
     }
 }

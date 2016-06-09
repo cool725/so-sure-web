@@ -30,13 +30,21 @@ class SalvaExportClaimsCommand extends ContainerAwareCommand
                 'date',
                 7
             )
+            ->addOption(
+                's3',
+                null,
+                InputOption::VALUE_NONE,
+                'Upload to s3'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $s3 = true === $input->getOption('s3');
+        $days = $input->getOption('days');
         $date = new \DateTime($input->getOption('date'));
         $salva = $this->getContainer()->get('app.salva');
-        $output->write($salva->exportClaims($date));
+        $output->write($salva->exportClaims($s3, $date, $days));
     }
 }

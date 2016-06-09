@@ -479,6 +479,35 @@ abstract class Policy
         return sprintf("%s/%d", $this->getPolicyNumber(), $version);
     }
 
+    public function getLatestSalvaStartDate()
+    {
+        return $this->getSalvaStartDate($this->getLatestSalvaPolicyNumberVersion());
+    }
+
+    public function getSalvaStartDate($version = null)
+    {
+        if (!$version) {
+            $version = count($this->getSalvaPolicyNumbers());
+        } else {
+            $version = $version - 1;
+        }
+
+        if (!isset($this->getSalvaPolicyNumbers()[$version])) {
+            return $this->getStart();
+        }
+
+        return new \DateTime($this->getSalvaPolicyNumbers()[$version]);
+    }
+
+    public function getSalvaTerminationDate($version = null)
+    {
+        if (!$version) {
+            return null;
+        }
+
+        return new \DateTime($this->getSalvaPolicyNumbers()[$version]);
+    }
+    
     public function incrementSalvaPolicyNumber(\DateTime $date = null)
     {
         if (!$date) {
