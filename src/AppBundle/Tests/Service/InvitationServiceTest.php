@@ -113,11 +113,17 @@ class InvitationServiceTest extends WebTestCase
         );
         $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
 
-        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite-connected', $this));
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-connected', $this)
+        );
         $this->assertTrue($invitation instanceof EmailInvitation);
 
         self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-05-01'));
-        $invitation = self::$invitationService->inviteByEmail($policyInvitee, static::generateEmail('connected-user', $this));
+        $invitation = self::$invitationService->inviteByEmail(
+            $policyInvitee,
+            static::generateEmail('connected-user', $this)
+        );
     }
 
     /**
