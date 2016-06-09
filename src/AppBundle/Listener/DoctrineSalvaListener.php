@@ -14,16 +14,23 @@ class DoctrineSalvaListener
     /** @var EventDispatcher */
     protected $dispatcher;
 
-    public function __construct($dispatcher)
+    /** @var string */
+    protected $environment;
+
+    public function __construct($dispatcher, $environment)
     {
         $this->dispatcher = $dispatcher;
+        $this->environment = $environment;
     }
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
         $document = $eventArgs->getDocument();
         if ($document instanceof PhonePolicy) {
-            if (!$document->isValidPolicy()) {
+            // For production, check if the policy is valid, or other envs, just check if its a policy
+            if ($this->environment == 'prod' && !$document->isValidPolicy()) {
+                return;
+            } elseif ($this->environment != 'prod' && !$document->isPolicy()) {
                 return;
             }
 

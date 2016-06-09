@@ -306,7 +306,8 @@ services:
     doctrine.listener.salva:
         class:   AppBundle\Listener\DoctrineSalvaListener
         arguments:
-            dispatcher: "@event_dispatcher"
+            dispatcher:  "@event_dispatcher"
+            environment: "%kernel.environment%"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
