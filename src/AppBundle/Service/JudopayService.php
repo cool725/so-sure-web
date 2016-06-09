@@ -80,7 +80,7 @@ class JudopayService
      * @param string $cardToken     Can be null if card is declined
      * @param string $deviceDna     Optional device dna data (json encoded) for judoshield
      */
-    public function add(Policy $policy, $receiptId, $consumerToken, $cardToken, $deviceDna)
+    public function add(Policy $policy, $receiptId, $consumerToken, $cardToken, $deviceDna = null)
     {
         $user = $policy->getUser();
 
