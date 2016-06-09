@@ -999,6 +999,41 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(404);
     }
 
+    public function testNewPolicyNotRegulated()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        self::$testUser->setFirstName('foo');
+        self::$testUser->setLastName('bar');
+        self::$dm->flush();
+
+        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'city' => 'London',
+            'postcode' => 'BX11LT',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(200);
+
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $data = $this->verifyResponse(200);
+
+        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $redis->set('ERROR_NOT_YET_REGULATED', 1);
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
+            'sort_code' => '200000',
+            'account_number' => '55779911',
+            'first_name' => 'foo',
+            'last_name' => 'bar',
+        ]]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_YET_REGULATED);
+
+        $redis->del('ERROR_NOT_YET_REGULATED');
+    }
+
     public function testNewPolicyDdOk()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
