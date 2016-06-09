@@ -83,4 +83,20 @@ class JudoPaymentMethod extends PaymentMethod
     {
         $this->deviceDna = $deviceDna;
     }
+
+    public function getDecodedDeviceDna()
+    {
+        if (!$this->deviceDna) {
+            return null;
+        }
+
+        $data = null;
+        try {
+            $data = json_decode($this->deviceDna);
+
+            return $data;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

@@ -137,7 +137,14 @@ class JudopayService
     public function validateReceipt(Policy $policy, $receiptId, $cardToken)
     {
         $transaction = $this->client->getModel('Transaction');
-        $transactionDetails = $transaction->find($receiptId);
+
+        try {
+            $transactionDetails = $transaction->find($receiptId);
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf('Error retrieving receipt %s (policy %s). Ex: %s', $receiptId, $policy->getId(), $e));
+
+            throw $e;
+        }
 
         $payment = new JudoPayment();
         $payment->setReference($transactionDetails["yourPaymentReference"]);
@@ -196,6 +203,27 @@ class JudopayService
             // We've recorded the payment - can return error now
             throw new PaymentDeclinedException();
         }
+
+        /* TODO: May want to validate this data??
+        if ($tokenPaymentDetails["type"] != 'Payment') {
+            $errMsg = sprintf('Payment type mismatch - expected payment, not %s', $tokenPaymentDetails["type"]);
+            $this->logger->error($errMsg);
+            // save up to this point
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+        }
+        if ($payment->getId() != $tokenPaymentDetails["yourPaymentReference"]) {
+            $errMsg = sprintf(
+                'Payment ref mismatch. %s != %s',
+                $payment->getId(),
+                $tokenPaymentDetails["yourPaymentReference"]
+            );
+            $this->logger->error($errMsg);
+            // save up to this point
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+            throw new \Exception($errMsg);
+        }
+        */
     }
 
     protected function validateUser($user)
@@ -236,6 +264,8 @@ class JudopayService
         $payment = $this->tokenPay($policy, $policy->getUser()->getPaymentMethod());
         $scheduledPayment->setPayment($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return $scheduledPayment;
     }
 
     protected function tokenPay(Policy $policy, JudoPaymentMethod $paymentMethod)
@@ -252,14 +282,10 @@ class JudopayService
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        // TODO - add judoshield data
-
         // add payment
         $tokenPayment = $this->client->getModel('TokenPayment');
 
-        // populate the required data fields.
-        $tokenPayment->setAttributeValues(
-            array(
+        $data = array(
                 'judoId' => $this->judoId,
                 'yourConsumerReference' => $user->getId(),
                 'yourPaymentReference' => $payment->getId(),
@@ -272,8 +298,13 @@ class JudopayService
                 'cardToken' => $cardToken,
                 'emailAddress' => $user->getEmail(),
                 'mobileNumber' => $user->getMobileNumber(),
-            )
         );
+        if ($paymentMethod->getDecodedDeviceDna()) {
+            $data= array_merge($data, $paymentMethod->getDecodedDeviceDna());
+        }
+
+        // populate the required data fields.
+        $tokenPayment->setAttributeValues($data);
 
         try {
             $tokenPaymentDetails = $tokenPayment->create();
@@ -283,28 +314,19 @@ class JudopayService
             throw $e;
         }
 
-        $payment->setReceipt($tokenPaymentDetails["receiptId"]);
-        $payment->setAmount($tokenPaymentDetails["amount"]);
+        $payment->setReference($transactionDetails["yourPaymentReference"]);
+        $payment->setReceipt($transactionDetails["receiptId"]);
+        $payment->setAmount($transactionDetails["amount"]);
+        $payment->setResult($transactionDetails["result"]);
+        $payment->setMessage($transactionDetails["message"]);
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        // Ensure the correct amount is paid
+        $this->validatePaymentResultAndAmount($payment);
+
         // TODO: $payment->setBrokerFee(Salva::FINAL_MONTHLY_BROKER_FEE);
         $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
-        if ($tokenPaymentDetails["type"] != 'Payment') {
-            $errMsg = sprintf('Payment type mismatch - expected payment, not %s', $tokenPaymentDetails["type"]);
-            $this->logger->error($errMsg);
-            // save up to this point
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-        }
-        if ($payment->getId() != $tokenPaymentDetails["yourPaymentReference"]) {
-            $errMsg = sprintf(
-                'Payment ref mismatch. %s != %s',
-                $payment->getId(),
-                $tokenPaymentDetails["yourPaymentReference"]
-            );
-            $this->logger->error($errMsg);
-            // save up to this point
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-            throw new \Exception($errMsg);
-        }
 
         return $payment;
     }
