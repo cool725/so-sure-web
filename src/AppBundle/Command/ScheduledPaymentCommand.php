@@ -43,13 +43,9 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         $repo = $dm->getRepository(ScheduledPayment::class);
         if ($id) {
             $scheduledPayment = $repo->find($id);
-            $judoPay->scheduledPayment($scheduledPayment);
-            $output->writeln(sprintf(
-                'Policy %s Status %s Amount %s',
-                $scheduledPayment->getPolicy()->getPolicyNumber(),
-                $scheduledPayment->getPayment()->getResult(),
-                $scheduledPayment->getAmount()
-            ));
+            $scheduledPayment = $judoPay->scheduledPayment($scheduledPayment);
+            $this->displayScheduledPayment($scheduledPayment, $output);
+            \Doctrine\Common\Util\Debug::dump($scheduledPayment);
         } elseif ($policyNumber) {
             $policyRepo = $dm->getRepository(PhonePolicy::class);
             $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
@@ -57,18 +53,26 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
             foreach ($policy->getScheduledPayments() as $scheduledPayment) {
-                $output->writeln(sprintf(
-                    'Scheduled %s Status %s Amount %s',
-                    $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
-                    $scheduledPayment->getPayment() ? $scheduledPayment->getPayment()->getResult() : 'n/a',
-                    $scheduledPayment->getAmount()
-                ));
+                $this->displayScheduledPayment($scheduledPayment, $output);
             }
         } else {
             $scheduledPolicies = $repo->findScheduled();
             foreach ($scheduledPolicies as $scheduledPolicy) {
-                $output->writeln($scheduledPolicy->getId());
+                $this->displayScheduledPayment($scheduledPayment, $output);
             }
         }
+    }
+
+    protected function displayScheduledPayment(ScheduledPayment $scheduledPayment, $output)
+    {
+        $output->writeln(sprintf(
+            'Policy %s SId %s Scheduled %s Amount %s Status %s Paid %s',
+            $scheduledPayment->getPolicy()->getPolicyNumber(),
+            $scheduledPayment->getId(),
+            $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
+            $scheduledPayment->getAmount(),
+            $scheduledPayment->getPayment() ? $scheduledPayment->getPayment()->getResult() : 'n/a',
+            $scheduledPayment->getPayment() ? $scheduledPayment->getPayment()->getAmount() : '-'
+        ));
     }
 }
