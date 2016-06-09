@@ -24,9 +24,9 @@
         <div>
             <ul>
                 <li>Policy Number: {{ policy.policyNumber }}</li>
-                <li>Date of subscription:: {{ policy.start | date('d M Y') }}</li>
+                <li>Date of subscription:: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
                 <li>Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }}</li>
-                <li>Period of cover: from {{ policy.start | date('d M Y') }} to {{ policy.end|date('d M Y') }}</li>
+                <li>Period of cover: from {{ policy.start | date('d M Y') }} to {{ policy.end|date('d M Y H:i', 'Europe/London') }}</li>
                 <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice }}</li>
             </ul>
         </div>

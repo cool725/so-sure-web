@@ -520,15 +520,13 @@ abstract class Policy
         }
         if (!$startDate) {
             $startDate = new \DateTime();
+            $startDate->add(new \DateInterval('P10M'));
         }
         $this->setStart($startDate);
         $nextYear = clone $this->getStart();
         // This is same date/time but add 1 to the year
         $nextYear = $nextYear->modify('+1 year');
-        // strip the time, so should be 00:00 of current day (e.g. midnight of previous day)
-        $midnight = new \DateTime($nextYear->format('Y-m-d'));
-        $midnight->modify("-1 second");
-        $this->setEnd($midnight);
+        $this->setEnd($nextYear);
 
         $initialPolicyNumber = 5500000;
         $this->setPolicyNumber(sprintf(
@@ -766,6 +764,15 @@ abstract class Policy
         }
 
         return $this->getStart()->diff($date)->days < 60;
+    }
+
+    public function isBeforePolicyStarted($date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $this->getStart() > $date;
     }
 
     public function getConnectionCliffDate()
@@ -1008,13 +1015,18 @@ abstract class Policy
         if (!$this->isPolicy()) {
             return $connectionValues;
         }
+        $now = new \DateTime();
+        $startDate = $this->getStart();
+        if ($startDate && $startDate > $now) {
+            $startDate = $now;
+        }
 
         $connectionValues[] = [
-            'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
+            'start_date' => $startDate ? $startDate->format(\DateTime::ATOM) : null,
             'end_date' => $this->getConnectionCliffDate() ?
                 $this->getConnectionCliffDate()->format(\DateTime::ATOM) :
                 null,
-            'value' => $this->getTotalConnectionValue($this->getStart()),
+            'value' => $this->getTotalConnectionValue($startDate),
         ];
 
         $afterCliffDate = clone $this->getConnectionCliffDate();

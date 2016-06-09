@@ -124,6 +124,9 @@ class PhonePolicy extends Policy
             return self::NETWORK_CLAIM_VALUE;
         } elseif ($this->isPolicyWithin60Days($date)) {
             return self::STANDARD_VALUE;
+        } elseif ($this->isBeforePolicyStarted($date)) {
+            // Case for Salva's 10 minute buffer
+            return self::STANDARD_VALUE;
         } else {
             return self::AGED_VALUE;
         }
@@ -143,7 +146,8 @@ class PhonePolicy extends Policy
             return 0;
         }
 
-        if ($this->isPolicyWithin60Days($date)) {
+        // Extra Case for Salva's 10 minute buffer
+        if ($this->isPolicyWithin60Days($date) || $this->isBeforePolicyStarted($date)) {
             if ($this->getUser()->isPreLaunch() || $this->getPromoCode() == self::PROMO_LAUNCH) {
                 return self::PROMO_LAUNCH_VALUE;
             }
