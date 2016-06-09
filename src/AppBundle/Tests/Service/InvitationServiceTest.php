@@ -22,6 +22,7 @@ use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\OptOutException;
+use AppBundle\Exception\ConnectedInvitationException;
 
 /**
  * @group functional-nonet
@@ -91,6 +92,38 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof EmailInvitation);
 
         self::$invitationService->inviteByEmail($policy, static::generateEmail('invite1', $this));
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\ConnectedInvitationException
+     */
+    public function testConnectedEmailInvitation()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('connected-user', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-connected', $this),
+            'bar'
+        );
+        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-connected', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-05-01'));
+        $invitation = self::$invitationService->inviteByEmail(
+            $policyInvitee,
+            static::generateEmail('connected-user', $this)
+        );
     }
 
     /**
@@ -166,6 +199,34 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->inviteBySms($policy, self::transformMobile($mobile));
     }
     
+    /**
+     * @expectedException AppBundle\Exception\ConnectedInvitationException
+     */
+    public function testConnectedMobileInvitation()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('connected-mobile-user', $this),
+            'bar'
+        );
+        $user->setMobileNumber(static::generateRandomMobile());
+        $policy = static::createPolicy($user, static::$dm, static::$phone);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-mobile-connected', $this),
+            'bar'
+        );
+        $userInvitee->setMobileNumber(static::generateRandomMobile());
+        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+
+        $invitation = self::$invitationService->inviteBySms($policy, $userInvitee->getMobileNumber());
+        $this->assertTrue($invitation instanceof SmsInvitation);
+
+        self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-05-01'));
+        self::$invitationService->inviteBySms($policyInvitee, $user->getMobileNumber());
+    }
+
     public function testOptOutCatIntivationsSmsInvitation()
     {
         $user = static::createUser(

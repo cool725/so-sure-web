@@ -1319,6 +1319,50 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
     }
 
+    public function testUnableToCrossInvite()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-cross', $this),
+            'foo'
+        );
+        $user2 = self::createUser(
+            self::$userManager,
+            self::generateEmail('cross-invitation', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('cross-invitation', $this),
+            'name' => 'Invitation Name',
+        ]);
+        $invitationData = $this->verifyResponse(200);
+
+        $cognitoIdentityId2 = $this->getAuthUser($user2);
+        $crawler = $this->generatePolicy($cognitoIdentityId2, $user2);
+        $policyData2 = $this->verifyResponse(200);
+
+        $this->payPolicy($cognitoIdentityId2, $policyData2['id']);
+        $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId2, $url, [
+            'action' => 'accept',
+            'policy_id' => $policyData2['id'],
+        ]);
+
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData2['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId2, $url, [
+            'email' => self::generateEmail('invitation-cross', $this),
+            'name' => 'Invitation Name',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_CONNECTED);
+    }
+
     // policy/{id}/keyfacts
 
     /**

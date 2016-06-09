@@ -69,6 +69,9 @@ class SalvaListenerTest extends WebTestCase
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
 
+        $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
+        $this->assertEquals($policy->getId(), $data['policyId']);
+        $this->assertEquals(SalvaExportService::QUEUE_CREATED, $data['action']);
         $this->assertTrue($policy->isValidPolicy());
 
         $listener = new SalvaListener(static::$salvaService);
@@ -96,6 +99,9 @@ class SalvaListenerTest extends WebTestCase
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
 
+        $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
+        $this->assertEquals($policy->getId(), $data['policyId']);
+        $this->assertEquals(SalvaExportService::QUEUE_CREATED, $data['action']);
         $this->assertTrue($policy->isValidPolicy());
 
         $listener = new SalvaListener(static::$salvaService);
@@ -122,6 +128,11 @@ class SalvaListenerTest extends WebTestCase
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
+
+        $this->assertEquals(1, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+        $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
+        $this->assertEquals($policy->getId(), $data['policyId']);
+        $this->assertEquals(SalvaExportService::QUEUE_CREATED, $data['action']);
 
         $this->assertTrue($policy->isValidPolicy());
         

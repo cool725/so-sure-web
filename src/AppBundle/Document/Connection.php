@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
  * @Gedmo\Loggable
  */
 class Connection
@@ -21,6 +21,12 @@ class Connection
      * @Gedmo\Versioned
      */
     protected $linkedUser;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @Gedmo\Versioned
+     */
+    protected $sourceUser;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="Policy")
@@ -88,6 +94,16 @@ class Connection
     public function setLinkedUser(User $user)
     {
         $this->linkedUser = $user;
+    }
+
+    public function getSourceUser()
+    {
+        return $this->sourceUser;
+    }
+
+    public function setSourceUser(User $user)
+    {
+        $this->sourceUser = $user;
     }
 
     public function getSourcePolicy()

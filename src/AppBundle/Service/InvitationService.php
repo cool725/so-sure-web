@@ -19,6 +19,7 @@ use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\OptOutException;
 use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\SelfInviteException;
+use AppBundle\Exception\ConnectedInvitationException;
 use AppBundle\Document\PhoneTrait;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -127,6 +128,11 @@ class InvitationService
             throw new DuplicateInvitationException('Email was already invited to this policy');
         }
 
+        $connectionRepo = $this->dm->getRepository(Connection::class);
+        if ($connectionRepo->isConnectedByEmail($policy, $email)) {
+            throw new ConnectedInvitationException('You are already connected');
+        }
+
         $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $optouts = $optOutRepo->findOptOut($email, EmailOptOut::OPTOUT_CAT_INVITATIONS);
         if (count($optouts) > 0) {
@@ -163,6 +169,11 @@ class InvitationService
         $prevInvitations = $invitationRepo->findDuplicate($policy, $mobile);
         if (count($prevInvitations) > 0) {
             throw new DuplicateInvitationException('Mobile was already invited to this policy');
+        }
+
+        $connectionRepo = $this->dm->getRepository(Connection::class);
+        if ($connectionRepo->isConnectedBySms($policy, $mobile)) {
+            throw new ConnectedInvitationException('You are already connected');
         }
 
         $optOutRepo = $this->dm->getRepository(SmsOptOut::class);
@@ -313,6 +324,19 @@ class InvitationService
 
         $this->validatePolicy($inviterPolicy);
         $this->validatePolicy($inviteePolicy);
+
+        // The invitation should never be sent in the first place, but in case
+        // there was perhaps an email update in the meantime
+        $connectionRepo = $this->dm->getRepository(Connection::class);
+        if ($invitation instanceof EmailInvitation) {
+            if ($connectionRepo->isConnectedByEmail($invitation->getPolicy(), $invitation->getEmail())) {
+                throw new ConnectedInvitationException('You are already connected');
+            }
+        } elseif ($invitation instanceof SmsInvitation) {
+            if ($connectionRepo->isConnectedBySms($invitation->getPolicy(), $invitation->getMobile())) {
+                throw new ConnectedInvitationException('You are already connected');
+            }
+        }
 
         // If there was a concellation in the network, new connection should replace the cancelled connection
         $this->addConnection($inviteePolicy, $invitation->getInviter(), $inviterPolicy, $date);
