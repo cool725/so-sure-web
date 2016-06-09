@@ -1015,13 +1015,18 @@ abstract class Policy
         if (!$this->isPolicy()) {
             return $connectionValues;
         }
+        $now = new \DateTime();
+        $startDate = $this->getStart();
+        if ($startDate && $startDate > $now) {
+            $startDate = $now;
+        }
 
         $connectionValues[] = [
-            'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
+            'start_date' => $startDate ? $startDate->format(\DateTime::ATOM) : null,
             'end_date' => $this->getConnectionCliffDate() ?
                 $this->getConnectionCliffDate()->format(\DateTime::ATOM) :
                 null,
-            'value' => $this->getTotalConnectionValue($this->getStart()),
+            'value' => $this->getTotalConnectionValue($startDate),
         ];
 
         $afterCliffDate = clone $this->getConnectionCliffDate();
