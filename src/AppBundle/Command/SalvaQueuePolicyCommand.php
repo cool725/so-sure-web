@@ -83,6 +83,9 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
                 $salva->queue($phonePolicy);
                 $output->writeln(sprintf("Policy %s was successfully requeued.", $policyNumber));
             } else {
+                if (!$phonePolicy) {
+                    throw new \Exception(sprintf('Unable to find Policy %s', $policyNumber));
+                }
                 $responseId = $salva->sendPolicy($phonePolicy);
                 $output->writeln(sprintf("Policy %s was successfully send. Response %s", $policyNumber, $responseId));
             }

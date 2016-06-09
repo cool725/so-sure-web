@@ -145,6 +145,8 @@ services:
             - [setSecretKey, ['%receperio_secretkey%']]
             - [setStoreId, ['%receperio_storeid%']]
             - [setEnvironment, ['%kernel.environment%']]
+        tags:
+            - { name: monolog.logger, channel: receperio }
 
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService
@@ -179,6 +181,8 @@ services:
             redis:          "@snc_redis.default"
             s3:             "@aws.s3"
             environment:    "%kernel.environment%"
+        tags:
+            - { name: monolog.logger, channel: salva }
 
     app.davies:
         class: AppBundle\Service\DaviesService
@@ -188,6 +192,8 @@ services:
             excel:          "@app.excel"
             s3:             "@aws.s3"
             claims:         "@app.claims"
+        tags:
+            - { name: monolog.logger, channel: davies }
 
     app.jwt:
         class: AppBundle\Service\JWTService
