@@ -27,6 +27,11 @@ class JudoPaymentMethod extends PaymentMethod
      */
     protected $cardTokenHash;
 
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $deviceDna;
+
     public function setCustomerToken($customerToken)
     {
         $this->customerToken = $customerToken;
@@ -67,5 +72,15 @@ class JudoPaymentMethod extends PaymentMethod
     public function getCardTokenHash()
     {
         return $this->cardTokenHash;
+    }
+
+    public function getDeviceDna()
+    {
+        return $this->deviceDna;
+    }
+
+    public function setDeviceDna($deviceDna)
+    {
+        $this->deviceDna = $deviceDna;
     }
 }

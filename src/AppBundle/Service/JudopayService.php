@@ -78,8 +78,9 @@ class JudopayService
      * @param string $receiptId
      * @param string $consumerToken
      * @param string $cardToken     Can be null if card is declined
+     * @param string $deviceDna     Optional device dna data (json encoded) for judoshield
      */
-    public function add(Policy $policy, $receiptId, $consumerToken, $cardToken)
+    public function add(Policy $policy, $receiptId, $consumerToken, $cardToken, $deviceDna = null)
     {
         $user = $policy->getUser();
 
@@ -87,6 +88,9 @@ class JudopayService
         $judo->setCustomerToken($consumerToken);
         if ($cardToken) {
             $judo->addCardToken($cardToken, null);
+        }
+        if ($deviceDna) {
+            $judo->setDeviceDna($deviceDna);
         }
         $user->setPaymentMethod($judo);
 
@@ -215,13 +219,19 @@ class JudopayService
     {
         if ($scheduledPayment->getPayment() &&
             $scheduledPayment->getPayment()->getResult() == JudoPayment::RESULT_SUCCESS) {
-            throw new \Exception(sprintf('Payment already received for scheduled payment %s', $scheduledPayment->getId()));
+            throw new \Exception(sprintf(
+                'Payment already received for scheduled payment %s',
+                $scheduledPayment->getId()
+            ));
         }
 
         $policy = $scheduledPayment->getPolicy();
         $paymentMethod = $policy->getUser()->getPaymentMethod();
         if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
-            throw new \Exception(sprintf('Payment method not valid for scheduled payment %s', $scheduledPayment->getId()));
+            throw new \Exception(sprintf(
+                'Payment method not valid for scheduled payment %s',
+                $scheduledPayment->getId()
+            ));
         }
         $payment = $this->tokenPay($policy, $policy->getUser()->getPaymentMethod());
         $scheduledPayment->setPayment($payment);
