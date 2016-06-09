@@ -304,7 +304,7 @@ class JudopayService
                 'emailAddress' => $user->getEmail(),
                 'mobileNumber' => $user->getMobileNumber(),
         );
-        if ($paymentMethod->getDecodedDeviceDna()) {
+        if ($paymentMethod->getDecodedDeviceDna() && is_array($paymentMethod->getDecodedDeviceDna())) {
             $data = array_merge($data, $paymentMethod->getDecodedDeviceDna());
         }
 

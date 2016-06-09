@@ -92,7 +92,7 @@ class JudoPaymentMethod extends PaymentMethod
 
         $data = null;
         try {
-            $data = json_decode($this->deviceDna);
+            $data = json_decode($this->deviceDna, true);
 
             return $data;
         } catch (\Exception $e) {

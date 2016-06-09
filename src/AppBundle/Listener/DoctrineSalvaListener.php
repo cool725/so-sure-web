@@ -27,10 +27,15 @@ class DoctrineSalvaListener
     {
         $document = $eventArgs->getDocument();
         if ($document instanceof PhonePolicy) {
-            // For production, check if the policy is valid, or other envs, just check if its a policy
-            if ($this->environment == 'prod' && !$document->isValidPolicy()) {
-                return;
-            } elseif ($this->environment != 'prod' && !$document->isPolicy()) {
+            if (!$document->isValidPolicy()) {
+                // The change in state from pending to active corresponds with the change in state
+                // from invalid to valid policy
+                if ($eventArgs->hasChangedField('status') &&
+                    $eventArgs->getOldValue('status') == PhonePolicy::STATUS_PENDING &&
+                    $eventArgs->getNewValue('status') == PhonePolicy::STATUS_ACTIVE) {
+                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CREATED);
+                }
+
                 return;
             }
 
@@ -39,13 +44,6 @@ class DoctrineSalvaListener
                 // Cancellation is more imporant then anything else
                 if ($eventArgs->getNewValue('status') == PhonePolicy::STATUS_CANCELLED) {
                     return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CANCELLED);
-                }
-
-                // Current implemention has a pending policy set in the create policy, followed later by a change
-                // to active
-                if ($eventArgs->getOldValue('status') == PhonePolicy::STATUS_PENDING &&
-                    $eventArgs->getNewValue('status') == PhonePolicy::STATUS_ACTIVE) {
-                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CREATED);
                 }
             }
 

@@ -56,8 +56,8 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 $this->displayScheduledPayment($scheduledPayment, $output);
             }
         } else {
-            $scheduledPolicies = $repo->findScheduled();
-            foreach ($scheduledPolicies as $scheduledPolicy) {
+            $scheduledPayments = $repo->findScheduled();
+            foreach ($scheduledPayments as $scheduledPayment) {
                 $this->displayScheduledPayment($scheduledPayment, $output);
             }
         }
