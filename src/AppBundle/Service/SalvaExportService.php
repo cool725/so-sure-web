@@ -18,8 +18,6 @@ class SalvaExportService
 {
     use CurrencyTrait;
 
-    const SALVA_TIMEZONE = "Europe/London";
-
     const SCHEMA_POLICY_IMPORT = 'policy/import/policyImportV1.xsd';
     const SCHEMA_POLICY_TERMINATE = 'policy/termination/policyTerminationV1.xsd';
 
@@ -509,7 +507,7 @@ class SalvaExportService
     public function adjustDate(\DateTime $date)
     {
         $clonedDate = clone $date;
-        $clonedDate->setTimezone(new \DateTimeZone(self::SALVA_TIMEZONE));
+        $clonedDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
 
         return $clonedDate->format("Y-m-d\TH:i:00");
     }

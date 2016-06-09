@@ -552,10 +552,16 @@ abstract class Policy
             $startDate = new \DateTime();
             $startDate->add(new \DateInterval('PT10M'));
         }
+
+        // salva needs a end time of 23:59 in local time
+        $startDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
+
         $this->setStart($startDate);
         $nextYear = clone $this->getStart();
         // This is same date/time but add 1 to the year
         $nextYear = $nextYear->modify('+1 year');
+        $nextYear->modify("-1 day");
+        $nextYear->setTime(23, 59, 59);
         $this->setEnd($nextYear);
 
         $initialPolicyNumber = 5500000;
