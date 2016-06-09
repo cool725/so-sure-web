@@ -603,7 +603,8 @@ class ApiAuthController extends BaseController
                     $policy,
                     $data['judo']['receipt_id'],
                     $data['judo']['consumer_token'],
-                    isset($data['judo']['card_token']) ? $data['judo']['card_token'] : null
+                    isset($data['judo']['card_token']) ? $data['judo']['card_token'] : null,
+                    isset($data['judo']['device_dna']) ? $data['judo']['device_dna'] : null
                 );
             }
 
