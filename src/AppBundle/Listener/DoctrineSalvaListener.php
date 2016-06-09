@@ -28,14 +28,6 @@ class DoctrineSalvaListener
         $document = $eventArgs->getDocument();
         if ($document instanceof PhonePolicy) {
             if (!$document->isValidPolicy()) {
-                // The change in state from pending to active corresponds with the change in state
-                // from invalid to valid policy
-                if ($eventArgs->hasChangedField('status') &&
-                    $eventArgs->getOldValue('status') == PhonePolicy::STATUS_PENDING &&
-                    $eventArgs->getNewValue('status') == PhonePolicy::STATUS_ACTIVE) {
-                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CREATED);
-                }
-
                 return;
             }
 

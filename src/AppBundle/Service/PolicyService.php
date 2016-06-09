@@ -33,6 +33,7 @@ class PolicyService
     protected $templating;
     protected $router;
     protected $mpdf;
+    protected $dispatcher;
 
     /** @var string */
     protected $environment;
@@ -56,6 +57,7 @@ class PolicyService
      * @param                 $router
      * @param                 $environment
      * @param                 $mpdf
+     * @param                 $dispatcher
      */
     public function __construct(
         DocumentManager $dm,
@@ -65,7 +67,8 @@ class PolicyService
         $templating,
         $router,
         $environment,
-        $mpdf
+        $mpdf,
+        $dispatcher
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -75,6 +78,7 @@ class PolicyService
         $this->router = $router->getRouter();
         $this->environment = $environment;
         $this->mpdf = $mpdf;
+        $this->dispatcher = $dispatcher;
     }
 
     public function create(Policy $policy, \DateTime $date = null)
@@ -107,6 +111,7 @@ class PolicyService
         $policySchedule = $this->generatePolicySchedule($policy);
 
         $this->newPolicyEmail($policy, [$policySchedule]);
+        $this->dispatcher->dispatch(SalvaPolicyEvent::EVENT_CREATED, new SalvaPolicyEvent($policy));
     }
 
     public function generatePolicySchedule(Policy $policy)

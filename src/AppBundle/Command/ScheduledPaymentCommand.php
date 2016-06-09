@@ -45,7 +45,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
             $scheduledPayment = $repo->find($id);
             $scheduledPayment = $judoPay->scheduledPayment($scheduledPayment);
             $this->displayScheduledPayment($scheduledPayment, $output);
-            \Doctrine\Common\Util\Debug::dump($scheduledPayment);
+            //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
         } elseif ($policyNumber) {
             $policyRepo = $dm->getRepository(PhonePolicy::class);
             $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
