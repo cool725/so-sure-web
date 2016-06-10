@@ -171,7 +171,12 @@ class JudopayService
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         // Ensure the correct amount is paid
-        $this->validatePaymentResultAndAmount($payment);
+        $this->validatePaymentAmount($payment);
+
+        if ($payment->getResult() != JudoPayment::RESULT_SUCCESS) {
+            // We've recorded the payment - can return error now
+            throw new PaymentDeclinedException();
+        }
 
         // Only set broker fees if we know the amount
         if ($payment->getAmount() == $policy->getPremium()->getYearlyPremiumPrice()) {
@@ -185,7 +190,7 @@ class JudopayService
         return $payment;
     }
 
-    protected function validatePaymentResultAndAmount(JudoPayment $payment)
+    protected function validatePaymentAmount(JudoPayment $payment)
     {
         // TODO: Should we issue a refund in this case??
         $premium = $payment->getPolicy()->getPremium();
@@ -203,10 +208,6 @@ class JudopayService
             $this->logger->error($errMsg);
 
             throw new InvalidPremiumException($errMsg);
-        }
-        if ($payment->getResult() != JudoPayment::RESULT_SUCCESS) {
-            // We've recorded the payment - can return error now
-            throw new PaymentDeclinedException();
         }
 
         /* TODO: May want to validate this data??
@@ -250,6 +251,14 @@ class JudopayService
 
     public function scheduledPayment(ScheduledPayment $scheduledPayment)
     {
+        if ($scheduledPayment->getStatus() != ScheduledPayment::STATUS_SCHEDULED) {
+            throw new \Exception(sprintf(
+                'Scheduled payment %s is not scheduled (status: %s)',
+                $scheduledPayment->getId(),
+                $scheduledPayment->getStatus()
+            ));
+        }
+
         if ($scheduledPayment->getPayment() &&
             $scheduledPayment->getPayment()->getResult() == JudoPayment::RESULT_SUCCESS) {
             throw new \Exception(sprintf(
@@ -266,9 +275,21 @@ class JudopayService
                 $scheduledPayment->getId()
             ));
         }
-        $payment = $this->tokenPay($policy, $policy->getUser()->getPaymentMethod());
-        $scheduledPayment->setPayment($payment);
-        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+        try {
+            $payment = $this->tokenPay($policy, $policy->getUser()->getPaymentMethod());
+            $scheduledPayment->setPayment($payment);
+            if ($payment == JudoPayment::RESULT_SUCCESS) {
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+            } else {
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
+            }
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+        } catch (\Exception $e) {
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+            throw $e;
+        }
 
         return $scheduledPayment;
     }
@@ -328,7 +349,7 @@ class JudopayService
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         // Ensure the correct amount is paid
-        $this->validatePaymentResultAndAmount($payment);
+        $this->validatePaymentAmount($payment);
 
         // TODO: $payment->setBrokerFee(Salva::FINAL_MONTHLY_BROKER_FEE);
         $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);

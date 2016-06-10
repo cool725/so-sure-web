@@ -66,9 +66,10 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
     protected function displayScheduledPayment(ScheduledPayment $scheduledPayment, $output)
     {
         $output->writeln(sprintf(
-            'Policy %s SId %s Scheduled %s Amount %s Status %s Paid %s',
+            'Policy %s Status %s SId %s Scheduled %s Amount %s Status %s Paid %s',
             $scheduledPayment->getPolicy()->getPolicyNumber(),
             $scheduledPayment->getId(),
+            $scheduledPayment->getStatus(),
             $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
             $scheduledPayment->getAmount(),
             $scheduledPayment->getPayment() ? $scheduledPayment->getPayment()->getResult() : 'n/a',
