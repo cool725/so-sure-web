@@ -223,7 +223,7 @@ abstract class Policy
     public function addPayment($payment)
     {
         $payment->setPolicy($this);
-        $payment->calculateIpt();
+        $payment->calculateSplit();
         $this->payments->add($payment);
     }
 
@@ -608,6 +608,12 @@ abstract class Policy
         if ($payments === null) {
             return $this->getPremium()->getYearlyPremiumPrice();
         }
+        /*
+        $premium = 0;
+        foreach ($payments as $payment) {
+            $premium = $premium + $payment->getAmount();
+        }
+        */
 
         return $this->toTwoDp($this->getPremium()->getMonthlyPremiumPrice() * count($payments));
     }
@@ -622,6 +628,12 @@ abstract class Policy
         if ($payments === null) {
             return $this->getPremium()->getYearlyGwp();
         }
+        /*
+        $gwp = 0;
+        foreach ($payments as $payment) {
+            $gwp = $gwp + $payment->getGwp();
+        }
+        */
 
         return $this->toTwoDp($this->getPremium()->getGwp() * count($payments));
     }
@@ -636,6 +648,12 @@ abstract class Policy
         if ($payments === null) {
             return $this->getPremium()->getTotalIpt();
         }
+        /*
+        $ipt = 0;
+        foreach ($payments as $payment) {
+            $ipt = $ipt + $payment->getIpt();
+        }
+        */
 
         return $this->toTwoDp($this->getPremium()->getIpt() * count($payments));
     }
