@@ -415,7 +415,7 @@ class SalvaExportService
                 $data = unserialize($queueItem);
 
                 if (!isset($data['policyId']) || !$data['policyId'] || !isset($data['action']) || !$data['action']) {
-                    return $count;
+                    throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
                 $repo = $this->dm->getRepository(PhonePolicy::class);
                 $policy = $repo->find($data['policyId']);
@@ -457,6 +457,10 @@ class SalvaExportService
 
     public function queue(PhonePolicy $policy, $action)
     {
+        if (!in_array($action, [self::QUEUE_CANCELLED, self::QUEUE_CREATED, self::QUEUE_UPDATED])) {
+            throw new \Exception(sprintf('Unknown queue action %s', $action));
+        }
+
         $data = ['policyId' => $policy->getId(), 'action' => $action];
         $this->redis->rpush(self::KEY_POLICY_ACTION, serialize($data));
     }
