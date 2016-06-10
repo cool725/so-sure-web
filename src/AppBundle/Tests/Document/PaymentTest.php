@@ -36,7 +36,7 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
         $payment->setAmount(5);
         $payment->setPolicy($phonePolicy);
         $payment->calculateSplit();
-        $this->assertEquals(4.52, $this->toTwoDp($payment->getGwp()));
+        $this->assertEquals(4.53, $this->toTwoDp($payment->getGwp()));
         $this->assertEquals(0.48, $this->toTwoDp($payment->getIpt()));
     }
 }

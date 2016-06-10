@@ -424,7 +424,7 @@ class SalvaExportService
                 }
 
                 if ($data['action'] == self::QUEUE_CREATED) {
-                    $this->createXml($policy);
+                    $this->sendPolicy($policy);
                 } elseif ($data['action'] == self::QUEUE_UPDATED) {
                     $this->updatePolicy($policy);
                 } elseif ($data['action'] == self::QUEUE_CANCELLED) {
