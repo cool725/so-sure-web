@@ -1061,6 +1061,13 @@ abstract class Policy
             $networkConnection->getLinkedPolicy()->updatePotValue();
         }
 
+        // Cancel any scheduled payments
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
+            }
+        }
+
         $this->updatePotValue();
     }
 

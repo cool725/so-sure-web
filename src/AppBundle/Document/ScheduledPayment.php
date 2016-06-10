@@ -11,6 +11,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class ScheduledPayment
 {
+    const STATUS_SCHEDULED = 'scheduled';
+    const STATUS_SUCCESS = 'success';
+    const STATUS_FAILED = 'failed';
+    const STATUS_CANCELLED = 'cancelled';
+
     /**
      * @MongoDB\Id
      */
@@ -21,6 +26,12 @@ class ScheduledPayment
      * @Gedmo\Versioned
      */
     protected $created;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $status;
 
     /**
      * @MongoDB\Date()
@@ -64,6 +75,16 @@ class ScheduledPayment
     public function getAmount()
     {
         return $this->amount;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
     }
 
     public function setScheduled($scheduled)

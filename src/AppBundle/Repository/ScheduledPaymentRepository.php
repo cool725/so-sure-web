@@ -2,7 +2,7 @@
 
 namespace AppBundle\Repository;
 
-use AppBundle\Document\Phone;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
@@ -17,6 +17,7 @@ class ScheduledPaymentRepository extends DocumentRepository
         return $this->createQueryBuilder()
             ->field('payment')->equals(null)
             ->field('scheduled')->lte($date)
+            ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
             ->getQuery()
             ->execute();
     }

@@ -830,6 +830,38 @@ class PhonePolicyTest extends WebTestCase
         }
     }
 
+    public function testCancelPolicyCancelsScheduledPayments()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+
+        for ($i = 0; $i < 11; $i++) {
+            $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $policy->addScheduledPayment($scheduledPayment);
+        }
+        static::$dm->persist($policy);
+        static::$dm->persist($user);
+        static::$dm->flush();
+
+        $policy->cancel(PhonePolicy::CANCELLED_GOODWILL);
+        foreach ($policy->getScheduledPayments() as $scheduledPayment) {
+            $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $scheduledPayment->getStatus());
+        }
+    }
+
     public function testGetPremiumPaidNotPolicy()
     {
         $policy = new PhonePolicy();

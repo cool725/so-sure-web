@@ -162,6 +162,7 @@ class PolicyService
                     $scheduledDate->add(new \DateInterval(sprintf('P%dM', $i)));
 
                     $scheduledPayment = new ScheduledPayment();
+                    $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
                     $scheduledPayment->setScheduled($scheduledDate);
                     $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
                     $policy->addScheduledPayment($scheduledPayment);
@@ -183,9 +184,9 @@ class PolicyService
     {
         $policy->cancel($reason, $date);
         $this->dm->flush();
+
         $this->cancelledPolicyEmail($policy);
         $this->networkCancelledPolicyEmails($policy);
-        // TODO - cancel dd
     }
 
     /**
