@@ -47,22 +47,28 @@ class PhonePolicyRepository extends DocumentRepository
         return $this->countAllPolicies() < 1000;
     }
 
-    public function getAllPoliciesForExport(\DateTime $date)
+    public function getAllPoliciesForExport(\DateTime $date, $environment)
     {
         \AppBundle\Classes\NoOp::noOp([$date]);
 
         $policy = new PhonePolicy();
 
-        return $this->createQueryBuilder()
+        $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_PENDING,
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_UNPAID
-            ])
-            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
-            ->getQuery()
+            ]);
+
+        if ($environment == "prod") {
+            $qb->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+        } else {
+            $qb->field('policyNumber')->notEqual(null);
+        }
+
+        return $qb->getQuery()
             ->execute();
     }
 }
