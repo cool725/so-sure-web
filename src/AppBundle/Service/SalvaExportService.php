@@ -190,7 +190,7 @@ class SalvaExportService
         $lines = [];
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $lines[] = sprintf("%s\n", $this->transformPolicy(null));
-        foreach ($repo->getAllPoliciesForExport($date) as $policy) {
+        foreach ($repo->getAllPoliciesForExport($date, $this->environment) as $policy) {
             foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
                 $lines[] =  sprintf("%s\n", $this->transformPolicy($policy, $version));
             }
