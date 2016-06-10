@@ -32,8 +32,8 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
             ->addOption(
                 'requeue',
                 null,
-                InputOption::VALUE_NONE,
-                'Requeue the given policy number'
+                InputOption::VALUE_REQUIRED,
+                'Requeue the given policy number [created, updated, cancelled]'
             )
             ->addOption(
                 'clear',
@@ -63,7 +63,7 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
         $policyNumber = $input->getOption('policyNumber');
         $cancel = $input->getOption('cancel');
         $clear = true === $input->getOption('clear');
-        $requeue = true === $input->getOption('requeue');
+        $requeue = $input->getOption('requeue');
         $show = true === $input->getOption('show');
         $process = $input->getOption('process');
 
@@ -80,8 +80,8 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
                     $responseId
                 ));
             } elseif ($requeue) {
-                $salva->queue($phonePolicy);
-                $output->writeln(sprintf("Policy %s was successfully requeued.", $policyNumber));
+                $salva->queue($phonePolicy, $requeue);
+                $output->writeln(sprintf("Policy %s was successfully requeued for %s.", $policyNumber, $requeue));
             } else {
                 if (!$phonePolicy) {
                     throw new \Exception(sprintf('Unable to find Policy %s', $policyNumber));
