@@ -53,14 +53,6 @@ class SalvaExportServiceTest extends WebTestCase
         $this->assertTrue(self::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
     }
 
-    /**
-    public function testSend()
-    {
-        $xml = file_get_contents(self::$xmlFile);
-        self::$salva->send($xml, SalvaExportService::SCHEMA_POLICY_IMPORT);
-    }
-    */
-
     public function testCreateXml()
     {
         $user = static::createUser(
