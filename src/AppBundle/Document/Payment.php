@@ -38,7 +38,16 @@ abstract class Payment
      */
     protected $amount;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $gwp;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
     protected $ipt;
 
     /**
@@ -111,6 +120,16 @@ abstract class Payment
         return $this->amount;
     }
 
+    public function setGwp($gwp)
+    {
+        $this->gwp = $gwp;
+    }
+
+    public function getGwp()
+    {
+        return $this->gwp;
+    }
+
     public function setIpt($ipt)
     {
         $this->ipt = $ipt;
@@ -121,9 +140,10 @@ abstract class Payment
         return $this->ipt;
     }
 
-    public function calculateIpt()
+    public function calculateSplit()
     {
         $this->setIpt($this->getPolicy()->getPremium()->getIptRate() * $this->getAmount());
+        $this->setGwp($this->getAmount() - $this->getIpt());
     }
 
     public function setBrokerFee($brokerFee)

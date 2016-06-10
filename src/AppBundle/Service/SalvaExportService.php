@@ -549,7 +549,7 @@ class SalvaExportService
         ));
 
         $payments = $phonePolicy->getPaymentsForSalvaVersions()[$version];
-        $usedPremium = $phonePolicy->getTotalPremiumPrice($payments);
+        $usedPremium = $phonePolicy->getTotalGwp($payments);
 
         $usedFinalPremium = $dom->createElement('n1:usedFinalPremium', $usedPremium);
         $usedFinalPremium->setAttribute('n2:currency', 'GBP');
