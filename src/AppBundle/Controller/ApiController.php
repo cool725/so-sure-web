@@ -429,14 +429,16 @@ class ApiController extends BaseController
                     404
                 );
             }
-            $policyKeyFactsUrl = $this->get('router')->generate(
+
+            $policyKeyFactsRoute = $this->get('router')->generate(
                 'latest_policy_keyfacts',
                 [
                     'policy_key' => $this->getParameter('policy_key'),
                     'maxPotValue' => $request->get('maxPotValue'),
                 ],
-                true
+                false
             );
+            $policyKeyFactsUrl = sprintf("%s%s", $this->getParameter('api_base_url'), $policyKeyFactsRoute);
 
             return new JsonResponse($latestKeyFacts->toApiArray($policyKeyFactsUrl));
         } catch (\Exception $e) {
@@ -467,14 +469,15 @@ class ApiController extends BaseController
                     404
                 );
             }
-            $policyTermsUrl = $this->get('router')->generate(
+            $policyTermsRoute = $this->get('router')->generate(
                 'latest_policy_terms',
                 [
                     'policy_key' => $this->getParameter('policy_key'),
                     'maxPotValue' => $request->get('maxPotValue'),
                 ],
-                true
+                false
             );
+            $policyTermsUrl = sprintf("%s%s", $this->getParameter('api_base_url'), $policyTermsRoute);
 
             return new JsonResponse($latestTerms->toApiArray($policyTermsUrl));
         } catch (\Exception $e) {
