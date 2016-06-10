@@ -70,7 +70,7 @@ class ClaimsService
             }
 
             $claim->setProcessed(true);
-            $this->recordLostPhone($policy, $claim);
+            $this->recordLostPhone($claim->getPolicy(), $claim);
             $this->dm->flush();
         }
     }
