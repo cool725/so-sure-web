@@ -626,8 +626,8 @@ class SalvaExportService
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_imei', $phonePolicy->getImei()));
         $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_value', $phone->getInitialPrice()));
 
-        $allPayments = $policy->getPaymentsForSalvaVersions(false);
-        $tariff = $policy->getRemainingTotalGwp($allPayments);
+        $allPayments = $phonePolicy->getPaymentsForSalvaVersions(false);
+        $tariff = $phonePolicy->getRemainingTotalGwp($allPayments);
         $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_base_tariff', $tariff));
 
         return $dom->saveXML();
