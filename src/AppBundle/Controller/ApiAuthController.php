@@ -218,6 +218,15 @@ class ApiAuthController extends BaseController
                 );
             }
 
+            $redis = $this->get('snc_redis.default');
+            if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_YET_REGULATED,
+                    "Coming soon",
+                    422
+                );
+            }
+
             $imeiValidator = $this->get('app.imei');
             $jwtValidator = $this->get('app.jwt');
             $addressValidator = $this->get('app.address');

@@ -520,6 +520,32 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
     }
 
+    public function testNewPolicyNotRegulated()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(self::$userManager, self::generateEmail('policy-notreg', $this), 'foo', true);
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+
+        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $redis->set('ERROR_NOT_YET_REGULATED', 1);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+        ]]);
+
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_YET_REGULATED);
+
+        $redis->del('ERROR_NOT_YET_REGULATED');
+    }
+
     public function testNewPolicyDisabledUser()
     {
         $this->clearRateLimit();
@@ -999,7 +1025,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(404);
     }
 
-    public function testNewPolicyNotRegulated()
+    public function testNewPolicyPayNotRegulated()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         self::$testUser->setFirstName('foo');
