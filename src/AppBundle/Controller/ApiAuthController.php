@@ -578,7 +578,7 @@ class ApiAuthController extends BaseController
             $data = json_decode($request->getContent(), true)['body'];
             if (isset($data['bank_account'])) {
                 // Not doing anymore, but too many tests currently expect gocardless, so allow for non-prod
-                if ($this->getParameter('kernerl.environment') == 'prod') {
+                if ($this->getParameter('kernel.environment') == 'prod') {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
                 }
                 if (!$this->validateFields(
