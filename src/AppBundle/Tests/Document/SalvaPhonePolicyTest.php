@@ -93,4 +93,24 @@ class SalvaPhonePolicyTest extends WebTestCase
         $this->assertEquals(new \DateTime('2016-02-01'), $policy->getSalvaStartDate());
         $this->assertEquals(new \DateTime('2016-01-01'), $policy->getSalvaStartDate(1));
     }
+
+    public function testGetTotalPremiumPrices()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(self::$phone);
+        $payments = [1,2];
+        $this->assertEquals(83.88, $policy->getTotalPremiumPrice());
+        $this->assertEquals(13.98, $policy->getTotalPremiumPrice($payments));
+        $this->assertEquals(69.90, $policy->getRemainingTotalPremiumPrice($payments));
+    }
+
+    public function testGetTotalGwpPrices()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(self::$phone);
+        $payments = [1,2];
+        $this->assertEquals(76.56, $policy->getTotalGwp());
+        $this->assertEquals(12.76, $policy->getTotalGwp($payments));
+        $this->assertEquals(63.80, $policy->getRemainingTotalGwp($payments));
+    }
 }

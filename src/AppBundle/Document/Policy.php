@@ -612,6 +612,20 @@ abstract class Policy
         return $this->toTwoDp($this->getPremium()->getMonthlyPremiumPrice() * count($payments));
     }
 
+    public function getRemainingTotalGwp($payments)
+    {
+        return $this->toTwoDp($this->getTotalGwp() - $this->getTotalGwp($payments));
+    }
+
+    public function getTotalGwp($payments = null)
+    {
+        if ($payments === null) {
+            return $this->getPremium()->getYearlyGwp();
+        }
+
+        return $this->toTwoDp($this->getPremium()->getGwp() * count($payments));
+    }
+
     public function getRemainingTotalIpt($payments)
     {
         return $this->toTwoDp($this->getTotalIpt() - $this->getTotalIpt($payments));

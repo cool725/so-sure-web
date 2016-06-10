@@ -361,8 +361,8 @@ class SalvaExportService
     {
         if (!$date) {
             $date = new \DateTime();
-            // Termination time can be a bit in the future without issue
-            $date->add(new \DateInterval('PT5M'));
+            // Termination time can be a bit in the future without issue - match the 10 minutes of policy creation
+            $date->add(new \DateInterval('PT10M'));
         }
 
         $phonePolicy->incrementSalvaPolicyNumber($date);
@@ -625,7 +625,9 @@ class SalvaExportService
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_memory', $phone->getMemory()));
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_imei', $phonePolicy->getImei()));
         $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_value', $phone->getInitialPrice()));
-        $tariff = $phonePolicy->getPremium()->getYearlyGwp();
+
+        $allPayments = $policy->getPaymentsForSalvaVersions(false);
+        $tariff = $policy->getRemainingTotalGwp($allPayments);
         $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_base_tariff', $tariff));
 
         return $dom->saveXML();
