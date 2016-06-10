@@ -577,6 +577,10 @@ class ApiAuthController extends BaseController
         try {
             $data = json_decode($request->getContent(), true)['body'];
             if (isset($data['bank_account'])) {
+                // Not doing anymore, but too many tests currently expect gocardless, so allow for non-prod
+                if ($this->getParameter('kernel.environment') == 'prod') {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+                }
                 if (!$this->validateFields(
                     $data['bank_account'],
                     ['sort_code', 'account_number', 'first_name', 'last_name']
@@ -584,6 +588,8 @@ class ApiAuthController extends BaseController
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
             } elseif (isset($data['braintree'])) {
+                // Not allow braintree
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
                 if (!$this->validateFields($data['braintree'], ['nonce'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
