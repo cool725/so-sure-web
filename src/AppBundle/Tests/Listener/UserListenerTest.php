@@ -119,6 +119,7 @@ class UserListenerTest extends WebTestCase
 
         $user = new User();
         $user->setMobileNumber('13123');
+        $user->setEmail(self::generateEmail('mobile-match', $this));
         self::$dm->persist($user);
 
         $event = new UserEvent($user);
