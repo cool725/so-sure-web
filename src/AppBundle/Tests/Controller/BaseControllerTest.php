@@ -16,6 +16,7 @@ class BaseControllerTest extends WebTestCase
     protected static $jwt;
     protected static $router;
     protected static $redis;
+    protected static $policyService;
 
     public function tearDown()
     {
@@ -31,6 +32,7 @@ class BaseControllerTest extends WebTestCase
         self::$router = self::$container->get('router');
         self::$jwt = self::$container->get('app.jwt');
         self::$redis = self::$container->get('snc_redis.default');
+        self::$policyService = self::$container->get('app.policy');
     }
 
     // helpers

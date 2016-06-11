@@ -8,6 +8,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\LostPhone;
+use AppBundle\Document\JudoPayment;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -125,7 +126,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -150,7 +151,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -175,7 +176,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -200,7 +201,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -229,7 +230,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -260,7 +261,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -295,7 +296,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -332,7 +333,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $inviteeCognitoIdentityId = $this->getAuthUser($user);
         $crawler = $this->generatePolicy($inviteeCognitoIdentityId, $user);
         $inviteePolicyData = $this->verifyResponse(200);
-        $this->payPolicy($inviteeCognitoIdentityId, $inviteePolicyData['id']);
+        $this->payPolicy($user, $inviteePolicyData['id']);
 
         $user = self::createUser(
             self::$userManager,
@@ -343,7 +344,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -370,7 +371,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $inviteeCognitoIdentityId = $this->getAuthUser($user);
         $crawler = $this->generatePolicy($inviteeCognitoIdentityId, $user);
         $inviteePolicyData = $this->verifyResponse(200);
-        $this->payPolicy($inviteeCognitoIdentityId, $inviteePolicyData['id']);
+        $this->payPolicy($user, $inviteePolicyData['id']);
 
         $user = self::createUser(
             self::$userManager,
@@ -381,7 +382,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -417,7 +418,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $inviteeCognitoIdentityId = $this->getAuthUser($user);
         $crawler = $this->generatePolicy($inviteeCognitoIdentityId, $user);
         $inviteePolicyData = $this->verifyResponse(200);
-        $this->payPolicy($inviteeCognitoIdentityId, $inviteePolicyData['id']);
+        $this->payPolicy($user, $inviteePolicyData['id']);
 
         $user = self::createUser(
             self::$userManager,
@@ -428,7 +429,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -1060,38 +1061,6 @@ class ApiAuthControllerTest extends BaseControllerTest
         $redis->del('ERROR_NOT_YET_REGULATED');
     }
 
-    public function testNewPolicyDdOk()
-    {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        self::$testUser->setFirstName('foo');
-        self::$testUser->setLastName('bar');
-        self::$dm->flush();
-
-        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
-        $data = [
-            'type' => 'billing',
-            'line1' => 'address line 1',
-            'city' => 'London',
-            'postcode' => 'BX11LT',
-        ];
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $data = $this->verifyResponse(200);
-
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
-        $data = $this->verifyResponse(200);
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
-            'sort_code' => '200000',
-            'account_number' => '55779911',
-            'first_name' => 'foo',
-            'last_name' => 'bar',
-        ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
-        $this->assertEquals($data['id'], $policyData['id']);
-    }
-
     public function testNewPolicyJudopayOk()
     {
         $user = self::createUser(
@@ -1210,7 +1179,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -1242,7 +1211,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -1271,7 +1240,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -1299,7 +1268,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser2);
         $data = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $data['id']);
+        $this->payPolicy(self::$testUser2, $data['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         //print sprintf("Invite from %s to %s", self::$testUser2->getName(), self::$testUser->getName());
@@ -1335,7 +1304,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -1361,7 +1330,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyData = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId, $policyData['id']);
+        $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -1374,7 +1343,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId2, $user2);
         $policyData2 = $this->verifyResponse(200);
 
-        $this->payPolicy($cognitoIdentityId2, $policyData2['id']);
+        $this->payPolicy($user2, $policyData2['id']);
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId2, $url, [
             'action' => 'accept',
@@ -1761,8 +1730,32 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->verifyResponse(200);
     }
 
-    protected function payPolicy($cognitoIdentityId, $policyId)
+    protected function payPolicy($user, $policyId)
     {
+        // Reload user to get address
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->find($user->getId());
+
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = $policyRepo->find($policyId);
+
+        $payment = new JudoPayment();
+        $dm->persist($payment);
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+        $user->addPolicy($policy);
+
+        static::$policyService->create($policy);
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $dm->flush();
+        $this->assertNotNull($payment->getId());
+        $this->assertNotNull($policy->getUser());
+        $this->assertNotNull($policy->getUser());
+        $this->assertNotNull($policy->getUser()->getBillingAddress());
+        $this->assertNotNull($policy->getUser()->getBillingAddress()->getLine1());
+        /*
         $url = sprintf("/api/v1/auth/policy/%s/pay", $policyId);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
             'sort_code' => '200000',
@@ -1773,5 +1766,6 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policyData = $this->verifyResponse(200);
         $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
         $this->assertEquals($policyId, $policyData['id']);
+        */
     }
 }
