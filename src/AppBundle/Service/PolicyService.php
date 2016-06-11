@@ -110,10 +110,32 @@ class PolicyService
 
         $this->dm->flush();
 
+        $policyTerms = $this->generatePolicyTerms($policy);
         $policySchedule = $this->generatePolicySchedule($policy);
 
-        $this->newPolicyEmail($policy, [$policySchedule]);
+        $this->newPolicyEmail($policy, [$policySchedule, $policyTerms]);
         $this->dispatcher->dispatch(SalvaPolicyEvent::EVENT_CREATED, new SalvaPolicyEvent($policy));
+    }
+
+    public function generatePolicyTerms(Policy $policy)
+    {
+        $tmpFile = sprintf(
+            "%s/%s-%s.pdf",
+            sys_get_temp_dir(),
+            "policy",
+            str_replace('/', '-', $policy->getPolicyNumber())
+        );
+        if (file_exists($tmpFile)) {
+            unlink($tmpFile);
+        }
+
+        $this->mpdf->init('utf-8', 'A4-L', '', '', '15', '15', '5', '5');
+        $this->mpdf->useTwigTemplate('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]);
+        file_put_contents($tmpFile, $this->mpdf->generate());
+
+        // TODO: Upload schedule to s3 and update policy
+
+        return $tmpFile;
     }
 
     public function generatePolicySchedule(Policy $policy)
