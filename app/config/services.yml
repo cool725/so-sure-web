@@ -226,6 +226,7 @@ services:
             environment: "%kernel.environment%"
             mpdf:        "@app.mpdf"
             dispatcher:  "@event_dispatcher"
+            s3:             "@aws.s3"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService

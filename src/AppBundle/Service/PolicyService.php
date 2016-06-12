@@ -21,6 +21,8 @@ use AppBundle\Exception\InvalidPremiumException;
 
 class PolicyService
 {
+    const S3_BUCKET = 'policy.so-sure.com';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -36,6 +38,7 @@ class PolicyService
     protected $router;
     protected $mpdf;
     protected $dispatcher;
+    protected $s3;
 
     /** @var string */
     protected $environment;
@@ -60,6 +63,7 @@ class PolicyService
      * @param                 $environment
      * @param                 $mpdf
      * @param                 $dispatcher
+     * @param                 $s3
      */
     public function __construct(
         DocumentManager $dm,
@@ -70,7 +74,8 @@ class PolicyService
         $router,
         $environment,
         $mpdf,
-        $dispatcher
+        $dispatcher,
+        $s3
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -81,6 +86,7 @@ class PolicyService
         $this->environment = $environment;
         $this->mpdf = $mpdf;
         $this->dispatcher = $dispatcher;
+        $this->s3 = $s3;
     }
 
     public function create(Policy $policy, \DateTime $date = null)
@@ -119,11 +125,15 @@ class PolicyService
 
     public function generatePolicyTerms(Policy $policy)
     {
-        $tmpFile = sprintf(
-            "%s/%s-%s.pdf",
-            sys_get_temp_dir(),
+        $filename = sprintf(
+            "%s-%s.pdf",
             "policy",
             str_replace('/', '-', $policy->getPolicyNumber())
+        );
+        $tmpFile = sprintf(
+            "%s/%s",
+            sys_get_temp_dir(),
+            $filename
         );
         if (file_exists($tmpFile)) {
             unlink($tmpFile);
@@ -133,18 +143,22 @@ class PolicyService
         $this->mpdf->useTwigTemplate('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]);
         file_put_contents($tmpFile, $this->mpdf->generate());
 
-        // TODO: Upload schedule to s3 and update policy
+        $this->uploadS3($tmpFile, $filename, $policy);
 
         return $tmpFile;
     }
 
     public function generatePolicySchedule(Policy $policy)
     {
-        $tmpFile = sprintf(
-            "%s/%s-%s.pdf",
-            sys_get_temp_dir(),
+        $filename = sprintf(
+            "%s-%s.pdf",
             "policy-schedule",
             str_replace('/', '-', $policy->getPolicyNumber())
+        );
+        $tmpFile = sprintf(
+            "%s/%s",
+            sys_get_temp_dir(),
+            $filename
         );
         if (file_exists($tmpFile)) {
             unlink($tmpFile);
@@ -154,9 +168,24 @@ class PolicyService
         $this->mpdf->useTwigTemplate('AppBundle:Pdf:policySchedule.html.twig', ['policy' => $policy]);
         file_put_contents($tmpFile, $this->mpdf->generate());
 
-        // TODO: Upload schedule to s3 and update policy
+        $this->uploadS3($tmpFile, $filename, $policy);
 
         return $tmpFile;
+    }
+
+    public function uploadS3($file, $filename, Policy $policy)
+    {
+        if ($this->environment == "test") {
+            return;
+        }
+
+        $s3Key = sprintf('%s/mob/%s/%s', $this->environment, $policy->getId(), $filename);
+
+        $result = $this->s3->putObject(array(
+            'Bucket' => self::S3_BUCKET,
+            'Key'    => $s3Key,
+            'SourceFile' => $file,
+        ));
     }
 
     public function generateScheduledPayments(Policy $policy, \DateTime $date = null)
