@@ -34,6 +34,7 @@ class PolicyService
 
     /** @var \Swift_Mailer */
     protected $mailer;
+    protected $smtp;
     protected $templating;
     protected $router;
     protected $mpdf;
@@ -58,6 +59,7 @@ class PolicyService
      * @param LoggerInterface $logger
      * @param SequenceService $sequence
      * @param \Swift_Mailer   $mailer
+     * @param                 $smtp
      * @param                 $templating
      * @param                 $router
      * @param                 $environment
@@ -70,6 +72,7 @@ class PolicyService
         LoggerInterface $logger,
         SequenceService $sequence,
         \Swift_Mailer $mailer,
+        $smtp,
         $templating,
         $router,
         $environment,
@@ -81,6 +84,7 @@ class PolicyService
         $this->logger = $logger;
         $this->sequence = $sequence;
         $this->mailer = $mailer;
+        $this->smtp = $smtp;
         $this->templating = $templating;
         $this->router = $router->getRouter();
         $this->environment = $environment;
@@ -259,14 +263,23 @@ class PolicyService
                     'text/plain'
                 );
 
-            // Make sure not to delete attachments as there's a timing issue
-            // leave to a cleanup /tmp folder process
             if ($attachmentFiles) {
+                // If there's attachments, make sure we send directly to smtp, instead of queueing
+                $mailer = new \Swift_Mailer($this->smtp);
                 foreach ($attachmentFiles as $attachmentFile) {
                     $message->attach(\Swift_Attachment::fromPath($attachmentFile));
                 }
+            } else {
+                $mailer = $this->mailer;
             }
-            $this->mailer->send($message);
+
+            $mailer->send($message);
+
+            if ($attachmentFiles) {
+                foreach ($attachmentFiles as $attachmentFile) {
+                    unlink($attachmentFile);
+                }
+            }
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()));
         }

@@ -221,12 +221,13 @@ services:
             logger:      "@logger"
             sequence:    "@app.sequence"
             mailer:      "@mailer"
+            smtp:        "@swiftmailer.transport.real"
             templating:  "@templating"
             router:      "@api.router"
             environment: "%kernel.environment%"
             mpdf:        "@app.mpdf"
             dispatcher:  "@event_dispatcher"
-            s3:             "@aws.s3"
+            s3:          "@aws.s3"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService
