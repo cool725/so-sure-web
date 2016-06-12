@@ -240,6 +240,7 @@ class DefaultController extends BaseController
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
         $phone = null;
         if ($id) {
             $phone = $repo->find($id);
@@ -270,9 +271,20 @@ class DefaultController extends BaseController
             }
         }
 
+        $isPromo = $phonePolicyRepo->isPromoLaunch();
+        $maxPot = $phone->getCurrentPhonePrice()->getMaxPot($isPromo);
+        $additionalValue = 0;
+        if ($isPromo) {
+            $additionalValue = PhonePolicy::PROMO_LAUNCH_VALUE;
+        }
+        $maxConnections = $phone->getCurrentPhonePrice()->getMaxConnections($additionalValue, $isPromo);
+
         return array(
             'phone' => $phone,
             'phone_price' => $phone->getCurrentPhonePrice(),
+            'connection_value' => PhonePolicy::STANDARD_VALUE + $additionalValue,
+            'max_connections' => $maxConnections,
+            'max_pot' => $maxPot,
             'form' => $form->createView()
         );
     }

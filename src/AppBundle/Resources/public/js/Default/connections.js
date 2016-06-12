@@ -3,7 +3,8 @@ var ctx = $("#connectionsChart").get(0).getContext("2d");
 var max_value = $('#connection-value').data('slider-max');
 var maxpot_value = $('#connection-value').data('slider-maxpot');
 var initial_value = $('#connection-value').data('slider-value');
-var adjusted_potential_value = maxpot_value - (max_value * 10);
+var connection_value = $('#connection-value').data('slider-connection-value');
+var adjusted_potential_value = maxpot_value - (max_value * connection_value);
 var data = [
     {
         value: initial_value,
@@ -28,13 +29,13 @@ function roundToTwo(num) {
 var connectionsDoughnutChart = new Chart(ctx).Doughnut(data, {
     tooltipTemplate: "<%if (label){%><%=label%>: <%}%>£" +
                      "<% if (label && label.indexOf('Pot ') > -1) { " +
-                         "if (value * 10 > " + maxpot_value + "){%>" +
+                         "if (value * " + connection_value + " > " + maxpot_value + "){%>" +
                              maxpot_value +
                           "<%} else {%>" +
-                             "<%= value * 10 %>" +
+                             "<%= value * " + connection_value + " %>" +
                           "<% }" +
                      "} else { %>" +
-                         "<%= roundToTwo(" + adjusted_potential_value + " + value * 10 ) %>" +
+                         "<%= roundToTwo(" + adjusted_potential_value + " + value * " + connection_value + " ) %>" +
                      "<% }%>",
     legendTemplate : '<ul>'
                   +'<% for (var i=0; i<data.length; i++) { %>'
@@ -47,7 +48,7 @@ var connectionsDoughnutChart = new Chart(ctx).Doughnut(data, {
 });
 
 var setConnectionText = function() {
-    var save_value = slider.getValue() * 10;
+    var save_value = slider.getValue() * connection_value;
     if (save_value > maxpot_value) {
         save_value = maxpot_value;
     }

@@ -52,14 +52,14 @@
                                 <p>Potential Money Back
                                     <i class="twa twa-tada"></i>
                                 </p>
-                                <h5>£{{ phone_price.maxPot }}
+                                <h5>£{{ max_pot }}
                                     with
-                                    {{ phone_price.maxConnections }}
+                                    {{ max_connections }}
                                     connections</h5>
                                 <div class="quote-card-footer">
                                     <p class="phone-fact-title">Not your device?</p>
                                     <p class="phone-fact-body">Select your phone
-                                        <a href="#">here</a>.</p>
+                                        <a href="{{ path('homepage') }}">here</a>.</p>
                                 </div>
                             </span>
                         </div>
@@ -127,7 +127,7 @@
                             <div class="quote-card-footer">
                                 <p class="phone-fact-title">Got a question?</p>
                                 <p class="phone-fact-body">Drop us an
-                                    <a href="#">email</a>. We're always happy to chat.</p>
+                                    <a href="mailto:support@weareosure.com">email</a>. We're always happy to chat.</p>
                             </div>
                         </div>
                     </div>
@@ -138,12 +138,12 @@
             <div class="row download-app">
                 <h4 class="text-center">Ready to pay? Download our app to continue.</h4>
                 <div class="col-md-6 text-right">
-                    <a href="#">
+                    <a href="{{ apple_app_download }}&cs=quotepage">
                         <img src="/images/icons/download-badge-app-store.svg" alt="Download so-sure on the App Store"></img>
                     </a>
                 </div>
                 <div class="col-md-6 text-left">
-                    <a href="#">
+                    <a href="{{ google_app_download }}&utm_source=quotepage">
                         <img src="/images/icons/download-badge-google-play.svg" alt="Get so-sure on Google Play"></img>
                     </a>
                 </div>
@@ -154,7 +154,7 @@
 
     <div class="connections" id="connections">
         <div class="container">
-            <h3>Do you want to pay just £{{ phone_price.monthlyPremiumPrice * 12 - phone_price.maxPot }}
+            <h3>Do you want to pay just £{{ phone_price.yearlyPremiumPrice - max_pot }}
                 for the entire year?</h3>
             <p>
                 <div id="connectionLegend"></div>
@@ -196,12 +196,12 @@
             <strong>£15 for each connection</strong>, allowing you to get your 1st year of insurance for free!</p>
         <div class="row download-app">
             <div class="col-md-6 text-right">
-                <a href="#">
+                <a href="{{ apple_app_download }}&cs=quotepage">
                     <img src="/images/icons/download-badge-app-store-dark.svg" alt="Download it on the App Store"></img>
                 </a>
             </div>
             <div class="col-md-6 text-left">
-                <a href="#">
+                <a href="{{ google_app_download }}&utm_source=quotepage">
                     <img src="/images/icons/download-badge-google-play-dark.svg" alt="Get it on Google Play"></img>
                 </a>
             </div>
