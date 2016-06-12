@@ -1,53 +1,194 @@
-.quotes {
-  padding: 2rem 0 2rem;
+/* VIEW QUOTE */
+
+.view-quote {
+    background: linear-gradient(45deg, #3399ff 50%, #00ccff 100%);
+    padding-top: 105px;
+    padding-bottom: 10px;
+    position: relative;
 }
-.quote .section-title {
-  padding-bottom: 2rem;
+.view-quote h1 {
+    color: #fff;
+    padding-bottom: 10px;
 }
-.quote {
-  margin-top: 2rem;
-  border-radius: 2px;
-  padding: 2rem;
-  margin-bottom: 20px;
-  background-color: #efefef;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    transition: all 0.2s ease-in-out;
-  color: #2e424d;
-  text-align: left;
+.view-quote .panel-primary > .panel-heading {
+    letter-spacing: 3px;
+    color: #202532;
+    text-transform: uppercase;
+    background: none;
 }
-.quote:hover {
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-    transition: all 0.2s ease-in-out;
+.clickable {
+    cursor: pointer;
 }
-.col-centered {
-  display: inline-block;
-  float: none;
+.view-quote .panel-title {
+    font-size: 14px;
 }
-.quote ul {
-  list-style-type: none;
-  margin-left: 0;
-  padding-left: 0;
+.view-quote .panel-body h5 {
+    padding-bottom: 20px;
+    font-size: 19px;
 }
-.quote li {
-  margin-left: 0;
-  margin-bottom: 15px;
+.quote-card-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
 }
-.quote .row {
-  margin-bottom: 20px;
-  vertical-align: top;
+.panel-group {
+  padding-bottom: 40px;
 }
-@media (min-width: 1000px) {
-  .row-centered {
+.phone-fact-title {
+    padding-top: 10px;
+    color: #999;
+    font-size: 11px;
+    text-transform: uppercase;
+    border-top: 1px solid #efefef;
+}
+.phone-fact-body {
+    font-size: 13px;
+}
+.view-quote .panel-body .coverage {
+    font-size: 14px;
     text-align: left;
-  }
-  .col-centered {
-    display: inline-block;
-    float: none;
-    margin-left: -10rem;
-    vertical-align: top;
-  }
 }
-.learn-more > p:nth-child(1) {
-  margin-bottom: 0.5rem;
-  padding-top: 4rem;
+.view-quote .panel-body .coverage ul, li {
+    margin: 0px 5px;
+    padding: 10px 5px;
+}
+.view-quote .panel-body .coverage h4 {
+    text-align: center;
+    text-decoration: none;
+}
+.view-quote .panel-body .not-covered h4 {
+    text-align: center;
+    text-decoration: none;
+}
+.panel-title > a {
+    display: inline-block;
+    width: 100%;
+}
+.panel-title > a:hover {
+    text-decoration: none;
+}
+.view-quote .panel-body .not-covered {
+    font-size: 14px;
+    text-align: left;
+}
+.view-quote .panel-body .not-covered ul, li {
+    margin: 0px 5px;
+    padding: 0px 5px;
+}
+.view-quote .panel-info > .panel-heading {
+    color: #fff;
+    background-color: #3399ff;
+    text-align: left;
+}
+.view-quote .panel-info {
+    border-color: #3399ff;
+}
+.view-quote .panel-primary {
+    flex: 1 0 210px;
+    padding: 5px 8px 0px;
+    margin: 0 -1px 39px 0;
+    border: 1px solid #efefef;
+    position: relative;
+    background: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+    text-align: center;
+    min-height: 350px;
+}
+.view-quote #app-store {
+    padding-top: 0;
+    padding-bottom: 20px;
+}
+.view-quote #app-store h4 {
+    color: #fff;
+    padding-bottom: 0;
+}
+.view-quote .download-app img {
+  padding-top: 5px;
+  padding-bottom: 20px;
+}
+@media (min-width:767px) {
+.view-quote .panel-primary .your-device {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+.got-a-question {
+    font-size: 12px;
+    padding-bottom: -20px;
+}
+}
+/* Page Scroll Indictor */
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+}
+
+/* Connections Indicator */
+
+.connections {
+    position: relative;
+    background-color: #FFF;
+    padding-top: 50px;
+    padding-bottom: 105px;
+    text-align: center;
+    color: #202532;
+    border-bottom: 1px solid #ECEFF7;
+}
+.reward-pot {
+    padding: 20px;
+}
+.connections p {
+    font-size: 15px;
+}
+.connections .explainer {
+    padding-top: 50px;
+    padding-bottom: 20px;
+    max-width: 960px;
+    display: inline-block;
+}
+.connections .explainer h5 {
+    padding-top: 10px;
+}
+.connections .explainer p {
+    text-align: left;
+    padding-top: 10px;
+    font-family: "Avenir LT Std 35 Light", "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
+    color: #626B78;
+}
+@media (max-width:767px) {
+  .connections .explainer p {
+      text-align: center;
+}
+}
+
+/* Page Scroll Indictor */
+
+.connections .download-prompt {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    color: #202532;
+}
+.hero .scroll-indicator {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Download Now */
+
+.download-now {
+    background-color: #FFF;
+    padding: 60px 20px 100px 20px;
+    text-align: center;
+    color: #202532;
+}
+.download-now p {
+    color: #626B78;
 }

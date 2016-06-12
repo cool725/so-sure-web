@@ -10,14 +10,14 @@ var data = [
         color:"#3399FF",
         highlight: "#3399FF",
         // If changing text, verify tooltipTemplate isn't affected
-        label: "Pot Value"
+        label: "You get back"
     },
     {
         value: max_value - initial_value,
-        color:"#1B262D",
+        color:"#202532",
         highlight: "#6F6F6F",
         // If changing text, verify tooltipTemplate isn't affected
-        label: "Potential Value"
+        label: "You'll pay"
     },
 ]
 
@@ -52,11 +52,11 @@ var setConnectionText = function() {
         save_value = maxpot_value;
     }
     var potential_value = roundToTwo(maxpot_value - save_value);
-    var connectionText = "With " + slider.getValue() + " connection(s), you could get £" + save_value.toFixed(2) + " back at the end of the year if you and your friend(s) don't claim.";
+    var connectionText = "Connect with " + slider.getValue() + " friend(s) and provided none of you claim you'll get £" + save_value + " back at the end of the year.";
     $('#connectionLegend').text(connectionText);
-    var potText = $('#connectionChartLegend-0').text().replace(/£.*/, '£' + save_value.toFixed(2));
+    var potText = $('#connectionChartLegend-0').text().replace(/£.*/, '£' + save_value);
     $('#connectionChartLegend-0').text(potText);
-    var potentialText = $('#connectionChartLegend-1').text().replace(/£.*/, '£' + potential_value.toFixed(2));
+    var potentialText = $('#connectionChartLegend-1').text().replace(/£.*/, '£' + potential_value);
     $('#connectionChartLegend-1').text(potentialText);
 }
 
