@@ -33,7 +33,9 @@ class InvitationController extends BaseController
         if (!$invitation) {
             throw $this->createNotFoundException('Unable to find invitation');
         } elseif ($invitation->isSingleUse() && $invitation->isProcessed()) {
-            return $this->render('AppBundle:Invitation:processed.html.twig');
+            return $this->render('AppBundle:Invitation:processed.html.twig', [
+                'invitation' => $invitation,
+            ]);
         } elseif ($this->getUser() !== null) {
             return $this->redirectToRoute('user_invitation', ['id' => $id]);
         }
@@ -78,7 +80,7 @@ class InvitationController extends BaseController
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
 
-                return $this->render('AppBundle:Invitation:processed.html.twig');
+                return $this->redirectToRoute('invitation', ['id' => $id]);
             }
         }
         return array(
