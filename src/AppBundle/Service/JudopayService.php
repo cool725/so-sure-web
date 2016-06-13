@@ -45,7 +45,7 @@ class JudopayService
      * @param string          $apiToken
      * @param string          $apiSecret
      * @param string          $judoId
-     * @param boolean         $prod
+     * @param string          $environment
      */
     public function __construct(
         DocumentManager $dm,
