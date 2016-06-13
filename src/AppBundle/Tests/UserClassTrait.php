@@ -26,7 +26,7 @@ trait UserClassTrait
         $policy->setUser($user);
 
         if ($init) {
-            $policy->init($user, self::getLatestPolicyTerms(static::$dm), self::getLatestPolicyKeyFacts(static::$dm));
+            $policy->init($user, self::getLatestPolicyTerms(static::$dm));
             $policy->create(rand(1, 999999));
             $policy->setPhone(self::$phone);
         }
