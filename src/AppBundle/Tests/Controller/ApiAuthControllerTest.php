@@ -1358,32 +1358,6 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_CONNECTED);
     }
 
-    // policy/{id}/keyfacts
-
-    /**
-     *
-     */
-    public function testGetPolicyKeyFacts()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-keyfacts', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $createData = $this->verifyResponse(200);
-        $policyId = $createData['id'];
-
-        $url = sprintf('/api/v1/auth/policy/%s/keyfacts?maxPotValue=62.8&_method=GET', $policyId);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $getData = $this->verifyResponse(200);
-        $policyUrl = self::$router->generate('policy_keyfacts', ['id' => $policyId]);
-        //print $getData["view_url"];
-        $this->assertTrue(stripos($getData["view_url"], $policyUrl) >= 0);
-        $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
-    }
-
     // policy/{id}/terms
 
     /**

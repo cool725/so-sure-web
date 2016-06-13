@@ -6,7 +6,6 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Address;
-use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
 use AppBundle\Classes\Salva;
@@ -91,7 +90,7 @@ trait UserClassTrait
 
         $policy = new PhonePolicy();
         $policy->setImei(self::generateRandomImei());
-        $policy->init($user, self::getLatestPolicyTerms($dm), self::getLatestPolicyKeyFacts($dm));
+        $policy->init($user, self::getLatestPolicyTerms($dm));
 
         if ($phone) {
             $policy->setPhone($phone);
@@ -118,14 +117,6 @@ trait UserClassTrait
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
 
         return $latestTerms;
-    }
-
-    public static function getLatestPolicyKeyFacts(\Doctrine\ODM\MongoDB\DocumentManager $dm)
-    {
-        $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
-        $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
-
-        return $latestKeyFacts;
     }
 
     public static function generateRandomImei()

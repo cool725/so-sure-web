@@ -4,7 +4,6 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
-use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;

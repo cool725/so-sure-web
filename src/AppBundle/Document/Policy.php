@@ -125,12 +125,6 @@ abstract class Policy
     protected $policyTerms;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\PolicyKeyFacts")
-     * @Gedmo\Versioned
-     */
-    protected $policyKeyFacts;
-
-    /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection", cascade={"persist"})
      */
     protected $connections = array();
@@ -380,16 +374,6 @@ abstract class Policy
         $this->promoPotValue = $promoPotValue;
     }
 
-    public function getPolicyKeyFacts()
-    {
-        return $this->policyKeyFacts;
-    }
-
-    public function setPolicyKeyFacts(PolicyKeyFacts $policyKeyFacts)
-    {
-        $this->policyKeyFacts = $policyKeyFacts;
-    }
-
     public function getPolicyTerms()
     {
         return $this->policyTerms;
@@ -553,11 +537,10 @@ abstract class Policy
         return null;
     }
 
-    public function init(User $user, PolicyDocument $terms, PolicyDocument $keyfacts)
+    public function init(User $user, PolicyDocument $terms)
     {
         $user->addPolicy($this);
         $this->setPolicyTerms($terms);
-        $this->setPolicyKeyFacts($keyfacts);
     }
 
     public function create($seq, $prefix = null, $startDate = null)
@@ -1139,9 +1122,6 @@ abstract class Policy
         if ($this->isPolicy() && !$this->getPolicyTerms()) {
             throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
         }
-        if ($this->isPolicy() && !$this->getPolicyKeyFacts()) {
-            throw new \Exception(sprintf('Policy %s is missing keyfacts', $this->getId()));
-        }
 
         return [
             'id' => $this->getId(),
@@ -1152,7 +1132,6 @@ abstract class Policy
             'policy_number' => $this->getPolicyNumber(),
             'monthly_premium' => $this->getPremium()->getMonthlyPremiumPrice(),
             'policy_terms_id' => $this->getPolicyTerms() ? $this->getPolicyTerms()->getId() : null,
-            'policy_keyfacts_id' => $this->getPolicyKeyFacts() ? $this->getPolicyKeyFacts()->getId() : null,
             'pot' => [
                 'connections' => count($this->getConnections()),
                 'max_connections' => $this->getMaxConnections(),

@@ -7,7 +7,6 @@ use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
 use AppBundle\Document\JudoPayment;

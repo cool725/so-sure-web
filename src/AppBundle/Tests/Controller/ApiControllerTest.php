@@ -227,23 +227,6 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
-    // policy/keyfacts
-
-    /**
-     *
-     */
-    public function testGetPolicyKeyFacts()
-    {
-        $cognitoIdentityId = $this->getUnauthIdentity();
-        $url = '/api/v1/policy/keyfacts?maxPotValue=62.8&_method=GET';
-
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $getData = $this->verifyResponse(200);
-        $policyKeyFactsUrl = self::$router->generate('latest_policy_keyfacts');
-        $this->assertTrue(stripos($getData["view_url"], $policyKeyFactsUrl) >= 0);
-        $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
-    }
-
     // policy/terms
 
     /**
