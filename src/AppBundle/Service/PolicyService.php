@@ -44,14 +44,24 @@ class PolicyService
     /** @var string */
     protected $environment;
 
+    /** @var boolean */
+    protected $skipS3;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
     }
 
+    /**
+     * Environment is injected into constructed and should only
+     * be overwriten for a few test cases.
+     *
+     * @param string $environment
+     */
     public function setEnvironment($environment)
     {
         $this->environment = $environment;
+        $this->skipS3 = true;
     }
 
     /**
@@ -179,7 +189,7 @@ class PolicyService
 
     public function uploadS3($file, $filename, Policy $policy)
     {
-        if ($this->environment == "test") {
+        if ($this->environment == "test" || $this->skipS3) {
             return;
         }
 

@@ -129,12 +129,7 @@ class JudopayService
         return $details;
     }
 
-    /**
-     * @param Policy $policy
-     * @param string $receiptId
-     * @param string $cardToken Can be null if card is declined
-     */
-    public function validateReceipt(Policy $policy, $receiptId, $cardToken)
+    public function getReceipt($receiptId)
     {
         $transaction = $this->client->getModel('Transaction');
 
@@ -142,7 +137,7 @@ class JudopayService
             $transactionDetails = $transaction->find($receiptId);
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
-                'Error retrieving receipt %s (policy %s). Ex: %s',
+                'Error retrieving receipt %s. Ex: %s',
                 $receiptId,
                 $policy->getId(),
                 $e
@@ -150,6 +145,18 @@ class JudopayService
 
             throw $e;
         }
+
+        return $transactionDetails;
+    }
+
+    /**
+     * @param Policy $policy
+     * @param string $receiptId
+     * @param string $cardToken Can be null if card is declined
+     */
+    public function validateReceipt(Policy $policy, $receiptId, $cardToken)
+    {
+        $transactionDetails = $this->getReceipt($receiptId);
 
         $payment = new JudoPayment();
         $payment->setReference($transactionDetails["yourPaymentReference"]);
