@@ -413,7 +413,8 @@ class SalvaExportService
     {
         $count = 0;
         while ($count < $max) {
-            $policyId = null;
+            $policy = null;
+            $action = null;
             try {
                 $queueItem = $this->redis->lpop(self::KEY_POLICY_ACTION);
                 if (!$queueItem) {
@@ -426,15 +427,16 @@ class SalvaExportService
                 }
                 $repo = $this->dm->getRepository(PhonePolicy::class);
                 $policy = $repo->find($data['policyId']);
+                $action = $data['action'];
                 if (!$policy) {
                     throw new \Exception(sprintf('Unable to find policyId: %s', $data['policyId']));
                 }
 
-                if ($data['action'] == self::QUEUE_CREATED) {
+                if ($action == self::QUEUE_CREATED) {
                     $this->sendPolicy($policy);
-                } elseif ($data['action'] == self::QUEUE_UPDATED) {
+                } elseif ($action == self::QUEUE_UPDATED) {
                     $this->updatePolicy($policy);
-                } elseif ($data['action'] == self::QUEUE_CANCELLED) {
+                } elseif ($action == self::QUEUE_CANCELLED) {
                     $this->cancelPolicy($policy);
                 } else {
                     throw new \Exception(sprintf(
@@ -447,13 +449,19 @@ class SalvaExportService
 
                 $count = $count + 1;
             } catch (\Exception $e) {
-                if ($policyId) {
-                    $this->redis->rpush(self::KEY_POLICY_ACTION, $policyId);
+                if ($policy && $action) {
+                    $this->queue($policy, $action);
                     $this->logger->error(sprintf(
-                        'Error updating policy %s to salva (requeued). Ex: %s',
-                        $policyId,
+                        'Error sending policy %s (%s) to salva (requeued). Ex: %s',
+                        $policy->getId(),
+                        $action,
                         $e->getMessage()
                     ));
+                } else {
+                    $this->logger->error(sprintf(
+                        'Error sending policy (Unknown) to salva (requeued). Ex: %s',
+                        $e->getMessage()
+                    ));                    
                 }
 
                 throw $e;
@@ -700,24 +708,18 @@ class SalvaExportService
     
     public function send($xml, $schema)
     {
-        try {
-            $client = new Client();
-            $url = sprintf("%s/service/xmlService", $this->baseUrl);
-            $res = $client->request('POST', $url, [
-                'body' => $xml,
-                'auth' => [$this->username, $this->password]
-            ]);
-            $body = (string) $res->getBody();
+        $client = new Client();
+        $url = sprintf("%s/service/xmlService", $this->baseUrl);
+        $res = $client->request('POST', $url, [
+            'body' => $xml,
+            'auth' => [$this->username, $this->password]
+        ]);
+        $body = (string) $res->getBody();
 
-            if (!$this->validate($body, $schema)) {
-                throw new \InvalidArgumentException("unable to validate response");
-            }
-
-            return $body;
-        } catch (\Exception $e) {
-            $this->logger->error(sprintf('Error in salva send: %s', $e->getMessage()));
-
-            throw $e;
+        if (!$this->validate($body, $schema)) {
+            throw new \InvalidArgumentException("unable to validate response");
         }
+
+        return $body;
     }
 }
