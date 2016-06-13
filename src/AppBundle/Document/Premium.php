@@ -67,11 +67,18 @@ abstract class Premium
 
     public function getYearlyGwp()
     {
-        return $this->toTwoDp($this->getGwp() * 12);
+        // Calculate based on yearly figure
+        return $this->toTwoDp($this->getYearlyGwpActual());
     }
 
     public function getTotalIpt()
     {
-        return $this->toTwoDp($this->getIpt() * 12);
+        // Calculate based on yearly figure
+        return $this->toTwoDp($this->getYearlyPremiumPrice() - $this->getYearlyGwpActual());
+    }
+
+    protected function getYearlyGwpActual()
+    {
+        return $this->getYearlyPremiumPrice() / (1 + $this->getIptRate());
     }
 }
