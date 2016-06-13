@@ -85,8 +85,8 @@ class PhonePolicyTest extends WebTestCase
 
     public function testHasNetworkClaimedInLast30Days()
     {
-        $policyA = $this->createUserPolicy(true);
-        $policyB = $this->createUserPolicy(true);
+        $policyA = static::createUserPolicy(true);
+        $policyB = static::createUserPolicy(true);
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
         $this->assertFalse($policyA->hasNetworkClaimedInLast30Days());
@@ -107,8 +107,8 @@ class PhonePolicyTest extends WebTestCase
 
     public function testHasNetworkClaimedInLast30DaysWithOpenStatus()
     {
-        $policyA = $this->createUserPolicy(true);
-        $policyB = $this->createUserPolicy(true);
+        $policyA = static::createUserPolicy(true);
+        $policyB = static::createUserPolicy(true);
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
         $this->assertFalse($policyA->hasNetworkClaimedInLast30Days(null, true));
@@ -181,10 +181,10 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskPolicyConnectionsNoClaims()
     {
-        $policyConnected = $this->createUserPolicy(true);
+        $policyConnected = static::createUserPolicy(true);
         $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $policyClaim = $this->createUserPolicy(true);
+        $policyClaim = static::createUserPolicy(true);
         $policyClaim->setStart(new \DateTime("2016-01-01"));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 10, 10);
         $policyClaim->updatePotValue();
@@ -195,17 +195,17 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskPolicyConnectionsClaimedPre30()
     {
-        $policyConnected = $this->createUserPolicy(true);
+        $policyConnected = static::createUserPolicy(true);
         $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $policyClaim = $this->createUserPolicy(true);
+        $policyClaim = static::createUserPolicy(true);
         $policyClaim->setStart(new \DateTime("2016-01-01"));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 10, 10);
         $policyClaim->updatePotValue();
         $policyConnected->updatePotValue();
 
         for ($i = 1; $i < 6; $i++) {
-            $policy = $this->createUserPolicy(true);
+            $policy = static::createUserPolicy(true);
             $policy->setStart(new \DateTime("2016-01-01"));
             list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policy, 10, 10);
             $policy->updatePotValue();
@@ -222,17 +222,17 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskPolicyConnectionsClaimedPost30()
     {
-        $policyConnected = $this->createUserPolicy(true);
+        $policyConnected = static::createUserPolicy(true);
         $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $policyClaim = $this->createUserPolicy(true);
+        $policyClaim = static::createUserPolicy(true);
         $policyClaim->setStart(new \DateTime("2016-01-01"));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 10, 10);
         $policyClaim->updatePotValue();
         $policyConnected->updatePotValue();
 
         for ($i = 1; $i < 6; $i++) {
-            $policy = $this->createUserPolicy(true);
+            $policy = static::createUserPolicy(true);
             $policy->setStart(new \DateTime("2016-01-01"));
             list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policy, 10, 10);
             $policy->updatePotValue();
@@ -267,23 +267,6 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(0, $policy->calculatePotValue());
     }
 
-    protected function createUserPolicy($init = false)
-    {
-        $user = new User();
-        self::addAddress($user);
-
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
-
-        if ($init) {
-            $policy->init($user, self::getLatestPolicyTerms(static::$dm));
-            $policy->create(rand(1, 999999));
-            $policy->setPhone(self::$phone);
-        }
-
-        return $policy;
-    }
-
     protected function createLinkedConnections($policyA, $policyB, $valueA, $valueB)
     {
         $connectionA = new Connection();
@@ -311,8 +294,8 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneConnection()
     {
-        $policyA = $this->createUserPolicy();
-        $policyB = $this->createUserPolicy();
+        $policyA = static::createUserPolicy();
+        $policyB = static::createUserPolicy();
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
         $this->assertEquals(10, $policyA->calculatePotValue());
@@ -320,10 +303,10 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePromoPotValueOneConnection()
     {
-        $policyA = $this->createUserPolicy();
+        $policyA = static::createUserPolicy();
         $policyA->setPromoCode(PhonePolicy::PROMO_LAUNCH);
         $policyA->setPhone(static::$phone);
-        $policyB = $this->createUserPolicy();
+        $policyB = static::createUserPolicy();
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 15, 10);
         $policyA->setStatus(PhonePolicy::STATUS_PENDING);
         $policyA->setStart(new \DateTime('2016-01-01'));
@@ -338,8 +321,8 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneInitialOnePostCliffConnection()
     {
-        $policyA = $this->createUserPolicy();
-        $policyB = $this->createUserPolicy();
+        $policyA = static::createUserPolicy();
+        $policyB = static::createUserPolicy();
         list($connectionInitialA, $connectionInitialB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
         list($connectionPostCliffA, $connectionPostCliffB) = $this->createLinkedConnections($policyA, $policyB, 2, 2);
 
@@ -348,11 +331,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneValidNetworkClaimThirtyPot()
     {
-        $policy = $this->createUserPolicy();
+        $policy = static::createUserPolicy();
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 3; $i++) {
-            $linkedPolicy = $this->createUserPolicy();
+            $linkedPolicy = static::createUserPolicy();
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }
@@ -367,11 +350,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneValidNetworkClaimFourtyPot()
     {
-        $policy = $this->createUserPolicy(true);
+        $policy = static::createUserPolicy(true);
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 4; $i++) {
-            $linkedPolicy = $this->createUserPolicy(true);
+            $linkedPolicy = static::createUserPolicy(true);
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }
@@ -386,11 +369,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneValidClaimFourtyPot()
     {
-        $policy = $this->createUserPolicy();
+        $policy = static::createUserPolicy();
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 4; $i++) {
-            $linkedPolicy = $this->createUserPolicy();
+            $linkedPolicy = static::createUserPolicy();
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }
@@ -405,11 +388,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueTwoValidNetworkClaimFourtyPot()
     {
-        $policy = $this->createUserPolicy();
+        $policy = static::createUserPolicy();
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 4; $i++) {
-            $linkedPolicy = $this->createUserPolicy();
+            $linkedPolicy = static::createUserPolicy();
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }
@@ -430,11 +413,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneInvalidNetworkClaimFourtyPot()
     {
-        $policy = $this->createUserPolicy();
+        $policy = static::createUserPolicy();
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 4; $i++) {
-            $linkedPolicy = $this->createUserPolicy();
+            $linkedPolicy = static::createUserPolicy();
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }
@@ -488,8 +471,8 @@ class PhonePolicyTest extends WebTestCase
 
     public function testConnectionValueWithSelfClaim()
     {
-        $policy = $this->createUserPolicy(true);
-        $linkedPolicy = $this->createUserPolicy(true);
+        $policy = static::createUserPolicy(true);
+        $linkedPolicy = static::createUserPolicy(true);
         list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
         $this->assertEquals(10, $policy->calculatePotValue());
 
@@ -508,8 +491,8 @@ class PhonePolicyTest extends WebTestCase
 
     public function testConnectionValueWithNetworkClaim()
     {
-        $policy = $this->createUserPolicy(true);
-        $linkedPolicy = $this->createUserPolicy(true);
+        $policy = static::createUserPolicy(true);
+        $linkedPolicy = static::createUserPolicy(true);
         list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
         $this->assertEquals(10, $policy->calculatePotValue());
 
@@ -749,9 +732,9 @@ class PhonePolicyTest extends WebTestCase
 
     public function testUnreplacedConnectionCancelledPolicyInLast30Days()
     {
-        $policyA = $this->createUserPolicy(true);
+        $policyA = static::createUserPolicy(true);
         $policyA->getUser()->setEmail(static::generateEmail('replace-a', $this));
-        $policyB = $this->createUserPolicy(true);
+        $policyB = static::createUserPolicy(true);
         $policyB->getUser()->setEmail(static::generateEmail('replace-b', $this));
         static::$dm->persist($policyA);
         static::$dm->persist($policyA->getUser());
@@ -776,11 +759,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCancelPolicy()
     {
-        $policyA = $this->createUserPolicy(true);
+        $policyA = static::createUserPolicy(true);
         $policyA->getUser()->setEmail(static::generateEmail('cancel-a', $this));
-        $policyB = $this->createUserPolicy(true);
+        $policyB = static::createUserPolicy(true);
         $policyB->getUser()->setEmail(static::generateEmail('cancel-b', $this));
-        $policyC = $this->createUserPolicy(true);
+        $policyC = static::createUserPolicy(true);
         $policyC->getUser()->setEmail(static::generateEmail('cancel-c', $this));
         static::$dm->persist($policyA);
         static::$dm->persist($policyA->getUser());

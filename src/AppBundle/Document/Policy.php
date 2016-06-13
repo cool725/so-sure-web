@@ -574,6 +574,18 @@ abstract class Policy
         $this->setStatus(self::STATUS_PENDING);
     }
 
+    public function getPolicyLength()
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        $diff = $this->getEnd()->diff($this->getStart());
+        $months = $diff->y * 12 + $diff->m + $diff->d / 30;
+
+        return (int) ceil($months);
+    }
+
     public function getNumberOfInstallments()
     {
         if (!$this->isPolicy() || count($this->getPayments()) == 0) {
@@ -606,7 +618,11 @@ abstract class Policy
     public function getTotalPremiumPrice($payments = null)
     {
         if ($payments === null) {
-            return $this->getPremium()->getYearlyPremiumPrice();
+            if ($this->getPolicyLength() == 12) {
+                return $this->getPremium()->getYearlyPremiumPrice();
+            } else {
+                return $this->getPremium()->getMonthlyPremiumPrice() * $this->getPolicyLength();
+            }
         }
         /*
         $premium = 0;
@@ -626,7 +642,11 @@ abstract class Policy
     public function getTotalGwp($payments = null)
     {
         if ($payments === null) {
-            return $this->getPremium()->getYearlyGwp();
+            if ($this->getPolicyLength() == 12) {
+                return $this->getPremium()->getYearlyGwp();
+            } else {
+                return $this->getPremium()->getGwp() * $this->getPolicyLength();
+            }
         }
         /*
         $gwp = 0;
@@ -640,13 +660,17 @@ abstract class Policy
 
     public function getRemainingTotalIpt($payments)
     {
-        return $this->toTwoDp($this->getTotalIpt() - $this->getTotalIpt($payments));
+        return $this->toTwoDp($this->getYearlyIpt() - $this->getYearlyIpt($payments));
     }
 
     public function getTotalIpt($payments = null)
     {
         if ($payments === null) {
-            return $this->getPremium()->getYearlyIpt();
+            if ($this->getPolicyLength() == 12) {
+                return $this->getPremium()->getYearlyIpt();
+            } else {
+                return $this->getPremium()->getIpt() * $this->getPolicyLength();
+            }
         }
         /*
         $ipt = 0;
