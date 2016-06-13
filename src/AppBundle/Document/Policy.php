@@ -202,6 +202,9 @@ abstract class Policy
     /** @MongoDB\Field(type="hash") */
     protected $salvaPolicyNumbers = array();
 
+    /** @MongoDB\Field(type="hash") */
+    protected $salvaPolicyResults = array();
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -456,6 +459,20 @@ abstract class Policy
     public function getSalvaPolicyNumbers()
     {
         return $this->salvaPolicyNumbers;
+    }
+
+    public function getSalvaPolicyResults()
+    {
+        return $this->salvaPolicyResults;
+    }
+
+    public function addSalvaPolicyResults($responseId, $cancel)
+    {
+        $key = sprintf('%d-create', $this->getLatestSalvaPolicyNumberVersion());
+        if ($cancel) {
+            $key = sprintf('%d-cancel', $this->getLatestSalvaPolicyNumberVersion() - 1);
+        }
+        $this->salvaPolicyResults[$key] = serialize(['responseId' => $responseId, 'time' => new \DateTime()]);
     }
 
     public function getLatestSalvaPolicyNumberVersion()

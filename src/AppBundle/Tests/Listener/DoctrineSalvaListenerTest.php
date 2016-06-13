@@ -61,14 +61,6 @@ class DoctrineSalvaListenerTest extends WebTestCase
 
         $this->assertTrue($policy->isValidPolicy());
 
-        // policy cancelled
-        $this->runPreUpdate(
-            $policy,
-            $this->once(),
-            ['status' => [null, PhonePolicy::STATUS_CANCELLED]],
-            SalvaPolicyEvent::EVENT_CANCELLED
-        );
-
         // policy updated
         $this->runPreUpdate($policy, $this->once(), ['phone.make' => ['Apple', 'Samsung']]);
         $this->runPreUpdate($policy, $this->once(), ['phone.model' => ['iPhone 5', 'iPhone 6']]);
