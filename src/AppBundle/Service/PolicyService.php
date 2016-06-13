@@ -252,6 +252,7 @@ class PolicyService
 
         $this->cancelledPolicyEmail($policy);
         $this->networkCancelledPolicyEmails($policy);
+        $this->dispatcher->dispatch(SalvaPolicyEvent::EVENT_CANCELLED, new SalvaPolicyEvent($policy));
     }
 
     /**

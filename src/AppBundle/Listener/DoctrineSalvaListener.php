@@ -31,14 +31,6 @@ class DoctrineSalvaListener
                 return;
             }
 
-            // Status changes need to be done prior to any updates and make those update irrelivent anyway
-            if ($eventArgs->hasChangedField('status')) {
-                // Cancellation is more imporant then anything else
-                if ($eventArgs->getNewValue('status') == PhonePolicy::STATUS_CANCELLED) {
-                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_CANCELLED);
-                }
-            }
-
             $fields = [
                 'phone.make',
                 'phone.model',
