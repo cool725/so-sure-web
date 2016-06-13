@@ -16,7 +16,6 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Classes\ApiErrorCode;
@@ -403,46 +402,6 @@ class ApiController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Endpoint added', 200);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api snsAction. %s', $e->getMessage()));
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
-    }
-
-    /**
-     * @Route("/policy/keyfacts", name="api_get_policy_keyfacts")
-     * @Method({"GET"})
-     */
-    public function getLatestKeyFactsAction(Request $request)
-    {
-        try {
-            if (!$this->validateQueryFields($request, ['maxPotValue'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-
-            $dm = $this->getManager();
-            $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
-            $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
-            if (!$latestKeyFacts) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_NOT_FOUND,
-                    'Unable to find keyfacts',
-                    404
-                );
-            }
-
-            $policyKeyFactsRoute = $this->get('router')->generate(
-                'latest_policy_keyfacts',
-                [
-                    'policy_key' => $this->getParameter('policy_key'),
-                    'maxPotValue' => $request->get('maxPotValue'),
-                ],
-                false
-            );
-            $policyKeyFactsUrl = sprintf("%s%s", $this->getParameter('api_base_url'), $policyKeyFactsRoute);
-
-            return new JsonResponse($latestKeyFacts->toApiArray($policyKeyFactsUrl));
-        } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api getLatestKeyFactsAction. %s', $e->getMessage()));
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

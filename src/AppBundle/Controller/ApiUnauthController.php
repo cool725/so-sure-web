@@ -15,7 +15,6 @@ use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Sns;
 use AppBundle\Document\User;
-use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Classes\ApiErrorCode;

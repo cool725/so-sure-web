@@ -10,7 +10,6 @@ use AppBundle\Document\User;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\PolicyKeyFacts;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Tests\UserClassTrait;
 use AppBundle\Classes\Salva;
@@ -144,7 +143,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policyA = new PhonePolicy();
-        $policyA->init($user, self::getLatestPolicyTerms(static::$dm), self::getLatestPolicyKeyFacts(static::$dm));
+        $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPhone(self::$phone);
@@ -156,7 +155,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policyA = new PhonePolicy();
-        $policyA->init($user, self::getLatestPolicyTerms(static::$dm), self::getLatestPolicyKeyFacts(static::$dm));
+        $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPhone(self::$phone);
@@ -168,7 +167,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policyA = new PhonePolicy();
-        $policyA->init($user, self::getLatestPolicyTerms(static::$dm), self::getLatestPolicyKeyFacts(static::$dm));
+        $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPhone(self::$phone);
@@ -277,7 +276,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setUser($user);
 
         if ($init) {
-            $policy->init($user, self::getLatestPolicyTerms(static::$dm), self::getLatestPolicyKeyFacts(static::$dm));
+            $policy->init($user, self::getLatestPolicyTerms(static::$dm));
             $policy->create(rand(1, 999999));
             $policy->setPhone(self::$phone);
         }
@@ -563,7 +562,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setCreated(new \DateTime('2017-01-01'));
         $this->assertFalse($user->isPreLaunch());
         $policy->setPhone(static::$phone);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
 
         $this->assertFalse(
@@ -615,7 +614,7 @@ class PhonePolicyTest extends WebTestCase
         // Most tests should be against non-prelaunch users
         $user->setCreated(new \DateTime('2017-01-01'));
 
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPhone(self::$phone);
@@ -635,7 +634,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setCreated(new \DateTime('2017-01-01'));
         $policy->setPromoCode(PhonePolicy::PROMO_LAUNCH);
 
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPhone(self::$phone);
@@ -652,7 +651,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setCreated(new \DateTime('2017-01-01'));
         $policy->setPromoCode(PhonePolicy::PROMO_LAUNCH);
 
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPhone(self::$phone);
@@ -664,7 +663,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy = new PhonePolicy();
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, new \DateTime('2016-01-01 16:00'));
         $this->assertEquals(
             new \DateTime('2016-12-31 23:59:59', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
@@ -677,7 +676,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy = new PhonePolicy();
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, new \DateTime('2016-07-01 16:00'));
         $this->assertEquals(
             new \DateTime('2017-06-30 23:59:59', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
@@ -690,7 +689,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy = new PhonePolicy();
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, new \DateTime('2016-04-19 16:00'));
         $this->assertEquals(new \DateTime('2016-06-18 16:00'), $policy->getConnectionCliffDate());
     }
@@ -733,7 +732,7 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
 
         $policy = new PhonePolicy();
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPhone(self::$phone);
@@ -837,7 +836,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
@@ -883,7 +882,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
@@ -903,7 +902,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
@@ -937,7 +936,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
@@ -951,7 +950,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
@@ -971,7 +970,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
@@ -1009,7 +1008,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
@@ -1029,7 +1028,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
@@ -1051,7 +1050,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(sprintf('%s/1', $policy->getPolicyNumber()), $policy->getSalvaPolicyNumber());
@@ -1067,7 +1066,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertNull($policy->getSalvaVersion(new \DateTime("2016-01-01")));
@@ -1087,7 +1086,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
@@ -1119,7 +1118,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         self::addAddress($user);
-        $policy->init($user, static::getLatestPolicyTerms(self::$dm), static::getLatestPolicyKeyFacts(self::$dm));
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 

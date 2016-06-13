@@ -6,7 +6,6 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
-use AppBundle\Document\PolicyKeyFacts;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -40,7 +39,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        $this->newPolicyKeyFacts($manager);
         $this->newPolicyTerms($manager);
         $manager->flush();
 
@@ -65,14 +63,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->newPolicy($manager, $user, $count);
 
         $manager->flush();
-    }
-
-    private function newPolicyKeyFacts($manager)
-    {
-        $policyKeyFacts = new PolicyKeyFacts();
-        $policyKeyFacts->setLatest(true);
-        $policyKeyFacts->setVersion('Version 1 May 2016');
-        $manager->persist($policyKeyFacts);
     }
 
     private function newPolicyTerms($manager)
@@ -141,15 +131,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
 
-        $policyKeyFactsRepo = $dm->getRepository(PolicyKeyFacts::class);
-        $latestKeyFacts = $policyKeyFactsRepo->findOneBy(['latest' => true]);
-
         $startDate = new \DateTime();
         $startDate->sub(new \DateInterval(sprintf("P%dD", rand(0, 120))));
         $policy = new PhonePolicy();
         $policy->setPhone($phone);
         $policy->setImei($this->generateRandomImei());
-        $policy->init($user, $latestTerms, $latestKeyFacts);
+        $policy->init($user, $latestTerms);
         if (rand(0, 3) == 0) {
             $this->addClaim($dm, $policy);
         }

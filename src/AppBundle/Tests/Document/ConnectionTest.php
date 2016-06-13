@@ -8,7 +8,6 @@ use AppBundle\Document\Connection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\PolicyKeyFacts;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Tests\UserClassTrait;
 
