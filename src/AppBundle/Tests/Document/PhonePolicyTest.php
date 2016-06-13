@@ -1113,12 +1113,15 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $this->assertEquals(Salva::YEARLY_BROKER_FEE, $policy->getTotalBrokerFee());
-        $this->assertEquals(1, $policy->getMonthsForCancellationCalc([$payment]));
-        $this->assertEquals(Salva::MONTHLY_BROKER_FEE, $policy->getTotalBrokerFee([$payment]));
+        $this->assertEquals(0, $policy->getMonthsForCancellationCalc([]));
+        $this->assertEquals(0, $policy->getTotalBrokerFee([]));
         $this->assertEquals(
-            Salva::YEARLY_BROKER_FEE - Salva::MONTHLY_BROKER_FEE,
-            $policy->getRemainingTotalBrokerFee([$payment])
+            Salva::YEARLY_BROKER_FEE,
+            $policy->getRemainingTotalBrokerFee([])
         );
+
+        $allPayments = $policy->getPaymentsForSalvaVersions(false);
+        $this->assertEquals(76.60, $policy->getRemainingTotalGwp($allPayments));
 
         $policy->incrementSalvaPolicyNumber(new \DateTime("2016-01-03"));
 
