@@ -44,7 +44,6 @@ parameters:
     judopay_apitoken:
     judopay_apisecret:
     judopay_id:
-    judopay_prod:
 
     mongodb_db: mongo
     mongodb_url: mongodb://localhost

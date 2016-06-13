@@ -54,7 +54,7 @@ class JudopayService
         $apiToken,
         $apiSecret,
         $judoId,
-        $prod
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -65,7 +65,7 @@ class JudopayService
            'apiSecret' => $apiSecret,
            'judoId' => $judoId,
         );
-        if ($prod) {
+        if ($environment == 'prod') {
             $data['endpointUrl'] = 'https://partnerapi.judopay.com/';
         } else {
             $data['endpointUrl'] = 'https://partnerapi.judopay-sandbox.com/';

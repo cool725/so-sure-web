@@ -60,13 +60,13 @@ services:
     app.judopay:
         class: AppBundle\Service\JudopayService
         arguments:
-            dm:        "@doctrine_mongodb.odm.default_document_manager"
-            logger:    "@logger"
-            policy:    "@app.policy"
-            apiToken:  "%judopay_apitoken%"
-            apiSecret: "%judopay_apisecret%"
-            judoId:    "%judopay_id%"
-            prod:      "%judopay_prod%"
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
+            logger:      "@logger"
+            policy:      "@app.policy"
+            apiToken:    "%judopay_apitoken%"
+            apiSecret:   "%judopay_apisecret%"
+            judoId:      "%judopay_id%"
+            environment: "%kernel.environment%"
 
     app.user.launch:
         class: AppBundle\Service\LaunchUserService
