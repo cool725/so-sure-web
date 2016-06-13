@@ -17,6 +17,23 @@ trait UserClassTrait
         return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
     }
 
+    public static function createUserPolicy($init = false)
+    {
+        $user = new User();
+        self::addAddress($user);
+
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+
+        if ($init) {
+            $policy->init($user, self::getLatestPolicyTerms(static::$dm));
+            $policy->create(rand(1, 999999));
+            $policy->setPhone(self::$phone);
+        }
+
+        return $policy;
+    }
+
     public static function createUser($userManager, $email, $password, $phone = null)
     {
         $user = $userManager->createUser();

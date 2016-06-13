@@ -95,7 +95,7 @@ class SalvaPhonePolicyTest extends WebTestCase
 
     public function testGetTotalPremiumPrices()
     {
-        $policy = new PhonePolicy();
+        $policy = static::createUserPolicy(true);
         $policy->setPhone(self::$phone);
         $payments = [1,2];
         $this->assertEquals(83.88, $policy->getTotalPremiumPrice());
@@ -105,7 +105,7 @@ class SalvaPhonePolicyTest extends WebTestCase
 
     public function testGetTotalGwpPrices()
     {
-        $policy = new PhonePolicy();
+        $policy = static::createUserPolicy(true);
         $policy->setPhone(self::$phone);
         $payments = [1,2];
         $this->assertEquals(76.60, $policy->getTotalGwp());
