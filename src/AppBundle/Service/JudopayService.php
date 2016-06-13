@@ -64,12 +64,10 @@ class JudopayService
            'apiToken' => $apiToken,
            'apiSecret' => $apiSecret,
            'judoId' => $judoId,
+           'useProduction' => $environment == 'prod',
+           // endpointUrl is overwriten in Judopay Configuration Constructor
+           // 'endpointUrl' => ''
         );
-        if ($environment == 'prod') {
-            $data['endpointUrl'] = 'https://partnerapi.judopay.com/';
-        } else {
-            $data['endpointUrl'] = 'https://partnerapi.judopay-sandbox.com/';
-        }
         $this->client = new Judopay($data);
     }
 
