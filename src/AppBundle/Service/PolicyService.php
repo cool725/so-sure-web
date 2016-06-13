@@ -116,9 +116,9 @@ class PolicyService
         }
 
         if ($prefix) {
-            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), $prefix);
+            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), $prefix, $date);
         } else {
-            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE));
+            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE), null, $date);
         }
         if ($policy instanceof PhonePolicy) {
             $repo = $this->dm->getRepository(PhonePolicy::class);

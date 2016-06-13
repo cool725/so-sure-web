@@ -12,6 +12,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 abstract class Premium
 {
+    use CurrencyTrait;
+
     /** @MongoDB\Field(type="float") */
     protected $gwp;
 
@@ -58,6 +60,33 @@ abstract class Premium
     public function getMonthlyPremiumPrice()
     {
         return $this->getGwp() + $this->getIpt();
+    }
+
+    public function sumPremiumPrice($months)
+    {
+        if ($months == 12) {
+            return $this->getYearlyPremiumPrice();
+        }
+
+        return $this->toTwoDp($this->getMonthlyPremiumPrice() * $months);
+    }
+
+    public function sumGwp($months)
+    {
+        if ($months == 12) {
+            return $this->getYearlyGwp();
+        }
+
+        return $this->toTwoDp($this->getGwp() * $months);
+    }
+
+    public function sumIpt($months)
+    {
+        if ($months == 12) {
+            return $this->getYearlyIpt();
+        }
+
+        return $this->toTwoDp($this->getIpt() * $months);
     }
 
     public function getYearlyPremiumPrice()

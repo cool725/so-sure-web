@@ -18,6 +18,7 @@ use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Classes\Salva;
+use AppBundle\Service\SalvaExportService;
 
 /**
  * @group functional-nonet
@@ -250,5 +251,92 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
         static::$policyService->create($policy);
+    }
+
+    public function testSalvaCancelSimple()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('salva-cancel', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'));
+        static::$policyService->setEnvironment('test');
+
+        $policy->addPayment(new JudoPayment());
+
+        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_FRAUD, new \DateTime('2016-02-10'));
+        $this->assertEquals(2, $policy->getPolicyLength());
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2, $policy->getTotalPremiumPrice());
+        $this->assertEquals($policy->getPremium()->getGwp() * 2, $policy->getTotalGwp());
+        $this->assertEquals($policy->getPremium()->getIpt() * 2, $policy->getTotalIpt());
+        $this->assertEquals(Salva::MONTHLY_BROKER_FEE * 2, $policy->getTotalBrokerFee());
+    }
+
+    public function testSalvaCooloff()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('salva-cooloff', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'));
+        static::$policyService->setEnvironment('test');
+
+        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_COOLOFF, new \DateTime('2016-01-10'));
+        $this->assertEquals(0, $policy->getTotalPremiumPrice());
+        $this->assertEquals(0, $policy->getTotalGwp());
+        $this->assertEquals(0, $policy->getTotalIpt());
+        $this->assertEquals(0, $policy->getTotalBrokerFee());
+    }
+
+    public function testSalvaFullPolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('salva-full', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'));
+        static::$policyService->setEnvironment('test');
+
+        for ($i = 1; $i <= 11; $i++) {
+            $policy->addPayment(new JudoPayment());
+        }
+
+        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getTotalPremiumPrice());
+        $this->assertEquals($policy->getPremium()->getYearlyGwp(), $policy->getTotalGwp());
+        $this->assertEquals($policy->getPremium()->getYearlyIpt(), $policy->getTotalIpt());
+        $this->assertEquals(Salva::YEARLY_BROKER_FEE, $policy->getTotalBrokerFee());
+    }
+
+    public function testSalvaPartialPolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('salva-partial', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'));
+        static::$policyService->setEnvironment('test');
+
+        $policy->addPayment(new JudoPayment());
+
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getTotalPremiumPrice([1]));
+        $this->assertEquals($policy->getPremium()->getGwp(), $policy->getTotalGwp([1]));
+        $this->assertEquals($policy->getPremium()->getIpt(), $policy->getTotalIpt([1]));
+        $this->assertEquals(Salva::MONTHLY_BROKER_FEE, $policy->getTotalBrokerFee([1]));
     }
 }

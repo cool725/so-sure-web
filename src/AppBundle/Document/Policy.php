@@ -617,21 +617,7 @@ abstract class Policy
 
     public function getTotalPremiumPrice($payments = null)
     {
-        if ($payments === null) {
-            if ($this->getPolicyLength() == 12) {
-                return $this->getPremium()->getYearlyPremiumPrice();
-            } else {
-                return $this->getPremium()->getMonthlyPremiumPrice() * $this->getPolicyLength();
-            }
-        }
-        /*
-        $premium = 0;
-        foreach ($payments as $payment) {
-            $premium = $premium + $payment->getAmount();
-        }
-        */
-
-        return $this->toTwoDp($this->getPremium()->getMonthlyPremiumPrice() * count($payments));
+        return $this->getPremium()->sumPremiumPrice($this->getMonthsForCancellationCalc($payments));
     }
 
     public function getRemainingTotalGwp($payments)
@@ -641,21 +627,7 @@ abstract class Policy
 
     public function getTotalGwp($payments = null)
     {
-        if ($payments === null) {
-            if ($this->getPolicyLength() == 12) {
-                return $this->getPremium()->getYearlyGwp();
-            } else {
-                return $this->getPremium()->getGwp() * $this->getPolicyLength();
-            }
-        }
-        /*
-        $gwp = 0;
-        foreach ($payments as $payment) {
-            $gwp = $gwp + $payment->getGwp();
-        }
-        */
-
-        return $this->toTwoDp($this->getPremium()->getGwp() * count($payments));
+        return $this->getPremium()->sumGwp($this->getMonthsForCancellationCalc($payments));
     }
 
     public function getRemainingTotalIpt($payments)
@@ -665,21 +637,7 @@ abstract class Policy
 
     public function getTotalIpt($payments = null)
     {
-        if ($payments === null) {
-            if ($this->getPolicyLength() == 12) {
-                return $this->getPremium()->getYearlyIpt();
-            } else {
-                return $this->getPremium()->getIpt() * $this->getPolicyLength();
-            }
-        }
-        /*
-        $ipt = 0;
-        foreach ($payments as $payment) {
-            $ipt = $ipt + $payment->getIpt();
-        }
-        */
-
-        return $this->toTwoDp($this->getPremium()->getIpt() * count($payments));
+        return $this->getPremium()->sumIpt($this->getMonthsForCancellationCalc($payments));
     }
 
     public function getRemainingTotalBrokerFee($payments)
@@ -689,11 +647,29 @@ abstract class Policy
 
     public function getTotalBrokerFee($payments = null)
     {
-        if ($payments === null) {
-            return Salva::YEARLY_BROKER_FEE;
+        $salva = new Salva();
+        // TODO: Includes final monthly fee?
+        return $salva->sumBrokerFee($this->getMonthsForCancellationCalc($payments));
+    }
+
+    public function getMonthsForCancellationCalc($payments = null)
+    {
+        // Cooloff should always return 0
+        if ($this->getStatus() == self::STATUS_CANCELLED &&
+            $this->getCancelledReason() == self::CANCELLED_COOLOFF) {
+            return 0;
         }
 
-        return $this->toTwoDp(Salva::MONTHLY_BROKER_FEE * count($payments));
+        if ($payments) {
+            // Payments passed in (for salva date ranges)
+            return count($payments);
+        } elseif ($this->getStatus() == self::STATUS_CANCELLED) {
+            // If we're cancelled, then just use what payments we've received
+            return count($this->getPayments());
+        } else {
+            // Otherwise entire year
+            return 12;
+        }
     }
 
     public function getPaymentsForSalvaVersions($multiArray = true)
