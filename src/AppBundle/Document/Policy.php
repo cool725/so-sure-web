@@ -663,7 +663,7 @@ abstract class Policy
     public function getTotalIpt($payments = null)
     {
         if ($payments === null) {
-            return $this->getPremium()->getTotalIpt();
+            return $this->getPremium()->getYearlyIpt();
         }
         /*
         $ipt = 0;
