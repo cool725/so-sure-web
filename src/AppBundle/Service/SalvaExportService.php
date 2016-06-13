@@ -461,7 +461,7 @@ class SalvaExportService
                     $this->logger->error(sprintf(
                         'Error sending policy (Unknown) to salva (requeued). Ex: %s',
                         $e->getMessage()
-                    ));                    
+                    ));
                 }
 
                 throw $e;
