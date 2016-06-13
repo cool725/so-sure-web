@@ -282,9 +282,10 @@ class DefaultController extends BaseController
         return array(
             'phone' => $phone,
             'phone_price' => $phone->getCurrentPhonePrice(),
-            'connection_value' => PhonePolicy::STANDARD_VALUE + $additionalValue,
+            'connection_value' => PhonePolicy::STANDARD_VALUE,
             'max_connections' => $maxConnections,
             'max_pot' => $maxPot,
+            'is_promo' => $isPromo,
             'form' => $form->createView()
         );
     }

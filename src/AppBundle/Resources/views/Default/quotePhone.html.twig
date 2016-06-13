@@ -52,9 +52,9 @@
                                 <p>Potential Money Back
                                     <i class="twa twa-tada"></i>
                                 </p>
-                                <h5>£{{ max_pot }}
+                                <h5>£{{ phone_price.maxPot }}
                                     with
-                                    {{ max_connections }}
+                                    {{ phone_price.maxConnections }}
                                     connections</h5>
                                 <div class="quote-card-footer">
                                     <p class="phone-fact-title">Not your device?</p>
@@ -154,7 +154,7 @@
 
     <div class="connections" id="connections">
         <div class="container">
-            <h3>Do you want to pay just £{{ phone_price.yearlyPremiumPrice - max_pot }}
+            <h3>Do you want to pay just £{{ phone_price.yearlyPremiumPrice - phone_price.maxPot }}
                 for the entire year?</h3>
             <p>
                 <div id="connectionLegend"></div>
@@ -192,8 +192,10 @@
 <div class="download-now" id="download-now">
     <div class="container">
         <h3>Ready for better? Download our app now!</h3>
+        {% if is_promo %}
         <p>As an added bonus, if you become one of our first 1,000 customers we'll give you up to
             <strong>£15 for each connection</strong>, allowing you to get your 1st year of insurance for free!</p>
+        {% endif %}
         <div class="row download-app">
             <div class="col-md-6 text-right">
                 <a href="{{ apple_app_download }}&cs=quotepage">
