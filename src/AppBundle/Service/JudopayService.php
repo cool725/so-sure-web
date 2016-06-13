@@ -139,7 +139,6 @@ class JudopayService
             $this->logger->error(sprintf(
                 'Error retrieving receipt %s. Ex: %s',
                 $receiptId,
-                $policy->getId(),
                 $e
             ));
 
