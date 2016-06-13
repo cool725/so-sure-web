@@ -109,8 +109,8 @@ class SalvaPhonePolicyTest extends WebTestCase
         $policy = new PhonePolicy();
         $policy->setPhone(self::$phone);
         $payments = [1,2];
-        $this->assertEquals(76.56, $policy->getTotalGwp());
+        $this->assertEquals(76.60, $policy->getTotalGwp());
         $this->assertEquals(12.76, $policy->getTotalGwp($payments));
-        $this->assertEquals(63.80, $policy->getRemainingTotalGwp($payments));
+        $this->assertEquals(63.84, $policy->getRemainingTotalGwp($payments));
     }
 }
