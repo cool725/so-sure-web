@@ -632,7 +632,7 @@ abstract class Policy
 
     public function getRemainingTotalIpt($payments)
     {
-        return $this->toTwoDp($this->getYearlyIpt() - $this->getYearlyIpt($payments));
+        return $this->toTwoDp($this->getTotalIpt() - $this->getTotalIpt($payments));
     }
 
     public function getTotalIpt($payments = null)
