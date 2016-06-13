@@ -357,6 +357,7 @@ class SalvaExportService
         $response = $this->send($xml, self::SCHEMA_POLICY_IMPORT);
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
+        $phonePolicy->addSalvaPolicyResults($responseId, false);
 
         return $responseId;
     }
@@ -397,6 +398,7 @@ class SalvaExportService
         $response = $this->send($xml, self::SCHEMA_POLICY_TERMINATE);
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
+        $phonePolicy->addSalvaPolicyResults($responseId, true);
 
         return $responseId;
     }
@@ -441,6 +443,7 @@ class SalvaExportService
                         $data['policyId']
                     ));
                 }
+                $this->dm->flush();
 
                 $count = $count + 1;
             } catch (\Exception $e) {
@@ -496,6 +499,11 @@ class SalvaExportService
         $xpath->registerNamespace('ns8', "http://sims.salva.ee/service/schema/policy/import/v1");
 
         $elementList = $xpath->query('//ns8:serviceResponse/ns8:policies/ns2:policy/ns2:recordId');
+        foreach ($elementList as $element) {
+            return $element->nodeValue;
+        }
+
+        $elementList = $xpath->query('//ns7:serviceResponse/ns7:policies/ns2:policy/ns2:recordId');
         foreach ($elementList as $element) {
             return $element->nodeValue;
         }

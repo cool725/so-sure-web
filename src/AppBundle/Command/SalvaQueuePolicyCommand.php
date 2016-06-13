@@ -94,7 +94,10 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
             $output->writeln(sprintf("Queue is cleared"));
         } elseif ($show) {
             $data = $salva->getQueueData($process);
-            $output->writeln(sprintf("Queue: %s", json_encode($data)));
+            $output->writeln(sprintf("Queue Size: %d", count($data)));
+            foreach ($data as $line) {
+                $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
+            }
         } else {
             $count = $salva->process($process);
             $output->writeln(sprintf("Sent %s policy updates", $count));
