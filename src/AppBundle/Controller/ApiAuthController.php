@@ -547,7 +547,7 @@ class ApiAuthController extends BaseController
                 throw new \Exception('Policy is missing keyfacts');
             }
             $this->denyAccessUnlessGranted('view', $policy);
-            $policyKeyFactsUrl = $this->get('router')->generate(
+            $policyKeyFactsRoute = $this->get('router')->generate(
                 'policy_keyfacts',
                 [
                     'id' => $policy->getId(),
@@ -555,8 +555,9 @@ class ApiAuthController extends BaseController
                     'maxPotValue' => $policy->getMaxPot(),
                     'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
                 ],
-                true
+                false
             );
+            $policyKeyFactsUrl = sprintf("%s%s", $this->getParameter('api_base_url'), $policyKeyFactsRoute);
 
             return new JsonResponse($policy->getPolicyKeyFacts()->toApiArray($policyKeyFactsUrl));
         } catch (AccessDeniedException $ade) {
@@ -684,7 +685,7 @@ class ApiAuthController extends BaseController
                 throw new \Exception('Policy is missing terms');
             }
             $this->denyAccessUnlessGranted('view', $policy);
-            $policyTermsUrl = $this->get('router')->generate(
+            $policyTermsRoute = $this->get('router')->generate(
                 'policy_terms',
                 [
                     'id' => $policy->getId(),
@@ -692,8 +693,9 @@ class ApiAuthController extends BaseController
                     'maxPotValue' => $policy->getMaxPot(),
                     'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
                 ],
-                true
+                false
             );
+            $policyTermsUrl = sprintf("%s%s", $this->getParameter('api_base_url'), $policyTermsRoute);
 
             return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));
         } catch (AccessDeniedException $ade) {
