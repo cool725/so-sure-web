@@ -660,15 +660,17 @@ abstract class Policy
             return 0;
         }
 
-        if ($payments) {
-            // Payments passed in (for salva date ranges)
-            return count($payments);
-        } elseif ($this->getStatus() == self::STATUS_CANCELLED) {
-            // If we're cancelled, then just use what payments we've received
-            return count($this->getPayments());
-        } else {
+        if ($payments === null) {
+            if ($this->getStatus() == self::STATUS_CANCELLED) {
+                // If we're cancelled, then just use what payments we've received
+                return count($this->getPayments());
+            }
+
             // Otherwise entire year
             return 12;
+        } else {
+            // Payments passed in (for salva date ranges)
+            return count($payments);
         }
     }
 
