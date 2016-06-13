@@ -185,6 +185,7 @@ class SalvaExportService
     {
         if (!$date) {
             $date = new \DateTime();
+            $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         }
 
         $lines = [];
@@ -209,6 +210,7 @@ class SalvaExportService
     {
         if (!$date) {
             $date = new \DateTime();
+            $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         }
 
         $lines = [];
@@ -230,6 +232,7 @@ class SalvaExportService
     {
         if (!$date) {
             $date = new \DateTime();
+            $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         }
 
         $lines = [];
@@ -362,6 +365,7 @@ class SalvaExportService
     {
         if (!$date) {
             $date = new \DateTime();
+            $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
             // Termination time can be a bit in the future without issue - match the 10 minutes of policy creation
             $date->add(new \DateInterval('PT10M'));
         }
