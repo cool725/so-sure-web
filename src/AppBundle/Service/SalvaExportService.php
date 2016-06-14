@@ -567,8 +567,11 @@ class SalvaExportService
                     $version
                 ));
             }
+            $policyNumber = $phonePolicy->getSalvaPolicyNumber($version);
+            $payments = $phonePolicy->getPaymentsForSalvaVersions()[$version];
         } else {
-            $version = $phonePolicy->getLatestSalvaPolicyNumberVersion();
+            $policyNumber = $phonePolicy->getSalvaPolicyNumber($phonePolicy->getLatestSalvaPolicyNumberVersion());
+            $payments = $phonePolicy->getPaymentsForSalvaVersions(false);
         }
 
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -585,14 +588,13 @@ class SalvaExportService
             'xmlns:n2',
             'http://sims.salva.ee/service/schema/v1'
         );
-        $root->appendChild($dom->createElement('n1:policyNo', $phonePolicy->getSalvaPolicyNumber($version)));
+        $root->appendChild($dom->createElement('n1:policyNo', $policyNumber));
         $root->appendChild($dom->createElement('n1:terminationReasonCode', $reason));
         $root->appendChild($dom->createElement(
             'n1:terminationTime',
             $this->adjustDate($date)
         ));
 
-        $payments = $phonePolicy->getPaymentsForSalvaVersions()[$version];
         $usedPremium = $phonePolicy->getTotalGwp($payments);
 
         $usedFinalPremium = $dom->createElement('n1:usedFinalPremium', $usedPremium);
