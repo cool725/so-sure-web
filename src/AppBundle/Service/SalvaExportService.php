@@ -110,6 +110,9 @@ class SalvaExportService
                 $connections = 0;
                 $potValue = 0;
                 $promoPotValue = 0;
+                $terminationDate = $policy->getSalvaTerminationDate($version) ?
+                    $policy->getSalvaTerminationDate($version) :
+                    null;
             } else {
                 $allPayments = $policy->getPaymentsForSalvaVersions(false);
 
@@ -122,15 +125,17 @@ class SalvaExportService
                 $connections = count($policy->getConnections());
                 $potValue = $policy->getPotValue();
                 $promoPotValue = $policy->getPromoPotValue();
+                $terminationDate = $policy->getStatus() == PhonePolicy::STATUS_CANCELLED ?
+                    $policy->getEnd():
+                    null;
             }
+
             $data = [
                 $policy->getSalvaPolicyNumber($version),
                 $status,
                 $this->adjustDate($policy->getSalvaStartDate($version)),
-                $this->adjustDate($policy->getEnd()),
-                $policy->getSalvaTerminationDate($version) ?
-                    $this->adjustDate($policy->getSalvaTerminationDate($version)) :
-                    '',
+                $this->adjustDate($policy->getStaticEnd()),
+                $terminationDate ? $this->adjustDate($terminationDate) : '',
                 $policy->getUser()->getId(),
                 $policy->getUser()->getFirstName(),
                 $policy->getUser()->getLastName(),
@@ -453,11 +458,22 @@ class SalvaExportService
                 $count = $count + 1;
             } catch (\Exception $e) {
                 if ($policy && $action) {
-                    $this->queue($policy, $action);
+                    $queued = false;
+                    if (isset($data['retryAttempts']) && $data['retryAttempts'] >= 0) {
+                        // 20 minute attempts
+                        if ($data['retryAttempts'] < 20) {
+                            $this->queue($policy, $action, $data['retryAttempts'] + 1);
+                            $queued = true;
+                        }
+                    } else {
+                        $this->queue($policy, $action);
+                        $queued = true;
+                    }
                     $this->logger->error(sprintf(
-                        'Error sending policy %s (%s) to salva (requeued). Ex: %s',
+                        'Error sending policy %s (%s) to salva (requeued: %s). Ex: %s',
                         $policy->getId(),
                         $action,
+                        $queued ? 'Yes' : 'No',
                         $e->getMessage()
                     ));
                 } else {
@@ -474,13 +490,13 @@ class SalvaExportService
         return $count;
     }
 
-    public function queue(PhonePolicy $policy, $action)
+    public function queue(PhonePolicy $policy, $action, $retryAttempts = 0)
     {
         if (!in_array($action, [self::QUEUE_CANCELLED, self::QUEUE_CREATED, self::QUEUE_UPDATED])) {
             throw new \Exception(sprintf('Unknown queue action %s', $action));
         }
 
-        $data = ['policyId' => $policy->getId(), 'action' => $action];
+        $data = ['policyId' => $policy->getId(), 'action' => $action, 'retryAttempts' => $retryAttempts];
         $this->redis->rpush(self::KEY_POLICY_ACTION, serialize($data));
     }
 
@@ -542,13 +558,20 @@ class SalvaExportService
 
     public function cancelXml(PhonePolicy $phonePolicy, $reason, $date)
     {
-        // Make sure policy is incremented prior to calling
-        $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
-        if (!isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
-            throw new \Exception(sprintf(
-                'Missing version %s for salva. Was version incremented prior to cancellation?',
-                $version
-            ));
+        if ($reason == self::CANCELLED_REPLACE) {
+            // Make sure policy was incremented prior to calling
+            $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
+            if (!isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
+                throw new \Exception(sprintf(
+                    'Missing version %s for salva. Was version incremented prior to cancellation?',
+                    $version
+                ));
+            }
+            $policyNumber = $phonePolicy->getSalvaPolicyNumber($version);
+            $payments = $phonePolicy->getPaymentsForSalvaVersions()[$version];
+        } else {
+            $policyNumber = $phonePolicy->getSalvaPolicyNumber($phonePolicy->getLatestSalvaPolicyNumberVersion());
+            $payments = $phonePolicy->getPaymentsForSalvaVersions(false);
         }
 
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -565,14 +588,13 @@ class SalvaExportService
             'xmlns:n2',
             'http://sims.salva.ee/service/schema/v1'
         );
-        $root->appendChild($dom->createElement('n1:policyNo', $phonePolicy->getSalvaPolicyNumber($version)));
+        $root->appendChild($dom->createElement('n1:policyNo', $policyNumber));
         $root->appendChild($dom->createElement('n1:terminationReasonCode', $reason));
         $root->appendChild($dom->createElement(
             'n1:terminationTime',
             $this->adjustDate($date)
         ));
 
-        $payments = $phonePolicy->getPaymentsForSalvaVersions()[$version];
         $usedPremium = $phonePolicy->getTotalGwp($payments);
 
         $usedFinalPremium = $dom->createElement('n1:usedFinalPremium', $usedPremium);
