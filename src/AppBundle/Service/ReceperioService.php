@@ -197,7 +197,7 @@ class ReceperioService extends BaseImeiService
 
         // Non applce devices rely on on the modelreference special mapping
         // we give reciperio and it really just a make/model check
-        if ($model != 'apple') {
+        if ($make != 'apple') {
             if (isset($modelData['modelreference']) && $modelData['modelreference']) {
                 $device = $modelData['modelreference'];
                 if (!in_array(strtolower($device), $phone->getDevices())) {

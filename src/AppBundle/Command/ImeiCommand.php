@@ -34,6 +34,12 @@ class ImeiCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'device'
             )
+            ->addOption(
+                'memory',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'memory'
+            )
         ;
     }
 
@@ -42,7 +48,8 @@ class ImeiCommand extends ContainerAwareCommand
         $imei = $input->getArgument('imei');
         $serial = $input->getOption('serial');
         $device = $input->getOption('device');
-        $phone = $this->getPhone($device);
+        $memory = $input->getOption('memory');
+        $phone = $this->getPhone($device, $memory);
         $imeiService = $this->getContainer()->get('app.imei');
         if ($imeiService->checkImei($phone, $imei)) {
             print sprintf("Imei %s is good\n", $imei);
@@ -59,12 +66,14 @@ class ImeiCommand extends ContainerAwareCommand
         }
     }
 
-    private function getPhone($device)
+    private function getPhone($device, $memory)
     {
         $phone = null;
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $phoneRepo = $dm->getRepository(Phone::class);
-        if ($device) {
+        if ($device && $memory) {
+            $phone = $phoneRepo->findOneBy(['devices' => $device, 'memory' => (int)$memory]);
+        } elseif ($device) {
             $phone = $phoneRepo->findOneBy(['devices' => $device]);
         } else {
             $phones = $phoneRepo->findAll();
