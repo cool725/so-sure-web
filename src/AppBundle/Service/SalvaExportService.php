@@ -371,8 +371,11 @@ class SalvaExportService
             // $date->add(new \DateInterval('PT10M'));
         }
 
-        $phonePolicy->incrementSalvaPolicyNumber($date);
-        $this->dm->flush();
+        // We should only bump the salva version if we're replacing a policy
+        if ($reason && $reason == self::CANCELLED_REPLACE) {
+            $phonePolicy->incrementSalvaPolicyNumber($date);
+            $this->dm->flush();
+        }
 
         if (!$reason) {
             if ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_UNPAID) {
