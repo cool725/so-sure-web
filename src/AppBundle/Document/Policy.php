@@ -550,7 +550,8 @@ abstract class Policy
         }
         if (!$startDate) {
             $startDate = new \DateTime();
-            $startDate->add(new \DateInterval('PT10M'));
+            // No longer necessary to start 10 minutes in the future
+            // $startDate->add(new \DateInterval('PT10M'));
         }
 
         // salva needs a end time of 23:59 in local time
