@@ -153,6 +153,12 @@ abstract class Policy
     protected $end;
 
     /**
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $staticEnd;
+
+    /**
      * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */
@@ -256,6 +262,16 @@ abstract class Policy
     public function setEnd(\DateTime $end)
     {
         $this->end = $end;
+    }
+
+    public function getStaticEnd()
+    {
+        return $this->staticEnd;
+    }
+
+    public function setStaticEnd(\DateTime $staticEnd)
+    {
+        $this->staticEnd = $staticEnd;
     }
 
     public function getStatus()
@@ -564,6 +580,7 @@ abstract class Policy
         $nextYear->modify("-1 day");
         $nextYear->setTime(23, 59, 59);
         $this->setEnd($nextYear);
+        $this->setStaticEnd($nextYear);
 
         $initialPolicyNumber = 5500000;
         $this->setPolicyNumber(sprintf(
