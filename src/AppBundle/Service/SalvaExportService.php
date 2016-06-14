@@ -567,11 +567,15 @@ class SalvaExportService
                     $version
                 ));
             }
-            $policyNumber = $phonePolicy->getSalvaPolicyNumber($version);
+        } else {
+            $version = $phonePolicy->getLatestSalvaPolicyNumberVersion();
+        }
+
+        $policyNumber = $phonePolicy->getSalvaPolicyNumber($version);
+        if (isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
             $payments = $phonePolicy->getPaymentsForSalvaVersions()[$version];
         } else {
-            $policyNumber = $phonePolicy->getSalvaPolicyNumber($phonePolicy->getLatestSalvaPolicyNumberVersion());
-            $payments = $phonePolicy->getPaymentsForSalvaVersions(false);
+            $payments = $phonePolicy->getPayments();
         }
 
         $dom = new DOMDocument('1.0', 'UTF-8');
