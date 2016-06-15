@@ -63,7 +63,7 @@ class CognitoIdentityService
         $result = $this->cognito->getOpenIdTokenForDeveloperIdentity($devIdentity);
         $identityId = $result->get('IdentityId');
         $token = $result->get('Token');
-        $this->logger->warning(sprintf('Found Cognito Identity %s', $identityId));
+        $this->logger->debug(sprintf('Found Cognito Identity %s', $identityId));
 
         return [$identityId, $token];
     }
