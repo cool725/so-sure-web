@@ -123,6 +123,43 @@ class PolicyServiceTest extends WebTestCase
         $this->assertTrue(stripos($updatedPolicy->getPolicyNumber(), 'INVALID/') !== false);
     }
 
+    public function testCreatePolicyDuplicateCreate()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('create-dup', $this),
+            'bar'
+        );
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'));
+        static::$policyService->setEnvironment('test');
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
+        $this->assertTrue($updatedPolicy->isValidPolicy(), 'Policy must be valid');
+        $this->assertTrue(
+            stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
+            'Policy number must contain Mob'
+        );
+        $this->assertEquals(new \DateTime('2016-01-01'), $updatedPolicy->getStart());
+
+        // Needs to be prod for a valid policy number, or create will affect policy times
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-02-01'));
+        static::$policyService->setEnvironment('test');
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
+        $this->assertTrue($updatedPolicy->isValidPolicy(), 'Policy must be valid');
+        $this->assertTrue(
+            stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
+            'Policy number must contain Mob'
+        );
+        $this->assertEquals(new \DateTime('2016-01-01'), $updatedPolicy->getStart());
+    }
+
     /**
      * @expectedException AppBundle\Exception\InvalidPremiumException
      */

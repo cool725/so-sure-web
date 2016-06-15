@@ -1163,6 +1163,54 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_INVALID_AMOUNT);
     }
 
+    public function testNewPolicyJudopayDuplicate()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-judopay-dup', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $receiptId = $judopay->testPay(
+            $user,
+            $data['id'],
+            '6.99',
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => '55779911',
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals($data['id'], $policyData['id']);
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => '55779911',
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals($data['id'], $policyData['id']);
+
+        // Ensure that policy creation didn't run twice
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(PhonePolicy::class);
+        $policy = $repo->find($policyData['id']);
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+    }
+
     // policy/{id}/invitation
 
     /**
