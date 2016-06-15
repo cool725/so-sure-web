@@ -158,7 +158,7 @@ class PCAService
         $data = [
             'Key' => $this->apiKey,
             'SearchTerm' => $search,
-            'SearchFor' => 'Everything',
+            'SearchFor' => 'PostalCodes',
             'Country' => 'GBR',
             'LanguagePreference' => 'EN',
             'MaxResults' => 50,
@@ -181,6 +181,7 @@ class PCAService
                 $data[$id] = $address;
             }
         }
+        $this->logger->info(sprintf('Address lookup for %s %s', $postcode, json_encode($data)));
 
         return $data;
     }
@@ -210,7 +211,10 @@ class PCAService
         }
 
         if (!empty($file->Rows)) {
-            return $this->transformAddress($file->Rows->Row[0]);
+            $data = $this->transformAddress($file->Rows->Row[0]);
+            $this->logger->info(sprintf('Address find for %s %s', $id, json_encode($data)));
+
+            return $data;
         }
 
         return null;
