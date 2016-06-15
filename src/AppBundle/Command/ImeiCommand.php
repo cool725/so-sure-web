@@ -20,13 +20,19 @@ class ImeiCommand extends ContainerAwareCommand
             ->addArgument(
                 'imei',
                 InputArgument::REQUIRED,
-                'Imei'
+                'Imei - this is the cheap gsma check of £0.02'
             )
             ->addOption(
                 'serial',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'serial'
+                'serial - will run make/model check of £0.05'
+            )
+            ->addOption(
+                'claimscheck',
+                null,
+                InputOption::VALUE_NONE,
+                'expensive £0.90 check'
             )
             ->addOption(
                 'device',
@@ -49,12 +55,22 @@ class ImeiCommand extends ContainerAwareCommand
         $serial = $input->getOption('serial');
         $device = $input->getOption('device');
         $memory = $input->getOption('memory');
+        $claimscheck = $input->getOption('claimscheck');
         $phone = $this->getPhone($device, $memory);
         $imeiService = $this->getContainer()->get('app.imei');
-        if ($imeiService->checkImei($phone, $imei)) {
-            print sprintf("Imei %s is good\n", $imei);
+
+        if ($claimscheck) {
+            if ($imeiService->checkClaims($phone, $imei)) {
+                print sprintf("Claimscheck %s is good\n", $imei);
+            } else {
+                print sprintf("Claimscheck %s failed validation\n", $imei);
+            }
         } else {
-            print sprintf("Imei %s failed validation\n", $imei);
+            if ($imeiService->checkImei($phone, $imei)) {
+                print sprintf("Imei %s is good\n", $imei);
+            } else {
+                print sprintf("Imei %s failed validation\n", $imei);
+            }
         }
 
         if ($serial) {
