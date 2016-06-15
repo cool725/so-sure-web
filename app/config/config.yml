@@ -75,7 +75,7 @@ doctrine_mongodb:
                     alias: GedmoLoggable
                     is_bundle: false
     default_commit_options:
-        timeout: 1000  # integer >= -1
+        timeout: 2000  # integer >= -1
 
 # Swiftmailer Configuration
 swiftmailer:
