@@ -59,6 +59,11 @@ class SalvaExportService
     protected $s3;
     protected $environment;
 
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
+    }
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -496,8 +501,15 @@ class SalvaExportService
             throw new \Exception(sprintf('Unknown queue action %s', $action));
         }
 
+        // For production, only process valid policies (e.g. not policies with @so-sure.com)
+        if ($this->environment == "prod" && !$policy->isValidPolicy()) {
+            return false;
+        }
+
         $data = ['policyId' => $policy->getId(), 'action' => $action, 'retryAttempts' => $retryAttempts];
         $this->redis->rpush(self::KEY_POLICY_ACTION, serialize($data));
+
+        return true;
     }
 
     public function clearQueue()

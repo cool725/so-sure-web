@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Classes\Salva;
 
@@ -21,6 +22,7 @@ class SalvaExportServiceTest extends WebTestCase
     protected static $policyService;
     protected static $userManager;
     protected static $xmlFile;
+    protected static $policyRepo;
 
     public static function setUpBeforeClass()
     {
@@ -35,6 +37,7 @@ class SalvaExportServiceTest extends WebTestCase
         //each test method, do this in setUp() instead
         self::$salva = self::$container->get('app.salva');
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$policyRepo = self::$dm->getRepository(Policy::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
         self::$xmlFile = sprintf(
@@ -66,5 +69,35 @@ class SalvaExportServiceTest extends WebTestCase
 
         $xml = static::$salva->createXml($policy);
         $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
+    }
+
+    public function testNonProdInvalidPolicyQueue()
+    {
+        $this->assertTrue(static::$salva->queue(new PhonePolicy(), SalvaExportService::QUEUE_CREATED));
+    }
+
+    public function testProdInvalidPolicyQueue()
+    {
+        static::$salva->setEnvironment('prod');
+        $this->assertFalse(static::$salva->queue(new PhonePolicy(), SalvaExportService::QUEUE_CREATED));
+        static::$salva->setEnvironment('test');
+    }
+
+    public function testProdValidPolicyQueue()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'notasosureemail@gmail.com',
+            'bar'
+        );
+        static::$salva->setEnvironment('prod');
+        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertTrue($updatedPolicy->isValidPolicy());
+        $this->assertTrue(static::$salva->queue($updatedPolicy, SalvaExportService::QUEUE_CREATED));
     }
 }
