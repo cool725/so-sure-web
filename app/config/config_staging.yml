@@ -16,7 +16,13 @@ framework:
 #        query_cache_driver: apc
 
 monolog:
+    channels: ['receperio']
     handlers:
+        rollbar:
+            type: rollbar
+            level: warning
+            token: %rollbar_access_token%
+            channels: ['!event']
         salva:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"
