@@ -90,6 +90,9 @@ swiftmailer:
             encryption: "%ses_mailer_encryption%"
             spool:      { type: service, id: snc_redis.swiftmailer.spool }
 
+monolog:
+    channels: ['receperio']
+
 assetic:
     bundles:        [ AppBundle ]
     debug:          '%kernel.debug%'

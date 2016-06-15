@@ -134,7 +134,7 @@ services:
         abstract: true
         class: AppBundle\Service\BaseImeiService
         calls:
-            - [setLogger, ['@logger']]
+            - [setLogger, ['@monolog.logger.receperio']]
             - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
             - [setRedis, ['@snc_redis.default']]
 
@@ -145,8 +145,6 @@ services:
             - [setSecretKey, ['%receperio_secretkey%']]
             - [setStoreId, ['%receperio_storeid%']]
             - [setEnvironment, ['%kernel.environment%']]
-        tags:
-            - { name: monolog.logger, channel: receperio }
 
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService
