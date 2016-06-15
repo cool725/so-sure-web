@@ -798,16 +798,16 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(2, count($policyA->getConnections()));
         // All connections for the cancelled policy should be zero
         foreach ($policyA->getConnections() as $networkConnection) {
-            $this->assertEquals(0, $networkConnection->getValue());
+            $this->assertEquals(0, $networkConnection->getTotalValue());
         }
 
         $this->assertEquals(2, count($policyB->getConnections()));
         // All connections to the cancelled policy should be zero; other connections should remain at value
         foreach ($policyB->getConnections() as $networkConnection) {
             if ($networkConnection->getLinkedPolicy()->getId() == $policyA->getId()) {
-                $this->assertEquals(0, $networkConnection->getValue());
+                $this->assertEquals(0, $networkConnection->getTotalValue());
             } else {
-                $this->assertGreaterThan(0, $networkConnection->getValue());
+                $this->assertGreaterThan(0, $networkConnection->getTotalValue());
             }
         }
     }

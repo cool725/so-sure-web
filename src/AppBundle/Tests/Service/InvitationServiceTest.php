@@ -37,6 +37,7 @@ class InvitationServiceTest extends WebTestCase
     protected static $userManager;
     protected static $invitationService;
     protected static $phone;
+    protected static $phone2;
     protected static $policyService;
 
     public static function setUpBeforeClass()
@@ -70,6 +71,7 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->setDebug(true);
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+        self::$phone2 = $phoneRepo->findOneBy(['devices' => 'iPhone8,1', 'memory' => 64]);
     }
 
     public function tearDown()
@@ -577,7 +579,7 @@ class InvitationServiceTest extends WebTestCase
         foreach ($inviterPolicy->getConnections() as $connection) {
             if ($connection->getLinkedPolicy()->getId() == $policyInvitee->getId()) {
                 $connectionFound = true;
-                $this->assertEquals(2, $connection->getValue());
+                $this->assertEquals(2, $connection->getTotalValue());
             }
         }
         $this->assertTrue($connectionFound);
@@ -587,7 +589,7 @@ class InvitationServiceTest extends WebTestCase
         foreach ($inviteePolicy->getConnections() as $connection) {
             if ($connection->getLinkedPolicy()->getId() == $inviterPolicy->getId()) {
                 $connectionFound = true;
-                $this->assertEquals(10, $connection->getValue());
+                $this->assertEquals(10, $connection->getTotalValue());
             }
         }
         $this->assertTrue($connectionFound);
@@ -647,7 +649,7 @@ class InvitationServiceTest extends WebTestCase
         foreach ($inviterPolicy->getConnections() as $connection) {
             if ($connection->getLinkedPolicy()->getId() == $policyInviteeAfter->getId()) {
                 $connectionFound = true;
-                $this->assertEquals(10, $connection->getValue());
+                $this->assertEquals(10, $connection->getTotalValue());
             }
         }
         $this->assertTrue($connectionFound);
@@ -715,5 +717,172 @@ class InvitationServiceTest extends WebTestCase
         $policy->addClaim($claim);
 
         self::$invitationService->reinvite($invitation);
+    }
+
+    public function testAcceptConnectionReductionStandard()
+    {
+        $policy = $this->createAndLink(static::generateEmail('user-reduction', $this), new \DateTime('2016-01-01'));
+
+        for ($i = 1; $i <= 6; $i++) {
+            $this->createAndLink(
+                static::generateEmail(sprintf('invite-accept-%d', $i), $this),
+                new \DateTime('2016-02-01'),
+                static::generateEmail('user-reduction', $this),
+                $policy
+            );
+        }
+
+        $repo = static::$dm->getRepository(Policy::class);
+        $checkPolicy = $repo->find($policy->getId());
+        $connectionFound = false;
+        foreach ($checkPolicy->getConnections() as $connection) {
+            $connectionFound = true;
+            $this->assertEquals(10, $connection->getTotalValue());
+        }
+        $this->assertTrue($connectionFound);
+
+        $this->createAndLink(
+            static::generateEmail('invite-accept-0', $this),
+            new \DateTime('2016-02-01'),
+            static::generateEmail('user-reduction', $this),
+            $policy
+        );
+
+        $repo = static::$dm->getRepository(Policy::class);
+        $checkPolicy = $repo->find($policy->getId());
+        $connectionFound = false;
+        foreach ($checkPolicy->getConnections() as $connection) {
+            if ($connection->getLinkedUser()->getEmail() == static::generateEmail('invite-accept-0', $this)) {
+                $connectionFound = true;
+                $this->assertEquals(7.10, $connection->getTotalValue());
+            }
+        }
+        $this->assertTrue($connectionFound);
+    }
+
+    public function testAcceptConnectionReductionPromoConnectionOnly()
+    {
+        $policy = $this->createAndLink(static::generateEmail('user-promo', $this), new \DateTime('2016-01-01'));
+        $policy->setPromoCode(PhonePolicy::PROMO_LAUNCH);
+        static::$dm->flush();
+
+        $this->assertEquals(83.88, $policy->getMaxPot());
+        // 83.88 / 15 = 5.6
+        for ($i = 1; $i <= 5; $i++) {
+            $this->createAndLink(
+                static::generateEmail(sprintf('invite-promo-%d', $i), $this),
+                new \DateTime('2016-02-01'),
+                static::generateEmail('user-promo', $this),
+                $policy
+            );
+        }
+
+        $repo = static::$dm->getRepository(Policy::class);
+        $checkPolicy = $repo->find($policy->getId());
+        $connectionFound = false;
+        foreach ($checkPolicy->getConnections() as $connection) {
+            $connectionFound = true;
+            $this->assertEquals(15, $connection->getTotalValue());
+        }
+        $this->assertTrue($connectionFound);
+
+        $this->createAndLink(
+            static::generateEmail('invite-promo-0', $this),
+            new \DateTime('2016-02-01'),
+            static::generateEmail('user-promo', $this),
+            $policy
+        );
+
+        $repo = static::$dm->getRepository(Policy::class);
+        $checkPolicy = $repo->find($policy->getId());
+        $connectionFound = false;
+        // 83.88 - 15 * 5 = 8.88
+        foreach ($checkPolicy->getConnections() as $connection) {
+            if ($connection->getLinkedUser()->getEmail() == static::generateEmail('invite-promo-0', $this)) {
+                $connectionFound = true;
+                $this->assertEquals(8.88, $connection->getTotalValue());
+                $this->assertEquals(8.88, $connection->getValue());
+                $this->assertEquals(0, $connection->getPromoValue());
+            }
+        }
+        $this->assertTrue($connectionFound);
+    }
+
+    public function testAcceptConnectionReductionPromoConnectionRollover()
+    {
+        $policy = $this->createAndLink(
+            static::generateEmail('user-promor', $this),
+            new \DateTime('2016-01-01'),
+            null,
+            null,
+            static::$phone2
+        );
+        $policy->setPromoCode(PhonePolicy::PROMO_LAUNCH);
+        static::$dm->flush();
+
+        $this->assertEquals(103.68, $policy->getMaxPot());
+        // 103.68 / 15 = 6.9
+        for ($i = 1; $i <= 6; $i++) {
+            $this->createAndLink(
+                static::generateEmail(sprintf('invite-promor-%d', $i), $this),
+                new \DateTime('2016-02-01'),
+                static::generateEmail('user-promor', $this),
+                $policy
+            );
+        }
+
+        $repo = static::$dm->getRepository(Policy::class);
+        $checkPolicy = $repo->find($policy->getId());
+        $connectionFound = false;
+        foreach ($checkPolicy->getConnections() as $connection) {
+            $connectionFound = true;
+            $this->assertEquals(15, $connection->getTotalValue());
+        }
+        $this->assertTrue($connectionFound);
+
+        $this->createAndLink(
+            static::generateEmail('invite-promor-0', $this),
+            new \DateTime('2016-02-01'),
+            static::generateEmail('user-promor', $this),
+            $policy
+        );
+
+        $repo = static::$dm->getRepository(Policy::class);
+        $checkPolicy = $repo->find($policy->getId());
+        $connectionFound = false;
+        // 103.68 - 15 * 6 = 13.68
+        foreach ($checkPolicy->getConnections() as $connection) {
+            if ($connection->getLinkedUser()->getEmail() == static::generateEmail('invite-promor-0', $this)) {
+                $connectionFound = true;
+                $this->assertEquals(13.68, $connection->getTotalValue());
+                $this->assertEquals(10, $connection->getValue());
+                $this->assertEquals(3.68, $connection->getPromoValue());
+            }
+        }
+        $this->assertTrue($connectionFound);
+    }
+
+    private function createAndLink($email, $date, $inviteeEmail = null, $policy = null, $phone = null)
+    {
+        if ($phone == null) {
+            $phone = static::$phone;
+        }
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar'
+        );
+        $newPolicy = static::createPolicy($user, static::$dm, $phone, $date);
+
+        if ($inviteeEmail) {
+            $invitation = self::$invitationService->inviteByEmail(
+                $newPolicy,
+                $inviteeEmail
+            );
+            $this->assertTrue($invitation instanceof EmailInvitation);
+            self::$invitationService->accept($invitation, $policy, $date);
+        }
+
+        return $newPolicy;
     }
 }

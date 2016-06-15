@@ -166,23 +166,41 @@ class PhonePolicy extends Policy
         return $this->getAllowedStandardOrPromoConnectionValue(true, $date);
     }
 
+    private function getMaxPotRemainder()
+    {
+        $potValue = $this->getPotValue();
+        $maxPot = $this->getMaxPot();
+
+        return $maxPot - $potValue;
+    }
+
     private function getAllowedStandardOrPromoConnectionValue($promoCodeOnly, \DateTime $date = null)
     {
         if (!$this->isPolicy()) {
             return 0;
         }
 
+        $connectionValue = $this->getConnectionValue($date);
         if ($promoCodeOnly) {
-            $connectionValue = $this->getPromoConnectionValue($date);
-        } else {
-            $connectionValue = $this->getConnectionValue($date);
-        }
+            $maxPromoPotRemainder = $this->getMaxPotRemainder() - $connectionValue;
 
-        // If its the last connection, then may be less than the full £15/£10/£2
-        $potValue = $this->getPotValue();
-        $maxPot = $this->getMaxPot();
-        if ($potValue + $connectionValue > $maxPot) {
-            $connectionValue = $maxPot - $potValue;
+            // If its the last connection, check that the initial bit of the connection value hasn't alredy been used up
+            if ($maxPromoPotRemainder <= 0) {
+                return 0;
+            }
+
+            // Get the promo connection value
+            $connectionValue = $this->getPromoConnectionValue($date);
+
+            // If its the last connection, then may be less than the full £15/£10/£2
+            if ($connectionValue > $maxPromoPotRemainder) {
+                $connectionValue = $maxPromoPotRemainder;
+            }
+        } else {
+            // If its the last connection, then may be less than the full £15/£10/£2
+            if ($this->getMaxPotRemainder() < $connectionValue) {
+                $connectionValue = $this->getMaxPotRemainder();
+            }
         }
 
         // Should never be the case, but ensure connectionValue isn't negative
