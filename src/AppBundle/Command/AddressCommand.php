@@ -56,7 +56,7 @@ class AddressCommand extends ContainerAwareCommand
             $output->writeln(json_encode($addressData));
         } elseif ($useAddress) {
             $addresses = $address->getAddress($postcode, $number);
-            $output->writeon(json_encode($addresses->toApiArray()));
+            $output->writeln(json_encode($addresses->toApiArray()));
         } else {
             $addresses = $address->find($postcode, $number);
             $output->writeln(json_encode($addresses));
