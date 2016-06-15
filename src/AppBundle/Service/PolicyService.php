@@ -104,6 +104,10 @@ class PolicyService
 
     public function create(Policy $policy, \DateTime $date = null)
     {
+        if ($policy->isValidPolicy()) {
+            return;
+        }
+
         $user = $policy->getUser();
         $this->generateScheduledPayments($policy, $date);
 

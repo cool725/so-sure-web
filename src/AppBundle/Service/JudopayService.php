@@ -80,6 +80,11 @@ class JudopayService
      */
     public function add(Policy $policy, $receiptId, $consumerToken, $cardToken, $deviceDna = null)
     {
+        // if already active, don't re-run
+        if ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {
+            return true;
+        }
+
         $user = $policy->getUser();
 
         $judo = new JudoPaymentMethod();
