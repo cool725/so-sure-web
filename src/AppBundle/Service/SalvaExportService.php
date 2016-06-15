@@ -227,6 +227,10 @@ class SalvaExportService
         $repo = $this->dm->getRepository(JudoPayment::class);
         $lines[] = sprintf("%s\n", $this->transformPayment(null));
         foreach ($repo->getAllPaymentsForExport($date) as $payment) {
+            // For prod, skip invalid policies
+            if ($this->environment == 'prod' && !$payment->getPolicy()->isValid()) {
+                continue;
+            }
             $lines[] = sprintf("%s\n", $this->transformPayment($payment));
         }
 
@@ -249,6 +253,10 @@ class SalvaExportService
         $repo = $this->dm->getRepository(Claim::class);
         $lines[] =  sprintf("%s\n", $this->transformClaim(null));
         foreach ($repo->getAllClaimsForExport($date, $days) as $claim) {
+            // For prod, skip invalid policies
+            if ($this->environment == 'prod' && !$claim->getPolicy()->isValid()) {
+                continue;
+            }
             $lines[] = sprintf("%s\n", $this->transformClaim($claim));
         }
 
