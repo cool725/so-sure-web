@@ -8,6 +8,8 @@ use AppBundle\Document\Phone;
 class ReceperioService extends BaseImeiService
 {
     // 1 day
+    const DUEDILIGENCE_CACHE_TIME = 84600;
+    const MAKEMODEL_CACHE_TIME = 84600;
     const CLAIMSCHECK_CACHE_TIME = 84600;
     const TEST_INVALID_IMEI = "352000067704506";
     const PARTNER_ID = 415;
@@ -77,8 +79,6 @@ class ReceperioService extends BaseImeiService
      */
     public function checkImei(Phone $phone, $imei)
     {
-        // TODO: Cache
-
         \AppBundle\Classes\NoOp::noOp([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == self::TEST_INVALID_IMEI) {
@@ -90,21 +90,75 @@ class ReceperioService extends BaseImeiService
         }
 
         try {
-            $key = sprintf("receperio:search:%s:%s", $phone->getId(), $imei);
+            $key = sprintf("receperio:duediligence:%s", $imei);
             if (($redisData = $this->redis->get($key)) != null) {
                 $data = unserialize($redisData);
+                $this->logger->info(sprintf("Cached DueDiligence search for %s -> %s", $imei, json_encode($data)));
+            } else {
+                $url = sprintf("/duediligence/%s/%s", $this->storeId, $imei);
+                $response = $this->send($url, [
+                    'category' => 1,
+                ]);
+                $this->logger->info(sprintf("DueDiligence search for %s -> %s", $imei, $response));
+
+                $data = json_decode($response, true);
+                $this->redis->setex($key, self::DUEDILIGENCE_CACHE_TIME, serialize($data));
+
+                $now = new \DateTime();
+                $logKey = sprintf('receperio:duediligence:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
+                $this->redis->zincrby($logKey, 1, $imei);
+            }
+            $this->responseData = $data;
+            $this->certId = $data['certid'];
+
+            return $data['result'] == 'passed';
+        } catch (\Exception $e) {
+            // TODO: automate a future retry check
+            $this->logger->error(sprintf("Unable to check imei %s Ex: %s", $imei, $e->getMessage()));
+
+            // For now, if there are any issues, assume true and run a manual retry later
+            return true;
+        }
+    }
+
+    /**
+     * Claimscheck
+     *
+     * @param Phone  $phone
+     * @param string $imei
+     *
+     * @return boolean True if imei is ok
+     */
+    public function checkClaims(Phone $phone, $imei)
+    {
+        \AppBundle\Classes\NoOp::noOp([$phone]);
+        // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
+        if ($imei == self::TEST_INVALID_IMEI) {
+            return false;
+        }
+
+        if ($this->getEnvironment() != 'prod') {
+            return true;
+        }
+
+        try {
+            $key = sprintf("receperio:claimscheck:%s", $imei);
+            if (($redisData = $this->redis->get($key)) != null) {
+                $data = unserialize($redisData);
+                $this->logger->info(sprintf("Cached Claimscheck search for %s -> %s", $imei, json_encode($data)));
             } else {
                 $response = $this->send("/claimscheck/search", [
                     'serial' => $imei,
                     'storeid' => $this->storeId,
                 ]);
-                $this->logger->info(sprintf("Claimscheck search for %s -> %s", $imei, json_encode($response)));
-                $now = new \DateTime();
-                $logKey = sprintf('receperio:search:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
-                $this->redis->zincrby($logKey, 1, $imei);
+                $this->logger->info(sprintf("Claimscheck search for %s -> %s", $imei, $response));
 
                 $data = json_decode($response, true);
                 $this->redis->setex($key, self::CLAIMSCHECK_CACHE_TIME, serialize($data));
+
+                $now = new \DateTime();
+                $logKey = sprintf('receperio:claimscheck:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
+                $this->redis->zincrby($logKey, 1, $imei);
             }
             $this->responseData = $data;
             $this->certId = $data['checkmendstatus']['certid'];
@@ -141,25 +195,31 @@ class ReceperioService extends BaseImeiService
         }
 
         try {
-            $key = sprintf("receperio:makemodel:%s:%s", $phone->getId(), $serialNumber);
+            $key = sprintf("receperio:makemodel:%s", $serialNumber);
             if (($redisData = $this->redis->get($key)) != null) {
                 $data = unserialize($redisData);
+                $this->logger->info(sprintf(
+                    "Cached Make/Model verification for %s -> %s",
+                    $serialNumber,
+                    json_encode($data)
+                ));
             } else {
                 $response = $this->send("/makemodelext", [
                     'serials' => [$serialNumber],
                     'storeid' => $this->storeId,
+                    'category' => 1,
                 ]);
                 $this->logger->info(sprintf(
-                    "Claimscheck serial verification for %s -> %s",
+                    "Make/Model verification for %s -> %s",
                     $serialNumber,
-                    json_encode($response)
+                    $response
                 ));
+                $data = json_decode($response, true);
+                $this->redis->setex($key, self::MAKEMODEL_CACHE_TIME, serialize($data));
+
                 $now = new \DateTime();
                 $logKey = sprintf('receperio:makemodel:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
                 $this->redis->zincrby($logKey, 1, $serialNumber);
-
-                $data = json_decode($response, true);
-                $this->redis->setex($key, self::CLAIMSCHECK_CACHE_TIME, serialize($data));
             }
             $this->responseData = $data;
 
