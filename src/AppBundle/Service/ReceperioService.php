@@ -105,7 +105,12 @@ class ReceperioService extends BaseImeiService
                 $this->redis->setex($key, self::DUEDILIGENCE_CACHE_TIME, serialize($data));
 
                 $now = new \DateTime();
-                $logKey = sprintf('receperio:duediligence:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
+                $logKey = sprintf(
+                    'receperio:duediligence:%s:%s:%s',
+                    $this->storeId,
+                    $now->format('Y'),
+                    $now->format('d')
+                );
                 $this->redis->zincrby($logKey, 1, $imei);
             }
             $this->responseData = $data;
@@ -157,7 +162,12 @@ class ReceperioService extends BaseImeiService
                 $this->redis->setex($key, self::CLAIMSCHECK_CACHE_TIME, serialize($data));
 
                 $now = new \DateTime();
-                $logKey = sprintf('receperio:claimscheck:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
+                $logKey = sprintf(
+                    'receperio:claimscheck:%s:%s:%s',
+                    $this->storeId,
+                    $now->format('Y'),
+                    $now->format('d')
+                );
                 $this->redis->zincrby($logKey, 1, $imei);
             }
             $this->responseData = $data;
