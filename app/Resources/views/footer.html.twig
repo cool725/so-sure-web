@@ -26,7 +26,6 @@
        data-heap-id="{{ heap_id }}"
        data-branch-key="{{ branch_key }}"
        data-branch-banner="{% if not app.user %}1{% endif %}"
-       data-smooch-key="{{ smooch_key }}"
        data-referral="{{ app.session.get('referral') }}"
        {% if fb_pixel_event is defined %}data-fb-pixel-event="{{ fb_pixel_event }}"{% endif %}
        ></div>
