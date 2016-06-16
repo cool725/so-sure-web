@@ -24,6 +24,7 @@
        data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"
        data-google-analytics="{{ google_analytics }}"
        data-heap-id="{{ heap_id }}"
+       data-drift-key="{{ drift_key }}"
        data-branch-key="{{ branch_key }}"
        data-branch-banner="{% if not app.user %}1{% endif %}"
        data-referral="{{ app.session.get('referral') }}"

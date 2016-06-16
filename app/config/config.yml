@@ -47,6 +47,7 @@ twig:
         heap_id: %heap_id%
         google_analytics: %google_analytics%
         branch_key: %branch_key%
+        drift_key: %drift_key%
         use_cdn: true
         branch_pot_url: %branch_pot_url%
         branch_share_url: %branch_share_url%
