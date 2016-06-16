@@ -27,7 +27,7 @@
                 <li>Date of subscription:: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
                 <li>Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }}</li>
                 <li>Period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end|date('d M Y H:i', 'Europe/London') }}</li>
-                <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice }} (inclusive of £{{ policy.premium.yearlyIpt }} IPT)</li>
+                <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice }} [inclusive of £{{ policy.premium.yearlyIpt }} Insurance Premium Tax (IPT)]</li>
             </ul>
         </div>
         <div>
@@ -40,7 +40,7 @@
         <div style="position: absolute; float: left; bottom: 50px; font-size: 12px; margin-right: 25mm;">
             <i>
                 The insurance cover is underwritten by Salva Kindlustuse AS, which is authorised by the Financial Conduct Authority 
-                under registration number 622523 with registered office Parnu Mnt, 1610141 Tallinn, Estonia. Pärnu road 16, 10141 Tallinn,.
+                under registration number 622523 with registered office Pärnu road 16, 10141 Tallinn, Estonia.
             </i>
         </div>
     </body>
