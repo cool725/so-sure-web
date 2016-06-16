@@ -53,13 +53,64 @@
             <script src="/components/bootstrap/bootstrap.js"></script>
         {% endif %}
         <script src="//cdn.optimizely.com/js/4833800075.js"></script>
-        <script src="https://cdn.smooch.io/smooch.min.js"></script>
+        <!-- Start of Async Drift Code -->
+        <script>
+            !function() {
+                var t;
+                return t = window.driftt = window.drift = window.driftt || [],
+                t.init
+                    ? void 0
+                    : t.invoked
+                        ? void(window.console && console.error && console.error("Drift snippet included twice."))
+                        : (t.invoked = !0, t.methods = [
+                            "identify",
+                            "track",
+                            "reset",
+                            "debug",
+                            "show",
+                            "ping",
+                            "page",
+                            "hide",
+                            "off",
+                            "on"
+                        ], t.factory = function(e) {
+                            return function() {
+                                var n;
+                                return n = Array.prototype.slice.call(arguments),
+                                n.unshift(e),
+                                t.push(n),
+                                t;
+                            };
+                        },
+                        t.methods.forEach(function(e) {
+                            t[e] = t.factory(e);
+                        }),
+                        t.load = function(t) {
+                            var e,
+                                n,
+                                o,
+                                r;
+                            e = 3e5,
+                            r = Math.ceil(new Date() / e) * e,
+                            o = document.createElement("script"),
+                            o.type = "text/javascript",
+                            o.async = !0,
+                            o.crossorigin = "anonymous",
+                            o.src = "https://js.driftt.com/include/" + r + "/" + t + ".js",
+                            n = document.getElementsByTagName("script")[0],
+                            n.parentNode.insertBefore(o, n);
+                        });
+            }();
+            drift.SNIPPET_VERSION = '0.2.0'
+            drift.load('fpkkpfe99m3a')
+        </script>
+        <!-- End of Async Drift Code -->
         <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
         <script type="text/javascript">
             window.cookieconsent_options = {
-                "message": "Just like every other website on the internet we use \uD83C\uDF6As." ,
                 "dismiss": "Got it!",
-                "learnMore": "Hungry? Here's all the cookie related info you can eat.",
+                "message": "Just like every other website we use \uD83C\uDF6As.",
+                "learnMore": "Hungry? Our cookie info is here.",
                 "link": "https://www.iubenda.com/privacy-policy/7805295",
                 "theme": "css/dark-bottom.css"
             };

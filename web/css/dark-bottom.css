@@ -95,9 +95,6 @@
     }
 }
 @media screen and (min-width: 768px) {
-    .cc_container {
-        padding: 15px 30px 15px
-    }
     .cc_container .cc_btn {
         font-size: 1em;
         padding: 8px 15px
@@ -105,6 +102,22 @@
     .cc_container .cc_message {
         font-size: 1em
     }
+    .cc_container {
+      padding: 10px 280px 10px;
+    }
+}
+@media screen and (max-width: 1044px) {
+  .cc_container .cc_btn {
+    margin-top: 5px;
+  }
+  .cc_container {
+    padding: 10px 180px 10px;
+  }
+}
+@media screen and (max-width: 992px) {
+  .cc_container {
+    padding: 10px 80px 10px;
+  }
 }
 @media screen and (min-width: 992px) {
     .cc_container .cc_message {
