@@ -485,7 +485,7 @@ class ApiController extends BaseController
 
             $rateLimit = $this->get('app.ratelimit');
             if (!$rateLimit->allowedByDevice(
-                RateLimitService::DEVICE_TYPE_RESET,
+                RateLimitService::DEVICE_TYPE_TOKEN,
                 $this->getCognitoIdentityIp($request),
                 $this->getCognitoIdentityId($request)
             )) {
