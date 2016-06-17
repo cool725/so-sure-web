@@ -109,6 +109,7 @@ class RateLimitService
 
         // ip should always be higher as may be multiple users behind a nat
         if ($ipRequests > $maxIpRequests || $cognitoRequests > $maxCognitoRequests) {
+            $this->logger->warning(sprintf('Rate limit exceeded for %s (%s/%s)', $type, $ip, $cognitoId));
             return false;
         }
 

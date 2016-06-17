@@ -64,6 +64,15 @@ class CognitoIdentityService
         $identityId = $result->get('IdentityId');
         $token = $result->get('Token');
         $this->logger->debug(sprintf('Found Cognito Identity %s', $identityId));
+        if (!$identityId || !$token) {
+            $this->logger->error(sprintf(
+                'Failed to find cognito id for user %s. [%s/%s/%s]',
+                $user->getId(),
+                $cognitoIdentityId,
+                $identityId,
+                $token
+            ));
+        }
 
         return [$identityId, $token];
     }
