@@ -15,7 +15,7 @@ parameters:
 framework:
     #esi:             ~
     translator:
-        enabled: false        
+        enabled: false
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -34,7 +34,7 @@ framework:
         handler_id: snc_redis.session.handler
     fragments:       ~
     http_method_override: true
-    
+
 # Twig Configuration
 twig:
     debug:            "%kernel.debug%"
@@ -47,7 +47,7 @@ twig:
         heap_id: %heap_id%
         google_analytics: %google_analytics%
         branch_key: %branch_key%
-        smooch_key: %smooch_key%
+        drift_key: %drift_key%
         use_cdn: true
         branch_pot_url: %branch_pot_url%
         branch_share_url: %branch_share_url%

@@ -124,15 +124,6 @@ window.twttr = (function(d, s, id) {
   return t;
 }(document, "script", "twitter-wjs"));
 
-// Smooch
-Smooch.init({
-  appToken: $('#ss-root').data('smooch-key'),
-  emailCaptureEnabled: true,
-  customText: {
-    settingsText: 'In case we\'re slow to respond you can leave us your email & we\'ll get back to you as soon as possible. Thanks.'
-  }
-});
-
 // Branch
 (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity track validateCode".split(" "), 0);
 branch.init($('#ss-root').data('branch-key'));
@@ -154,3 +145,52 @@ if (branch_banner !== '') {
   //console.log('no branch banner');
 }
 
+// Drift
+!function() {
+    var t;
+    return t = window.driftt = window.drift = window.driftt || [],
+    t.init
+        ? void 0
+        : t.invoked
+            ? void(window.console && console.error && console.error("Drift snippet included twice."))
+            : (t.invoked = !0, t.methods = [
+                "identify",
+                "track",
+                "reset",
+                "debug",
+                "show",
+                "ping",
+                "page",
+                "hide",
+                "off",
+                "on"
+            ], t.factory = function(e) {
+                return function() {
+                    var n;
+                    return n = Array.prototype.slice.call(arguments),
+                    n.unshift(e),
+                    t.push(n),
+                    t;
+                };
+            },
+            t.methods.forEach(function(e) {
+                t[e] = t.factory(e);
+            }),
+            t.load = function(t) {
+                var e,
+                    n,
+                    o,
+                    r;
+                e = 3e5,
+                r = Math.ceil(new Date() / e) * e,
+                o = document.createElement("script"),
+                o.type = "text/javascript",
+                o.async = !0,
+                o.crossorigin = "anonymous",
+                o.src = "https://js.driftt.com/include/" + r + "/" + t + ".js",
+                n = document.getElementsByTagName("script")[0],
+                n.parentNode.insertBefore(o, n);
+            });
+}();
+drift.SNIPPET_VERSION = '0.2.0';
+drift.load($('#ss-root').data('drift-key'));
