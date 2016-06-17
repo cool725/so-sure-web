@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Charge;
 use AppBundle\Document\User;
+use AppBundle\Document\PhonePolicy;
 
 class ReceperioService extends BaseImeiService
 {
@@ -184,7 +185,9 @@ class ReceperioService extends BaseImeiService
                 $charge = new Charge();
                 $charge->setType(Charge::TYPE_CLAIMSCHECK);
                 $charge->setPolicy($policy);
-                $charge->setUser($policy->getUser());
+                if ($policy) {
+                    $charge->setUser($policy->getUser());
+                }
                 $charge->setDetails($imei);
                 $this->dm->persist($charge);
                 $this->dm->flush();
