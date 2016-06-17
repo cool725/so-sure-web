@@ -6,7 +6,7 @@
 {% block body %}
     <div class="container">
       <div class="row">
-        <div class="text-left">
+        <div class="text-center">
           <p>Hmm, it looks like this invitation to join the Social Insurance revolution has already been
           {% if invitation.isAccepted %}accepted
           {% elseif invitation.isRejected %}declined
@@ -15,6 +15,7 @@
           {% endif %}
           .</p>
           <p>Something not right? <a href="mailto:support@wearesosure.com">Let us know</a>.</p>
-        <div>
+        </div>
     </div>
+  </div>
 {% endblock %}
