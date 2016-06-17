@@ -73,6 +73,13 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
 
+            // remove any password check for apple morons            
+            if ($user->getEmailCanonical == "apple@so-sure.com") {
+                list($identityId, $token) = $this->getCognitoIdToken($user, $request);
+
+                return new JsonResponse($user->toApiArray($identityId, $token));
+            }
+
             // soft delete
             if ($user->isExpired()) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User does not exist', 403);
