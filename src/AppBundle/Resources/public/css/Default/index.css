@@ -99,40 +99,6 @@
     outline: none;
 }
 
-/* DOWNLOAD APP */
-
-#app-store {
-    padding-top: 20px;
-    text-align: center;
-}
-.download-app li {
-    list-style-type: none;
-    display: inline-block;
-    text-align: center;
-    padding: 0;
-    margin-left: -25px;
-}
-.download-app img {
-    width: 30%;
-    padding-top: 20px;
-}
-@media (max-width:992px) {
-    .download-app img {
-        width: 30%;
-    }
-    .download-app .text-left {
-        text-align: center;
-    }
-    .download-app .text-right {
-        text-align: center;
-    }
-}
-@media (max-width:543px) {
-    .download-app img {
-        width: 40%;
-    }
-}
-
 /* HOW IT WORKS */
 
 #learn-more {

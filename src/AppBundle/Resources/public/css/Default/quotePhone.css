@@ -2,8 +2,8 @@
 
 .view-quote {
     background: linear-gradient(45deg, #3399ff 50%, #00ccff 100%);
-    padding-top: 105px;
-    padding-bottom: 10px;
+    padding-top: 50px;
+    padding-bottom: 105px;
     position: relative;
 }
 .view-quote h1 {
@@ -94,18 +94,6 @@
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
     text-align: center;
     min-height: 350px;
-}
-.view-quote #app-store {
-    padding-top: 0;
-    padding-bottom: 20px;
-}
-.view-quote #app-store h4 {
-    color: #fff;
-    padding-bottom: 0;
-}
-.view-quote .download-app img {
-  padding-top: 5px;
-  padding-bottom: 20px;
 }
 @media (min-width:767px) {
 .view-quote .panel-primary .your-device {

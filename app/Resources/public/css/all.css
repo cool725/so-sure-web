@@ -1,46 +1,230 @@
+@charset "UTF-8";
+@font-face {
+    font-family: 'Avenir LT Std 45 Book';
+    font-style: normal;
+    font-weight: 300;
+    src: local('/fonts/Avenir LT Std 45 Book'), url('/fonts/AvenirLTStd-Book.woff') format('woff');
+}
+@font-face {
+    font-family: 'Avenir LT Std 85 Heavy';
+    font-style: bold;
+    font-weight: 700;
+    src: local('/fonts/Avenir LT Std 85 Heavy'), url('/fonts/AvenirLTStd-Heavy.woff') format('woff');
+}
+@font-face {
+    font-family: 'Avenir LT Std 55 Oblique';
+    font-style: italic;
+    font-weight: 300;
+    src: local('/fonts/Avenir LT Std 55 Oblique'), url('/fonts/AvenirLTStd-Oblique.woff') format('woff');
+}
+@font-face {
+    font-family: 'Avenir LT Std 35 Light';
+    font-style: light;
+    font-weight: 200;
+    src: local('/fonts/Avenir LT Std 35 Light'), url('/fonts/AvenirLTStd-Light.woff') format('woff');
+}
 
-@font-face {
-  font-family: 'Avenir LT Std 45 Book';
-  font-style: normal;
-  font-weight: normal;
-  src: local('/fonts/Avenir LT Std 45 Book'), url('/fonts/AvenirLTStd-Book.woff') format('woff');
+/* Global */
+
+body {
+    font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.42857143;
+    color: #202532;
+    background-color: #ffffff
 }
-@font-face {
-  font-family: 'Avenir LT Std 85 Heavy';
-  font-style: normal;
-  font-weight: normal;
-  src: local('/fonts/Avenir LT Std 85 Heavy'), url('/fonts/AvenirLTStd-Heavy.woff') format('woff');
+strong {
+    font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-style: bold;
+    font-weight: 700;
 }
-.section {
-  padding: 8rem 0 7rem;
-  text-align: center;
+td {
+    width: 50%;
 }
-.section-heading {
-  margin-bottom: 1.2rem;
+ul, li {
+    margin: auto;
+    padding: 0;
 }
-.section-description {
-  margin-bottom: 4rem;
-  max-width: 100%;
+.so-sure-logo-dark {
+    background: transparent no-repeat center top url("/images/logo/Logo-Dark-with-Social-Insurance.svg");
+    background-size: 130px;
+    width: 130px;
+    height: 40px;
 }
-.navbar-brand img {
-    max-height: 20px;
+.so-sure-logo-light {
+    background: transparent no-repeat center top url("/images/logo/Logo-Light-with-Social-Insurance.svg");
+    background-size: 130px;
+    width: 130px;
+    height: 40px;
 }
-.chevron::before {
-  border-style: solid;
-  border-width: 0.25em 0.25em 0 0;
-  content: '';
-  display: inline-block;
-  height: 1em;
-  top: 0.25em;
-  transform: rotate(-45deg);
-  vertical-align: top;
-  width: 1em;
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-.chevron.bottom:before {
-  top: -0.5rem;
-  transform: rotate(135deg);
+@media (max-width: 500px) {
+  h1 {
+    font-size: 34px;
+  }
 }
-#navbar .download-button {
-    margin-top: 6px;
+
+/* NAVIGATION */
+
+.navbar-default {
+    z-index: 1000;
+    margin-bottom: 0;
+    border: 0;
+    background: transparent;
+    display: block;
+}
+.container .navbar-header {
+  padding-bottom: 5px;
+}
+.navbar-default .navbar-collapse, .navbar-default .navbar-form {
+    padding-bottom: 5px;
+}
+.navbar .btn {
+    font-size: 13px;
+    color: #fff;
+    padding: 10px 10px;
+    border-radius: 4px;
+    line-height: 10px;
+    margin-top: 12px;
+    margin-left: 10px !important;
+    letter-spacing: 0;
+    text-transform: none;
+    background: #3399ff;
+    border: 2px solid !important;
+    border-color: #3399ff !important;
+}
+.navbar-default .navbar-nav > li > a {
+    font-size: 13px;
+    padding-top: 20px;
+    color: #202532 !important;
+}
+.navbar-default .navbar-nav li > a:hover {
+    color: #3399ff !important;
+}
+.navbar-default .navbar-nav li > a:focus {
+    color: #3399ff !important;
+}
+.navbar-default .navbar-nav li > .btn:hover {
+    border-color: #3399ff !important;
+}
+.navbar-toggle {
+    background-color: transparent;
     border: none;
+}
+.navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
+    background-color: transparent;
+    border: none;
+}
+.navbar-nav>li {
+    margin: 0px 5px;
+    padding: 0px 5px;
+}
+@media (max-width: 767px) {
+    .navbar-default .navbar-collapse {
+        background-color: #fff;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+        border-bottom: #efefef 2px solid;
+    }
+    .navbar-default .navbar-nav > li > a {
+        color: #3399ff !important;
+    }
+    .navbar-default .navbar-nav > li > a:hover {
+        color: #2a303a !important;
+    }
+    .navbar-default .navbar-nav li > a.btn:hover {
+        color: #2a303a !important;
+        border: 2px solid;
+    }
+    .navbar .btn {
+        display: none;
+    }
+    .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+        background-color: transparent !important;
+    }
+}
+.open>.dropdown-toggle.btn-default {
+    background-color: transparent;
+    border: none;
+}
+.open>.dropdown-toggle.btn-default:hover, .open>.dropdown-toggle.btn-default:focus, .open>.dropdown-toggle.btn-default:active {
+    border: 2px solid !important;
+    border-color: #202532 !important;
+    color: #202532;
+    background-color: transparent;
+}
+.dropdown-menu>li>a {
+    display: block;
+    padding: 10px 10px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #202532;
+    white-space: nowrap;
+    margin: 0 5px 5px 5px;
+}
+
+/* TEXT LINE BREAK */
+
+.text-break {
+    color: #fff;
+}
+.break-text .line:first-child {
+    margin-right: 10px;
+}
+.text-break .line {
+    border-bottom: 1px solid #fff;
+    display: inline-block;
+    width: 20%;
+    vertical-align: middle;
+    margin: 10px;
+}
+
+/* DOWNLOAD APP */
+
+#app-store {
+    padding-top: 20px;
+    text-align: center;
+}
+.download-app li {
+    list-style-type: none;
+    display: inline-block;
+    text-align: center;
+    padding: 0;
+    margin-left: -25px;
+}
+.download-app img {
+    width: 30%;
+    padding-top: 20px;
+}
+@media (max-width:992px) {
+    .download-app img {
+        width: 30%;
+    }
+    .download-app .text-left {
+        text-align: center;
+    }
+    .download-app .text-right {
+        text-align: center;
+    }
+}
+@media (max-width:543px) {
+    .download-app img {
+        width: 40%;
+    }
+}
+
+/* BUTTONS */
+
+#app-store .btn-danger {
+  color: #fff;
+  background-color: #ff3300;
+  border-color: #ff3300;
+  margin: 20px;
+}
+#app-store .btn-danger:hover {
+  color: #fff;
+  background-color:  #ff6666;
+  border-color:  #ff6666;
 }

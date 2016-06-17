@@ -42,15 +42,15 @@
                         <div class="panel-body">
                             <span>
                                 <p>Device
-                                    <i class="twa twa-iphone"></i>
+
                                 </p>
                                 <h5>{{ phone }}</h5>
                                 <p>Monthly Cost
-                                    <i class="twa twa-pound"></i>
+
                                 </p>
                                 <h5>£{{ phone_price.monthlyPremiumPrice }}</h5>
                                 <p>Potential Money Back
-                                    <i class="twa twa-tada"></i>
+
                                 </p>
                                 <h5>£{{ phone_price.maxPot }}
                                     with
@@ -72,11 +72,9 @@
                         </div>
                         <div class="panel-body">
                             <p>Coverage Summary
-                                <i class="twa twa-closed-lock-with-key"></i>
                             </p>
                             <h5>Theft, Loss &amp; Accidental Damage</h5>
                             <p>More Information
-                                <i class="twa twa-page-with-curl"></i>
                             </p>
                             <div class="panel-group" role="tablist" aria-multiselectable="true" id="accordion-2">
                                 <div class="panel panel-info coverage">
@@ -136,7 +134,11 @@
         </div>
         <div class="container" id="app-store">
             <div class="row download-app">
-                <h4 class="text-center">Ready to pay? Download our app to continue.</h4>
+              <div class="text-break">
+                  <div class="line"></div>
+                  download our app to continue
+                  <div class="line"></div>
+              </div>
                 <div class="col-md-6 text-right">
                     <a href="{{ apple_app_download }}&cs=quotepage">
                         <img src="/images/icons/download-badge-app-store.svg" alt="Download so-sure on the App Store"></img>
@@ -149,7 +151,6 @@
                 </div>
             </div>
         </div>
-        <a href="#connections"><div class="scroll-indicator fa fa-chevron-down"></div></a>
     </div>
 
     <div class="connections" id="connections">
@@ -159,7 +160,6 @@
             </h3>
             <p>
                 <div id="connectionLegend"></div>
-                <i class="twa twa-lg twa-couple"></i><i class="twa twa-lg twa-two-men-holding-hands"></i><i class="twa twa-lg twa-two-women-holding-hands"></i><i class="twa twa-lg twa-couple"></i>
             </p>
             <div class="reward-pot">
                 {% include 'AppBundle:Default:connections.html.twig' %}
@@ -192,7 +192,7 @@
 
 <div class="download-now" id="download-now">
     <div class="container">
-        <h3>Ready for better? Download our app now!</h3>
+        <h3>Ready for better? Download our app now.</h3>
         {% if is_promo %}
         <p>As an added bonus, if you become one of our first 1,000 customers we'll give you up to
             <strong>£15 for each connection</strong>, allowing you to get your 1st year of insurance for free!</p>
