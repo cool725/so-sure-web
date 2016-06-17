@@ -1,21 +1,19 @@
 <div>
-<div id="connectionLegend"></div>
 </div>
 <div>
     <canvas id="connectionsChart" width="200" height="200"></canvas>
     <div id="connectionsChartLegend" class="chart-legend"></div>
 </div>
-<div>
-  <p id="slider-description"><em>Drag the slider to see how your Reward Pot grows the more connections you make</em><p>
-</div>
+<br>
 <form>
 <input type="text" class="span2" value=""
        data-slider-min="0"
        data-slider-max="{{ phone_price.maxConnections }}"
        data-slider-maxpot="{{ phone_price.maxPot }}"
        data-slider-step="1"
-       data-slider-value="3"
+       data-slider-value="{{ phone_price.maxConnections }}"
        data-slider-id="connection-slider" id="connection-value"
-       data-slider-handle="round" />
+       data-slider-handle="round"
+       data-slider-connection-value="{{ connection_value }}" />
 &nbsp;
 </form>

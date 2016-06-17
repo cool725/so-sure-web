@@ -2,7 +2,6 @@
   {% set og_title = 'Join today & get rewarded' %}
   {% set og_image = cdn_url ~ '/images/so-sure-welcome.png' %}
 {% endif %}
-{% set hide_nav = 1 %}
 {% extends 'base.html.twig' %}
 
 {% block title %}so-sure - Welcome to Social Insurance.{% endblock %}
@@ -15,134 +14,263 @@
     {{ parent() }}
     {% stylesheets
     'bundles/app/css/Default/index.css'
+    'bundles/app/css/Default/scrollindicator.css'
     %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
   <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <div class="hero">
-    <div class="container">
-      <img class="logo" src="images/logo/so-sure-logo-new-light.svg"></img>
-      <h1 class="section-title">Welcome to Social Insurance</h1>
-      <p class="pre-launch-description">Get your phone insured with the friends you trust &amp; get up to 80% back if no-one claims.</p>
-      <p class="select-device">Select from the list of devices below. <a href="mailto:hello@wearesosure.com?subject=Help! I can't find my device.">Don't see your device? Send us an email.</a></p>
-      <div class="row">
-        <div class="signup">
-          {{ form_start(form_phone) }}
-          <div class="input-group">
-            {{ form_widget(form_phone.phone, { 'attr': {'class': 'form-control'}}) }}
-            <span class="input-group-btn">
-            {{ form_widget(form_phone.next, {'label': 'Quote me', 'attr': {'class': 'btn btn-success'}}) }}
-            </span>
+  <section class="hero">
+      <div class="container">
+          <div id="navchange"></div>
+          <div class="row" id="welcome">
+              <div class="col-md-12">
+                  <div>
+                      <h1 class="text-center">Social Mobile Phone Insurance. Simply Amazing.</h1></div>
+                  <div>
+                      <p class="text-center">Get your phone insured with the friends you trust &amp; get up to 80% of your money back when no-one claims <i class="twa twa-lg twa-tada"></i></p>
+                  </div>
+              </div>
           </div>
-          {{ form_end(form_phone) }}
-        </div>
       </div>
-  {# Direct link to playstore would loose the referral link.  Branch.io link wouldn't work as desktop link would go to sms page #}
-  {% if referral ==  '' %}
+      <div class="container" id="get-quote">
+          <div class="row">
+              <div class="col-sm-12">
+                  <div class="device-select">
+                    {{ form_start(form_phone) }}
+                    <div class="input-group">
+                      {{ form_widget(form_phone.phone, { 'attr': {'class': 'form-control'}}) }}
+                      <span class="input-group-btn">
+                      {{ form_widget(form_phone.next, {'label': 'Quote Me!', 'attr': {'class': 'btn btn-primary'}}) }}
+                      </span>
+                    </div>
+                    {{ form_end(form_phone) }}
+                  </div>
+              </div>
+          </div>
+          <p class="text-center"><a href="mailto:hello@wearesosure.com">Don't see your device. Let us know</a></p>
+      </div>
+
+      <div class="container" id="app-store">
+          <div class="row download-app">
+                  <p class="text-center">Or download our app to get a quote in just <strong>3 seconds</strong>! <i class="twa twa-lg twa-raised-hands"></i></p>
+                      <div class="col-md-6 text-right">
+                        <a href="{{ apple_app_download }}&cs=homepage"><img src="/images/icons/download-badge-app-store.svg" alt="Download so-sure on the App Store"></img></a>
+                      </div>
+                      <div class="col-md-6 text-left">
+                        <a href="{{ google_app_download }}&utm_source=homepage"><img src="/images/icons/download-badge-google-play.svg" alt="Get so-sure on Google Play"></img></a>
+                      </div>
+                  </div>
+              </div>
+          <div class="mouse"></div>
+  </section>
+
+  <section>
+      <div id="learn-more">
+          <div class="container">
+              <h3 class="text-center">How it works</h3>
+              <p></p>
+          <div class="row">
+              <div class="col-md-6">
+                  <p class="text-center"><img src="{{ cdn_url }}/images/home/illustrations/gifs/so-sure_illy-1.gif" alt"Get your phone covered for Theft, Loss and Accidental Damage for a small monthly fee"></img>
+                  </p>
+              </div>
+              <div class="col-md-6">
+                  <h4 class="text-left">Get your phone covered.</h4>
+                  <p class="text-left">Download our app and for a small monthly fee your phone is covered for theft, loss and accidental damage. Learn more <a href="https://help.wearesosure.com/hc/en-us/articles/207523559-What-does-it-mean-to-put-your-phone-at-risk">here</a>.</p>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-md-6 col-md-push-6">
+                <p class="text-center"><img src="{{ cdn_url }}/images/home/illustrations/gifs/so-sure_illy-2.gif" alt"Connect with friends to build your Reward Pot"></img>
+                </p>
+              </div>
+              <div class="col-md-6 col-md-pull-6">
+                  <h4 class="text-right">Connect with friends &amp; build your Reward Pot.</h4>
+                  <p class="text-right">Invite your trusted friends and for each one that also buys insurance with us we’ll add up to £10 to both of your Reward Pots.</p>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-md-6">
+                  <p class="text-center"><img src="{{ cdn_url }}/images/home/illustrations/gifs/so-sure_illy-3.gif" alt="If you and your friends don't claim you get money back!"></img>
+                  </p>
+              </div>
+              <div class="col-md-6">
+                  <h4 class="text-left">Nobody claims? You get money back.</h4>
+                  <p class="text-left">If everyone looks after their phone and don't claim, we’ll give you back whatever is in your Reward Pot at the end of the year. Or you can roll it over into next year to significantly reduce the cost of your premium.</p>
+              </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 col-md-push-6">
+                <p class="text-center"><img src="{{ cdn_url }}/images/home/illustrations/gifs/so-sure_illy-4.gif" alt="If a friend makes a claim, your Reward Pot will help them get their phone back."></img>
+                </p>
+            </div>
+              <div class="col-md-6 col-md-pull-6">
+                  <h4 class="text-right">Someone needs to make a claim?</h4>
+                  <p class="text-right">If a friend makes a claim, your Reward Pot will go towards helping them get their phone back. They’ll do the same if you make a claim. After all, what are friends for.</p>
+              </div>
+          </div>
+          </div>
+        </div>
+  </section>
+
+  <section>
+      <div class="popular-devices">
+          <div class="container">
+              <h3>Select from our most popular devices</h3>
+              <p>Find out how much you could save when you get your phone insured with us.</p>
+              <div class="row">
+                  <div class="col-md-4">
+                      <div id="device-logo">
+                          <img src="{{ cdn_url }}/images/home/phone-logos/Samsung_Galaxy_S7_logo.svg" alt="Get your Samsung Galaxy S7 insured today!"></img>
+                          <div id="memory-select">
+                            <h5>Select memory</h5>
+                            <ul>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S7', 'memory': '32'}) }}">32GB</a></li>
+                            </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-4">
+                      <div id="device-logo">
+                          <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_6s_Logo.svg" alt="Get your iPhone 6S insured today!"></img>
+                          <div id="memory-select">
+                            <h5>Select memory</h5>
+                            <ul>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6S', 'memory': '16'}) }}">16GB</a></li>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6S', 'memory': '64'}) }}">64GB</a></li>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6S', 'memory': '128'}) }}">128GB</a></li>
+                            </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-4">
+                      <div id="device-logo">
+                      <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_6_Logo.svg" alt="Get your iPhone 6 insured today!"></img>
+                      <div id="memory-select">
+                        <h5>Select memory</h5>
+                        <ul>
+                          <li><a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '16'}) }}">16GB</a></li>
+                          <li><a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '64'}) }}">64GB</a></li>
+                          <li><a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '128'}) }}">128GB</a></li>
+                        </ul>
+                      </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-4">
+                      <div id="device-logo">
+                          <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_SE_logo.svg" alt="Get your Samsung iPhone SE insured today!"></img>
+                          <div id="memory-select">
+                            <h5>Select memory</h5>
+                            <ul>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone SE', 'memory': '16'}) }}">16GB</a></li>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone SE', 'memory': '64'}) }}">64GB</a></li>
+                            </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-4">
+                      <div id="device-logo">
+                          <img src="{{ cdn_url }}/images/home/phone-logos/GalaxyS6_Logo.svg" alt="Get your Samsung Galaxy S6 insured today"></img>
+                          <div id="memory-select">
+                            <h5>Select memory</h5>
+                            <ul>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S6', 'memory': '32'}) }}">32GB</a></li>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S6', 'memory': '64'}) }}">64GB</a></li>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S6', 'memory': '128'}) }}">128GB</a></li>
+                            </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-4">
+                      <div id="device-logo">
+                          <img src="{{ cdn_url }}/images/home/phone-logos/Samsung_Galaxy_S5_logo.svg" alt="Get your Samsung Galaxy S5 insured today"></img>
+                          <div id="memory-select">
+                            <h5>Select memory</h5>
+                            <ul>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S5', 'memory': '16'}) }}">16GB</a></li>
+                              <li><a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S5', 'memory': '32'}) }}">32GB</a></li>
+                            </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  <section>
+      <div class="social-proof">
+          <div class="container">
+              <h3>Why insurance needs to change</h3>
+              <p>Don't take our word for it, just look at these disgruntled people. This is why we're commited to giving you the best possible experience.</p>
+              <div class="row centered">
+                  <div class="col-md-4">
+                      <blockquote class="twitter-tweet" lang="en">
+                        <p lang="en" dir="ltr"><a href="https://twitter.com/AskNationwide">@AskNationwide</a> why is your mobile phone insurance claim process via paper and post? <a href="https://twitter.com/hashtag/1980s?src=hash">#1980s</a> <a href="https://twitter.com/hashtag/slow?src=hash">#slow</a>              <a href="https://twitter.com/hashtag/needsarethink?src=hash">#needsarethink</a></p>&mdash; Kerrie Colford (@kerriecolford) <a href="https://twitter.com/kerriecolford/status/684687370843779072">January 6, 2016</a>
+                      </blockquote>
+                    </div>
+                    <div class="col-md-4">
+                      <blockquote class="twitter-tweet" lang="en">
+                        <p lang="en" dir="ltr">Bad service <a href="https://twitter.com/AskLloydsBank">@AskLloydsBank</a> Acc upgrade met with advisor saying &quot;computer says no&quot; just cos I didn&#39;t want your mobile insurance bundled in.</p>&mdash; Tom R. (@Tomptati0n) <a href="https://twitter.com/Tomptati0n/status/614420014419083267">June 26, 2015</a>
+                      </blockquote>
+                    </div>
+                    <div class="col-md-4">
+                      <blockquote class="twitter-tweet" lang="en">
+                        <p lang="en" dir="ltr">incredibly poor ecommerce experience from <a href="https://twitter.com/EE">@EE</a> apparently if you upgrade via the mobile site, they REMOVE your insurance!</p>&mdash; Robert Nicholson (@RobBothan) <a href="https://twitter.com/RobBothan/status/684056441360105472">January 4, 2016</a>
+                      </blockquote>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <div class="pre-footer">
       <div class="row">
-        <p>Or download our app to get an instant quote &amp; start inviting your friends!</p>
-        <div class="col-md-3">
-        </div>
-        <div class="col-md-3 center-block">
-        <a href="{{ google_app_download }}&utm_source=homepage"><img class="google-play" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a>
+          <div class="col-sm-6 col-a">
+              <h4><a href="http://help.wearesosure.com">Learn More</a></h4>
+              <p>Learn more about how Social Insurance works and why you should join us. We also cover all the basics to help you understand exactly what you're paying for.</p>
+          </div>
+
+          <div class="col-sm-6 col-b">
+              <h4><a href="https://wearesosure.zendesk.com/hc/en-us/articles/207523059-Our-mission">Our Mission</a></h4>
+              <p>Insurance is rubbish. We're making it better by returning it to how it all started. We call this Social Insurance. Starting with mobile phones, then the world!</p>
+          </div>
       </div>
-      <div class="col-md-3 center-block">
-      <a href="{{ apple_app_download }}&cs=homepage"><img class="app-store" src="/images/icons/Download_on_the_App_Store_Badge_US-UK_135x40.svg"></img></a>
-    </div>
-      <div class="col-md-3">
-      </div>
-      </div>
-  {% endif %}
-      <div class="row">
-        <div class="learn-more">
-          <span class="chevron bottom"></span>
-        </div>
-      </div>
-    </div>
   </div>
 
-  <div class="section how">
-    <div class="container">
-      <h3 class="section-heading">Why we're better</h3>
-      <p class="section-description">We're committed to making it as easy as possible for you and your friends to get covered, make a claim and when you don't get money back.</p>
-      <div class="row">
-        <div class="col-md-4">
-          <h2><img src="/images/icons/lock.svg"></img></h2>
-          <h4 class="section-heading">Your phone is covered</h4>
-          <p class="section-description">For a small monthly fee, you're covered for theft, loss, accidental damage, accessories and unauthorised usage.</p>
-        </div>
-        <div class="col-md-4">
-          <h2><img src="/images/icons/wallet.svg"></img></h2>
-          <h4 class="section-heading">You can get money back</h4>
-          <p class="section-description">Invite your friends &amp; for each one that signs up we'll give you up to £10 credit. No one claims? You get your credit back.</p>
-        </div>
-        <div class="col-md-4">
-          <h2><img src="/images/icons/stopwatch.svg"></img></h2>
-          <h4 class="section-heading">Next day replacement</h4>
-          <p class="section-description">To claim, just give us a call any time and once approved we’ll aim to get a replacement phone to you the next working day.</p>
-        </div>
-      </div>
-    </div>
+  <div class="pre-footer footer-social">
+      <p>Help us change insurance for good by sharing the love. <i class="twa twa-lg twa-heart"></i></p>
+      <ul class="share-row">
+          <li class="gplus">
+              <div class="g-plus" data-action="share" data-annotation="none"></div>
+              <script src="https://apis.google.com/js/platform.js" async defer>
+                  {
+                      lang: 'en-GB'
+                  }
+              </script>
+          </li>
+          <li class="twitter-share">
+              <a href="https://twitter.com/share" class="twitter-share-button" data-via="#" data-hashtags="#" data-related="#">Tweet</a>
+          </li>
+          <li class="facebook-share">
+              <div id="fb-root"></div>
+              <script>
+                  (function(d, s, id) {
+                      var js, fjs = d.getElementsByTagName(s)[0];
+                      if (d.getElementById(id)) return;
+                      js = d.createElement(s);
+                      js.id = id;
+                      js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.6&appId=192557904434983";
+                      fjs.parentNode.insertBefore(js, fjs);
+                  }(document, 'script', 'facebook-jssdk'));
+              </script>
+              <div class="fb-share-button" data-href="https://facebook.com/wearesosure" data-layout="button" data-mobile-iframe="true"></div>
+          </li>
+      </ul>
   </div>
 
-  <div class="section mission">
-    <div class="container">
-      <div class="row">
-        <h2 class="section-title">Our mission</h2>
-        <h3 class="section-heading">Insurance is rubbish.</h3>
-        <p class="section-description">It costs too much, you're never quite sure what you're paying for and when you try to claim you discover that you didn't read their <small>small print</small>.</p>
-        <h3 class="section-heading">We are making it better.</h3>
-        <p class="section-description">We're taking insurance back to how it all started: careful, connected people who can trust that when the worst does happen, they’re covered. And when it doesn’t, they get most of their money back.
-          <br><br> We call this Social Insurance.</p>
-        <h3 class="section-heading">We are starting with phones.</h3>
-        <p class="section-description">Why? Because those shiny, magical objects connect us with the people we <i class="fa fa-heart" alt="love"></i> most.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="section twitter">
-    <div class="container">
-      <h3 class="section-heading">It's time for a change</h3>
-      <p class="section-description">This is why we're commited to giving you the best possible experience.</p>
-      <div class="row">
-        <div class="col-md-4">
-          <blockquote class="twitter-tweet" lang="en">
-            <p lang="en" dir="ltr"><a href="https://twitter.com/AskNationwide">@AskNationwide</a> why is your mobile phone insurance claim process via paper and post? <a href="https://twitter.com/hashtag/1980s?src=hash">#1980s</a> <a href="https://twitter.com/hashtag/slow?src=hash">#slow</a>              <a href="https://twitter.com/hashtag/needsarethink?src=hash">#needsarethink</a></p>&mdash; Kerrie Colford (@kerriecolford) <a href="https://twitter.com/kerriecolford/status/684687370843779072">January 6, 2016</a>
-          </blockquote>
-        </div>
-        <div class="col-md-4">
-          <blockquote class="twitter-tweet" lang="en">
-            <p lang="en" dir="ltr">Bad service <a href="https://twitter.com/AskLloydsBank">@AskLloydsBank</a> Acc upgrade met with advisor saying &quot;computer says no&quot; just cos I didn&#39;t want your mobile insurance bundled in.</p>&mdash; Tom R. (@Tomptati0n) <a href="https://twitter.com/Tomptati0n/status/614420014419083267">June 26, 2015</a>
-          </blockquote>
-        </div>
-        <div class="col-md-4">
-          <blockquote class="twitter-tweet" lang="en">
-            <p lang="en" dir="ltr">incredibly poor ecommerce experience from <a href="https://twitter.com/EE">@EE</a> apparently if you upgrade via the mobile site, they REMOVE your insurance!</p>&mdash; Robert Nicholson (@RobBothan) <a href="https://twitter.com/RobBothan/status/684056441360105472">January 4, 2016</a>
-          </blockquote>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section cta">
-    <div class="container">
-      <h2 class="section-heading">Sign up today &amp; get rewarded!</h2>
-      <h4 style="color: #fff;">We've not launched yet, but as one of our first 1,000 customers you could get your first year's insurance for free!</h4>
-      <p>Enter your email to find out how.</p>
-      <div class="signup">
-        {{ form_start(form_bottom) }}
-        <div class="input-group">
-          {{ form_widget(form_bottom.email, {'attr': {'class': 'form-control email', 'placeholder': 'Email address'}}) }}
-            <span class="input-group-btn">
-            {{ form_widget(form_bottom.save, {'label': 'Signup', 'attr': {'class': 'btn btn-success'}}) }}
-            </span>
-        </div>
-        {{ form_end(form_bottom) }}
-      </div>
-    </div>
-  </div>
-
-  </div>
+</div>
 {% endblock %}

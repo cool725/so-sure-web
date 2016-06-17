@@ -5,16 +5,16 @@
 	background: #3399FF;
 }
 #connectionLegend {
-	padding-bottom: 2rem;
+	padding-bottom: 20px;
+	color: #626B78;
 }
-#slider-description {
-	padding-top: 2rem;
+#connectionsChartLegend {
+	padding-top: 20px;
 }
-
 #connectionsChartLegend ul {
 	list-style: none;
+	color: #626B78;
 }
-
 #connectionsChartLegend ul li span {
 	padding-right: 5px;
 }

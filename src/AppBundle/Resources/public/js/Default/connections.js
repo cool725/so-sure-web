@@ -3,21 +3,22 @@ var ctx = $("#connectionsChart").get(0).getContext("2d");
 var max_value = $('#connection-value').data('slider-max');
 var maxpot_value = $('#connection-value').data('slider-maxpot');
 var initial_value = $('#connection-value').data('slider-value');
-var adjusted_potential_value = maxpot_value - (max_value * 10);
+var connection_value = $('#connection-value').data('slider-connection-value');
+var adjusted_potential_value = maxpot_value - (max_value * connection_value);
 var data = [
     {
         value: initial_value,
         color:"#3399FF",
         highlight: "#3399FF",
         // If changing text, verify tooltipTemplate isn't affected
-        label: "Pot Value"
+        label: "You get back"
     },
     {
         value: max_value - initial_value,
-        color:"#1B262D",
+        color:"#202532",
         highlight: "#6F6F6F",
         // If changing text, verify tooltipTemplate isn't affected
-        label: "Potential Value"
+        label: "You could still get back"
     },
 ]
 
@@ -28,13 +29,13 @@ function roundToTwo(num) {
 var connectionsDoughnutChart = new Chart(ctx).Doughnut(data, {
     tooltipTemplate: "<%if (label){%><%=label%>: <%}%>£" +
                      "<% if (label && label.indexOf('Pot ') > -1) { " +
-                         "if (value * 10 > " + maxpot_value + "){%>" +
+                         "if (value * " + connection_value + " > " + maxpot_value + "){%>" +
                              maxpot_value +
                           "<%} else {%>" +
-                             "<%= value * 10 %>" +
+                             "<%= value * " + connection_value + " %>" +
                           "<% }" +
                      "} else { %>" +
-                         "<%= roundToTwo(" + adjusted_potential_value + " + value * 10 ) %>" +
+                         "<%= roundToTwo(" + adjusted_potential_value + " + value * " + connection_value + " ) %>" +
                      "<% }%>",
     legendTemplate : '<ul>'
                   +'<% for (var i=0; i<data.length; i++) { %>'
@@ -47,16 +48,16 @@ var connectionsDoughnutChart = new Chart(ctx).Doughnut(data, {
 });
 
 var setConnectionText = function() {
-    var save_value = slider.getValue() * 10;
+    var save_value = slider.getValue() * connection_value;
     if (save_value > maxpot_value) {
         save_value = maxpot_value;
     }
     var potential_value = roundToTwo(maxpot_value - save_value);
-    var connectionText = "With " + slider.getValue() + " connection(s), you could get £" + save_value.toFixed(2) + " back at the end of the year if you and your friend(s) don't claim.";
+    var connectionText = "Connect with " + slider.getValue() + " friend(s) and provided none of you claim you'll get £" + save_value + " back at the end of the year.";
     $('#connectionLegend').text(connectionText);
-    var potText = $('#connectionChartLegend-0').text().replace(/£.*/, '£' + save_value.toFixed(2));
+    var potText = $('#connectionChartLegend-0').text().replace(/£.*/, '£' + save_value);
     $('#connectionChartLegend-0').text(potText);
-    var potentialText = $('#connectionChartLegend-1').text().replace(/£.*/, '£' + potential_value.toFixed(2));
+    var potentialText = $('#connectionChartLegend-1').text().replace(/£.*/, '£' + potential_value);
     $('#connectionChartLegend-1').text(potentialText);
 }
 
