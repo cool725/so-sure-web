@@ -35,7 +35,15 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $s3 = true === $input->getOption('s3');
-        $date = new \DateTime($input->getOption('date'));
+        $date = $input->getOption('date');
+        if ($date) {
+            $date = new \DateTime($input->getOption('date'));
+        } else {
+            $now = new \DateTime();
+            $date = new \DateTime(sprintf("%d-%d-01", $now->format('Y'), $now->format('m')));
+            $date->sub(new \DateInterval('P1M'));
+            $output->writeln(sprintf('Using last month %s', $date->format('Y-m')));
+        }
         $salva = $this->getContainer()->get('app.salva');
         $output->write($salva->exportPayments($s3, $date));
     }
