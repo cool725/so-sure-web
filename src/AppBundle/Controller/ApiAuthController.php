@@ -69,7 +69,7 @@ class ApiAuthController extends BaseController
             $number = trim($request->get('number'));
 
             $lookup = $this->get('app.address');
-            if (!$address = $lookup->getAddress($postcode, $number)) {
+            if (!$address = $lookup->getAddress($postcode, $number, $this->getUser())) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
@@ -341,7 +341,7 @@ class ApiAuthController extends BaseController
                 null;
 
             // Checking against blacklist should be last check to possible avoid costs
-            if (!$imeiValidator->checkImei($phone, $imei)) {
+            if (!$imeiValidator->checkImei($phone, $imei, $this->getUser())) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED,
                     'Imei is blacklisted',
@@ -354,7 +354,7 @@ class ApiAuthController extends BaseController
                 $serialNumber = $imei;
             }
 
-            if (!$imeiValidator->checkSerial($phone, $serialNumber)) {
+            if (!$imeiValidator->checkSerial($phone, $serialNumber, $this->getUser())) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_IMEI_PHONE_MISMATCH,
                     'Imei/Phone mismatch',

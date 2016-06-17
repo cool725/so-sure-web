@@ -295,6 +295,13 @@ class InvitationService
         } else {
             $invitation->setStatus(SmsInvitation::STATUS_FAILED);
         }
+
+        $charge = new Charge();
+        $charge->setType(Charge::TYPE_SMS);
+        $charge->setUser($invitation->getInviter());
+        $charge->setPolicy($invitation->getPolicy());
+        $charge->setDetails($invitation->getMobile());
+        $this->dm->persist($charge);
     }
 
     protected function validatePolicy(Policy $policy)

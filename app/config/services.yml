@@ -110,9 +110,10 @@ services:
     app.address:
         class: AppBundle\Service\PCAService
         arguments:
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
             logger:      "@logger"
-            apiKey:      %pca_apikey%
-            environment: %kernel.environment%
+            apiKey:      "%pca_apikey%"
+            environment: "%kernel.environment%"
             redis:       "@snc_redis.default"
 
     app.geoip:

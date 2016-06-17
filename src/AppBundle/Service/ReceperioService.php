@@ -4,6 +4,9 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Charge;
+use AppBundle\Document\User;
+use AppBundle\Document\PhonePolicy;
 
 class ReceperioService extends BaseImeiService
 {
@@ -74,10 +77,11 @@ class ReceperioService extends BaseImeiService
      *
      * @param Phone  $phone
      * @param string $imei
+     * @param User   $user
      *
      * @return boolean True if imei is ok
      */
-    public function checkImei(Phone $phone, $imei)
+    public function checkImei(Phone $phone, $imei, User $user = null)
     {
         \AppBundle\Classes\NoOp::noOp([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
@@ -112,6 +116,13 @@ class ReceperioService extends BaseImeiService
                     $now->format('d')
                 );
                 $this->redis->zincrby($logKey, 1, $imei);
+
+                $charge = new Charge();
+                $charge->setType(Charge::TYPE_GSMA);
+                $charge->setUser($user);
+                $charge->setDetails($imei);
+                $this->dm->persist($charge);
+                $this->dm->flush();
             }
             $this->responseData = $data;
             $this->certId = $data['certid'];
@@ -129,12 +140,13 @@ class ReceperioService extends BaseImeiService
     /**
      * Claimscheck
      *
-     * @param Phone  $phone
-     * @param string $imei
+     * @param Phone       $phone
+     * @param string      $imei
+     * @param PhonePolicy $policy
      *
      * @return boolean True if imei is ok
      */
-    public function checkClaims(Phone $phone, $imei)
+    public function checkClaims(Phone $phone, $imei, PhonePolicy $policy = null)
     {
         \AppBundle\Classes\NoOp::noOp([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
@@ -169,6 +181,16 @@ class ReceperioService extends BaseImeiService
                     $now->format('d')
                 );
                 $this->redis->zincrby($logKey, 1, $imei);
+
+                $charge = new Charge();
+                $charge->setType(Charge::TYPE_CLAIMSCHECK);
+                $charge->setPolicy($policy);
+                if ($policy) {
+                    $charge->setUser($policy->getUser());
+                }
+                $charge->setDetails($imei);
+                $this->dm->persist($charge);
+                $this->dm->flush();
             }
             $this->responseData = $data;
             $this->certId = $data['checkmendstatus']['certid'];
@@ -188,10 +210,11 @@ class ReceperioService extends BaseImeiService
      *
      * @param Phone  $phone
      * @param string $serialNumber
+     * @param User   $user
      *
      * @return boolean True if imei is ok
      */
-    public function checkSerial(Phone $phone, $serialNumber)
+    public function checkSerial(Phone $phone, $serialNumber, User $user = null)
     {
         // TODO: Cache
 
@@ -230,6 +253,13 @@ class ReceperioService extends BaseImeiService
                 $now = new \DateTime();
                 $logKey = sprintf('receperio:makemodel:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
                 $this->redis->zincrby($logKey, 1, $serialNumber);
+
+                $charge = new Charge();
+                $charge->setType(Charge::TYPE_MAKEMODEL);
+                $charge->setUser($user);
+                $charge->setDetails($serialNumber);
+                $this->dm->persist($charge);
+                $this->dm->flush();
             }
             $this->responseData = $data;
 
