@@ -36,7 +36,7 @@ class RateLimitService
     public static $maxRequests = [
         self::DEVICE_TYPE_IMEI => 2,
         self::DEVICE_TYPE_ADDRESS => 3,
-        self::DEVICE_TYPE_LOGIN => 3,
+        self::DEVICE_TYPE_LOGIN => 10,
         self::DEVICE_TYPE_POLICY => 1,
         self::DEVICE_TYPE_RESET => 2,
         self::DEVICE_TYPE_TOKEN => 10,

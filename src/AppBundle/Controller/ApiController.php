@@ -50,15 +50,6 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            $rateLimit = $this->get('app.ratelimit');
-            if (!$rateLimit->allowedByDevice(
-                RateLimitService::DEVICE_TYPE_LOGIN,
-                $this->getCognitoIdentityIp($request),
-                $this->getCognitoIdentityId($request)
-            )) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
-            }
-
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $user = null;
@@ -73,11 +64,20 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
 
-            // remove any password check for apple morons            
+            // remove any password check for apple morons
             if ($user->getEmailCanonical == "apple@so-sure.com") {
                 list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
                 return new JsonResponse($user->toApiArray($identityId, $token));
+            }
+
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_LOGIN,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
             // soft delete
