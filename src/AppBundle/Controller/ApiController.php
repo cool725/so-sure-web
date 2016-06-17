@@ -65,7 +65,7 @@ class ApiController extends BaseController
             }
 
             // remove any password check for apple morons
-            if ($user->getEmailCanonical == "apple@so-sure.com") {
+            if ($user->getEmailCanonical() == "apple@so-sure.com") {
                 list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
                 return new JsonResponse($user->toApiArray($identityId, $token));
