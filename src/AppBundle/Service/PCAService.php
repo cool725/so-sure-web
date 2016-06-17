@@ -3,6 +3,9 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Address;
+use AppBundle\Document\Charge;
+use AppBundle\Document\User;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 class PCAService
 {
@@ -15,6 +18,9 @@ class PCAService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var DocumentManager */
+    protected $dm;
+
     /** @var string */
     protected $apiKey;
 
@@ -24,13 +30,15 @@ class PCAService
     protected $redis;
 
     /**
+     * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $apiKey
      * @param string          $environment
      * @param                 $redis
      */
-    public function __construct(LoggerInterface $logger, $apiKey, $environment, $redis)
+    public function __construct(DocumentManager $dm, LoggerInterface $logger, $apiKey, $environment, $redis)
     {
+        $this->dm = $dm;
         $this->logger = $logger;
         $this->apiKey = $apiKey;
         $this->environment = $environment;
@@ -45,8 +53,9 @@ class PCAService
     /**
      * @param string $postcode
      * @param string $number   Optional house number
+     * @param User   $user     Optional user
      */
-    public function getAddress($postcode, $number)
+    public function getAddress($postcode, $number, User $user = null)
     {
         $postcode = $this->normalizePostcode($postcode);
 
@@ -82,6 +91,16 @@ class PCAService
 
             $address = $this->retreive($key);
             $this->cacheResults($postcode, $number, $address);
+
+            // ignore free check
+            if ($postcode != "WR53DA") {
+                $charge = new Charge();
+                $charge->setType(Charge::TYPE_ADDRESS);
+                $charge->setUser($user);
+                $charge->setDetails(sprintf('%s, %s', $postcode, $number));
+                $this->dm->persist($charge);
+                $this->dm->flush();
+            }
 
             return $address;
         }
