@@ -154,8 +154,9 @@
 
     <div class="connections" id="connections">
         <div class="container">
-            <h3>Do you want to pay just £{{ phone_price.yearlyPremiumPrice - phone_price.maxPot }}
-                for the entire year?</h3>
+            <h3>
+              Do you want to get £{{ phone_price.maxPot|number_format(2, '.', ',') }} back at the end of the year?
+            </h3>
             <p>
                 <div id="connectionLegend"></div>
                 <i class="twa twa-lg twa-couple"></i><i class="twa twa-lg twa-two-men-holding-hands"></i><i class="twa twa-lg twa-two-women-holding-hands"></i><i class="twa twa-lg twa-couple"></i>
@@ -168,7 +169,7 @@
                     <h4>Frequently Asked Questions</h4>
                     <div class="col-md-6">
                         <h5>How does it work?</h5>
-                        <p>You still pay £{{ phone_price.monthlyPremiumPrice }}
+                        <p>You still pay £{{ phone_price.monthlyPremiumPrice|number_format(2, '.', ',') }}
                             monthly for a year, but for each friend that also insures with us we’ll add up to £10 your Reward Pot.</p>
                     </div>
                     <div class="col-md-6">

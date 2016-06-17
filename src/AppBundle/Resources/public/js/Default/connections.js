@@ -18,7 +18,7 @@ var data = [
         color:"#202532",
         highlight: "#6F6F6F",
         // If changing text, verify tooltipTemplate isn't affected
-        label: "You'll pay"
+        label: "You could still get back"
     },
 ]
 
