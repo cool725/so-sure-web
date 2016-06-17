@@ -32,7 +32,7 @@ class ApiUnauthController extends BaseController
      * @Route("/token", name="api_unauth_token")
      * @Method({"POST"})
      */
-    public function unauthTokenction(Request $request)
+    public function unauthTokenAction(Request $request)
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
