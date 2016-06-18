@@ -64,12 +64,14 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
 
-            // remove any password check for apple morons
+            /* Apple appears to have problems logging in
+             * so may want to re-enable for releases
             if ($user->getEmailCanonical() == "apple@so-sure.com") {
                 list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
                 return new JsonResponse($user->toApiArray($identityId, $token));
             }
+            */
 
             $rateLimit = $this->get('app.ratelimit');
             if (!$rateLimit->allowedByDevice(
