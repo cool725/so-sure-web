@@ -3,21 +3,24 @@
 {% block body %}
 <div class="container">
     {{ form_start(form) }}
+    <div class="row">
         <div class="form-group">
             {{ form_label(form.mobile, 'Mobile Number', {'label_attr': {'class': 'col-sm-2'}}) }}
             {{ form_errors(form.mobile) }}
-            {{ form_widget(form.mobile, {'attr': {'class': 'col-sm-4'}}) }}
+            {{ form_widget(form.mobile, {'attr': {'class': 'col-sm-3'}}) }}
         </div>
         <div class="form-group">
             {{ form_label(form.email, 'Email', {'label_attr': {'class': 'col-sm-2'}}) }}
             {{ form_errors(form.email) }}
-            {{ form_widget(form.email, {'attr': {'class': 'col-sm-4'}}) }}
+            {{ form_widget(form.email, {'attr': {'class': 'col-sm-3'}}) }}
         </div>
         <div class="form-group">
             {{ form_label(form.postcode, 'Postcode', {'label_attr': {'class': 'col-sm-2'}}) }}
             {{ form_errors(form.postcode) }}
-            {{ form_widget(form.postcode, {'attr': {'class': 'col-sm-4'}}) }}
+            {{ form_widget(form.postcode, {'attr': {'class': 'col-sm-3'}}) }}
         </div>
+    </div>
+    <div class="row">
         <div class="form-group">
             {{ form_label(form.lastname, 'Lastname', {'label_attr': {'class': 'col-sm-2'}}) }}
             {{ form_errors(form.lastname) }}
@@ -26,6 +29,7 @@
         <div class="form-group">
             {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success'}}) }}
         </div>
+    </div>
     {{ form_end(form) }}
     
     {% if users.count == 0 %}
