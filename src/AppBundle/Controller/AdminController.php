@@ -216,12 +216,12 @@ class AdminController extends BaseController
         if ($form->isValid()) {
             $this->formToMongoSearch($form, $users, 'email', 'email');
             $this->formToMongoSearch($form, $users, 'lastname', 'lastName');
-            $this->formToMongoSearch($form, $users, 'mobile', 'mobile_number');
-            $this->formToMongoSearch($form, $users, 'postcode', 'addresses.postcode');
+            $this->formToMongoSearch($form, $users, 'mobile', 'mobileNumber');
+            $this->formToMongoSearch($form, $users, 'postcode', 'billingAddress.postcode');
 
             $policyRepo = $dm->getRepository(Policy::class);
             $policiesQb = $policyRepo->createQueryBuilder();
-            if ($policies = $this->formToMongoSearch($form, $policiesQb, 'policy', 'policy_number', true)) {
+            if ($policies = $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber', true)) {
                 $userIds = [];
                 foreach ($policies as $policy) {
                     $userIds[] = $policy->getUser()->getId();
