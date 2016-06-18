@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Charge;
+use AppBundle\Document\Claim;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 
@@ -65,6 +66,15 @@ class ReceperioService extends BaseImeiService
     public function getCertId()
     {
         return $this->certId;
+    }
+
+    public function getCertUrl($certId = null)
+    {
+        if ($certId == null) {
+            $certId = $this->getCertId();
+        }
+
+        return sprintf("https://www.checkmend.com/uk/verify/%s", $certId);
     }
 
     public function getResponseData()
@@ -135,6 +145,24 @@ class ReceperioService extends BaseImeiService
             // For now, if there are any issues, assume true and run a manual retry later
             return true;
         }
+    }
+
+    public function policyClaim(PhonePolicy $policy, $claimType)
+    {
+        $result = null;
+        if ($claimType == Claim::TYPE_DAMAGE) {
+            $result = $this->checkImei($policy->getPhone(), $policy->getImei(), $policy->getUser());
+        } elseif (in_array($claimType, [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
+            $result = $this->checkClaims($policy->getPhone(), $policy->getImei(), $policy);
+        } else {
+            throw new \InvalidArgumentException(sprintf('Unknown claim type %s', $claimType));
+        }
+
+        $now = new \DateTime();
+        $policy->addCheckmendCerts($now->format('U'), $this->getCertId());
+        $this->dm->flush();
+
+        return $result;
     }
 
     /**

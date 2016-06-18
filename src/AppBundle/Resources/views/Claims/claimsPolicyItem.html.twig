@@ -50,11 +50,11 @@
                     <tr>
                       <td>ClaimsCheck Cert Id</td>
                       <td>
-                        {% if policy.checkmendCert %}
-                          <a href="https://www.checkmend.com/uk/verify/{{ policy.checkmendCert }}" target="_blank">{{ policy.checkmendCert }}</a>
-                        </form>
-                        {% else %}
-                          Cert not present
+                        {% for key, value in policy.checkmendCerts %}
+                          <a href="https://www.checkmend.com/uk/verify/{{ value }}" target="_blank">{{ value }}</a> ({{ key|date("F j, Y H:i", "Europe/London") }})<br />
+                        {% endfor %}
+                        {% if policy.checkmendCerts|length == 0 %}
+                          Certs not present
                         {% endif %}
                       </td>
                     </tr>
@@ -221,5 +221,6 @@
             {% endif %}
         </div>
     </div>
+    <div style="padding-bottom: 30px"></div>
 
     {% include 'AppBundle::Claims/phoneAlternativesModal.html.twig' %}

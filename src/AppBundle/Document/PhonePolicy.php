@@ -43,10 +43,10 @@ class PhonePolicy extends Policy
     protected $serialNumber;
 
     /**
-     * @MongoDB\Field(type="string")
+     * @MongoDB\Field(type="hash")
      * @Gedmo\Versioned
      */
-    protected $checkmendCert;
+    protected $checkmendCerts = array();
 
     public function getPhone()
     {
@@ -93,14 +93,14 @@ class PhonePolicy extends Policy
         $this->phoneData = $phoneData;
     }
 
-    public function getCheckmendCert()
+    public function getCheckmendCerts()
     {
-        return $this->checkmendCert;
+        return $this->checkmendCerts;
     }
 
-    public function setCheckmendCert($checkmendCert)
+    public function addCheckmendCerts($key, $value)
     {
-        $this->checkmendCert = $checkmendCert;
+        $this->checkmendCerts[$key] = $value;
     }
 
     public function getTotalConnectionValue(\DateTime $date = null)
