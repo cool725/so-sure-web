@@ -98,9 +98,38 @@ class PhonePolicy extends Policy
         return $this->checkmendCerts;
     }
 
+    public function getCheckmendCertsAsArray()
+    {
+        $certs = [];
+        foreach ($this->getCheckmendCerts() as $date => $data) {
+            try {
+                $certs[$date] = unserialize($data);
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        return $certs;
+    }
+
     public function addCheckmendCerts($key, $value)
     {
         $this->checkmendCerts[$key] = $value;
+    }
+
+    public function addCheckmendCertData($certId, $response)
+    {
+        if (!$certId || strlen(trim($certId)) == 0) {
+            return;
+        }
+
+        $now = new \DateTime();
+        $data = [
+            'certId' => $certId,
+            'response' => $response,
+        ];
+
+        $this->checkmendCerts[$now->format('U')] = serialize($data);
     }
 
     public function getTotalConnectionValue(\DateTime $date = null)

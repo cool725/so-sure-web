@@ -23,7 +23,7 @@ class ClaimsCheckType extends AbstractType
                 Claim::TYPE_THEFT => Claim::TYPE_THEFT,
                 Claim::TYPE_DAMAGE => Claim::TYPE_DAMAGE,
             ]])
-            ->add('Run Check', SubmitType::class)
+            ->add('run', SubmitType::class)
         ;
     }
 

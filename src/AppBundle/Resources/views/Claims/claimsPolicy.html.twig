@@ -13,14 +13,29 @@
 {% block body %}
 <div class="container">
     <h2>so-sure Claims - {{policy.user.name }}</h2>
-    <div class="bg-danger" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+    <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <p class="text-center"><strong>Run ClaimsCheck</strong></p>
         <p>
             ClaimsCheck should be run after the claim has been judged as valid as a final
             verification of the customer's actions as there is an assocated cost in running
             this check.
         </p>
-        {{ form(formClaimsCheck) }}
+        {{ form_start(formClaimsCheck) }}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(formClaimsCheck.type, 'Type of claim', {'label_attr': {'class': 'col-sm-4'}}) }}
+                    {{ form_errors(formClaimsCheck.type) }}
+                    {{ form_widget(formClaimsCheck.type, {'attr': {'class': 'col-sm-3'}}) }}
+                </div>                
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    {{ form_widget(formClaimsCheck.run, {'label': 'Run ClaimsCheck', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>                
+            </div>
+        </div>
+        {{ form_end(formClaimsCheck) }}
     </div>
     <div class="bg-danger" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <p class="text-center"><strong>Record Claim</strong></p>

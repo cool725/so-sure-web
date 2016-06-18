@@ -50,8 +50,8 @@
                     <tr>
                       <td>ClaimsCheck Cert Id</td>
                       <td>
-                        {% for key, value in policy.checkmendCerts %}
-                          <a href="https://www.checkmend.com/uk/verify/{{ value }}" target="_blank">{{ value }}</a> ({{ key|date("F j, Y H:i", "Europe/London") }})<br />
+                        {% for key, data in policy.checkmendCertsAsArray if data['certId'] is defined %}
+                          <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a> ({{ key|date("F j, Y H:i", "Europe/London") }})<br />
                         {% endfor %}
                         {% if policy.checkmendCerts|length == 0 %}
                           Certs not present
