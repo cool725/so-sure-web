@@ -14,6 +14,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ClaimType;
+use AppBundle\Form\Type\ClaimsCheckType;
 use AppBundle\Form\Type\UserSearchType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -111,21 +112,46 @@ class ClaimsController extends BaseController
         }
 
         $claim = new Claim();
-        $form = $this->createForm(ClaimType::class, $claim);
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $claim->setHandler($this->getUser());
-            $claimsService = $this->get('app.claims');
-            $claimsService->addClaim($policy, $claim);
-            $this->addFlash('success', sprintf('Claim %s is added', $claim->getNumber()));
+        $formClaim = $this->get('form.factory')
+            ->createNamedBuilder('claim', ClaimType::class, $claim)
+            ->getForm();
+        $formClaimsCheck = $this->get('form.factory')
+            ->createNamedBuilder('claimscheck', ClaimsCheckType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claim')) {
+                $formClaim->handleRequest($request);
+                if ($formClaim->isValid()) {
+                    $claim->setHandler($this->getUser());
+                    $claimsService = $this->get('app.claims');
+                    $claimsService->addClaim($policy, $claim);
+                    $this->addFlash('success', sprintf('Claim %s is added', $claim->getNumber()));
 
-            return $this->redirectToRoute('claims_policy', ['id' => $id]);
+                    return $this->redirectToRoute('claims_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('claimscheck')) {
+                $formClaimsCheck->handleRequest($request);
+                if ($formClaimsCheck->isValid()) {
+                    $imeiService = $this->get('app.imei');
+                    $type = $formClaimsCheck->get('type')->getData();
+                    $result = $imeiService->policyClaim($policy, $type);
+                    $this->addFlash('success', sprintf(
+                        'ClaimCheck <a href="%s" target="_blank">%s</a> (Phone is %s)',
+                        $imeiService->getCertUrl(),
+                        $imeiService->getCertId(),
+                        $result ? 'not blocked' : 'blocked'
+                    ));
+
+                    return $this->redirectToRoute('claims_policy', ['id' => $id]);
+                }
+            }
         }
         $checks = $fraudService->runChecks($policy);
 
         return [
             'policy' => $policy,
-            'form' => $form->createView(),
+            'formClaim' => $formClaim->createView(),
+            'formClaimsCheck' => $formClaimsCheck->createView(),
             'fraud' => $checks,
             'policy_route' => 'claims_policy',
             'policy_history' => $this->getPhonePolicyHistory($policy->getId()),
