@@ -80,12 +80,12 @@ class LaunchUserService
             throw new \Exception('Failed to add');
         }
 
-        /**
-         * Not necessary to email once we launch
         if ($userCreated) {
             $this->mailchimp->subscribe($user->getEmail());
         }
 
+        /**
+         * Not necessary to email once we launch
         if ($userCreated || $resend) {
             $this->sendEmail($existingUser);
         }
