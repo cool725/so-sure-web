@@ -204,6 +204,7 @@ class ApiControllerTest extends BaseControllerTest
 
     public function testLoginRateLimited()
     {
+        $user = static::createUser(self::$userManager, static::generateEmail('invalid-user', $this), 'bar');
         $cognitoIdentityId = $this->getUnauthIdentity();
 
         for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_LOGIN] + 1; $i++) {
