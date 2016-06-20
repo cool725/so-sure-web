@@ -76,6 +76,23 @@ class RateLimitService
     }
 
     /**
+     * Clear the rate limit
+     *
+     * @param string $type      TYPE_ADDRESS|TYPE_IMEI
+     * @param string $ip
+     * @param string $cognitoId
+     *
+     * @return boolean
+     */
+    public function clearByDevice($type, $ip, $cognitoId)
+    {
+        $ipKey = sprintf(self::KEY_FORMAT, $type, $ip);
+        $cognitoIdKey = sprintf(self::KEY_FORMAT, $type, $cognitoId);
+        $this->redis->del($ipKey);
+        $this->redis->del($cognitoIdKey);
+    }
+
+    /**
      * Is the call allowed
      *
      * @param string $type      TYPE_ADDRESS|TYPE_IMEI

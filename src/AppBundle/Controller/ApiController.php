@@ -378,6 +378,14 @@ class ApiController extends BaseController
             $user->setPasswordRequestedAt(new \DateTime());
             $this->get('fos_user.user_manager')->updateUser($user);
 
+            // If resetting password, clear the login rate limit
+            // Rate limit on reset should prevent too many login/reset/login attempts
+            $rateLimit->clearByDevice(
+                RateLimitService::DEVICE_TYPE_LOGIN,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            );
+
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Reset password email sent', 200);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in api referralAction. %s', $e->getMessage()));
