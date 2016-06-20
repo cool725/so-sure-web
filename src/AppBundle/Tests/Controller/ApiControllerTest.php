@@ -496,6 +496,43 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
     }
 
+    public function testResetClearsLogin()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('user-reset-clear', $this), 'bar');
+        $this->assertNull($user->getConfirmationToken());
+
+        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_LOGIN]; $i++) {
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+                'email' => static::generateEmail('user-reset-clear', $this),
+                'password' => 'foo'
+            ]));
+            $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
+        }
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+            'email' => static::generateEmail('user-reset-clear', $this),
+            'password' => 'foo'
+        ]));
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/reset', array(
+            'email' => static::generateEmail('user-reset-clear', $this)
+        ));
+        $data = $this->verifyResponse(200);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+            'email' => static::generateEmail('user-reset-clear', $this),
+            'password' => 'foo'
+        ]));
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+            'email' => static::generateEmail('user-reset-clear', $this),
+            'password' => 'bar'
+        ]));
+        $data = $this->verifyResponse(200);
+    }
+
     // sns
 
     /**
