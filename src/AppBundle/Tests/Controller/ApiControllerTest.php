@@ -717,9 +717,12 @@ class ApiControllerTest extends BaseControllerTest
         $user->setPreLaunch(true);
         self::$dm->flush();
 
+        $mobile = static::generateRandomMobile();
+
         // now duplicate the create
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => static::generateEmail('create-prelaunch', $this),
+            'mobile_number' => $mobile,
         ));
         $data = $this->verifyResponse(200);
         // Token should have changed
@@ -732,6 +735,7 @@ class ApiControllerTest extends BaseControllerTest
         ]);
         $this->assertTrue($userUpdated !== null);
         $this->assertNotNull($userUpdated->getLastLogin());
+        $this->assertEquals($mobile, $userUpdated->getMobileNumber());
     }
 
     public function testPreLaunchUserLoggedInWillNotOverwrite()

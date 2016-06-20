@@ -536,21 +536,18 @@ class ApiController extends BaseController
                 if ($user && $user->isPreLaunch() && !$user->getLastLogin() && count($user->getPolicies()) == 0) {
                     $user->resetToken();
                     $user->setLastLogin(new \DateTime());
-                    $dm->flush();
-                    list($identityId, $token) = $this->getCognitoIdToken($user, $request);
-
-                    return new JsonResponse($user->toApiArray($identityId, $token));
+                } else {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_USER_EXISTS,
+                        'User already exists',
+                        422
+                    );
                 }
-
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_USER_EXISTS,
-                    'User already exists',
-                    422
-                );
+            } else {
+                $userManager = $this->get('fos_user.user_manager');
+                $user = $userManager->createUser();
             }
 
-            $userManager = $this->get('fos_user.user_manager');
-            $user = $userManager->createUser();
             $user->setEnabled(true);
             $user->setEmail($data['email']);
             $user->setFirstName(isset($data['first_name']) ? ucfirst($data['first_name']) : null);
