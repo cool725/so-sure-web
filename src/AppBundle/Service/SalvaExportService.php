@@ -380,19 +380,14 @@ class SalvaExportService
         return $responseId;
     }
 
-    public function cancelPolicy(PhonePolicy $phonePolicy, $reason = null, \DateTime $date = null)
+    public function cancelPolicy(PhonePolicy $phonePolicy, $reason = null)
     {
-        if (!$date) {
-            $date = new \DateTime();
-            $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
-            // Termination time can be a bit in the future without issue - match the 10 minutes of policy creation
-            // $date->add(new \DateInterval('PT10M'));
-        }
+        $date = $phonePolicy->getEnd();
 
         // We should only bump the salva version if we're replacing a policy
         if ($reason && $reason == self::CANCELLED_REPLACE) {
-            $phonePolicy->incrementSalvaPolicyNumber($date);
-            $this->dm->flush();
+            // latest start date same as previous termination date
+            $date = $phonePolicy->getLatestSalvaStartDate();
         }
 
         if (!$reason) {
@@ -424,18 +419,13 @@ class SalvaExportService
         return $responseId;
     }
 
-    public function updatePolicy(PhonePolicy $phonePolicy)
-    {
-        $this->cancelPolicy($phonePolicy, self::CANCELLED_REPLACE);
-        $this->sendPolicy($phonePolicy);
-    }
-
     public function process($max)
     {
         $count = 0;
         while ($count < $max) {
             $policy = null;
             $action = null;
+            $cancelReason = null;
             try {
                 $queueItem = $this->redis->lpop(self::KEY_POLICY_ACTION);
                 if (!$queueItem) {
@@ -449,16 +439,17 @@ class SalvaExportService
                 $repo = $this->dm->getRepository(PhonePolicy::class);
                 $policy = $repo->find($data['policyId']);
                 $action = $data['action'];
+                if (isset($data['cancel_reason'])) {
+                    $cancelReason = $data['cancel_reason'];
+                }
                 if (!$policy) {
                     throw new \Exception(sprintf('Unable to find policyId: %s', $data['policyId']));
                 }
 
                 if ($action == self::QUEUE_CREATED) {
                     $this->sendPolicy($policy);
-                } elseif ($action == self::QUEUE_UPDATED) {
-                    $this->updatePolicy($policy);
                 } elseif ($action == self::QUEUE_CANCELLED) {
-                    $this->cancelPolicy($policy);
+                    $this->cancelPolicy($policy, $cancelReason);
                 } else {
                     throw new \Exception(sprintf(
                         'Unknown action %s for policyId: %s',
@@ -475,7 +466,12 @@ class SalvaExportService
                     if (isset($data['retryAttempts']) && $data['retryAttempts'] >= 0) {
                         // 20 minute attempts
                         if ($data['retryAttempts'] < 20) {
-                            $this->queue($policy, $action, $data['retryAttempts'] + 1);
+                            $this->queueMessage(
+                                $policy->getId(),
+                                $action,
+                                $data['retryAttempts'] + 1,
+                                $cancelReason
+                            );
                             $queued = true;
                         }
                     } else {
@@ -514,10 +510,34 @@ class SalvaExportService
             return false;
         }
 
-        $data = ['policyId' => $policy->getId(), 'action' => $action, 'retryAttempts' => $retryAttempts];
-        $this->redis->rpush(self::KEY_POLICY_ACTION, serialize($data));
+        // Increment policy number should be done outside the queue process
+        if ($action == self::QUEUE_UPDATED) {
+            $this->incrementPolicyNumber($policy);
+
+            $this->queueMessage($policy->getId(), self::QUEUE_CANCELLED, $retryAttempts, self::CANCELLED_REPLACE);
+            $this->queueMessage($policy->getId(), self::QUEUE_CREATED, $retryAttempts);
+        } else {
+            $this->queueMessage($policy->getId(), self::QUEUE_CREATED, $retryAttempts);
+        }
 
         return true;
+    }
+
+    private function incrementPolicyNumber(PhonePolicy $policy)
+    {
+        $date = new \DateTime();
+        $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
+        $policy->incrementSalvaPolicyNumber($date);
+        $this->dm->flush();
+    }
+
+    private function queueMessage($id, $action, $retryAttempts, $cancelReason = null)
+    {
+        $data = ['policyId' => $policy->getId(), 'action' => $action, 'retryAttempts' => $retryAttempts];
+        if ($cancelReason) {
+            $data['cancel_reason'] = $cancelReason;
+        }
+        $this->redis->rpush(self::KEY_POLICY_ACTION, serialize($data));
     }
 
     public function clearQueue()
