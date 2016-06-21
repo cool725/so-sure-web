@@ -19,16 +19,11 @@
 /web/bundles/
 /web/CACHE
 /web/robots.txt
-/web/uploads/documents
 /web/.htaccess
 /web/app.php
 /web/css
 /web/js
 /web/ops
-/app/config/config_jason.yml
-/app/config/routing_jason.yml
-/src/peerj/UploadBundle/Service/Uno/*.pyc
-/src/peerj/UploadBundle/Service/Uno/__pycache__/
 /bower_components/
 web/sitemap.xml
 web/sitemap_index.xml
@@ -36,3 +31,4 @@ VagrantfileExtra.rb
 .idea
 /backup
 *.backup
+deploy/*
