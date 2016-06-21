@@ -11,9 +11,25 @@ use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use AppBundle\Document\Phone;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
 
 class PhoneSearchType extends AbstractType
 {
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -45,9 +61,25 @@ class PhoneSearchType extends AbstractType
             ])
             ->add('search', SubmitType::class)
         ;
+
+        $currentRequest = $this->requestStack->getCurrentRequest();
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
+            $form = $event->getForm();
+            $form->get('os')->setData($currentRequest->query->get('os'));
+            $form->get('active')->setData($currentRequest->query->get('active'));
+            $form->get('rules')->setData($currentRequest->query->get('rules'));
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setDefaults(array(
+            'csrf_protection'   => false,
+        ));
+    }
+
+    public function getName()
+    {
+        return null;
     }
 }

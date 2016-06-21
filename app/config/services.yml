@@ -367,3 +367,9 @@ services:
         arguments: ["@request_stack"]
         tags:
             - { name: form.type }
+
+    app.form.type.phonesearch:
+        class: AppBundle\Form\Type\PhoneSearchType
+        arguments: ["@request_stack"]
+        tags:
+            - { name: form.type }
