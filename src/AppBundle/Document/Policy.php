@@ -456,6 +456,24 @@ abstract class Policy
         $this->scheduledPayments[] = $scheduledPayment;
     }
 
+    public function getNextScheduledPayment()
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $next = null;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                if (!$next || $next->getScheduled() > $scheduledPayment->getScheduled()) {
+                    $next = $scheduledPayment;
+                }
+            }
+        }
+
+        return $next;
+    }
+
     public function getSalvaPolicyNumbers()
     {
         return $this->salvaPolicyNumbers;
@@ -604,24 +622,37 @@ abstract class Policy
         return (int) ceil($months);
     }
 
-    public function getNumberOfInstallments()
+    public function getNumberOfInstallments($type = null)
     {
+        if (!$type) {
+            $type = ScheduledPayment::TYPE_SCHEDULED;
+        }
+
         if (!$this->isPolicy() || count($this->getPayments()) == 0) {
             return null;
         }
 
-        return count($this->getScheduledPayments()) + 1;
+        $count = 1;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getType() == $type) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
-    public function getInstallmentAmount()
+    public function getInstallmentAmount($type = null)
     {
         if (!$this->isPolicy() || count($this->getPayments()) == 0) {
             return null;
         }
 
-        if ($this->getNumberOfInstallments() == 1) {
+        if (!$this->getNumberOfInstallments($type)) {
+            return null;
+        } elseif ($this->getNumberOfInstallments($type) == 1) {
             return $this->getPremium()->getYearlyPremiumPrice();
-        } elseif ($this->getNumberOfInstallments() == 12) {
+        } elseif ($this->getNumberOfInstallments($type) >= 12) {
             return $this->getPremium()->getMonthlyPremiumPrice();
         } else {
             return null;
@@ -899,6 +930,46 @@ abstract class Policy
         }
 
         return $this->getEnd()->diff($date)->days < 30;
+    }
+
+    public function getLastSuccessfulPayment()
+    {
+        $successfulPayments = [];
+        foreach ($this->getPayments() as $payment) {
+            if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
+                $successfulPayments[] = $payment;
+            }
+        }
+
+        if (count($successfulPayments) == 0) {
+            return null;
+        }
+
+        // sort high to low
+        usort($successfulPayments, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+
+        return $successfulPayments[0];
+    }
+
+    public function shouldExpirePolicy($date = null)
+    {
+        if (!$this->isValidPolicy()) {
+            return false;
+        }
+
+        // if its a valid policy without a payment, it should be expired
+        if (!$this->getLastSuccessfulPayment()) {
+            return true;
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        // Max month is 31 days + 30 days cancellation
+        return $this->getLastSuccessfulPayment()->getDate()->diff($date)->days > 61;
     }
 
     public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)

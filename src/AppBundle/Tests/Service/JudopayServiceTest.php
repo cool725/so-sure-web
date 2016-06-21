@@ -7,7 +7,10 @@ use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Policy;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\JudoPayment;
+use AppBundle\Document\ScheduledPayment;
 
 /**
  * @group functional-net
@@ -21,6 +24,7 @@ class JudopayServiceTest extends WebTestCase
     protected static $dm;
     protected static $userRepo;
     protected static $userManager;
+    protected static $policyService;
 
     public static function setUpBeforeClass()
     {
@@ -37,6 +41,7 @@ class JudopayServiceTest extends WebTestCase
          self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
          self::$userRepo = self::$dm->getRepository(User::class);
          self::$userManager = self::$container->get('fos_user.user_manager');
+         self::$policyService = self::$container->get('app.policy');
     }
 
     public function tearDown()
@@ -227,5 +232,74 @@ class JudopayServiceTest extends WebTestCase
         $scheduledPayment = $policy->getScheduledPayments()[0];
 
         self::$judopay->scheduledPayment($scheduledPayment);
+    }
+
+    public function testProcessTokenPayResult()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-process-token', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::createPolicy($user, static::$dm, $phone);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        // @codingStandardsIgnoreStart
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+        );
+        // @codingStandardsIgnoreEnd
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        $payment = new JudoPayment();
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+
+        self::$judopay->processTokenPayResult($scheduledPayment, $payment);
+        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+
+        // Payment failures should be rescheduled
+        $initialScheduledPayment = $policy->getNextScheduledPayment();
+        for ($i = 1; $i <= 4; $i++) {
+            $scheduledPayment = $policy->getNextScheduledPayment();
+            $this->assertLessThan(
+                29,
+                $scheduledPayment->getScheduled()->diff($initialScheduledPayment->getScheduled())->days
+            );
+            if ($i > 1) {
+                $this->assertGreaterThan($initialScheduledPayment->getScheduled(), $scheduledPayment->getScheduled());
+            }
+            $payment = new JudoPayment();
+            $payment->setResult(JudoPayment::RESULT_DECLINED);
+
+            self::$judopay->processTokenPayResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
+            $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
+            $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+            $this->assertEquals(11 + $i, count($policy->getScheduledPayments()));
+        }
+
+        // A further failed payment should not add another scheduled payment
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        $payment = new JudoPayment();
+        $payment->setResult(JudoPayment::RESULT_DECLINED);
+
+        self::$judopay->processTokenPayResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
+        $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+        // 11 + 4
+        $this->assertEquals(15, count($policy->getScheduledPayments()));
     }
 }

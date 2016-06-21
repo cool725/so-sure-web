@@ -286,14 +286,14 @@ class JudopayService
         }
         try {
             $payment = $this->tokenPay($policy, $policy->getUser()->getPaymentMethod());
-            $scheduledPayment->setPayment($payment);
-            if ($payment == JudoPayment::RESULT_SUCCESS) {
-                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
-            } else {
-                $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
-            }
+            $this->processTokenPayResult($scheduledPayment, $payment);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         } catch (\Exception $e) {
+            $this->logger->error(sprintf(
+                'Error running scheduled payment %s. Ex: %s',
+                $scheduledPayment->getId(),
+                $e->getMessage()
+            ));
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
@@ -301,6 +301,32 @@ class JudopayService
         }
 
         return $scheduledPayment;
+    }
+
+    public function processTokenPayResult($scheduledPayment, $payment, \DateTime $date = null)
+    {
+        $policy = $scheduledPayment->getPolicy();
+        $scheduledPayment->setPayment($payment);
+        if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        } else {
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
+            // Very important to update status to unpaid as used by the app to update payment
+            // and used by expire process to cancel policy if unpaid after 30 days
+            $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+            $repo = $this->dm->getRepository(ScheduledPayment::class);
+
+            // Only allow up to 4 failed payment attempts
+            if ($repo->countUnpaidScheduledPayments($policy, $date) <= 4) {
+                // create another scheduled payment for 7 days later
+                $rescheduled = $scheduledPayment->reschedule($date);
+                $policy->addScheduledPayment($rescheduled);
+
+                // TODO: Email user
+            }
+        }
     }
 
     protected function tokenPay(Policy $policy, JudoPaymentMethod $paymentMethod)
