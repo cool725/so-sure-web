@@ -50,7 +50,7 @@ class AdminController extends BaseController
         $phones = $repo->createQueryBuilder();
         $phones = $phones->field('make')->notEqual('ALL');
 
-        $form = $this->createForm(PhoneSearchType::class);
+        $form = $this->createForm(PhoneSearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
         $data = $form->get('os')->getData();
         $phones = $phones->field('os')->in($data);

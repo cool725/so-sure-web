@@ -53,8 +53,7 @@ class UserSearchType extends AbstractType
         ;
 
         $currentRequest = $this->requestStack->getCurrentRequest();
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest)
-        {
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
             $form = $event->getForm();
             $form->get('email')->setData($currentRequest->query->get('email'));
             $form->get('mobile')->setData($currentRequest->query->get('mobile'));
