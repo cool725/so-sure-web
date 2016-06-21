@@ -517,7 +517,7 @@ class SalvaExportService
             $this->queueMessage($policy->getId(), self::QUEUE_CANCELLED, $retryAttempts, self::CANCELLED_REPLACE);
             $this->queueMessage($policy->getId(), self::QUEUE_CREATED, $retryAttempts);
         } else {
-            $this->queueMessage($policy->getId(), self::QUEUE_CREATED, $retryAttempts);
+            $this->queueMessage($policy->getId(), $action, $retryAttempts);
         }
 
         return true;
