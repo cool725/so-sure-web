@@ -361,3 +361,9 @@ services:
             logger:      "@logger"
             policy:      "@app.policy"
             transaction: "@braintree.transaction"
+
+    app.form.type.usersearch:
+        class: AppBundle\Form\Type\UserSearchType
+        arguments: ["@request_stack"]
+        tags:
+            - { name: form.type }
