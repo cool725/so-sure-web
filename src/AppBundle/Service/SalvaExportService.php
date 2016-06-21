@@ -533,7 +533,7 @@ class SalvaExportService
 
     private function queueMessage($id, $action, $retryAttempts, $cancelReason = null)
     {
-        $data = ['policyId' => $policy->getId(), 'action' => $action, 'retryAttempts' => $retryAttempts];
+        $data = ['policyId' => $id, 'action' => $action, 'retryAttempts' => $retryAttempts];
         if ($cancelReason) {
             $data['cancel_reason'] = $cancelReason;
         }
