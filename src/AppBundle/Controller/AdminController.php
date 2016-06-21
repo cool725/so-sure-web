@@ -211,23 +211,29 @@ class AdminController extends BaseController
         $repo = $dm->getRepository(User::class);
 
         $users = $repo->createQueryBuilder();
-        $form = $this->createForm(UserSearchType::class);
+        $form = $this->createForm(UserSearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
-        if ($form->isValid()) {
-            $this->formToMongoSearch($form, $users, 'email', 'email');
-            $this->formToMongoSearch($form, $users, 'lastname', 'lastName');
-            $this->formToMongoSearch($form, $users, 'mobile', 'mobileNumber');
-            $this->formToMongoSearch($form, $users, 'postcode', 'billingAddress.postcode');
+        $this->formToMongoSearch($form, $users, 'email', 'email');
+        $this->formToMongoSearch($form, $users, 'lastname', 'lastName');
+        $this->formToMongoSearch($form, $users, 'mobile', 'mobileNumber');
+        $this->formToMongoSearch($form, $users, 'postcode', 'billingAddress.postcode');
 
-            $policyRepo = $dm->getRepository(Policy::class);
-            $policiesQb = $policyRepo->createQueryBuilder();
-            if ($policies = $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber', true)) {
-                $userIds = [];
-                foreach ($policies as $policy) {
-                    $userIds[] = $policy->getUser()->getId();
-                }
-                $users->field('id')->in($userIds);
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policiesQb = $policyRepo->createQueryBuilder();
+        if ($policies = $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber', true)) {
+            $userIds = [];
+            foreach ($policies as $policy) {
+                $userIds[] = $policy->getUser()->getId();
             }
+            $users->field('id')->in($userIds);
+        }
+        $policiesQb = $policyRepo->createQueryBuilder();
+        if ($policies = $this->formToMongoSearch($form, $policiesQb, 'status', 'status', true)) {
+            $userIds = [];
+            foreach ($policies as $policy) {
+                $userIds[] = $policy->getUser()->getId();
+            }
+            $users->field('id')->in($userIds);
         }
         $pager = $this->pager($request, $users);
 
