@@ -38,10 +38,16 @@ class JudopayService
     /** @var PolicyService */
     protected $policyService;
 
+    /** @var \Swift_Mailer */
+    protected $mailer;
+    protected $templating;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param PolicyService   $policyService
+     * @param \Swift_Mailer   $mailer
+     * @param                 $templating
      * @param string          $apiToken
      * @param string          $apiSecret
      * @param string          $judoId
@@ -51,6 +57,8 @@ class JudopayService
         DocumentManager $dm,
         LoggerInterface $logger,
         PolicyService $policyService,
+        \Swift_Mailer $mailer,
+        $templating,
         $apiToken,
         $apiSecret,
         $judoId,
@@ -60,6 +68,8 @@ class JudopayService
         $this->logger = $logger;
         $this->policyService = $policyService;
         $this->judoId = $judoId;
+        $this->mailer = $mailer;
+        $this->templating = $templating;
         $data = array(
            'apiToken' => $apiToken,
            'apiSecret' => $apiSecret,
@@ -286,14 +296,14 @@ class JudopayService
         }
         try {
             $payment = $this->tokenPay($policy, $policy->getUser()->getPaymentMethod());
-            $scheduledPayment->setPayment($payment);
-            if ($payment == JudoPayment::RESULT_SUCCESS) {
-                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
-            } else {
-                $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
-            }
+            $this->processTokenPayResult($scheduledPayment, $payment);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         } catch (\Exception $e) {
+            $this->logger->error(sprintf(
+                'Error running scheduled payment %s. Ex: %s',
+                $scheduledPayment->getId(),
+                $e->getMessage()
+            ));
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
@@ -301,6 +311,60 @@ class JudopayService
         }
 
         return $scheduledPayment;
+    }
+
+    public function processTokenPayResult($scheduledPayment, $payment, \DateTime $date = null)
+    {
+        $policy = $scheduledPayment->getPolicy();
+        $scheduledPayment->setPayment($payment);
+        if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        } else {
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
+            // Very important to update status to unpaid as used by the app to update payment
+            // and used by expire process to cancel policy if unpaid after 30 days
+            $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+            $repo = $this->dm->getRepository(ScheduledPayment::class);
+
+            // Only allow up to 4 failed payment attempts
+            if ($repo->countUnpaidScheduledPayments($policy, $date) <= 4) {
+                // create another scheduled payment for 7 days later
+                $rescheduled = $scheduledPayment->reschedule($date);
+                $policy->addScheduledPayment($rescheduled);
+
+                $this->failedPaymentEmail($policy, $rescheduled->getScheduled());
+            } else {
+                // TODO: Should probably be a final warning email
+                $this->failedPaymentEmail($policy, null);
+            }
+        }
+    }
+
+    /**
+     * @param Policy    $policy
+     * @param \DateTime $next
+     */
+    private function failedPaymentEmail(Policy $policy, $next)
+    {
+        $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject(sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber()))
+            ->setFrom('hello@wearesosure.com')
+            ->setTo($policy->getUser()->getEmail())
+            ->setBody(
+                $this->templating->render($htmlTemplate, ['policy' => $policy, 'next' => $next]),
+                'text/html'
+            )
+            ->addPart(
+                $this->templating->render($textTemplate, ['policy' => $policy, 'next' => $next]),
+                'text/plain'
+            );
+        $this->mailer->send($message);
     }
 
     protected function tokenPay(Policy $policy, JudoPaymentMethod $paymentMethod)

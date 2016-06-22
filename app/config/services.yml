@@ -63,6 +63,8 @@ services:
             dm:          "@doctrine_mongodb.odm.default_document_manager"
             logger:      "@logger"
             policy:      "@app.policy"
+            mailer:      "@mailer"
+            templating:  "@templating"
             apiToken:    "%judopay_apitoken%"
             apiSecret:   "%judopay_apisecret%"
             judoId:      "%judopay_id%"

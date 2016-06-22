@@ -193,6 +193,12 @@ trait UserClassTrait
         return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "DELETE");
     }
 
+    public static function clearEmail($container)
+    {
+        $redis = $container->get('snc_redis.mailer');
+        $redis->del('swiftmailer');
+    }
+
     private static function cognitoRequest($client, $cognitoIdentityId, $url, $body, $method)
     {
         return $client->request(

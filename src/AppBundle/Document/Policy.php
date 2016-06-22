@@ -456,6 +456,24 @@ abstract class Policy
         $this->scheduledPayments[] = $scheduledPayment;
     }
 
+    public function getNextScheduledPayment()
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $next = null;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                if (!$next || $next->getScheduled() > $scheduledPayment->getScheduled()) {
+                    $next = $scheduledPayment;
+                }
+            }
+        }
+
+        return $next;
+    }
+
     public function getSalvaPolicyNumbers()
     {
         return $this->salvaPolicyNumbers;
@@ -610,7 +628,18 @@ abstract class Policy
             return null;
         }
 
-        return count($this->getScheduledPayments()) + 1;
+        $count = 1;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getType() == ScheduledPayment::TYPE_SCHEDULED) {
+                $count++;
+            }
+        }
+
+        if ($count > 12) {
+            throw new \Exception(sprintf('Policy %s has too many installment payments', $this->getId()));
+        }
+
+        return $count;
     }
 
     public function getInstallmentAmount()
@@ -619,12 +648,14 @@ abstract class Policy
             return null;
         }
 
-        if ($this->getNumberOfInstallments() == 1) {
+        if (!$this->getNumberOfInstallments()) {
+            return null;
+        } elseif ($this->getNumberOfInstallments() == 1) {
             return $this->getPremium()->getYearlyPremiumPrice();
         } elseif ($this->getNumberOfInstallments() == 12) {
             return $this->getPremium()->getMonthlyPremiumPrice();
         } else {
-            return null;
+            throw new \Exception(sprintf('Policy %s does not have correct installment amout', $this->getId()));
         }
     }
 
@@ -899,6 +930,49 @@ abstract class Policy
         }
 
         return $this->getEnd()->diff($date)->days < 30;
+    }
+
+    public function getLastSuccessfulPayment()
+    {
+        $successfulPayments = [];
+        foreach ($this->getPayments() as $payment) {
+            if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
+                $successfulPayments[] = $payment;
+            }
+        }
+
+        if (count($successfulPayments) == 0) {
+            return null;
+        }
+
+        // sort high to low
+        usort($successfulPayments, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+
+        return $successfulPayments[0];
+    }
+
+    public function shouldExpirePolicy($date = null)
+    {
+        if (!$this->isValidPolicy()) {
+            return false;
+        }
+
+        // if its a valid policy without a payment, probably it should be expired
+        if (!$this->getLastSuccessfulPayment()) {
+            throw new \Exception(sprintf(
+                'Policy %s does not have a success payment - should be expired?',
+                $this->getId()
+            ));
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        // Max month is 31 days + 30 days cancellation
+        return $this->getLastSuccessfulPayment()->getDate()->diff($date)->days > 61;
     }
 
     public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)

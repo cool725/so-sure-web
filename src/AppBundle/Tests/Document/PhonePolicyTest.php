@@ -958,8 +958,8 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
-        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -968,6 +968,84 @@ class PhonePolicyTest extends WebTestCase
         }
 
         $this->assertEquals(12, $policy->getNumberOfInstallments());
+    }
+
+    public function testNumberOfInstallments11ScheduledWithRescheduled()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+
+        for ($i = 0; $i < 11; $i++) {
+            $scheduledPayment = new ScheduledPayment();
+            $policy->addScheduledPayment($scheduledPayment);
+            $policy->addScheduledPayment($scheduledPayment->reschedule());
+        }
+
+        $this->assertEquals(12, $policy->getNumberOfInstallments());
+        $this->assertEquals(22, count($policy->getScheduledPayments()));
+    }
+
+    public function testGetInstallmentAmountMonthly()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+
+        for ($i = 0; $i < 11; $i++) {
+            $scheduledPayment = new ScheduledPayment();
+            $policy->addScheduledPayment($scheduledPayment);
+            $policy->addScheduledPayment($scheduledPayment->reschedule());
+        }
+
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getInstallmentAmount());
+    }
+
+    public function testGetInstallmentAmountYearly()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $policy->addPayment($payment);
+
+        for ($i = 0; $i < 11; $i++) {
+            $scheduledPayment = new ScheduledPayment();
+            $policy->addScheduledPayment($scheduledPayment->reschedule());
+        }
+
+        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getInstallmentAmount());
     }
 
     public function testGetBrokerFeePaidNotPolicy()
@@ -1138,5 +1216,94 @@ class PhonePolicyTest extends WebTestCase
             Salva::YEARLY_BROKER_FEE - Salva::MONTHLY_BROKER_FEE,
             $policy->getRemainingTotalBrokerFee([$payment])
         );
+    }
+
+    public function testGetLastSuccessfulPayment()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        $this->assertNull($policy->getLastSuccessfulPayment());
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setDate(new \DateTime('2016-01-01'));
+        $policy->addPayment($payment);
+
+        $date = new \DateTime('2016-01-01');
+        $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setDate(new \DateTime('2016-02-01'));
+        $policy->addPayment($payment);
+
+        $date = new \DateTime('2016-01-01');
+        $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setDate(new \DateTime('2016-02-15'));
+        $policy->addPayment($payment);
+
+        $date = new \DateTime('2016-02-15');
+        $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
+    }
+
+    public function testShouldExpirePolicy()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+
+        // Policy doesn't have a payment, so should be expired
+        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setDate(new \DateTime('2016-01-01'));
+        $policy->addPayment($payment);
+
+        $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-03-03")));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setDate(new \DateTime('2016-02-01'));
+        $policy->addPayment($payment);
+
+        $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-03-03")));
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setDate(new \DateTime('2016-02-08'));
+        $policy->addPayment($payment);
+
+        $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-02-09")));
+        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-04-15")));
     }
 }

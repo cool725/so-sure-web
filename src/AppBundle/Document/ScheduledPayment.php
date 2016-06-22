@@ -16,6 +16,9 @@ class ScheduledPayment
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELLED = 'cancelled';
 
+    const TYPE_SCHEDULED = 'scheduled';
+    const TYPE_RESCHEDULED = 'rescheduled';
+
     /**
      * @MongoDB\Id
      */
@@ -32,6 +35,12 @@ class ScheduledPayment
      * @Gedmo\Versioned
      */
     protected $status;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $type;
 
     /**
      * @MongoDB\Date()
@@ -52,7 +61,7 @@ class ScheduledPayment
     protected $policy;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Payment", inversedBy="scheduledPayment")
+     * @MongoDB\ReferenceOne(targetDocument="Payment", inversedBy="scheduledPayment", cascade={"persist"})
      * @Gedmo\Versioned
      */
     protected $payment;
@@ -60,6 +69,7 @@ class ScheduledPayment
     public function __construct()
     {
         $this->created = new \DateTime();
+        $this->type = self::TYPE_SCHEDULED;
     }
 
     public function getId()
@@ -85,6 +95,16 @@ class ScheduledPayment
     public function getStatus()
     {
         return $this->status;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    public function getType()
+    {
+        return $this->type;
     }
 
     public function setScheduled($scheduled)
@@ -115,5 +135,24 @@ class ScheduledPayment
     public function getPolicy()
     {
         return $this->policy;
+    }
+
+    public function reschedule($date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        } else {
+            $date = clone $date;
+        }
+        $date->add(new \DateInterval('P7D'));
+
+        $rescheduled = new ScheduledPayment();
+        $rescheduled->setType(self::TYPE_RESCHEDULED);
+        $rescheduled->setPolicy($this->getPolicy());
+        $rescheduled->setAmount($this->getAmount());
+        $rescheduled->setStatus(self::STATUS_SCHEDULED);
+        $rescheduled->setScheduled($date);
+
+        return $rescheduled;
     }
 }
