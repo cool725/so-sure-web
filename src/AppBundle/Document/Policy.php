@@ -622,40 +622,40 @@ abstract class Policy
         return (int) ceil($months);
     }
 
-    public function getNumberOfInstallments($type = null)
+    public function getNumberOfInstallments()
     {
-        if (!$type) {
-            $type = ScheduledPayment::TYPE_SCHEDULED;
-        }
-
         if (!$this->isPolicy() || count($this->getPayments()) == 0) {
             return null;
         }
 
         $count = 1;
         foreach ($this->getScheduledPayments() as $scheduledPayment) {
-            if ($scheduledPayment->getType() == $type) {
+            if ($scheduledPayment->getType() == ScheduledPayment::TYPE_SCHEDULED) {
                 $count++;
             }
+        }
+
+        if ($count > 12) {
+            throw new \Exception(sprintf('Policy %s has too many installment payments', $this->getId()));
         }
 
         return $count;
     }
 
-    public function getInstallmentAmount($type = null)
+    public function getInstallmentAmount()
     {
         if (!$this->isPolicy() || count($this->getPayments()) == 0) {
             return null;
         }
 
-        if (!$this->getNumberOfInstallments($type)) {
+        if (!$this->getNumberOfInstallments()) {
             return null;
-        } elseif ($this->getNumberOfInstallments($type) == 1) {
+        } elseif ($this->getNumberOfInstallments() == 1) {
             return $this->getPremium()->getYearlyPremiumPrice();
-        } elseif ($this->getNumberOfInstallments($type) >= 12) {
+        } elseif ($this->getNumberOfInstallments() == 12) {
             return $this->getPremium()->getMonthlyPremiumPrice();
         } else {
-            return null;
+            throw new \Exception(sprintf('Policy %s does not have correct installment amout', $this->getId()));
         }
     }
 
