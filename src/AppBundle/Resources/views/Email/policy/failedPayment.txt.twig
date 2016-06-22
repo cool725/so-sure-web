@@ -1,0 +1,15 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Payment failure for {{ policy.policyNumber }}
+
+**
+------------------------------------------------------------
+Your monthly payment of £{{ policy.premium.monthlyPremiumPrice }} was declined.
+{% if next %}
+We will attempt to re-charge your card on file again on {{ next|date }}.
+{% endif %}
+
+You can update your card details by <a href="{{ branch_pot_url }}">opening the so-sure app</a> and updating your address and card details.
+
+Please note that we will cancel any policy that is 30 days past due, so please ensure that you update your card details if your card has changed!
+{% endblock body %}

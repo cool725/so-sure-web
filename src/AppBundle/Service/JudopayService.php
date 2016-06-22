@@ -38,10 +38,16 @@ class JudopayService
     /** @var PolicyService */
     protected $policyService;
 
+    /** @var \Swift_Mailer */
+    protected $mailer;
+    protected $templating;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param PolicyService   $policyService
+     * @param \Swift_Mailer   $mailer
+     * @param                 $templating
      * @param string          $apiToken
      * @param string          $apiSecret
      * @param string          $judoId
@@ -51,6 +57,8 @@ class JudopayService
         DocumentManager $dm,
         LoggerInterface $logger,
         PolicyService $policyService,
+        \Swift_Mailer $mailer,
+        $templating,
         $apiToken,
         $apiSecret,
         $judoId,
@@ -60,6 +68,8 @@ class JudopayService
         $this->logger = $logger;
         $this->policyService = $policyService;
         $this->judoId = $judoId;
+        $this->mailer = $mailer;
+        $this->templating = $templating;
         $data = array(
            'apiToken' => $apiToken,
            'apiSecret' => $apiSecret,
@@ -324,9 +334,37 @@ class JudopayService
                 $rescheduled = $scheduledPayment->reschedule($date);
                 $policy->addScheduledPayment($rescheduled);
 
-                // TODO: Email user
+                $this->failedPaymentEmail($policy, $rescheduled->getScheduled());
+            } else {
+                // TODO: Should probably be a final warning email
+                $this->failedPaymentEmail($policy, null);
             }
         }
+    }
+
+    /**
+     * @param Policy    $policy
+     * @param \DateTime $next
+     */
+    private function failedPaymentEmail(Policy $policy, $next)
+    {
+        $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject(sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber()))
+            ->setFrom('hello@wearesosure.com')
+            ->setTo($policy->getUser()->getEmail())
+            ->setBody(
+                $this->templating->render($htmlTemplate, ['policy' => $policy, 'next' => $next]),
+                'text/html'
+            )
+            ->addPart(
+                $this->templating->render($textTemplate, ['policy' => $policy, 'next' => $next]),
+                'text/plain'
+            );
+        $this->mailer->send($message);
     }
 
     protected function tokenPay(Policy $policy, JudoPaymentMethod $paymentMethod)

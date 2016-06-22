@@ -236,6 +236,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testProcessTokenPayResult()
     {
+        $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('judo-process-token', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::createPolicy($user, static::$dm, $phone);
