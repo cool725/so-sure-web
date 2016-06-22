@@ -312,6 +312,7 @@ class PolicyService
             ->setSubject(sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()))
             ->setFrom('hello@wearesosure.com')
             ->setTo($policy->getUser()->getEmail())
+            ->setBcc('bcc@so-sure.com')
             ->setBody(
                 $this->templating->render($htmlTemplate, ['policy' => $policy]),
                 'text/html'
