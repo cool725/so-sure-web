@@ -178,9 +178,12 @@ h1, h2, h3, h4, h5, h6 {
     display: inline-block;
     width: 20%;
     vertical-align: middle;
-    margin: 10px;
 }
-
+@media (min-width:544px) {
+  .text-break .line {
+    margin: 10px;
+  }
+}
 /* DOWNLOAD APP */
 
 #app-store {
