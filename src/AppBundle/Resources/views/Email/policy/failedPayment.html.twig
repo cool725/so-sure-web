@@ -1,3 +1,4 @@
+{% set logo_image = 'unhappy' %}
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
 {% block title %}Payment failure for {{ policy.policyNumber }}{% endblock %}
@@ -8,20 +9,18 @@
 		</h1>
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 				Your monthly payment of £{{ policy.premium.monthlyPremiumPrice }} was declined.
 				{% if next %}
 				<br><br>
-				We will attempt to re-charge your card on file again on {{ next|date }}.
+				We will attempt to process the payment again, using the card details you originally provided us with, on {{ next|date }}.
 			    {% endif %}
 				<br><br>
-				You can update your card details by <a href="{{ branch_pot_url }}">opening the so-sure app</a> and updating your address and card details.
+				If your payment details are no longer valid, you can update them by <a href="{{ branch_pot_url }}">opening the app</a> and following the steps on screen.
 				<br><br>
-				Please note that we will cancel any policy that is 30 days past due, so please ensure that you update your card details
-				if your card has changed!
-				<br><br>				
-			    If you have any questions, please don't hesitate to
-				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+				Please note that if you fail to pay within the next 30 days we will cancel your policy, so please ensure that your card details are correct as soon as possible.
+				<br><br>
+			    If you have any questions, please don't hesitate to <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
 		   </div>
 		</div>
 	{{ macros.end_table() }}
