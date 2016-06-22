@@ -959,9 +959,12 @@ abstract class Policy
             return false;
         }
 
-        // if its a valid policy without a payment, it should be expired
+        // if its a valid policy without a payment, probably it should be expired
         if (!$this->getLastSuccessfulPayment()) {
-            return true;
+            throw new \Exception(sprintf(
+                'Policy %s does not have a success payment - should be expired?',
+                $this->getId()
+            ));
         }
 
         if ($date == null) {
