@@ -209,7 +209,12 @@ class SalvaExportService
         }
 
         if ($s3) {
-            $filename = sprintf('policies-export-%d-%02d.csv', $date->format('Y'), $date->format('m'));
+            $filename = sprintf(
+                'policies-export-%d-%02d-%s.csv',
+                $date->format('Y'),
+                $date->format('m'),
+                $date->format('U')
+            );
             $this->uploadS3($lines, $filename, 'policies', $date->format('Y'));
         }
 
@@ -235,7 +240,12 @@ class SalvaExportService
         }
 
         if ($s3) {
-            $filename = sprintf('payments-export-%d-%02d.csv', $date->format('Y'), $date->format('m'));
+            $filename = sprintf(
+                'payments-export-%d-%02d-%s.csv',
+                $date->format('Y'),
+                $date->format('m'),
+                $date->format('U')
+            );
             $this->uploadS3($lines, $filename, 'payments', $date->format('Y'));
         }
 
@@ -262,10 +272,11 @@ class SalvaExportService
 
         if ($s3) {
             $filename = sprintf(
-                'claims-export-%d-%02d-%02d.csv',
+                'claims-export-%d-%02d-%02d-%s.csv',
                 $date->format('Y'),
                 $date->format('m'),
-                $date->format('d')
+                $date->format('d'),
+                $date->format('U')
             );
             $this->uploadS3($lines, $filename, 'claims', $date->format('Y'));
         }
