@@ -99,4 +99,80 @@ class JudoPaymentMethod extends PaymentMethod
             return null;
         }
     }
+
+    public function getCardDetail($type)
+    {
+        if (!isset($this->getCardTokens()[$this->getCardToken()])) {
+            return null;
+        }
+
+        $json = $this->getCardTokens()[$this->getCardToken()];
+        $data = null;
+        try {
+            $data = json_decode($json, true);
+
+            if (!isset($data[$type])) {
+                return null;
+            }
+
+            return $data[$type];
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function getCardLastFour()
+    {
+        // Receipts use cardLastfour whereas payments are cardLastFour
+        if ($this->getCardDetail('cardLastfour')) {
+            return $this->getCardDetail('cardLastfour');
+        } else {
+            return $this->getCardDetail('cardLastFour');
+        }
+    }
+
+    public function getCardEndDate()
+    {
+        return $this->getCardDetail('endDate');
+    }
+
+    public function getCardType($cardType = null)
+    {
+        if (!$cardType) {
+            $cardType = $this->getCardDetail('cardType');
+        }
+
+        // see https://www.judopay.com/docs/v4_1/restful-api/api-reference/#transactionspayments-response-ok200
+        if ($cardType == 1) {
+            return 'Visa';
+        } elseif ($cardType == 2) {
+            return 'Mastercard';
+        } elseif ($cardType == 3) {
+            return 'Visa Electron';
+        } elseif ($cardType == 4) {
+            return 'Switch';
+        } elseif ($cardType == 5) {
+            return 'Solo';
+        } elseif ($cardType == 6) {
+            return 'Laser';
+        } elseif ($cardType == 7) {
+            return 'China Union Pay';
+        } elseif ($cardType == 8) {
+            return 'Amex';
+        } elseif ($cardType == 9) {
+            return 'JCB';
+        } elseif ($cardType == 10) {
+            return 'Maestro';
+        } elseif ($cardType == 11) {
+            return 'Visa Debit';
+        } elseif ($cardType == 12) {
+            return 'Mastercard Debit';
+        } elseif ($cardType == 13) {
+            return 'Visa Purchasing';
+        } elseif ($cardType == 0) {
+            return 'Unknown';
+        } else {
+            return 'Missing';
+        }
+    }
 }
