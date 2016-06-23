@@ -30,6 +30,12 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'Show scheduled payments for a policy'
             )
+            ->addOption(
+                'show',
+                null,
+                InputOption::VALUE_NONE,
+                'Only display payments that should be run'
+            )
         ;
     }
 
@@ -37,8 +43,10 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
     {
         $id = $input->getOption('id');
         $policyNumber = $input->getOption('policyNumber');
+        $show = true === $input->getOption('show');
 
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $logger = $this->getContainer()->get('logger');
         $judoPay = $this->getContainer()->get('app.judopay');
         $repo = $dm->getRepository(ScheduledPayment::class);
         if ($id) {
@@ -58,7 +66,24 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         } else {
             $scheduledPayments = $repo->findScheduled();
             foreach ($scheduledPayments as $scheduledPayment) {
-                $this->displayScheduledPayment($scheduledPayment, $output);
+                if (!$scheduledPayment->getPolicy()->isValidPolicy()) {
+                    $output->writeln(sprintf(
+                        'Skipping Scheduled Payment %s as policy is invalid',
+                        $scheduledPayment->getId()
+                    ));
+                    $this->displayScheduledPayment($scheduledPayment, $output);
+                }
+
+                try {
+                    if (!$show) {
+                        $scheduledPayment = $judoPay->scheduledPayment($scheduledPayment);
+                    }
+                    $this->displayScheduledPayment($scheduledPayment, $output);
+                } catch (\Exception $e) {
+                    $logger->error($e->getMessage());
+                    $output->writeln($e->getMessage());
+                    $this->displayScheduledPayment($scheduledPayment, $output);
+                }
             }
         }
     }
