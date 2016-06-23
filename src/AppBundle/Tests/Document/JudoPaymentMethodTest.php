@@ -42,4 +42,13 @@ class JudoPaymentMethodTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($judoPaymentMethod->getDecodedDeviceDna()));
         $this->assertEquals('iPhone OS 9.3.2', $judoPaymentMethod->getDecodedDeviceDna()['os']);
     }
+
+    public function testCardDigits()
+    {
+        $judoPaymentMethod = new JudoPaymentMethod();
+        $judoPaymentMethod->addCardToken('a', "{\"cardLastfour\":\"7954\",\"endDate\":\"0518\",\"cardType\":11}");
+        $this->assertEquals("7954", $judoPaymentMethod->getCardLastFour());
+        $this->assertEquals("0518", $judoPaymentMethod->getCardEndDate());
+        $this->assertEquals("Visa Debit", $judoPaymentMethod->getCardType());
+    }
 }
