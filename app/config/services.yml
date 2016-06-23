@@ -375,3 +375,13 @@ services:
         arguments: ["@request_stack"]
         tags:
             - { name: form.type }
+
+    rollbar.voter.notfound:
+        class: AppBundle\Security\NotFoundHttpExceptionVoter
+        tags:
+            - { name: staffim_rollbar.report_voter }
+
+    rollbar.voter.untrustedhost:
+        class: AppBundle\Security\UntrustedHostUnexpectedValueExceptionVoter
+        tags:
+            - { name: staffim_rollbar.report_voter }
