@@ -213,7 +213,8 @@ class JudopayServiceTest extends WebTestCase
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
             '4976 0000 0000 3436',
             '12/20',
-            '452'
+            '452',
+            $policy->getId()
         );
         if (!isset($details['cardDetails'])) {
             throw new \Exception('Payment failed');

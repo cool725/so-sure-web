@@ -117,26 +117,30 @@ class JudopayService
         return true;
     }
 
-    public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2)
+    public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
     {
-        return $this->testPayDetails($user, $ref, $amount, $cardNumber, $expiryDate, $cv2)['receiptId'];
+        return $this->testPayDetails($user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId)['receiptId'];
     }
 
-    public function testPayDetails(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2)
+    public function testPayDetails(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
     {
         $payment = $this->client->getModel('CardPayment');
-        $payment->setAttributeValues(
-            array(
-                'judoId' => $this->judoId,
-                'yourConsumerReference' => $user->getId(),
-                'yourPaymentReference' => $ref,
-                'amount' => $amount,
-                'currency' => 'GBP',
-                'cardNumber' => $cardNumber,
-                'expiryDate' => $expiryDate,
-                'cv2' => $cv2,
-            )
+        $data = array(
+            'judoId' => $this->judoId,
+            'yourConsumerReference' => $user->getId(),
+            'yourPaymentReference' => $ref,
+            'amount' => $amount,
+            'currency' => 'GBP',
+            'cardNumber' => $cardNumber,
+            'expiryDate' => $expiryDate,
+            'cv2' => $cv2,
         );
+
+        if ($policyId) {
+            $data['yourPaymentMetaData'] = ['policy_id' => $policyId];
+        }
+
+        $payment->setAttributeValues($data);
         $details = $payment->create();
 
         return $details;
@@ -188,6 +192,18 @@ class JudopayService
 
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        if (!isset($transactionDetails["yourPaymentMetaData"]) ||
+            !isset($transactionDetails["yourPaymentMetaData"]["policy_id"])) {
+            $this->logger->warning(sprintf('Unable to find policy id metadata for payment id %s', $payment->getId()));
+        } elseif ($transactionDetails["yourPaymentMetaData"]["policy_id"] != $policy->getId()) {
+            $this->logger->error(sprintf(
+                'Payment id %s metadata [%s] does not match policy id %s',
+                $payment->getId(),
+                json_encode($transactionDetails["yourPaymentMetaData"]),
+                $policy->getId()
+            ));
+        }
 
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
