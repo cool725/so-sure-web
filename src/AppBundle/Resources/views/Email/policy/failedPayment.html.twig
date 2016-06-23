@@ -13,7 +13,7 @@
 				Your monthly payment of £{{ policy.premium.monthlyPremiumPrice }} was declined.
 				{% if next %}
 				<br><br>
-				We will attempt to process the payment again, using the card details you originally provided us with, on {{ next|date }}.
+				We will attempt to process the payment again, using your {{ policy.user.paymentMethod.cardType }} card ending in {{ policy.user.paymentMethod.cardLastFour }}, on {{ next|date }}.
 			    {% endif %}
 				<br><br>
 				If your payment details are no longer valid, you can update them by <a href="{{ branch_pot_url }}">opening the app</a> and following the steps on screen.

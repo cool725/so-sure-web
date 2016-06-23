@@ -253,6 +253,10 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
+        if (!isset($details['cardDetails'])) {
+            throw new \Exception('Payment failed');
+        }
+
         // @codingStandardsIgnoreStart
         self::$judopay->add(
             $policy,
