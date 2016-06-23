@@ -215,13 +215,17 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
+        if (!isset($details['cardDetails'])) {
+            throw new \Exception('Payment failed');
+        }
+
         // @codingStandardsIgnoreStart
         self::$judopay->add(
             $policy,
             $details['receiptId'],
             $details['consumer']['consumerToken'],
             $details['cardDetails']['cardToken'],
-            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+            "{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}"
         );
         // @codingStandardsIgnoreEnd
 

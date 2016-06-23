@@ -399,7 +399,10 @@ class JudopayService
                 'mobileNumber' => $user->getMobileNumber(),
         );
         if ($paymentMethod->getDecodedDeviceDna() && is_array($paymentMethod->getDecodedDeviceDna())) {
-            $data = array_merge($data, $paymentMethod->getDecodedDeviceDna());
+            $data['clientDetails'] = $paymentMethod->getDecodedDeviceDna();
+        } else {
+            // We should always have the clientDetails
+            $this->logger->warning(sprintf('Missing JudoPay DeviceDna for user %s', $user->getId()));
         }
 
         // populate the required data fields.

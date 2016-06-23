@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "573f9060b3d6601d3ef7428e0a28aa15",
-    "content-hash": "bf6e17bd0a097319088eb869c714514b",
+    "hash": "9aa9a8b27df525c4c101544e4a8b9fbe",
+    "content-hash": "979974c1875dcdc9c8988f45e06530a3",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2788,16 +2788,16 @@
         },
         {
             "name": "judopay/judopay-sdk",
-            "version": "1.0.3",
+            "version": "1.0.3.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/JudoPay/PhpSdk.git",
-                "reference": "fb0c46cb8ebc16891edcdfdc2c9334a14e9368d0"
+                "url": "https://github.com/so-sure/PhpSdk.git",
+                "reference": "dbbd59bb184b4a316b4d4efa570d720b2196bfc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JudoPay/PhpSdk/zipball/fb0c46cb8ebc16891edcdfdc2c9334a14e9368d0",
-                "reference": "fb0c46cb8ebc16891edcdfdc2c9334a14e9368d0",
+                "url": "https://api.github.com/repos/so-sure/PhpSdk/zipball/dbbd59bb184b4a316b4d4efa570d720b2196bfc3",
+                "reference": "dbbd59bb184b4a316b4d4efa570d720b2196bfc3",
                 "shasum": ""
             },
             "require": {
@@ -2820,7 +2820,6 @@
                     "src/Judopay.php"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2835,7 +2834,10 @@
             "keywords": [
                 "payment"
             ],
-            "time": "2015-03-17 18:19:31"
+            "support": {
+                "source": "https://github.com/so-sure/PhpSdk/tree/1.0.3.1"
+            },
+            "time": "2016-06-23 10:22:45"
         },
         {
             "name": "kriswallsmith/assetic",
