@@ -295,12 +295,19 @@ class InvitationServiceTest extends WebTestCase
         );
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite5', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
+        
+        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
+        $count = count($emailInvitationRepo->findSystemReinvitations());
+        $future = new \DateTime();
+        $future->add(new \DateInterval('P3D'));
+        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
 
         // allow reinvitation
         $invitation->setNextReinvited('2016-01-01');
         self::$invitationService->reinvite($invitation);
 
         $this->assertEquals(1, $invitation->getReinvitedCount());
+        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
     }
 
     /**
@@ -326,7 +333,16 @@ class InvitationServiceTest extends WebTestCase
         );
         $this->assertTrue($invitation instanceof EmailInvitation);
 
+        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
+        $count = count($emailInvitationRepo->findSystemReinvitations());
+        $future = new \DateTime();
+        $future->add(new \DateInterval('P3D'));
+        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
+        
         $invitation->setAccepted(new \DateTime());
+        static::$dm->flush();
+        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
+
         self::$invitationService->reinvite($invitation);
     }
 
@@ -368,9 +384,17 @@ class InvitationServiceTest extends WebTestCase
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite6', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
+
+        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
+        $count = count($emailInvitationRepo->findSystemReinvitations());
+        $future = new \DateTime();
+        $future->add(new \DateInterval('P3D'));
+        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
+
         self::$invitationService->cancel($invitation, Policy::CANCELLED_FRAUD);
 
         $this->assertTrue($invitation->isCancelled());
+        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
     }
 
     public function testEmailInvitationReject()
@@ -385,9 +409,17 @@ class InvitationServiceTest extends WebTestCase
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite7', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
+
+        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
+        $count = count($emailInvitationRepo->findSystemReinvitations());
+        $future = new \DateTime();
+        $future->add(new \DateInterval('P3D'));
+        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
+
         self::$invitationService->reject($invitation);
 
         $this->assertTrue($invitation->isRejected());
+        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
     }
 
     public function testEmailInvitationAccept()
