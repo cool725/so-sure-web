@@ -25,7 +25,7 @@
         "drewm/mailchimp-api": "dev-api-v3",
         "google/apiclient": "^2.0.0@RC",
         "staffim/rollbar-bundle": "*",
-        "judopay/judopay-sdk": "~1.0",
+        "judopay/judopay-sdk": "1.0.3.1",
         "facebook/php-sdk-v4": "^5.1",
         "aws/aws-sdk-php": "^3.15",
         "jms/security-extra-bundle": "^1.6",
@@ -58,6 +58,10 @@
         {
             "type": "vcs",
             "url":  "git@github.com:peerj/mpdf.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://github.com/so-sure/PhpSdk.git"
         }
     ],
     "scripts": {
