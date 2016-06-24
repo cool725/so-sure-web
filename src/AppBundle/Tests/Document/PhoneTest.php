@@ -77,6 +77,32 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new \DateTime('2016-01-03'), $phone->getCurrentPhonePrice()->getValidFrom());
     }
 
+    public function testIsSameMake()
+    {
+        $this->assertTrue($this->getSamplePhoneA()->isSameMake('APPLE'));
+        $this->assertFalse($this->getSamplePhoneA()->isSameMake('LG'));
+
+        $phone = new Phone();
+        $phone->setMake('LG');
+        $this->assertTrue($phone->isSameMake('lge'));
+
+        $phone = new Phone();
+        $phone->setMake('LG');
+        $this->assertTrue($phone->isSameMake('Google'));
+
+        $phone = new Phone();
+        $phone->setMake('Motorola');
+        $this->assertTrue($phone->isSameMake('Google'));
+
+        $phone = new Phone();
+        $phone->setMake('Huawei');
+        $this->assertTrue($phone->isSameMake('Google'));
+
+        $phone = new Phone();
+        $phone->setMake('Apple');
+        $this->assertFalse($phone->isSameMake('Google'));
+    }
+
     private function getSamplePhoneA()
     {
         $phone = new Phone();
