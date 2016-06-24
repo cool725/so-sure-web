@@ -49,6 +49,7 @@ abstract class BaseController extends Controller
     protected function getQuotes($make, $device, $returnAllIfNone = true)
     {
         // TODO: We should probably be checking make as well.  However, we need to analyize the data
+        // See Phone::isSameMake()
         \AppBundle\Classes\NoOp::noOp([$make]);
 
         $dm = $this->getManager();

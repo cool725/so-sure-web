@@ -217,8 +217,7 @@ class ApiController extends BaseController
             }
 
             $differentMake = false;
-            // Google phones are known to report different...
-            if ($deviceFound && strtolower($phones[0]->getMake()) != strtolower($make) && $make != 'google') {
+            if ($deviceFound && !$phones[0]->isSameMake($make)) {
                 $differentMake = true;
                 $this->differentMake($phones[0]->getMake(), $make);
             }

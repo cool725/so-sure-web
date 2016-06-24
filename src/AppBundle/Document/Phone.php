@@ -400,6 +400,22 @@ class Phone
         return null;
     }
 
+    public function isSameMake($make)
+    {
+        $make = strtolower($make);
+        if ($make == 'lge') {
+            $make = 'lg';
+        } elseif ($make == 'google') {
+            // https://en.wikipedia.org/wiki/Google_Nexus
+            // TODO: Improve based on model, but as not really used at this point
+            if (in_array($this->getMake(), ['LG', 'Huawei', 'Motorola'])) {
+                $make = strtolower($this->getMake());
+            }
+        }
+
+        return strtolower($this->getMake()) == $make;
+    }
+
     public function __toString()
     {
         $name = sprintf("%s %s", $this->make, $this->model);
