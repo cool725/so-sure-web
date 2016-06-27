@@ -332,12 +332,18 @@ class AdminController extends BaseController
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $total = 0;
+        $numPayments = 0;
         $received = 0;
         $refunded = 0;
         $totalCommission = 0;
         $coverholderCommission = 0;
         $brokerCommission = 0;
         foreach ($payments as $payment) {
+            // For prod, skip invalid policies
+            if ($this->environment == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
+                continue;
+            }
+
             $total += $payment->getAmount();
             if ($payment->getAmount() >= 0) {
                 $received += $payment->getAmount();
@@ -347,8 +353,8 @@ class AdminController extends BaseController
             $totalCommission += $payment->getTotalCommission();
             $coverholderCommission += $payment->getCoverholderCommission();
             $brokerCommission += $payment->getBrokerCommission();
+            $numPayments++;
         }
-        $numPayments = count($payments);
         $avgPayment = 'n/a';
         if ($numPayments > 0) {
             $avgPayment = $total / $numPayments;
