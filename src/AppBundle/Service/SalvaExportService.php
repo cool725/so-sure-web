@@ -113,7 +113,7 @@ class SalvaExportService
                 $premiumPaid = $policy->getPremiumPaid($payments);
                 $totalIpt = $policy->getTotalIpt($payments);
                 $totalBroker = $policy->getTotalBrokerFee($payments);
-                $brokerPaid = $policy->getBrokerFeePaid($payments);
+                $brokerPaid = $policy->getTotalCommissionPaid($payments);
                 $connections = 0;
                 $potValue = 0;
                 $promoPotValue = 0;
@@ -128,7 +128,7 @@ class SalvaExportService
                 $premiumPaid = $policy->getRemainingPremiumPaid($allPayments);
                 $totalIpt = $policy->getRemainingTotalIpt($allPayments);
                 $totalBroker = $policy->getRemainingTotalBrokerFee($allPayments);
-                $brokerPaid = $policy->getRemainingBrokerFeePaid($allPayments);
+                $brokerPaid = $policy->getRemainingTotalCommissionPaid($allPayments);
                 $connections = count($policy->getConnections());
                 $potValue = $policy->getPotValue();
                 $promoPotValue = $policy->getPromoPotValue();

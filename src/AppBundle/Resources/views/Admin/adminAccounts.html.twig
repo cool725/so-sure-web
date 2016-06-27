@@ -35,12 +35,12 @@
         <td>£{{ total|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
-        <td>Total Broker Fees (so-sure + Afl)</td>
-        <td>£{{ brokerFee|number_format(2, '.', ',') }}</td>
+        <td>Total Commissions (so-sure + Afl)</td>
+        <td>£{{ totalCommission|number_format(2, '.', ',') }}</td>
     </tr>
     <tr class="success">
         <td>so-sure Broker Fee</td>
-        <td>£{{ sosureBrokerFee|number_format(2, '.', ',') }}</td>
+        <td>£{{ coverholderCommission|number_format(2, '.', ',') }}</td>
     </tr>
     <tr class="danger">
         <td>Due to Salva</td>
@@ -48,7 +48,7 @@
     </tr>
     <tr class="danger">
         <td>Due to Afl</td>
-        <td>£{{ aflBrokerFee|number_format(2, '.', ',') }}</td>
+        <td>£{{ brokerCommission|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
         <td>Number of Payments Received</td>

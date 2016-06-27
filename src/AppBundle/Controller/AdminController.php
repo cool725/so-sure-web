@@ -332,14 +332,14 @@ class AdminController extends BaseController
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $total = 0;
-        $brokerFee = 0;
-        $sosureBrokerFee = 0;
-        $aflBrokerFee = 0;
+        $totalCommission = 0;
+        $coverholderCommission = 0;
+        $brokerCommission = 0;
         foreach ($payments as $payment) {
             $total += $payment->getAmount();
-            $brokerFee += $payment->getBrokerFee();
-            $sosureBrokerFee += $payment->getSoSureBrokerFee();
-            $aflBrokerFee += $payment->getAflBrokerFee();
+            $totalCommission += $payment->getTotalCommission();
+            $coverholderCommission += $payment->getCoverholderCommission();
+            $brokerCommission += $payment->getBrokerCommission();
         }
         $numPayments = count($payments);
         $avgPayment = 'n/a';
@@ -361,10 +361,10 @@ class AdminController extends BaseController
             'year' => $year,
             'month' => $month,
             'total' => $total,
-            'brokerFee' => $brokerFee,
-            'sosureBrokerFee' => $sosureBrokerFee,
-            'aflBrokerFee' => $aflBrokerFee,
-            'underwriterAmount' => $total - $brokerFee,
+            'totalCommission' => $totalCommission,
+            'coverholderCommission' => $coverholderCommission,
+            'brokerCommission' => $brokerCommission,
+            'underwriterAmount' => $total - $totalCommission,
             'numPayments' => $numPayments,
             'avgPayment' => $avgPayment,
             // TODO: query will eve

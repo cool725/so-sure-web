@@ -825,7 +825,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -851,7 +851,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -871,7 +871,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $policy->addPayment($payment);
 
@@ -891,7 +891,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -905,7 +905,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -939,7 +939,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -959,7 +959,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -983,7 +983,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -1010,7 +1010,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -1036,7 +1036,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
@@ -1055,11 +1055,11 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
-        $this->assertEquals(0, $policy->getBrokerFeePaid());
+        $this->assertEquals(0, $policy->getTotalCommissionPaid());
     }
 
     public function testGetBrokerFeePaidFailedPayment()
@@ -1075,11 +1075,11 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $policy->addPayment($payment);
 
-        $this->assertEquals(0, $policy->getBrokerFeePaid());
+        $this->assertEquals(0, $policy->getTotalCommissionPaid());
     }
 
     public function testGetBrokerFeePaid()
@@ -1096,12 +1096,12 @@ class PhonePolicyTest extends WebTestCase
         for ($i = 0; $i <= 1; $i++) {
             $payment = new JudoPayment();
             $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $policy->addPayment($payment);
         }
 
-        $this->assertEquals(Salva::MONTHLY_BROKER_FEE * 2, $policy->getBrokerFeePaid());
+        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION * 2, $policy->getTotalCommissionPaid());
     }
 
     public function testGetSalvaPolicyNumber()
@@ -1153,7 +1153,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
         $policy->addPayment($payment);
@@ -1163,13 +1163,13 @@ class PhonePolicyTest extends WebTestCase
         for ($i = 2; $i < 4; $i ++) {
             $payment = new JudoPayment();
             $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $payment->setDate(new \DateTime(sprintf('2016-0%d-01', $i)));
             $policy->addPayment($payment);
         }
 
-        $this->assertEquals(Salva::MONTHLY_BROKER_FEE * 2, $policy->getRemainingBrokerFeePaid([$payment]));
+        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION * 2, $policy->getRemainingTotalCommissionPaid([$payment]));
     }
 
     public function testGetTotalBrokerFee()
@@ -1185,16 +1185,16 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
         $policy->addPayment($payment);
 
-        $this->assertEquals(Salva::YEARLY_BROKER_FEE, $policy->getTotalBrokerFee());
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee());
         $this->assertEquals(0, $policy->getMonthsForCancellationCalc([]));
         $this->assertEquals(0, $policy->getTotalBrokerFee([]));
         $this->assertEquals(
-            Salva::YEARLY_BROKER_FEE,
+            Salva::YEARLY_TOTAL_COMMISSION,
             $policy->getRemainingTotalBrokerFee([])
         );
 
@@ -1206,14 +1206,14 @@ class PhonePolicyTest extends WebTestCase
         for ($i = 2; $i < 4; $i ++) {
             $payment = new JudoPayment();
             $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $payment->setDate(new \DateTime(sprintf('2016-0%d-01', $i)));
             $policy->addPayment($payment);
         }
 
         $this->assertEquals(
-            Salva::YEARLY_BROKER_FEE - Salva::MONTHLY_BROKER_FEE,
+            Salva::YEARLY_TOTAL_COMMISSION - Salva::MONTHLY_TOTAL_COMMISSION,
             $policy->getRemainingTotalBrokerFee([$payment])
         );
     }
@@ -1233,7 +1233,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
         $policy->addPayment($payment);
@@ -1243,7 +1243,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $payment->setDate(new \DateTime('2016-02-01'));
         $policy->addPayment($payment);
@@ -1253,7 +1253,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-02-15'));
         $policy->addPayment($payment);
@@ -1278,7 +1278,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
         $policy->addPayment($payment);
@@ -1288,7 +1288,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $payment->setDate(new \DateTime('2016-02-01'));
         $policy->addPayment($payment);
@@ -1298,7 +1298,7 @@ class PhonePolicyTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-02-08'));
         $policy->addPayment($payment);

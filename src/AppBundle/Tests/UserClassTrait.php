@@ -116,7 +116,7 @@ trait UserClassTrait
         if ($addPayment && $policy->getPhone()) {
             $payment = new GocardlessPayment();
             $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $policy->addPayment($payment);
         }
 

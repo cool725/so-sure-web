@@ -216,10 +216,10 @@ class JudopayService
         // Only set broker fees if we know the amount
         if ($payment->getAmount() == $policy->getPremium()->getYearlyPremiumPrice()) {
             // Yearly broker will include the final monthly calc in the total
-            $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+            $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         } elseif ($payment->getAmount() == $policy->getPremium()->getMonthlyPremiumPrice()) {
             // This is always the first payment, so shouldn't have to worry about the final one
-            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         }
 
         return $payment;
@@ -443,8 +443,8 @@ class JudopayService
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
 
-        // TODO: $payment->setBrokerFee(Salva::FINAL_MONTHLY_BROKER_FEE);
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        // TODO: $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
 
         return $payment;
     }

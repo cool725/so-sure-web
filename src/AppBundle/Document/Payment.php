@@ -55,19 +55,19 @@ abstract class Payment
      * @MongoDB\Float()
      * @Gedmo\Versioned
      */
-    protected $totalBrokerFee;
+    protected $totalCommission;
 
     /**
      * @MongoDB\Float()
      * @Gedmo\Versioned
      */
-    protected $sosureBrokerFee;
+    protected $coverholderCommission;
 
     /**
      * @MongoDB\Float()
      * @Gedmo\Versioned
      */
-    protected $aflBrokerFee;
+    protected $brokerCommission;
 
     /**
      * @MongoDB\String()
@@ -159,34 +159,34 @@ abstract class Payment
         $this->setGwp($this->getAmount() - $this->getIpt());
     }
 
-    public function setBrokerFee($brokerFee)
+    public function setTotalCommission($totalCommission)
     {
-        $this->totalBrokerFee = $brokerFee;
-        if ($brokerFee == Salva::YEARLY_BROKER_FEE) {
-            $this->sosureBrokerFee = Salva::YEARLY_SOSURE_BROKER_FEE;
-            $this->aflBrokerFee = Salva::YEARLY_AFL_BROKER_FEE;
-        } elseif ($brokerFee == Salva::MONTHLY_BROKER_FEE) {
-            $this->sosureBrokerFee = Salva::MONTHLY_SOSURE_BROKER_FEE;
-            $this->aflBrokerFee = Salva::MONTHLY_AFL_BROKER_FEE;
-        } elseif ($brokerFee == Salva::FINAL_MONTHLY_BROKER_FEE) {
-            $this->sosureBrokerFee = Salva::FINAL_MONTHLY_SOSURE_BROKER_FEE;
-            $this->aflBrokerFee = Salva::FINAL_MONTHLY_AFL_BROKER_FEE;
+        $this->totalCommission = $totalCommission;
+        if ($totalCommission == Salva::YEARLY_TOTAL_COMMISSION) {
+            $this->coverholderCommission = Salva::YEARLY_COVERHOLDER_COMMISSION;
+            $this->brokerCommission = Salva::YEARLY_BROKER_COMMISSION;
+        } elseif ($totalCommission == Salva::MONTHLY_TOTAL_COMMISSION) {
+            $this->coverholderCommission = Salva::MONTHLY_COVERHOLDER_COMMISSION;
+            $this->brokerCommission = Salva::MONTHLY_BROKER_COMMISSION;
+        } elseif ($totalCommission == Salva::FINAL_MONTHLY_TOTAL_COMMISSION) {
+            $this->coverholderCommission = Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION;
+            $this->brokerCommission = Salva::FINAL_MONTHLY_BROKER_COMMISSION;
         }
     }
 
-    public function getBrokerFee()
+    public function getTotalCommission()
     {
-        return $this->totalBrokerFee;
+        return $this->totalCommission;
     }
 
-    public function getSoSureBrokerFee()
+    public function getCoverholderCommission()
     {
-        return $this->sosureBrokerFee;
+        return $this->coverholderCommission;
     }
 
-    public function getAflBrokerFee()
+    public function getBrokerCommission()
     {
-        return $this->aflBrokerFee;
+        return $this->brokerCommission;
     }
 
     public function setReference($reference)

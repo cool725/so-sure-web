@@ -190,7 +190,7 @@ class PolicyServiceTest extends WebTestCase
 
         $payment = new GocardlessPayment();
         $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $policy->addPayment($payment);
 
         static::$policyService->create($policy);
@@ -219,7 +219,7 @@ class PolicyServiceTest extends WebTestCase
 
             $payment = new GocardlessPayment();
             $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-            $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $policy->addPayment($payment);
 
             static::$policyService->create($policy, $date);
@@ -248,7 +248,7 @@ class PolicyServiceTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $policy->addPayment($payment);
 
@@ -267,7 +267,7 @@ class PolicyServiceTest extends WebTestCase
 
         $payment = new GocardlessPayment();
         $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $policy->addPayment($payment);
 
         static::$policyService->create($policy);
@@ -310,7 +310,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2, $policy->getTotalPremiumPrice());
         $this->assertEquals($policy->getPremium()->getGwp() * 2, $policy->getTotalGwp());
         $this->assertEquals($policy->getPremium()->getIpt() * 2, $policy->getTotalIpt());
-        $this->assertEquals(Salva::MONTHLY_BROKER_FEE * 2, $policy->getTotalBrokerFee());
+        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION * 2, $policy->getTotalBrokerFee());
     }
 
     public function testSalvaCooloff()
@@ -353,7 +353,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getTotalPremiumPrice());
         $this->assertEquals($policy->getPremium()->getYearlyGwp(), $policy->getTotalGwp());
         $this->assertEquals($policy->getPremium()->getYearlyIpt(), $policy->getTotalIpt());
-        $this->assertEquals(Salva::YEARLY_BROKER_FEE, $policy->getTotalBrokerFee());
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee());
     }
 
     public function testSalvaPartialPolicy()
@@ -374,6 +374,6 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getTotalPremiumPrice([1]));
         $this->assertEquals($policy->getPremium()->getGwp(), $policy->getTotalGwp([1]));
         $this->assertEquals($policy->getPremium()->getIpt(), $policy->getTotalIpt([1]));
-        $this->assertEquals(Salva::MONTHLY_BROKER_FEE, $policy->getTotalBrokerFee([1]));
+        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee([1]));
     }
 }
