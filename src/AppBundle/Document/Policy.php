@@ -774,14 +774,14 @@ abstract class Policy
         return $paid;
     }
 
-    public function getRemainingBrokerFeePaid($payments)
+    public function getRemainingTotalCommissionPaid($payments)
     {
-        return $this->toTwoDp($this->getBrokerFeePaid() - $this->getBrokerFeePaid($payments));
+        return $this->toTwoDp($this->getTotalCommissionPaid() - $this->getTotalCommissionPaid($payments));
     }
 
-    public function getBrokerFeePaid($payments = null)
+    public function getTotalCommissionPaid($payments = null)
     {
-        $brokerFee = 0;
+        $totalCommission = 0;
         if (!$this->isPolicy()) {
             return 0;
         }
@@ -791,11 +791,11 @@ abstract class Policy
 
         foreach ($payments as $payment) {
             if ($payment->isSuccess()) {
-                $brokerFee += $payment->getBrokerFee();
+                $totalCommission += $payment->getTotalCommission();
             }
         }
 
-        return $this->toTwoDp($brokerFee);
+        return $this->toTwoDp($totalCommission);
     }
 
     public function getRiskColour()

@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="container">
+<div class="container" style="margin-bottom: 50px"  >
     <div class="row-fluid">
-        Some type of stats here
-        <ul>
-            <li><a href="{{ path('admin_users') }}">Users</a></li>
-            <li><a href="{{ path('admin_phones') }}">Phones</a></li>
-            <li><a href="{{ path('admin_claims') }}">Claims</a></li>
+        <ul style="list-style: none">
+            <li><h2><a href="{{ path('admin_users') }}">Users</a></h2></li>
+            <li><h2><a href="{{ path('admin_phones') }}">Phones</a></h2></li>
+            <li><h2><a href="{{ path('admin_claims') }}">Claims</a></h2></li>
+            <li><h2><a href="{{ path('admin_accounts') }}">Accounts</a></h2></li>
         </ul>
     </div>
 </div>

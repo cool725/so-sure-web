@@ -294,7 +294,7 @@ class GocardlessService
         $payment = new GocardlessPayment();
         $payment->setReference($subscription->links->mandate);
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $policy->addPayment($payment);
 
         $this->dm->flush();

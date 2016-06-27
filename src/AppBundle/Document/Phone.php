@@ -378,7 +378,7 @@ class Phone
 
         // Avg Excess + Expected Recycling - Claims handling fee - Claims Check fee - replacement phone price
         $costOfClaims = 56 + 19 - 14 - 1 - $price;
-        $nwt = $this->getCurrentPhonePrice()->getYearlyGwp() - Salva::YEARLY_BROKER_FEE;
+        $nwt = $this->getCurrentPhonePrice()->getYearlyGwp() - Salva::YEARLY_TOTAL_COMMISSION;
         $profit = $nwt + $costOfClaims * $claimFrequency;
 
         return $this->toTopTwoDp($profit);

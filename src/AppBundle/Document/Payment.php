@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\Salva;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -54,7 +55,19 @@ abstract class Payment
      * @MongoDB\Float()
      * @Gedmo\Versioned
      */
-    protected $brokerFee;
+    protected $totalCommission;
+
+    /**
+     * @MongoDB\Float()
+     * @Gedmo\Versioned
+     */
+    protected $coverholderCommission;
+
+    /**
+     * @MongoDB\Float()
+     * @Gedmo\Versioned
+     */
+    protected $brokerCommission;
 
     /**
      * @MongoDB\String()
@@ -146,14 +159,34 @@ abstract class Payment
         $this->setGwp($this->getAmount() - $this->getIpt());
     }
 
-    public function setBrokerFee($brokerFee)
+    public function setTotalCommission($totalCommission)
     {
-        $this->brokerFee = $brokerFee;
+        $this->totalCommission = $totalCommission;
+        if ($totalCommission == Salva::YEARLY_TOTAL_COMMISSION) {
+            $this->coverholderCommission = Salva::YEARLY_COVERHOLDER_COMMISSION;
+            $this->brokerCommission = Salva::YEARLY_BROKER_COMMISSION;
+        } elseif ($totalCommission == Salva::MONTHLY_TOTAL_COMMISSION) {
+            $this->coverholderCommission = Salva::MONTHLY_COVERHOLDER_COMMISSION;
+            $this->brokerCommission = Salva::MONTHLY_BROKER_COMMISSION;
+        } elseif ($totalCommission == Salva::FINAL_MONTHLY_TOTAL_COMMISSION) {
+            $this->coverholderCommission = Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION;
+            $this->brokerCommission = Salva::FINAL_MONTHLY_BROKER_COMMISSION;
+        }
     }
 
-    public function getBrokerFee()
+    public function getTotalCommission()
     {
-        return $this->brokerFee;
+        return $this->totalCommission;
+    }
+
+    public function getCoverholderCommission()
+    {
+        return $this->coverholderCommission;
+    }
+
+    public function getBrokerCommission()
+    {
+        return $this->brokerCommission;
     }
 
     public function setReference($reference)

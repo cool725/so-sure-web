@@ -11,12 +11,19 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Payment;
+use AppBundle\Document\JudoPayment;
 use AppBundle\Document\User;
+use AppBundle\Document\File\S3File;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
+use AppBundle\Form\Type\YearMonthType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Pagerfanta\Pagerfanta;
@@ -299,6 +306,79 @@ class AdminController extends BaseController
             'claims' => $pager->getCurrentPageResults(),
             'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
+        ];
+    }
+
+    /**
+     * @Route("/accounts", name="admin_accounts")
+     * @Route("/accounts/{year}/{month}", name="admin_accounts_date")
+     * @Template
+     */
+    public function adminAccountsAction(Request $request, $year = null, $month = null)
+    {
+        $now = new \DateTime();
+        if (!$year) {
+            $year = $now->format('Y');
+        }
+        if (!$month) {
+            $month = $now->format('m');
+        }
+        $date = new \DateTime(sprintf('%d-%d-01', $year, $month));
+
+        $dm = $this->getManager();
+        $paymentRepo = $dm->getRepository(JudoPayment::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $s3FileRepo = $dm->getRepository(S3File::class);
+
+        $payments = $paymentRepo->getAllPaymentsForExport($date);
+        $total = 0;
+        $received = 0;
+        $refunded = 0;
+        $totalCommission = 0;
+        $coverholderCommission = 0;
+        $brokerCommission = 0;
+        foreach ($payments as $payment) {
+            $total += $payment->getAmount();
+            if ($payment->getAmount() >= 0) {
+                $received += $payment->getAmount();
+            } else {
+                $refunded += $payment->getAmount();
+            }
+            $totalCommission += $payment->getTotalCommission();
+            $coverholderCommission += $payment->getCoverholderCommission();
+            $brokerCommission += $payment->getBrokerCommission();
+        }
+        $numPayments = count($payments);
+        $avgPayment = 'n/a';
+        if ($numPayments > 0) {
+            $avgPayment = $total / $numPayments;
+        }
+
+        $form = $this->createForm(YearMonthType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            return $this->redirectToRoute('admin_accounts_date', [
+                'year' => $form->get('year')->getData(),
+                'month' => $form->get('month')->getData()
+            ]);
+        }
+
+        return [
+            'form' => $form->createView(),
+            'year' => $year,
+            'month' => $month,
+            'total' => $total,
+            'received' => $received,
+            'refunded' => $refunded,
+            'totalCommission' => $totalCommission,
+            'coverholderCommission' => $coverholderCommission,
+            'brokerCommission' => $brokerCommission,
+            'underwriterAmount' => $total - $totalCommission,
+            'numPayments' => $numPayments,
+            'avgPayment' => $avgPayment,
+            // TODO: query will eve
+            'activePolicies' => $phonePolicyRepo->countAllActivePolicies($date),
+            'files' => $s3FileRepo->getAllFiles($date),
         ];
     }
 }

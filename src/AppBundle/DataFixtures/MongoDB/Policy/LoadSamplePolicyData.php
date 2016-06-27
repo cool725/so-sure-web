@@ -149,7 +149,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $payment = new JudoPayment();
             $payment->setDate($paymentDate);
             $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-            $payment->setBrokerFee(Salva::YEARLY_BROKER_FEE);
+            $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $policy->addPayment($payment);
         } else {
@@ -158,9 +158,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $payment = new JudoPayment();
                 $payment->setDate(clone $paymentDate);
                 $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-                $payment->setBrokerFee(Salva::MONTHLY_BROKER_FEE);
+                $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
                 if ($months == 12) {
-                    $payment->setBrokerFee(Salva::FINAL_MONTHLY_BROKER_FEE);
+                    $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
                 }
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
                 $policy->addPayment($payment);
