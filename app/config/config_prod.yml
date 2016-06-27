@@ -35,6 +35,8 @@ monolog:
             level: warning
             token: %rollbar_access_token%
             channels: ['!event']
+            config:
+                checkIgnore: "function ($isUncaught, $exception, $payload) { return $exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException; }"
         salva:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"
