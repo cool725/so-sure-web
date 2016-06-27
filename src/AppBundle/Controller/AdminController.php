@@ -332,11 +332,18 @@ class AdminController extends BaseController
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $total = 0;
+        $received = 0;
+        $refunded = 0;
         $totalCommission = 0;
         $coverholderCommission = 0;
         $brokerCommission = 0;
         foreach ($payments as $payment) {
             $total += $payment->getAmount();
+            if ($payment->getAmount() >= 0) {
+                $received += $payment->getAmount();
+            } else {
+                $refunded += $payment->getAmount();
+            }
             $totalCommission += $payment->getTotalCommission();
             $coverholderCommission += $payment->getCoverholderCommission();
             $brokerCommission += $payment->getBrokerCommission();
@@ -361,6 +368,8 @@ class AdminController extends BaseController
             'year' => $year,
             'month' => $month,
             'total' => $total,
+            'received' => $received,
+            'refunded' => $refunded,
             'totalCommission' => $totalCommission,
             'coverholderCommission' => $coverholderCommission,
             'brokerCommission' => $brokerCommission,

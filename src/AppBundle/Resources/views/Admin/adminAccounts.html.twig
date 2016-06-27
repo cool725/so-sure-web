@@ -31,24 +31,32 @@
 
 <table class="table table-striped">
     <tr class="info">
-        <td>Amount Received</td>
+        <td>Total for month</td>
         <td>£{{ total|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
+        <td>Paid in</td>
+        <td>£{{ received|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td>Refunded</td>
+        <td>£{{ refunded|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
         <td>Total Commissions (so-sure + Afl)</td>
-        <td>£{{ totalCommission|number_format(2, '.', ',') }}</td>
+        <td>£{{ totalCommission|number_format(2, '.', ',') }} ( {{ (100 * totalCommission / total) |number_format(1, '.', ',')}}% )</td>
     </tr>
     <tr class="success">
-        <td>so-sure Broker Fee</td>
-        <td>£{{ coverholderCommission|number_format(2, '.', ',') }}</td>
+        <td>so-sure Commission</td>
+        <td>£{{ coverholderCommission|number_format(2, '.', ',') }} ( {{ (100 * coverholderCommission / total) |number_format(1, '.', ',')}}% )</td>
     </tr>
     <tr class="danger">
-        <td>Due to Salva</td>
-        <td>£{{ underwriterAmount|number_format(2, '.', ',') }}</td>
+        <td>Salva</td>
+        <td>£{{ underwriterAmount|number_format(2, '.', ',') }} ( {{ (100 * underwriterAmount / total) |number_format(1, '.', ',')}}% )</td>
     </tr>
     <tr class="danger">
-        <td>Due to Afl</td>
-        <td>£{{ brokerCommission|number_format(2, '.', ',') }}</td>
+        <td>Afl Commission</td>
+        <td>£{{ brokerCommission|number_format(2, '.', ',') }} ( {{ (100 * brokerCommission / total) |number_format(1, '.', ',')}}% )</td>
     </tr>
     <tr>
         <td>Number of Payments Received</td>
