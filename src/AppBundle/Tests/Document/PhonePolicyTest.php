@@ -1262,7 +1262,10 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
     }
 
-    public function testShouldExpirePolicy()
+    /**
+     * @expectedException \Exception
+     */
+    public function testShouldExpirePolicyMissingPayment()
     {
         $policy = new PhonePolicy();
         $policy->setPhone(static::$phone);
@@ -1275,6 +1278,18 @@ class PhonePolicyTest extends WebTestCase
 
         // Policy doesn't have a payment, so should be expired
         $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
+    }
+
+    public function testShouldExpirePolicy()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
