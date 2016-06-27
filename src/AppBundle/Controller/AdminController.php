@@ -335,7 +335,7 @@ class AdminController extends BaseController
         $brokerFee = 0;
         $sosureBrokerFee = 0;
         $aflBrokerFee = 0;
-        foreach($payments as $payment) {
+        foreach ($payments as $payment) {
             $total += $payment->getAmount();
             $brokerFee += $payment->getBrokerFee();
             $sosureBrokerFee += $payment->getSoSureBrokerFee();
