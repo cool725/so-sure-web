@@ -340,7 +340,7 @@ class AdminController extends BaseController
         $brokerCommission = 0;
         foreach ($payments as $payment) {
             // For prod, skip invalid policies
-            if ($this->environment == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
+            if ($this->getParameter('kernel.environment') == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
                 continue;
             }
 
