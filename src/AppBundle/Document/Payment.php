@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\Salva;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -54,7 +55,19 @@ abstract class Payment
      * @MongoDB\Float()
      * @Gedmo\Versioned
      */
-    protected $brokerFee;
+    protected $totalBrokerFee;
+
+    /**
+     * @MongoDB\Float()
+     * @Gedmo\Versioned
+     */
+    protected $sosureBrokerFee;
+
+    /**
+     * @MongoDB\Float()
+     * @Gedmo\Versioned
+     */
+    protected $aflBrokerFee;
 
     /**
      * @MongoDB\String()
@@ -148,12 +161,32 @@ abstract class Payment
 
     public function setBrokerFee($brokerFee)
     {
-        $this->brokerFee = $brokerFee;
+        $this->totalBrokerFee = $brokerFee;
+        if ($brokerFee == Salva::YEARLY_BROKER_FEE) {
+            $this->sosureBrokerFee = Salva::YEARLY_SOSURE_BROKER_FEE;
+            $this->aflBrokerFee = Salva::YEARLY_AFL_BROKER_FEE;
+        } elseif ($brokerFee == Salva::MONTHLY_BROKER_FEE) {
+            $this->sosureBrokerFee = Salva::MONTHLY_SOSURE_BROKER_FEE;
+            $this->aflBrokerFee = Salva::MONTHLY_AFL_BROKER_FEE;
+        } elseif ($brokerFee == Salva::FINAL_MONTHLY_BROKER_FEE) {
+            $this->sosureBrokerFee = Salva::FINAL_MONTHLY_SOSURE_BROKER_FEE;
+            $this->aflBrokerFee = Salva::FINAL_MONTHLY_AFL_BROKER_FEE;
+        }
     }
 
     public function getBrokerFee()
     {
-        return $this->brokerFee;
+        return $this->totalBrokerFee;
+    }
+
+    public function getSoSureBrokerFee()
+    {
+        return $this->sosureBrokerFee;
+    }
+
+    public function getAflBrokerFee()
+    {
+        return $this->aflBrokerFee;
     }
 
     public function setReference($reference)

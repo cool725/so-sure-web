@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-md-7">
+        <h1>so-sure Accounts for {{ month }} / {{ year }}</h1>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            {{ form_label(form.month, 'Month') }}
+            {{ form_errors(form.month) }}
+            {{ form_widget(form.month) }}
+        </div>                
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            {{ form_label(form.year, 'Year') }}
+            {{ form_errors(form.year) }}
+            {{ form_widget(form.year) }}
+        </div>                
+    </div>
+    <div class="col-md-1">
+        <div class="form-group">
+            {{ form_widget(form.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}
+        </div>                
+    </div>
+</div>
+{{ form_end(form) }}
+
+<table class="table table-striped">
+    <tr class="info">
+        <td>Amount Received</td>
+        <td>£{{ total|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td>Total Broker Fees (so-sure + Afl)</td>
+        <td>£{{ brokerFee|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr class="success">
+        <td>so-sure Broker Fee</td>
+        <td>£{{ sosureBrokerFee|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr class="danger">
+        <td>Due to Salva</td>
+        <td>£{{ underwriterAmount|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr class="danger">
+        <td>Due to Afl</td>
+        <td>£{{ aflBrokerFee|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td>Number of Payments Received</td>
+        <td>{{ numPayments }}</td>
+    </tr>
+    <tr>
+        <td>Average Payment Amount</td>
+        <td>£{{ avgPayment|number_format(2, '.', ',')  }}</td>
+    </tr>
+    <tr>
+        <td>Number of Active Policies (as of end {{ month }} / {{ year }}) <br />
+        * <i>May not be very accurate when viewed historically</i></td>
+        <td>{{ activePolicies }}</td>
+    </tr>
+</table>
+<h2>Reconciliation Data</h2>
+    {% for file in files %}
+        <h3>{{ file.filename }}</h3>
+        <ul>
+            {% for key, value in file.metadata %}
+                <li>{{ key }}: {{ value }}</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</div>
+{% endblock %}

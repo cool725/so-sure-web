@@ -13,6 +13,8 @@ use AppBundle\Document\JudoPayment;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\User;
+use AppBundle\Document\File\SalvaPolicyFile;
+use AppBundle\Document\File\SalvaPaymentFile;
 
 class SalvaExportService
 {
@@ -188,6 +190,11 @@ class SalvaExportService
             ];
         }
 
+        return $data;
+    }
+
+    protected function formatLine($data)
+    {
         return sprintf('"%s"', implode('","', $data));
     }
 
@@ -199,13 +206,21 @@ class SalvaExportService
         }
 
         $lines = [];
+        $paidPremium = 0;
+        $paidBrokerFee = 0;
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $lines[] = sprintf("%s\n", $this->transformPolicy(null));
+        $lines[] = sprintf("%s\n", $this->formatLine($this->transformPolicy(null)));
         foreach ($repo->getAllPoliciesForExport($date, $this->environment) as $policy) {
             foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
-                $lines[] =  sprintf("%s\n", $this->transformPolicy($policy, $version));
+                $data = $this->transformPolicy($policy, $version);
+                $paidPremium += $data[16];
+                $paidBrokerFee += $data[19];
+                $lines[] =  sprintf("%s\n", $this->formatLine($data));
             }
-            $lines[] =  sprintf("%s\n", $this->transformPolicy($policy));
+            $data = $this->transformPolicy($policy);
+            $paidPremium += $data[16];
+            $paidBrokerFee += $data[19];
+            $lines[] =  sprintf("%s\n", $this->formatLine($data));
         }
 
         if ($s3) {
@@ -215,7 +230,16 @@ class SalvaExportService
                 $date->format('m'),
                 $date->format('U')
             );
-            $this->uploadS3($lines, $filename, 'policies', $date->format('Y'));
+            $key = $this->uploadS3($lines, $filename, 'policies', $date->format('Y'));
+
+            $file = new SalvaPolicyFile();
+            $file->setBucket(self::S3_BUCKET);
+            $file->setKey($key);
+            $file->setDate($date);
+            $file->addMetadata('paidPremium', $paidPremium);
+            $file->addMetadata('paidBrokerFee', $paidBrokerFee);
+            $this->dm->persist($file);
+            $this->dm->flush();
         }
 
         return $lines;
@@ -229,14 +253,19 @@ class SalvaExportService
         }
 
         $lines = [];
+        $total = 0;
+        $numPayments = 0;
         $repo = $this->dm->getRepository(JudoPayment::class);
-        $lines[] = sprintf("%s\n", $this->transformPayment(null));
+        $lines[] = sprintf("%s\n", $this->formatLine($this->transformPayment(null)));
         foreach ($repo->getAllPaymentsForExport($date) as $payment) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
                 continue;
             }
-            $lines[] = sprintf("%s\n", $this->transformPayment($payment));
+            $data = $this->transformPayment($payment);
+            $total += $data[2];
+            $numPayments++;
+            $lines[] = sprintf("%s\n", $this->formatLine($data));
         }
 
         if ($s3) {
@@ -246,7 +275,16 @@ class SalvaExportService
                 $date->format('m'),
                 $date->format('U')
             );
-            $this->uploadS3($lines, $filename, 'payments', $date->format('Y'));
+            $key = $this->uploadS3($lines, $filename, 'payments', $date->format('Y'));
+
+            $file = new SalvaPaymentFile();
+            $file->setBucket(self::S3_BUCKET);
+            $file->setKey($key);
+            $file->setDate($date);
+            $file->addMetadata('total', $total);
+            $file->addMetadata('numPayments', $numPayments);
+            $this->dm->persist($file);
+            $this->dm->flush();
         }
 
         return $lines;
@@ -261,13 +299,14 @@ class SalvaExportService
 
         $lines = [];
         $repo = $this->dm->getRepository(Claim::class);
-        $lines[] =  sprintf("%s\n", $this->transformClaim(null));
+        $lines[] =  sprintf("%s\n", $this->formatLine($this->transformClaim(null)));
         foreach ($repo->getAllClaimsForExport($date, $days) as $claim) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$claim->getPolicy()->isValidPolicy()) {
                 continue;
             }
-            $lines[] = sprintf("%s\n", $this->transformClaim($claim));
+            $data = $this->transformClaim($claim);
+            $lines[] = sprintf("%s\n", $this->formatLine($data));
         }
 
         if ($s3) {
@@ -297,6 +336,8 @@ class SalvaExportService
         ));
 
         unlink($tmpFile);
+
+        return $s3Key;
     }
 
     public function transformPayment(JudoPayment $payment = null)
@@ -319,7 +360,7 @@ class SalvaExportService
             ];
         }
 
-        return sprintf('"%s"', implode('","', $data));
+        return $data;
     }
 
     public function transformClaim(Claim $claim = null)
@@ -373,7 +414,7 @@ class SalvaExportService
             ];
         }
 
-        return sprintf('"%s"', implode('","', $data));
+        return $data;
     }
 
     public function sendPolicy(PhonePolicy $phonePolicy)

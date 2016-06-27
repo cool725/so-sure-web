@@ -1,22 +1,21 @@
 <?php
 
-namespace AppBundle\Repository;
+namespace AppBundle\Repository\File;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Policy;
 use AppBundle\Document\DateTrait;
 
-class JudoPaymentRepository extends DocumentRepository
+class S3FileRepository extends DocumentRepository
 {
     use DateTrait;
 
-    public function getAllPaymentsForExport(\DateTime $date)
+    public function getAllFiles(\DateTime $date)
     {
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
 
         return $this->createQueryBuilder()
-            ->field('result')->equals(JudoPayment::RESULT_SUCCESS)
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
             ->getQuery()

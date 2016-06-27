@@ -5,9 +5,12 @@ namespace AppBundle\Repository;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\DateTrait;
 
 class PhonePolicyRepository extends DocumentRepository
 {
+    use DateTrait;
+
     public function isMissingOrExpiredOnlyPolicy($imei)
     {
         // if there's an imei in the db, only allow insurance for an expired policy
@@ -37,6 +40,26 @@ class PhonePolicyRepository extends DocumentRepository
                 Policy::STATUS_UNPAID
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
+            ->getQuery()
+            ->execute()
+            ->count();
+    }
+
+    /**
+     * All policies that are active (excluding so-sure test ones)
+     */
+    public function countAllActivePolicies(\DateTime $date = null)
+    {
+        $nextMonth = $this->endOfMonth($date);
+
+        $policy = new PhonePolicy();
+
+        return $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
+            ->field('start')->lt($nextMonth)
             ->getQuery()
             ->execute()
             ->count();
