@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Connection;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\OptOut\EmailOptOut;
