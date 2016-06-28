@@ -2,32 +2,32 @@
 {% block body %}
 <div class="container" style="margin-bottom: 50px">
 
-{{ form_start(form) }}
+{{ form_start(yearMonthForm) }}
 <div class="row">
     <div class="col-md-7">
         <h1>so-sure Accounts for {{ month }} / {{ year }}</h1>
     </div>
     <div class="col-md-2">
         <div class="form-group">
-            {{ form_label(form.month, 'Month') }}
-            {{ form_errors(form.month) }}
-            {{ form_widget(form.month) }}
+            {{ form_label(yearMonthForm.month, 'Month') }}
+            {{ form_errors(yearMonthForm.month) }}
+            {{ form_widget(yearMonthForm.month) }}
         </div>                
     </div>
     <div class="col-md-2">
         <div class="form-group">
-            {{ form_label(form.year, 'Year') }}
-            {{ form_errors(form.year) }}
-            {{ form_widget(form.year) }}
+            {{ form_label(yearMonthForm.year, 'Year') }}
+            {{ form_errors(yearMonthForm.year) }}
+            {{ form_widget(yearMonthForm.year) }}
         </div>                
     </div>
     <div class="col-md-1">
         <div class="form-group">
-            {{ form_widget(form.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}
+            {{ form_widget(yearMonthForm.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}
         </div>                
     </div>
 </div>
-{{ form_end(form) }}
+{{ form_end(yearMonthForm) }}
 
 <table class="table table-striped">
     <tr class="info">
@@ -72,14 +72,37 @@
         <td>{{ activePolicies }}</td>
     </tr>
 </table>
-<h2>Reconciliation Data</h2>
+{{ form_start(judoForm) }}
+<div class="row">
+    <div class="col-md-7">
+        <h2>Reconciliation Data</h2>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            {{ form_label(judoForm.file, 'File') }}
+            {{ form_errors(judoForm.file) }}
+            {{ form_widget(judoForm.file) }}
+        </div>                
+    </div>
+    <div class="col-md-1">
+        <div class="form-group">
+            {{ form_widget(judoForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+        </div>                
+    </div>
+</div>
+{{ form_end(yearMonthForm) }}
+
     {% for file in files %}
-        <h3>{{ file.filename }}</h3>
+        {% set filename = file.filename|split('.') %}
+        {% set file_dates = filename[0]|split('-') %}
+        {% set file_date = file_dates[file_dates|length - 1] %}
+        <h3>{{ file.filename }} [From {{ file_date|date }}]</h3>
         <ul>
             {% for key, value in file.metadata %}
                 <li>{{ key }}: {{ value }}</li>
             {% endfor %}
         </ul>
     {% endfor %}
+    
 </div>
 {% endblock %}
