@@ -21,12 +21,23 @@ class OpsController extends BaseController
      */
     public function statusAction()
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(User::class);
-        $user = $repo->find(1);
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find(1);
 
-        return new JsonResponse([
-            'status' => 'Ok',
-        ]);
+            // Ensure there's a bit of free disk space
+            $temp = tmpfile();
+            fwrite($temp, "t");
+            fclose($temp);
+
+            return new JsonResponse([
+                'status' => 'Ok',
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => 'Error',
+            ], 500);
+        }
     }
 }
