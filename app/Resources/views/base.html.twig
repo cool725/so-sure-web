@@ -15,6 +15,16 @@
         {% endblock %}
     </head>
     <body>
+        <!-- Google Tag Manager -->
+        <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KGBBJQ{{ ga_tag_manager_env }}"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        '//www.googletagmanager.com/gtm.js?id='+i+dl+'{{ ga_tag_manager_env }}';f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
+        <!-- End Google Tag Manager -->
+
         {% if not hide_nav is defined or hide_nav != 1 %}
             {% include '::nav.html.twig' %}
         {% endif %}
@@ -52,20 +62,7 @@
             <script src="/components/jquery/jquery.min.js"></script>
             <script src="/components/bootstrap/bootstrap.js"></script>
         {% endif %}
-        <script src="//cdn.optimizely.com/js/4833800075.js"></script>
-        <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
-        <script type="text/javascript">
-            window.cookieconsent_options = {
-                "dismiss": "Got it!",
-                "message": "We use \uD83C\uDF6As. Hungry? Our cookie info is",
-                "learnMore": "here.",
-                "link": "https://www.iubenda.com/privacy-policy/7805295",
-                "theme": "/css/dark-bottom.css"
-            };
-        </script>
 
-        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
-        <!-- End Cookie Consent plugin -->
         {% block javascripts %}
             {% javascripts
             '@AppBundle/Resources/public/js/*'

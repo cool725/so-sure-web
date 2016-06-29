@@ -68,19 +68,10 @@
 <!-- Analytics -->
 
   <div id="fb-root"></div>
-  <div id="ss-root" data-fb-id="{{ fb_appid }}" data-fb-pixel-id="{{ fb_pixel_id }}"
+  <div id="ss-root" data-fb-id="{{ fb_appid }}"
        data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"
-       data-google-analytics="{{ google_analytics }}"
-       data-heap-id="{{ heap_id }}"
-       data-drift-key="{{ drift_key }}"
        data-branch-key="{{ branch_key }}"
        data-branch-banner="{% if not app.user %}1{% endif %}"
        data-referral="{{ app.session.get('referral') }}"
        {% if fb_pixel_event is defined %}data-fb-pixel-event="{{ fb_pixel_event }}"{% endif %}
        ></div>
-
-  <!-- Facebook Pixel Code -->
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id={{ fb_pixel_id }}&ev=PageView&noscript=1" /></noscript>
-  {% if fb_pixel_event is defined %}
-    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id={{ fb_pixel_id }}&ev={{ fb_pixel_event }}&noscript=1" /></noscript>
-  {% endif %}
