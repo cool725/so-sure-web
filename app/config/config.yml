@@ -182,3 +182,28 @@ stof_doctrine_extensions:
   mongodb:
     default:
       loggable: true
+
+oneup_flysystem:
+    adapters:
+        s3admin:
+            awss3v3:
+                client: aws.s3
+                bucket: admin.so-sure.com
+                prefix: %kernel.environment%
+    filesystems:
+        s3admin_fs:
+            adapter: s3admin
+            mount: s3admin_fs
+
+vich_uploader:
+    db_driver: mongodb
+    storage: flysystem
+    mappings:
+        judo:
+            namer:
+                service: vich_uploader.namer_property
+                options: { property: 's3FileName'}
+            upload_destination: s3admin_fs
+            inject_on_load:     false
+            delete_on_update:   true
+            delete_on_remove:   true

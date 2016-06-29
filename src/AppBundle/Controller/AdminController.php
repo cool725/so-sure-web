@@ -16,12 +16,14 @@ use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\File\S3File;
+use AppBundle\Document\File\JudoFile;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
 use AppBundle\Form\Type\YearMonthType;
+use AppBundle\Form\Type\JudoFileType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -360,17 +362,53 @@ class AdminController extends BaseController
             $avgPayment = $total / $numPayments;
         }
 
-        $form = $this->createForm(YearMonthType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            return $this->redirectToRoute('admin_accounts_date', [
-                'year' => $form->get('year')->getData(),
-                'month' => $form->get('month')->getData()
-            ]);
+        $judoFile = new JudoFile();
+        $judoForm = $this->get('form.factory')
+            ->createNamedBuilder('judo', JudoFileType::class, $judoFile)
+            ->getForm();
+        $yearMonthForm = $this->get('form.factory')
+            ->createNamedBuilder('yearMonth', YearMonthType::class)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('yearMonth')) {
+                $yearMonthForm->handleRequest($request);
+                if ($yearMonthForm->isSubmitted() && $yearMonthForm->isValid()) {
+                    return $this->redirectToRoute('admin_accounts_date', [
+                        'year' => $yearMonthForm->get('year')->getData(),
+                        'month' => $yearMonthForm->get('month')->getData()
+                    ]);
+                }
+            } elseif ($request->request->has('judo')) {
+                $judoForm->handleRequest($request);
+                if ($judoForm->isSubmitted() && $judoForm->isValid()) {
+                    $dm = $this->getManager();
+                    $judoFile->setBucket('admin.so-sure.com');
+                    $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                    $judoService = $this->get('app.judopay');
+                    $data = $judoService->processCsv($judoFile->getFile());
+                    $judoFile->addMetadata('total', $data['total']);
+                    $judoFile->addMetadata('payments', $data['payments']);
+                    $judoFile->addMetadata('numPayments', $data['numPayments']);
+                    $judoFile->addMetadata('refunds', $data['refunds']);
+                    $judoFile->addMetadata('numRefunds', $data['numRefunds']);
+                    $judoFile->setDate($data['date']);
+
+                    $dm->persist($judoFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_accounts_date', [
+                        'year' => $yearMonthForm->get('year')->getData(),
+                        'month' => $yearMonthForm->get('month')->getData()
+                    ]);
+                }
+            }
         }
 
         return [
-            'form' => $form->createView(),
+            'yearMonthForm' => $yearMonthForm->createView(),
+            'judoForm' => $judoForm->createView(),
             'year' => $year,
             'month' => $month,
             'total' => $total,

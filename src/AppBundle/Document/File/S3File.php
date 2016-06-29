@@ -9,7 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\File\S3FileRepository")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("fileType")
- * @MongoDB\DiscriminatorMap({"salvaPayment"="SalvaPaymentFile","salvaPolicy"="SalvaPolicyFile"})
+ * @MongoDB\DiscriminatorMap({"salvaPayment"="SalvaPaymentFile","salvaPolicy"="SalvaPolicyFile","judo"="JudoFile"})
  * @Gedmo\Loggable
  */
 abstract class S3File

@@ -519,4 +519,54 @@ class JudopayService
 
         return $payment->getPolicy();
     }
+
+    public function processCsv($filename)
+    {
+        $header = null;
+        $data = array();
+        $payments = 0;
+        $numPayments = 0;
+        $refunds = 0;
+        $numRefunds = 0;
+        $total = 0;
+        $maxDate = null;
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000)) !== false) {
+                if (!$header) {
+                    $header = $row;
+                } else {
+                    $line = array_combine($header, $row);
+                    $data[] = $line;
+                    if ($line['TransactionType'] == "Payment") {
+                        $total += $line['Net'];
+                        $payments += $line['Net'];
+                        $numPayments++;
+                    } elseif ($line['TransactionType'] == "Refund") {
+                        $total -= $line['Net'];
+                        $refunds += $line['Net'];
+                        $numRefunds++;
+                    }
+                    $date = new \DateTime($line['Date']);
+                    if ($maxDate && $maxDate->format('m') != $date->format('m')) {
+                        throw new \Exception('Export should only be for the same calendar month');
+                    }
+
+                    if (!$maxDate || $maxDate > $date) {
+                        $maxDate = $date;
+                    }
+                }
+            }
+            fclose($handle);
+        }
+
+        return [
+            'total' => $this->toTwoDp($total),
+            'payments' => $this->toTwoDp($payments),
+            'numPayments' => $numPayments,
+            'refunds' => $this->toTwoDp($refunds),
+            'numRefunds' => $numRefunds,
+            'date' => $maxDate,
+            'data' => $data
+        ];
+    }
 }

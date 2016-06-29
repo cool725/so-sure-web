@@ -43,7 +43,10 @@
         "braintree/braintree_php": "^3.11",
         "cometcult/braintree-bundle": "^0.1.0",
         "stof/doctrine-extensions-bundle": "^1.2",
-        "peerj/mpdf": "5.7.2.1"
+        "peerj/mpdf": "5.7.2.1",
+        "vich/uploader-bundle": "^1.1.0",
+        "oneup/flysystem-bundle": "^1.4.1",
+        "league/flysystem-aws-s3-v3": "^1.0.13"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
