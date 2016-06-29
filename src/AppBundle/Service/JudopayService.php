@@ -530,10 +530,8 @@ class JudopayService
         $numRefunds = 0;
         $total = 0;
         $maxDate = null;
-        if (($handle = fopen($filename, 'r')) !== FALSE)
-        {
-            while (($row = fgetcsv($handle, 1000)) !== FALSE)
-            {
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000)) !== false) {
                 if (!$header) {
                     $header = $row;
                 } else {

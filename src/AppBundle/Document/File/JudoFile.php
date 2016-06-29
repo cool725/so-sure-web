@@ -16,9 +16,9 @@ class JudoFile extends S3File
 
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
-     * 
+     *
      * @Vich\UploadableField(mapping="judo", fileNameProperty="fileName")
-     * 
+     *
      * @var File
      */
     private $file;
@@ -43,7 +43,7 @@ class JudoFile extends S3File
      * must be able to accept an instance of 'File' as the bundle will inject one here
      * during Doctrine hydration.
      *
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $image
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $file
      *
      */
     public function setFile(File $file = null)
@@ -55,7 +55,7 @@ class JudoFile extends S3File
             // otherwise the event listeners won't be called and the file is lost
             $this->updatedAt = new \DateTime('now');
         }
-    }    
+    }
 
     /**
      * @return File
