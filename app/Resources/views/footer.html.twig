@@ -70,8 +70,4 @@
   <div id="fb-root"></div>
   <div id="ss-root" data-fb-id="{{ fb_appid }}"
        data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"
-       data-branch-key="{{ branch_key }}"
-       data-branch-banner="{% if not app.user %}1{% endif %}"
-       data-referral="{{ app.session.get('referral') }}"
-       {% if fb_pixel_event is defined %}data-fb-pixel-event="{{ fb_pixel_event }}"{% endif %}
        ></div>

@@ -15,13 +15,23 @@
         {% endblock %}
     </head>
     <body>
+        <!-- Google Tag Manager Data Layer -->
+        <script>
+            dataLayer = [{
+                'branch': {
+                    'banner': {% if not app.user %}true{% else %}false{% endif %},
+                    'referral': '{{ app.session.get('referral') }}'
+                }
+            }];
+        </script>
+
         <!-- Google Tag Manager -->
-        <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KGBBJQ{{ ga_tag_manager_env }}"
+        <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KGBBJQ{{ ga_tag_manager_env|raw }}"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
         j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        '//www.googletagmanager.com/gtm.js?id='+i+dl+'{{ ga_tag_manager_env }}';f.parentNode.insertBefore(j,f);
+        '//www.googletagmanager.com/gtm.js?id='+i+dl+'{{ ga_tag_manager_env|raw }}';f.parentNode.insertBefore(j,f);
         })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
         <!-- End Google Tag Manager -->
 
@@ -70,8 +80,5 @@
             <script src="{{ asset_url }}"></script>
             {% endjavascripts %}
         {% endblock %}
-
-        <!-- Site JS -->
-        <script src="/js/site.js"></script>
     </body>
 </html>
