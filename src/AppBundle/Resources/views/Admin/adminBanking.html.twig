@@ -29,63 +29,72 @@
 </div>
 {{ form_end(yearMonthForm) }}
 
-<table class="table table-striped">
-    <tr>
-        <td>so-sure/Judo Total for month</td>
-        <td>£{{ paymentTotals.total|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td>Barclays Total for month (transaction date)</td>
-        <td>£{{ totalTransaction|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td>Barclays Total for month (processing date)</td>
-        <td>£{{ totalBarclaysProcessing|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td>Lloyds Total for month (processing date)</td>
-        <td>£{{ totalLloydsProcessing|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td>Lloyds Total for month (received date)</td>
-        <td>£{{ totalReceived|number_format(2, '.', ',') }}</td>
-    </tr>
-</table>
 <div class="row">
-            <div class="col-md-2">
+    <div class="col-md-8">
+        <h3>Transaction Date</h3>
+        <table class="table table-striped">
+            <tr>
+                <td>so-sure/Judo Total for month</td>
+                <td>£{{ paymentTotals.total|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Barclays Total for month</td>
+                <td>£{{ totalTransaction|number_format(2, '.', ',') }}</td>
+            </tr>
+        </table>
+        <h3>Processing Date</h3>
+        <table class="table table-striped">
+            <tr>
+                <td>Barclays Total for month (processing date)</td>
+                <td>£{{ totalBarclaysProcessing|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Lloyds Total for month (processing date)</td>
+                <td>£{{ totalLloydsProcessing|number_format(2, '.', ',') }}</td>
+            </tr>
+        </table>
+        <h3>Received Date</h3>
+        <table class="table table-striped">
+            <tr>
+                <td>Lloyds Total for month (received date)</td>
+                <td>£{{ totalReceived|number_format(2, '.', ',') }}</td>
+            </tr>
+        </table>        
+    </div>
+    <div class="col-md-4">
+        <div style="border-radius: 5px; border: solid 1px; padding: 10px;">
                 <h3>Barclays</h3>
-            </div>
+                {% for barclaysFile in barclaysFiles %}
+                    <p>{{ barclaysFile.fileName }}</p>
+                {% endfor %}
             {{ form_start(barclaysForm) }}
-            <div class="col-md-3">
                 <div class="form-group">
                     {{ form_label(barclaysForm.file, 'File') }}
                     {{ form_errors(barclaysForm.file) }}
                     {{ form_widget(barclaysForm.file) }}
                 </div>                
-            </div>
-            <div class="col-md-1">
                 <div class="form-group">
                     {{ form_widget(barclaysForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
-            </div>
             {{ form_end(barclaysForm) }}
-            <div class="col-md-2">
-                <h3>Lloyds</h3>
-            </div>
+        </div>
+        <div style="border-radius: 5px; border: solid 1px; padding: 10px;">
+            <h3>Lloyds</h3>
+                {% for lloydsFile in lloydsFiles %}
+                    <p>{{ lloydsFile.fileName }}</p>
+                {% endfor %}
             {{ form_start(lloydsForm) }}
-            <div class="col-md-3">
                 <div class="form-group">
                     {{ form_label(lloydsForm.file, 'File') }}
                     {{ form_errors(lloydsForm.file) }}
                     {{ form_widget(lloydsForm.file) }}
                 </div>                
-            </div>
-            <div class="col-md-1">
                 <div class="form-group">
                     {{ form_widget(lloydsForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
-            </div>
             {{ form_end(lloydsForm) }}
+        </div>
+    </div>
 </div>
 <div class="row">
     <div class="col-md-4">

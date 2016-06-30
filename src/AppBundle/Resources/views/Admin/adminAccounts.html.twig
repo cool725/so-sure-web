@@ -93,6 +93,7 @@
 {{ form_end(judoForm) }}
 
     {% for file in files %}
+        {% if file.fileType == 'SalvaPaymentFile' or file.fileType == 'SalvaPolicyFile' or file.fileType == 'JudoFile' %}
         {% set filename = file.filename|split('.') %}
         {% set file_dates = filename[0]|split('-') %}
         {% set file_date = file_dates[file_dates|length - 1] %}
@@ -102,6 +103,7 @@
                 <li>{{ key }}: {{ value }}</li>
             {% endfor %}
         </ul>
+        {% endif %}
     {% endfor %}
     
 </div>

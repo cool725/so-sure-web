@@ -475,7 +475,6 @@ class AdminController extends BaseController
         }
         
         $barclaysFiles = $barclaysFileRepo->getBarclaysFiles($date);
-        //\Doctrine\Common\Util\Debug::dump($barclaysFiles);
         $dailyTransaction = BarclaysFile::combineDailyTransactions($barclaysFiles);
         $dailyBarclaysProcessing = BarclaysFile::combineDailyProcessing($barclaysFiles);
         $totalTransaction = 0;
@@ -524,6 +523,8 @@ class AdminController extends BaseController
             'dailyBarclaysProcessing' => $dailyBarclaysProcessing,
             'dailyLloydsProcessing' => $dailyLloydsProcessing,
             'dailyReceived' => $dailyReceived,
+            'barclaysFiles' => $barclaysFiles,
+            'lloydsFiles' => $lloydsFiles,
         ];
     }
 }

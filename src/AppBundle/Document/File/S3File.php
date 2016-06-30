@@ -116,4 +116,11 @@ abstract class S3File
     {
         $this->metadata[$key] = $value;
     }
+
+    public function getFileType()
+    {
+        $names = explode('\\', get_class($this));
+
+        return $names[count($names) - 1];
+    }
 }
