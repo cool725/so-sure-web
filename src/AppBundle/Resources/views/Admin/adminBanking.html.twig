@@ -98,7 +98,15 @@
             </tr>
             {% for day in 1..days_in_month %}
                 {% set ymd = year ~ month ~ day %}
-                <tr>
+                {% set color = '' %}
+                {% if paymentDailys[day] is defined and dailyTransaction[ymd] is defined  %}
+                    {% if paymentDailys[day] == dailyTransaction[ymd] %}
+                        {% set color = 'success' %}
+                    {% else %}
+                        {% set color = 'danger' %}
+                    {% endif %}
+                {% endif %}
+                <tr class='{{ color }}'>
                     <td>{{ day }}</td>
                     <td>{% if paymentDailys[day] is defined %}£{{ paymentDailys[day] }}{% else %}-{% endif %}</td>
                     <td>{% if dailyTransaction[ymd] is defined %}£{{ dailyTransaction[ymd] }}{% else %}-{% endif %}</td>
@@ -116,7 +124,15 @@
             </tr>
             {% for day in 1..days_in_month %}
                 {% set ymd = year ~ month ~ day %}
-                <tr>
+                {% set color = '' %}
+                {% if dailyBarclaysProcessing[ymd] is defined and dailyLloydsProcessing[ymd] is defined  %}
+                    {% if dailyBarclaysProcessing[ymd] == dailyLloydsProcessing[ymd] %}
+                        {% set color = 'success' %}
+                    {% else %}
+                        {% set color = 'danger' %}
+                    {% endif %}
+                {% endif %}
+                <tr class='{{ color }}'>
                     <td>{{ day }}</td>
                     <td>{% if dailyBarclaysProcessing[ymd] is defined %}£{{ dailyBarclaysProcessing[ymd] }}{% else %}-{% endif %}</td>
                     <td>{% if dailyLloydsProcessing[ymd] is defined %}£{{ dailyLloydsProcessing[ymd] }}{% else %}-{% endif %}</td>
