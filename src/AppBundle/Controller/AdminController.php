@@ -17,6 +17,8 @@ use AppBundle\Document\JudoPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
+use AppBundle\Document\File\BarclaysFile;
+use AppBundle\Document\File\LloydsFile;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
@@ -24,6 +26,8 @@ use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
 use AppBundle\Form\Type\YearMonthType;
 use AppBundle\Form\Type\JudoFileType;
+use AppBundle\Form\Type\BarclaysFileType;
+use AppBundle\Form\Type\LloydsFileType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -333,34 +337,7 @@ class AdminController extends BaseController
         $s3FileRepo = $dm->getRepository(S3File::class);
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
-        $total = 0;
-        $numPayments = 0;
-        $received = 0;
-        $refunded = 0;
-        $totalCommission = 0;
-        $coverholderCommission = 0;
-        $brokerCommission = 0;
-        foreach ($payments as $payment) {
-            // For prod, skip invalid policies
-            if ($this->getParameter('kernel.environment') == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
-                continue;
-            }
-
-            $total += $payment->getAmount();
-            if ($payment->getAmount() >= 0) {
-                $received += $payment->getAmount();
-            } else {
-                $refunded += $payment->getAmount();
-            }
-            $totalCommission += $payment->getTotalCommission();
-            $coverholderCommission += $payment->getCoverholderCommission();
-            $brokerCommission += $payment->getBrokerCommission();
-            $numPayments++;
-        }
-        $avgPayment = 'n/a';
-        if ($numPayments > 0) {
-            $avgPayment = $total / $numPayments;
-        }
+        $paymentTotals = Payment::sumPayments($payments, $this->getParameter('kernel.environment') == 'prod');
 
         $judoFile = new JudoFile();
         $judoForm = $this->get('form.factory')
@@ -387,13 +364,7 @@ class AdminController extends BaseController
                     $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     $judoService = $this->get('app.judopay');
-                    $data = $judoService->processCsv($judoFile->getFile());
-                    $judoFile->addMetadata('total', $data['total']);
-                    $judoFile->addMetadata('payments', $data['payments']);
-                    $judoFile->addMetadata('numPayments', $data['numPayments']);
-                    $judoFile->addMetadata('refunds', $data['refunds']);
-                    $judoFile->addMetadata('numRefunds', $data['numRefunds']);
-                    $judoFile->setDate($data['date']);
+                    $data = $judoService->processCsv($judoFile);
 
                     $dm->persist($judoFile);
                     $dm->flush();
@@ -411,18 +382,148 @@ class AdminController extends BaseController
             'judoForm' => $judoForm->createView(),
             'year' => $year,
             'month' => $month,
-            'total' => $total,
-            'received' => $received,
-            'refunded' => $refunded,
-            'totalCommission' => $totalCommission,
-            'coverholderCommission' => $coverholderCommission,
-            'brokerCommission' => $brokerCommission,
-            'underwriterAmount' => $total - $totalCommission,
-            'numPayments' => $numPayments,
-            'avgPayment' => $avgPayment,
+            'paymentTotals' => $paymentTotals,
             // TODO: query will eve
             'activePolicies' => $phonePolicyRepo->countAllActivePolicies($date),
             'files' => $s3FileRepo->getAllFiles($date),
+        ];
+    }
+
+    /**
+     * @Route("/banking", name="admin_banking")
+     * @Route("/banking/{year}/{month}", name="admin_banking_date")
+     * @Template
+     */
+    public function adminBankingAction(Request $request, $year = null, $month = null)
+    {
+        $now = new \DateTime();
+        if (!$year) {
+            $year = $now->format('Y');
+        }
+        if (!$month) {
+            $month = $now->format('m');
+        }
+        $date = new \DateTime(sprintf('%d-%d-01', $year, $month));
+
+        $dm = $this->getManager();
+        $paymentRepo = $dm->getRepository(JudoPayment::class);
+        $barclaysFileRepo = $dm->getRepository(BarclaysFile::class);
+        $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
+
+        $payments = $paymentRepo->getAllPaymentsForExport($date);
+        $paymentTotals = Payment::sumPayments($payments, $this->getParameter('kernel.environment') == 'prod');
+        $paymentDailys = Payment::dailyPayments($payments, $this->getParameter('kernel.environment') == 'prod');
+
+        $lloydsFile = new LloydsFile();
+        $lloydsForm = $this->get('form.factory')
+            ->createNamedBuilder('lloyds', LloydsFileType::class, $lloydsFile)
+            ->getForm();
+        $barclaysFile = new BarclaysFile();
+        $barclaysForm = $this->get('form.factory')
+            ->createNamedBuilder('barclays', BarclaysFileType::class, $barclaysFile)
+            ->getForm();
+        $yearMonthForm = $this->get('form.factory')
+            ->createNamedBuilder('yearMonth', YearMonthType::class)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('yearMonth')) {
+                $yearMonthForm->handleRequest($request);
+                if ($yearMonthForm->isSubmitted() && $yearMonthForm->isValid()) {
+                    return $this->redirectToRoute('admin_banking_date', [
+                        'year' => $yearMonthForm->get('year')->getData(),
+                        'month' => $yearMonthForm->get('month')->getData()
+                    ]);
+                }
+            } elseif ($request->request->has('lloyds')) {
+                $lloydsForm->handleRequest($request);
+                if ($lloydsForm->isSubmitted() && $lloydsForm->isValid()) {
+                    $dm = $this->getManager();
+                    $lloydsFile->setBucket('admin.so-sure.com');
+                    $lloydsFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                    $lloydsService = $this->get('app.lloyds');
+                    $data = $lloydsService->processCsv($lloydsFile);
+
+                    $dm->persist($lloydsFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_banking_date', [
+                        'year' => $yearMonthForm->get('year')->getData(),
+                        'month' => $yearMonthForm->get('month')->getData()
+                    ]);
+                }
+            } elseif ($request->request->has('barclays')) {
+                $barclaysForm->handleRequest($request);
+                if ($barclaysForm->isSubmitted() && $barclaysForm->isValid()) {
+                    $dm = $this->getManager();
+                    $barclaysFile->setBucket('admin.so-sure.com');
+                    $barclaysFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                    $barclaysService = $this->get('app.barclays');
+                    $data = $barclaysService->processCsv($barclaysFile);
+
+                    $dm->persist($barclaysFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_banking_date', [
+                        'year' => $yearMonthForm->get('year')->getData(),
+                        'month' => $yearMonthForm->get('month')->getData()
+                    ]);
+                }
+            }
+        }
+        
+        $barclaysFiles = $barclaysFileRepo->getBarclaysFiles($date);
+        //\Doctrine\Common\Util\Debug::dump($barclaysFiles);
+        $dailyTransaction = BarclaysFile::combineDailyTransactions($barclaysFiles);
+        $dailyBarclaysProcessing = BarclaysFile::combineDailyProcessing($barclaysFiles);
+        $totalTransaction = 0;
+        foreach ($dailyTransaction as $key => $value) {
+            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+                $totalTransaction += $value;
+            }
+        }
+        $totalBarclaysProcessing = 0;
+        foreach ($dailyBarclaysProcessing as $key => $value) {
+            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+                $totalBarclaysProcessing += $value;
+            }
+        }
+
+        $lloydsFiles = $lloydsFileRepo->getLloydsFiles($date);
+        $dailyReceived = LloydsFile::combineDailyReceived($lloydsFiles);
+        $dailyLloydsProcessing = LloydsFile::combineDailyProcessing($lloydsFiles);
+        $totalReceived = 0;
+        foreach ($dailyReceived as $key => $value) {
+            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+                $totalReceived += $value;
+            }
+        }
+        $totalLloydsProcessing = 0;
+        foreach ($dailyLloydsProcessing as $key => $value) {
+            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+                $totalLloydsProcessing += $value;
+            }
+        }
+
+        return [
+            'yearMonthForm' => $yearMonthForm->createView(),
+            'lloydsForm' => $lloydsForm->createView(),
+            'barclaysForm' => $barclaysForm->createView(),
+            'year' => $year,
+            'month' => $month,
+            'days_in_month' => cal_days_in_month(CAL_GREGORIAN, $month, $year),
+            'paymentTotals' => $paymentTotals,
+            'totalTransaction' => $totalTransaction,
+            'totalBarclaysProcessing' => $totalBarclaysProcessing,
+            'totalLloydsProcessing' => $totalLloydsProcessing,
+            'totalReceived' => $totalReceived,
+            'paymentDailys' => $paymentDailys,
+            'dailyTransaction' => $dailyTransaction,
+            'dailyBarclaysProcessing' => $dailyBarclaysProcessing,
+            'dailyLloydsProcessing' => $dailyLloydsProcessing,
+            'dailyReceived' => $dailyReceived,
         ];
     }
 }

@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+
+{{ form_start(yearMonthForm) }}
+<div class="row">
+    <div class="col-md-7">
+        <h1>so-sure Banking for {{ month }} / {{ year }}</h1>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            {{ form_label(yearMonthForm.month, 'Month') }}
+            {{ form_errors(yearMonthForm.month) }}
+            {{ form_widget(yearMonthForm.month) }}
+        </div>                
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            {{ form_label(yearMonthForm.year, 'Year') }}
+            {{ form_errors(yearMonthForm.year) }}
+            {{ form_widget(yearMonthForm.year) }}
+        </div>                
+    </div>
+    <div class="col-md-1">
+        <div class="form-group">
+            {{ form_widget(yearMonthForm.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}
+        </div>                
+    </div>
+</div>
+{{ form_end(yearMonthForm) }}
+
+<table class="table table-striped">
+    <tr>
+        <td>so-sure/Judo Total for month</td>
+        <td>£{{ paymentTotals.total|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td>Barclays Total for month (transaction date)</td>
+        <td>£{{ totalTransaction|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td>Barclays Total for month (processing date)</td>
+        <td>£{{ totalBarclaysProcessing|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td>Lloyds Total for month (processing date)</td>
+        <td>£{{ totalLloydsProcessing|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td>Lloyds Total for month (received date)</td>
+        <td>£{{ totalReceived|number_format(2, '.', ',') }}</td>
+    </tr>
+</table>
+<div class="row">
+            <div class="col-md-2">
+                <h3>Barclays</h3>
+            </div>
+            {{ form_start(barclaysForm) }}
+            <div class="col-md-3">
+                <div class="form-group">
+                    {{ form_label(barclaysForm.file, 'File') }}
+                    {{ form_errors(barclaysForm.file) }}
+                    {{ form_widget(barclaysForm.file) }}
+                </div>                
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    {{ form_widget(barclaysForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>
+            </div>
+            {{ form_end(barclaysForm) }}
+            <div class="col-md-2">
+                <h3>Lloyds</h3>
+            </div>
+            {{ form_start(lloydsForm) }}
+            <div class="col-md-3">
+                <div class="form-group">
+                    {{ form_label(lloydsForm.file, 'File') }}
+                    {{ form_errors(lloydsForm.file) }}
+                    {{ form_widget(lloydsForm.file) }}
+                </div>                
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    {{ form_widget(lloydsForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>
+            </div>
+            {{ form_end(lloydsForm) }}
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>Transaction Date</h2>
+        <table class="table table-striped">
+            <tr>
+                <th>Day of Month</th>
+                <th>so-sure/Judo</th>
+                <th>Barclays</th>
+            </tr>
+            {% for day in 1..days_in_month %}
+                {% set ymd = year ~ month ~ day %}
+                <tr>
+                    <td>{{ day }}</td>
+                    <td>{% if paymentDailys[day] is defined %}£{{ paymentDailys[day] }}{% else %}-{% endif %}</td>
+                    <td>{% if dailyTransaction[ymd] is defined %}£{{ dailyTransaction[ymd] }}{% else %}-{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-4">
+        <h2>Processing Date</h2>
+        <table class="table table-striped">
+            <tr>
+                <th>Day of Month</th>
+                <th>Barclays</th>
+                <th>Lloyds</th>
+            </tr>
+            {% for day in 1..days_in_month %}
+                {% set ymd = year ~ month ~ day %}
+                <tr>
+                    <td>{{ day }}</td>
+                    <td>{% if dailyBarclaysProcessing[ymd] is defined %}£{{ dailyBarclaysProcessing[ymd] }}{% else %}-{% endif %}</td>
+                    <td>{% if dailyLloydsProcessing[ymd] is defined %}£{{ dailyLloydsProcessing[ymd] }}{% else %}-{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-4">
+        <h2>Received Date</h2>
+        <table class="table table-striped">
+            <tr>
+                <th>Day of Month</th>
+                <th>Lloyds</th>
+            </tr>
+            {% for day in 1..days_in_month %}
+                {% set ymd = year ~ month ~ day %}
+                <tr>
+                    <td>{{ day }}</td>
+                    <td>{% if dailyReceived[ymd] is defined %}£{{ dailyReceived[ymd] }}{% else %}-{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+
+    
+</div>
+{% endblock %}

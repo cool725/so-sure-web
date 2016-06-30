@@ -249,4 +249,78 @@ abstract class Payment
         $scheduledPayment->setPayment($this);
         $this->scheduledPayments[] = $scheduledPayment;
     }
+
+    public static function sumPayments($payments, $requireValidPolicy)
+    {
+        $data = [
+            'total' => 0,
+            'numPayments' => 0,
+            'received' => 0,
+            'refunded' => 0,
+            'totalCommission' => 0,
+            'totalCommissionPercent' => 0,
+            'coverholderCommission' => 0,
+            'coverholderCommissionPercent' => 0,
+            'brokerCommission' => 0,
+            'brokerCommissionPercent' => 0,
+            'totalUnderwriter' => 0,
+            'totalUnderwriterPercent' => 0,
+            'avgPayment' => null,
+        ];
+        foreach ($payments as $payment) {
+            // For prod, skip invalid policies
+            if ($requireValidPolicy && !$payment->getPolicy()->isValidPolicy()) {
+                continue;
+            }
+
+            $data['total'] += $payment->getAmount();
+            if ($payment->getAmount() >= 0) {
+                $data['received'] += $payment->getAmount();
+            } else {
+                $data['refunded'] += $payment->getAmount();
+            }
+            $data['totalCommission'] += $payment->getTotalCommission();
+            $data['coverholderCommission'] += $payment->getCoverholderCommission();
+            $data['brokerCommission'] += $payment->getBrokerCommission();
+            $data['numPayments']++;
+        }
+        if ($data['numPayments'] > 0) {
+            $data['avgPayment'] = $data['total'] / $data['numPayments'];
+        }
+        $data['totalUnderwriter'] = $data['total'] - $data['totalCommission'];
+        if ($data['total'] != 0) {
+            $data['totalCommissionPercent'] = 100 * $data['totalCommission'] / $data['total'];
+            $data['coverholderCommissionPercent'] = 100 * $data['coverholderCommission'] / $data['total'];
+            $data['brokerCommissionPercent'] = 100 * $data['brokerCommission'] / $data['total'];
+            $data['totalUnderwriterPercent'] = 100 * $data['totalUnderwriter'] / $data['total'];
+        }
+
+        return $data;
+    }
+
+    public static function dailyPayments($payments, $requireValidPolicy)
+    {
+        $month = null;
+        $data = [];
+        foreach ($payments as $payment) {
+            // For prod, skip invalid policies
+            if ($requireValidPolicy && !$payment->getPolicy()->isValidPolicy()) {
+                continue;
+            }
+
+            if (!$month) {
+                $month = $payment->getDate()->format('m');
+            } elseif ($month != $payment->getDate()->format('m')) {
+                throw new \Exception('Payment list contains multiple months');
+            }
+
+            $day = $payment->getDate()->format('d');
+            if (!isset($data[$day])) {
+                $data[$day] = 0;
+            }
+            $data[$day] += $payment->getAmount();
+        }
+
+        return $data;
+    }
 }
