@@ -19,7 +19,7 @@ class BarclaysFile extends UploadFile
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
      *
-     * @Vich\UploadableField(mapping="barclays", fileNameProperty="fileName")
+     * @Vich\UploadableField(mapping="adminS3Mapping", fileNameProperty="fileName")
      *
      * @var File
      */
@@ -45,7 +45,7 @@ class BarclaysFile extends UploadFile
         $now = new \DateTime();
 
         return sprintf(
-            'judo-%d-%02d-%s',
+            'barclays-%d-%02d-%s',
             $this->getDate()->format('Y'),
             $this->getDate()->format('m'),
             $now->format('U')
@@ -83,7 +83,7 @@ class BarclaysFile extends UploadFile
             }
         }
 
-        return $dailyTransactions;        
+        return $dailyTransactions;
     }
 
     public static function combineDailyProcessing($barclayFiles)
@@ -97,6 +97,6 @@ class BarclaysFile extends UploadFile
             }
         }
 
-        return $dailyProcessing;        
+        return $dailyProcessing;
     }
 }

@@ -92,7 +92,8 @@ class BarclaysService
             fclose($handle);
         }
         
-        // TODO: Attempt to find JudoPayments that match the transaction date, card number, amount, card type, and sale/refund criteria
+        // TODO: Attempt to find JudoPayments that match the transaction date, card number,
+        // amount, card type, and sale/refund criteria
         // and add transaction details if found
         // if none or more than one, flag record
         // also record number of transactions found in metadata

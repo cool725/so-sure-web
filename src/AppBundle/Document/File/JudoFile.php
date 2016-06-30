@@ -15,7 +15,7 @@ class JudoFile extends UploadFile
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
      *
-     * @Vich\UploadableField(mapping="judo", fileNameProperty="fileName")
+     * @Vich\UploadableField(mapping="adminS3Mapping", fileNameProperty="fileName")
      *
      * @var File
      */

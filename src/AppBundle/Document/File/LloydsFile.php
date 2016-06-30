@@ -17,7 +17,7 @@ class LloydsFile extends UploadFile
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
      *
-     * @Vich\UploadableField(mapping="lloyds", fileNameProperty="fileName")
+     * @Vich\UploadableField(mapping="adminS3Mapping", fileNameProperty="fileName")
      *
      * @var File
      */
@@ -81,7 +81,7 @@ class LloydsFile extends UploadFile
             }
         }
 
-        return $dailyReceived;        
+        return $dailyReceived;
     }
 
     public static function combineDailyProcessing($lloydsFiles)
@@ -95,6 +95,6 @@ class LloydsFile extends UploadFile
             }
         }
 
-        return $dailyProcessing;        
+        return $dailyProcessing;
     }
 }
