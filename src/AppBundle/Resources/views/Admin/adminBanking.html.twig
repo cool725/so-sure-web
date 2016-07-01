@@ -106,7 +106,11 @@
                 <th>Barclays</th>
             </tr>
             {% for day in 1..days_in_month %}
-                {% set ymd = year ~ month ~ day %}
+                {% if day < 10 %}
+                    {% set ymd = year ~ month ~ "0" ~ day %}
+                {% else %}
+                    {% set ymd = year ~ month ~ day %}
+                {% endif %}
                 {% set color = '' %}
                 {% if paymentDailys[day] is defined and dailyTransaction[ymd] is defined  %}
                     {% if paymentDailys[day] == dailyTransaction[ymd] %}
@@ -116,7 +120,7 @@
                     {% endif %}
                 {% endif %}
                 <tr class='{{ color }}'>
-                    <td>{{ day }}</td>
+                    <td>{{ day }} - {{ ymd }}</td>
                     <td>{% if paymentDailys[day] is defined %}£{{ paymentDailys[day] }}{% else %}-{% endif %}</td>
                     <td>{% if dailyTransaction[ymd] is defined %}£{{ dailyTransaction[ymd] }}{% else %}-{% endif %}</td>
                 </tr>
@@ -132,7 +136,11 @@
                 <th>Lloyds</th>
             </tr>
             {% for day in 1..days_in_month %}
-                {% set ymd = year ~ month ~ day %}
+                {% if day < 10 %}
+                    {% set ymd = year ~ month ~ "0" ~ day %}
+                {% else %}
+                    {% set ymd = year ~ month ~ day %}
+                {% endif %}
                 {% set color = '' %}
                 {% if dailyBarclaysProcessing[ymd] is defined and dailyLloydsProcessing[ymd] is defined  %}
                     {% if dailyBarclaysProcessing[ymd] == dailyLloydsProcessing[ymd] %}
@@ -157,7 +165,11 @@
                 <th>Lloyds</th>
             </tr>
             {% for day in 1..days_in_month %}
-                {% set ymd = year ~ month ~ day %}
+                {% if day < 10 %}
+                    {% set ymd = year ~ month ~ "0" ~ day %}
+                {% else %}
+                    {% set ymd = year ~ month ~ day %}
+                {% endif %}
                 <tr>
                     <td>{{ day }}</td>
                     <td>{% if dailyReceived[ymd] is defined %}£{{ dailyReceived[ymd] }}{% else %}-{% endif %}</td>
