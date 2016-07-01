@@ -271,6 +271,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
         $this->assertEquals(11, count($policy->getScheduledPayments()));
+        $this->assertEquals(3436, $policy->getPayments()[0]->getCardLastFour());
 
         $scheduledPayment = $policy->getNextScheduledPayment();
         $payment = new JudoPayment();

@@ -26,6 +26,18 @@ class JudoPayment extends Payment
      */
     protected $message;
 
+    /**
+     * @MongoDB\String()
+     * @Gedmo\Versioned
+     */
+    protected $cardLastFour;
+
+    /**
+     * @MongoDB\String()
+     * @Gedmo\Versioned
+     */
+    protected $barclaysReference;
+
     public function getResult()
     {
         return $this->result;
@@ -44,6 +56,26 @@ class JudoPayment extends Payment
     public function setMessage($message)
     {
         $this->message = $message;
+    }
+
+    public function getCardLastFour()
+    {
+        return $this->cardLastFour;
+    }
+
+    public function setCardLastFour($cardLastFour)
+    {
+        $this->cardLastFour = $cardLastFour;
+    }
+
+    public function getBarclaysReference()
+    {
+        return $this->barclaysReference;
+    }
+
+    public function setBarclaysReference($barclaysReference)
+    {
+        $this->barclaysReference = $barclaysReference;
     }
 
     public function isSuccess()

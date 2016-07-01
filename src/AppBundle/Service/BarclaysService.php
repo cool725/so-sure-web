@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\JudoPayment;
 
 class BarclaysService
 {
@@ -91,12 +92,38 @@ class BarclaysService
             }
             fclose($handle);
         }
-        
-        // TODO: Attempt to find JudoPayments that match the transaction date, card number,
-        // amount, card type, and sale/refund criteria
-        // and add transaction details if found
-        // if none or more than one, flag record
-        // also record number of transactions found in metadata
+
+        // Attempt to match barclay card transaction against JudoPayment record
+        $matchedTransactions = 0;
+        $paymentRepo = $this->dm->getRepository(JudoPayment::class);
+        foreach ($lines as $line) {
+            $transactionDate = new \DateTime($line['Transaction date']);
+            if ($line['Transaction type'] == "Sale") {
+                $amount = $line['Transaction amount'];
+            } elseif ($line['Transaction type'] == "Sales Refund") {
+                $amount = 0 - $line['Transaction amount'];
+            }
+            $cardNumbers = explode('*', $line['Card number']);
+            $cardLastFour = $cardNumbers[count($cardNumbers) - 1];
+            $ref = str_replace("'", "", $line['Acquirer reference number']);
+            $transactions = $paymentRepo->findTransaction($transactionDate, $amount, $cardLastFour);
+            if (count($transactions) == 1) {
+                foreach ($transactions as $transaction) {
+                    $transaction->setBarclaysReference($ref);
+                    $matchedTransactions++;
+                }
+            } else {
+                // we many have manually added the transaction
+                $existingRef = $paymentRepo->findOneBy(['barclaysReference' => $ref]);
+                if (count($existingRef) == 0) {
+                    $this->logger->warning(sprintf(
+                        'Unable to find matching transaction for %s',
+                        $line['Acquirer reference number']
+                    ));
+                }
+            }
+        }
+        $this->dm->flush();
 
         $data = [
             'total' => $this->toTwoDp($total),
@@ -108,6 +135,7 @@ class BarclaysService
             'data' => $lines,
             'dailyTransaction' => $dailyTransaction,
             'dailyProcessing' => $dailyProcessing,
+            'matchedTransactions' => $matchedTransactions,
         ];
 
         $barclaysFile->addMetadata('total', $data['total']);
@@ -115,6 +143,7 @@ class BarclaysService
         $barclaysFile->addMetadata('numPayments', $data['numPayments']);
         $barclaysFile->addMetadata('refunds', $data['refunds']);
         $barclaysFile->addMetadata('numRefunds', $data['numRefunds']);
+        $barclaysFile->addMetadata('matchedTransactions', $data['matchedTransactions']);
         $barclaysFile->setDate($data['date']);
         $barclaysFile->setDailyTransaction($data['dailyTransaction']);
         $barclaysFile->setDailyProcessing($data['dailyProcessing']);

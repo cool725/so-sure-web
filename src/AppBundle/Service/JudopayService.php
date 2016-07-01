@@ -187,6 +187,11 @@ class JudopayService
             $tokens = $judoPaymentMethod->getCardTokens();
             if (!isset($tokens[$cardToken]) || !$tokens[$cardToken]) {
                 $judoPaymentMethod->addCardToken($cardToken, json_encode($transactionDetails['cardDetails']));
+                if (isset($transactionDetails['cardDetails']['cardLastfour'])) {
+                    $payment->setCardLastFour($transactionDetails['cardDetails']['cardLastfour']);
+                } elseif (isset($transactionDetails['cardDetails']['cardLastFour'])) {
+                    $payment->setCardLastFour($transactionDetails['cardDetails']['cardLastFour']);
+                }
             }
         }
 
