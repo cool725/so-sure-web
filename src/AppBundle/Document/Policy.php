@@ -895,15 +895,22 @@ abstract class Policy
         return $this->getStart() > $date;
     }
 
-    public function getConnectionCliffDate()
+    public function getConnectionCliffDate($pseudo = false)
     {
         if (!$this->getStart()) {
             return null;
         }
 
         $cliffDate = clone $this->getStart();
-        // add 60 days
-        $cliffDate->add(new \DateInterval('P60D'));
+
+        // pseudo cliff date for displaying a 14 day message
+        if ($pseudo) {
+            // add 14 days
+            $cliffDate->add(new \DateInterval('P14D'));
+        } else {
+            // add 60 days
+            $cliffDate->add(new \DateInterval('P60D'));
+        }
 
         return $cliffDate;
     }
@@ -1196,20 +1203,32 @@ abstract class Policy
 
         $connectionValues[] = [
             'start_date' => $startDate ? $startDate->format(\DateTime::ATOM) : null,
-            'end_date' => $this->getConnectionCliffDate() ?
-                $this->getConnectionCliffDate()->format(\DateTime::ATOM) :
+            'end_date' => $this->getConnectionCliffDate(true) ?
+                $this->getConnectionCliffDate(true)->format(\DateTime::ATOM) :
                 null,
             'value' => $this->getTotalConnectionValue($startDate),
         ];
 
-        $afterCliffDate = clone $this->getConnectionCliffDate();
+        $afterCliffDate = clone $this->getConnectionCliffDate(true);
         $afterCliffDate->add(new \DateInterval('PT1S'));
         $connectionValues[] = [
-            'start_date' => $this->getConnectionCliffDate() ?
-                $this->getConnectionCliffDate()->format(\DateTime::ATOM) :
+            'start_date' => $this->getConnectionCliffDate(true) ?
+                $this->getConnectionCliffDate(true)->format(\DateTime::ATOM) :
+                null,
+            'end_date' => $this->getConnectionCliffDate(false) ?
+                $this->getConnectionCliffDate(false)->format(\DateTime::ATOM) :
+                null,
+            'value' => $this->getTotalConnectionValue($afterCliffDate),
+        ];
+
+        $afterCliffDate = clone $this->getConnectionCliffDate(false);
+        $afterCliffDate->add(new \DateInterval('PT1S'));
+        $connectionValues[] = [
+            'start_date' => $this->getConnectionCliffDate(false) ?
+                $this->getConnectionCliffDate(false)->format(\DateTime::ATOM) :
                 null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
-            'value' => $this->getConnectionValue($afterCliffDate),
+            'value' => $this->getTotalConnectionValue($afterCliffDate),
         ];
 
         return $connectionValues;
