@@ -187,6 +187,11 @@ class JudopayService
             $tokens = $judoPaymentMethod->getCardTokens();
             if (!isset($tokens[$cardToken]) || !$tokens[$cardToken]) {
                 $judoPaymentMethod->addCardToken($cardToken, json_encode($transactionDetails['cardDetails']));
+                if (isset($transactionDetails['cardDetails']['cardLastfour'])) {
+                    $payment->setCardLastFour($transactionDetails['cardDetails']['cardLastfour']);
+                } elseif (isset($transactionDetails['cardDetails']['cardLastFour'])) {
+                    $payment->setCardLastFour($transactionDetails['cardDetails']['cardLastFour']);
+                }
             }
         }
 
@@ -520,10 +525,11 @@ class JudopayService
         return $payment->getPolicy();
     }
 
-    public function processCsv($filename)
+    public function processCsv($judoFile)
     {
+        $filename = $judoFile->getFile();
         $header = null;
-        $data = array();
+        $lines = array();
         $payments = 0;
         $numPayments = 0;
         $refunds = 0;
@@ -536,7 +542,7 @@ class JudopayService
                     $header = $row;
                 } else {
                     $line = array_combine($header, $row);
-                    $data[] = $line;
+                    $lines[] = $line;
                     if ($line['TransactionType'] == "Payment") {
                         $total += $line['Net'];
                         $payments += $line['Net'];
@@ -559,14 +565,23 @@ class JudopayService
             fclose($handle);
         }
 
-        return [
+        $data = [
             'total' => $this->toTwoDp($total),
             'payments' => $this->toTwoDp($payments),
             'numPayments' => $numPayments,
             'refunds' => $this->toTwoDp($refunds),
             'numRefunds' => $numRefunds,
             'date' => $maxDate,
-            'data' => $data
+            'data' => $lines,
         ];
+    
+        $judoFile->addMetadata('total', $data['total']);
+        $judoFile->addMetadata('payments', $data['payments']);
+        $judoFile->addMetadata('numPayments', $data['numPayments']);
+        $judoFile->addMetadata('refunds', $data['refunds']);
+        $judoFile->addMetadata('numRefunds', $data['numRefunds']);
+        $judoFile->setDate($data['date']);
+
+        return $data;
     }
 }

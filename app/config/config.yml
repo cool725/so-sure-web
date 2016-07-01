@@ -200,7 +200,7 @@ vich_uploader:
     db_driver: mongodb
     storage: flysystem
     mappings:
-        judo:
+        adminS3Mapping:
             namer:
                 service: vich_uploader.namer_property
                 options: { property: 's3FileName'}

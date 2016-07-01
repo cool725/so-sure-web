@@ -1,0 +1,61 @@
+<?php
+
+namespace AppBundle\Tests\Document;
+
+use AppBundle\Document\DateTrait;
+
+/**
+ * @group unit
+ */
+class DateTraitTest extends \PHPUnit_Framework_TestCase
+{
+    use DateTrait;
+
+    public static function setUpBeforeClass()
+    {
+    }
+
+    public function tearDown()
+    {
+    }
+
+    public function testStartOfPreviousMonth()
+    {
+        $this->assertEquals(
+            new \DateTime('2016-01-01 00:00'),
+            $this->startOfPreviousMonth(new \DateTime('2016-02-12 15:00'))
+        );
+    }
+
+    public function testStartOfMonth()
+    {
+        $this->assertEquals(
+            new \DateTime('2016-02-01 00:00'),
+            $this->startOfMonth(new \DateTime('2016-02-12 15:00'))
+        );
+    }
+
+    public function testEndOfMonth()
+    {
+        $this->assertEquals(
+            new \DateTime('2016-03-01 00:00'),
+            $this->endOfMonth(new \DateTime('2016-02-12 15:00'))
+        );
+    }
+
+    public function testStartOfDay()
+    {
+        $this->assertEquals(
+            new \DateTime('2016-02-12 00:00'),
+            $this->startOfDay(new \DateTime('2016-02-12 15:00'))
+        );
+    }
+
+    public function testEndOfDay()
+    {
+        $this->assertEquals(
+            new \DateTime('2016-02-13 00:00'),
+            $this->endOfDay(new \DateTime('2016-02-12 15:00'))
+        );
+    }
+}

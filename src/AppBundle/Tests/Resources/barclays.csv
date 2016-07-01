@@ -1,0 +1,5 @@
+Transaction Date 01 Jun 2016 - 30 Jun 2016
+Transaction date,Processed date,Transaction amount,Transaction currency,Card number,Transaction type,Card type,Card scheme,Channel,Acquirer reference number,Merchant ID,Group Number,Chain Number,Outlet Number,
+10 Jun 2016,11 Jun 2016,0.01,GBP,000000******1234,Sale,Debit (Delta),Visa,E-commerce,'74579156163006076980289',8008566,,,8008566
+10 Jun 2016,11 Jun 2016,8.64,GBP,000000******9876,Sale,Credit,Visa,E-commerce,'74579156163006476980327',8008566,,,8008566
+10 Jun 2016,11 Jun 2016,0.05,GBP,000000******4567,Sales Refund,Credit,Visa,E-commerce,'74579156163006476980326',8008566,,,8008566

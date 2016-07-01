@@ -44,4 +44,9 @@ trait CurrencyTrait
     {
         return number_format(round($float, 4), 4, ".", ",");
     }
+
+    public static function staticToTwoDp($float)
+    {
+        return number_format(round($float, 2), 2, ".", ",");
+    }
 }

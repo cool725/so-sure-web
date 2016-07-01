@@ -22,4 +22,19 @@ class JudoPaymentRepository extends DocumentRepository
             ->getQuery()
             ->execute();
     }
+
+    public function findTransaction($date, $amount, $cardLastFour)
+    {
+        $startDay = $this->startOfDay($date);
+        $nextDay = $this->endOfDay($date);
+
+        return $this->createQueryBuilder()
+            ->field('result')->equals(JudoPayment::RESULT_SUCCESS)
+            ->field('amount')->equals((double) $amount)
+            ->field('date')->gte($startDay)
+            ->field('date')->lt($nextDay)
+            ->field('cardLastFour')->equals($cardLastFour)
+            ->getQuery()
+            ->execute();
+    }
 }

@@ -34,4 +34,28 @@ trait DateTrait
 
         return $nextMonth;
     }
+
+    public function startOfDay(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $startMonth = new \DateTime(
+            sprintf('%d-%d-%d 00:00:00', $date->format('Y'), $date->format('m'), $date->format('d'))
+        );
+
+        return $startMonth;
+    }
+
+    public function endOfDay(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $startDay = $this->startOfDay($date);
+        $nextDay = clone $startDay;
+        $nextDay->add(new \DateInterval('P1D'));
+
+        return $nextDay;
+    }
 }

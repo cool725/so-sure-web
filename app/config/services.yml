@@ -70,6 +70,18 @@ services:
             judoId:      "%judopay_id%"
             environment: "%kernel.environment%"
 
+    app.barclays:
+        class: AppBundle\Service\BarclaysService
+        arguments:
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
+            logger:      "@logger"
+
+    app.lloyds:
+        class: AppBundle\Service\LloydsService
+        arguments:
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
+            logger:      "@logger"
+
     app.user.launch:
         class: AppBundle\Service\LaunchUserService
         arguments:
