@@ -94,4 +94,27 @@ class PhonePolicyRepository extends DocumentRepository
         return $qb->getQuery()
             ->execute();
     }
+
+    public function getWeeklyEmail($environment)
+    {
+        $lastWeek = new \DateTime();
+        $lastWeek->sub(new \DateInterval('P1W'));
+        $policy = new PhonePolicy();
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID
+            ])
+            ->field('lastEmailed')->lte($lastWeek);
+
+        if ($environment == "prod") {
+            $qb->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+        } else {
+            $qb->field('policyNumber')->notEqual(null);
+        }
+
+        return $qb->getQuery()
+            ->execute();
+    }
 }

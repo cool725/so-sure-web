@@ -206,6 +206,11 @@ abstract class Policy
     /** @MongoDB\Field(type="hash") */
     protected $salvaPolicyResults = array();
 
+    /**
+     * @MongoDB\Date()
+     */
+    protected $lastEmailed;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -566,6 +571,16 @@ abstract class Policy
 
         // Current version null
         return null;
+    }
+
+    public function getLastEmailed()
+    {
+        return $this->lastEmailed;
+    }
+
+    public function setLastEmailed($lastEmailed)
+    {
+        $this->lastEmailed = $lastEmailed;
     }
 
     public function init(User $user, PolicyDocument $terms)
