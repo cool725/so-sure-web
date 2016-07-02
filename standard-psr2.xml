@@ -3,7 +3,7 @@
  <description>SoSure custom coding standard.</description>
  <!-- No need to exclude LineLength inside PSR2 rule as explicitly configured below -->
  <rule ref="PSR2" />
-
+ 
  <rule ref="PEAR.Commenting.FunctionComment">
    <exclude name="PEAR.Commenting.FunctionComment.MissingParamComment" />
    <exclude name="PEAR.Commenting.FunctionComment.MissingReturn" />
