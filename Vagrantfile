@@ -5,14 +5,6 @@ export CACHE_DIR=/dev/shm/cache
 # make sure paramters.yml exists
 if [ ! -f /vagrant/app/config/parameters.yml ]; then
   cp /vagrant/app/config/parameters.yml.dist /vagrant/app/config/parameters.yml
-  echo "    kernel.logs_dir: /tmp" >> /vagrant/app/config/parameters.yml
-  echo "    kernel.cache_dir: $CACHE_DIR" >> /vagrant/app/config/parameters.yml
-else
-  CORRECT_CACHE_DIR=`grep "kernel.cache_dir: $CACHE_DIR" /vagrant/app/config/parameters.yml | wc -l`
-  if [ "$CORRECT_CACHE_DIR" == "0" ]; then
-    echo "kernel.cache_dir is not set to $CACHE_DIR in parameters.yml and is required to be set as such."
-    exit 1
-  fi
 fi
 
 if [ ! -f /usr/bin/ansible-playbook ]; then
@@ -90,6 +82,57 @@ Vagrant.configure("2") do |config|
     	inline: $deploy
     	
     dev_config.vm.provider "virtualbox" do |v|
+      v.customize ["modifyvm", :id, "--memory", 1200]
+      v.customize ["modifyvm", :id, "--cpus", 1]
+      
+      # Virtualbox has issues with symlinks - https://www.virtualbox.org/ticket/10085#comment:12
+      v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/vagrant", "1"]
+
+      # if you ever need the gui
+      # v.gui = true
+      
+      # This setting makes it so that network access from the vagrant guest is able to
+      # resolve connections using the hosts VPN connection
+      # it means we can DNS resolve internal.vpn domains
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    end      
+  end
+
+  config.vm.define "dev1604", primary: false, autostart: false do |dev1604_config|
+    dev1604_config.vm.box = "geerlingguy/ubuntu1604"
+    dev1604_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
+    dev1604_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
+    dev1604_config.vm.network "private_network", ip: "10.0.4.2"
+    #dev1604_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
+    dev1604_config.vm.synced_folder ".", "/vagrant", nfs: true
+    #dev1604_config.vm.synced_folder ".", "/vagrant"
+    dev1604_config.ssh.forward_agent = true
+    dev1604_config.vm.provision "shell",
+    	inline: $script
+
+    dev1604_config.vm.provision "shell",
+    	inline: $github_ops,
+		privileged: false
+
+    # Patch for https://github.com/mitchellh/vagrant/issues/6793
+    dev1604_config.vm.provision "shell" do |s|
+        s.inline = '[[ ! -f $1 ]] || grep -F -q "$2" $1 || sed -i "/__main__/a \\    $2" $1'
+        s.args = ['/usr/bin/ansible-galaxy', "if sys.argv == ['/usr/bin/ansible-galaxy', '--help']: sys.argv.insert(1, 'info')"]
+    end
+	
+    dev1604_config.vm.provision "ansible_local" do |a|
+        a.playbook = "vagrant1604.yml"
+        a.provisioning_path = "/var/ops/ansible"
+        a.inventory_path = "/var/ops/ansible/vagrant_inventory"
+        a.limit = "vagrant"
+        a.install = false
+    end
+
+    dev1604_config.vm.provision "shell",
+    	inline: $deploy
+    	
+    dev1604_config.vm.provider "virtualbox" do |v|
       v.customize ["modifyvm", :id, "--memory", 1200]
       v.customize ["modifyvm", :id, "--cpus", 1]
       
