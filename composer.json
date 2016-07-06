@@ -45,7 +45,7 @@
         "vich/uploader-bundle": "^1.1.0",
         "oneup/flysystem-bundle": "^1.4.1",
         "league/flysystem-aws-s3-v3": "^1.0.13",
-        "peerj/mpdf-bundle": "5.7.2.1"
+        "knplabs/knp-snappy-bundle": "~1.4"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
