@@ -96,12 +96,13 @@ trait UserClassTrait
         return str_replace("+44", "0", $mobile);
     }
 
-    public static function createPolicy(
+    public static function initPolicy(
         User $user,
         \Doctrine\ODM\MongoDB\DocumentManager $dm,
         $phone = null,
         $date = null,
-        $addPayment = false
+        $addPayment = false,
+        $createPolicy = false
     ) {
         self::addAddress($user);
 
@@ -120,7 +121,9 @@ trait UserClassTrait
             $policy->addPayment($payment);
         }
 
-        $policy->create(rand(1, 999999), 'TEST', $date);
+        if ($createPolicy) {
+            $policy->create(rand(1, 999999), 'TEST', $date);
+        }
 
         $dm->persist($policy);
         $dm->flush();

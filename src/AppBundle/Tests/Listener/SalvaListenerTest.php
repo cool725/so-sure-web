@@ -63,7 +63,7 @@ class SalvaListenerTest extends WebTestCase
             static::generateEmail('salva-queue-updated', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
@@ -98,7 +98,7 @@ class SalvaListenerTest extends WebTestCase
             static::generateEmail('salva-queue-created', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
@@ -128,7 +128,7 @@ class SalvaListenerTest extends WebTestCase
             static::generateEmail('salva-queue-cancelled', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);

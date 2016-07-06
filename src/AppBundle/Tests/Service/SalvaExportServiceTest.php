@@ -63,7 +63,7 @@ class SalvaExportServiceTest extends WebTestCase
             static::generateEmail('create-xml', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy);
 
@@ -91,7 +91,7 @@ class SalvaExportServiceTest extends WebTestCase
             'bar'
         );
         static::$salva->setEnvironment('prod');
-        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');

@@ -56,8 +56,7 @@ class ClaimsServiceTest extends WebTestCase
             'bar'
         );
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::createPolicy($user, static::$dm, $phone, null, true);
-        static::$policyService->create($policy);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setType(Claim::TYPE_THEFT);
