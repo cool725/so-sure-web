@@ -166,7 +166,6 @@ class PolicyService
             $this->templating->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]),
             $tmpFile
         );
-        file_put_contents('/tmp/s.html', $this->templating->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]));
 
         $this->uploadS3($tmpFile, $filename, $policy);
 
