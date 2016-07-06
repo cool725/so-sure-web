@@ -12,19 +12,19 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class IdentityLog
 {
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $cognitoId;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $ip;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $country;

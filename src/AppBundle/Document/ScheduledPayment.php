@@ -49,7 +49,7 @@ class ScheduledPayment
     protected $scheduled;
 
     /**
-     * @MongoDB\Float()
+     * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $amount;
