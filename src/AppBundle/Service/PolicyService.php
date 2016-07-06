@@ -161,10 +161,12 @@ class PolicyService
             unlink($tmpFile);
         }
 
+        $this->snappyPdf->setOption('orientation', 'Landscape');
         $this->snappyPdf->generateFromHtml(
             $this->templating->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]),
             $tmpFile
         );
+        file_put_contents('/tmp/s.html', $this->templating->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]));
 
         $this->uploadS3($tmpFile, $filename, $policy);
 
@@ -187,6 +189,7 @@ class PolicyService
             unlink($tmpFile);
         }
 
+        $this->snappyPdf->setOption('orientation', 'Portrait');
         $this->snappyPdf->generateFromHtml(
             $this->templating->render('AppBundle:Pdf:policySchedule.html.twig', ['policy' => $policy]),
             $tmpFile

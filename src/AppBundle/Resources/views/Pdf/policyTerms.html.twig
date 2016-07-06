@@ -1,8 +1,10 @@
 {% set font = "font-size: 8pt;" %}
-{% set column_one_initial_margins = "width: 120mm; float: left; margin-right: 5mm;page-break-inside:avoid;" %}
-{% set column_two_initial_margins = "width: 120mm; float: right;page-break-inside:avoid;page-break-after:always" %}
-{% set column_one_margins = "width: 120mm; float: left; margin-right: 5mm; padding-top: 8mm;page-break-inside:avoid;page-break-before:always" %}
-{% set column_two_margins = "width: 120mm; float: right; padding-top: 8mm;page-break-inside:avoid;" %}
+{% set header_column = "width: 48%; height: 187mm; page-break-inside:avoid;"%}
+{% set standard_column = "width: 48%; height: 187mm; page-break-inside:avoid;"%}
+{% set column_one_initial_margins = "float: left; margin-right: 5mm;" ~ header_column %}
+{% set column_two_initial_margins = "float: right;" ~ header_column %}
+{% set column_one_margins = "float: left; margin-right: 5mm; page-break-before:always;" ~ standard_column %}
+{% set column_two_margins = "float: right;" ~ standard_column %}
 {% set table = "border-collapse: collapse;"~font %}
 {% set table_padding = "5" %}
 <html>
@@ -10,10 +12,9 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
 </head>
 <body style="{{ font }}">
-    <div style="text-align: center; margin-bottom: 0mm; margin-top: 0mm; page-break-after: avoid;">
+  <div style="text-align: center; margin-bottom: 0mm; margin-top: 0mm;">
         <img src="{{ cdn_url }}/images/icons/logo-social-insurance-2x.png" width="20%" />            
-    </div>
-
+  </div>
   <div style="{{ column_one_initial_margins }}">
     <h3>
         Terms and conditions of your so-sure mobile phone insurance 
@@ -133,8 +134,9 @@
     <p>
         For further details on all of the above, please refer to the full Policy Document.
     </p>
-
+    <p>&nbsp;</p>
   </div>
+
   <div style="{{ column_one_margins }}">
     <h3>
         The Policy Document 
