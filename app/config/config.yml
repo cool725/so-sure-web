@@ -173,12 +173,6 @@ snc_redis:
         client: mailer
         key: swiftmailer
 
-comet_cult_braintree:
-  environment: %braintree_env%
-  merchant_id: %braintree_merchant_id%
-  public_key:  %braintree_public_key%
-  private_key: %braintree_private_key%
-
 stof_doctrine_extensions:
   mongodb:
     default:

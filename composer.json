@@ -40,8 +40,6 @@
         "predis/predis": "^1.0",
         "egulias/email-validator": "~1.2",
         "fzaninotto/faker": "^1.6",
-        "braintree/braintree_php": "^3.11",
-        "cometcult/braintree-bundle": "^0.1.0",
         "stof/doctrine-extensions-bundle": "^1.2",
         "peerj/mpdf": "5.7.2.1",
         "vich/uploader-bundle": "^1.1.0",

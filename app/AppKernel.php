@@ -35,7 +35,6 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new Staffim\RollbarBundle\StaffimRollbarBundle(),
             new Snc\RedisBundle\SncRedisBundle(),
-            new CometCult\BraintreeBundle\CometCultBraintreeBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new Vich\UploaderBundle\VichUploaderBundle(),
             new Oneup\FlysystemBundle\OneupFlysystemBundle(),
