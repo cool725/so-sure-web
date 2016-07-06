@@ -356,26 +356,6 @@ services:
             -  { name: kernel.event_listener, event: event.salva.updated, method: onSalvaPolicyUpdatedEvent }
             -  { name: kernel.event_listener, event: event.salva.cancelled, method: onSalvaPolicyCancelledEvent }
 
-    braintree.customer:
-        class:            Braintree_Customer
-        factory_service:  comet_cult_braintree.factory
-        factory_method:   get
-        arguments: ["customer"]
-
-    braintree.transaction:
-        class:            Braintree_Transaction
-        factory_service:  comet_cult_braintree.factory
-        factory_method:   get
-        arguments: ["transaction"]
-
-    app.braintree:
-        class: AppBundle\Service\BraintreeService
-        arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
-            policy:      "@app.policy"
-            transaction: "@braintree.transaction"
-
     app.form.type.usersearch:
         class: AppBundle\Form\Type\UserSearchType
         arguments: ["@request_stack"]

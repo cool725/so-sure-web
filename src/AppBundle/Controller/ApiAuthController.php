@@ -586,8 +586,7 @@ class ApiAuthController extends BaseController
                     $data['bank_account']['account_number']
                 );
             } elseif (isset($data['braintree'])) {
-                $braintree = $this->get('app.braintree');
-                $braintree->add($policy, $data['braintree']['nonce']);
+                throw new \Exception('Braintree is no longer supported');
             } elseif (isset($data['judo'])) {
                 $judo = $this->get('app.judopay');
                 $judo->add(
