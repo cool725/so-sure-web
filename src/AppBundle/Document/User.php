@@ -75,35 +75,35 @@ class User extends BaseUser
     protected $created;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $firstName;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $lastName;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $facebookId;
 
-    /** @MongoDB\String() */
+    /** @MongoDB\Field(type="string") */
     protected $facebookAccessToken;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $token;
 
-    /** @MongoDB\String() */
+    /** @MongoDB\Field(type="string") */
     protected $snsEndpoint;
 
     /**
@@ -120,7 +120,7 @@ class User extends BaseUser
 
     /**
      * @Assert\Regex(pattern="/^(00447[1-9]\d{8,8}|\+447[1-9]\d{8,8})$/")
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $mobileNumber;
@@ -149,7 +149,7 @@ class User extends BaseUser
     protected $preLaunch = false;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $referer;

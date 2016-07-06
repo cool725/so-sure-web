@@ -34,7 +34,7 @@ abstract class Payment
     protected $date;
 
     /**
-     * @MongoDB\Float()
+     * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $amount;
@@ -52,25 +52,25 @@ abstract class Payment
     protected $ipt;
 
     /**
-     * @MongoDB\Float()
+     * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $totalCommission;
 
     /**
-     * @MongoDB\Float()
+     * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $coverholderCommission;
 
     /**
-     * @MongoDB\Float()
+     * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $brokerCommission;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @MongoDB\Index(sparse=true)
      * @Gedmo\Versioned
      */
@@ -83,7 +83,7 @@ abstract class Payment
     protected $policy;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $receipt;

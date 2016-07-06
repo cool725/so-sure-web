@@ -15,25 +15,25 @@ class JudoPayment extends Payment
     const RESULT_DECLINED = "Declined";
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $result;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $message;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $cardLastFour;
 
     /**
-     * @MongoDB\String()
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $barclaysReference;

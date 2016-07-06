@@ -54,10 +54,10 @@ abstract class Invitation
     /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="invitations") */
     protected $policy;
 
-    /** @MongoDB\String() */
+    /** @MongoDB\Field(type="string") */
     protected $link;
 
-    /** @MongoDB\String() */
+    /** @MongoDB\Field(type="string") */
     protected $name;
 
     abstract public function isSingleUse();
