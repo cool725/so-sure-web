@@ -53,7 +53,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
             static::generateEmail('salva-preupdate', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);

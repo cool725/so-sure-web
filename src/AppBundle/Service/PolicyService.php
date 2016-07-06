@@ -104,12 +104,7 @@ class PolicyService
 
     public function create(Policy $policy, \DateTime $date = null)
     {
-        if ($policy->isValidPolicy()) {
-            return;
-        }
-
         $user = $policy->getUser();
-        $this->generateScheduledPayments($policy, $date);
 
         $prefix = null;
         if ($this->environment != 'prod') {
@@ -118,6 +113,16 @@ class PolicyService
             // any emails with @so-sure.com will generate an invalid policy
             $prefix = 'INVALID';
         }
+
+        if ($policy->isValidPolicy($prefix)) {
+            return;
+        }
+
+        if (count($policy->getScheduledPayments()) > 0) {
+            throw new \Exception(sprintf('Policy %s is not valid, yet has scheduled payments', $policy->getId()));
+        }
+
+        $this->generateScheduledPayments($policy, $date);
 
         if ($prefix) {
             $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), $prefix, $date);

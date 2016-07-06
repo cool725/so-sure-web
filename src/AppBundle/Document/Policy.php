@@ -579,6 +579,11 @@ abstract class Policy
 
     public function create($seq, $prefix = null, $startDate = null)
     {
+        // Only create 1 time
+        if ($this->getPolicyNumber()) {
+            return;
+        }
+
         if (!$prefix) {
             $prefix = $this->getPolicyNumberPrefix();
         }
@@ -1094,13 +1099,16 @@ abstract class Policy
         return $this->getStatus() !== null && $this->getPremium() !== null;
     }
 
-    public function isValidPolicy()
+    public function isValidPolicy($prefix = null)
     {
         if (!$this->isPolicy()) {
             return false;
         }
+        if (!$prefix) {
+            $prefix = $this->getPolicyNumberPrefix();
+        }
 
-        return strpos($this->getPolicyNumber(), $this->getPolicyNumberPrefix()) === 0;
+        return strpos($this->getPolicyNumber(), $prefix) === 0;
     }
 
     public function getSentInvitations()

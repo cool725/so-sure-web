@@ -88,7 +88,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user1', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite1', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
 
@@ -105,14 +105,14 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('connected-user', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $userInvitee = static::createUser(
             static::$userManager,
             static::generateEmail('invite-connected', $this),
             'bar'
         );
-        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteByEmail(
             $policy,
@@ -137,7 +137,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user2', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $optOut = new EmailOptOut();
         $optOut->setEmail(static::generateEmail('invite2', $this));
@@ -158,7 +158,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user3', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $optOut = new EmailOptOut();
         $optOut->setEmail(static::generateEmail('invite3', $this));
@@ -176,7 +176,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user4', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite4', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
@@ -193,7 +193,7 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         $mobile = static::generateRandomMobile();
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $invitation = self::$invitationService->inviteBySms($policy, $mobile);
         $this->assertTrue($invitation instanceof SmsInvitation);
 
@@ -211,7 +211,7 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         $user->setMobileNumber(static::generateRandomMobile());
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -219,7 +219,7 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         $userInvitee->setMobileNumber(static::generateRandomMobile());
-        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteBySms($policy, $userInvitee->getMobileNumber());
         $this->assertTrue($invitation instanceof SmsInvitation);
@@ -235,7 +235,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('smsuser2', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $optOut = new SmsOptOut();
         $optOut->setMobile('11234');
@@ -254,7 +254,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('smsuser3', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $optOut = new SmsOptOut();
         $optOut->setMobile('112345');
@@ -273,7 +273,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('smsuser4', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteBySms($policy, '1123456');
         $this->assertTrue($invitation instanceof SmsInvitation);
@@ -286,7 +286,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user5', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -320,7 +320,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-processed', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -356,7 +356,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-ratelimit', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -379,7 +379,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user6', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $this->assertTrue($policy->isPolicy());
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite6', $this));
@@ -404,7 +404,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user7', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $this->assertTrue($policy->isPolicy());
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite7', $this));
@@ -429,14 +429,14 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user8', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $userInvitee = static::createUser(
             static::$userManager,
             static::generateEmail('invite8', $this),
             'bar'
         );
-        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite8', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
@@ -457,7 +457,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user9', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('user9', $this));
     }
@@ -472,7 +472,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-maxpot', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $this->assertTrue($policy->isPolicy());
         $policy->setPotValue($policy->getMaxPot());
 
@@ -489,7 +489,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-claims', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $this->assertTrue($policy->isPolicy());
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
@@ -510,7 +510,7 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         $user->setMobileNumber('+447700900001');
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteBySms($policy, '07700900001');
     }
@@ -525,7 +525,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-accept-fullpot', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $this->assertTrue($policy->isPolicy());
 
         $userInvitee = static::createUser(
@@ -533,7 +533,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invite-accept-maxpot', $this),
             'bar'
         );
-        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteByEmail(
             $policy,
@@ -556,7 +556,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-accept-claims', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $this->assertTrue($policy->isPolicy());
 
         $userInvitee = static::createUser(
@@ -564,7 +564,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invite-accept-claims', $this),
             'bar'
         );
-        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone);
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteByEmail(
             $policy,
@@ -587,7 +587,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-accept', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone, new \DateTime('2016-01-01'));
+        $policy = static::initPolicy($user, static::$dm, static::$phone, new \DateTime('2016-01-01'), false, true);
         $this->assertTrue($policy->isPolicy());
 
         $userInvitee = static::createUser(
@@ -595,7 +595,14 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invite-accept', $this),
             'bar'
         );
-        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone, new \DateTime('2016-04-01'));
+        $policyInvitee = static::initPolicy(
+            $userInvitee,
+            static::$dm,
+            static::$phone,
+            new \DateTime('2016-04-01'),
+            false,
+            true
+        );
 
         $invitation = self::$invitationService->inviteByEmail(
             $policy,
@@ -634,7 +641,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-accept-cancel', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone, new \DateTime('2016-01-01'));
+        $policy = static::initPolicy($user, static::$dm, static::$phone, new \DateTime('2016-01-01'), false, true);
         $this->assertTrue($policy->isPolicy());
 
         $userInvitee = static::createUser(
@@ -642,7 +649,14 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invite-accept-cancel-before', $this),
             'bar'
         );
-        $policyInvitee = static::createPolicy($userInvitee, static::$dm, static::$phone, new \DateTime('2016-02-01'));
+        $policyInvitee = static::initPolicy(
+            $userInvitee,
+            static::$dm,
+            static::$phone,
+            new \DateTime('2016-02-01'),
+            false,
+            true
+        );
 
         $invitation = self::$invitationService->inviteByEmail(
             $policy,
@@ -660,11 +674,13 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invite-accept-cancel-after', $this),
             'bar'
         );
-        $policyInviteeAfter = static::createPolicy(
+        $policyInviteeAfter = static::initPolicy(
             $userInvitee,
             static::$dm,
             static::$phone,
-            new \DateTime('2016-04-10')
+            new \DateTime('2016-04-10'),
+            false,
+            true
         );
 
         $invitationAfter = self::$invitationService->inviteByEmail(
@@ -697,7 +713,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-reinvite-maxpot', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -728,7 +744,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-reinvite-claim', $this),
             'bar'
         );
-        $policy = static::createPolicy($user, static::$dm, static::$phone);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -904,7 +920,7 @@ class InvitationServiceTest extends WebTestCase
             $email,
             'bar'
         );
-        $newPolicy = static::createPolicy($user, static::$dm, $phone, $date);
+        $newPolicy = static::initPolicy($user, static::$dm, $phone, $date, false, true);
 
         if ($inviteeEmail) {
             $invitation = self::$invitationService->inviteByEmail(

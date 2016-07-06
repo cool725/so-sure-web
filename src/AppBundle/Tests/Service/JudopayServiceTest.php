@@ -72,7 +72,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-receipt', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::createPolicy($user, static::$dm, $phone);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
@@ -106,7 +106,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-receipt-yearly', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::createPolicy($user, static::$dm, $phone);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
@@ -136,7 +136,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-receipt-exception', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::createPolicy($user, static::$dm, $phone);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
@@ -162,7 +162,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-receipt-declined-exception', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::createPolicy($user, static::$dm, $phone);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
@@ -185,7 +185,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-add', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::createPolicy($user, static::$dm, $phone);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
         $receiptId = self::$judopay->testPay(
             $user,
@@ -205,7 +205,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-scheduled', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::createPolicy($user, static::$dm, $phone);
+        $policy = static::initPolicy($user, static::$dm, $phone);
 
         $details = self::$judopay->testPayDetails(
             $user,
@@ -216,7 +216,7 @@ class JudopayServiceTest extends WebTestCase
             '452',
             $policy->getId()
         );
-        if (!isset($details['cardDetails'])) {
+        if (!isset($details['cardDetails']) || $details['result'] != JudoPayment::RESULT_SUCCESS) {
             throw new \Exception('Payment failed');
         }
 
@@ -244,7 +244,7 @@ class JudopayServiceTest extends WebTestCase
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('judo-process-token', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::createPolicy($user, static::$dm, $phone);
+        $policy = static::initPolicy($user, static::$dm, $phone);
 
         $details = self::$judopay->testPayDetails(
             $user,
