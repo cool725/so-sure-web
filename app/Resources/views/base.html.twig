@@ -19,8 +19,8 @@
         <script>
             dataLayer = [{
                 'branch': {
-                    'banner': {% if not app.user %}true{% else %}false{% endif %},
-                    'referral': '{{ app.session.get('referral') }}'
+                    'banner': {% if app.user is null or not app.user %}true{% else %}false{% endif %},
+                    'referral': '{% if app is not null and app.session.isStarted %}{{ app.session.get('referral') }}{% endif %}'
                 }
             }];
         </script>
