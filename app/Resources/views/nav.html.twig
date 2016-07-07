@@ -29,7 +29,7 @@
                       <li><a href="{{ apple_app_download }}&cs=nav"><i class="fa fa-apple fa-lg"></i> iOS</a></li>
                     </ul>
                 </div></li>
-                {% if app.user %}
+                {% if app.user is not null and app.user %}
                   {% if is_granted('ROLE_ADMIN') %}
                     <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
                   {% elseif is_granted('ROLE_CLAIMS') %}
