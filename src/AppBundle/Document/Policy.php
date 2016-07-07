@@ -1201,34 +1201,46 @@ abstract class Policy
             $startDate = $now;
         }
 
+        $firstCliffDate = $this->getConnectionCliffDate(true);
+        $afterFirstCliffDate = $this->addOneSecond($firstCliffDate);
+
+        $secondCliffDate = $this->getConnectionCliffDate(false);
+        $afterSecondCliffDate = $this->addOneSecond($secondCliffDate);
+
         $connectionValues[] = [
             'start_date' => $startDate ? $startDate->format(\DateTime::ATOM) : null,
-            'end_date' => $this->getConnectionCliffDate(true) ?
-                $this->getConnectionCliffDate(true)->format(\DateTime::ATOM) :
+            'end_date' => $firstCliffDate ?
+                $firstCliffDate->format(\DateTime::ATOM) :
                 null,
             'value' => $this->getTotalConnectionValue($startDate),
+            'teaser' => 'until the Ideal Connection Time expires',
+            'description' => 'For the best chance of filling your Reward Pot we recommend making all your connections in the first 2 weeks!',
         ];
 
-        $afterCliffDate = clone $this->getConnectionCliffDate(true);
-        $afterCliffDate->add(new \DateInterval('PT1S'));
         $connectionValues[] = [
-            'start_date' => $this->getConnectionCliffDate(true) ?
-                $this->getConnectionCliffDate(true)->format(\DateTime::ATOM) :
+            'start_date' => $firstCliffDate ?
+                $firstCliffDate->format(\DateTime::ATOM) :
                 null,
-            'end_date' => $this->getConnectionCliffDate(false) ?
-                $this->getConnectionCliffDate(false)->format(\DateTime::ATOM) :
+            'end_date' => $secondCliffDate ?
+                $secondCliffDate->format(\DateTime::ATOM) :
                 null,
-            'value' => $this->getTotalConnectionValue($afterCliffDate),
+            'value' => $this->getTotalConnectionValue($afterFirstCliffDate),
+            'teaser' => 'until your Connection Bonus is reduced',
+            'description' => sprintf(
+                "Connections are £%d during this time & only £%d afterwards – so signup your friends before it's too late!",
+                    $this->getTotalConnectionValue($afterFirstCliffDate),
+                    $this->getTotalConnectionValue($afterSecondCliffDate)
+                ),
         ];
 
-        $afterCliffDate = clone $this->getConnectionCliffDate(false);
-        $afterCliffDate->add(new \DateInterval('PT1S'));
         $connectionValues[] = [
-            'start_date' => $this->getConnectionCliffDate(false) ?
-                $this->getConnectionCliffDate(false)->format(\DateTime::ATOM) :
+            'start_date' => $secondCliffDate ?
+                $secondCliffDate->format(\DateTime::ATOM) :
                 null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
-            'value' => $this->getTotalConnectionValue($afterCliffDate),
+            'value' => $this->getTotalConnectionValue($afterSecondCliffDate),
+            'teaser' => '',
+            'description' => '',
         ];
 
         return $connectionValues;

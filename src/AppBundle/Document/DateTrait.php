@@ -58,4 +58,13 @@ trait DateTrait
 
         return $nextDay;
     }
+
+    public function addOneSecond($date)
+    {
+        $after = clone $date;
+        $after->add(new \DateInterval('PT1S'));
+
+        return $after;
+    }
+
 }
