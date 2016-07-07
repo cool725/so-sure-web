@@ -18,6 +18,7 @@ abstract class Policy
 {
     use ArrayToApiArrayTrait;
     use CurrencyTrait;
+    use DateTrait;
 
     const RISK_LEVEL_HIGH = 'high';
     const RISK_LEVEL_MEDIUM = 'medium';
