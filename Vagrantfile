@@ -100,6 +100,10 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "dev1604", primary: false, autostart: false do |dev1604_config|
+	# https://github.com/geerlingguy/packer-ubuntu-1604/issues/1
+	# edit /etc/network/interfaces and remove
+	#   auto eth1
+    #   iface eth1 inet manual
     dev1604_config.vm.box = "geerlingguy/ubuntu1604"
     dev1604_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
     dev1604_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
