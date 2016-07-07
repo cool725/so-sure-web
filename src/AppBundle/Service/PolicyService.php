@@ -36,7 +36,7 @@ class PolicyService
     protected $smtp;
     protected $templating;
     protected $router;
-    protected $mpdf;
+    protected $snappyPdf;
     protected $dispatcher;
     protected $s3;
 
@@ -72,7 +72,7 @@ class PolicyService
      * @param                 $templating
      * @param                 $router
      * @param                 $environment
-     * @param                 $mpdf
+     * @param                 $snappyPdf
      * @param                 $dispatcher
      * @param                 $s3
      */
@@ -85,7 +85,7 @@ class PolicyService
         $templating,
         $router,
         $environment,
-        $mpdf,
+        $snappyPdf,
         $dispatcher,
         $s3
     ) {
@@ -97,7 +97,7 @@ class PolicyService
         $this->templating = $templating;
         $this->router = $router->getRouter();
         $this->environment = $environment;
-        $this->mpdf = $mpdf;
+        $this->snappyPdf = $snappyPdf;
         $this->dispatcher = $dispatcher;
         $this->s3 = $s3;
     }
@@ -161,9 +161,11 @@ class PolicyService
             unlink($tmpFile);
         }
 
-        $this->mpdf->init('utf-8', 'A4-L', '', '', '15', '15', '5', '5');
-        $this->mpdf->useTwigTemplate('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]);
-        file_put_contents($tmpFile, $this->mpdf->generate());
+        $this->snappyPdf->setOption('orientation', 'Landscape');
+        $this->snappyPdf->generateFromHtml(
+            $this->templating->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]),
+            $tmpFile
+        );
 
         $this->uploadS3($tmpFile, $filename, $policy);
 
@@ -186,9 +188,11 @@ class PolicyService
             unlink($tmpFile);
         }
 
-        $this->mpdf->init('utf-8', 'A4', '', '', '25', '25', '15', '10');
-        $this->mpdf->useTwigTemplate('AppBundle:Pdf:policySchedule.html.twig', ['policy' => $policy]);
-        file_put_contents($tmpFile, $this->mpdf->generate());
+        $this->snappyPdf->setOption('orientation', 'Portrait');
+        $this->snappyPdf->generateFromHtml(
+            $this->templating->render('AppBundle:Pdf:policySchedule.html.twig', ['policy' => $policy]),
+            $tmpFile
+        );
 
         $this->uploadS3($tmpFile, $filename, $policy);
 

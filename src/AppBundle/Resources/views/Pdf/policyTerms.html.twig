@@ -1,17 +1,20 @@
-{% set font = "font-size: 9pt;" %}
-{% set column_one_initial_margins = "width: 120mm; float: left; margin-right: 5mm;" %}
-{% set column_two_initial_margins = "width: 120mm; float: right;" %}
-{% set column_one_margins = "width: 120mm; float: left; margin-right: 5mm; padding-top: 8mm;" %}
-{% set column_two_margins = "width: 120mm; float: right; padding-top: 8mm;" %}
-{% set table = "border-collapse: collapse;" %}
+{% set font = "font-size: 8pt;" %}
+{% set header_column = "width: 48%; height: 187mm; page-break-inside:avoid;"%}
+{% set standard_column = "width: 48%; height: 187mm; page-break-inside:avoid;"%}
+{% set column_one_initial_margins = "float: left; margin-right: 5mm;" ~ header_column %}
+{% set column_two_initial_margins = "float: right;" ~ header_column %}
+{% set column_one_margins = "float: left; margin-right: 5mm; page-break-before:always;" ~ standard_column %}
+{% set column_two_margins = "float: right;" ~ standard_column %}
+{% set table = "border-collapse: collapse;"~font %}
 {% set table_padding = "5" %}
 <html>
 <head>
-    <body style="{{ font }}">
-        <div style="text-align: center; margin-bottom: 0mm; margin-top: -10mm;">
-            <img src="{{ cdn_url }}/images/icons/logo-social-insurance-2x.png" width="20%" />            
-        </div>
-        <columns  column-count=”2” vAlign=”justify” column-gap=”10” />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+</head>
+<body style="{{ font }}">
+  <div style="text-align: center; margin-bottom: 0mm; margin-top: 0mm;">
+        <img src="{{ cdn_url }}/images/icons/logo-social-insurance-2x.png" width="20%" />            
+  </div>
   <div style="{{ column_one_initial_margins }}">
     <h3>
         Terms and conditions of your so-sure mobile phone insurance 
@@ -131,9 +134,9 @@
     <p>
         For further details on all of the above, please refer to the full Policy Document.
     </p>
-
+    <p>&nbsp;</p>
   </div>
-  <pagebreak>
+
   <div style="{{ column_one_margins }}">
     <h3>
         The Policy Document 
@@ -161,7 +164,7 @@
     <p>
         The following defines the terms that are used throughout this document:
     </p>
-    <table>
+    <table style="{{ table }}" cellpadding="{{ table_padding }}">
         <tr>
             <td valign="top">
                 Loss:
@@ -295,7 +298,6 @@
     </table>
     
   </div>
-  <pagebreak>
   <div style="{{ column_one_margins }}">
     <table border="1" style="{{ table }}" cellpadding="{{ table_padding }}">
         <tr>
@@ -423,7 +425,6 @@
         </tr>
     </table>
   </div>
-  <pagebreak>
   <div style="{{ column_one_margins }}">
 
     <table border="1" style="{{ table }}" cellpadding="{{ table_padding }}">
@@ -596,7 +597,6 @@
         </tr>
     </table>
   </div>
-  <pagebreak>
   <div style="{{ column_one_margins }}">
     
     
@@ -696,7 +696,6 @@
         </li>
     </ul>
   </div>
-  <pagebreak>
   <div style="{{ column_one_margins }}">
     <p>
         Our customer services team is available on 0344 856 0852 24hrs a day, 365 days a year to take down all the details so that our claim validation team can start processing the claim. The claim validation team works 8am to 5pm Monday to Friday.
@@ -793,7 +792,6 @@
         </li>
     </ul>
   </div>
-  <pagebreak>
   <div style="{{ column_one_margins }}">
     <p>
         What you need to know about the claims process
@@ -852,7 +850,6 @@
         We do not tolerate any aspect of fraudulent activity. We work closely and share data with other insurers, law enforcement agencies and airtime providers to identify fraud and support prosecution where the appropriate evidence exists. Our fraud team works tirelessly to prevent and detect fraud. We, and other organisations, may access and use the information’ recorded by fraud prevention agencies, from both the UK and from other countries. It is important that when applying for insurance, or submitting a claim you or anyone acting on your behalf must take reasonable care to answer all questions honestly and to the best of your knowledge. Failure to do so may affect the validity of your policy or the payment of your claim.
     </p>
   </div>
-  <pagebreak>
   <div style="{{ column_one_margins }}">
     <p>
         If false or inaccurate information is provided and fraud is identified then we will:
@@ -947,7 +944,6 @@
         English law applies to this policy. All communication with you will be in English.
     </p>
   </div>
-  <pagebreak>
   <div style="{{ column_one_margins }}">
     <h4>
         If we need to change the terms of the policy 

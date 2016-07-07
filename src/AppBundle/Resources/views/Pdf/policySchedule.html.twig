@@ -1,4 +1,7 @@
 <html>
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    </head>
     <body>
         <div style="text-align: center">
             <img src="{{ cdn_url }}/images/icons/logo-social-insurance-2x.png" width="60%" />            
@@ -24,7 +27,7 @@
         <div>
             <ul>
                 <li>Policy Number: {{ policy.policyNumber }}</li>
-                <li>Date of subscription:: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
+                <li>Date of subscription: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
                 <li>Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }}</li>
                 <li>Period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end|date('d M Y H:i', 'Europe/London') }}</li>
                 <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice }}, inclusive of £{{ policy.premium.yearlyIpt }} Insurance Premium Tax (IPT)</li>

@@ -202,3 +202,15 @@ vich_uploader:
             inject_on_load:     false
             delete_on_update:   true
             delete_on_remove:   true
+
+knp_snappy:
+    pdf:
+        enabled:    true
+        binary:     /usr/local/bin/wkhtmltopdf
+        options:
+            - name: print-media-type
+              value: true
+    image:
+        enabled:    false
+        binary:     /usr/local/bin/wkhtmltopdf
+        options:    []
