@@ -458,6 +458,10 @@ abstract class Policy
 
     public function getNextScheduledPayment()
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         $next = null;
         foreach ($this->getScheduledPayments() as $scheduledPayment) {
             if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
@@ -1214,7 +1218,9 @@ abstract class Policy
                 null,
             'value' => $this->getTotalConnectionValue($startDate),
             'teaser' => 'until the Ideal Connection Time expires',
+            // @codingStandardsIgnoreStart
             'description' => 'For the best chance of filling your Reward Pot we recommend making all your connections in the first 2 weeks!',
+            // @codingStandardsIgnoreEnd
         ];
 
         $connectionValues[] = [
@@ -1227,10 +1233,12 @@ abstract class Policy
             'value' => $this->getTotalConnectionValue($afterFirstCliffDate),
             'teaser' => 'until your Connection Bonus is reduced',
             'description' => sprintf(
+                // @codingStandardsIgnoreStart
                 "Connections are £%d during this time & only £%d afterwards – so signup your friends before it's too late!",
-                    $this->getTotalConnectionValue($afterFirstCliffDate),
-                    $this->getTotalConnectionValue($afterSecondCliffDate)
-                ),
+                // @codingStandardsIgnoreEnd
+                $this->getTotalConnectionValue($afterFirstCliffDate),
+                $this->getTotalConnectionValue($afterSecondCliffDate)
+            ),
         ];
 
         $connectionValues[] = [

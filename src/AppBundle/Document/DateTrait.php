@@ -66,5 +66,4 @@ trait DateTrait
 
         return $after;
     }
-
 }
