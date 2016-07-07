@@ -254,7 +254,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        if (!isset($details['cardDetails'])) {
+        if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
             throw new \Exception('Payment failed');
         }
 
