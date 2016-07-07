@@ -18,6 +18,7 @@ abstract class Policy
 {
     use ArrayToApiArrayTrait;
     use CurrencyTrait;
+    use DateTrait;
 
     const RISK_LEVEL_HIGH = 'high';
     const RISK_LEVEL_MEDIUM = 'medium';
@@ -458,6 +459,10 @@ abstract class Policy
 
     public function getNextScheduledPayment()
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         $next = null;
         foreach ($this->getScheduledPayments() as $scheduledPayment) {
             if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
@@ -895,15 +900,22 @@ abstract class Policy
         return $this->getStart() > $date;
     }
 
-    public function getConnectionCliffDate()
+    public function getConnectionCliffDate($pseudo = false)
     {
         if (!$this->getStart()) {
             return null;
         }
 
         $cliffDate = clone $this->getStart();
-        // add 60 days
-        $cliffDate->add(new \DateInterval('P60D'));
+
+        // pseudo cliff date for displaying a 14 day message
+        if ($pseudo) {
+            // add 14 days
+            $cliffDate->add(new \DateInterval('P14D'));
+        } else {
+            // add 60 days
+            $cliffDate->add(new \DateInterval('P60D'));
+        }
 
         return $cliffDate;
     }
@@ -1194,22 +1206,50 @@ abstract class Policy
             $startDate = $now;
         }
 
+        $firstCliffDate = $this->getConnectionCliffDate(true);
+        $afterFirstCliffDate = $this->addOneSecond($firstCliffDate);
+
+        $secondCliffDate = $this->getConnectionCliffDate(false);
+        $afterSecondCliffDate = $this->addOneSecond($secondCliffDate);
+
         $connectionValues[] = [
             'start_date' => $startDate ? $startDate->format(\DateTime::ATOM) : null,
-            'end_date' => $this->getConnectionCliffDate() ?
-                $this->getConnectionCliffDate()->format(\DateTime::ATOM) :
+            'end_date' => $firstCliffDate ?
+                $firstCliffDate->format(\DateTime::ATOM) :
                 null,
             'value' => $this->getTotalConnectionValue($startDate),
+            'teaser' => 'until the Ideal Connection Time expires',
+            // @codingStandardsIgnoreStart
+            'description' => 'For the best chance of filling your Reward Pot we recommend making all your connections in the first 2 weeks!',
+            // @codingStandardsIgnoreEnd
         ];
 
-        $afterCliffDate = clone $this->getConnectionCliffDate();
-        $afterCliffDate->add(new \DateInterval('PT1S'));
         $connectionValues[] = [
-            'start_date' => $this->getConnectionCliffDate() ?
-                $this->getConnectionCliffDate()->format(\DateTime::ATOM) :
+            'start_date' => $firstCliffDate ?
+                $firstCliffDate->format(\DateTime::ATOM) :
+                null,
+            'end_date' => $secondCliffDate ?
+                $secondCliffDate->format(\DateTime::ATOM) :
+                null,
+            'value' => $this->getTotalConnectionValue($afterFirstCliffDate),
+            'teaser' => 'until your Connection Bonus is reduced',
+            'description' => sprintf(
+                // @codingStandardsIgnoreStart
+                "Connections are £%d during this time & only £%d afterwards – so signup your friends before it's too late!",
+                // @codingStandardsIgnoreEnd
+                $this->getTotalConnectionValue($afterFirstCliffDate),
+                $this->getTotalConnectionValue($afterSecondCliffDate)
+            ),
+        ];
+
+        $connectionValues[] = [
+            'start_date' => $secondCliffDate ?
+                $secondCliffDate->format(\DateTime::ATOM) :
                 null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
-            'value' => $this->getConnectionValue($afterCliffDate),
+            'value' => $this->getTotalConnectionValue($afterSecondCliffDate),
+            'teaser' => '',
+            'description' => '',
         ];
 
         return $connectionValues;
