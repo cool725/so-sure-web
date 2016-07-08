@@ -317,6 +317,22 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue(count($data['quotes']) < 10);
     }
 
+    public function testQuoteInactivePhonePreLaunch()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/quote?make=Apple&device=iPhone%204');
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(false, $data['device_found']);
+        $this->assertTrue(count($data['quotes']) > 1);
+        // Make sure we're not returning all the quotes
+        $this->assertTrue(count($data['quotes']) < 10);
+    }
+
+    public function testQuoteInactivePhoneMvp()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/quote?make=Apple&device=iPhone%204&rooted=false&debug=true');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE);
+    }
+
     public function testQuoteUnknownDevicePreLaunch()
     {
         $crawler = self::$client->request('GET', '/api/v1/quote?make=One&device=foo&debug=true');
