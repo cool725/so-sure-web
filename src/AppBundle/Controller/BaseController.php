@@ -54,7 +54,7 @@ abstract class BaseController extends Controller
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $phones = $repo->findBy(['devices' => $device]);
+        $phones = $repo->findBy(['devices' => $device, 'active' => true]);
         if ($returnAllIfNone &&
             (count($phones) == 0 || $device == "")) {
             $phones = $repo->findBy(['make' => 'ALL']);
