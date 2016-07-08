@@ -799,6 +799,26 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
     }
 
+    public function testNewPolicyInvactivePhone()
+    {
+        $user = self::createUser(self::$userManager, self::generateEmail('policy-inactive-phone', $this), 'foo', true);
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->clearRateLimit();
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'Apple',
+            'device' => 'iPhone 4',
+            'memory' => 15,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+            'serial_number' => "23423423342",
+        ]]);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
     public function testNewPolicyRooted()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
