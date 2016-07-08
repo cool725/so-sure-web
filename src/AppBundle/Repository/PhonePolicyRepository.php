@@ -112,7 +112,8 @@ class PhonePolicyRepository extends DocumentRepository
         );
 
         if ($environment == "prod") {
-            $qb->addAnd($qb->expr()->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix()))));
+            $prodPolicyRegEx = new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix()));
+            $qb->addAnd($qb->expr()->field('policyNumber')->equals($prodPolicyRegEx));
         } else {
             $qb->addAnd($qb->expr()->field('policyNumber')->notEqual(null));
         }
