@@ -459,10 +459,6 @@ abstract class Policy
 
     public function getNextScheduledPayment()
     {
-        if (!$date) {
-            $date = new \DateTime();
-        }
-
         $next = null;
         foreach ($this->getScheduledPayments() as $scheduledPayment) {
             if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
