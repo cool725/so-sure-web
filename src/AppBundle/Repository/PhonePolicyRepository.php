@@ -101,17 +101,20 @@ class PhonePolicyRepository extends DocumentRepository
         $lastWeek->sub(new \DateInterval('P1W'));
         $policy = new PhonePolicy();
 
-        $qb = $this->createQueryBuilder()
-            ->field('status')->in([
+        $qb = $this->createQueryBuilder();
+        $qb->addAnd($qb->expr()->field('status')->in([
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID
-            ])
-            ->field('lastEmailed')->lte($lastWeek);
+        ]));
+        $qb->addAnd(
+            $qb->expr()->addOr($qb->expr()->field('lastEmailed')->lte($lastWeek))
+                ->addOr($qb->expr()->field('lastEmailed')->exists(false))
+        );
 
         if ($environment == "prod") {
-            $qb->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+            $qb->addAnd($qb->expr()->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix()))));
         } else {
-            $qb->field('policyNumber')->notEqual(null);
+            $qb->addAnd($qb->expr()->field('policyNumber')->notEqual(null));
         }
 
         return $qb->getQuery()

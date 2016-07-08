@@ -240,6 +240,11 @@ class PhonePolicy extends Policy
         return $connectionValue;
     }
 
+    public function getRemainingConnections(\DateTime $date = null)
+    {
+        return $this->getMaxConnections($date) - count($this->getConnections());
+    }
+
     public function getMaxConnections(\DateTime $date = null)
     {
         if (!$this->isPolicy() || $this->getConnectionValue($date) == 0) {

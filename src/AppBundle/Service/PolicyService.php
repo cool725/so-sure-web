@@ -329,9 +329,9 @@ class PolicyService
                 );
 
             $this->mailer->send($message);
-            $policy->setLastEmail(new \DateTime());
+            $policy->setLastEmailed(new \DateTime());
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Failed sending policy weekly email to %s', $policy->getUser()->getEmail()));
+            $this->logger->error(sprintf('Failed sending policy weekly email to %s. Ex: %s', $policy->getUser()->getEmail(), $e->getMessage()));
         }
     }
 
