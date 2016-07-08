@@ -31,12 +31,10 @@ swiftmailer:
 monolog:
     handlers:
         rollbar:
+            id: "app.logger.rollbar"
             type: rollbar
             level: warning
-            token: %rollbar_access_token%
             channels: ['!event']
-            config:
-                checkIgnore: "function ($isUncaught, $exception, $payload) { return $exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException || $exception instanceof \Symfony\Component\Routing\Exception\ResourceNotFoundException; }"
         salva:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"

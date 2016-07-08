@@ -248,6 +248,11 @@ services:
             redis:          "@snc_redis.default"
             logger:         "@logger"
 
+    app.logger.rollbar:
+        class: AppBundle\Classes\Rollbar
+        arguments:
+            - access_token: '%rollbar_access_token%'
+
     aws.credentials:
         class: Aws\Credentials\Credentials
         arguments:

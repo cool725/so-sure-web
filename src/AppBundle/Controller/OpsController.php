@@ -40,4 +40,12 @@ class OpsController extends BaseController
             ], 500);
         }
     }
+
+    /**
+     * @Route("/exception", name="ops_exception")
+     */
+    public function exceptionAction()
+    {
+        throw new \Exception('Exception');
+    }
 }
