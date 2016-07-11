@@ -918,13 +918,19 @@ abstract class Policy
 
     public function hasMonetaryClaimed($includeOpen = false)
     {
+        return count($this->getMonetaryClaimed($includeOpen)) > 0;
+    }
+
+    public function getMonetaryClaimed($includeOpen = false)
+    {
+        $claims = [];
         foreach ($this->claims as $claim) {
             if ($claim->isMonetaryClaim($includeOpen)) {
-                return true;
+                $claims[] = $claim;
             }
         }
 
-        return false;
+        return $claims;
     }
 
     public function isCancelled()
@@ -1274,11 +1280,12 @@ abstract class Policy
                 'historical_max_value' => $this->getHistoricalMaxPotValue(),
                 'connection_values' => $this->getConnectionValues(),
             ],
-            'connections' => $this->eachApiArray($this->getConnections()),
+            'connections' => $this->eachApiArray($this->getConnections(), $this->getNetworkClaims()),
             'sent_invitations' => $this->eachApiArray($this->getSentInvitations()),
             'promo_code' => $this->getPromoCode(),
             'has_claim' => $this->hasMonetaryClaimed(),
             'has_network_claim' => $this->hasNetworkClaim(true),
+            'claim_dates' => $this->eachApiMethod($this->getMonetaryClaimed(), 'getClosedDate'),
         ];
     }
 }

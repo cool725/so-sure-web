@@ -90,4 +90,11 @@ class InvitationTest extends WebTestCase
         $invitationB->setMobile('00447700 900000');
         $this->assertEquals('+447700900000', $invitationB->getMobile());
     }
+
+    public function testToApiArrayNoDebug()
+    {
+        $invitation = new EmailInvitation();
+        $api = $invitation->toApiArray();
+        $this->assertFalse(isset($api['inviter_id']));
+    }
 }
