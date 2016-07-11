@@ -297,6 +297,7 @@ class PolicyService
             }
 
             $mailer->send($message);
+            $policy->setLastEmail(new \DateTime());
 
             if ($attachmentFiles) {
                 foreach ($attachmentFiles as $attachmentFile) {
@@ -305,6 +306,41 @@ class PolicyService
             }
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()));
+        }
+    }
+
+    /**
+     * @param Policy $policy
+     */
+    public function weeklyEmail(Policy $policy)
+    {
+        // No need to send weekly email if pot is full
+        if ($policy->isPotCompletelyFilled()) {
+            return;
+        }
+
+        try {
+            $message = \Swift_Message::newInstance()
+                ->setSubject(sprintf('Your so-sure weekly email'))
+                ->setFrom('hello@wearesosure.com')
+                ->setTo($policy->getUser()->getEmail())
+                ->setBody(
+                    $this->templating->render('AppBundle:Email:policy/weekly.html.twig', ['policy' => $policy]),
+                    'text/html'
+                )
+                ->addPart(
+                    $this->templating->render('AppBundle:Email:policy/weekly.txt.twig', ['policy' => $policy]),
+                    'text/plain'
+                );
+
+            $this->mailer->send($message);
+            $policy->setLastEmailed(new \DateTime());
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf(
+                'Failed sending policy weekly email to %s. Ex: %s',
+                $policy->getUser()->getEmail(),
+                $e->getMessage()
+            ));
         }
     }
 

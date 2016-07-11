@@ -549,6 +549,8 @@
                                                                   <td class="mcnImageContent" valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align:center;">
                                                                     {% if logo_image is defined and logo_image == 'unhappy' %}
                                                                        <img align="center" alt="" src="{{ cdn_url }}/images/emails/banner-welcome-unhappy-logo.png" width="564" style="max-width:1120px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
+                                                                    {% elseif logo_image is defined and logo_image == 'smile' %}
+                                                                       <img align="center" alt="" src="{{ cdn_url }}/images/emails/banner-welcome-smile-logo.png" width="564" style="max-width:1120px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
                                                                     {% else %}
                                                                        <img align="center" alt="" src="{{ cdn_url }}/images/emails/banner-welcome-4.png" width="564" style="max-width:1022px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
                                                                     {% endif %}
@@ -580,7 +582,7 @@
                                                                      <tbody>
                                                                         <tr>
                                                                            <td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
-                                                                              <div style="text-align: center;"><em><span style="font-size:13px"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">Need more information? Contact <a href="mailto:support@wearesosure.com" target="_blank"><span style="color:#3399ff">support@wearesosure.com</span></a></span></span></em></div>
+                                                                              <div style="text-align: center;"><em><span style="font-size:13px"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">Not sure why you received this? Contact <a href="mailto:support@wearesosure.com" target="_blank"><span style="color:#3399ff">support@wearesosure.com</span></a></span></span></em></div>
                                                                            </td>
                                                                         </tr>
                                                                      </tbody>

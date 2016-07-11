@@ -1,0 +1,57 @@
+{% set logo_image='smile' %}
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}so-sure – Your Weekly Summary{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 20px; font-weight: bold; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				Weekly Summary<br /><br />
+		   </span></div>
+		   <div style="font-size: 16px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				Your Reward Pot is currently worth...<br /><br />
+		   </span></div>
+		   <div style="font-size: 20px; text-align: center; color: #3399FF;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				£{{ policy.potValue|number_format(2, '.', ',') }}<br /><br />
+		   </span></div>
+		   <div style="font-size: 16px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				You can still connect with...<br /><br />
+		   </span></div>
+		   <div style="font-size: 20px; text-align: center; color: #3CCCCC;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+			{{ policy.remainingConnections }} friends<br /><br />
+		   </span></div>
+		</div>
+		{{ macros.email_button_table(branch_share_url, 'Invite more friends', 'Invite more friends') }}
+		<hr />
+		<br />
+		{% if policy.sentInvitations|length > 0 %}
+		  <div style="font-size: 14px; text-align: left;">
+			 <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+			 <div style="font-size: 16px; font-weight: bold; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				  Your Invitations
+			 </span></div>
+		     <div style="font-size: 16px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+			   You haven't heard from these friends in a while, why not give them a nudge!<br /><br />
+			 </span></div>
+			 {% for invitation in policy.sentInvitations %}
+	 		     <div style="font-size: 16px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+	 			   <a href="{{ branch_share_url }}" style="color: #3399ff;">{{ invitation.inviteeName }}</a><br /><br />
+	 			 </span></div>
+		     {% endfor %}
+		  </div>
+	 	  {{ macros.email_button_table(branch_share_url, 'View existing invites', 'View existing invites') }}
+	 	  <hr />
+		  <br />
+	    {% endif %}
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 12px; font-style: italic; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		  		p.s. we're always around and love hearing from you. Please get in touch if you want to ask something or even just to say hello :)
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}
