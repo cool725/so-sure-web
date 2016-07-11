@@ -280,7 +280,7 @@ abstract class Invitation
         }
     }
 
-    public function toApiArray($debug = false)
+    public function toApiArray($debug = null)
     {
         $data = [
             'id' => $this->getId(),

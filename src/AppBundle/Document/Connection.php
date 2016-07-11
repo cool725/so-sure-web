@@ -201,11 +201,21 @@ class Connection
         $this->replacementUser = $replacementUser;
     }
 
-    public function toApiArray()
+    public function toApiArray($claims)
     {
+        $claimDates = [];
+        if ($claims) {
+            foreach ($claims as $claim) {
+                if ($claim->getPolicy()->getId() == $this->getSourcePolicy()->getId() && $claim->getClosedDate()) {
+                    $claimDates[] =  $claim->getClosedDate()->format(\DateTime::ATOM);
+                }
+            }
+        }
+
         return [
             'name' => $this->getLinkedUser() ? $this->getLinkedUser()->getName() : null,
             'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ATOM) : null,
+            'claim_dates' => $claimDates,
         ];
     }
 }

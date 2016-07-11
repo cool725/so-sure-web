@@ -56,6 +56,9 @@ class PhonePolicyTest extends WebTestCase
         $policyApi = $policy->toApiArray();
         $this->assertEquals(0, $policyApi['pot']['connections']);
         $this->assertEquals(0, $policyApi['pot']['value']);
+        $this->assertFalse($policyApi['has_claim']);
+        $this->assertFalse($policyApi['has_network_claim']);
+        $this->assertEquals(0, count($policyApi['claim_dates']));
     }
 
     public function testIsPolicyWithin30Days()
@@ -94,15 +97,36 @@ class PhonePolicyTest extends WebTestCase
         $claimA = new Claim();
         $claimA->setRecordedDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setClosedDate(new \DateTime("2016-01-01"));
         $policyA->addClaim($claimA);
         $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-01")));
         $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-01-15")));
-        
+
         $claimB = new Claim();
         $claimB->setRecordedDate(new \DateTime("2016-02-01"));
         $claimB->setStatus(Claim::STATUS_SETTLED);
+        $claimB->setClosedDate(new \DateTime("2016-02-01"));
         $policyA->addClaim($claimB);
         $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21")));
+
+        $policyAApi = $policyA->toApiArray();
+        $this->assertTrue($policyAApi['has_claim']);
+        $this->assertFalse($policyAApi['has_network_claim']);
+        $this->assertEquals(2, count($policyAApi['claim_dates']));
+        $this->assertTrue(in_array((new \DateTime("2016-01-01"))->format(\DateTime::ATOM), $policyAApi['claim_dates']));
+        $this->assertTrue(in_array((new \DateTime("2016-02-01"))->format(\DateTime::ATOM), $policyAApi['claim_dates']));
+
+        $policyBApi = $policyB->toApiArray();
+        $this->assertFalse($policyBApi['has_claim']);
+        $this->assertTrue($policyBApi['has_network_claim']);
+        $this->assertTrue(in_array(
+            (new \DateTime("2016-01-01"))->format(\DateTime::ATOM),
+            $policyBApi['connections'][0]['claim_dates']
+        ));
+        $this->assertTrue(in_array(
+            (new \DateTime("2016-02-01"))->format(\DateTime::ATOM),
+            $policyBApi['connections'][0]['claim_dates']
+        ));
     }
 
     public function testHasNetworkClaimedInLast30DaysWithOpenStatus()
