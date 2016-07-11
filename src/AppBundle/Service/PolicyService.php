@@ -314,6 +314,11 @@ class PolicyService
      */
     public function weeklyEmail(Policy $policy)
     {
+        // No need to send weekly email if pot is full
+        if ($policy->isPotCompletelyFilled()) {
+            return;
+        }
+
         try {
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('Your so-sure weekly email'))

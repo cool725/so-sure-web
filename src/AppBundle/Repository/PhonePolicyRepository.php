@@ -99,6 +99,8 @@ class PhonePolicyRepository extends DocumentRepository
     {
         $lastWeek = new \DateTime();
         $lastWeek->sub(new \DateInterval('P1W'));
+        $sixtyDays = new \DateTime();
+        $sixtyDays->sub(new \DateInterval('P60D'));
         $policy = new PhonePolicy();
 
         $qb = $this->createQueryBuilder();
@@ -106,6 +108,7 @@ class PhonePolicyRepository extends DocumentRepository
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID
         ]));
+        $qb->addAnd($qb->expr()->field('start')->gt($sixtyDays));
         $qb->addAnd(
             $qb->expr()->addOr($qb->expr()->field('lastEmailed')->lte($lastWeek))
                 ->addOr($qb->expr()->field('lastEmailed')->exists(false))

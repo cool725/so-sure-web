@@ -52,5 +52,6 @@ class WeeklyEmailCommand extends ContainerAwareCommand
             $dm->flush();
             $count++;
         }
+        $output->writeln(sprintf('%d emails sent', $count));
     }
 }
