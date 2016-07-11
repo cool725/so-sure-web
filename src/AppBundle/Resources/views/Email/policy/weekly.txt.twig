@@ -20,13 +20,13 @@ Invite more friends: {{ branch_share_url }}
 **
 ------------------------------------------------------------
 
-You haven't heard from these friends in a while, why give them a nudge!
+You haven't heard from these friends in a while, why not give them a nudge!
 
 {% for invitation in policy.sentInvitations %}
 * {{ invitation.inviteeName }}
 {% endfor %}
 
-Give them a nudge: {{ branch_share_url }}
+View existing invites: {{ branch_share_url }}
 {% endif %}
 
 **
