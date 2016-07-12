@@ -89,8 +89,19 @@ class PhonePolicyTest extends WebTestCase
     public function testHasNetworkClaimedInLast30Days()
     {
         $policyA = static::createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('policya', $this));
         $policyB = static::createUserPolicy(true);
+        $policyB->getUser()->setEmail(static::generateEmail('policyb', $this));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyB);
+        static::$dm->persist($connectionA);
+        static::$dm->persist($connectionB);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+        $this->assertNotNull($policyB->getId());
 
         $this->assertFalse($policyA->hasNetworkClaimedInLast30Days());
 

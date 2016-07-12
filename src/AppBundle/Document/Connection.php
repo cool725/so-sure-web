@@ -206,7 +206,7 @@ class Connection
         $claimDates = [];
         if ($claims) {
             foreach ($claims as $claim) {
-                if ($claim->getPolicy()->getId() == $this->getSourcePolicy()->getId() && $claim->getClosedDate()) {
+                if ($claim->getPolicy()->getId() == $this->getLinkedPolicy()->getId() && $claim->getClosedDate()) {
                     $claimDates[] =  $claim->getClosedDate()->format(\DateTime::ATOM);
                 }
             }
