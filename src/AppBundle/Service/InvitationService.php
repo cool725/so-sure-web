@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use AppBundle\Document\Connection;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
+use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -25,6 +26,7 @@ use AppBundle\Document\PhoneTrait;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class InvitationService
 {
@@ -203,6 +205,20 @@ class InvitationService
         $this->dm->flush();
 
         return $invitation;
+    }
+
+    public function inviteBySCode(Policy $policy, $scode)
+    {
+        $this->validatePolicy($policy);
+
+        $repo = $this->dm->getRepository(SCode::class);
+        $scodeObj = $repo->findOneBy(['code' => $scode]);
+        if (!$scodeObj) {
+            throw new NotFoundHttpException();
+        }
+        $user = $scodeObj->getPolicy()->getUser();
+
+        return $this->inviteByEmail($policy, $user->getEmail(), $user->getName());
     }
 
     /**

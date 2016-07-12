@@ -1,0 +1,51 @@
+{% set include_emoji = 1 %}
+{% extends 'base.html.twig' %}
+
+{% block title %}so-sure - Join today and we'll reward you!{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'bundles/app/css/Default/index.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+<section class="hero">
+    <div class="container">
+        <div id="navchange"></div>
+        <div class="row" id="welcome">
+            <div class="col-md-12">
+                <div class="text-center">
+                  <h4>Your friend, {{scode.policy.user.name}}, just joined the Social Insurance revolution &amp; they'd like you to join them!</h4>
+                  <p><br>We offer better &amp; up to 80% cheaper phone insurance when you connect with friends and none of you claim. <br><br> Find out how much you could save by getting a quote below.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="get-quote">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="device-select">
+                    {{ form_start(form_phone) }}
+                    <div class="input-group">
+                        {{ form_widget(form_phone.phone, { 'attr': {'class': 'form-control'}}) }}
+                        <span class="input-group-btn">
+                            {{ form_widget(form_phone.next, {'label': 'Quote me', 'attr': {'class': 'btn btn-primary'}}) }}
+                        </span>
+                    </div>
+                    {{ form_end(form_phone) }}
+                </div>
+            </div>
+        </div>
+        <p class="text-center">
+            <a href="mailto:hello@wearesosure.com">Don't see your device. Let us know.</a>
+        </p>
+    </div>
+
+</section>
+
+    {% include 'AppBundle::Default/howItWorks.html.twig' %}
+
+
+    {% endblock %}

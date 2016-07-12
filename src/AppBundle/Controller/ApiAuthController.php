@@ -17,6 +17,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Sns;
+use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\Invitation\Invitation;
 
@@ -39,6 +40,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @Route("/api/v1/auth")
@@ -432,11 +434,7 @@ class ApiAuthController extends BaseController
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->find($id);
             if (!$policy) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_NOT_FOUND,
-                    'Unable to find policy',
-                    404
-                );
+                throw new NotFoundHttpException();
             }
             $this->denyAccessUnlessGranted('send-invitation', $policy);
 
@@ -450,12 +448,15 @@ class ApiAuthController extends BaseController
             $email = isset($data['email']) ? $data['email'] : null;
             $mobile = isset($data['mobile']) ? $data['mobile'] : null;
             $name = isset($data['name']) ? $data['name'] : null;
+            $scode = isset($data['scode']) ? $data['scode'] : null;
             try {
                 $invitation  = null;
                 if ($email) {
                     $invitation = $invitationService->inviteByEmail($policy, $email, $name);
                 } elseif ($mobile) {
                     $invitation = $invitationService->inviteBySms($policy, $mobile, $name);
+                } elseif ($scode) {
+                    $invitation = $invitationService->inviteBySCode($policy, $scode);
                 } else {
                     // TODO: General
                     return $this->getErrorJsonResponse(
@@ -507,6 +508,12 @@ class ApiAuthController extends BaseController
                     ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
                     'User has previously claimed',
                     422
+                );
+            } catch (NotFoundHttpException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy/code',
+                    404
                 );
             } catch (\Exception $e) {
                 $this->get('logger')->error('Error in api newInvitation.', ['exception' => $e]);
@@ -611,6 +618,135 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api payPolicy.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/scode", name="api_auth_create_policy_scode")
+     * @Method({"POST"})
+     */
+    public function postPolicySCodeAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!isset($data['type'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted('edit', $policy);
+            if ($data['type'] == SCode::TYPE_STANDARD && $policy->getStandardSCode()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                    'Only 1 standard active code is allowed',
+                    422
+                );
+            }
+
+            $scode = new SCode();
+            $scode->setType($data['type']);
+            $scodeRepo = $dm->getRepository(SCode::class);
+            if ($scodeRepo->findOneBy(['code' => $scode->getCode()])) {
+                // TODO: Change to while loop
+                throw new \Exception('duplicate code');
+            }
+            $policy->addSCode($scode);
+
+            return new JsonResponse($scode->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (NotFoundHttpException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find policy/code',
+                404
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api postPolicySCodeAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/scode/{code}", name="api_auth_get_policy_scode")
+     * @Method({"GET"})
+     */
+    public function getPolicySCodeAction($id, $code)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted('view', $policy);
+
+            $scodeRepo = $dm->getRepository(SCode::class);
+            $scode = $scodeRepo->findOneBy(['code' => $code]);
+            if (!$scode || !$scode->isActive()) {
+                throw new NotFoundHttpException();
+            }
+
+            return new JsonResponse($scode->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (NotFoundHttpException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find policy/code',
+                404
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api getPolicySCodeAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/scode/{code}", name="api_auth_delete_policy_scode")
+     * @Method({"DELETE"})
+     */
+    public function deletePolicySCodeAction($id, $code)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted('edit', $policy);
+
+            $scodeRepo = $dm->getRepository(SCode::class);
+            $scode = $scodeRepo->findOneBy(['code' => $code]);
+            if (!$scode || !$scode->isActive()) {
+                throw new NotFoundHttpException();
+            }
+
+            $scode->setActive(false);
+            $dm->flush();
+
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, sprintf('%s inactivated', $code), 200);
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (NotFoundHttpException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find policy/code',
+                404
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api deletePolicySCodeAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -793,6 +929,16 @@ class ApiAuthController extends BaseController
                     return $birthday;
                 }
                 $user->setBirthday($birthday);
+                $userChanged = true;
+            }
+
+            if (isset($data['scode']) && strlen($data['scode']) > 0) {
+                $scodeRepo = $dm->getRepository(SCode::class);
+                $scode = $scodeRepo->findOneBy(['code' => $data['scode']]);
+                if (!$scode || !$scode->isActive()) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'SCode missing', 404);
+                }
+                $scode->addAcceptor($user);
                 $userChanged = true;
             }
 

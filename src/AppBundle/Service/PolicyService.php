@@ -7,6 +7,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
+use AppBundle\Document\SCode;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -46,6 +47,9 @@ class PolicyService
     /** @var boolean */
     protected $skipS3;
 
+    /** @var ShortLinkService */
+    protected $shortLink;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -64,17 +68,18 @@ class PolicyService
     }
 
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param SequenceService $sequence
-     * @param \Swift_Mailer   $mailer
-     * @param                 $smtp
-     * @param                 $templating
-     * @param                 $router
-     * @param                 $environment
-     * @param                 $snappyPdf
-     * @param                 $dispatcher
-     * @param                 $s3
+     * @param DocumentManager  $dm
+     * @param LoggerInterface  $logger
+     * @param SequenceService  $sequence
+     * @param \Swift_Mailer    $mailer
+     * @param                  $smtp
+     * @param                  $templating
+     * @param                  $router
+     * @param                  $environment
+     * @param                  $snappyPdf
+     * @param                  $dispatcher
+     * @param                  $s3
+     * @param ShortLinkService $shortLink
      */
     public function __construct(
         DocumentManager $dm,
@@ -87,7 +92,8 @@ class PolicyService
         $environment,
         $snappyPdf,
         $dispatcher,
-        $s3
+        $s3,
+        ShortLinkService $shortLink
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -100,6 +106,7 @@ class PolicyService
         $this->snappyPdf = $snappyPdf;
         $this->dispatcher = $dispatcher;
         $this->s3 = $s3;
+        $this->shortLink = $shortLink;
     }
 
     public function create(Policy $policy, \DateTime $date = null)
@@ -136,6 +143,10 @@ class PolicyService
             }
         }
 
+        $scode = $this->uniqueSCode($policy);
+        $link = $this->router->generate('scode', ['code' => $scode->getCode()], true);
+        $shortLink = $this->shortLink->addShortLink($link);
+        $scode->setShareLink($shortLink);
         $this->dm->flush();
 
         $policyTerms = $this->generatePolicyTerms($policy);
@@ -143,6 +154,32 @@ class PolicyService
 
         $this->newPolicyEmail($policy, [$policySchedule, $policyTerms]);
         $this->dispatcher->dispatch(SalvaPolicyEvent::EVENT_CREATED, new SalvaPolicyEvent($policy));
+    }
+
+    public function uniqueSCode($policy, $count = 0)
+    {
+        if ($count > 10) {
+            throw new \Exception('Too many unique scode attempts');
+        }
+
+        $repo = $this->dm->getRepository(SCode::class);
+        $scode = $policy->getStandardSCode();
+        if (!$scode) {
+            $policy->addSCode(new SCode());
+
+            return $this->uniqueSCode($policy, $count + 1);
+        }
+
+        $exists = $repo->findOneBy(['code' => $scode->getCode()]);
+        if ($exists) {
+            // removing scode from policy seems to be problematic, so change code and make inactive
+            $scode->deactivate();
+            $policy->addSCode(new SCode());
+
+            return $this->uniqueSCode($policy, $count + 1);
+        }
+
+        return $scode;
     }
 
     public function generatePolicyTerms(Policy $policy)

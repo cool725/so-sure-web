@@ -211,6 +211,14 @@ abstract class Policy
      */
     protected $lastEmailed;
 
+    /**
+     * @MongoDB\ReferenceMany(
+     *  targetDocument="AppBundle\Document\SCode",
+     *  cascade={"persist"}
+     * )
+     */
+    protected $scodes = array();
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -583,6 +591,39 @@ abstract class Policy
         $this->lastEmailed = $lastEmailed;
     }
 
+    public function getSCodes()
+    {
+        return $this->scodes;
+    }
+
+    public function addSCode(SCode $scode)
+    {
+        $scode->setPolicy($this);
+        $this->scodes[] = $scode;
+    }
+
+    public function getStandardSCode()
+    {
+        foreach ($this->scodes as $scode) {
+            //\Doctrine\Common\Util\Debug::dump($scode);
+            if ($scode->isActive() && $scode->isStandard()) {
+                return $scode;
+            }
+        }
+
+        return null;
+    }
+
+    public function getShareLink()
+    {
+        $scode = $this->getStandardSCode();
+        if ($scode) {
+            return $scode->getShareLink();
+        }
+
+        return null;
+    }
+
     public function init(User $user, PolicyDocument $terms)
     {
         $user->addPolicy($this);
@@ -625,6 +666,9 @@ abstract class Policy
             $initialPolicyNumber + $seq
         ));
         $this->setStatus(self::STATUS_PENDING);
+        if (count($this->getSCodes()) == 0) {
+            $this->addSCode(new SCode());
+        }
     }
 
     public function getPolicyLength()
@@ -1308,6 +1352,7 @@ abstract class Policy
             'has_claim' => $this->hasMonetaryClaimed(),
             'has_network_claim' => $this->hasNetworkClaim(true),
             'claim_dates' => $this->eachApiMethod($this->getMonetaryClaimed(), 'getClosedDate'),
+            'share_link' => $this->getShareLink(),
         ];
     }
 }

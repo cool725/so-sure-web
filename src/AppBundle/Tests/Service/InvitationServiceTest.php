@@ -528,6 +528,29 @@ class InvitationServiceTest extends WebTestCase
         $invitation = self::$invitationService->inviteBySms($policy, '07700900001');
     }
 
+    public function testSCodeInvitation()
+    {
+        $inviterUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('inviter-scode', $this),
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
+
+        $inviteeUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('invitee-scode', $this),
+            'bar'
+        );
+        $inviteePolicy = static::initPolicy($inviteeUser, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteBySCode(
+            $inviteePolicy,
+            $inviterPolicy->getStandardSCode()->getCode()
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+    }
+
     /**
      * @expectedException AppBundle\Exception\FullPotException
      */

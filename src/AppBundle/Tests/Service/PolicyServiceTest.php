@@ -9,6 +9,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
+use AppBundle\Document\SCode;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
@@ -371,5 +372,26 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($policy->getPremium()->getGwp(), $policy->getTotalGwp([1]));
         $this->assertEquals($policy->getPremium()->getIpt(), $policy->getTotalIpt([1]));
         $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee([1]));
+    }
+
+    public function testScodeUnique()
+    {
+        $scode = new SCode();
+        static::$dm->persist($scode);
+        static::$dm->flush();
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('scode', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $dupSCode = new SCode();
+        $dupSCode->setCode($scode->getCode());
+        $policy->addSCode($dupSCode);
+
+        static::$policyService->create($policy, new \DateTime('2016-01-01'));
+        $this->assertNotEquals($policy->getStandardSCode()->getCode(), $scode->getCode());
     }
 }
