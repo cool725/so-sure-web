@@ -36,7 +36,10 @@ class ApiController extends BaseController
     public function loginAction(Request $request)
     {
         try {
-            // throw new \Exception('Manual Exception Test');
+            if ($request->get('debug')) {
+                throw new \Exception('Debug Exception Test');
+            }
+
             $data = json_decode($request->getContent(), true)['body'];
             if (isset($data['email_user'])) {
                 if (!$this->validateFields($data['email_user'], ['email', 'password'])) {
@@ -123,7 +126,7 @@ class ApiController extends BaseController
 
             return new JsonResponse($user->toApiArray($identityId, $token));
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api loginAction. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api loginAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -246,7 +249,7 @@ class ApiController extends BaseController
 
             return new JsonResponse($response);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api quoteAction. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api quoteAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -281,7 +284,7 @@ class ApiController extends BaseController
 
             return new JsonResponse(['url' => $url]);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api referralAciton. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api referralAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -320,7 +323,7 @@ class ApiController extends BaseController
 
             return new JsonResponse(['url' => $url]);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api referralAction. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api referralAddAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -387,7 +390,7 @@ class ApiController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Reset password email sent', 200);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api referralAction. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api resetAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -417,7 +420,7 @@ class ApiController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Endpoint added', 200);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api snsAction. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api snsAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -456,7 +459,7 @@ class ApiController extends BaseController
 
             return new JsonResponse($latestTerms->toApiArray($policyTermsUrl));
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api getLatestPolicyTerms. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api getLatestPolicyTerms.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -512,7 +515,7 @@ class ApiController extends BaseController
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api tokenAction. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api tokenAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -601,7 +604,7 @@ class ApiController extends BaseController
 
             return new JsonResponse($user->toApiArray($identityId, $token));
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api userAction. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api userAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -642,7 +645,7 @@ class ApiController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api versionAction. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api versionAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

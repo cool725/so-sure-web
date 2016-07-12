@@ -75,7 +75,7 @@ class ApiAuthController extends BaseController
 
             return new JsonResponse($address->toApiArray());
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api addressAction. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api addressAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -175,7 +175,7 @@ class ApiAuthController extends BaseController
                 422
             );
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api processInvitation. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api processInvitation.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -386,7 +386,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api newPolicy. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api newPolicy.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -415,7 +415,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api getPolicy. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api getPolicy.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -509,14 +509,14 @@ class ApiAuthController extends BaseController
                     422
                 );
             } catch (\Exception $e) {
-                $this->get('logger')->error(sprintf('Error in api newInvitation. %s', $e->getMessage()));
+                $this->get('logger')->error('Error in api newInvitation.', ['exception' => $e]);
 
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
             }
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api newInvitation. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api newInvitation.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -610,7 +610,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api payPolicy. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api payPolicy.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -653,7 +653,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api getPolicyTerms. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api getPolicyTerms.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -671,7 +671,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api getSecret. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api getSecret.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -695,7 +695,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api getUser. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api getCurrentUser.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -725,7 +725,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api getUser. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api getUser.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -810,7 +810,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api updateUser. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api updateUser.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -859,7 +859,7 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api addUserAddress. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api addUserAddress.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

@@ -92,7 +92,7 @@ class ApiExternalController extends BaseController
 
             return new JsonResponse(['jwt' => $jwt]);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Error in api zenddesk. %s', $e->getMessage()));
+            $this->get('logger')->error('Error in api zenddesk.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

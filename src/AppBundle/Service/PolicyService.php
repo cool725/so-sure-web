@@ -297,7 +297,7 @@ class PolicyService
             }
 
             $mailer->send($message);
-            $policy->setLastEmail(new \DateTime());
+            $policy->setLastEmailed(new \DateTime());
 
             if ($attachmentFiles) {
                 foreach ($attachmentFiles as $attachmentFile) {

@@ -253,6 +253,11 @@ services:
         arguments:
             - access_token: '%rollbar_access_token%'
 
+    app.logger.lineformatter:
+        class: Monolog\Formatter\LineFormatter
+        calls:
+            - [includeStacktraces]
+
     aws.credentials:
         class: Aws\Credentials\Credentials
         arguments:
