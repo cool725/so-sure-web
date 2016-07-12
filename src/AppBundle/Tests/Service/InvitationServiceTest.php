@@ -281,6 +281,7 @@ class InvitationServiceTest extends WebTestCase
 
     public function testEmailInvitationReinvite()
     {
+        $this->removeAllEmailInvitations();
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('user5', $this),
@@ -310,11 +311,21 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
     }
 
+    private function removeAllEmailInvitations()
+    {
+        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
+        foreach ($emailInvitationRepo->findAll() as $invite) {
+            static::$dm->remove($invite);
+        }
+        static::$dm->flush();
+    }
+
     /**
      * @expectedException AppBundle\Exception\ProcessedException
      */
     public function testEmailReinviteProcessed()
     {
+        $this->removeAllEmailInvitations();
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('user-processed', $this),
@@ -374,6 +385,7 @@ class InvitationServiceTest extends WebTestCase
 
     public function testEmailInvitationCancel()
     {
+        $this->removeAllEmailInvitations();
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('user6', $this),
@@ -399,6 +411,7 @@ class InvitationServiceTest extends WebTestCase
 
     public function testEmailInvitationReject()
     {
+        $this->removeAllEmailInvitations();
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('user7', $this),
