@@ -1,15 +1,15 @@
 <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
-    <div>
-        <h2>Email me a reset password link</h2>
+    <div class="container">
+        <h1>Need a new password? No problem.</h1>
+        <p>Just enter your email below and we'll send you link to reset it.</p>
         {% if invalid_username is defined %}
             <p>Invalid email address</p>
         {% endif %}
         <div class="form-group">
-            <label for="username">Email</label>
-            <input type="text" id="username" name="username" required="required" />
+            <input type="text" id="username" name="username" required="required" class="reset" placeholder="Email Address"/>
         </div>
         <div class="form-group">
-            <input type="submit" value="Reset my pasword" class="btn btn-success" />
+            <input type="submit" value="Send me a link!" class="btn btn-primary" />
         </div>
     </div>
 </form>
