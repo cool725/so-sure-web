@@ -13,27 +13,6 @@ use AppBundle\Service\RateLimitService;
  */
 class ApiControllerTest extends BaseControllerTest
 {
-    // Manual test
-
-    /**
-     * This is a test that can be manually run by uncommenting exception in login
-     * Purely to test that boilerplate exception login & return codes work
-     */
-    /*
-    public function testManual()
-    {
-        $crawler = self::$client->request(
-            'POST',
-            '/api/v1/login',
-            array(),
-            array(),
-            array('CONTENT_TYPE' => 'application/json'),
-            json_encode(array('body' => array('username' => 'foo', 'password' => 'bar')))
-        );
-        $data = $this->verifyResponse(500);
-    }
-    */
-
     // login
 
     /**
@@ -216,7 +195,20 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
 
-    // ping
+    public function testLoginException()
+    {
+        $crawler = self::$client->request(
+            'POST',
+            '/api/v1/login?debug=true',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(array('body' => array('username' => 'foo', 'password' => 'bar')))
+        );
+        $data = $this->verifyResponse(500);
+    }
+
+   // ping
 
     /**
      *

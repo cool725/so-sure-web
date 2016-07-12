@@ -30,6 +30,7 @@ monolog:
             level:  info
             channels: ["receperio"]            
         main:
+            formatter: "app.logger.lineformatter"
             type:   stream
             path:   "%kernel.logs_dir%/%kernel.environment%.log"
             level:  debug
