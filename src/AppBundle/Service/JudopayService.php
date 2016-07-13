@@ -289,11 +289,11 @@ class JudopayService
         }
     }
 
-    public function scheduledPayment(ScheduledPayment $scheduledPayment)
+    public function scheduledPayment(ScheduledPayment $scheduledPayment, $prefix = null)
     {
-        if ($scheduledPayment->getStatus() != ScheduledPayment::STATUS_SCHEDULED) {
+        if (!$scheduledPayment->isBillable($prefix)) {
             throw new \Exception(sprintf(
-                'Scheduled payment %s is not scheduled (status: %s)',
+                'Scheduled payment %s is not billable (status: %s)',
                 $scheduledPayment->getId(),
                 $scheduledPayment->getStatus()
             ));

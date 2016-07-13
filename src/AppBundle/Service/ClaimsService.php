@@ -59,7 +59,7 @@ class ClaimsService
         }
 
         if ($claim->isMonetaryClaim()) {
-             if (!$claim->getPolicy() instanceof PhonePolicy) {
+            if (!$claim->getPolicy() instanceof PhonePolicy) {
                 throw new \Exception('not policy');
             }
             $claim->getPolicy()->updatePotValue();
