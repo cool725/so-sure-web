@@ -22,6 +22,7 @@ use AppBundle\Document\File\LloydsFile;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
+use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
 use AppBundle\Form\Type\YearMonthType;
@@ -273,22 +274,45 @@ class AdminController extends BaseController
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
         }
-        $form = $this->createForm(CancelPolicyType::class);
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $policyService->cancel($policy, $form->get('cancelledReason')->getData());
-            $this->addFlash(
-                'success',
-                sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
-            );
 
-            return $this->redirectToRoute('admin_users');
+        $cancelForm = $this->get('form.factory')
+            ->createNamedBuilder('cancel_form', CancelPolicyType::class)
+            ->getForm();
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_form', ImeiType::class, $policy)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('cancel_form')) {
+                $cancelForm->handleRequest($request);
+                if ($cancelForm->isValid()) {
+                    $policyService->cancel($policy, $cancelForm->get('cancelledReason')->getData());
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_users');
+                }
+            } elseif ($request->request->has('imei_form')) {
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
         }
         $checks = $fraudService->runChecks($policy);
 
         return [
             'policy' => $policy,
-            'form' => $form->createView(),
+            'cancel_form' => $cancelForm->createView(),
+            'imei_form' => $imeiForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getPhonePolicyHistory($policy->getId()),
