@@ -54,6 +54,10 @@ class ClaimsService
 
     public function processClaim(Claim $claim)
     {
+        if (!$policy instanceof PhonePolicy) {
+            throw new \Exception('not policy');
+        }
+
         if ($claim->getProcessed()) {
             return;
         }
@@ -77,29 +81,26 @@ class ClaimsService
 
     public function recordLostPhone(Policy $policy, Claim $claim)
     {
-        if (!$policy instanceof PhonePolicy) {
-            throw new \Exception('not policy');
-            return;
-        }
-
         if (!$claim->isOwnershipTransferClaim()) {
-            throw new \Exception('not transfer');
             return;
         }
 
+        // Check if phone has been 'lost' multiple times
         $repo = $this->dm->getRepository(LostPhone::class);
-        $phone = $repo->findOneBy(['imei' => $policy->getImei()]);
-        if ($phone) {
-            throw new \Exception('found imei');
-            return;
+        $lost = $repo->findOneBy(['imei' => $policy->getImei()]);
+        if ($lost) {
+            $this->logger->error(sprintf(
+                'Imei (%s) that was previously reported as lost is being reported as lost again.',
+                $policy->getImei()
+            ));
         }
 
-        $phone = new LostPhone();
-        $phone->populate($policy);
-        $this->dm->persist($phone);
+        $lost = new LostPhone();
+        $lost->populate($policy);
+        $this->dm->persist($lost);
         $this->dm->flush();
 
-        return $phone;
+        return $lost;
     }
 
     public function notifyMonetaryClaim(Policy $policy, Claim $claim, $isClaimer)
