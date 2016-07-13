@@ -62,8 +62,8 @@ parameters:
     pca_apikey: ''
     branch_key: ''
     drift_key: ''
-    zendesk_jwt_secret: ''
-    geoip_db: ''
+    zendesk_jwt_secret: 'cannotbeblank'
+    geoip_db: '/var/geoip/GeoLite2-City.mmdb'
 
     gsma_apikey:  ''
     gsma_username: ''
@@ -78,9 +78,9 @@ parameters:
     sns_prelaunch_registered: ''
     sns_prelaunch_unregistered: ''
 
-    plivo_authid:        ''
-    plivo_authtoken:     ''
-    plivo_sendingnumber: ''
+    plivo_authid:        'cannotbeblank'
+    plivo_authtoken:     'cannotbeblank'
+    plivo_sendingnumber: 'sosuredev'
 
     branch_pot_url: ''
     branch_share_url: ''
