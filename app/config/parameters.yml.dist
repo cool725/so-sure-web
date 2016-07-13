@@ -46,8 +46,8 @@ parameters:
     judopay_apisecret:
     judopay_id:
 
-    mongodb_db: mongo
-    mongodb_url: mongodb://localhost
+    mongodb_db: so-sure
+    mongodb_url: mongodb://root:root@localhost
 
     redis_default_dsn: redis://localhost/0
     redis_session_dsn: redis://localhost/1
