@@ -27,7 +27,7 @@ parameters:
     fb_pixel_id:
     fb_og_namespace: 'wearesosure-dev'
 
-    mailchimp_apikey:
+    mailchimp_apikey: bad-mailchimp # exception thrown if - not present in param
     mailchimp_prelaunch_list:
 
     google_appname:
