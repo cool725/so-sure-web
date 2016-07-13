@@ -17,6 +17,7 @@ use AppBundle\Document\PolicyTerms;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends BaseController
 {
@@ -288,5 +289,15 @@ class DefaultController extends BaseController
             'is_promo' => $isPromo,
             'form' => $form->createView()
         );
+    }
+
+    /**
+     * @Route("/apple-app-site-association", name="apple-app-site-assocaition")
+     */
+    public function appleAppAction()
+    {
+        $view = $this->renderView('AppBundle:Default:apple-app-site-association.json.twig');
+
+        return new Response($view, 200, array('Content-Type'=>'application/json'));
     }
 }
