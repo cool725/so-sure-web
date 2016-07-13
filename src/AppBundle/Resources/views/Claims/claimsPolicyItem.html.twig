@@ -7,6 +7,9 @@
       <li role="presentation"><a href="#network">Network Claims <span class="badge" title="Number of network claims">{{ policy.networkClaims|length }}</span></a></li>
       <li role="presentation"><a href="#user">User</a></li>
       <li role="presentation"><a href="#history">History</a></li>
+      {% if is_granted('ROLE_ADMIN') %}
+        <li role="presentation"><a href="#admin">Admin</a></li>
+      {% endif %}
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="policy">
@@ -220,6 +223,25 @@
               <p>No history is present</p>
             {% endif %}
         </div>
+      {% if is_granted('ROLE_ADMIN') %}
+        <div role="tabpanel" class="tab-pane" id="admin">
+            <h3>Admin</h3>
+            <table class="table table-striped">
+                <tr>
+                    <td>Imei</td>
+                    <td>
+                      {{ form_start(imei_form, {'attr': {'class': 'form-inline'}}) }}
+                      <div class="form-group">
+                          {{ form_errors(imei_form.imei) }}
+                          {{ form_widget(imei_form.imei) }}
+                      </div>
+                      {{ form_widget(imei_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-update'}}) }}
+                      {{ form_end(imei_form) }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+      {% endif %}
     </div>
     <div style="padding-bottom: 30px"></div>
 

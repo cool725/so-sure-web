@@ -54,15 +54,14 @@ class ClaimsService
 
     public function processClaim(Claim $claim)
     {
-        if (!$policy instanceof PhonePolicy) {
-            throw new \Exception('not policy');
-        }
-
         if ($claim->getProcessed()) {
             return;
         }
 
         if ($claim->isMonetaryClaim()) {
+             if (!$claim->getPolicy() instanceof PhonePolicy) {
+                throw new \Exception('not policy');
+            }
             $claim->getPolicy()->updatePotValue();
             $this->dm->flush();
             $this->notifyMonetaryClaim($claim->getPolicy(), $claim, true);
