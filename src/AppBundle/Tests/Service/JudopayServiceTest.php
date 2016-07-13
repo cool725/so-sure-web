@@ -236,7 +236,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $scheduledPayment = $policy->getScheduledPayments()[0];
 
-        self::$judopay->scheduledPayment($scheduledPayment);
+        self::$judopay->scheduledPayment($scheduledPayment, 'TEST');
     }
 
     public function testProcessTokenPayResult()

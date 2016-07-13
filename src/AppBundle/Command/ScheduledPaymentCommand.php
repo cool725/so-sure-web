@@ -66,9 +66,9 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         } else {
             $scheduledPayments = $repo->findScheduled();
             foreach ($scheduledPayments as $scheduledPayment) {
-                if (!$scheduledPayment->getPolicy()->isValidPolicy()) {
+                if (!$scheduledPayment->isBillable()) {
                     $output->writeln(sprintf(
-                        'Skipping Scheduled Payment %s as policy is invalid',
+                        'Skipping Scheduled Payment %s as policy is not billable',
                         $scheduledPayment->getId()
                     ));
                     $this->displayScheduledPayment($scheduledPayment, $output);

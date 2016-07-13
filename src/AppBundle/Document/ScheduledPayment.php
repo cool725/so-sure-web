@@ -155,4 +155,11 @@ class ScheduledPayment
 
         return $rescheduled;
     }
+
+    public function isBillable($prefix = null)
+    {
+        return $this->getStatus() == self::STATUS_SCHEDULED &&
+                $this->getPolicy()->isValidPolicy($prefix) &&
+                $this->getPolicy()->isBillablePolicy();
+    }
 }
