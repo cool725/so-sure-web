@@ -72,6 +72,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                         $scheduledPayment->getId()
                     ));
                     $this->displayScheduledPayment($scheduledPayment, $output);
+                    continue;
                 }
 
                 try {
