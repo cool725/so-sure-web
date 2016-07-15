@@ -266,4 +266,13 @@ abstract class BaseController extends Controller
 
         return $policyHistory;
     }
+
+    protected function getDefaultPhone()
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = $phoneRepo->findOneBy(['model' => 'iPhone 6S', 'memory' => 16]);
+
+        return $phone;
+    }
 }
