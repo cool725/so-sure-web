@@ -21,6 +21,12 @@
 #welcome h1 {
     margin-bottom: 20px;
 }
+@media (min-width: 992px) {
+#hero-description {
+    padding-left: 175px;
+    padding-right: 175px;
+}
+}
 
 /* GET QUOTE */
 
