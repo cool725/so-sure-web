@@ -44,7 +44,7 @@ SCRIPT
 
 $deploy = <<SCRIPT
 set -e
-/var/ops/scripts/deploy.sh -u vagrant -n /vagrant vagrant
+/var/ops/scripts/deploy.sh -d -u vagrant -n /vagrant vagrant
 SCRIPT
 
 Vagrant.configure("2") do |config|
