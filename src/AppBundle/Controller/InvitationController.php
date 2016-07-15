@@ -43,6 +43,9 @@ class InvitationController extends BaseController
         $policy = new PhonePolicy();
         if ($request->getMethod() == "GET") {
             $phone = $deviceAtlas->getPhone($request);
+            if (!$phone) {
+                $phone = $this->getDefaultPhone();
+            }
             if ($phone instanceof Phone) {
                 $policy->setPhone($phone);
             }
