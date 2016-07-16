@@ -1006,7 +1006,7 @@
                         haltonwarning="true"
                         haltonerror="true">
             <fileset refid="${force.cs.fileset}" />
-            <formatter type="full" usefile="false" />
+            <formatter type="full" outfile="/tmp/psr2.log"/>
         </phpcodesniffer>
 
         <phpcodesniffer standard="standard-generic.xml"
@@ -1021,7 +1021,7 @@
                 in the noop-sourcecodesniffer.
             -->
             <fileset refid="${force.cs.noop-fileset}" />
-            <formatter type="full" usefile="false" />
+            <formatter type="full" outfile="/tmp/generic.log"/>
         </phpcodesniffer>
     </target>
 
