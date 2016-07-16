@@ -9,7 +9,7 @@ class UntrustedHostUnexpectedValueExceptionVoter implements ReportVoterInterface
     private function support($exception)
     {
         if ($exception instanceof \UnexpectedValueException &&
-            stripos($e->getMessage(), "Untrusted Host") !== false) {
+            stripos($exception->getMessage(), "Untrusted Host") !== false) {
             return true;
         }
 
