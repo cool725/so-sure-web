@@ -371,6 +371,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.claim:
+        class: AppBundle\Form\Type\ClaimType
+        arguments: ["@app.imei"]
+        tags:
+            - { name: form.type }
+
     rollbar.voter.notfound:
         class: AppBundle\Security\NotFoundHttpExceptionVoter
         tags:

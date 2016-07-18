@@ -12,9 +12,23 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
+use AppBundle\Service\ReceperioService;
 
 class ClaimType extends AbstractType
 {
+    /**
+     * @var ReceperioService
+     */
+    private $receperio;
+
+    /**
+     * @param ReceperioService $receperio
+     */
+    public function __construct(ReceperioService $receperio)
+    {
+        $this->receperio = $receperio;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -32,6 +46,12 @@ class ClaimType extends AbstractType
                 Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,
             ]])
             ->add('suspected_fraud', CheckboxType::class, ['required' => false])
+            ->add('force', ChoiceType::class, [
+                    'choices' => $this->receperio->getForces(),
+                    'required' => false,
+                    'placeholder' => 'Select a Policy Force',
+            ])
+            ->add('crime_ref', TextType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
             ->add('record', SubmitType::class)
         ;
