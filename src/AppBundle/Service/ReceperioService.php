@@ -449,7 +449,7 @@ class ReceperioService extends BaseImeiService
             } else {
                 $res = $client->request('GET', $url, [
                     'auth' => [self::PARTNER_ID, $this->sign('')],
-                    'headers' => ['Accept' => 'application/json'],                    
+                    'headers' => ['Accept' => 'application/json'],
                 ]);
             }
             $body = (string) $res->getBody();
