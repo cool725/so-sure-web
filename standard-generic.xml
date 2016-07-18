@@ -35,7 +35,6 @@
   <exclude name="Generic.VersionControl.SubversionProperties" />
   <exclude name="Generic.WhiteSpace.DisallowSpaceIndent" />
   <exclude name="Generic.WhiteSpace.ScopeIndent" />
-  <exclude name="Generic.Formatting.SpaceAfterNot" />
 </rule>
 <rule ref="Generic.PHP.ForbiddenFunctions">
   <properties>
