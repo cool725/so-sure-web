@@ -16,7 +16,6 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function tearDown()
     {
-        
     }
 
     public function testIndex()

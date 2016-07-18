@@ -16,7 +16,6 @@ class ApiViewControllerTest extends BaseControllerTest
 
     public function tearDown()
     {
-        
     }
 
     public function testPolicyTerms()

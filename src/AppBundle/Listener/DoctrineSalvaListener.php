@@ -64,7 +64,6 @@ class DoctrineSalvaListener
                 }
             }
         }
-
     }
 
     private function triggerEvent(PhonePolicy $phonePolicy, $eventType)
