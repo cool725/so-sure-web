@@ -73,6 +73,22 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(formClaim.force, '', {'label_attr': {'class': 'col-sm-4'}}) }}
+                    {{ form_errors(formClaim.force) }}
+                    {{ form_widget(formClaim.force, {'attr': {'class': 'col-sm-6'}}) }}
+                </div>                
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(formClaim.crime_ref, 'Crime Ref (Lost/Stolen)', {'label_attr': {'class': 'col-sm-4'}}) }}
+                    {{ form_errors(formClaim.crime_ref) }}
+                    {{ form_widget(formClaim.crime_ref, {'attr': {'class': 'col-sm-3'}}) }}
+                </div>                
+            </div>
+        </div>
+        <div class="row" style="margin-top: 5px">
             <div class="col-md-8">
                 <div class="form-group">
                     {{ form_label(formClaim.notes, '', {'label_attr': {'class': 'col-sm-2'}}) }}

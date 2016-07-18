@@ -117,6 +117,7 @@
                         <th>Claims Number</th>
                         <th>Claims Type</th>
                         <th>Claims Status</th>
+                        <th>Crime Ref</th>
                         <th>Suspected Fraud</th>
                         <th>Notes</th>
                     </tr>
@@ -126,6 +127,9 @@
                         <td>{{ claim.number }}</td>
                         <td>{{ claim.type }}</td>
                         <td>{{ claim.status }}</td>
+                        <td class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
+                          {{ claim.crimeRef }}
+                        </td>
                         <td>{{ claim.suspectedFraud }}</td>
                         <td>{{ claim.notes }}</td>
                     </tr>

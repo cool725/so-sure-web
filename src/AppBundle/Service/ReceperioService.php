@@ -15,6 +15,7 @@ class ReceperioService extends BaseImeiService
     const DUEDILIGENCE_CACHE_TIME = 84600;
     const MAKEMODEL_CACHE_TIME = 84600;
     const CLAIMSCHECK_CACHE_TIME = 84600;
+    const FORCES_CACHE_TIME = 84600;
     const TEST_INVALID_IMEI = "352000067704506";
     const PARTNER_ID = 415;
     const BASE_URL = "http://gapi.checkmend.com";
@@ -369,22 +370,93 @@ class ReceperioService extends BaseImeiService
         return true;
     }
 
-    protected function send($url, $data)
+    /**
+     * Get a list of all uk police forces
+     *
+     * @return array
+     */
+    public function getForces()
+    {
+        try {
+            $key = sprintf("receperio:forces");
+            if (($redisData = $this->redis->get($key)) != null) {
+                $data = unserialize($redisData);
+                $this->logger->debug(sprintf("Cached Claimscheck Forces"));
+            } else {
+                $response = $this->send("/claimscheck/forces");
+                $this->logger->debug(sprintf("Get Claimscheck Forces"));
+
+                $data = json_decode($response, true);
+                $forces = [];
+                foreach ($data['forces'] as $force) {
+                    $forces[$force['force']] = $force['forcename'];
+                }
+                $data = $forces;
+
+                $this->redis->setex($key, self::FORCES_CACHE_TIME, serialize($data));
+            }
+
+            return $data;
+        } catch (\Exception $e) {
+            $this->logger->error('Unable to query claimscheck forces', ['exception' => $e]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @param string $force    Force value (see getForces)
+     * @param string $crimeRef Crime Reference
+     *
+     * @return boolean
+     */
+    public function validateCrimeRef($force, $crimeRef)
+    {
+        try {
+            $response = $this->send("/claimscheck/validatecrimeref", [
+                'crimereference' => $crimeRef,
+                'storeid' => $this->storeId,
+                'force' => $force,
+            ]);
+            $this->logger->info(sprintf("ValidateCrimeRef (%s %s) -> %s", $force, $crimeRef, $response));
+
+            $data = json_decode($response, true);
+            $this->responseData = $data;
+
+            return filter_var($data['matchesforce'], FILTER_VALIDATE_BOOLEAN);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf("Error in ValidateCrimeRef (%s %s)", $force, $crimeRef),
+                ['exception' => $e]
+            );
+
+            throw $e;
+        }
+    }
+
+    protected function send($url, $data = null)
     {
         try {
             $body = json_encode($data);
             $client = new Client();
             $url = sprintf("%s%s", self::BASE_URL, $url);
-            $res = $client->request('POST', $url, [
-                'json' => $data,
-                'auth' => [self::PARTNER_ID, $this->sign($body)],
-                'headers' => ['Accept' => 'application/json'],
-            ]);
+            if ($data) {
+                $res = $client->request('POST', $url, [
+                    'json' => $data,
+                    'auth' => [self::PARTNER_ID, $this->sign($body)],
+                    'headers' => ['Accept' => 'application/json'],
+                ]);
+            } else {
+                $res = $client->request('GET', $url, [
+                    'auth' => [self::PARTNER_ID, $this->sign('')],
+                    'headers' => ['Accept' => 'application/json'],                    
+                ]);
+            }
             $body = (string) $res->getBody();
 
             return $body;
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Error in checkImei: %s', $e->getMessage()));
+            $this->logger->error(sprintf('Error in receperio request: %s', $url), ['exception' => $e]);
         }
     }
     

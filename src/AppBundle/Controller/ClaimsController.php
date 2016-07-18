@@ -109,6 +109,7 @@ class ClaimsController extends BaseController
      */
     public function claimsPolicyAction(Request $request, $id)
     {
+        $imeiService = $this->get('app.imei');
         $fraudService = $this->get('app.fraud');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
@@ -129,6 +130,17 @@ class ClaimsController extends BaseController
                 $formClaim->handleRequest($request);
                 if ($formClaim->isValid()) {
                     $claim->setHandler($this->getUser());
+                    if (strlen($claim->getCrimeRef()) > 0) {
+                        $validCrimeRef = $imeiService->validateCrimeRef($claim->getForce(), $claim->getCrimeRef());
+                        $claim->setValidCrimeRef($validCrimeRef);
+                        if (!$validCrimeRef) {
+                            $this->addFlash('error', sprintf(
+                                'CrimeRef %s is not valid. %s',
+                                $claim->getCrimeRef(),
+                                json_encode($imeiService->getResponseData())
+                            ));
+                        }
+                    }
                     $claimsService = $this->get('app.claims');
                     $claimsService->addClaim($policy, $claim);
                     $this->addFlash('success', sprintf('Claim %s is added', $claim->getNumber()));
@@ -138,7 +150,6 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('claimscheck')) {
                 $formClaimsCheck->handleRequest($request);
                 if ($formClaimsCheck->isValid()) {
-                    $imeiService = $this->get('app.imei');
                     $type = $formClaimsCheck->get('type')->getData();
                     $result = $imeiService->policyClaim($policy, $type);
                     $this->addFlash('success', sprintf(

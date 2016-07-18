@@ -51,7 +51,7 @@ class ClaimsService
 
         $this->processClaim($claim);
     }
-
+    
     public function processClaim(Claim $claim)
     {
         if ($claim->getProcessed()) {

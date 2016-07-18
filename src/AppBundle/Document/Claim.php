@@ -190,6 +190,24 @@ class Claim
      */
     protected $incurred;
 
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $force;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $crimeRef;
+
+    /**
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $validCrimeRef;
+
     public function __construct()
     {
         $this->recordedDate = new \DateTime();
@@ -511,6 +529,36 @@ class Claim
     public function setProcessed($processed)
     {
         $this->processed = $processed;
+    }
+
+    public function getForce()
+    {
+        return $this->force;
+    }
+
+    public function setForce($force)
+    {
+        $this->force = $force;
+    }
+
+    public function getCrimeRef()
+    {
+        return $this->crimeRef;
+    }
+
+    public function setCrimeRef($crimeRef)
+    {
+        $this->crimeRef = $crimeRef;
+    }
+
+    public function isValidCrimeRef()
+    {
+        return $this->validCrimeRef;
+    }
+
+    public function setValidCrimeRef($validCrimeRef)
+    {
+        $this->validCrimeRef = $validCrimeRef;
     }
 
     public function isMonetaryClaim($includeOpen = false)
