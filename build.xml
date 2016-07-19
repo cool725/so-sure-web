@@ -444,9 +444,6 @@
     <target name="build:prepare" description="Create build directories.">
         <echo msg="Creating build directories ..." />
         <mkdir dir="${dir.build}" />
-        <mkdir dir="${dir.docs}" />
-        <mkdir dir="${dir.docs.phpdoc}" />
-        <mkdir dir="${dir.docs.phpdoc2}" />
         <mkdir dir="${dir.reports}" />
         <mkdir dir="${dir.reports.coverage}" />
         <mkdir dir="${dir.reports.pdepend}" />
@@ -987,7 +984,7 @@
         </phpcodesniffer>
     </target>
 
-    <target name="force:cs" description="Forces coding standard.">
+    <target name="force:cs" depends="build:clean,build:prepare" description="Forces coding standard.">
         <property name="force.cs.fileset" value="sourcecodesniffer" />
         <property name="force.cs.noop-fileset" value="noop-sourcecodesniffer" />
         <phingcall target="force:cs:run" />
@@ -1003,17 +1000,27 @@
         <phpcodesniffer standard="standard-psr2.xml"
                         showSniffs="true"
                         showWarnings="true"
-                        haltonwarning="true"
-                        haltonerror="true">
+                        haltonwarning="false"
+                        haltonerror="false">
             <fileset refid="${force.cs.fileset}" />
-            <formatter type="full" outfile="/dev/stdout"/>
+            <formatter type="full" outfile="${dir.reports}/psr2.log" />
         </phpcodesniffer>
+
+        <loadfile property="log_psr2" file="${dir.reports}/psr2.log"/>
+        <if>
+            <not>
+                <equals arg1="${log_psr2}" arg2="" trim="true" />
+            </not>
+            <then>
+                <fail message="PSR2 Sniff Failure ${log_psr2}" />
+            </then>
+        </if>
 
         <phpcodesniffer standard="standard-generic.xml"
                         showSniffs="true"
                         showWarnings="true"
-                        haltonwarning="true"
-                        haltonerror="true">
+                        haltonwarning="false"
+                        haltonerror="false">
             <!--
                 The primary purpose of this check is the VariableAnalysis sniff.
                 As we're already doing that sniff, we might as well do another few sniffs,
@@ -1021,8 +1028,17 @@
                 in the noop-sourcecodesniffer.
             -->
             <fileset refid="${force.cs.noop-fileset}" />
-            <formatter type="full" outfile="/dev/stdout"/>
+            <formatter type="full" outfile="${dir.reports}/generic.log" />
         </phpcodesniffer>
+        <loadfile property="log_generic" file="${dir.reports}/generic.log"/>
+        <if>
+            <not>
+                <equals arg1="${log_generic}" arg2="" trim="true" />
+            </not>
+            <then>
+                <fail message="Generic Sniff failure ${log_generic}" />
+            </then>
+        </if>
     </target>
 
     <!-- copy/paste detector -->
