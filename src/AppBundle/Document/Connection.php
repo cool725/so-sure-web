@@ -86,6 +86,11 @@ class Connection
         return $this->id;
     }
 
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
     public function getLinkedUser()
     {
         return $this->linkedUser;
@@ -216,6 +221,7 @@ class Connection
             'name' => $this->getLinkedUser() ? $this->getLinkedUser()->getName() : null,
             'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ATOM) : null,
             'claim_dates' => $claimDates,
+            'id' => $this->getId(),
         ];
     }
 }
