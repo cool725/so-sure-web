@@ -9,7 +9,11 @@
         {% include '::header.html.twig' %}
 
         {% block stylesheets %}
-            {% stylesheets output = 'css/*' '../app/Resources/public/css/bootstrap.min.css' '../app/Resources/public/css/all.css' '../app/Resources/public/css/footer.css' %}
+            {% stylesheets output = 'css/*'
+            '../app/Resources/public/css/bootstrap.min.css'
+            '../app/Resources/public/css/all.css'
+            '../app/Resources/public/css/footer.css'
+            %}
             <link rel="stylesheet" href="{{ asset_url }}">
             {% endstylesheets %}
         {% endblock %}
@@ -20,7 +24,8 @@
             dataLayer = [{
                 'branch': {
                     'banner': {% if app.user is null or not app.user %}true{% else %}false{% endif %},
-                    'referral': '{% if app is not null and app.session.isStarted %}{{ app.session.get('referral') }}{% endif %}'
+                    'referral': '{% if app is not null and app.session.isStarted %}{{ app.session.get('referral') }}{% endif %}',
+                    'scode': '{% if app is not null and app.session.isStarted %}{{ app.session.get('scode') }}{% endif %}'
                 }
             }];
         </script>

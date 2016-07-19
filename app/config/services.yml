@@ -234,6 +234,7 @@ services:
             snappy_pdf:  "@knp_snappy.pdf"
             dispatcher:  "@event_dispatcher"
             s3:          "@aws.s3"
+            shortLink:   "@app.shortlink"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService

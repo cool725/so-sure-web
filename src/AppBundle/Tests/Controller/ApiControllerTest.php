@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\SCode;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -910,6 +911,54 @@ class ApiControllerTest extends BaseControllerTest
         ));
         $data = $this->verifyResponse(200);
         $this->assertEquals($normalizedMobile, $data['mobile_number']);
+    }
+
+    public function testUserCreateSCode()
+    {
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $scode = new SCode();
+        $dm->persist($scode);
+        $dm->flush();
+
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $birthday = new \DateTime('1980-01-01');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => 'api-new-user-scode@api.bar.com',
+            'birthday' => $birthday->format(\DateTime::ATOM),
+            'first_name' => 'foo',
+            'last_name' => 'bar',
+            'scode' => $scode->getCode(),
+        ));
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('api-new-user-scode@api.bar.com', $data['email']);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->findOneBy(['email' => 'api-new-user-scode@api.bar.com']);
+        $this->assertTrue($user !== null);
+        $this->assertEquals($scode->getId(), $user->getAcceptedSCode()->getId());
+    }
+
+    public function testUserCreateInactiveSCode()
+    {
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $scode = new SCode();
+        $scode->setActive(false);
+        $dm->persist($scode);
+        $dm->flush();
+
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $birthday = new \DateTime('1980-01-01');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => 'api-new-user-inactive-scode@api.bar.com',
+            'birthday' => $birthday->format(\DateTime::ATOM),
+            'first_name' => 'foo',
+            'last_name' => 'bar',
+            'scode' => $scode->getCode(),
+        ));
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
     // version

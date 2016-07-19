@@ -14,6 +14,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Sns;
+use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
@@ -575,6 +576,14 @@ class ApiController extends BaseController
             }
             $user->setBirthday($birthday);
             $user->setIdentityLog($this->getIdentityLog($request));
+            if (isset($data['scode']) && strlen($data['scode']) > 0) {
+                $scodeRepo = $dm->getRepository(SCode::class);
+                $scode = $scodeRepo->findOneBy(['code' => $data['scode']]);
+                if (!$scode || !$scode->isActive()) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'SCode missing', 404);
+                }
+                $scode->addAcceptor($user);
+            }
 
             $validator = $this->get('validator');
             $errors = $validator->validate($user);

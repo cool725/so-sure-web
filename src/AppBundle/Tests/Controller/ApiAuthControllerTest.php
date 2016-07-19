@@ -9,6 +9,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\SCode;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -1495,6 +1496,209 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_CONNECTED);
     }
 
+    // policy/{id}/scode
+
+    /**
+     *
+     */
+    public function testCreatePolicySCode()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-scode', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $this->payPolicy($user, $policyId);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = $policyRepo->find($policyId);
+        $oldCode = $policy->getStandardSCode()->getCode();
+        $policy->getStandardSCode()->setActive(false);
+        $dm->flush();
+
+        $url = sprintf('/api/v1/auth/policy/%s/scode', $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['type' => SCode::TYPE_STANDARD]);
+        $getData = $this->verifyResponse(200);
+        $this->assertEquals(8, strlen($getData['code']));
+        $this->assertEquals(SCode::TYPE_STANDARD, $getData['type']);
+        $this->assertNotEquals($oldCode, $getData['code']);
+    }
+
+    public function testCreatePolicySCodeNoType()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-scode-notype', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $this->payPolicy($user, $policyId);
+
+        $url = sprintf('/api/v1/auth/policy/%s/scode', $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testCreatePolicySCodeDuplicate()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-scode-duptype', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $this->payPolicy($user, $policyId);
+
+        $url = sprintf('/api/v1/auth/policy/%s/scode', $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['type' => SCode::TYPE_STANDARD]);
+        $getData = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    // GET policy/{id}/scode/{id}
+
+    /**
+     *
+     */
+    public function testGetPolicySCode()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-get-scode', $this),
+            'foo',
+            self::getRandomPhone(static::$dm)
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $this->payPolicy($user, $policyId);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = $policyRepo->find($policyId);
+        $sCode = $policy->getStandardSCode();
+
+        $url = sprintf('/api/v1/auth/policy/%s/scode/%s?_method=GET', $policyId, $sCode->getCode());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(200);
+        $this->assertEquals(8, strlen($getData['code']));
+        $this->assertEquals(SCode::TYPE_STANDARD, $getData['type']);
+        $this->assertEquals($user->getName(), $getData['sharer_name']);
+        $this->assertEquals(true, $getData['active']);
+
+        $shareUrl = self::$router->generate('scode', ['code' => $sCode->getCode()]);
+        $this->assertTrue(stripos($getData["share_link"], $shareUrl) >= 0);
+        $this->assertTrue(stripos($getData["share_link"], 'http') >= 0);
+    }
+
+    public function testGetPolicyInactiveSCode()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-get-policy-inactive-scode', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $this->payPolicy($user, $policyId);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = $policyRepo->find($policyId);
+        $sCode = $policy->getStandardSCode();
+
+        $sCode->setActive(false);
+        $dm->flush();
+
+        $url = sprintf('/api/v1/auth/policy/%s/scode/%s?_method=GET', $policyId, $sCode->getCode());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertNull($data['share_link']);
+    }
+
+    // DELETE policy/{id}/scode/{id}
+
+    /**
+     *
+     */
+    public function testDeletePolicySCode()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-del-scode', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $this->payPolicy($user, $policyId);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = $policyRepo->find($policyId);
+        $sCode = $policy->getStandardSCode()->getCode();
+
+        $url = sprintf('/api/v1/auth/policy/%s/scode/%s?_method=DELETE', $policyId, $sCode);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = $policyRepo->find($policyId);
+        $this->assertNull($policy->getStandardSCode());
+    }
+
+    public function testDeletePolicyInactiveSCode()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-delete-policy-inactive-scode', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $this->payPolicy($user, $policyId);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = $policyRepo->find($policyId);
+        $sCode = $policy->getStandardSCode();
+
+        $sCode->setActive(false);
+        $dm->flush();
+
+        $url = sprintf('/api/v1/auth/policy/%s/scode/%s?_method=DELETE', $policyId, $sCode->getCode());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
     // policy/{id}/terms
 
     /**
@@ -1735,6 +1939,46 @@ class ApiAuthControllerTest extends BaseControllerTest
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_TOO_YOUNG);
+    }
+
+    public function testUpdateUserSCode()
+    {
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $scode = new SCode();
+        $dm->persist($scode);
+        $dm->flush();
+
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $birthday = new \DateTime('1980-01-01');
+        $data = [
+            'scode' => $scode->getCode(),
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->find($result['id']);
+        $this->assertEquals($scode->getId(), $user->getAcceptedSCode()->getId());
+    }
+
+    public function testUpdateUserInactiveSCode()
+    {
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $scode = new SCode();
+        $scode->setActive(false);
+        $dm->persist($scode);
+        $dm->flush();
+
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $birthday = new \DateTime('1980-01-01');
+        $data = [
+            'scode' => $scode->getCode(),
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
     // user/{id}/address

@@ -160,6 +160,12 @@ class User extends BaseUser
      */
     protected $birthday;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="SCode")
+     * @Gedmo\Versioned
+     */
+    protected $acceptedSCode;
+
     public function __construct()
     {
         parent::__construct();
@@ -516,6 +522,16 @@ class User extends BaseUser
     public function setBirthday($birthday)
     {
         $this->birthday = $birthday;
+    }
+
+    public function getAcceptedSCode()
+    {
+        return $this->acceptedSCode;
+    }
+
+    public function setAcceptedSCode(SCode $scode)
+    {
+        $this->acceptedSCode = $scode;
     }
 
     public function hasSoSureEmail()
