@@ -40,4 +40,18 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(5, $connection->getPromoValue());
         $this->assertEquals(15, $connection->getTotalValue());
     }
+
+    public function testConnectionApi()
+    {
+        $connection = new Connection();
+        $api = $connection->toApiArray([]);
+        $this->assertNull($api['name']);
+        $this->assertEquals($connection->getDate()->format(\DateTime::ATOM), $api['date']);
+        $this->assertNull($api['id']);
+        $this->assertEquals(0, count($api['claim_dates']));
+
+        $connection->setId('34243242');
+        $api = $connection->toApiArray([]);
+        $this->assertEquals('34243242', $api['id']);
+    }
 }
