@@ -27,6 +27,8 @@ function roundToTwo(num) {
 }
 
 var connectionsDoughnutChart = new Chart(ctx).Doughnut(data, {
+    // Hack to remove tooltips until resolved as displaying incorrect values
+    tooltipTemplate: " ",
     // Removing ToolTip until they can be fixed - see https://github.com/so-sure/product-backlog/issues/241
     // tooltipTemplate: "<%if (label){%><%=label%>: <%}%>£" +
     //                  "<% if (label && label.indexOf('Pot ') > -1) { " +
