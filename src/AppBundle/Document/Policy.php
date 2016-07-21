@@ -44,10 +44,11 @@ abstract class Policy
     const CANCELLED_COOLOFF = 'cooloff';
     const CANCELLED_BADRISK = 'badrisk';
 
+    const PLAN_MONTHLY = 'monthly';
+    const PLAN_YEARLY = 'yearly';
+
     // First 1000 policies
     const PROMO_LAUNCH = 'launch';
-
-    const PAYMENT_DD_MONTHLY = 'gocardless_monthly';
 
     public static $riskLevels = [
         self::RISK_CONNECTED_POT_ZERO => self::RISK_LEVEL_HIGH,
@@ -182,6 +183,12 @@ abstract class Policy
      * @Gedmo\Versioned
      */
     protected $promoCode;
+
+    /**
+     * @MongoDB\Field(type="integer")
+     * @Gedmo\Versioned
+     */
+    protected $premiumInstallments;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Premium")
@@ -591,6 +598,16 @@ abstract class Policy
         $this->lastEmailed = $lastEmailed;
     }
 
+    public function getPremiumInstallments()
+    {
+        return $this->premiumInstallments;
+    }
+
+    public function setPremiumInstallments($premiumInstallments)
+    {
+        $this->premiumInstallments = $premiumInstallments;
+    }
+
     public function getSCodes()
     {
         return $this->scodes;
@@ -683,40 +700,40 @@ abstract class Policy
         return (int) ceil($months);
     }
 
-    public function getNumberOfInstallments()
+    public function getPremiumInstallmentCount()
     {
         if (!$this->isPolicy() || count($this->getPayments()) == 0) {
             return null;
         }
 
-        $count = 1;
-        foreach ($this->getScheduledPayments() as $scheduledPayment) {
-            if ($scheduledPayment->getType() == ScheduledPayment::TYPE_SCHEDULED) {
-                $count++;
-            }
-        }
-
-        if ($count > 12) {
-            throw new \Exception(sprintf('Policy %s has too many installment payments', $this->getId()));
-        }
-
-        return $count;
+        return $this->getPremiumInstallments();
     }
 
-    public function getInstallmentAmount()
+    public function getPremiumInstallmentPrice()
     {
         if (!$this->isPolicy() || count($this->getPayments()) == 0) {
             return null;
         }
 
-        if (!$this->getNumberOfInstallments()) {
+        if (!$this->getPremiumInstallmentCount()) {
             return null;
-        } elseif ($this->getNumberOfInstallments() == 1) {
+        } elseif ($this->getPremiumInstallmentCount() == 1) {
             return $this->getPremium()->getYearlyPremiumPrice();
-        } elseif ($this->getNumberOfInstallments() == 12) {
+        } elseif ($this->getPremiumInstallmentCount() == 12) {
             return $this->getPremium()->getMonthlyPremiumPrice();
         } else {
-            throw new \Exception(sprintf('Policy %s does not have correct installment amout', $this->getId()));
+            throw new \Exception(sprintf('Policy %s does not have correct installment amount', $this->getId()));
+        }
+    }
+
+    private function getPremiumPlan()
+    {
+        if ($this->getPremiumInstallments() == 1) {
+            return self::PLAN_YEARLY;
+        } elseif ($this->getPremiumInstallments() == 12) {
+            return self::PLAN_MONTHLY;
+        } else {
+            return null;
         }
     }
 
@@ -1353,6 +1370,9 @@ abstract class Policy
             'has_network_claim' => $this->hasNetworkClaim(true),
             'claim_dates' => $this->eachApiMethod($this->getMonetaryClaimed(), 'getClosedDate'),
             'share_link' => $this->getShareLink(),
+            'yearly_premium' => $this->getPremium()->getYearlyPremiumPrice(),
+            'premium' => $this->getPremiumInstallmentPrice(),
+            'premium_plan' => $this->getPremiumPlan(),
         ];
     }
 }

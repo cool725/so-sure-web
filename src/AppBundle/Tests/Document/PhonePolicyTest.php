@@ -944,7 +944,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
 
-        $this->assertNull($policy->getNumberOfInstallments());
+        $this->assertNull($policy->getPremiumInstallmentCount());
     }
 
     public function testNumberOfInstallmentsNoPayments()
@@ -958,7 +958,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
-        $this->assertNull($policy->getNumberOfInstallments());
+        $this->assertNull($policy->getPremiumInstallmentCount());
     }
 
     public function testNumberOfInstallmentsNoScheduled()
@@ -977,8 +977,10 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
+        // not using policy service here, so simulate what's done there
+        $policy->setPremiumInstallments(1);
 
-        $this->assertEquals(1, $policy->getNumberOfInstallments());
+        $this->assertEquals(1, $policy->getPremiumInstallmentCount());
     }
 
     public function testNumberOfInstallments11Scheduled()
@@ -997,12 +999,14 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
+        // not using policy service here, so simulate what's done there
+        $policy->setPremiumInstallments(12);
 
         for ($i = 0; $i < 11; $i++) {
             $policy->addScheduledPayment(new ScheduledPayment());
         }
 
-        $this->assertEquals(12, $policy->getNumberOfInstallments());
+        $this->assertEquals(12, $policy->getPremiumInstallmentCount());
     }
 
     public function testNumberOfInstallments11ScheduledWithRescheduled()
@@ -1021,6 +1025,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
+        // not using policy service here, so simulate what's done there
+        $policy->setPremiumInstallments(12);
 
         for ($i = 0; $i < 11; $i++) {
             $scheduledPayment = new ScheduledPayment();
@@ -1028,7 +1034,7 @@ class PhonePolicyTest extends WebTestCase
             $policy->addScheduledPayment($scheduledPayment->reschedule());
         }
 
-        $this->assertEquals(12, $policy->getNumberOfInstallments());
+        $this->assertEquals(12, $policy->getPremiumInstallmentCount());
         $this->assertEquals(22, count($policy->getScheduledPayments()));
     }
 
@@ -1048,6 +1054,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
+        // not using policy service here, so simulate what's done there
+        $policy->setPremiumInstallments(12);
 
         for ($i = 0; $i < 11; $i++) {
             $scheduledPayment = new ScheduledPayment();
@@ -1055,7 +1063,7 @@ class PhonePolicyTest extends WebTestCase
             $policy->addScheduledPayment($scheduledPayment->reschedule());
         }
 
-        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getInstallmentAmount());
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getPremiumInstallmentPrice());
     }
 
     public function testGetInstallmentAmountYearly()
@@ -1074,13 +1082,15 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
+        // not using policy service here, so simulate what's done there
+        $policy->setPremiumInstallments(1);
 
         for ($i = 0; $i < 11; $i++) {
             $scheduledPayment = new ScheduledPayment();
             $policy->addScheduledPayment($scheduledPayment->reschedule());
         }
 
-        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getInstallmentAmount());
+        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getPremiumInstallmentPrice());
     }
 
     public function testGetBrokerFeePaidNotPolicy()
