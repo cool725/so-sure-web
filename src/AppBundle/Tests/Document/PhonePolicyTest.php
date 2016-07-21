@@ -978,7 +978,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
-        $policy->setPolicyInstallments(1);
+        $policy->setPremiumInstallments(1);
 
         $this->assertEquals(1, $policy->getPremiumInstallmentCount());
     }
@@ -1000,7 +1000,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
-        $policy->setPolicyInstallments(12);
+        $policy->setPremiumInstallments(12);
 
         for ($i = 0; $i < 11; $i++) {
             $policy->addScheduledPayment(new ScheduledPayment());
@@ -1026,7 +1026,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
-        $policy->setPolicyInstallments(12);
+        $policy->setPremiumInstallments(12);
 
         for ($i = 0; $i < 11; $i++) {
             $scheduledPayment = new ScheduledPayment();
@@ -1055,7 +1055,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
-        $policy->setPolicyInstallments(12);
+        $policy->setPremiumInstallments(12);
 
         for ($i = 0; $i < 11; $i++) {
             $scheduledPayment = new ScheduledPayment();
@@ -1083,7 +1083,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
-        $policy->setPolicyInstallments(1);
+        $policy->setPremiumInstallments(1);
 
         for ($i = 0; $i < 11; $i++) {
             $scheduledPayment = new ScheduledPayment();
