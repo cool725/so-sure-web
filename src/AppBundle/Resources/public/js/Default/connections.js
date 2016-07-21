@@ -11,14 +11,14 @@ var data = [
         color:"#3399FF",
         highlight: "#3399FF",
         // If changing text, verify tooltipTemplate isn't affected
-        label: "You get back"
+        label: "Value of Your Reward Pot"
     },
     {
         value: max_value - initial_value,
         color:"#202532",
         highlight: "#6F6F6F",
         // If changing text, verify tooltipTemplate isn't affected
-        label: "You could still get back"
+        label: "Remaining Reward Pot Value"
     },
 ]
 
@@ -27,16 +27,17 @@ function roundToTwo(num) {
 }
 
 var connectionsDoughnutChart = new Chart(ctx).Doughnut(data, {
-    tooltipTemplate: "<%if (label){%><%=label%>: <%}%>£" +
-                     "<% if (label && label.indexOf('Pot ') > -1) { " +
-                         "if (value * " + connection_value + " > " + maxpot_value + "){%>" +
-                             maxpot_value +
-                          "<%} else {%>" +
-                             "<%= value * " + connection_value + " %>" +
-                          "<% }" +
-                     "} else { %>" +
-                         "<%= roundToTwo(" + adjusted_potential_value + " + value * " + connection_value + " ) %>" +
-                     "<% }%>",
+    // Removing ToolTip until they can be fixed - see https://github.com/so-sure/product-backlog/issues/241
+    // tooltipTemplate: "<%if (label){%><%=label%>: <%}%>£" +
+    //                  "<% if (label && label.indexOf('Pot ') > -1) { " +
+    //                      "if (value * " + connection_value + " > " + maxpot_value + "){%>" +
+    //                          maxpot_value +
+    //                       "<%} else {%>" +
+    //                          "<%= value * " + connection_value + " %>" +
+    //                       "<% }" +
+    //                  "} else { %>" +
+    //                      "<%= roundToTwo(" + adjusted_potential_value + " + value * " + connection_value + " ) %>" +
+    //                  "<% }%>",
     legendTemplate : '<ul>'
                   +'<% for (var i=0; i<data.length; i++) { %>'
                     +'<li>'
