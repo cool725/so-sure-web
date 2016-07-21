@@ -102,7 +102,7 @@ class SalvaExportService
     public function transformPolicy(PhonePolicy $policy = null, $version = null)
     {
         if ($policy) {
-            if (!$policy->getNumberOfInstallments()) {
+            if (!$policy->getPremiumInstallmentCount()) {
                 throw new \Exception('Invalid policy payment');
             }
             if ($version) {
@@ -151,8 +151,8 @@ class SalvaExportService
                 $policy->getPhone()->getMemory(),
                 $policy->getImei(),
                 $policy->getPhone()->getInitialPrice(),
-                $policy->getNumberOfInstallments(),
-                $policy->getInstallmentAmount(),
+                $policy->getPremiumInstallmentCount(),
+                $policy->getPremiumInstallmentPrice(),
                 $totalPremium,
                 $premiumPaid,
                 $totalIpt,
@@ -739,7 +739,7 @@ class SalvaExportService
         ));
         $policy->appendChild($dom->createElement(
             'ns2:paymentsPerYearCode',
-            $phonePolicy->getNumberOfInstallments()
+            $phonePolicy->getPremiumInstallmentCount()
         ));
         $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
         $policy->appendChild($dom->createElement('ns2:deliveryModeCode', 'undefined'));

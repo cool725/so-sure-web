@@ -269,8 +269,10 @@ class PolicyService
             }
 
             if ($paymentItem->getAmount() == $policy->getPremium()->getYearlyPremiumPrice()) {
+                $policy->setPremiumInstallments(1);
                 return;
             } elseif ($paymentItem->getAmount() == $policy->getPremium()->getMonthlyPremiumPrice()) {
+                $policy->setPremiumInstallments(12);
                 for ($i = 1; $i <= 11; $i++) {
                     $scheduledDate = clone $date;
                     $scheduledDate->add(new \DateInterval(sprintf('P%dM', $i)));
