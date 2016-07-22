@@ -9,10 +9,21 @@ class Rollbar extends \RollbarNotifier
         $this->checkIgnore = (function ($isUncaught, $exception, $payload) {
             if ($exception instanceof \RollbarException) {
                 $source = $exception->getException();
-                return $source instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException ||
-                    $source instanceof \Symfony\Component\Routing\Exception\ResourceNotFoundException;
+                // Don't sent 404's
+                // Verify: GET -UsEd https://wearesosure.com/not-found
+                if ($source instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException ||
+                    $source instanceof \Symfony\Component\Routing\Exception\ResourceNotFoundException) {
+                    return true;
+                }
+
+                // Don't sent Untrusted Host
+                // Verify: GET -UsEd -H "HOST: 52.19.177.49" https://wearesosure.com
+                if ($source instanceof \UnexpectedValueException &&
+                    stripos($source->getMessage(), "Untrusted Host") !== false) {
+                    return true;
+                }
             }
-    
+
             return false;
         });
     }
