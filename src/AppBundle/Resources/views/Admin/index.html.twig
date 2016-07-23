@@ -1,15 +1,24 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px"  >
+    {% set style = "text-align: center; height: 100px; margin-bottom: 20px; padding-top: 30px; font-size: 24px; vertical-align: middle; border-radius: 5px; border: solid 1px;" %}
+<div class="container" style="margin-bottom: 50px; margin-top: 70px;"  >
     <div class="row-fluid">
-        <ul style="list-style: none">
-            <li><h2><a href="{{ path('admin_users') }}">Users</a></h2></li>
-            <li><h2><a href="{{ path('admin_phones') }}">Phones</a></h2></li>
-            <li><h2><a href="{{ path('admin_claims') }}">Claims</a></h2></li>
-            <li><h2><a href="{{ path('admin_accounts') }}">Accounts</a></h2></li>
-            <li><h2><a href="{{ path('admin_banking') }}">Banking</a></h2></li>
-        </ul>
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('admin_users') }}"><i class="fa fa-user fa-large"></i> Users</a>
+        </div>
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('admin_phones') }}"><i class="fa fa-mobile fa-large"></i> Phones</a>
+        </div>
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('admin_claims') }}"><i class="fa fa-exchange fa-large"></i> Claims</a>
+        </div>
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('admin_accounts') }}"><i class="fa fa-users fa-large"></i> Accounts</a>
+        </div>
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('admin_banking') }}"><i class="fa fa-bank fa-large"></i> Banking</a>
+        </div>
     </div>
 </div>
 {% endblock %}
