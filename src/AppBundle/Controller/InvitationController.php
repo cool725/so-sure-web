@@ -82,6 +82,10 @@ class InvitationController extends BaseController
             if ($form->isSubmitted() && $form->isValid()) {
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
+                $this->addFlash(
+                    'error',
+                    'You have declined this invitation.'
+                );
 
                 return $this->redirectToRoute('invitation', ['id' => $id]);
             }
