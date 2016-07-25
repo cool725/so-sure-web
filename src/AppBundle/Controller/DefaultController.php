@@ -12,7 +12,9 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhoneTrait;
 use AppBundle\Form\Type\PhoneType;
+use AppBundle\Form\Type\SmsAppLinkType;
 use AppBundle\Document\PolicyTerms;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,6 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends BaseController
 {
+    use PhoneTrait;
+
     /**
      * @Route("/", name="homepage")
      * @Template
@@ -160,6 +164,47 @@ class DefaultController extends BaseController
             $session->set('quote', $policy->getPhone()->getId());
 
             return $this->redirectToRoute('purchase');
+        }
+
+        return array(
+            'form' => $form->createView(),
+        );
+    }
+
+    /**
+     * @Route("/text-me-the-app", name="sms_app_link")
+     * @Template
+     */
+    public function smsAppLinkAction(Request $request)
+    {
+        $form = $this->createForm(SmsAppLinkType::class);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $mobileNumber = $form->get('mobileNumber')->getData();
+            $ukMobileNumber = $this->normalizeUkMobile($mobileNumber);
+            if (stripos($ukMobileNumber, '+44') === 0) {
+                $sms = $this->get('app.sms');
+                $link = sprintf(
+                    'Welcome to the social insurance revolution! Download so-sure at %s',
+                    $this->getParameter('branch_pot_url')
+                );
+                if ($sms->send($ukMobileNumber, $link)) {
+                    $this->addFlash('success', sprintf(
+                        'You should receive a download link shortly',
+                        $ukMobileNumber
+                    ));
+                } else {
+                    $this->addFlash('error', sprintf(
+                        'Sorry, we had a problem sending a link to %s',
+                        $mobileNumber
+                    ));                    
+                }
+            } else {
+                $this->addFlash('error', sprintf(
+                    '%s does not appear to be a valid UK Mobile Number',
+                    $mobileNumber
+                ));
+            }
         }
 
         return array(
