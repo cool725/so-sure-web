@@ -183,6 +183,7 @@ services:
             logger:            "@logger"
             router:            "@router"
             redis:             "@snc_redis.default"
+            environment:       "%kernel.environment%"
             branchKey:         "%branch_key%"
             googleAppDownload: "%google_app_download%"
             appleAppDownload": "%apple_app_download%"

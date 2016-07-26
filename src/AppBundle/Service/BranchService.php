@@ -17,6 +17,9 @@ class BranchService
     protected $redis;
 
     /** @var string */
+    protected $environment;
+
+    /** @var string */
     protected $branchKey;
 
     /** @var string */
@@ -29,6 +32,7 @@ class BranchService
      * @param LoggerInterface $logger
      * @param                 $router
      * @param                 $redis
+     * @param                 $environment
      * @param                 $branchKey
      * @param                 $googleAppDownload
      * @param                 $appleAppDownload
@@ -37,6 +41,7 @@ class BranchService
         LoggerInterface $logger,
         $router,
         $redis,
+        $environment,
         $branchKey,
         $googleAppDownload,
         $appleAppDownload
@@ -44,6 +49,7 @@ class BranchService
         $this->logger = $logger;
         $this->router = $router;
         $this->redis = $redis;
+        $this->environment = $environment;
         $this->branchKey = $branchKey;
         $this->googleAppDownload = $googleAppDownload;
         $this->appleAppDownload = $appleAppDownload;
@@ -51,7 +57,7 @@ class BranchService
 
     public function downloadAppleLink($source)
     {
-        if ($source) {
+        if ($source && $this->environment == 'prod') {
             return sprintf("%s&cs=%s", $this->appleAppDownload, $source);
         } else {
             return $this->appleAppDownload;
@@ -60,7 +66,7 @@ class BranchService
 
     public function downloadGoogleLink($source)
     {
-        if ($source) {
+        if ($source && $this->environment == 'prod') {
             return sprintf("%s&utm_source=%s", $this->googleAppDownload, $source);
         } else {
             return $this->googleAppDownload;
@@ -69,45 +75,40 @@ class BranchService
 
     public function googleLink($data, $marketing, $source)
     {
-        $marketing = array_merge($marketing, [
-           "sdk" => "api", 
-        ]);
         $data = array_merge($data, [
             '$desktop_url' => $this->downloadGoogleLink($source),
             '$android_url' => $this->downloadGoogleLink($source),
         ]);
-        $response = $this->send($data, $marketing);
 
-        return $response;
+        return $this->send($data, $this->marketing($marketing));
     }
 
     public function appleLink($data, $marketing, $source)
     {
-        $marketing = array_merge($marketing, [
-           "sdk" => "api", 
-        ]);
         $data = array_merge($data, [
             '$desktop_url' => $this->downloadAppleLink($source),
             '$ios_url' => $this->downloadAppleLink($source),
         ]);
-        $response = $this->send($data, $marketing);
 
-        return $response;
+        return $this->send($data, $this->marketing($marketing));
     }
 
     public function link($data, $marketing, $source)
     {
-        $marketing = array_merge($marketing, [
-           "sdk" => "api", 
-        ]);
         $data = array_merge($data, [
             //'$desktop_url' => $this->router->generate('', true),
             '$ios_url' => $this->appleLink($source),
             '$android_url' => $this->googleLink($source),
         ]);
-        $response = $this->send($data, $marketing);
 
-        return $response;
+        return $this->send($data, $this->marketing($marketing));
+    }
+
+    protected function marketing($marketing)
+    {
+        return array_merge($marketing, [
+           "sdk" => "api",
+        ]);
     }
 
     protected function send($data, $marketing)
