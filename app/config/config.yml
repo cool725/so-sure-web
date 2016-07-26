@@ -54,8 +54,6 @@ twig:
         branch_share_url: %branch_share_url%
         branch_policy_url: %branch_policy_url%
         expected_claim_frequency: %expected_claim_frequency%
-        google_app_download: 'https://play.google.com/store/apps/details?id=com.wearesosure&utm_medium=web&utm_content=android&utm_campaign=downloadapp'
-        apple_app_download: "https://click.google-analytics.com/redirect?tid=UA-73109263-3&url=https%%3A%%2F%%2Fitunes.apple.com%%2Fgb%%2Fapp%%2Fso-sure%%2Fid1094307449&aid=com.wearesosure&idfa=%%{idfa}&cm=web&cn=downloadapp&cc=ios"
 
 doctrine_mongodb:
     connections:

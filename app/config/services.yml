@@ -177,6 +177,27 @@ services:
             auth_token:     "%plivo_authtoken%"
             sending_number: "%plivo_sendingnumber%"
 
+    app.branch:
+        class: AppBundle\Service\BranchService
+        arguments:
+            logger:            "@logger"
+            router:            "@router"
+            redis:             "@snc_redis.default"
+            environment:       "%kernel.environment%"
+            branchKey:         "%branch_key%"
+            googleAppDownload: "%google_app_download%"
+            appleAppDownload": "%apple_app_download%"
+
+    app.twig.branch:
+        class: AppBundle\Service\BranchTwigExtension
+        arguments:
+            branch:       "@app.branch"
+            requestStack: "@request_stack"
+            logger:       "@logger"
+        public: false
+        tags:
+            - { name: twig.extension }
+
     app.excel:
         class: AppBundle\Service\ExcelService
         arguments:
