@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Psr\Log\LoggerInterface;
 
 class BranchTwigExtension extends \Twig_Extension
 {
@@ -11,16 +12,22 @@ class BranchTwigExtension extends \Twig_Extension
     /** @var RequestStack */
     protected $requestStack;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
-     * @param BranchService $branch
-     * @param RequestStack  $requestStack
+     * @param BranchService   $branch
+     * @param RequestStack    $requestStack
+     * @param LoggerInterface $logger
      */
     public function __construct(
         BranchService $branch,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        LoggerInterface $logger
     ) {
         $this->branch = $branch;
         $this->requestStack = $requestStack;
+        $this->logger = $logger;
     }
 
     public function getFunctions()
@@ -57,7 +64,11 @@ class BranchTwigExtension extends \Twig_Extension
     {
         if ($this->getSCode()) {
             $data['scode'] = $this->getSCode();
-            return $this->branch->appleLink($data, [], $source);
+            try {
+                return $this->branch->appleLink($data, [], $source);
+            } catch (\Exception $e) {
+                $this->logger->error('Failed generating apple scode link', ['exception' => $e]);
+            }
         }
 
         return $this->branch->downloadAppleLink($source);
@@ -67,7 +78,11 @@ class BranchTwigExtension extends \Twig_Extension
     {
         if ($this->getSCode()) {
             $data['scode'] = $this->getSCode();
-            return $this->branch->googleLink($data, [], $source);
+            try {
+                return $this->branch->googleLink($data, [], $source);
+            } catch (\Exception $e) {
+                $this->logger->error('Failed generating google scode link', ['exception' => $e]);
+            }
         }
 
         return $this->branch->downloadGoogleLink($source);

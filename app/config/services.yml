@@ -182,6 +182,7 @@ services:
         arguments:
             logger:            "@logger"
             router:            "@router"
+            redis:             "@snc_redis.default"
             branchKey:         "%branch_key%"
             googleAppDownload: "%google_app_download%"
             appleAppDownload": "%apple_app_download%"
@@ -191,6 +192,7 @@ services:
         arguments:
             branch:       "@app.branch"
             requestStack: "@request_stack"
+            logger:       "@logger"
         public: false
         tags:
             - { name: twig.extension }
