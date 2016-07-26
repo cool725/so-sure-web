@@ -1,15 +1,17 @@
+<h1>Choose a new password</h1>
+<p>Make sure it contains a mixture of letters, numbers and special charachters.</p>
 <form action="{{ path('fos_user_resetting_reset', {'token': token}) }}" {{ form_enctype(form) }} method="POST" class="fos_user_resetting_reset">
+    <div class="reset">
         <div class="form-group">
-            <label for="fos_user_resetting_form_new_first">New Password</label>
-            <input id="fos_user_resetting_form_new_first" type="password" name="fos_user_resetting_form[new][first]" required="required" />
+            <input id="fos_user_resetting_form_new_first" type="password" name="fos_user_resetting_form[new][first]" required="required" class="username" placeholder="New Password"/>
         </div>
         <div class="form-group">
-            <label for="fos_user_resetting_form_new_second">Confirm Password</label>
-            <input id="fos_user_resetting_form_new_second" type="password" name="fos_user_resetting_form[new][second]" required="required" />
+            <input id="fos_user_resetting_form_new_second" type="password" name="fos_user_resetting_form[new][second]" required="required" class="password" placeholder="Confirm Password" />
         </div>
         <div class="form-group">
             {{ form_errors(form) }}
             <input type="hidden" id="fos_user_resetting_form__token" name="fos_user_resetting_form[_token]" value="{{ form._token.vars['value'] }}" />
-            <input type="submit" value="Set your password" class="btn btn-success" />
+            <input type="submit" value="Set password" class="btn btn-primary" />
         </div>
+    </div>
 </form>

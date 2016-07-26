@@ -36,10 +36,7 @@
                     <li><a href="{{ path('claims_home') }}"><i class="fa fa-home"></i> Claims</a></li>
                   {% else %}
                     <li class="">
-                      <a href="{{ path('user_home') }}">
-                      <img src="https://graph.facebook.com/{{ app.user.facebookId }}/picture" width="20" height="20" />
-                      {{ app.user.firstName }}
-                      </a>
+                      <a href="{{ path('user_home') }}">Your Account</a>
                     </li>
                   {% endif %}
                   <li><a href="{{ path('fos_user_security_logout') }}">Logout</a></li>
