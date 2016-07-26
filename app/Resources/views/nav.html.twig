@@ -25,8 +25,8 @@
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Download
                     <span class="caret"></span></button>
                     <ul class="dropdown-menu">
-                      <li><a href="{{ google_app_download }}&utm_source=nav"><i class="fa fa-android fa-lg"></i> Android</a></li>
-                      <li><a href="{{ apple_app_download }}&cs=nav"><i class="fa fa-apple fa-lg"></i> iOS</a></li>
+                      <li><a href="{{ google_download('nav') }}"><i class="fa fa-android fa-lg"></i> Android</a></li>
+                      <li><a href="{{ apple_download('nav') }}"><i class="fa fa-apple fa-lg"></i> iOS</a></li>
                     </ul>
                 </div></li>
                 {% if app.user is not null and app.user %}
