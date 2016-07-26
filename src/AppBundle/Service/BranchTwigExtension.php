@@ -62,6 +62,11 @@ class BranchTwigExtension extends \Twig_Extension
         return $data;
     }
 
+    private function getMarketing()
+    {
+        return ['channel' => 'web', 'campaign' => 'downloadapp'];
+    }
+
     public function branch($source)
     {
         return $this->branch->link($this->getData(), [], $source);
@@ -71,7 +76,7 @@ class BranchTwigExtension extends \Twig_Extension
     {
         if ($this->getSCode()) {
             try {
-                return $this->branch->appleLink($this->getData(), [], $source);
+                return $this->branch->appleLink($this->getData(), $this->getMarketing(), $source);
             } catch (\Exception $e) {
                 $this->logger->error('Failed generating apple scode link', ['exception' => $e]);
             }
@@ -84,7 +89,7 @@ class BranchTwigExtension extends \Twig_Extension
     {
         if ($this->getSCode()) {
             try {
-                return $this->branch->googleLink($this->getData(), [], $source);
+                return $this->branch->googleLink($this->getData(), $this->getMarketing(), $source);
             } catch (\Exception $e) {
                 $this->logger->error('Failed generating google scode link', ['exception' => $e]);
             }
