@@ -49,23 +49,29 @@ class BranchTwigExtension extends \Twig_Extension
 
         return null;
     }
-    
-    public function branch($source)
+
+    private function getData()
     {
         $data = [];
-        if ($this->getSCode()) {
-            $data['scode'] = $this->getSCode();
+        $scode = $this->getSCode();
+        if ($scode) {
+            $data['scode'] = $scode;
+            $data['$deeplink_path'] = sprintf('invite/scode/%s', $scode);
         }
 
-        return $this->branch->link($data, [], $source);
+        return $data;
+    }
+
+    public function branch($source)
+    {
+        return $this->branch->link($this->getData(), [], $source);
     }
 
     public function apple($source)
     {
         if ($this->getSCode()) {
-            $data['scode'] = $this->getSCode();
             try {
-                return $this->branch->appleLink($data, [], $source);
+                return $this->branch->appleLink($this->getData(), [], $source);
             } catch (\Exception $e) {
                 $this->logger->error('Failed generating apple scode link', ['exception' => $e]);
             }
@@ -77,9 +83,8 @@ class BranchTwigExtension extends \Twig_Extension
     public function google($source)
     {
         if ($this->getSCode()) {
-            $data['scode'] = $this->getSCode();
             try {
-                return $this->branch->googleLink($data, [], $source);
+                return $this->branch->googleLink($this->getData(), [], $source);
             } catch (\Exception $e) {
                 $this->logger->error('Failed generating google scode link', ['exception' => $e]);
             }

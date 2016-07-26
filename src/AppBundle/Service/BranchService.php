@@ -29,13 +29,13 @@ class BranchService
     protected $appleAppDownload;
 
     /**
-     * @param LoggerInterface $logger
-     * @param                 $router
-     * @param                 $redis
-     * @param                 $environment
-     * @param                 $branchKey
-     * @param                 $googleAppDownload
-     * @param                 $appleAppDownload
+     * @param LoggerInterface   $logger
+     * @param                   $router
+     * @param                   $redis
+     * @param                   $environment
+     * @param                   $branchKey
+     * @param                   $googleAppDownload
+     * @param                   $appleAppDownload
      */
     public function __construct(
         LoggerInterface $logger,
