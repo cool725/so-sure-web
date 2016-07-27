@@ -53,7 +53,7 @@ class InvitationController extends BaseController
 
         $form = $this->createFormBuilder()
             ->add('decline', SubmitType::class, array(
-                'label' => "No thanks",
+                'label' => "No thanks!",
                 'attr' => ['class' => 'btn btn-danger'],
             ))
             ->getForm();
