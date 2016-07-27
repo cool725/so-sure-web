@@ -32,6 +32,8 @@ class SalvaExportService
     const CANCELLED_COOLOFF = 'withdrawal';
     const CANCELLED_BADRISK = 'claim';
     const CANCELLED_OTHER = 'other';
+    const CANCELLED_DISPOSSESSION = 'dispossession';
+    const CANCELLED_WRECKAGE = 'wreckage';
 
     const KEY_POLICY_ACTION = 'salva:policyid:action';
 
@@ -453,6 +455,10 @@ class SalvaExportService
                 $reason = self::CANCELLED_COOLOFF;
             } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_BADRISK) {
                 $reason = self::CANCELLED_BADRISK;
+            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_DISPOSSESSION) {
+                $reason = self::CANCELLED_DISPOSSESSION ;
+            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_WRECKAGE) {
+                $reason = self::CANCELLED_WRECKAGE;
             } else {
                 $reason = self::CANCELLED_OTHER;
             }

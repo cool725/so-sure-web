@@ -23,6 +23,8 @@ class CancelPolicyType extends AbstractType
                 Policy::CANCELLED_GOODWILL => Policy::CANCELLED_GOODWILL,
                 Policy::CANCELLED_COOLOFF => Policy::CANCELLED_COOLOFF,
                 Policy::CANCELLED_BADRISK => Policy::CANCELLED_BADRISK,
+                Policy::CANCELLED_DISPOSSESSION => Policy::CANCELLED_DISPOSSESSION,
+                Policy::CANCELLED_WRECKAGE => Policy::CANCELLED_WRECKAGE,
             ]])
             ->add('cancel', SubmitType::class)
         ;
