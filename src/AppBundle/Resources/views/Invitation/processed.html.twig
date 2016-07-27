@@ -1,11 +1,10 @@
 {% set include_emoji = 1 %}
-{% extends "FOSUserBundle::layout.html.twig" %}
+{% extends 'base.html.twig' %}
 
 {% block title %}so-sure - Invitation{% endblock %}
 
-
-{% block fos_user_content %}
-<div class="container">
+{% block body %}
+<div class="login">
       <div class="row">
         <div class="text-center">
         <img class="logo" src="{{ cdn_url }}/images/logo/unhappy-so-sure-smiley.svg" style="width: 10%; margin-bottom: 50px;"></img>
@@ -19,5 +18,5 @@
           <p>Something not right? <a href="mailto:support@wearesosure.com">Let us know</a>.</p>
         </div>
     </div>
-  </div>
-{% endblock fos_user_content %}
+</div>
+{% endblock %}

@@ -132,7 +132,7 @@
     padding-bottom: 105px;
     text-align: center;
     color: #202532;
-    border-bottom: 1px solid #ECEFF7;
+    border-top: #efefef 2px solid;
 }
 .reward-pot {
     padding: 20px;
@@ -175,16 +175,4 @@
     bottom: 20px;
     width: 100%;
     text-align: center;
-}
-
-/* Download Now */
-
-.download-now {
-    background-color: #FFF;
-    padding: 60px 20px 100px 20px;
-    text-align: center;
-    color: #202532;
-}
-.download-now p {
-    color: #626B78;
 }
