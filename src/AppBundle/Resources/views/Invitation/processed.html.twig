@@ -1,13 +1,15 @@
 {% set include_emoji = 1 %}
-{% extends 'base.html.twig' %}
+{% extends "FOSUserBundle::layout.html.twig" %}
 
 {% block title %}so-sure - Invitation{% endblock %}
 
-{% block body %}
-    <div class="container">
+
+{% block fos_user_content %}
+<div class="container">
       <div class="row">
         <div class="text-center">
-          <p>Hmm, it looks like this invitation to join the Social Insurance revolution has already been
+        <img class="logo" src="{{ cdn_url }}/images/logo/unhappy-so-sure-smiley.svg" style="width: 10%; margin-bottom: 50px;"></img>
+          <p>Hmm, it looks like this invitation to join so-sure has already been
           {% if invitation.isAccepted %}accepted
           {% elseif invitation.isRejected %}declined
           {% elseif invitation.isCancelled %}cancelled
@@ -18,4 +20,4 @@
         </div>
     </div>
   </div>
-{% endblock %}
+{% endblock fos_user_content %}
