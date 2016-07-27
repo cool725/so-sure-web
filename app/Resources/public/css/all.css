@@ -86,9 +86,9 @@ h1, h2, h3, h4, h5, h6 {
     padding-bottom: 5px;
 }
 .navbar .btn {
-    font-size: 13px;
-    color: #fff;
-    padding: 10px 10px;
+    font-size: 13px !important;
+    color: #fff !important;
+    padding: 10px 10px !important;
     border-radius: 4px;
     line-height: 10px;
     margin-top: 12px;
@@ -102,7 +102,7 @@ h1, h2, h3, h4, h5, h6 {
 .navbar-default .navbar-nav> li> a {
     font-size: 13px;
     padding-top: 20px;
-    color: #202532 !important;
+    color: #202532;
 }
 .navbar-default .navbar-nav li> a:hover {
     color: #3399ff !important;
