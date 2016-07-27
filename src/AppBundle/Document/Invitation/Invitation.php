@@ -14,6 +14,8 @@ use AppBundle\Document\GravatarTrait;
  */
 abstract class Invitation
 {
+    use GravatarTrait;
+
     const STATUS_SENT = 'sent';
     const STATUS_FAILED = 'failed';
 
