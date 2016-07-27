@@ -551,11 +551,7 @@ class User extends BaseUser
             );
         }
 
-        if ($this->getFirstName()) {
-            return $this->gravatarImage($this->getEmail(), $size, substr($this->getFirstName(), 0, 1));
-        } else {
-            return $this->gravatarImage($this->getEmail(), $size);
-        }
+        return $this->gravatarImage($this->getEmail(), $size);
     }
 
     public function hasValidDetails()

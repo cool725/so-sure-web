@@ -289,16 +289,11 @@ abstract class Invitation
             return $this->getInvitee()->getImageUrl();
         }
 
-        $letter = null;
-        if ($this->getName() && strlen(trim($this->getName())) > 0) {
-            $letter = substr($this->getName(), 0, 1);
-        }
-
         if ($this instanceof EmailInvitation) {
-            return $this->gravatarImage($this->getEmail(), $size, $letter);
+            return $this->gravatarImage($this->getEmail(), $size);
         }
 
-        return $this->fallbackImage($letter);
+        return null;
     }
 
     public function toApiArray($debug = null)

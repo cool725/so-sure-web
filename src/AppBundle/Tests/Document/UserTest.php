@@ -148,7 +148,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->setFirstName('Foo');
         // @codingStandardsIgnoreStart
         $this->assertEquals(
-            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=https%3A%2F%2Fcdn.so-sure.com%2Fimages%2Fprofile%2Ff.png&s=1',
+            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=1',
             $user->getImageUrl(1)
         );
         // @codingStandardsIgnoreEnd
@@ -158,11 +158,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
         $user->setEmail('foo@bar.com');
-        // @codingStandardsIgnoreStart
         $this->assertEquals(
-            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=https%3A%2F%2Fcdn.so-sure.com%2Fimages%2Fprofile%2Funknown.png&s=1',
+            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=1',
             $user->getImageUrl(1)
         );
-        // @codingStandardsIgnoreEnd
     }
 }

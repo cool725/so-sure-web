@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Document\User;
 
 /**
  * @group functional-nonet
@@ -98,6 +99,24 @@ class InvitationTest extends WebTestCase
         $this->assertFalse(isset($api['inviter_id']));
     }
 
+    public function testImageUrlLinkedUser()
+    {
+        $user = new User();
+        $user->setEmail('foo@bar.com');
+        $user->setFacebookId('1');
+
+        $invitation = new EmailInvitation();
+        $invitation->setEmail('foo@bar.com');
+        $invitation->setName('Foo Bar');
+        $invitation->setInvitee($user);
+
+        $api = $invitation->toApiArray();
+        $this->assertEquals(
+            'https://graph.facebook.com/1/picture?width=100&height=100',
+            $api['image_url']
+        );
+    }
+
     public function testImageUrlEmailWithName()
     {
         $invitation = new EmailInvitation();
@@ -105,7 +124,7 @@ class InvitationTest extends WebTestCase
         $invitation->setName('Foo Bar');
         $api = $invitation->toApiArray();
         $this->assertEquals(
-            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=https%3A%2F%2Fcdn.so-sure.com%2Fimages%2Fprofile%2Ff.png&s=100',
+            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=100',
             $api['image_url']
         );
     }
@@ -116,7 +135,7 @@ class InvitationTest extends WebTestCase
         $invitation->setEmail('foo@bar.com');
         $api = $invitation->toApiArray();
         $this->assertEquals(
-            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=https%3A%2F%2Fcdn.so-sure.com%2Fimages%2Fprofile%2Funknown.png&s=100',
+            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=100',
             $api['image_url']
         );
     }
@@ -125,7 +144,7 @@ class InvitationTest extends WebTestCase
     {
         $invitation = new SmsInvitation();
         $api = $invitation->toApiArray();
-        $this->assertEquals('https://cdn.so-sure.com/images/profile/unknown.png', $api['image_url']);
+        $this->assertNull($api['image_url']);
     }
 
     public function testImageUrlSmsWithName()
@@ -133,6 +152,6 @@ class InvitationTest extends WebTestCase
         $invitation = new SmsInvitation();
         $invitation->setName('Foo Bar');
         $api = $invitation->toApiArray();
-        $this->assertEquals('https://cdn.so-sure.com/images/profile/f.png', $api['image_url']);
+        $this->assertNull($api['image_url']);
     }
 }
