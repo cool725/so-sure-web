@@ -883,7 +883,7 @@ class ApiAuthController extends BaseController
 
             $this->denyAccessUnlessGranted('edit', $user);
             $data = json_decode($request->getContent(), true)['body'];
-            $this->get('logger')->info(sprintf('Update user %s', json_encode($data)));
+            // $this->get('logger')->info(sprintf('Update user %s', json_encode($data)));
 
             $email = isset($data['email']) ? trim($data['email']) : null;
             $facebookId = isset($data['facebook_id']) ? trim($data['facebook_id']) : null;
