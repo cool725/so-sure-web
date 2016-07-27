@@ -37,7 +37,9 @@ class InvitationController extends BaseController
                 'invitation' => $invitation,
             ]);
         } elseif ($this->getUser() !== null) {
-            return $this->redirectToRoute('user_invitation', ['id' => $id]);
+            // As we're not doing anything else on the yet for the user, user really should be logged in
+            // So its probably safe for now to redirect to the app.
+            return $this->redirect($this->getParameter('branch_share_url'));
         }
 
         $policy = new PhonePolicy();
@@ -91,18 +93,5 @@ class InvitationController extends BaseController
             'form' => $form->createView(),
             'form_phone' => $formPhone->createView(),
         );
-    }
-
-    /**
-     * @Route("/user/invitation/{id}", name="user_invitation")
-     * @Template
-     */
-    public function userInvitationAction($id)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Invitation::class);
-        $invitation = $repo->find($id);
-
-        return array();
     }
 }
