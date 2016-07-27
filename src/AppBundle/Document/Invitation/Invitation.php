@@ -4,6 +4,7 @@ namespace AppBundle\Document\Invitation;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Document\User;
+use AppBundle\Document\GravatarTrait;
 
 /**
  * @MongoDB\Document
@@ -280,6 +281,24 @@ abstract class Invitation
         }
     }
 
+    public function getInviteeImageUrl($size = 100)
+    {
+        if ($this->getInvitee()) {
+            return $this->getInvitee()->getImageUrl();
+        }
+
+        $letter = null;
+        if ($this->getName() && strlen(trim($this->getName())) > 0) {
+            $letter = substr($this->getName(), 0, 1);
+        }
+
+        if ($this instanceof EmailInvitation) {
+            return $this->gravatarImage($this->getEmail(), $size, $letter);
+        }
+
+        return $this->fallbackImage($letter);
+    }
+
     public function toApiArray($debug = null)
     {
         $data = [
@@ -294,6 +313,7 @@ abstract class Invitation
             'next_reinvite_date' =>  $this->getNextReinvited() ?
                 $this->getNextReinvited()->format(\DateTime::ATOM) :
                 null,
+            'image_url' => $this->getInviteeImageUrl(),
         ];
 
         if ($debug) {

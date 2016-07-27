@@ -20,6 +20,7 @@ class User extends BaseUser
 {
     use ArrayToApiArrayTrait;
     use PhoneTrait;
+    use GravatarTrait;
 
     /**
      * @MongoDB\Id
@@ -539,6 +540,24 @@ class User extends BaseUser
         return stripos($this->getEmailCanonical(), '@so-sure.com') !== false;
     }
 
+    public function getImageUrl($size = 100)
+    {
+        if ($this->getFacebookId()) {
+            return sprintf(
+                'https://graph.facebook.com/%s/picture?width=%d&height=%d',
+                $this->getFacebookId(),
+                $size,
+                $size
+            );
+        }
+
+        if ($this->getFirstName()) {
+            return $this->gravatarImage($this->getEmail(), $size, substr($this->getFirstName(), 0, 1));
+        } else {
+            return $this->gravatarImage($this->getEmail(), $size);
+        }
+    }
+
     public function hasValidDetails()
     {
         // TODO: Improve validation
@@ -583,7 +602,8 @@ class User extends BaseUser
           'has_cancelled_policy' => $this->hasCancelledPolicy(),
           'has_unpaid_policy' => $this->hasUnpaidPolicy(),
           'has_valid_policy' => $this->hasValidPolicy(),
-          'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null
+          'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
+          'image_url' => $this->getImageUrl(),
         ];
     }
 }
