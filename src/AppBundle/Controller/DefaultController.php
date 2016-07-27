@@ -181,14 +181,14 @@ class DefaultController extends BaseController
         $form->handleRequest($request);
         if ($form->isValid()) {
             $mobileNumber = $form->get('mobileNumber')->getData();
-            $ukMobileNumber = $this->normalizeUkMobile($mobileNumber);
+            $ukMobileNumber = $this->normalizeUkMobile($mobileNumber, true);
             if (stripos($ukMobileNumber, '+44') === 0) {
                 $sms = $this->get('app.sms');
-                $link = sprintf(
-                    'Welcome to the social insurance revolution! Download so-sure at %s',
-                    $this->getParameter('branch_pot_url')
+                $message = $this->get('templating')->render(
+                    'AppBundle:Sms:text-me.txt.twig',
+                    ['branch_pot_url' => $this->getParameter('branch_pot_url')]
                 );
-                if ($sms->send($ukMobileNumber, $link)) {
+                if ($sms->send($ukMobileNumber, $message)) {
                     $this->addFlash('success', sprintf(
                         'You should receive a download link shortly',
                         $ukMobileNumber
