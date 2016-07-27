@@ -46,6 +46,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $connection = new Connection();
         $api = $connection->toApiArray([]);
         $this->assertNull($api['name']);
+        $this->assertNull($api['image_url']);
         $this->assertEquals($connection->getDate()->format(\DateTime::ATOM), $api['date']);
         $this->assertNull($api['id']);
         $this->assertEquals(0, count($api['claim_dates']));
@@ -53,5 +54,21 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $connection->setId('34243242');
         $api = $connection->toApiArray([]);
         $this->assertEquals('34243242', $api['id']);
+    }
+
+    public function testConnectionApiImageUrl()
+    {
+        $user = new User();
+        $user->setEmail('foo@bar.com');
+        $user->setFirstName('Foo');
+        $user->setLastName('Bar');
+        $connection = new Connection();
+        $connection->setLinkedUser($user);
+        $api = $connection->toApiArray([]);
+        $this->assertEquals('Foo Bar', $api['name']);
+        $this->assertEquals(
+            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=100',
+            $api['image_url']
+        );
     }
 }

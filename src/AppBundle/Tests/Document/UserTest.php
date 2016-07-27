@@ -133,4 +133,34 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user2->setEmailCanonical('foo@notsosure.com');
         $this->assertFalse($user2->hasSoSureEmail());
     }
+
+    public function testImageUrlFacebook()
+    {
+        $user = new User();
+        $user->setFacebookId('1');
+        $this->assertEquals('https://graph.facebook.com/1/picture?width=2&height=2', $user->getImageUrl(2));
+    }
+
+    public function testImageUrlLetter()
+    {
+        $user = new User();
+        $user->setEmail('foo@bar.com');
+        $user->setFirstName('Foo');
+        // @codingStandardsIgnoreStart
+        $this->assertEquals(
+            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=1',
+            $user->getImageUrl(1)
+        );
+        // @codingStandardsIgnoreEnd
+    }
+
+    public function testImageUrlUnknown()
+    {
+        $user = new User();
+        $user->setEmail('foo@bar.com');
+        $this->assertEquals(
+            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=1',
+            $user->getImageUrl(1)
+        );
+    }
 }

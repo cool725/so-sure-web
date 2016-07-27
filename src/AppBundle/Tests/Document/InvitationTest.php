@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Document\User;
 
 /**
  * @group functional-nonet
@@ -96,5 +97,61 @@ class InvitationTest extends WebTestCase
         $invitation = new EmailInvitation();
         $api = $invitation->toApiArray();
         $this->assertFalse(isset($api['inviter_id']));
+    }
+
+    public function testImageUrlLinkedUser()
+    {
+        $user = new User();
+        $user->setEmail('foo@bar.com');
+        $user->setFacebookId('1');
+
+        $invitation = new EmailInvitation();
+        $invitation->setEmail('foo@bar.com');
+        $invitation->setName('Foo Bar');
+        $invitation->setInvitee($user);
+
+        $api = $invitation->toApiArray();
+        $this->assertEquals(
+            'https://graph.facebook.com/1/picture?width=100&height=100',
+            $api['image_url']
+        );
+    }
+
+    public function testImageUrlEmailWithName()
+    {
+        $invitation = new EmailInvitation();
+        $invitation->setEmail('foo@bar.com');
+        $invitation->setName('Foo Bar');
+        $api = $invitation->toApiArray();
+        $this->assertEquals(
+            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=100',
+            $api['image_url']
+        );
+    }
+
+    public function testImageUrlEmailWithoutName()
+    {
+        $invitation = new EmailInvitation();
+        $invitation->setEmail('foo@bar.com');
+        $api = $invitation->toApiArray();
+        $this->assertEquals(
+            'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=100',
+            $api['image_url']
+        );
+    }
+
+    public function testImageUrlSmsWithoutName()
+    {
+        $invitation = new SmsInvitation();
+        $api = $invitation->toApiArray();
+        $this->assertNull($api['image_url']);
+    }
+
+    public function testImageUrlSmsWithName()
+    {
+        $invitation = new SmsInvitation();
+        $invitation->setName('Foo Bar');
+        $api = $invitation->toApiArray();
+        $this->assertNull($api['image_url']);
     }
 }

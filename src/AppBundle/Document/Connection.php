@@ -222,6 +222,7 @@ class Connection
             'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ATOM) : null,
             'claim_dates' => $claimDates,
             'id' => $this->getId(),
+            'image_url' => $this->getLinkedUser() ? $this->getLinkedUser()->getImageUrl() : null,
         ];
     }
 }
