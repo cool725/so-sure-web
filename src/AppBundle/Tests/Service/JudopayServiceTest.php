@@ -201,6 +201,42 @@ class JudopayServiceTest extends WebTestCase
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
     }
 
+    public function testJudoRefund()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-refund', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token');
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+
+        $payment = $policy->getPayments()[0];
+
+        $refund = self::$judopay->refund($payment);
+        $this->assertEquals('Success', $refund->getResult());
+        $this->assertEquals(0 - $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(), $refund->getAmount());
+
+        $calculator = JudoPayment::sumPayments([$payment, $refund], false);
+        $this->assertEquals(2, $calculator['numPayments']);
+
+        $this->assertEquals(0, $calculator['total']);
+        $this->assertEquals(0, $calculator['totalCommission']);
+        $this->assertEquals(0, $calculator['coverholderCommission']);
+        $this->assertEquals(0, $calculator['brokerCommission']);
+        $this->assertEquals(0, $calculator['totalUnderwriter']);
+        $this->assertEquals($calculator['received'], 0 - $calculator['refunded']);
+    }
+
     public function testJudoScheduledPayment()
     {
         $user = $this->createValidUser(static::generateEmail('judo-scheduled', $this));
