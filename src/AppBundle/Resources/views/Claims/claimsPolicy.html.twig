@@ -42,60 +42,75 @@
         {{ form_start(formClaim) }}
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group">
-                    {{ form_label(formClaim.number, 'Claim Number', {'label_attr': {'class': 'col-sm-4'}}) }}
-                    {{ form_errors(formClaim.number) }}
-                    {{ form_widget(formClaim.number, {'attr': {'class': 'col-sm-3'}}) }}
-                </div>                
+                <div class="row">
+                    <div class="col-md-12">                
+                        <div class="form-group">
+                            {{ form_label(formClaim.number, 'Claim Number', {'label_attr': {'class': 'col-sm-4'}}) }}
+                            {{ form_errors(formClaim.number) }}
+                            {{ form_widget(formClaim.number, {'attr': {'class': 'col-sm-3'}}) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{ form_label(formClaim.type, 'Claim Type', {'label_attr': {'class': 'col-sm-4'}}) }}
+                            {{ form_errors(formClaim.type) }}
+                            {{ form_widget(formClaim.type, {'attr': {'class': 'col-sm-3'}}) }}
+                        </div>                
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{ form_label(formClaim.status, '', {'label_attr': {'class': 'col-sm-4'}}) }}
+                            {{ form_errors(formClaim.status) }}
+                            {{ form_widget(formClaim.status, {'attr': {'class': 'col-sm-3'}}) }}
+                        </div>                
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{ form_label(formClaim.suspected_fraud, '', {'label_attr': {'class': 'col-sm-4'}}) }}
+                            {{ form_errors(formClaim.suspected_fraud) }}
+                            {{ form_widget(formClaim.suspected_fraud, {'attr': {'class': 'col-sm-3'}}) }}
+                        </div>                
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <i class="fa fa-question-circle" title="If the claim is declined/withdrawn and the phone is lost/stolen/or unusable"></i>
+                            {{ form_label(formClaim.shouldCancelPolicy, '', {'label_attr': {'class': 'col-sm-4'}}) }}
+                            {{ form_errors(formClaim.shouldCancelPolicy) }}
+                            {{ form_widget(formClaim.shouldCancelPolicy, {'attr': {'class': 'col-sm-3'}}) }}
+                        </div>                
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    {{ form_label(formClaim.type, 'Claim Type', {'label_attr': {'class': 'col-sm-4'}}) }}
-                    {{ form_errors(formClaim.type) }}
-                    {{ form_widget(formClaim.type, {'attr': {'class': 'col-sm-3'}}) }}
-                </div>                
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    {{ form_label(formClaim.suspected_fraud, '', {'label_attr': {'class': 'col-sm-4'}}) }}
-                    {{ form_errors(formClaim.suspected_fraud) }}
-                    {{ form_widget(formClaim.suspected_fraud, {'attr': {'class': 'col-sm-3'}}) }}
-                </div>                
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    {{ form_label(formClaim.status, '', {'label_attr': {'class': 'col-sm-4'}}) }}
-                    {{ form_errors(formClaim.status) }}
-                    {{ form_widget(formClaim.status, {'attr': {'class': 'col-sm-3'}}) }}
-                </div>                
-            </div>
-        </div>
-        <div class="row" style="margin-top: 5px">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <i class="fa fa-question-circle" title="If the claim is declined/withdrawn and the phone is lost/stolen/or unusable"></i>
-                    {{ form_label(formClaim.shouldCancelPolicy, '', {'label_attr': {'class': 'col-sm-4'}}) }}
-                    {{ form_errors(formClaim.shouldCancelPolicy) }}
-                    {{ form_widget(formClaim.shouldCancelPolicy, {'attr': {'class': 'col-sm-3'}}) }}
-                </div>                
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    {{ form_label(formClaim.force, '', {'label_attr': {'class': 'col-sm-4'}}) }}
-                    {{ form_errors(formClaim.force) }}
-                    {{ form_widget(formClaim.force, {'attr': {'class': 'col-sm-6'}}) }}
-                </div>                
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    {{ form_label(formClaim.crime_ref, 'Crime Ref (Lost/Stolen)', {'label_attr': {'class': 'col-sm-4'}}) }}
-                    {{ form_errors(formClaim.crime_ref) }}
-                    {{ form_widget(formClaim.crime_ref, {'attr': {'class': 'col-sm-3'}}) }}
-                </div>                
+            <div class="col-md-5" style="border: solid 1px; border-radius: 5px;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>Optional Crime Ref Check</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{ form_label(formClaim.force, '', {'label_attr': {'class': 'col-sm-4'}}) }}
+                            {{ form_errors(formClaim.force) }}
+                            {{ form_widget(formClaim.force, {'attr': {'class': 'col-sm-6'}}) }}
+                        </div>                
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{ form_label(formClaim.crime_ref, 'Crime Ref (Lost/Stolen)', {'label_attr': {'class': 'col-sm-4'}}) }}
+                            {{ form_errors(formClaim.crime_ref) }}
+                            {{ form_widget(formClaim.crime_ref, {'attr': {'class': 'col-sm-3'}}) }}
+                        </div>                
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row" style="margin-top: 5px">
