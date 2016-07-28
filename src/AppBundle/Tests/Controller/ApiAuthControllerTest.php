@@ -1444,7 +1444,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'scode' => $scode,
         ]);
         $data = $this->verifyResponse(200);
-        $this->assertEquals($inviter->getName(), $data['name']);
+        $this->assertEquals('foo bar', $data['name']);
     }
 
     public function testSCodeValidationInvitation()
