@@ -1339,9 +1339,27 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
     }
 
-    /**
-     *
-     */
+    public function testEmailValidationInvitation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-email-validate', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => 'notanemail',
+            'name' => 'functional test',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
     public function testNewSmsAndDupInvitation()
     {
         $user = self::createUser(
@@ -1369,6 +1387,85 @@ class ApiAuthControllerTest extends BaseControllerTest
             'name' => 'functional test',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
+    }
+
+    public function testSmsValidationInvitation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-sms-validate', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'mobile' => 'notasms',
+            'name' => 'functional test',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testNewSCodeInvitation()
+    {
+        $inviter = self::createUser(
+            self::$userManager,
+            self::generateEmail('inviter-scode', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($inviter);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $inviter);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($inviter, $policyData['id']);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = $policyRepo->find($policyData['id']);
+        $scode = $policy->getStandardSCode()->getCode();
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-scode', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'scode' => $scode,
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('foo bar', $data['name']);
+    }
+
+    public function testSCodeValidationInvitation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-scode-validate', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'scode' => 'not-an-scode',
+            'name' => 'functional test',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
     public function testSentInvitationAppears()
