@@ -140,6 +140,12 @@ class Claim
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
+    protected $shouldCancelPolicy;
+
+    /**
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
     protected $processed;
 
     /**
@@ -358,6 +364,16 @@ class Claim
     public function setSuspectedFraud($suspectedFraud)
     {
         $this->suspectedFraud = $suspectedFraud;
+    }
+
+    public function getShouldCancelPolicy()
+    {
+        return $this->shouldCancelPolicy;
+    }
+
+    public function setShouldCancelPolicy($shouldCancelPolicy)
+    {
+        $this->shouldCancelPolicy = $shouldCancelPolicy;
     }
 
     public function getNotes()

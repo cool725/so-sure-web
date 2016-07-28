@@ -108,11 +108,12 @@ services:
     app.claims:
         class: AppBundle\Service\ClaimsService
         arguments:
-            dm:         "@doctrine_mongodb.odm.default_document_manager"
-            logger:     "@logger"
-            mailer:     "@mailer"
-            templating: "@templating"
-            router:     "@api.router"
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
+            logger:      "@logger"
+            mailer:      "@mailer"
+            templating:  "@templating"
+            router:      "@api.router"
+            environment: "%kernel.environment%"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService

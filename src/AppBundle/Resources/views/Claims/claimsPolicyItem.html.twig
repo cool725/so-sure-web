@@ -118,20 +118,23 @@
                         <th>Claims Type</th>
                         <th>Claims Status</th>
                         <th>Crime Ref</th>
-                        <th>Suspected Fraud</th>
+                        <th>Flags</th>
                         <th>Notes</th>
                     </tr>
                     {% for claim in policy.claims %}
                     <tr>
-                        <td>{{ claim.recordedDate|date }}</td>
-                        <td>{{ claim.number }}</td>
-                        <td>{{ claim.type }}</td>
-                        <td>{{ claim.status }}</td>
-                        <td class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
+                        <td style="width: 20%;">{{ claim.recordedDate|date }}</td>
+                        <td style="width: 10%;">{{ claim.number }}</td>
+                        <td style="width: 10%;">{{ claim.type }}</td>
+                        <td style="width: 10%;">{{ claim.status }}</td>
+                        <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
-                        <td>{{ claim.suspectedFraud }}</td>
-                        <td>{{ claim.notes }}</td>
+                        <td style="width: 10%;" class="{% if claim.suspectedFraud or claim.shouldCancelPolicy %}danger{% endif %}">
+                          {% if claim.suspectedFraud %}Suspected Fraud;{% endif %}
+                          {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
+                        </td>
+                        <td style="width: 30%;">{{ claim.notes }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -153,13 +156,18 @@
                     </tr>
                     {% for claim in policy.networkClaims %}
                     <tr>
-                        <td>{{ claim.recordedDate|date }}</td>
-                        <td><a href="{{ path(policy_route, {'id': claim.policy.id }) }}">{{ claim.policy.policyNumber }}</a></td>
-                        <td>{{ claim.number }}</td>
-                        <td>{{ claim.type }}</td>
-                        <td>{{ claim.status }}</td>
-                        <td>{{ claim.suspectedFraud }}</td>
-                        <td>{{ claim.notes }}</td>
+                        <td style="width: 20%;">{{ claim.recordedDate|date }}</td>
+                        <td style="width: 10%;">{{ claim.number }}</td>
+                        <td style="width: 10%;">{{ claim.type }}</td>
+                        <td style="width: 10%;">{{ claim.status }}</td>
+                        <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
+                          {{ claim.crimeRef }}
+                        </td>
+                        <td style="width: 10%;" class="{% if claim.suspectedFraud or claim.shouldCancelPolicy %}danger{% endif %}">
+                          {% if claim.suspectedFraud %}Suspected Fraud;{% endif %}
+                          {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
+                        </td>
+                        <td style="width: 30%;">{{ claim.notes }}</td>
                     </tr>
                     {% endfor %}
                 </table>
