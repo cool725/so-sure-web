@@ -93,10 +93,21 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     private function newUser($email)
     {
         $user = new User();
-        $user->setEmail($email);
         $user->setFirstName($this->faker->firstName);
         $user->setLastName($this->faker->lastName);
         $user->setMobileNumber($this->faker->mobileNumber);
+
+        // Use the first/last name as the user portion of the email address so they vaugely match
+        // Keep the random portion of the email domain though
+        $rand = rand(1, 3);
+        if ($rand == 1) {
+            $email = sprintf("%s.%s@%s", $user->getFirstName(), $user->getLastName(), explode("@", $email)[1]);
+        } elseif ($rand == 2) {
+            $email = sprintf("%s%s@%s", substr($user->getFirstName(), 0, 1), $user->getLastName(), explode("@", $email)[1]);
+        } elseif ($rand == 3) {
+            $email = sprintf("%s%s%2d@%s", substr($user->getFirstName(), 0, 1), $user->getLastName(), rand(1, 99), explode("@", $email)[1]);
+        }
+        $user->setEmail($email);
 
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
