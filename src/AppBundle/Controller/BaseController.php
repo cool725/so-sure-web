@@ -184,7 +184,7 @@ abstract class BaseController extends Controller
 
         // Escape special chars
         $data = preg_quote($data, '/');
-        $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/", $data)));
+        $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data)));
         if ($run) {
             return $qb->getQuery()->execute();
         }
