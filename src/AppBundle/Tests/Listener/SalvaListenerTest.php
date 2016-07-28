@@ -12,7 +12,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Listener\SalvaListener;
-use AppBundle\Event\SalvaPolicyEvent;
+use AppBundle\Event\PolicyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -75,7 +75,7 @@ class SalvaListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
 
         $listener = new SalvaListener(static::$salvaService);
-        $listener->onSalvaPolicyUpdatedEvent(new SalvaPolicyEvent($policy));
+        $listener->onPolicyUpdatedEvent(new PolicyEvent($policy));
 
         // one cancel, one create
         $this->assertEquals(2, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
@@ -110,7 +110,7 @@ class SalvaListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
 
         $listener = new SalvaListener(static::$salvaService);
-        $listener->onSalvaPolicyCreatedEvent(new SalvaPolicyEvent($policy));
+        $listener->onPolicyCreatedEvent(new PolicyEvent($policy));
 
         $this->assertEquals(1, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
         $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
@@ -142,7 +142,7 @@ class SalvaListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
         
         $listener = new SalvaListener(static::$salvaService);
-        $listener->onSalvaPolicyCancelledEvent(new SalvaPolicyEvent($policy));
+        $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
         $this->assertEquals(1, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
         $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));

@@ -286,11 +286,19 @@ class AdminController extends BaseController
             if ($request->request->has('cancel_form')) {
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
-                    $policyService->cancel($policy, $cancelForm->get('cancelledReason')->getData());
-                    $this->addFlash(
-                        'success',
-                        sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
-                    );
+                    $cancelReason = $cancelForm->get('cancelledReason')->getData();
+                    if ($policy->canCancel($cancelReason)) {
+                        $policyService->cancel($policy, $cancelReason);
+                        $this->addFlash(
+                            'success',
+                            sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            sprintf('Unable to cancel Policy %s due to %s', $policy->getPolicyNumber(), $cancelReason)
+                        );
+                    }
 
                     return $this->redirectToRoute('admin_users');
                 }

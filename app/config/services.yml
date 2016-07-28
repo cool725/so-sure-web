@@ -378,9 +378,17 @@ services:
         arguments:
             salva: "@app.salva"
         tags:
-            -  { name: kernel.event_listener, event: event.salva.created, method: onSalvaPolicyCreatedEvent }
-            -  { name: kernel.event_listener, event: event.salva.updated, method: onSalvaPolicyUpdatedEvent }
-            -  { name: kernel.event_listener, event: event.salva.cancelled, method: onSalvaPolicyCancelledEvent }
+            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.updated, method: onPolicyUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+
+    app.listener.refund:
+        class:   AppBundle\Listener\RefundListener
+        arguments:
+            judopay: "@app.judopay"
+            logger:  "@logger"
+        tags:
+            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.form.type.usersearch:
         class: AppBundle\Form\Type\UserSearchType
