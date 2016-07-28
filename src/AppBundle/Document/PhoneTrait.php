@@ -17,4 +17,11 @@ trait PhoneTrait
         
         return $mobile;
     }
+
+    public function isValidUkMobile($mobile, $addZero = false)
+    {
+        $mobile = $this->normalizeUkMobile($mobile, $addZero);
+
+        return preg_match("/^\+447\d{9,9}/", $mobile);
+    }
 }

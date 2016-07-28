@@ -71,6 +71,11 @@ class SCode
         $this->setCode(substr(base64_encode(uniqid(mt_rand(), true)), 0, 8));
     }
 
+    public static function isValidSCode($scode)
+    {
+        return preg_match("/^[a-zA-Z0-9\/+]{8,8}/", $scode) === 1;
+    }
+
     public function deactivate()
     {
         $this->setCode(base64_encode(uniqid(mt_rand(), true)));

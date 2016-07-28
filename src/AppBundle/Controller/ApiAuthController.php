@@ -21,6 +21,8 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\Invitation\Invitation;
 
+use AppBundle\Document\PhoneTrait;
+
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\SelfInviteException;
@@ -41,12 +43,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Egulias\EmailValidator\EmailValidator;
 
 /**
  * @Route("/api/v1/auth")
  */
 class ApiAuthController extends BaseController
 {
+    use PhoneTrait;
+
     /**
      * @Route("/address", name="api_auth_address")
      * @Method({"GET"})
@@ -430,6 +435,7 @@ class ApiAuthController extends BaseController
     public function newInvitationAction(Request $request, $id)
     {
         try {
+            $validator = new EmailValidator();
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->find($id);
@@ -451,11 +457,11 @@ class ApiAuthController extends BaseController
             $scode = isset($data['scode']) ? $data['scode'] : null;
             try {
                 $invitation  = null;
-                if ($email) {
+                if ($email && $validator->isValid($email)) {
                     $invitation = $invitationService->inviteByEmail($policy, $email, $name);
-                } elseif ($mobile) {
+                } elseif ($mobile && $this->isValidUkMobile($mobile)) {
                     $invitation = $invitationService->inviteBySms($policy, $mobile, $name);
-                } elseif ($scode) {
+                } elseif ($scode && SCode::isValidSCode($scode)) {
                     $invitation = $invitationService->inviteBySCode($policy, $scode);
                 } else {
                     // TODO: General

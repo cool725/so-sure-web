@@ -191,7 +191,7 @@ class DefaultController extends BaseController
                     "Oops, looks like we already sent you a link.",
                     $mobileNumber
                 ));
-            } elseif (stripos($ukMobileNumber, '+44') !== 0) {
+            } elseif (!$this->isValidUkMobile($ukMobileNumber)) {
                 $this->addFlash('error', sprintf(
                     '%s does not appear to be a valid UK Mobile Number',
                     $mobileNumber
