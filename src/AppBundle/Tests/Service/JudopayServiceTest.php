@@ -237,6 +237,31 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals($calculator['received'], 0 - $calculator['refunded']);
     }
 
+    /** @expectedException \Judopay\Exception\BadRequest */
+    public function testJudoRefundExceeded()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-refund-exceeded', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token');
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+
+        $payment = $policy->getPayments()[0];
+
+        $refund = self::$judopay->refund($payment, $payment->getAmount() + 0.01);
+    }
+
     public function testJudoScheduledPayment()
     {
         $user = $this->createValidUser(static::generateEmail('judo-scheduled', $this));
