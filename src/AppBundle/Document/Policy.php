@@ -43,6 +43,8 @@ abstract class Policy
     const CANCELLED_GOODWILL = 'goodwill';
     const CANCELLED_COOLOFF = 'cooloff';
     const CANCELLED_BADRISK = 'badrisk';
+    const CANCELLED_DISPOSSESSION = 'dispossession';
+    const CANCELLED_WRECKAGE = 'wreckage';
 
     const PLAN_MONTHLY = 'monthly';
     const PLAN_YEARLY = 'yearly';
