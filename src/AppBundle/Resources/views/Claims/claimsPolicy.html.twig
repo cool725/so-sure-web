@@ -72,6 +72,16 @@
                 </div>                
             </div>
         </div>
+        <div class="row" style="margin-top: 5px">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <i class="fa fa-question-circle" title="If the claim is declined/withdrawn and the phone is lost/stolen/or unusable"></i>
+                    {{ form_label(formClaim.shouldCancelPolicy, '', {'label_attr': {'class': 'col-sm-4'}}) }}
+                    {{ form_errors(formClaim.shouldCancelPolicy) }}
+                    {{ form_widget(formClaim.shouldCancelPolicy, {'attr': {'class': 'col-sm-3'}}) }}
+                </div>                
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">

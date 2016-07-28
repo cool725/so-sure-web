@@ -22,6 +22,7 @@ class ClaimsService
     protected $mailer;
     protected $templating;
     protected $router;
+    protected $environment;
 
     /**
      * @param DocumentManager $dm
@@ -35,13 +36,15 @@ class ClaimsService
         LoggerInterface $logger,
         \Swift_Mailer $mailer,
         $templating,
-        $router
+        $router,
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->templating = $templating;
         $this->router = $router->getRouter();
+        $this->environment = $environment;
     }
 
     public function addClaim(Policy $policy, Claim $claim)
@@ -50,6 +53,9 @@ class ClaimsService
         $this->dm->flush();
 
         $this->processClaim($claim);
+        if ($claim->getShouldCancelPolicy()) {
+            $this->notifyPolicyShouldBeCancelled($policy, $claim);
+        }
     }
 
     public function processClaim(Claim $claim)
@@ -134,6 +140,32 @@ class ClaimsService
             $this->mailer->send($message);
         } catch (\Exception $e) {
             $this->logger->error(sprintf("Error in notifyMonetaryClaim. Ex: %s", $e->getMessage()));
+        }
+    }
+
+    public function notifyPolicyShouldBeCancelled(Policy $policy, Claim $claim)
+    {
+        try {
+            $subject = sprintf(
+                'Policy %s should be cancelled',
+                $claim->getPolicy()->getPolicyNumber()
+            );
+            if ($this->environment != 'prod') {
+                $subject = sprintf('[%s] %s', $this->environment, $subject);
+            }
+            $templateHtml = "AppBundle:Email:claim/shouldBeCancelled.html.twig";
+
+            $message = \Swift_Message::newInstance()
+                ->setSubject($subject)
+                ->setFrom('hello@wearesosure.com')
+                ->setTo('support@wearesosure.com')
+                ->setBody(
+                    $this->templating->render($templateHtml, ['claim' => $claim, 'policy' => $policy]),
+                    'text/html'
+                );
+            $this->mailer->send($message);
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf("Error in notifyPolicyShouldBeCancelled.", ['exception' => $e]));
         }
     }
 }

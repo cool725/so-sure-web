@@ -52,6 +52,7 @@ class ClaimType extends AbstractType
                     'placeholder' => 'Select a Police Force',
             ])
             ->add('crime_ref', TextType::class, ['required' => false])
+            ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
             ->add('record', SubmitType::class)
         ;
