@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Lead;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
@@ -62,6 +63,41 @@ class DefaultControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->assertContains(
             sprintf("£%.2f", $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
+            self::$client->getResponse()->getContent()
+        );
+    }
+
+    public function testTextAppInvalidMobile()
+    {
+        $crawler = self::$client->request('GET', self::$router->generate('sms_app_link'));
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('Text me a link')->form();
+        $form['sms_app_link[mobileNumber]'] = '123';
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+        $this->assertContains(
+            "valid UK Mobile Number",
+            self::$client->getResponse()->getContent()
+        );
+    }
+
+    public function testTextAppLeadPresent()
+    {
+        $lead = new Lead();
+        $lead->setMobileNumber(static::generateRandomMobile());
+        self::$dm->persist($lead);
+        self::$dm->flush();
+
+        $crawler = self::$client->request('GET', self::$router->generate('sms_app_link'));
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('Text me a link')->form();
+        $form['sms_app_link[mobileNumber]'] = str_replace('+44', '', $lead->getMobileNumber());
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+        $this->assertContains(
+            "already sent you a link",
             self::$client->getResponse()->getContent()
         );
     }
