@@ -12,8 +12,11 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhoneTrait;
 use AppBundle\Form\Type\PhoneType;
+use AppBundle\Form\Type\SmsAppLinkType;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\Lead;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -21,6 +24,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends BaseController
 {
+    use PhoneTrait;
+
     /**
      * @Route("/", name="homepage")
      * @Template
@@ -160,6 +165,59 @@ class DefaultController extends BaseController
             $session->set('quote', $policy->getPhone()->getId());
 
             return $this->redirectToRoute('purchase');
+        }
+
+        return array(
+            'form' => $form->createView(),
+        );
+    }
+
+    /**
+     * @Route("/text-me-the-app", name="sms_app_link")
+     * @Template
+     */
+    public function smsAppLinkAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Lead::class);
+        $form = $this->createForm(SmsAppLinkType::class);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $mobileNumber = $form->get('mobileNumber')->getData();
+            $ukMobileNumber = $this->normalizeUkMobile($mobileNumber, true);
+            $lead = $repo->findOneBy(['mobileNumber' => $ukMobileNumber]);
+            if ($lead) {
+                $this->addFlash('error', sprintf(
+                    "Oops, looks like we already sent you a link.",
+                    $mobileNumber
+                ));
+            } elseif (stripos($ukMobileNumber, '+44') !== 0) {
+                $this->addFlash('error', sprintf(
+                    '%s does not appear to be a valid UK Mobile Number',
+                    $mobileNumber
+                ));
+            } else {
+                $sms = $this->get('app.sms');
+                $message = $this->get('templating')->render(
+                    'AppBundle:Sms:text-me.txt.twig',
+                    ['branch_pot_url' => $this->getParameter('branch_pot_url')]
+                );
+                if ($sms->send($ukMobileNumber, $message)) {
+                    $lead = new Lead();
+                    $lead->setMobileNumber($ukMobileNumber);
+                    $dm->persist($lead);
+                    $dm->flush();
+                    $this->addFlash('success', sprintf(
+                        'You should receive a download link shortly',
+                        $ukMobileNumber
+                    ));
+                } else {
+                    $this->addFlash('error', sprintf(
+                        'Sorry, we had a problem sending a link to %s',
+                        $mobileNumber
+                    ));
+                }
+            }
         }
 
         return array(
