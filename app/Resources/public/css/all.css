@@ -129,7 +129,6 @@ h1, h2, h3, h4, h5, h6 {
     .navbar-default .navbar-collapse {
         background-color: #fff;
         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
-        border-bottom: #efefef 2px solid;
     }
     .navbar-default .navbar-nav> li> a {
         color: #3399ff !important;
@@ -183,8 +182,26 @@ h1, h2, h3, h4, h5, h6 {
     width: 20%;
     vertical-align: middle;
 }
+.text-break-dark {
+  color: #202532;
+  font-weight: bold;
+}
+.text-break-dark .line-dark:first-child {
+    margin-right: 10px;
+}
+.text-break-dark .line-dark {
+  border-bottom: 1px solid #efefef;
+  display: inline-block;
+  width: 20%;
+  vertical-align: middle;
+}
+
 @media (min-width:544px) {
     .text-break .line {
+        margin: 10px;
+    }
+}
+    .text-break-dark .line-dark {
         margin: 10px;
     }
 }

@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-  <div class="login">
+  <div class="login" id="text-app">
     <div class="container text-center">
       <img class="logo" src="{{ cdn_url }}/images/logo/happy-so-sure-smiley.svg" style="width: 10%;"></img>
       <h1 class="section-title" style="margin-top: 30px;">Get a download link sent to your phone!</h1>
       <p>Enter your phone number below and we'll text you a link to the correct app store.</p>
-      <div class="pre-launch-description" style="margin-bottom: 100px;">
+      <div class="pre-launch-description">
         {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
           <div class="form-group">
             <div class="input-group">
@@ -20,6 +20,25 @@
           <p style="margin-top: 10px"><i>One text per phone number. UK Numbers only.</i></p>
         {{ form_end(form) }}
         </div>
+    <div id="app-store">
+        <div class="row download-app">
+            <div class="text-break-dark">
+                <div class="line-dark"></div>
+                or
+                <div class="line-dark"></div>
+            </div>
+            <div class="col-md-6 text-right">
+                <a class="ga-outbound-click" href="{{ apple_download('text-me-the-app') }}">
+                    <img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
+                </a>
+            </div>
+            <div class="col-md-6 text-left">
+                <a class="ga-outbound-click" href="{{ google_download('text-me-the-app') }}">
+                    <img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
+                </a>
+            </div>
+        </div>
+    </div>
     </div>
   </div>
 </div>
