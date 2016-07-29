@@ -525,6 +525,61 @@ class JudopayService
         return $payment->getPolicy();
     }
 
+    /**
+     * Refund a payment
+     *
+     * @param JudoPayment $payment
+     * @param float       $amount  Amount to refund (or null for entire initial amount)
+     *
+     * @return JudoPayment
+     */
+    public function refund(JudoPayment $payment, $amount = null)
+    {
+        if (!$amount) {
+            $amount = $payment->getAmount();
+        }
+
+        // Refund is a negative payment
+        $refund = new JudoPayment();
+        $refund->setAmount(0 - $amount);
+        $payment->getPolicy()->addPayment($refund);
+        $this->dm->persist($refund);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        // add refund
+        $refundModel = $this->client->getModel('Refund');
+
+        $data = array(
+                'judoId' => $this->judoId,
+                'receiptId' => $payment->getReceipt(),
+                'yourPaymentReference' => $refund->getId(),
+                'amount' => abs($refund->getAmount()),
+        );
+
+        // populate the required data fields.
+        $refundModel->setAttributeValues($data);
+
+        try {
+            $refundModelDetails = $refundModel->create();
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf('Error running refund %s', $refund->getId()), ['exception' => $e]);
+
+            throw $e;
+        }
+
+        $refund->setReference($refundModelDetails["yourPaymentReference"]);
+        $refund->setReceipt($refundModelDetails["receiptId"]);
+        $refund->setAmount(0 - $refundModelDetails["amount"]);
+        $refund->setResult($refundModelDetails["result"]);
+        $refund->setMessage($refundModelDetails["message"]);
+
+        $refund->setRefundTotalCommission($payment->getTotalCommission());
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return $refund;
+    }
+
     public function processCsv($judoFile)
     {
         $filename = $judoFile->getFile();

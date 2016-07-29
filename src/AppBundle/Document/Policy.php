@@ -1016,6 +1016,29 @@ abstract class Policy
         return $this->getStatus() == self::STATUS_CANCELLED;
     }
 
+    public function canCancel($reason, $date = null)
+    {
+        // Doesn't make sense to cancel
+        if (in_array($this->getStatus(), [self::STATUS_CANCELLED, self::STATUS_EXPIRED])) {
+            return false;
+        }
+
+        if ($reason == Policy::CANCELLED_COOLOFF) {
+            return $this->isWithinCooloffPeriod($date);
+        }
+
+        return true;
+    }
+
+    public function isWithinCooloffPeriod($date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $this->getStart()->diff($date)->days < 14;
+    }
+
     public function hasEndedInLast30Days($date = null)
     {
         if ($date == null) {

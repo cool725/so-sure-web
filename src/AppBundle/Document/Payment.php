@@ -174,6 +174,14 @@ abstract class Payment
         }
     }
 
+    public function setRefundTotalCommission($totalCommission)
+    {
+        $this->setTotalCommission(abs($totalCommission));
+        $this->totalCommission = 0 - $this->totalCommission;
+        $this->coverholderCommission = 0 - $this->coverholderCommission;
+        $this->brokerCommission = 0 - $this->brokerCommission;
+    }
+
     public function getTotalCommission()
     {
         return $this->totalCommission;

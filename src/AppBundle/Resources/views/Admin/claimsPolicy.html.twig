@@ -23,6 +23,8 @@
         </div>
         {{ form_widget(cancel_form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
         {{ form_end(cancel_form) }}
+        <br />
+        <i>Cooloff will auto-refund the policy payment</i>
     </div>
     {% include 'AppBundle::Claims/claimsPolicyItem.html.twig' %}
 </div>

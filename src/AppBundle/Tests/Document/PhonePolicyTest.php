@@ -7,6 +7,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
@@ -1365,5 +1366,68 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-02-09")));
         $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-04-15")));
+    }
+
+    public function testCanCancelPolicy()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $this->assertTrue($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-01")));
+        $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-15")));
+        $this->assertTrue($policy->canCancel(Policy::CANCELLED_GOODWILL, new \DateTime("2016-01-15")));
+    }
+
+    public function testCanCancelPolicyAlreadyCancelled()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        static::$dm->persist($policy);
+        static::$dm->persist($user);
+        static::$dm->flush();
+
+        $policy->cancel(new \DateTime("2016-01-02"));
+        $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-01")));
+    }
+
+    public function testCanCancelPolicyExpired()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setEnd(new \DateTime("2016-12-31 23:59"));
+        $policy->setStatus(Policy::STATUS_EXPIRED);
+        $this->assertFalse($policy->canCancel(Policy::CANCELLED_GOODWILL, new \DateTime("2016-01-01")));
+    }
+
+    public function testIsWithinCooloffPeriod()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $this->assertTrue($policy->isWithinCooloffPeriod(new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->isWithinCooloffPeriod(new \DateTime("2016-01-14 23:59:59")));
+        $this->assertFalse($policy->isWithinCooloffPeriod(new \DateTime("2016-01-15")));
     }
 }

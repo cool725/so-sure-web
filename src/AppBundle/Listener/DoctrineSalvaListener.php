@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Event\SalvaPolicyEvent;
+use AppBundle\Event\PolicyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoctrineSalvaListener
@@ -41,7 +41,7 @@ class DoctrineSalvaListener
             ];
             foreach ($fields as $field) {
                 if ($eventArgs->hasChangedField($field)) {
-                    return $this->triggerEvent($document, SalvaPolicyEvent::EVENT_UPDATED);
+                    return $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED);
                 }
             }
         }
@@ -58,7 +58,7 @@ class DoctrineSalvaListener
                 if ($eventArgs->hasChangedField($field)) {
                     foreach ($document->getPolicies() as $policy) {
                         if ($policy instanceof PhonePolicy && $policy->isValidPolicy()) {
-                            return $this->triggerEvent($policy, SalvaPolicyEvent::EVENT_UPDATED);
+                            return $this->triggerEvent($policy, PolicyEvent::EVENT_UPDATED);
                         }
                     }
                 }
@@ -68,7 +68,7 @@ class DoctrineSalvaListener
 
     private function triggerEvent(PhonePolicy $phonePolicy, $eventType)
     {
-        $event = new SalvaPolicyEvent($phonePolicy);
+        $event = new PolicyEvent($phonePolicy);
         $this->dispatcher->dispatch($eventType, $event);
     }
 }

@@ -14,7 +14,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Service\SalvaExportService;
-use AppBundle\Event\SalvaPolicyEvent;
+use AppBundle\Event\PolicyEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\InvalidPremiumException;
@@ -49,6 +49,9 @@ class PolicyService
 
     /** @var ShortLinkService */
     protected $shortLink;
+
+    /** @var JudopayService */
+    protected $judopay;
 
     public function setMailer($mailer)
     {
@@ -153,7 +156,7 @@ class PolicyService
         $policySchedule = $this->generatePolicySchedule($policy);
 
         $this->newPolicyEmail($policy, [$policySchedule, $policyTerms]);
-        $this->dispatcher->dispatch(SalvaPolicyEvent::EVENT_CREATED, new SalvaPolicyEvent($policy));
+        $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
     }
 
     public function uniqueSCode($policy, $count = 0)
@@ -303,7 +306,7 @@ class PolicyService
 
         $this->cancelledPolicyEmail($policy);
         $this->networkCancelledPolicyEmails($policy);
-        $this->dispatcher->dispatch(SalvaPolicyEvent::EVENT_CANCELLED, new SalvaPolicyEvent($policy));
+        $this->dispatcher->dispatch(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
     }
 
     /**

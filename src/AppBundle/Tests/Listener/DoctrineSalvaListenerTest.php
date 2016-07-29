@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Listener\DoctrineUserListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
-use AppBundle\Event\SalvaPolicyEvent;
+use AppBundle\Event\PolicyEvent;
 use AppBundle\Listener\DoctrineSalvaListener;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
@@ -79,7 +79,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
     private function runPreUpdate($policy, $count, $changeSet, $event = null)
     {
         if (!$event) {
-            $event = SalvaPolicyEvent::EVENT_UPDATED;
+            $event = PolicyEvent::EVENT_UPDATED;
         }
         $listener = $this->createListener($policy, $count, $event);
         $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
@@ -88,14 +88,14 @@ class DoctrineSalvaListenerTest extends WebTestCase
 
     private function runPreUpdateUser($user, $policy, $count, $changeSet)
     {
-        $listener = $this->createListener($policy, $count, SalvaPolicyEvent::EVENT_UPDATED);
+        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED);
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
     }
 
     private function createListener($policy, $count, $eventType)
     {
-        $event = new SalvaPolicyEvent($policy);
+        $event = new PolicyEvent($policy);
 
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
                          ->setMethods(array('dispatch'))
