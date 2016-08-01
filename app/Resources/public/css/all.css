@@ -173,36 +173,30 @@ h1, h2, h3, h4, h5, h6 {
 .text-break {
     color: #fff;
 }
-.break-text .line:first-child {
-    margin-right: 10px;
-}
 .text-break .line {
     border-bottom: 1px solid #fff;
     display: inline-block;
-    width: 20%;
+    width: 30%;
     vertical-align: middle;
 }
 .text-break-dark {
   color: #202532;
   font-weight: bold;
 }
-.text-break-dark .line-dark:first-child {
-    margin-right: 10px;
-}
 .text-break-dark .line-dark {
   border-bottom: 1px solid #efefef;
   display: inline-block;
-  width: 20%;
+  width: 30%;
   vertical-align: middle;
 }
-
 @media (min-width:544px) {
     .text-break .line {
         margin: 10px;
+        width: 20%;
     }
-}
     .text-break-dark .line-dark {
         margin: 10px;
+        width: 20%;
     }
 }
 
