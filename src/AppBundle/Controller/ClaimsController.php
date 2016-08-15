@@ -41,6 +41,12 @@ class ClaimsController extends BaseController
      */
     public function claimsUsersAction(Request $request)
     {
+        if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('warning', 'Redirected to Admin Site');
+
+            return $this->redirectToRoute('admin_users');
+        }
+
         $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
@@ -89,6 +95,12 @@ class ClaimsController extends BaseController
      */
     public function claimsUserAction($id)
     {
+        if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('warning', 'Redirected to Admin Site');
+
+            return $this->redirectToRoute('admin_user', ['id' => $id]);
+        }
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $user = $repo->find($id);
@@ -110,6 +122,12 @@ class ClaimsController extends BaseController
      */
     public function claimsPolicyAction(Request $request, $id)
     {
+        if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('warning', 'Redirected to Admin Site');
+
+            return $this->redirectToRoute('admin_policy', ['id' => $id]);
+        }
+
         $imeiService = $this->get('app.imei');
         $fraudService = $this->get('app.fraud');
         $dm = $this->getManager();
