@@ -22,6 +22,13 @@ class Rollbar extends \RollbarNotifier
                     stripos($source->getMessage(), "Untrusted Host") !== false) {
                     return true;
                 }
+
+                // Don't sent HWI OAuth No resource owner 
+                // Verify: GET -UsEd https://wearesosure.com/login/LoginForm.jsp
+                if ($source instanceof \RuntimeException &&
+                    stripos($source->getMessage(), "No resource owner") !== false) {
+                    return true;
+                }
             }
 
             return false;
