@@ -13,6 +13,7 @@ use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhoneTrait;
 use AppBundle\Classes\ApiErrorCode;
 
 use MongoRegex;
@@ -20,6 +21,8 @@ use Gedmo\Loggable\Document\LogEntry;
 
 abstract class BaseController extends Controller
 {
+    use PhoneTrait;
+
     protected function getManager()
     {
         return $this->get('doctrine_mongodb.odm.default_document_manager');
@@ -175,9 +178,22 @@ abstract class BaseController extends Controller
         return new JsonResponse(['code' => $errorCode, 'description' => $description], $httpCode);
     }
 
+    protected function mobileToMongoSearch($form, $qb, $formField, $mongoField, $run = false)
+    {
+        $data = $form->get($formField)->getData();
+
+        return $this->dataToMongoSearch($form, $qb, $this->normalizeUkMobile($data), $mongoField, $run);
+    }
+
     protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false)
     {
         $data = $form->get($formField)->getData();
+
+        return $this->dataToMongoSearch($form, $qb, $data, $mongoField, $run);
+    }
+
+    protected function dataToMongoSearch($form, $qb, $data, $mongoField, $run = false)
+    {
         if (strlen($data) == 0) {
             return null;
         }

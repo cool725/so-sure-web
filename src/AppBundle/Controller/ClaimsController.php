@@ -52,8 +52,9 @@ class ClaimsController extends BaseController
         $form->handleRequest($request);
         $this->formToMongoSearch($form, $users, 'email', 'email');
         $this->formToMongoSearch($form, $users, 'lastname', 'lastName');
-        $this->formToMongoSearch($form, $users, 'mobile', 'mobileNumber');
         $this->formToMongoSearch($form, $users, 'postcode', 'billingAddress.postcode');
+
+        $this->mobileToMongoSearch($form, $users, 'mobile', 'mobileNumber');
 
         $policyRepo = $dm->getRepository(Policy::class);
         $policiesQb = $policyRepo->createQueryBuilder();
