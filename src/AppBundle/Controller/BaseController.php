@@ -182,17 +182,17 @@ abstract class BaseController extends Controller
     {
         $data = $form->get($formField)->getData();
 
-        return $this->dataToMongoSearch($form, $qb, $this->normalizeUkMobile($data), $mongoField, $run);
+        return $this->dataToMongoSearch($qb, $this->normalizeUkMobile($data), $mongoField, $run);
     }
 
     protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false)
     {
         $data = $form->get($formField)->getData();
 
-        return $this->dataToMongoSearch($form, $qb, $data, $mongoField, $run);
+        return $this->dataToMongoSearch($qb, $data, $mongoField, $run);
     }
 
-    protected function dataToMongoSearch($form, $qb, $data, $mongoField, $run = false)
+    protected function dataToMongoSearch($qb, $data, $mongoField, $run = false)
     {
         if (strlen($data) == 0) {
             return null;
