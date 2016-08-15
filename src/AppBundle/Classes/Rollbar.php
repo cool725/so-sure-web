@@ -7,12 +7,7 @@ class Rollbar extends \RollbarNotifier
     {
         parent::__construct($config);
         $this->checkIgnore = (function ($isUncaught, $exception, $payload) {
-            // Don't sent HWI OAuth No resource owner 
-            // Verify: GET -UsEd https://wearesosure.com/login/LoginForm.jsp
-            if ($exception instanceof \RuntimeException &&
-                stripos($exception->getMessage(), "No resource owner") !== false) {
-                return true;
-            } elseif ($exception instanceof \RollbarException) {
+            if ($exception instanceof \RollbarException) {
                 $source = $exception->getException();
                 // Don't sent 404's
                 // Verify: GET -UsEd https://wearesosure.com/not-found

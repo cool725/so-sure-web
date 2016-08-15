@@ -417,3 +417,8 @@ services:
         class: AppBundle\Security\UntrustedHostUnexpectedValueExceptionVoter
         tags:
             - { name: staffim_rollbar.report_voter }
+
+    rollbar.voter.runtime:
+        class: AppBundle\Security\RuntimeExceptionVoter
+        tags:
+            - { name: staffim_rollbar.report_voter }
