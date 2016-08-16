@@ -1739,11 +1739,6 @@ class ApiAuthControllerTest extends BaseControllerTest
         $url = sprintf('/api/v1/auth/policy/%s/scode/%s?_method=GET', $policyId, $sCode->getCode());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
-
-        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $policyId);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(200);
-        $this->assertNull($data['share_link']);
     }
 
     // DELETE policy/{id}/scode/{id}
