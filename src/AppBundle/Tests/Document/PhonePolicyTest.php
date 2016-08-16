@@ -8,6 +8,7 @@ use AppBundle\Document\Connection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
+use AppBundle\Document\SCode;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
@@ -1429,5 +1430,22 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->isWithinCooloffPeriod(new \DateTime("2016-01-01")));
         $this->assertTrue($policy->isWithinCooloffPeriod(new \DateTime("2016-01-14 23:59:59")));
         $this->assertFalse($policy->isWithinCooloffPeriod(new \DateTime("2016-01-15")));
+    }
+
+    public function testActiveSCode()
+    {
+        $scodeA = new SCode();
+        $scodeB = new SCode();
+        $scodeC = new SCode();
+        $scodeA->setActive(false);
+        $policy = new PhonePolicy();
+        $policy->addSCode($scodeA);
+        $policy->addSCode($scodeB);
+        $policy->addSCode($scodeC);
+
+        $this->assertEquals(2, count($policy->getActiveSCodes()));
+        foreach ($policy->getActiveSCodes() as $scode) {
+            $this->assertTrue(in_array($scode->getCode(), [$scodeB->getCode(), $scodeC->getCode()]));
+        }
     }
 }

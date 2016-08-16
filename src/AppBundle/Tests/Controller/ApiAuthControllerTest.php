@@ -1705,6 +1705,13 @@ class ApiAuthControllerTest extends BaseControllerTest
         $shareUrl = self::$router->generate('scode', ['code' => $sCode->getCode()]);
         $this->assertTrue(stripos($getData["share_link"], $shareUrl) >= 0);
         $this->assertTrue(stripos($getData["share_link"], 'http') >= 0);
+
+        // And make sure scode appears under policy as well
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(200);
+        $this->assertEquals(1, count($getData['scodes']));
+        $this->assertEquals($sCode->getCode(), $getData['scodes'][0]['code']);
     }
 
     public function testGetPolicyInactiveSCode()

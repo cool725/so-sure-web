@@ -615,6 +615,18 @@ abstract class Policy
         return $this->scodes;
     }
 
+    public function getActiveSCodes()
+    {
+        $scodes = [];
+        foreach ($this->getSCodes() as $scode) {
+            if ($scode->isActive()) {
+                $scodes[] = $scode;
+            }
+        }
+
+        return $scodes;
+    }
+
     public function addSCode(SCode $scode)
     {
         $scode->setPolicy($this);
@@ -1398,6 +1410,7 @@ abstract class Policy
             'yearly_premium' => $this->getPremium()->getYearlyPremiumPrice(),
             'premium' => $this->getPremiumInstallmentPrice(),
             'premium_plan' => $this->getPremiumPlan(),
+            'scodes' => $this->eachApiArray($this->getActiveSCodes()),
         ];
     }
 }
