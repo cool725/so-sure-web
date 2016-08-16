@@ -615,6 +615,18 @@ abstract class Policy
         return $this->scodes;
     }
 
+    public function getActiveSCodes()
+    {
+        $scodes = [];
+        foreach ($this->getSCodes() as $scode) {
+            if ($scode->isActive()) {
+                $scodes[] = $scode;
+            }
+        }
+
+        return $scodes;
+    }
+
     public function addSCode(SCode $scode)
     {
         $scode->setPolicy($this);
@@ -628,16 +640,6 @@ abstract class Policy
             if ($scode->isActive() && $scode->isStandard()) {
                 return $scode;
             }
-        }
-
-        return null;
-    }
-
-    public function getShareLink()
-    {
-        $scode = $this->getStandardSCode();
-        if ($scode) {
-            return $scode->getShareLink();
         }
 
         return null;
@@ -1394,10 +1396,10 @@ abstract class Policy
             'has_claim' => $this->hasMonetaryClaimed(),
             'has_network_claim' => $this->hasNetworkClaim(true),
             'claim_dates' => $this->eachApiMethod($this->getMonetaryClaimed(), 'getClosedDate'),
-            'share_link' => $this->getShareLink(),
             'yearly_premium' => $this->getPremium()->getYearlyPremiumPrice(),
             'premium' => $this->getPremiumInstallmentPrice(),
             'premium_plan' => $this->getPremiumPlan(),
+            'scodes' => $this->eachApiArray($this->getActiveSCodes()),
         ];
     }
 }
