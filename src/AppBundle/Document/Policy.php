@@ -645,16 +645,6 @@ abstract class Policy
         return null;
     }
 
-    public function getShareLink()
-    {
-        $scode = $this->getStandardSCode();
-        if ($scode) {
-            return $scode->getShareLink();
-        }
-
-        return null;
-    }
-
     public function init(User $user, PolicyDocument $terms)
     {
         $user->addPolicy($this);
@@ -1406,7 +1396,6 @@ abstract class Policy
             'has_claim' => $this->hasMonetaryClaimed(),
             'has_network_claim' => $this->hasNetworkClaim(true),
             'claim_dates' => $this->eachApiMethod($this->getMonetaryClaimed(), 'getClosedDate'),
-            'share_link' => $this->getShareLink(),
             'yearly_premium' => $this->getPremium()->getYearlyPremiumPrice(),
             'premium' => $this->getPremiumInstallmentPrice(),
             'premium_plan' => $this->getPremiumPlan(),

@@ -1390,6 +1390,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail($this->generateEmail('cancel-already-cancelled', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
