@@ -94,8 +94,14 @@ class ReceperioService extends BaseImeiService
         return $this->responseData;
     }
 
-    private function queueMessage($action, $phoneId, $userId = null, $imei = null, $serial = null, $phonePolicyId = null)
-    {
+    private function queueMessage(
+        $action,
+        $phoneId,
+        $userId = null,
+        $imei = null,
+        $serial = null,
+        $phonePolicyId = null
+    ) {
         $data = ['action' => $action, 'phoneId' => $phoneId, 'userId' => $userId];
         if ($imei) {
             $data['imei'] = $imei;
@@ -150,7 +156,7 @@ class ReceperioService extends BaseImeiService
                 $phoneRepo = $this->dm->getRepository(Phone::class);
                 $phone = $phoneRepo->find($data['phoneId']);
                 if (!$phone) {
-                    throw new \Exception(sprintf('Unknown phone from queue %s', json_encode($data)));                    
+                    throw new \Exception(sprintf('Unknown phone from queue %s', json_encode($data)));
                 }
 
                 if ($action == self::CHECK_IMEI) {
@@ -460,7 +466,13 @@ class ReceperioService extends BaseImeiService
             $this->logger->error(sprintf("Unable to check serial number %s Ex: %s", $serialNumber, $e->getMessage()));
 
             // If there are any issues, assume true and manually process queue later
-            $this->queueMessage(self::CHECK_SERIAL, $phone->getId(), $user ? $user->getId() : null, null, $serialNumber);
+            $this->queueMessage(
+                self::CHECK_SERIAL,
+                $phone->getId(),
+                $user ? $user->getId() : null,
+                null,
+                $serialNumber
+            );
 
             return true;
         }
