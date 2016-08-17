@@ -45,7 +45,8 @@
         "alcaeus/mongo-php-adapter": "^1.0",
         "doctrine/mongodb-odm": "^1.1",
         "doctrine/mongodb-odm-bundle": "^3.2",
-        "knplabs/knp-snappy-bundle": "^1.4"
+        "knplabs/knp-snappy-bundle": "^1.4",
+        "peerj/peerj-user-security-bundle": "^0.1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

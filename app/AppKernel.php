@@ -39,6 +39,7 @@ class AppKernel extends Kernel
             new Vich\UploaderBundle\VichUploaderBundle(),
             new Oneup\FlysystemBundle\OneupFlysystemBundle(),
             new Knp\Bundle\SnappyBundle\KnpSnappyBundle(),
+            new Peerj\UserSecurityBundle\PeerjUserSecurityBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {
