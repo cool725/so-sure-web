@@ -1597,7 +1597,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_CONNECTED);
     }
 
-    // policy/{id}/scode
+    // scode
 
     /**
      *
@@ -1623,15 +1623,18 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policy->getStandardSCode()->setActive(false);
         $dm->flush();
 
-        $url = sprintf('/api/v1/auth/policy/%s/scode', $policyId);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['type' => SCode::TYPE_STANDARD]);
+        $url = sprintf('/api/v1/auth/scode');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'type' => SCode::TYPE_STANDARD,
+            'policy_id' => $policyId,
+        ]);
         $getData = $this->verifyResponse(200);
         $this->assertEquals(8, strlen($getData['code']));
         $this->assertEquals(SCode::TYPE_STANDARD, $getData['type']);
         $this->assertNotEquals($oldCode, $getData['code']);
     }
 
-    public function testCreatePolicySCodeNoType()
+    public function testCreatePolicySCodeMissingParams()
     {
         $user = self::createUser(
             self::$userManager,
@@ -1645,8 +1648,15 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $this->payPolicy($user, $policyId);
 
-        $url = sprintf('/api/v1/auth/policy/%s/scode', $policyId);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $url = sprintf('/api/v1/auth/scode');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'policy_id' => $policyId,
+        ]);
+        $getData = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'type' => SCode::TYPE_STANDARD,
+        ]);
         $getData = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
@@ -1664,12 +1674,15 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $this->payPolicy($user, $policyId);
 
-        $url = sprintf('/api/v1/auth/policy/%s/scode', $policyId);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['type' => SCode::TYPE_STANDARD]);
+        $url = sprintf('/api/v1/auth/scode');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'type' => SCode::TYPE_STANDARD,
+            'policy_id' => $policyId,
+        ]);
         $getData = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
-    // GET policy/{id}/scode/{id}
+    // GET /scode/{id}
 
     /**
      *
@@ -1694,7 +1707,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policy = $policyRepo->find($policyId);
         $sCode = $policy->getStandardSCode();
 
-        $url = sprintf('/api/v1/auth/policy/%s/scode/%s?_method=GET', $policyId, $sCode->getCode());
+        $url = sprintf('/api/v1/auth/scode/%s?_method=GET', $sCode->getCode());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
         $this->assertEquals(8, strlen($getData['code']));
@@ -1736,12 +1749,12 @@ class ApiAuthControllerTest extends BaseControllerTest
         $sCode->setActive(false);
         $dm->flush();
 
-        $url = sprintf('/api/v1/auth/policy/%s/scode/%s?_method=GET', $policyId, $sCode->getCode());
+        $url = sprintf('/api/v1/auth/scode/%s?_method=GET', $sCode->getCode());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
-    // DELETE policy/{id}/scode/{id}
+    // DELETE scode/{id}
 
     /**
      *
@@ -1765,7 +1778,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policy = $policyRepo->find($policyId);
         $sCode = $policy->getStandardSCode()->getCode();
 
-        $url = sprintf('/api/v1/auth/policy/%s/scode/%s?_method=DELETE', $policyId, $sCode);
+        $url = sprintf('/api/v1/auth/scode/%s?_method=DELETE', $sCode);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
 
@@ -1797,7 +1810,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $sCode->setActive(false);
         $dm->flush();
 
-        $url = sprintf('/api/v1/auth/policy/%s/scode/%s?_method=DELETE', $policyId, $sCode->getCode());
+        $url = sprintf('/api/v1/auth/scode/%s?_method=DELETE', $sCode->getCode());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
