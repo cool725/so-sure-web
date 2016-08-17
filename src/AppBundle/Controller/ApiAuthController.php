@@ -630,20 +630,20 @@ class ApiAuthController extends BaseController
     }
 
     /**
-     * @Route("/policy/{id}/scode", name="api_auth_create_policy_scode")
+     * @Route("/scode", name="api_auth_create_scode")
      * @Method({"POST"})
      */
-    public function postPolicySCodeAction(Request $request, $id)
+    public function postSCodeAction(Request $request)
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (!isset($data['type'])) {
+            if (!$this->validateFields($data, ['type', 'policy_id'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
-            $policy = $repo->find($id);
+            $policy = $repo->find($data['policy_id']);
             if (!$policy) {
                 throw new NotFoundHttpException();
             }
@@ -675,26 +675,21 @@ class ApiAuthController extends BaseController
                 404
             );
         } catch (\Exception $e) {
-            $this->get('logger')->error('Error in api postPolicySCodeAction.', ['exception' => $e]);
+            $this->get('logger')->error('Error in api postSCodeAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
 
     /**
-     * @Route("/policy/{id}/scode/{code}", name="api_auth_get_policy_scode")
+     * @Route("/scode/{code}", name="api_auth_get_scode")
      * @Method({"GET"})
      */
-    public function getPolicySCodeAction($id, $code)
+    public function getSCodeAction($code)
     {
         try {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
-            $policy = $repo->find($id);
-            if (!$policy) {
-                throw new NotFoundHttpException();
-            }
-            $this->denyAccessUnlessGranted('view', $policy);
 
             $scodeRepo = $dm->getRepository(SCode::class);
             $scode = $scodeRepo->findOneBy(['code' => $code]);
@@ -719,7 +714,7 @@ class ApiAuthController extends BaseController
     }
 
     /**
-     * @Route("/policy/{id}/scode/{code}", name="api_auth_delete_policy_scode")
+     * @Route("/scode/{code}", name="api_auth_delete_policy_scode")
      * @Method({"DELETE"})
      */
     public function deletePolicySCodeAction($id, $code)
