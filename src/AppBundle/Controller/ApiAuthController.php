@@ -714,25 +714,26 @@ class ApiAuthController extends BaseController
     }
 
     /**
-     * @Route("/scode/{code}", name="api_auth_delete_policy_scode")
+     * @Route("/scode/{code}", name="api_auth_delete_scode")
      * @Method({"DELETE"})
      */
-    public function deletePolicySCodeAction($id, $code)
+    public function deletePolicySCodeAction($code)
     {
         try {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
-            $policy = $repo->find($id);
-            if (!$policy) {
-                throw new NotFoundHttpException();
-            }
-            $this->denyAccessUnlessGranted('edit', $policy);
 
             $scodeRepo = $dm->getRepository(SCode::class);
             $scode = $scodeRepo->findOneBy(['code' => $code]);
             if (!$scode || !$scode->isActive()) {
                 throw new NotFoundHttpException();
             }
+
+            $policy = $scode->getPolicy();
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted('edit', $policy);
 
             $scode->setActive(false);
             $dm->flush();
