@@ -35,6 +35,7 @@ security:
                 csrf_provider: security.csrf.token_manager # Use form.csrf_provider instead for Symfony <2.4
                 default_target_path: /login-redirect
                 always_use_default_target_path: false
+                failure_handler: peerj_user_security.component.authentication.handler.login_failure_handler
             logout:       true
             anonymous:    true
             security: true
