@@ -56,7 +56,8 @@ security:
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
-        - { path: ^/claims/, role: ROLE_CLAIMS }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ 217.158.0.52 ] }
+        - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/purchase/, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
