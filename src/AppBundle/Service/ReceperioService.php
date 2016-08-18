@@ -17,8 +17,19 @@ class ReceperioService extends BaseImeiService
     const CLAIMSCHECK_CACHE_TIME = 84600;
     const FORCES_CACHE_TIME = 84600;
     const TEST_INVALID_IMEI = "352000067704506";
+    const TEST_INVALID_SERIAL = "111111";
     const PARTNER_ID = 415;
     const BASE_URL = "http://gapi.checkmend.com";
+
+    const KEY_RECEPERIO_QUEUE = "receperio:queue";
+    const KEY_DUEDILIGENCE_FORMAT = "receperio:duediligence:%s";
+    const KEY_CLAIMSCHECK_FORMAT = "receperio:claimscheck:%s";
+    const KEY_MAKEMODEL_FORMAT = "receperio:makemodel:%s";
+    const KEY_FORCES = "receperio:forces";
+
+    const CHECK_IMEI = 'imei';
+    const CHECK_CLAIMS = 'claims';
+    const CHECK_SERIAL = 'serial';
 
     /** @var string */
     protected $secretKey;
@@ -83,6 +94,187 @@ class ReceperioService extends BaseImeiService
         return $this->responseData;
     }
 
+    private function queueMessage(
+        $action,
+        $phoneId,
+        $userId = null,
+        $imei = null,
+        $serial = null,
+        $phonePolicyId = null
+    ) {
+        $data = ['action' => $action, 'phoneId' => $phoneId, 'userId' => $userId];
+        if ($imei) {
+            $data['imei'] = $imei;
+        }
+        if ($serial) {
+            $data['serial'] = $serial;
+        }
+        if ($phonePolicyId) {
+            $data['phonePolicyId'] = $phonePolicyId;
+        }
+        $this->redis->rpush(self::KEY_RECEPERIO_QUEUE, serialize($data));
+    }
+
+    public function clearQueue($max = null)
+    {
+        if (!$max) {
+            $this->redis->del(self::KEY_RECEPERIO_QUEUE);
+        } else {
+            for ($i = 0; $i < $max; $i++) {
+                $this->redis->lpop(self::KEY_RECEPERIO_QUEUE);
+            }
+        }
+    }
+
+    public function getQueueSize()
+    {
+        return $this->redis->llen(self::KEY_RECEPERIO_QUEUE);
+    }
+
+    public function getQueueData($max)
+    {
+        return $this->redis->lrange(self::KEY_RECEPERIO_QUEUE, 0, $max - 1);
+    }
+
+    public function process($max)
+    {
+        $count = 0;
+        while ($count < $max) {
+            $policy = null;
+            $action = null;
+            $cancelReason = null;
+            try {
+                $queueItem = $this->redis->lpop(self::KEY_RECEPERIO_QUEUE);
+                if (!$queueItem) {
+                    return $count;
+                }
+                $data = unserialize($queueItem);
+
+                if (!isset($data['action']) || !isset($data['phoneId'])) {
+                    throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
+                }
+                $action = $data['action'];
+                $user = null;
+                $userRepo = $this->dm->getRepository(User::class);
+                if (isset($data['userId'])) {
+                    $user = $userRepo->find($data['userId']);
+                }
+                $phoneRepo = $this->dm->getRepository(Phone::class);
+                $phone = $phoneRepo->find($data['phoneId']);
+                if (!$phone) {
+                    throw new \Exception(sprintf('Unknown phone from queue %s', json_encode($data)));
+                }
+
+                if ($action == self::CHECK_IMEI) {
+                    if (!isset($data['imei'])) {
+                        throw new \Exception(sprintf('Missing imei from message in queue %s', json_encode($data)));
+                    }
+                    $this->reprocessImei($phone, $data['imei'], $user, $data);
+                } elseif ($action == self::CHECK_SERIAL) {
+                    if (!isset($data['serial'])) {
+                        throw new \Exception(sprintf('Missing serial from message in queue %s', json_encode($data)));
+                    }
+                    $this->reprocessSerial($phone, $data['serial'], $user, $data);
+                } else {
+                    throw new \Exception(sprintf(
+                        'Unknown action %s [%s]',
+                        $data['action'],
+                        json_encode($data)
+                    ));
+                }
+
+                $count = $count + 1;
+            } catch (\Exception $e) {
+                $this->logger->error(sprintf(
+                    'Error reprocessing receperio message [%s]',
+                    json_encode($data)
+                ), ['exeception' => $e]);
+
+                throw $e;
+            }
+        }
+        
+        return $count;
+    }
+
+    /**
+     * Reprocess an imei check and record the checkmend against a policy with that imei
+     *
+     * @param Phone  $phone
+     * @param string $imei
+     * @param User   $user
+     * @param        $data
+     *
+     * @return boolean|null null if unable to find policy, otherwise, checkImei result
+     */
+    public function reprocessImei(Phone $phone, $imei, User $user = null, $data = null)
+    {
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        // TODO: check policy status
+        $policy = $phonePolicyRepo->findOneBy(['imei' => $imei]);
+        if (!$policy) {
+            $this->logger->warning(sprintf(
+                'Skipping imei recheck as policy has not been created for imei %s [%s]',
+                $imei,
+                json_encode($data)
+            ));
+
+            return null;
+        }
+
+        // TODO: Should we record the checkImei result against the policy as well as the certid
+        $result = $this->checkImei($phone, $imei, $user);
+        $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData());
+        $this->dm->flush();
+        if (!$result) {
+            $this->logger->error(sprintf(
+                'Imei %s failed validation and policy %s should be cancelled',
+                $imei,
+                $policy->getId()
+            ));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reprocess an serial check and record the checkmend against a policy with that serial
+     *
+     * @param Phone  $phone
+     * @param string $serialNumber
+     * @param User   $user
+     * @param        $data
+     *
+     * @return boolean|null null if unable to find policy, otherwise, checkSerial result
+     */
+    public function reprocessSerial(Phone $phone, $serialNumber, User $user = null, $data = null)
+    {
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        // TODO: check policy status
+        $policy = $phonePolicyRepo->findOneBy(['serialNumber' => $serialNumber]);
+        if (!$policy) {
+            $this->logger->warning(sprintf(
+                'Missing serial recheck as policy has not been created for serial %s [%s]',
+                $serial,
+                json_encode($data)
+            ));
+
+            return null;
+        }
+
+        // TODO: Should we record the checkSerial result against the policy
+        $result = $this->checkSerial($phone, $serialNumber, $user);
+        if (!$result) {
+            $this->logger->error(sprintf(
+                'Serial %s failed validation and policy %s should be investigated (cancelled?)',
+                $serialNumber,
+                $policy->getId()
+            ));
+        }
+
+        return $result;
+    }
+
     /**
      * Checks imei against a blacklist
      *
@@ -105,7 +297,7 @@ class ReceperioService extends BaseImeiService
         }
 
         try {
-            $key = sprintf("receperio:duediligence:%s", $imei);
+            $key = sprintf(self::KEY_DUEDILIGENCE_FORMAT, $imei);
             if (($redisData = $this->redis->get($key)) != null) {
                 $data = unserialize($redisData);
                 $this->logger->info(sprintf("Cached DueDiligence search for %s -> %s", $imei, json_encode($data)));
@@ -143,7 +335,9 @@ class ReceperioService extends BaseImeiService
             // TODO: automate a future retry check
             $this->logger->error(sprintf("Unable to check imei %s Ex: %s", $imei, $e->getMessage()));
 
-            // For now, if there are any issues, assume true and run a manual retry later
+            // If there are any issues, assume true and manually process queue later
+            $this->queueMessage(self::CHECK_IMEI, $phone->getId(), $user ? $user->getId() : null, $imei);
+
             return true;
         }
     }
@@ -187,7 +381,7 @@ class ReceperioService extends BaseImeiService
         }
 
         try {
-            $key = sprintf("receperio:claimscheck:%s", $imei);
+            $key = sprintf(self::KEY_CLAIMSCHECK_FORMAT, $imei);
             if (($redisData = $this->redis->get($key)) != null) {
                 $data = unserialize($redisData);
                 $this->logger->info(sprintf("Cached Claimscheck search for %s -> %s", $imei, json_encode($data)));
@@ -226,9 +420,21 @@ class ReceperioService extends BaseImeiService
             return $data['checkmendstatus']['result'] == 'green';
         } catch (\Exception $e) {
             // TODO: automate a future retry check
-            $this->logger->error(sprintf("Unable to check imei %s Ex: %s", $imei, $e->getMessage()));
+            $this->logger->error(sprintf("Unable to check claims for imei %s Ex: %s", $imei, $e->getMessage()));
 
-            // For now, if there are any issues, assume true and run a manual retry later
+            // Claims are currently a manual process and so would fail at point of triggering
+            // not sure that we currently need a process to requeue it
+            /*
+            $this->queueMessage(
+                self::CHECK_CLAIMS,
+                $phone->getId(),
+                $user ? $user->getId() : null,
+                $imei,
+                null,
+                $policy->getId()
+            );
+            */
+
             return true;
         }
     }
@@ -244,10 +450,8 @@ class ReceperioService extends BaseImeiService
      */
     public function checkSerial(Phone $phone, $serialNumber, User $user = null)
     {
-        // TODO: Cache
-
         \AppBundle\Classes\NoOp::noOp([$phone]);
-        if ($serialNumber == "111111") {
+        if ($serialNumber == self::TEST_INVALID_SERIAL) {
             return false;
         }
 
@@ -256,7 +460,7 @@ class ReceperioService extends BaseImeiService
         }
 
         try {
-            $key = sprintf("receperio:makemodel:%s", $serialNumber);
+            $key = sprintf(self::KEY_MAKEMODEL_FORMAT, $serialNumber);
             if (($redisData = $this->redis->get($key)) != null) {
                 $data = unserialize($redisData);
                 $this->logger->info(sprintf(
@@ -296,7 +500,15 @@ class ReceperioService extends BaseImeiService
             // TODO: automate a future retry check
             $this->logger->error(sprintf("Unable to check serial number %s Ex: %s", $serialNumber, $e->getMessage()));
 
-            // For now, if there are any issues, assume true and run a manual retry later
+            // If there are any issues, assume true and manually process queue later
+            $this->queueMessage(
+                self::CHECK_SERIAL,
+                $phone->getId(),
+                $user ? $user->getId() : null,
+                null,
+                $serialNumber
+            );
+
             return true;
         }
     }
@@ -378,7 +590,7 @@ class ReceperioService extends BaseImeiService
     public function getForces()
     {
         try {
-            $key = sprintf("receperio:forces");
+            $key = sprintf(self::KEY_FORCES);
             if (($redisData = $this->redis->get($key)) != null) {
                 $data = unserialize($redisData);
                 $this->logger->debug(sprintf("Cached Claimscheck Forces"));
@@ -388,12 +600,14 @@ class ReceperioService extends BaseImeiService
 
                 $data = json_decode($response, true);
                 $forces = [];
-                foreach ($data['forces'] as $force) {
-                    $forces[$force['force']] = $force['forcename'];
+                if (isset($data['forces'])) {
+                    foreach ($data['forces'] as $force) {
+                        $forces[$force['force']] = $force['forcename'];
+                    }
+
+                    $this->redis->setex($key, self::FORCES_CACHE_TIME, serialize($forces));
                 }
                 $data = $forces;
-
-                $this->redis->setex($key, self::FORCES_CACHE_TIME, serialize($data));
             }
 
             return $data;
@@ -457,6 +671,7 @@ class ReceperioService extends BaseImeiService
             return $body;
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error in receperio request: %s', $url), ['exception' => $e]);
+            throw $e;
         }
     }
     

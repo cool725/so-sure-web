@@ -28,9 +28,9 @@ class ReceperioServiceTest extends WebTestCase
          //get the DI container
          self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$imei = self::$container->get('app.imei');
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        self::$imei = self::$container->get('app.imei');
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$phoneRepo = self::$dm->getRepository(Phone::class);
     }
