@@ -27,7 +27,7 @@ class ReceperioQueueCommand extends ContainerAwareCommand
                 'process',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Max Number to process',
+                'Max Number to process (-1 to clear all queue)',
                 1
             )
             ->addOption(
@@ -47,8 +47,13 @@ class ReceperioQueueCommand extends ContainerAwareCommand
         $process = $input->getOption('process');
 
         if ($clear) {
-            $receperio->clearQueue();
-            $output->writeln(sprintf("Queue is cleared"));
+            if ($process > 0) {
+                $receperio->clearQueue($process);
+                $output->writeln(sprintf("Queue is cleared of %d messages", $process));
+            } else {
+                $receperio->clearQueue();
+                $output->writeln(sprintf("Queue is cleared"));
+            }
         } elseif ($show) {
             $data = $receperio->getQueueData($process);
             $output->writeln(sprintf("Queue Size: %d (%d shown)", $receperio->getQueueSize(), count($data)));

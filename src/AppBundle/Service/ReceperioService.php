@@ -115,9 +115,15 @@ class ReceperioService extends BaseImeiService
         $this->redis->rpush(self::KEY_RECEPERIO_QUEUE, serialize($data));
     }
 
-    public function clearQueue()
+    public function clearQueue($max = null)
     {
-        $this->redis->del(self::KEY_RECEPERIO_QUEUE);
+        if (!$max) {
+            $this->redis->del(self::KEY_RECEPERIO_QUEUE);
+        } else {
+            for ($i = 0; $i < $max; $i++) {
+                $this->redis->lpop(self::KEY_RECEPERIO_QUEUE);
+            }
+        }
     }
 
     public function getQueueSize()
@@ -144,13 +150,13 @@ class ReceperioService extends BaseImeiService
                 }
                 $data = unserialize($queueItem);
 
-                if (!isset($data['action']) || !isset($data['phoneId']) || !isset($data['userId'])) {
+                if (!isset($data['action']) || !isset($data['phoneId'])) {
                     throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
                 $action = $data['action'];
                 $user = null;
                 $userRepo = $this->dm->getRepository(User::class);
-                if ($data['userId']) {
+                if (isset($data['userId'])) {
                     $user = $userRepo->find($data['userId']);
                 }
                 $phoneRepo = $this->dm->getRepository(Phone::class);
@@ -191,9 +197,20 @@ class ReceperioService extends BaseImeiService
         return $count;
     }
 
-    private function reprocessImei($phone, $imei, $user, $data)
+    /**
+     * Reprocess an imei check and record the checkmend against a policy with that imei
+     *
+     * @param Phone  $phone
+     * @param string $imei
+     * @param User   $user
+     * @param        $data
+     *
+     * @return boolean|null null if unable to find policy, otherwise, checkImei result
+     */
+    public function reprocessImei(Phone $phone, $imei, User $user = null, $data = null)
     {
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        // TODO: check policy status
         $policy = $phonePolicyRepo->findOneBy(['imei' => $imei]);
         if (!$policy) {
             $this->logger->warning(sprintf(
@@ -202,24 +219,38 @@ class ReceperioService extends BaseImeiService
                 json_encode($data)
             ));
 
-            return;
+            return null;
         }
 
-        if ($this->checkImei($phone, $imei, $user)) {
-            $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData());
-            $this->dm->flush();
-        } else {
+        // TODO: Should we record the checkImei result against the policy as well as the certid
+        $result = $this->checkImei($phone, $imei, $user);
+        $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData());
+        $this->dm->flush();
+        if (!$result) {
             $this->logger->error(sprintf(
                 'Imei %s failed validation and policy %s should be cancelled',
                 $imei,
                 $policy->getId()
             ));
         }
+
+        return $result;
     }
 
-    private function reprocessSerial($phone, $serialNumber, $user, $data)
+    /**
+     * Reprocess an serial check and record the checkmend against a policy with that serial
+     *
+     * @param Phone  $phone
+     * @param string $serialNumber
+     * @param User   $user
+     * @param        $data
+     *
+     * @return boolean|null null if unable to find policy, otherwise, checkSerial result
+     */
+    public function reprocessSerial(Phone $phone, $serialNumber, User $user = null, $data = null)
     {
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        // TODO: check policy status
         $policy = $phonePolicyRepo->findOneBy(['serialNumber' => $serialNumber]);
         if (!$policy) {
             $this->logger->warning(sprintf(
@@ -228,16 +259,20 @@ class ReceperioService extends BaseImeiService
                 json_encode($data)
             ));
 
-            return;
+            return null;
         }
 
-        if (!$this->checkSerial($phone, $serialNumber, $user)) {
+        // TODO: Should we record the checkSerial result against the policy
+        $result = $this->checkSerial($phone, $serialNumber, $user);
+        if (!$result) {
             $this->logger->error(sprintf(
                 'Serial %s failed validation and policy %s should be investigated (cancelled?)',
                 $serialNumber,
                 $policy->getId()
             ));
         }
+
+        return $result;
     }
 
     /**
