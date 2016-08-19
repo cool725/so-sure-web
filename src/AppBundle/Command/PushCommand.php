@@ -49,7 +49,14 @@ class PushCommand extends ContainerAwareCommand
         // @codingStandardsIgnoreEnd
 
         if (strlen($email) > 0) {
-            $push->sendToUser($this->getUser($email), $message);
+            $user = $this->getUser($email);
+            if (!$user) {
+                throw new \Exception('Unable to find user');
+            }
+            if (strlen($user->getSnsEndpoint()) == 0) {
+                throw new \Exception('User does not have a sns endpoint registered');
+            }
+            $push->sendToUser($user, $message);
             $output->writeln('Sent message');
         } elseif (strlen($arn) > 0) {
             $push->send($arn, $message);
