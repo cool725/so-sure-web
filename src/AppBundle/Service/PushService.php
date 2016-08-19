@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\User;
 use Psr\Log\LoggerInterface;
 
 class PushService
