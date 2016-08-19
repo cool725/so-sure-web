@@ -945,6 +945,15 @@ class ApiAuthController extends BaseController
                 $userChanged = true;
             }
 
+            if (isset($data['sns_endpoint']) && strlen($data['sns_endpoint']) > 0) {
+                $oldEndpointUsers = $repo->findBy(['snsEndpoint' => $data['sns_endpoint']]);
+                foreach ($oldEndpointUsers as $oldEndpointUser) {
+                    $oldEndpointUser->setSnsEndpoint(null);
+                }
+                $user->setSnsEndpoint($data['sns_endpoint']);
+                $userChanged = true;
+            }
+
             $validator = $this->get('validator');
             $errors = $validator->validate($user);
             if (count($errors) > 0) {
