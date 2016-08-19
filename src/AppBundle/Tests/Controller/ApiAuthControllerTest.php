@@ -2097,6 +2097,50 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
+    public function testUpdateUserSnsEndpoint()
+    {
+        $userA = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-sns-a', $this),
+            'foo'
+        );
+        $userA->setSnsEndpoint('foo');
+
+        $userB = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-sns-b', $this),
+            'foo'
+        );
+        $userB->setSnsEndpoint('foo');
+
+        $userC = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-sns-c', $this),
+            'foo'
+        );
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm->flush();
+
+        $cognitoIdentityId = $this->getAuthUser($userC);
+        $url = sprintf('/api/v1/auth/user/%s', $userC->getId());
+        $data = [
+            'sns_endpoint' => 'foo',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+
+        $changedUserA = $userRepo->findOneBy(['email' => $userA->getEmail()]);
+        $changedUserB = $userRepo->findOneBy(['email' => $userB->getEmail()]);
+        $changedUserC = $userRepo->findOneBy(['email' => $userC->getEmail()]);
+        $this->assertEquals('foo', $changedUserC->getSnsEndpoint());
+        $this->assertNull($changedUserA->getSnsEndpoint());
+        $this->assertNull($changedUserB->getSnsEndpoint());
+    }
+
     // user/{id}/address
 
     /**
