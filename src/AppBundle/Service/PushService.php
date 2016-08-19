@@ -2,29 +2,22 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
-use Doctrine\ODM\MongoDB\DocumentManager;
 
 class PushService
 {
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var DocumentManager */
-    protected $dm;
-
     protected $sns;
 
     /**
-     * @param DocumentManager  $dm
-     * @param LoggerInterface  $logger
-     * @param                  $sns
+     * @param LoggerInterface $logger
+     * @param                 $sns
      */
     public function __construct(
-        DocumentManager $dm,
         LoggerInterface $logger,
         $sns
     ) {
-        $this->dm = $dm;
         $this->logger = $logger;
         $this->sns = $sns;
     }
@@ -64,7 +57,9 @@ class PushService
     }
 
     /**
+     * @codingStandardsIgnoreStart
      * @see https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/TheNotificationPayload.html
+     * @codingStandardsIgnoreEnd
      */
     private function generateAPNSMessage($message, $category = null, $badge = null, $newContent = null)
     {
@@ -81,7 +76,7 @@ class PushService
             $apns['aps']['badge'] = $badge;
         }
         if ($newContent) {
-            $apns['apps']['content-available'] = 1;  
+            $apns['apps']['content-available'] = 1;
         }
 
         return $apns;
