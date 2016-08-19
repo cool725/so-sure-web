@@ -58,6 +58,9 @@ class InvitationService
     /** @var RateLimitService */
     protected $rateLimit;
 
+    /** @var PushService */
+    protected $push;
+
     /** @var boolean */
     protected $debug;
 
@@ -70,6 +73,7 @@ class InvitationService
      * @param ShortLinkService $shortLink
      * @param SmsService       $sms
      * @param RateLimitService $rateLimit
+     * @param PushService      $push
      */
     public function __construct(
         DocumentManager $dm,
@@ -79,7 +83,8 @@ class InvitationService
         $router,
         ShortLinkService $shortLink,
         SmsService $sms,
-        RateLimitService $rateLimit
+        RateLimitService $rateLimit,
+        PushService $push
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -89,6 +94,7 @@ class InvitationService
         $this->shortLink = $shortLink;
         $this->sms = $sms;
         $this->rateLimit = $rateLimit;
+        $this->push = $push;
     }
 
     public function setDebug($debug)
@@ -373,6 +379,10 @@ class InvitationService
 
         // Notify inviter of acceptance
         $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
+        $this->push->sendToUser($invitation->getInviter(), sprintf(
+            '%s has accepted your connection!',
+            $invitation->getInviteeName()
+        ));
     }
 
     protected function addConnection(Policy $policy, User $linkedUser, Policy $linkedPolicy, \DateTime $date = null)

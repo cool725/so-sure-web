@@ -104,6 +104,14 @@ services:
             shortLink:  "@app.shortlink"
             sms:        "@app.sms"
             rateLimit:  "@app.ratelimit"
+            push:       "@app.push"
+
+    app.push:
+        class: AppBundle\Service\PushService
+        arguments:
+            dm:         "@doctrine_mongodb.odm.default_document_manager"
+            logger:     "@logger"
+            sns:        "@aws.sns"
 
     app.claims:
         class: AppBundle\Service\ClaimsService
