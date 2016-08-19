@@ -104,6 +104,13 @@ services:
             shortLink:  "@app.shortlink"
             sms:        "@app.sms"
             rateLimit:  "@app.ratelimit"
+            push:       "@app.push"
+
+    app.push:
+        class: AppBundle\Service\PushService
+        arguments:
+            logger:     "@logger"
+            sns:        "@aws.sns"
 
     app.claims:
         class: AppBundle\Service\ClaimsService
