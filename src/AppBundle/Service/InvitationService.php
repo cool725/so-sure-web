@@ -379,7 +379,7 @@ class InvitationService
 
         // Notify inviter of acceptance
         $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
-        $this->push->sendToUser($invitation->getInviter(), sprintf(
+        $this->push->sendToUser(PushService::MESSAGE_CONNECTED, $invitation->getInviter(), sprintf(
             '%s has accepted your connection!',
             $invitation->getInviteeName()
         ));

@@ -29,6 +29,13 @@ class PushCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'arn to send to'
             )
+            ->addOption(
+                'type',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'message type (general, connected)',
+                'general'
+            )
             ->addArgument(
                 'message',
                 InputArgument::REQUIRED,
@@ -40,6 +47,7 @@ class PushCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $message = $input->getArgument('message');
+        $messageType = $input->getOption('type');
         $arn = $input->getOption('arn');
         $email = $input->getOption('email');
 
@@ -56,10 +64,10 @@ class PushCommand extends ContainerAwareCommand
             if (strlen($user->getSnsEndpoint()) == 0) {
                 throw new \Exception('User does not have a sns endpoint registered');
             }
-            $push->sendToUser($user, $message);
+            $push->sendToUser($messageType, $user, $message);
             $output->writeln('Sent message');
         } elseif (strlen($arn) > 0) {
-            $push->send($arn, $message);
+            $push->send($messageType, $arn, $message);
             $output->writeln('Sent message');
         } else {
             $output->writeln('Nothing to do - use --email or --arn');
