@@ -91,22 +91,31 @@ class JudopayService
 
         $transactions->setAttributeValues($data);
         $details = $transactions->all(0, $pageSize);
-        $okCount = 0;
+        $result = [
+            'validated' => 0,
+            'missing' => 0,
+            'non-payment' => 0
+        ];
         foreach ($details['results'] as $receipt) {
-            $payment = $repo->findOneBy(['receipt' => $receipt['receiptId']]);
-            if (!$payment) {
-                $this->logger->warning(sprintf(
-                    'Missing judo payment item for receipt %s on %s [%s]',
-                    $receipt['receiptId'],
-                    $receipt['createdAt'],
-                    json_encode($receipt)
-                ));
+            if ($receipt['type'] == 'Payment') {
+                $payment = $repo->findOneBy(['receipt' => $receipt['receiptId']]);
+                if (!$payment) {
+                    $this->logger->warning(sprintf(
+                        'Missing judo payment item for receipt %s on %s [%s]',
+                        $receipt['receiptId'],
+                        $receipt['createdAt'],
+                        json_encode($receipt)
+                    ));
+                    $result['missing']++;
+                } else {
+                    $result['validated']++;
+                }
             } else {
-                $okCount++;
+                $result['non-payment']++;
             }
         }
 
-        return $okCount;
+        return $result;
     }
 
     /**
