@@ -1,0 +1,19 @@
+{% set logo_image = 'unhappy' %}
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your email has been changed.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<h1>
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	</h1>
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+       As per request, your email has been changed to {{ user.email }}.
+       <br />
+       If you didn't request this change, please let us know immediately.
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+{% endblock %}

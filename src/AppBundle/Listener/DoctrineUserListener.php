@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
+use AppBundle\Event\UserEmailEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoctrineUserListener
@@ -30,6 +31,11 @@ class DoctrineUserListener
     {
         $document = $eventArgs->getDocument();
         if ($document instanceof User) {
+            if ($eventArgs->hasChangedField('email')) {
+                $event = new UserEmailEvent($document, $eventArgs->getOldValue('email'));
+                $this->dispatcher->dispatch(UserEmailEvent::EVENT_CHANGED, $event);
+            }
+
             // If both confirmationToken & passwordRequestAt are changing to null,
             // then the user has reset their password using their token.
             // This was most likely received by email and if so, then their email should be valid

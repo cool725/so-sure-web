@@ -7,19 +7,69 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
+use AppBundle\Event\UserEmailEvent;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Psr\Log\LoggerInterface;
 
 class UserListener
 {
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /** @var \Swift_Mailer */
+    protected $mailer;
+    protected $templating;
+
     /**
      * @param DocumentManager $dm
+     * @param LoggerInterface $logger
+     * @param \Swift_Mailer   $mailer
+     * @param                 $templating
      */
-    public function __construct(DocumentManager $dm)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        LoggerInterface $logger,
+        \Swift_Mailer $mailer,
+        $templating
+    ) {
         $this->dm = $dm;
+        $this->logger = $logger;
+        $this->mailer = $mailer;
+        $this->templating = $templating;
+    }
+
+    /**
+     * @param UserEmailEvent $event
+     */
+    public function onUserEmailChangedEvent(UserEmailEvent $event)
+    {
+        $this->sendEmail($event->getUser(), $event->getOldEmail());
+        $this->sendEmail($event->getUser(), $event->getUser()->getEmail());
+    }
+
+    /**
+     * Send user an email changed email
+     *
+     * @param User $user
+     */
+    public function sendEmail(User $user, $email)
+    {
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Welcome to so-sure')
+            ->setFrom('hello@wearesosure.com')
+            ->setTo($email)
+            ->setBody(
+                $this->templating->render('AppBundle:Email:emailChanged.html.twig', ['user' => $user]),
+                'text/html'
+            )
+            ->addPart(
+                $this->templating->render('AppBundle:Email:emailChanged.txt.twig', ['user' => $user]),
+                'text/plain'
+            );
+        $this->mailer->send($message);
     }
 
     /**

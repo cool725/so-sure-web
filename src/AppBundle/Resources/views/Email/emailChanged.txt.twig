@@ -1,0 +1,11 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your email has been changed.
+
+**
+------------------------------------------------------------
+As per request, your email has been changed to {{ user.email }}.
+
+If you didn't request this change, please let us know immediately.
+
+{% endblock body %}
