@@ -40,8 +40,8 @@ class JudopayCommand extends ContainerAwareCommand
             $details = $judopay->getReceipt($receiptId);
             $output->writeln(json_encode($details, JSON_PRETTY_PRINT));
         } else {
-            $okCount = $judopay->getTransactions($pageSize);
-            $output->writeln(sprintf('Found %d of %d recepts', $okCount, $pageSize));
+            $results = $judopay->getTransactions($pageSize);
+            $output->writeln(sprintf('%d Entries %s', $pageSize, json_encode($results, JSON_PRETTY_PRINT)));
         }
     }
 }
