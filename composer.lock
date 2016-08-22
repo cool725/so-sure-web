@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "68ed383695f320fea14322fcdb6fae02",
-    "content-hash": "c2d9b5cb17b4572d4a84801ed74d4334",
+    "hash": "1da30daf08fbad61d69cd08b2f20aa3c",
+    "content-hash": "167cd755b6d1c36bb861e58f23afe578",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1246,6 +1246,66 @@
                 "orm"
             ],
             "time": "2016-01-05 21:34:58"
+        },
+        {
+            "name": "dpn/xml-sitemap-bundle",
+            "version": "v2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bjo3rnf/DpnXmlSitemapBundle.git",
+                "reference": "16734ad4a7d0857103a02ee72e6d274ed49ee265"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bjo3rnf/DpnXmlSitemapBundle/zipball/16734ad4a7d0857103a02ee72e6d274ed49ee265",
+                "reference": "16734ad4a7d0857103a02ee72e6d274ed49ee265",
+                "shasum": ""
+            },
+            "require": {
+                "symfony/dependency-injection": "~2.3|~3.0",
+                "symfony/framework-bundle": "~2.3|~3.0",
+                "symfony/twig-bundle": "~2.3|~3.0",
+                "twig/twig": "~1.12"
+            },
+            "require-dev": {
+                "matthiasnoback/symfony-dependency-injection-test": "^0.7.4",
+                "mockery/mockery": "~0.9",
+                "symfony/browser-kit": "~2.3|~3.0",
+                "symfony/console": "~2.3|~3.0",
+                "symfony/finder": "~2.3|~3.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dpn\\XmlSitemapBundle\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Björn Fromme",
+                    "email": "fromme@dreipunktnull.com",
+                    "homepage": "http://www.dreipunktnull.com"
+                },
+                {
+                    "name": "Kevin Bond",
+                    "email": "kevinbond@gmail.com",
+                    "homepage": "http://zenstruck.com"
+                }
+            ],
+            "description": "Generates XML sitemaps for your favourite search engine by extracting sitemap information out of the site's routes.",
+            "keywords": [
+                "Sitemap"
+            ],
+            "time": "2015-12-01 17:53:40"
         },
         {
             "name": "drewm/mailchimp-api",

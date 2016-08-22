@@ -429,3 +429,12 @@ services:
         class: AppBundle\Security\RuntimeExceptionVoter
         tags:
             - { name: staffim_rollbar.report_voter }
+
+    sitemap.phone:
+        class: AppBundle\Service\PhoneSitemapGenerator
+        arguments:
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
+            logger:      "@logger"
+            router:      "@router"
+        tags:
+            - { name: dpn_xml_sitemap.generator }
