@@ -412,11 +412,25 @@ class ApiController extends BaseController
             $endpoint = $data['endpoint'];
             $platform = isset($data['platform']) ? $data['platform'] : null;
             $version = isset($data['version']) ? $data['version'] : null;
+            $oldEndpoint = isset($data['old_endpoint']) ? $data['old_endpoint'] : null;
             $this->snsSubscribe('all', $endpoint);
             $this->snsSubscribe('unregistered', $endpoint);
             if ($platform) {
                 $this->snsSubscribe($platform, $endpoint);
                 $this->snsSubscribe(sprintf('%s-%s', $platform, $version), $endpoint);
+            }
+            if ($oldEndpoint) {
+                $this->snsUnsubscribe('all', $oldEndpoint);
+                $this->snsUnsubscribe('unregistered', $oldEndpoint);
+                $this->snsUnsubscribe('registered', $oldEndpoint);
+
+                $dm = $this->getManager();
+                $repo = $dm->getRepository(Sns::class);
+                $remove = $repo->findOneBy(['endpoint' => $oldEndpoint]);
+                if ($remove) {
+                    $dm->remove($remove);
+                    $dm->flush();
+                }
             }
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Endpoint added', 200);

@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Sns;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -549,13 +550,38 @@ class ApiControllerTest extends BaseControllerTest
      */
     public function testSns()
     {
+        // @codingStandardsIgnoreStart
+        $endpoint1 = 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e';
+        $endpoint2 = 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/f09de5ae-9a07-36b3-950d-db1dfee0102f';
+        // @codingStandardsIgnoreEnd
+
         $cognitoIdentityId = $this->getUnauthIdentity();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/sns', array(
-            // @codingStandardsIgnoreStart
-            'endpoint' => 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e'
-            // @codingStandardsIgnoreEnd
+            'endpoint' => $endpoint1,
         ));
         $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Sns::class);
+        $sns = $repo->findOneBy(['endpoint' => $endpoint1]);
+        $this->assertNotNull($sns);
+        $this->assertTrue(strlen($sns->getAll()) > 0);
+        $this->assertTrue(strlen($sns->getUnregistered()) > 0);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/sns', array(
+            'endpoint' => $endpoint2,
+            'old_endpoint' => $endpoint1,
+        ));
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Sns::class);
+        $sns1 = $repo->findOneBy(['endpoint' => $endpoint1]);
+        $sns2 = $repo->findOneBy(['endpoint' => $endpoint2]);
+        $this->assertNull($sns1);
+        $this->assertNotNull($sns2);
+        $this->assertTrue(strlen($sns2->getAll()) > 0);
+        $this->assertTrue(strlen($sns2->getUnregistered()) > 0);
     }
 
     public function testSnsMissingEndpoint()
