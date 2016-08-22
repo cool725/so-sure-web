@@ -81,6 +81,34 @@ class JudopayService
         $this->client = new Judopay($data);
     }
 
+    public function getTransactions($pageSize)
+    {
+        $repo = $this->dm->getRepository(JudoPayment::class);
+        $transactions = $this->client->getModel('Transaction');
+        $data = array(
+            'judoId' => $this->judoId,
+        );
+
+        $transactions->setAttributeValues($data);
+        $details = $transactions->all(0, $pageSize);
+        $okCount = 0;
+        foreach ($details['results'] as $receipt) {
+            $payment = $repo->findOneBy(['receipt' => $receipt['receiptId']]);
+            if (!$payment) {
+                $this->logger->warning(sprintf(
+                    'Missing judo payment item for receipt %s on %s [%s]',
+                    $receipt['receiptId'],
+                    $receipt['createdAt'],
+                    json_encode($receipt)
+                ));
+            } else {
+                $okCount++;
+            }
+        }
+
+        return $okCount;
+    }
+
     /**
      * @param Policy $policy
      * @param string $receiptId

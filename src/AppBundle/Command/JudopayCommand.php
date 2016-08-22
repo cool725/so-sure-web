@@ -15,19 +15,33 @@ class JudopayCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:judopay')
             ->setDescription('Check a receipt')
-            ->addArgument(
+            ->addOption(
                 'receiptId',
-                InputArgument::REQUIRED,
+                null,
+                InputOption::VALUE_REQUIRED,
                 'Receipt to check'
+            )
+            ->addOption(
+                'pageSize',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Number of records to check',
+                10
             )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $receiptId = $input->getArgument('receiptId');
+        $receiptId = $input->getOption('receiptId');
+        $pageSize = $input->getOption('pageSize');
         $judopay = $this->getContainer()->get('app.judopay');
-        $details = $judopay->getReceipt($receiptId);
-        $output->writeln(json_encode($details, JSON_PRETTY_PRINT));
+        if ($receiptId) {
+            $details = $judopay->getReceipt($receiptId);
+            $output->writeln(json_encode($details, JSON_PRETTY_PRINT));
+        } else {
+            $okCount = $judopay->getTransactions($pageSize);
+            $output->writeln(sprintf('Found %d of %d recepts', $okCount, $pageSize));
+        }
     }
 }
