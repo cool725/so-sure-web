@@ -40,6 +40,7 @@ class AppKernel extends Kernel
             new Oneup\FlysystemBundle\OneupFlysystemBundle(),
             new Knp\Bundle\SnappyBundle\KnpSnappyBundle(),
             new Peerj\UserSecurityBundle\PeerjUserSecurityBundle(),
+            new Dpn\XmlSitemapBundle\DpnXmlSitemapBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

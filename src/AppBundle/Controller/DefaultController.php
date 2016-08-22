@@ -27,7 +27,7 @@ class DefaultController extends BaseController
     use PhoneTrait;
 
     /**
-     * @Route("/", name="homepage")
+     * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
      * @Template
      */
     public function indexAction(Request $request)
@@ -173,7 +173,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/text-me-the-app", name="sms_app_link")
+     * @Route("/text-me-the-app", name="sms_app_link", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      * @Template
      */
     public function smsAppLinkAction(Request $request)
@@ -243,7 +243,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/jobs", name="jobs")
+     * @Route("/jobs", name="jobs", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      * @Template
      */
     public function jobsAction()
@@ -252,7 +252,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/terms", name="terms")
+     * @Route("/terms", name="terms", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      * @Template
      */
     public function termsAction()
@@ -293,9 +293,9 @@ class DefaultController extends BaseController
     /**
      * @Route("/quote/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
      * @Route("/quote/{make}+{model}+{memory}+insurance", name="quote_make_model_memory",
-     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/quote/{make}+{model}+insurance", name="quote_make_model",
-     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-a-zA-Z0-9() ]+"})
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      * @Template
      */
     public function quotePhoneAction(Request $request, $id = null, $make = null, $model = null, $memory = null)

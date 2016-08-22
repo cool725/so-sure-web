@@ -10,6 +10,19 @@ class PhoneRepository extends DocumentRepository
 {
     use PhoneTrait;
 
+    public function findActive()
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->addAnd($qb->expr()->field('os')->in([Phone::OS_CYANOGEN, Phone::OS_ANDROID, Phone::OS_IOS]));
+        $qb->addAnd($qb->expr()->field('make')->notEqual("ALL"));
+        $qb->addAnd($qb->expr()->field('active')->equals(true));
+        $qb->sort('make', 'asc')
+            ->sort('model', 'asc')
+            ->sort('memory', 'asc');
+
+        return $qb;
+    }
+    
     public function alternatives(Phone $phone)
     {
         $qb = $this->createQueryBuilder();
