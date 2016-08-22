@@ -38,6 +38,7 @@ class ClaimsService
      * @param \Swift_Mailer   $mailer
      * @param                 $templating
      * @param                 $router
+     * @param string          $environment
      * @param string          $defaultSenderAddress
      * @param string          $defaultSenderName
      */
