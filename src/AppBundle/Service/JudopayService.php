@@ -42,6 +42,12 @@ class JudopayService
     protected $mailer;
     protected $templating;
 
+    /** @var string */
+    protected $defaultSenderAddress;
+
+    /** @var string */
+    protected $defaultSenderName;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -52,6 +58,8 @@ class JudopayService
      * @param string          $apiSecret
      * @param string          $judoId
      * @param string          $environment
+     * @param string          $defaultSenderAddress
+     * @param string          $defaultSenderName
      */
     public function __construct(
         DocumentManager $dm,
@@ -62,7 +70,9 @@ class JudopayService
         $apiToken,
         $apiSecret,
         $judoId,
-        $environment
+        $environment,
+        $defaultSenderAddress,
+        $defaultSenderName
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -79,6 +89,8 @@ class JudopayService
            // 'endpointUrl' => ''
         );
         $this->client = new Judopay($data);
+        $this->defaultSenderAddress = $defaultSenderAddress;
+        $this->defaultSenderName = $defaultSenderName;
     }
 
     public function getTransactions($pageSize)
@@ -412,7 +424,7 @@ class JudopayService
 
         $message = \Swift_Message::newInstance()
             ->setSubject(sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber()))
-            ->setFrom('hello@wearesosure.com')
+            ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
             ->setTo($policy->getUser()->getEmail())
             ->setBody(
                 $this->templating->render($htmlTemplate, ['policy' => $policy, 'next' => $next]),

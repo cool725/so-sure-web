@@ -11,6 +11,8 @@ parameters:
         database: %mongodb_db%
         collection: session
     cognito_developer_login: 'login.so-sure.com'
+    default_sender_address: 'hello@wearesosure.com'
+    default_sender_name: 'so-sure'
 
 framework:
     #esi:             ~

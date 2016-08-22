@@ -60,15 +60,17 @@ services:
     app.judopay:
         class: AppBundle\Service\JudopayService
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
-            policy:      "@app.policy"
-            mailer:      "@mailer"
-            templating:  "@templating"
-            apiToken:    "%judopay_apitoken%"
-            apiSecret:   "%judopay_apisecret%"
-            judoId:      "%judopay_id%"
-            environment: "%kernel.environment%"
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+            policy:               "@app.policy"
+            mailer:               "@mailer"
+            templating:           "@templating"
+            apiToken:             "%judopay_apitoken%"
+            apiSecret:            "%judopay_apisecret%"
+            judoId:               "%judopay_id%"
+            environment:          "%kernel.environment%"
+            defaultSenderAddress: "%default_sender_address%"
+            defaultSenderName:    "%default_sender_name%"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
@@ -96,15 +98,17 @@ services:
     app.invitation:
         class: AppBundle\Service\InvitationService
         arguments:
-            dm:         "@doctrine_mongodb.odm.default_document_manager"
-            logger:     "@logger"
-            mailer:     "@mailer"
-            templating: "@templating"
-            router:     "@api.router"
-            shortLink:  "@app.shortlink"
-            sms:        "@app.sms"
-            rateLimit:  "@app.ratelimit"
-            push:       "@app.push"
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+            mailer:               "@mailer"
+            templating:           "@templating"
+            router:               "@api.router"
+            shortLink:            "@app.shortlink"
+            sms:                  "@app.sms"
+            rateLimit:            "@app.ratelimit"
+            push:                 "@app.push"
+            defaultSenderAddress: "%default_sender_address%"
+            defaultSenderName:    "%default_sender_name%"
 
     app.push:
         class: AppBundle\Service\PushService
@@ -115,12 +119,14 @@ services:
     app.claims:
         class: AppBundle\Service\ClaimsService
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
-            mailer:      "@mailer"
-            templating:  "@templating"
-            router:      "@api.router"
-            environment: "%kernel.environment%"
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+            mailer:               "@mailer"
+            templating:           "@templating"
+            router:               "@api.router"
+            environment:          "%kernel.environment%"
+            defaultSenderAddress: "%default_sender_address%"
+            defaultSenderName:    "%default_sender_name%"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
@@ -252,18 +258,20 @@ services:
     app.policy:
         class: AppBundle\Service\PolicyService
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
-            sequence:    "@app.sequence"
-            mailer:      "@mailer"
-            smtp:        "@swiftmailer.transport.real"
-            templating:  "@templating"
-            router:      "@api.router"
-            environment: "%kernel.environment%"
-            snappy_pdf:  "@knp_snappy.pdf"
-            dispatcher:  "@event_dispatcher"
-            s3:          "@aws.s3"
-            shortLink:   "@app.shortlink"
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+            sequence:             "@app.sequence"
+            mailer:               "@mailer"
+            smtp:                 "@swiftmailer.transport.real"
+            templating:           "@templating"
+            router:               "@api.router"
+            environment:          "%kernel.environment%"
+            snappy_pdf:           "@knp_snappy.pdf"
+            dispatcher:           "@event_dispatcher"
+            s3:                   "@aws.s3"
+            shortLink:            "@app.shortlink"
+            defaultSenderAddress: "%default_sender_address%"
+            defaultSenderName:    "%default_sender_name%"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService

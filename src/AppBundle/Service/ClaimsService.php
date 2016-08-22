@@ -22,7 +22,15 @@ class ClaimsService
     protected $mailer;
     protected $templating;
     protected $router;
+
+    /** @var string */
     protected $environment;
+
+    /** @var string */
+    protected $defaultSenderAddress;
+
+    /** @var string */
+    protected $defaultSenderName;
 
     /**
      * @param DocumentManager $dm
@@ -30,6 +38,8 @@ class ClaimsService
      * @param \Swift_Mailer   $mailer
      * @param                 $templating
      * @param                 $router
+     * @param string          $defaultSenderAddress
+     * @param string          $defaultSenderName
      */
     public function __construct(
         DocumentManager $dm,
@@ -37,7 +47,9 @@ class ClaimsService
         \Swift_Mailer $mailer,
         $templating,
         $router,
-        $environment
+        $environment,
+        $defaultSenderAddress,
+        $defaultSenderName
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -45,6 +57,8 @@ class ClaimsService
         $this->templating = $templating;
         $this->router = $router->getRouter();
         $this->environment = $environment;
+        $this->defaultSenderAddress = $defaultSenderAddress;
+        $this->defaultSenderName = $defaultSenderName;
     }
 
     public function addClaim(Policy $policy, Claim $claim)
@@ -127,7 +141,7 @@ class ClaimsService
 
             $message = \Swift_Message::newInstance()
                 ->setSubject($subject)
-                ->setFrom('hello@wearesosure.com')
+                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
                 ->setTo($policy->getUser()->getEmail())
                 ->setBody(
                     $this->templating->render($templateHtml, ['claim' => $claim, 'policy' => $policy]),
@@ -157,7 +171,7 @@ class ClaimsService
 
             $message = \Swift_Message::newInstance()
                 ->setSubject($subject)
-                ->setFrom('hello@wearesosure.com')
+                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
                 ->setTo('support@wearesosure.com')
                 ->setBody(
                     $this->templating->render($templateHtml, ['claim' => $claim, 'policy' => $policy]),
