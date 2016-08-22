@@ -64,6 +64,12 @@ class InvitationService
     /** @var boolean */
     protected $debug;
 
+    /** @var string */
+    protected $defaultSenderAddress;
+
+    /** @var string */
+    protected $defaultSenderName;
+
     /**
      * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
@@ -74,6 +80,8 @@ class InvitationService
      * @param SmsService       $sms
      * @param RateLimitService $rateLimit
      * @param PushService      $push
+     * @param string           $defaultSenderAddress
+     * @param string           $defaultSenderName
      */
     public function __construct(
         DocumentManager $dm,
@@ -84,7 +92,9 @@ class InvitationService
         ShortLinkService $shortLink,
         SmsService $sms,
         RateLimitService $rateLimit,
-        PushService $push
+        PushService $push,
+        $defaultSenderAddress,
+        $defaultSenderName
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -95,6 +105,8 @@ class InvitationService
         $this->sms = $sms;
         $this->rateLimit = $rateLimit;
         $this->push = $push;
+        $this->defaultSenderAddress = $defaultSenderAddress;
+        $this->defaultSenderName = $defaultSenderName;
     }
 
     public function setDebug($debug)
@@ -278,7 +290,7 @@ class InvitationService
 
         $message = \Swift_Message::newInstance()
             ->setSubject($subject)
-            ->setFrom('hello@wearesosure.com')
+            ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
             ->setTo($to)
             ->setBody(
                 $this->templating->render($htmlTemplate, ['invitation' => $invitation]),

@@ -53,6 +53,12 @@ class PolicyService
     /** @var JudopayService */
     protected $judopay;
 
+    /** @var string */
+    protected $defaultSenderAddress;
+
+    /** @var string */
+    protected $defaultSenderName;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -83,6 +89,8 @@ class PolicyService
      * @param                  $dispatcher
      * @param                  $s3
      * @param ShortLinkService $shortLink
+     * @param string           $defaultSenderAddress
+     * @param string           $defaultSenderName
      */
     public function __construct(
         DocumentManager $dm,
@@ -96,7 +104,9 @@ class PolicyService
         $snappyPdf,
         $dispatcher,
         $s3,
-        ShortLinkService $shortLink
+        ShortLinkService $shortLink,
+        $defaultSenderAddress,
+        $defaultSenderName
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -110,6 +120,8 @@ class PolicyService
         $this->dispatcher = $dispatcher;
         $this->s3 = $s3;
         $this->shortLink = $shortLink;
+        $this->defaultSenderAddress = $defaultSenderAddress;
+        $this->defaultSenderName = $defaultSenderName;
     }
 
     public function create(Policy $policy, \DateTime $date = null)
@@ -317,7 +329,7 @@ class PolicyService
         try {
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('Your so-sure policy %s', $policy->getPolicyNumber()))
-                ->setFrom('hello@wearesosure.com')
+                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
                 ->setTo($policy->getUser()->getEmail())
                 ->setBody(
                     $this->templating->render('AppBundle:Email:policy/new.html.twig', ['policy' => $policy]),
@@ -364,7 +376,7 @@ class PolicyService
         try {
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('Your so-sure weekly email'))
-                ->setFrom('hello@wearesosure.com')
+                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
                 ->setTo($policy->getUser()->getEmail())
                 ->setBody(
                     $this->templating->render('AppBundle:Email:policy/weekly.html.twig', ['policy' => $policy]),
@@ -397,7 +409,7 @@ class PolicyService
 
         $message = \Swift_Message::newInstance()
             ->setSubject(sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()))
-            ->setFrom('hello@wearesosure.com')
+            ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
             ->setTo($policy->getUser()->getEmail())
             ->setBcc('bcc@so-sure.com')
             ->setBody(
@@ -425,7 +437,7 @@ class PolicyService
             }
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('Your friend, %s, cancelled their so-sure policy', $cancelledUser->getName()))
-                ->setFrom('hello@wearesosure.com')
+                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
                 ->setTo($networkConnection->getLinkedUser()->getEmail())
                 ->setBody(
                     $this->templating->render('AppBundle:Email:policy-cancellation/network.html.twig', [
