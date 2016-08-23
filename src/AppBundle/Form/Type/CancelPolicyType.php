@@ -27,8 +27,8 @@ class CancelPolicyType extends AbstractType
             $data[Policy::CANCELLED_COOLOFF] = 'Cooloff';
             $preferred[] = Policy::CANCELLED_COOLOFF;
         } else {
-            $data[Policy::CANCELLED_GOODWILL] = 'User Requested';
-            $preferred[] = Policy::CANCELLED_GOODWILL;
+            $data[Policy::CANCELLED_USER_REQUESTED] = 'User Requested';
+            $preferred[] = Policy::CANCELLED_USER_REQUESTED;
         }
         if ($policy->getStatus() == Policy::STATUS_UNPAID) {
             $data[Policy::CANCELLED_UNPAID] = 'Unpaid';

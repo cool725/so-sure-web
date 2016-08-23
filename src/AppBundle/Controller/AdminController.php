@@ -296,10 +296,11 @@ class AdminController extends BaseController
                             sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
                         );
                     } else {
-                        $this->addFlash(
-                            'error',
-                            sprintf('Unable to cancel Policy %s due to %s', $policy->getPolicyNumber(), $cancel->getCancellationReason())
-                        );
+                        $this->addFlash('error', sprintf(
+                            'Unable to cancel Policy %s due to %s',
+                            $policy->getPolicyNumber(),
+                            $cancel->getCancellationReason()
+                        ));
                     }
 
                     return $this->redirectToRoute('admin_users');

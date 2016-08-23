@@ -820,10 +820,10 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(20, $policyB->getPotValue());
         $this->assertEquals(20, $policyC->getPotValue());
 
-        $policyA->cancel(PhonePolicy::CANCELLED_GOODWILL);
+        $policyA->cancel(PhonePolicy::CANCELLED_USER_REQUESTED);
 
         $this->assertEquals(PhonePolicy::STATUS_CANCELLED, $policyA->getStatus());
-        $this->assertEquals(PhonePolicy::CANCELLED_GOODWILL, $policyA->getCancelledReason());
+        $this->assertEquals(PhonePolicy::CANCELLED_USER_REQUESTED, $policyA->getCancelledReason());
         $now = new \DateTime();
         $this->assertEquals($now->format('y-M-d'), $policyA->getEnd()->format('y-M-d'));
         $this->assertTrue($policyA->getUser()->isLocked());
@@ -875,7 +875,7 @@ class PhonePolicyTest extends WebTestCase
         static::$dm->persist($user);
         static::$dm->flush();
 
-        $policy->cancel(PhonePolicy::CANCELLED_GOODWILL);
+        $policy->cancel(PhonePolicy::CANCELLED_USER_REQUESTED);
         foreach ($policy->getScheduledPayments() as $scheduledPayment) {
             $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $scheduledPayment->getStatus());
         }
@@ -1381,7 +1381,24 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertTrue($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-01")));
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-15")));
-        $this->assertTrue($policy->canCancel(Policy::CANCELLED_GOODWILL, new \DateTime("2016-01-15")));
+        $this->assertTrue($policy->canCancel(Policy::CANCELLED_USER_REQUESTED, new \DateTime("2016-01-15")));
+        $this->assertFalse($policy->canCancel(Policy::CANCELLED_BADRISK));
+    }
+
+    public function testCanCancelPolicyUnpaid()
+    {
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $this->assertFalse($policy->canCancel(Policy::CANCELLED_UNPAID));
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $this->assertTrue($policy->canCancel(Policy::CANCELLED_UNPAID));
     }
 
     public function testCanCancelPolicyAlreadyCancelled()
@@ -1415,7 +1432,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setEnd(new \DateTime("2016-12-31 23:59"));
         $policy->setStatus(Policy::STATUS_EXPIRED);
-        $this->assertFalse($policy->canCancel(Policy::CANCELLED_GOODWILL, new \DateTime("2016-01-01")));
+        $this->assertFalse($policy->canCancel(Policy::CANCELLED_USER_REQUESTED, new \DateTime("2016-01-01")));
     }
 
     public function testIsWithinCooloffPeriod()
