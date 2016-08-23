@@ -51,8 +51,8 @@ class DoctrineSalvaListener
                 return;
             }
             $fields = [
-                'firstname',
-                'lastname',
+                'firstName',
+                'lastName',
             ];
             foreach ($fields as $field) {
                 if ($eventArgs->hasChangedField($field)) {
