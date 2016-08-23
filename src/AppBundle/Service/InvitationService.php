@@ -164,19 +164,10 @@ class InvitationService
             throw new SelfInviteException('User can not invite themself');
         }
 
-        /*
-        $userRepo = $this->dm->getRepository(User::class);
-        $invitee = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
-        if ($invitee && $policy->getUser()->getId() == $invitee->getId()) {
-            throw new SelfInviteException('User can not invite themself');
-        }
-        */
-
         $invitation = new EmailInvitation();
         $invitation->setEmail($email);
         $invitation->setPolicy($policy);
         $invitation->setName($name);
-        //$invitation->setInvitee($invitee);
         $invitation->invite();
         $this->dm->persist($invitation);
         $this->dm->flush();
@@ -272,7 +263,8 @@ class InvitationService
                 '%s wants to connect with you!',
                 $invitation->getInviterName()
             );
-            $badge = count($user->getUnprocessedReceivedInvitations());
+            // TODO: Enable this when iOS app is ready to handle
+            // $badge = count($user->getUnprocessedReceivedInvitations());
         }
 
         if (!$user) {
