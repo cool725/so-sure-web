@@ -2141,6 +2141,50 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertNull($changedUserB->getSnsEndpoint());
     }
 
+    public function testUpdateUserChangeNameWithPolicy()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('update-user-change-name', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user/%s', $user->getId());
+        $data = [
+            'first_name' => 'first',
+            'last_name' => 'last',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(200);
+        $this->assertEquals('first', $result['first_name']);
+        $this->assertEquals('last', $result['last_name']);
+
+        // note this changes the user's name
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $this->payPolicy($user, $policyId);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->find($user->getId());
+        $this->assertTrue($user->hasValidPolicy());
+
+        $url = sprintf('/api/v1/auth/user/%s', $user->getId());
+        $data = [
+            'first_name' => 'newfirst',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $data = [
+            'last_name' => 'newlast',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
     // user/{id}/address
 
     /**

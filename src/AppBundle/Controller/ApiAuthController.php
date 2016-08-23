@@ -910,11 +910,29 @@ class ApiAuthController extends BaseController
                 $user->setEmail($email);
                 $userChanged = true;
             }
-            if (isset($data['first_name']) && strlen($data['first_name']) > 0) {
+            if (isset($data['first_name']) &&
+                strlen($data['first_name']) > 0 &&
+                $data['first_name'] != $user->getFirstName()) {
+                if ($user->hasValidPolicy()) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                        'Unable to change name after policy is created',
+                        422
+                    );
+                }
                 $user->setFirstName($data['first_name']);
                 $userChanged = true;
             }
-            if (isset($data['last_name']) && strlen($data['last_name']) > 0) {
+            if (isset($data['last_name']) &&
+                strlen($data['last_name']) > 0 &&
+                $data['last_name'] != $user->getLastName()) {
+                if ($user->hasValidPolicy()) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                        'Unable to change name after policy is created',
+                        422
+                    );
+                }
                 $user->setLastName($data['last_name']);
                 $userChanged = true;
             }
