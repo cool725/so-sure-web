@@ -17,9 +17,17 @@
     <div class="bg-danger text-right" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         {{ form_start(cancel_form, {'attr': {'class': 'form-inline'}}) }}
         <div class="form-group">
-            {{ form_label(cancel_form.cancelledReason, 'Reason') }}
-            {{ form_errors(cancel_form.cancelledReason) }}
-            {{ form_widget(cancel_form.cancelledReason) }}
+            {{ form_label(cancel_form.cancellationReason, 'Reason') }}
+            {{ form_errors(cancel_form.cancellationReason) }}
+            {{ form_widget(cancel_form.cancellationReason, { 'separator': '---Unlikely Reasons---' }) }}
+        <i class="fa fa-question-circle" title="
+Cooloff: only visible if within 14 days and no pending claims
+User Request: any other user requested reason beyond cooloff
+Unpaid: only visible if status is unpaid, but should only be cancelled after 30 days
+Fraud: should only be used in cases where it can be proven
+Dispossession: only for cases where a phone has been lost but claim not approved
+Wreckage: only for cases where a phone is damaged beyond use but claim not approved
+"></i>
         </div>
         {{ form_widget(cancel_form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
         {{ form_end(cancel_form) }}

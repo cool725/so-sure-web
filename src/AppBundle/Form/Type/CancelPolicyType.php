@@ -16,16 +16,30 @@ class CancelPolicyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $policy = $builder->getData()->getPolicy();
+        $data = [
+            Policy::CANCELLED_FRAUD => 'Fraud (actual)',
+            Policy::CANCELLED_DISPOSSESSION => 'Dispossession',
+            Policy::CANCELLED_WRECKAGE => 'Wreckage',
+        ];
+        $preferred = [];
+        if ($policy->isWithinCooloffPeriod() && !$policy->hasMonetaryClaimed(true)) {
+            $data[Policy::CANCELLED_COOLOFF] = 'Cooloff';
+            $preferred[] = Policy::CANCELLED_COOLOFF;
+        } else {
+            $data[Policy::CANCELLED_GOODWILL] = 'User Requested';
+            $preferred[] = Policy::CANCELLED_GOODWILL;
+        }
+        if ($policy->getStatus() == Policy::STATUS_UNPAID) {
+            $data[Policy::CANCELLED_UNPAID] = 'Unpaid';
+            $preferred[] = Policy::CANCELLED_UNPAID;
+        }
+
         $builder
-            ->add('cancelledReason', ChoiceType::class, ['choices' => [
-                Policy::CANCELLED_UNPAID => Policy::CANCELLED_UNPAID,
-                Policy::CANCELLED_FRAUD => Policy::CANCELLED_FRAUD,
-                Policy::CANCELLED_GOODWILL => Policy::CANCELLED_GOODWILL,
-                Policy::CANCELLED_COOLOFF => Policy::CANCELLED_COOLOFF,
-                Policy::CANCELLED_BADRISK => Policy::CANCELLED_BADRISK,
-                Policy::CANCELLED_DISPOSSESSION => Policy::CANCELLED_DISPOSSESSION,
-                Policy::CANCELLED_WRECKAGE => Policy::CANCELLED_WRECKAGE,
-            ]])
+            ->add('cancellationReason', ChoiceType::class, [
+                'choices' => $data,
+                'preferred_choices' => $preferred,
+            ])
             ->add('cancel', SubmitType::class)
         ;
     }
@@ -33,6 +47,7 @@ class CancelPolicyType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
+            'data_class' => 'AppBundle\Document\Form\Cancel',
         ));
     }
 }
