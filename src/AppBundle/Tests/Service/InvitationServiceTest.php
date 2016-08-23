@@ -64,7 +64,10 @@ class InvitationServiceTest extends WebTestCase
             self::$container->get('api.router'),
             self::$container->get('app.shortlink'),
             self::$container->get('app.sms'),
-            self::$container->get('app.ratelimit')
+            self::$container->get('app.ratelimit'),
+            self::$container->get('app.push'),
+            '',
+            ''
         );
         self::$policyService = self::$container->get('app.policy');
 
