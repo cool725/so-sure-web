@@ -8,6 +8,7 @@ use AppBundle\Listener\DoctrineUserListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use AppBundle\Event\UserEvent;
+use AppBundle\Event\UserEmailEvent;
 use AppBundle\Document\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -60,7 +61,7 @@ class DoctrineUserListenerTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail('dul1@listener.so-sure.com');
-        $listener = $this->createListener($user, $this->once(), UserEvent::EVENT_UPDATED);
+        $listener = $this->createUserEventListener($user, $this->once(), UserEvent::EVENT_UPDATED);
     
         $events = new LifecycleEventArgs($user, self::$dm);
         $listener->postUpdate($events);
@@ -70,15 +71,51 @@ class DoctrineUserListenerTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail('dul2@listener.so-sure.com');
-        $listener = $this->createListener($user, $this->once(), UserEvent::EVENT_UPDATED);
+        $listener = $this->createUserEventListener($user, $this->once(), UserEvent::EVENT_UPDATED);
     
         $events = new LifecycleEventArgs($user, self::$dm);
         $listener->postPersist($events);
     }
 
-    private function createListener($user, $count, $eventType)
+    public function testPreUpdateUserEmail()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('user-email', $this));
+        static::$dm->persist($user);
+        $listener = $this->createUserEmailEventListener(
+            $user,
+            static::generateEmail('user-email', $this),
+            $this->once(),
+            UserEmailEvent::EVENT_CHANGED
+        );
+
+        $changeSet = ['email' => [
+            static::generateEmail('user-email', $this),
+            static::generateEmail('user-email-new', $this)
+        ]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    private function createUserEventListener($user, $count, $eventType)
     {
         $event = new UserEvent($user);
+
+        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
+                         ->setMethods(array('dispatch'))
+                         ->getMock();
+        $dispatcher->expects($count)
+                     ->method('dispatch')
+                     ->with($eventType, $event);
+
+        $listener = new DoctrineUserListener($dispatcher);
+
+        return $listener;
+    }
+
+    private function createUserEmailEventListener($user, $oldEmail, $count, $eventType)
+    {
+        $event = new UserEmailEvent($user, $oldEmail);
 
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
                          ->setMethods(array('dispatch'))
