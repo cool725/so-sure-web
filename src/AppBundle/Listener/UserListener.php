@@ -34,8 +34,8 @@ class UserListener
      * @param LoggerInterface $logger
      * @param \Swift_Mailer   $mailer
      * @param                 $templating
-     * @param string           $defaultSenderAddress
-     * @param string           $defaultSenderName
+     * @param string          $defaultSenderAddress
+     * @param string          $defaultSenderName
      */
     public function __construct(
         DocumentManager $dm,
