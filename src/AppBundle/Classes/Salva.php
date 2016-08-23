@@ -21,7 +21,7 @@ class Salva
 
     const SALVA_TIMEZONE = "Europe/London";
 
-    public static function sumBrokerFee($months, $includeFinalCommission)
+    public function sumBrokerFee($months, $includeFinalCommission)
     {
         if ($months == 12) {
             return self::YEARLY_TOTAL_COMMISSION;

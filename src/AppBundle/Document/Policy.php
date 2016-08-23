@@ -943,13 +943,16 @@ abstract class Policy
     public function getTotalBrokerFee($payments = null)
     {
         $includeFinalCommission = false;
-        foreach ($payments as $payment) {
-            if ($payment->getTotalCommission() == Salva::FINAL_MONTHLY_TOTAL_COMMISSION) {
-                $includeFinalCommission = true;
+        if ($payments) {
+            foreach ($payments as $payment) {
+                if ($payment->getTotalCommission() == Salva::FINAL_MONTHLY_TOTAL_COMMISSION) {
+                    $includeFinalCommission = true;
+                }
             }
         }
+        $salva = new Salva();
 
-        return Salva::sumBrokerFee($this->getMonthsForCancellationCalc($payments), $includeFinalCommission);
+        return $salva->sumBrokerFee($this->getMonthsForCancellationCalc($payments), $includeFinalCommission);
     }
 
     public function getMonthsForCancellationCalc($payments = null)
