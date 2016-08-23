@@ -41,6 +41,7 @@ class UserRepository extends DocumentRepository
         $qb->field('id')->notEqual($user->getId());
         if ($email) {
             $qb->addOr($qb->expr()->field('emailCanonical')->equals(strtolower($email)));
+            $qb->addOr($qb->expr()->field('usernameCanonical')->equals(strtolower($email)));
         }
         if ($facebookId) {
             $qb->addOr($qb->expr()->field('facebookId')->equals(trim($facebookId)));

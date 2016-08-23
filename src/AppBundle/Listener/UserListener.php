@@ -46,8 +46,8 @@ class UserListener
      */
     public function onUserEmailChangedEvent(UserEmailEvent $event)
     {
-        $this->sendEmail($event->getUser(), $event->getOldEmail());
-        $this->sendEmail($event->getUser(), $event->getUser()->getEmail());
+        $this->sendUserEmailChangedEmail($event->getUser(), $event->getOldEmail());
+        $this->sendUserEmailChangedEmail($event->getUser(), $event->getUser()->getEmail());
     }
 
     /**
@@ -55,10 +55,10 @@ class UserListener
      *
      * @param User $user
      */
-    public function sendEmail(User $user, $email)
+    public function sendUserEmailChangedEmail(User $user, $email)
     {
         $message = \Swift_Message::newInstance()
-            ->setSubject('Welcome to so-sure')
+            ->setSubject('Your email has been changed')
             ->setFrom('hello@wearesosure.com')
             ->setTo($email)
             ->setBody(
