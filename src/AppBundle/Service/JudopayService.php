@@ -505,8 +505,11 @@ class JudopayService
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
 
-        // TODO: $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        if ($policy->isFinalMonthlyPayment()) {
+            $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
+        } else {
+            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        }
 
         return $payment;
     }
