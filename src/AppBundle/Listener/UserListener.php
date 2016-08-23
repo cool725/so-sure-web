@@ -23,22 +23,34 @@ class UserListener
     protected $mailer;
     protected $templating;
 
+    /** @var string */
+    protected $defaultSenderAddress;
+
+    /** @var string */
+    protected $defaultSenderName;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param \Swift_Mailer   $mailer
      * @param                 $templating
+     * @param string           $defaultSenderAddress
+     * @param string           $defaultSenderName
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         \Swift_Mailer $mailer,
-        $templating
+        $templating,
+        $defaultSenderAddress,
+        $defaultSenderName
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->templating = $templating;
+        $this->defaultSenderAddress = $defaultSenderAddress;
+        $this->defaultSenderName = $defaultSenderName;
     }
 
     /**
@@ -59,7 +71,7 @@ class UserListener
     {
         $message = \Swift_Message::newInstance()
             ->setSubject('Your email has been changed')
-            ->setFrom('hello@wearesosure.com')
+            ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
             ->setTo($email)
             ->setBody(
                 $this->templating->render('AppBundle:Email:emailChanged.html.twig', ['user' => $user]),

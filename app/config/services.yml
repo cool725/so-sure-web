@@ -384,10 +384,12 @@ services:
     app.listener.user:
         class:   AppBundle\Listener\UserListener
         arguments:
-            dm:         "@doctrine_mongodb.odm.default_document_manager"
-            logger:     "@logger"
-            mailer:     "@mailer"
-            templating: "@templating"
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+            mailer:               "@mailer"
+            templating:           "@templating"
+            defaultSenderAddress: "%default_sender_address%"
+            defaultSenderName:    "%default_sender_name%"
         tags:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
