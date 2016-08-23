@@ -63,7 +63,7 @@ class PolicyServiceTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, null, null, false, true);
-        static::$policyService->cancel($policy, Policy::CANCELLED_GOODWILL);
+        static::$policyService->cancel($policy, Policy::CANCELLED_USER_REQUESTED);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::STATUS_CANCELLED, $updatedPolicy->getStatus());

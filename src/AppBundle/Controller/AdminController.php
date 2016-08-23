@@ -19,6 +19,7 @@ use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\File\BarclaysFile;
 use AppBundle\Document\File\LloydsFile;
+use AppBundle\Document\Form\Cancel;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
@@ -275,8 +276,10 @@ class AdminController extends BaseController
             throw $this->createNotFoundException('Policy not found');
         }
 
+        $cancel = new Cancel();
+        $cancel->setPolicy($policy);
         $cancelForm = $this->get('form.factory')
-            ->createNamedBuilder('cancel_form', CancelPolicyType::class)
+            ->createNamedBuilder('cancel_form', CancelPolicyType::class, $cancel)
             ->getForm();
         $imeiForm = $this->get('form.factory')
             ->createNamedBuilder('imei_form', ImeiType::class, $policy)
@@ -286,18 +289,18 @@ class AdminController extends BaseController
             if ($request->request->has('cancel_form')) {
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
-                    $cancelReason = $cancelForm->get('cancelledReason')->getData();
-                    if ($policy->canCancel($cancelReason)) {
-                        $policyService->cancel($policy, $cancelReason);
+                    if ($policy->canCancel($cancel->getCancellationReason())) {
+                        $policyService->cancel($policy, $cancel->getCancellationReason());
                         $this->addFlash(
                             'success',
                             sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
                         );
                     } else {
-                        $this->addFlash(
-                            'error',
-                            sprintf('Unable to cancel Policy %s due to %s', $policy->getPolicyNumber(), $cancelReason)
-                        );
+                        $this->addFlash('error', sprintf(
+                            'Unable to cancel Policy %s due to %s',
+                            $policy->getPolicyNumber(),
+                            $cancel->getCancellationReason()
+                        ));
                     }
 
                     return $this->redirectToRoute('admin_users');

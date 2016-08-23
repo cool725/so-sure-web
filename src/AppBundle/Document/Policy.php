@@ -40,7 +40,7 @@ abstract class Policy
 
     const CANCELLED_UNPAID = 'unpaid';
     const CANCELLED_FRAUD = 'fraud';
-    const CANCELLED_GOODWILL = 'goodwill';
+    const CANCELLED_USER_REQUESTED = 'user-requested';
     const CANCELLED_COOLOFF = 'cooloff';
     const CANCELLED_BADRISK = 'badrisk';
     const CANCELLED_DISPOSSESSION = 'dispossession';
@@ -1026,7 +1026,15 @@ abstract class Policy
         }
 
         if ($reason == Policy::CANCELLED_COOLOFF) {
-            return $this->isWithinCooloffPeriod($date);
+            return $this->isWithinCooloffPeriod($date) && !$this->hasMonetaryClaimed(true);
+        }
+
+        if ($reason == Policy::CANCELLED_UNPAID) {
+            return $this->getStatus() == self::STATUS_UNPAID;
+        }
+
+        if ($reason == Policy::CANCELLED_BADRISK) {
+            return false;
         }
 
         return true;
