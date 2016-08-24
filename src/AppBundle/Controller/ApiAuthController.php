@@ -204,7 +204,7 @@ class ApiAuthController extends BaseController
     public function newPolicyAction(Request $request)
     {
         try {
-            $this->get('statsd')->startTiming("app.newPolicy");
+            $this->get('statsd')->startTiming("api.newPolicy");
             $data = json_decode($request->getContent(), true)['body'];
             if (!isset($data['phone_policy'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
@@ -390,7 +390,7 @@ class ApiAuthController extends BaseController
             $dm->persist($policy);
             $dm->flush();
 
-            $this->get('statsd')->endTiming("app.newPolicy");
+            $this->get('statsd')->endTiming("api.newPolicy");
 
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
@@ -409,7 +409,6 @@ class ApiAuthController extends BaseController
     public function getPolicyAction($id)
     {
         try {
-            $this->get('statsd')->startTiming("app.getPolicy");
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->find($id);
@@ -421,8 +420,6 @@ class ApiAuthController extends BaseController
                 );
             }
             $this->denyAccessUnlessGranted('view', $policy);
-
-            $this->get('statsd')->endTiming("app.getPolicy");
 
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
@@ -441,6 +438,7 @@ class ApiAuthController extends BaseController
     public function newInvitationAction(Request $request, $id)
     {
         try {
+            $this->get('statsd')->startTiming("api.newInvitation");
             $validator = new EmailValidator();
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
@@ -477,6 +475,7 @@ class ApiAuthController extends BaseController
                         422
                     );
                 }
+                $this->get('statsd')->endTiming("api.newInvitation");
 
                 return new JsonResponse($invitation->toApiArray());
             } catch (DuplicateInvitationException $e) {
@@ -548,6 +547,7 @@ class ApiAuthController extends BaseController
     public function payPolicyAction(Request $request, $id)
     {
         try {
+            $this->get('statsd')->startTiming("api.payPolicy");
             $data = json_decode($request->getContent(), true)['body'];
             if (isset($data['bank_account'])) {
                 // Not doing anymore, but too many tests currently expect gocardless, so allow for non-prod
@@ -616,6 +616,7 @@ class ApiAuthController extends BaseController
                     isset($data['judo']['device_dna']) ? $data['judo']['device_dna'] : null
                 );
             }
+            $this->get('statsd')->endTiming("api.payPolicy");
 
             return new JsonResponse($policy->toApiArray());
         } catch (InvalidPremiumException $e) {
@@ -828,7 +829,7 @@ class ApiAuthController extends BaseController
     public function getCurrentUserAction()
     {
         try {
-            $this->get('statsd')->startTiming("app.getCurrentUser");
+            $this->get('statsd')->startTiming("api.getCurrentUser");
             $user = $this->getUser();
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
@@ -836,7 +837,7 @@ class ApiAuthController extends BaseController
 
             $this->denyAccessUnlessGranted('view', $user);
 
-            $this->get('statsd')->endTiming("app.getCurrentUser");
+            $this->get('statsd')->endTiming("api.getCurrentUser");
 
             return new JsonResponse($user->toApiArray());
         } catch (AccessDeniedException $ade) {

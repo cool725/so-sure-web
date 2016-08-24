@@ -216,7 +216,7 @@ knp_snappy:
         options:    []
 
 domnikl_statsd:
-    namespace: "so-sure"
+    namespace: "sosure"
     connection:
         class: \Domnikl\Statsd\Connection\Socket # or Blackhole to disable metrics
         port: 8125 # default is 8125
