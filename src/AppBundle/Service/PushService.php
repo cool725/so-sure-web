@@ -12,6 +12,9 @@ class PushService
     // sent to inviter
     const MESSAGE_CONNECTED = 'connected';
 
+    // sent to invitee
+    const MESSAGE_INVITATION = 'invitation';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -29,7 +32,7 @@ class PushService
         $this->sns = $sns;
     }
 
-    public function sendToUser($messageType, User $user, $message)
+    public function sendToUser($messageType, User $user, $message, $badge = null)
     {
         $this->logger->debug(sprintf('Push triggered to user id: %s %s', $user->getId(), $message));
         if (!$user->getSnsEndpoint() || strlen(trim($user->getSnsEndpoint())) == 0) {
@@ -38,19 +41,20 @@ class PushService
             return;
         }
 
-        return $this->send($messageType, $user->getSnsEndpoint(), $message);
+        return $this->send($messageType, $user->getSnsEndpoint(), $message, $badge);
     }
 
-    public function send($messageType, $arn, $message)
+    public function send($messageType, $arn, $message, $badge = null)
     {
         $this->logger->debug(sprintf('Push triggered to %s %s', $arn, $message));
+        $url = $this->getUrl($messageType);
         $this->sns->publish([
            'TargetArn' => $arn,
            'MessageStructure' => 'json',
             'Message' => json_encode([
-                'APNS' => json_encode($this->generateAPNSMessage($message, $this->getUrl($messageType))),
-                'APNS_SANDBOX' => json_encode($this->generateAPNSMessage($message, $this->getUrl($messageType))),
-                'GCM' => json_encode($this->generateGCMMessage($message, $this->getUrl($messageType))),
+                'APNS' => json_encode($this->generateAPNSMessage($message, $url, $badge)),
+                'APNS_SANDBOX' => json_encode($this->generateAPNSMessage($message, $url, $badge)),
+                'GCM' => json_encode($this->generateGCMMessage($message, $url)),
             ])
         ]);
     }
@@ -60,6 +64,8 @@ class PushService
         if ($messageType == self::MESSAGE_GENERAL) {
             return null;
         } elseif ($messageType == self::MESSAGE_CONNECTED) {
+            return ClientUrl::POT;
+        } elseif ($messageType == self::MESSAGE_INVITATION) {
             return ClientUrl::POT;
         } else {
             return null;

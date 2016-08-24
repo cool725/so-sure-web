@@ -177,6 +177,7 @@ class InvitationService
         $this->dm->flush();
 
         $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+        $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
 
         return $invitation;
     }
@@ -222,6 +223,8 @@ class InvitationService
         $this->sendSms($invitation);
         $this->dm->flush();
 
+        $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+
         return $invitation;
     }
 
@@ -237,6 +240,38 @@ class InvitationService
         $user = $scodeObj->getPolicy()->getUser();
 
         return $this->inviteByEmail($policy, $user->getEmail(), $user->getName());
+    }
+
+    /**
+     * Send a push notification
+     *
+     * @param Invitation $invitation Invitation and not EmailInvitation as SmsInvitations can be accepted, etc
+     */
+    protected function sendPush(Invitation $invitation, $type)
+    {
+        $user = null;
+        $badge = null;
+        if ($type == PushService::MESSAGE_CONNECTED) {
+            $user = $invitation->getInviter();
+            $message = sprintf(
+                '%s has accepted your connection!',
+                $invitation->getInviteeName()
+            );
+        } elseif ($type == PushService::MESSAGE_INVITATION) {
+            $user = $invitation->getInvitee();
+            $message = sprintf(
+                '%s wants to connect with you!',
+                $invitation->getInviterName()
+            );
+            // TODO: Enable this when iOS app is ready to handle
+            // $badge = count($user->getUnprocessedReceivedInvitations());
+        }
+
+        if (!$user) {
+            return null;
+        }
+
+        $this->push->sendToUser($type, $user, $message, $badge);
     }
 
     /**
@@ -391,10 +426,7 @@ class InvitationService
 
         // Notify inviter of acceptance
         $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
-        $this->push->sendToUser(PushService::MESSAGE_CONNECTED, $invitation->getInviter(), sprintf(
-            '%s has accepted your connection!',
-            $invitation->getInviteeName()
-        ));
+        $this->sendPush($invitation, PushService::MESSAGE_CONNECTED);
     }
 
     protected function addConnection(Policy $policy, User $linkedUser, Policy $linkedPolicy, \DateTime $date = null)
@@ -469,10 +501,12 @@ class InvitationService
             $this->sendEmail($invitation, self::TYPE_EMAIL_REINVITE);
             $invitation->reinvite();
             $this->dm->flush();
+            $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
         } elseif ($invitation instanceof SmsInvitation) {
             $this->sendSms($invitation);
             $invitation->reinvite();
             $this->dm->flush();
+            $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
         } else {
             throw new \Exception('Unknown invitation type. Unable to reinvite.');
         }
