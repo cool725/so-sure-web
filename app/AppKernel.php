@@ -41,6 +41,7 @@ class AppKernel extends Kernel
             new Knp\Bundle\SnappyBundle\KnpSnappyBundle(),
             new Peerj\UserSecurityBundle\PeerjUserSecurityBundle(),
             new Dpn\XmlSitemapBundle\DpnXmlSitemapBundle(),
+            new Domnikl\StatsdBundle\DomniklStatsdBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

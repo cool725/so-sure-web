@@ -204,6 +204,7 @@ class ApiAuthController extends BaseController
     public function newPolicyAction(Request $request)
     {
         try {
+            $this->get('statsd')->startTiming("app.newPolicy");
             $data = json_decode($request->getContent(), true)['body'];
             if (!isset($data['phone_policy'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
@@ -389,6 +390,8 @@ class ApiAuthController extends BaseController
             $dm->persist($policy);
             $dm->flush();
 
+            $this->get('statsd')->endTiming("app.newPolicy");
+
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
@@ -406,6 +409,7 @@ class ApiAuthController extends BaseController
     public function getPolicyAction($id)
     {
         try {
+            $this->get('statsd')->startTiming("app.getPolicy");
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->find($id);
@@ -417,6 +421,8 @@ class ApiAuthController extends BaseController
                 );
             }
             $this->denyAccessUnlessGranted('view', $policy);
+
+            $this->get('statsd')->endTiming("app.getPolicy");
 
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
@@ -822,12 +828,15 @@ class ApiAuthController extends BaseController
     public function getCurrentUserAction()
     {
         try {
+            $this->get('statsd')->startTiming("app.getCurrentUser");
             $user = $this->getUser();
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
             }
 
             $this->denyAccessUnlessGranted('view', $user);
+
+            $this->get('statsd')->endTiming("app.getCurrentUser");
 
             return new JsonResponse($user->toApiArray());
         } catch (AccessDeniedException $ade) {
