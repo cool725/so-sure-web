@@ -59,6 +59,8 @@ class PolicyService
     /** @var string */
     protected $defaultSenderName;
 
+    protected $statsd;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -91,6 +93,7 @@ class PolicyService
      * @param ShortLinkService $shortLink
      * @param string           $defaultSenderAddress
      * @param string           $defaultSenderName
+     * @param                  $statsd
      */
     public function __construct(
         DocumentManager $dm,
@@ -106,7 +109,8 @@ class PolicyService
         $s3,
         ShortLinkService $shortLink,
         $defaultSenderAddress,
-        $defaultSenderName
+        $defaultSenderName,
+        $statsd
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -122,10 +126,12 @@ class PolicyService
         $this->shortLink = $shortLink;
         $this->defaultSenderAddress = $defaultSenderAddress;
         $this->defaultSenderName = $defaultSenderName;
+        $this->statsd = $statsd;
     }
 
     public function create(Policy $policy, \DateTime $date = null)
     {
+        $this->statsd->startTiming("policy.create");
         $user = $policy->getUser();
 
         $prefix = null;
@@ -164,11 +170,15 @@ class PolicyService
         $scode->setShareLink($shortLink);
         $this->dm->flush();
 
+        $this->statsd->startTiming("policy.schedule+terms");
         $policyTerms = $this->generatePolicyTerms($policy);
         $policySchedule = $this->generatePolicySchedule($policy);
+        $this->statsd->endTiming("policy.schedule+terms");
 
         $this->newPolicyEmail($policy, [$policySchedule, $policyTerms]);
         $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
+
+        $this->statsd->endTiming("policy.create");
     }
 
     public function uniqueSCode($policy, $count = 0)
