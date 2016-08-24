@@ -71,6 +71,7 @@ services:
             environment:          "%kernel.environment%"
             defaultSenderAddress: "%default_sender_address%"
             defaultSenderName:    "%default_sender_name%"
+            statsd:               "@statsd"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
@@ -131,9 +132,10 @@ services:
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
         arguments:
-            logger: "@logger"
-            googleAppName: %google_appname%
-            googleApiKey: %google_apikey%
+            logger:        "@logger"
+            googleAppName: "%google_appname%"
+            googleApiKey:  "%google_apikey%"
+            statsd:        "@statsd"
 
     app.address:
         class: AppBundle\Service\PCAService
@@ -272,6 +274,7 @@ services:
             shortLink:            "@app.shortlink"
             defaultSenderAddress: "%default_sender_address%"
             defaultSenderName:    "%default_sender_name%"
+            statsd:               "@statsd"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService

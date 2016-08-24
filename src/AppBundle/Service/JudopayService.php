@@ -48,6 +48,8 @@ class JudopayService
     /** @var string */
     protected $defaultSenderName;
 
+    protected $statsd;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -60,6 +62,7 @@ class JudopayService
      * @param string          $environment
      * @param string          $defaultSenderAddress
      * @param string          $defaultSenderName
+     * @param                 $statsd
      */
     public function __construct(
         DocumentManager $dm,
@@ -72,7 +75,8 @@ class JudopayService
         $judoId,
         $environment,
         $defaultSenderAddress,
-        $defaultSenderName
+        $defaultSenderName,
+        $statsd
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -91,6 +95,7 @@ class JudopayService
         $this->client = new Judopay($data);
         $this->defaultSenderAddress = $defaultSenderAddress;
         $this->defaultSenderName = $defaultSenderName;
+        $this->statsd = $statsd;
     }
 
     public function getTransactions($pageSize)
@@ -139,6 +144,7 @@ class JudopayService
      */
     public function add(Policy $policy, $receiptId, $consumerToken, $cardToken, $deviceDna = null)
     {
+        $this->statsd->startTiming("judopay.add");
         // if already active, don't re-run
         if ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {
             return true;
@@ -162,6 +168,8 @@ class JudopayService
         $this->policyService->create($policy);
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $this->dm->flush();
+
+        $this->statsd->endTiming("judopay.add");
 
         return true;
     }

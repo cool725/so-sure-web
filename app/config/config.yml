@@ -214,3 +214,10 @@ knp_snappy:
         enabled:    false
         binary:     /usr/local/bin/wkhtmltopdf
         options:    []
+
+domnikl_statsd:
+    namespace: "sosure"
+    connection:
+        class: \Domnikl\Statsd\Connection\Socket # or Blackhole to disable metrics
+        port: 8125 # default is 8125
+        host: "localhost" # default is localhost

@@ -14,16 +14,20 @@ class ShortLinkService
     /** @var string */
     protected $googleApiKey;
 
+    protected $statsd;
+
     /**
      * @param LoggerInterface $logger
      * @param string          $googleAppName
      * @param string          $googleApiKey
+     * @param                 $statsd
      */
-    public function __construct(LoggerInterface $logger, $googleAppName, $googleApiKey)
+    public function __construct(LoggerInterface $logger, $googleAppName, $googleApiKey, $statsd)
     {
         $this->logger = $logger;
         $this->googleAppName = $googleAppName;
         $this->googleApiKey = $googleApiKey;
+        $this->statsd = $statsd;
     }
 
     /**
@@ -34,6 +38,8 @@ class ShortLinkService
     public function addShortLink($url)
     {
         try {
+            $this->statsd->startTiming("google.shortlink");
+
             $client = new \Google_Client();
             $client->setApplicationName($this->googleAppName);
             $client->setDeveloperKey($this->googleApiKey);
@@ -41,6 +47,8 @@ class ShortLinkService
             $gUrl = new \Google_Service_Urlshortener_Url();
             $gUrl->longUrl = $url;
             $result = $service->url->insert($gUrl);
+
+            $this->statsd->endTiming("google.shortlink");
 
             return $result['id'];
         } catch (\Exception $e) {
