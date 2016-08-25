@@ -13,6 +13,8 @@ use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\File\PolicyTermsFile;
+use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Event\PolicyEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
