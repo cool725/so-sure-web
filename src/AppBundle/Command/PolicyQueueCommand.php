@@ -36,33 +36,55 @@ class PolicyQueueCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Show items in the queue'
             )
+            ->addOption(
+                'id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy id to manually resend the policy docs (will not affect the queue)'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $policy = $this->getContainer()->get('app.policy');
+        $policyService = $this->getContainer()->get('app.policy');
         $clear = true === $input->getOption('clear');
         $show = true === $input->getOption('show');
         $process = $input->getOption('process');
+        $policyId = $input->getOption('id');
 
         if ($clear) {
             if ($process > 0) {
-                $policy->clearQueue($process);
+                $policyService->clearQueue($process);
                 $output->writeln(sprintf("Queue is cleared of %d messages", $process));
             } else {
-                $policy->clearQueue();
+                $policyService->clearQueue();
                 $output->writeln(sprintf("Queue is cleared"));
             }
         } elseif ($show) {
-            $data = $policy->getQueueData($process);
-            $output->writeln(sprintf("Queue Size: %d (%d shown)", $policy->getQueueSize(), count($data)));
+            $data = $policyService->getQueueData($process);
+            $output->writeln(sprintf("Queue Size: %d (%d shown)", $policyService->getQueueSize(), count($data)));
             foreach ($data as $line) {
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
             }
+        } elseif ($policyId) {
+            $policy = $this->getPolicy($policyId);
+            if (!$policy) {
+                throw new \Exception(sprintf('Unable to find policy %s', $policyId));
+            }
+            $policyService->generatePolicyFiles($policy);
+            $output->writeln(sprintf("Re-generated policy (%s) docs and emailed", $policy->getId()));
         } else {
-            $count = $policy->process($process);
+            $count = $policyService->process($process);
             $output->writeln(sprintf("Generated docs for %d policies", $count));
         }
+    }
+
+    private function getPolicy($policyId)
+    {
+        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(PhonePolicy::class);
+
+        return $repo->find($policyId);
     }
 }

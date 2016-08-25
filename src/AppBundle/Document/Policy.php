@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\PersistentCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use AppBundle\Classes\Salva;
+use AppBundle\Document\File\S3File;
 
 /**
  * @MongoDB\Document
@@ -227,6 +228,14 @@ abstract class Policy
      * )
      */
     protected $scodes = array();
+
+    /**
+     * @MongoDB\ReferenceMany(
+     *  targetDocument="AppBundle\Document\File\S3File",
+     *  cascade={"persist"}
+     * )
+     */
+    protected $policyFiles = array();
 
     public function __construct()
     {
@@ -643,6 +652,16 @@ abstract class Policy
         }
 
         return null;
+    }
+
+    public function getPolicyFiles()
+    {
+        return $this->policyFiles;
+    }
+
+    public function addPolicyFile(S3File $file)
+    {
+        $this->policyFiles[] = $file;
     }
 
     public function init(User $user, PolicyDocument $terms)

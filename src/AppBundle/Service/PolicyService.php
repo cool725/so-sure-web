@@ -231,12 +231,7 @@ class PolicyService
                     throw new \Exception(sprintf('Unknown policy in queue %s', json_encode($data)));
                 }
 
-                $this->statsd->startTiming("policy.schedule+terms");
-                $policyTerms = $this->generatePolicyTerms($policy);
-                $policySchedule = $this->generatePolicySchedule($policy);
-                $this->statsd->endTiming("policy.schedule+terms");
-
-                $this->newPolicyEmail($policy, [$policySchedule, $policyTerms]);
+                $this->generatePolicyFiles($policy);
 
                 $count = $count + 1;
             } catch (\Exception $e) {
@@ -250,6 +245,19 @@ class PolicyService
         }
 
         return $count;
+    }
+
+    public function generatePolicyFiles($policy, $email = true)
+    {
+        $this->statsd->startTiming("policy.schedule+terms");
+        $policyTerms = $this->generatePolicyTerms($policy);
+        $policySchedule = $this->generatePolicySchedule($policy);
+        $this->dm->flush();
+        $this->statsd->endTiming("policy.schedule+terms");
+
+        if ($email) {
+            $this->newPolicyEmail($policy, [$policySchedule, $policyTerms]);
+        }
     }
 
     public function uniqueSCode($policy, $count = 0)
@@ -302,6 +310,11 @@ class PolicyService
 
         $this->uploadS3($tmpFile, $filename, $policy);
 
+        $policyTermsFile = new PolicyTermsFile();
+        $policyTermsFile->setBucket(self::S3_BUCKET);
+        $policyTermsFile->setKey($this->getS3Key($policy, $filename));
+        $policy->addPolicyFile($policyTermsFile);
+
         return $tmpFile;
     }
 
@@ -329,7 +342,17 @@ class PolicyService
 
         $this->uploadS3($tmpFile, $filename, $policy);
 
+        $policyScheduleFile = new PolicyScheduleFile();
+        $policyScheduleFile->setBucket(self::S3_BUCKET);
+        $policyScheduleFile->setKey($this->getS3Key($policy, $filename));
+        $policy->addPolicyFile($policyScheduleFile);
+
         return $tmpFile;
+    }
+
+    public function getS3Key($policy, $filename)
+    {
+        return sprintf('%s/mob/%s/%s', $this->environment, $policy->getId(), $filename);
     }
 
     public function uploadS3($file, $filename, Policy $policy)
@@ -338,7 +361,7 @@ class PolicyService
             return;
         }
 
-        $s3Key = sprintf('%s/mob/%s/%s', $this->environment, $policy->getId(), $filename);
+        $s3Key = $this->getS3Key($policy, $filename);
 
         $result = $this->s3->putObject(array(
             'Bucket' => self::S3_BUCKET,

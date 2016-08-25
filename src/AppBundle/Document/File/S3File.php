@@ -14,7 +14,9 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *      "salvaPolicy"="SalvaPolicyFile",
  *      "judo"="JudoFile",
  *      "lloyds"="LloydsFile",
- *      "barclays"="BarclaysFile"
+ *      "barclays"="BarclaysFile",
+ *      "policySchedule"="PolicyScheduleFile",
+ *      "policyTerms"="PolicyTermsFile"
  * })
  * @Gedmo\Loggable
  */
