@@ -13,6 +13,8 @@ use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\File\PolicyTermsFile;
+use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Event\PolicyEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -22,6 +24,7 @@ use AppBundle\Exception\InvalidPremiumException;
 class PolicyService
 {
     const S3_BUCKET = 'policy.so-sure.com';
+    const KEY_POLICY_QUEUE = 'policy:queue';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -61,6 +64,8 @@ class PolicyService
 
     protected $statsd;
 
+    protected $redis;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -94,6 +99,7 @@ class PolicyService
      * @param string           $defaultSenderAddress
      * @param string           $defaultSenderName
      * @param                  $statsd
+     * @param                  $redis
      */
     public function __construct(
         DocumentManager $dm,
@@ -110,7 +116,8 @@ class PolicyService
         ShortLinkService $shortLink,
         $defaultSenderAddress,
         $defaultSenderName,
-        $statsd
+        $statsd,
+        $redis
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -127,6 +134,7 @@ class PolicyService
         $this->defaultSenderAddress = $defaultSenderAddress;
         $this->defaultSenderName = $defaultSenderName;
         $this->statsd = $statsd;
+        $this->redis = $redis;
     }
 
     public function create(Policy $policy, \DateTime $date = null)
@@ -170,15 +178,88 @@ class PolicyService
         $scode->setShareLink($shortLink);
         $this->dm->flush();
 
-        $this->statsd->startTiming("policy.schedule+terms");
-        $policyTerms = $this->generatePolicyTerms($policy);
-        $policySchedule = $this->generatePolicySchedule($policy);
-        $this->statsd->endTiming("policy.schedule+terms");
+        $this->queueMessage($policy);
 
-        $this->newPolicyEmail($policy, [$policySchedule, $policyTerms]);
         $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
 
         $this->statsd->endTiming("policy.create");
+    }
+
+    private function queueMessage($policy)
+    {
+        $data = ['policyId' => $policy->getId()];
+        $this->redis->rpush(self::KEY_POLICY_QUEUE, serialize($data));
+    }
+
+    public function clearQueue($max = null)
+    {
+        if (!$max) {
+            $this->redis->del(self::KEY_POLICY_QUEUE);
+        } else {
+            for ($i = 0; $i < $max; $i++) {
+                $this->redis->lpop(self::KEY_POLICY_QUEUE);
+            }
+        }
+    }
+
+    public function getQueueSize()
+    {
+        return $this->redis->llen(self::KEY_POLICY_QUEUE);
+    }
+
+    public function getQueueData($max)
+    {
+        return $this->redis->lrange(self::KEY_POLICY_QUEUE, 0, $max - 1);
+    }
+
+    public function process($max)
+    {
+        $count = 0;
+        while ($count < $max) {
+            $policy = null;
+            try {
+                $queueItem = $this->redis->lpop(self::KEY_POLICY_QUEUE);
+                if (!$queueItem) {
+                    return $count;
+                }
+                $data = unserialize($queueItem);
+
+                if (!isset($data['policyId'])) {
+                    throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
+                }
+                $policyRepo = $this->dm->getRepository(Policy::class);
+                $policy = $policyRepo->find($data['policyId']);
+                if (!$policy) {
+                    throw new \Exception(sprintf('Unknown policy in queue %s', json_encode($data)));
+                }
+
+                $this->generatePolicyFiles($policy);
+
+                $count = $count + 1;
+            } catch (\Exception $e) {
+                $this->logger->error(sprintf(
+                    'Error reprocessing policy message [%s]',
+                    json_encode($data)
+                ), ['exeception' => $e]);
+
+                throw $e;
+            }
+        }
+
+        return $count;
+    }
+
+    public function generatePolicyFiles($policy, $email = true)
+    {
+        $this->statsd->startTiming("policy.schedule+terms");
+        $policyTerms = $this->generatePolicyTerms($policy);
+        $policySchedule = $this->generatePolicySchedule($policy);
+        $this->dm->flush();
+        $this->statsd->endTiming("policy.schedule+terms");
+
+        if ($email) {
+            $this->newPolicyEmail($policy, [$policySchedule, $policyTerms]);
+        }
     }
 
     public function uniqueSCode($policy, $count = 0)
@@ -231,6 +312,11 @@ class PolicyService
 
         $this->uploadS3($tmpFile, $filename, $policy);
 
+        $policyTermsFile = new PolicyTermsFile();
+        $policyTermsFile->setBucket(self::S3_BUCKET);
+        $policyTermsFile->setKey($this->getS3Key($policy, $filename));
+        $policy->addPolicyFile($policyTermsFile);
+
         return $tmpFile;
     }
 
@@ -258,7 +344,17 @@ class PolicyService
 
         $this->uploadS3($tmpFile, $filename, $policy);
 
+        $policyScheduleFile = new PolicyScheduleFile();
+        $policyScheduleFile->setBucket(self::S3_BUCKET);
+        $policyScheduleFile->setKey($this->getS3Key($policy, $filename));
+        $policy->addPolicyFile($policyScheduleFile);
+
         return $tmpFile;
+    }
+
+    public function getS3Key($policy, $filename)
+    {
+        return sprintf('%s/mob/%s/%s', $this->environment, $policy->getId(), $filename);
     }
 
     public function uploadS3($file, $filename, Policy $policy)
@@ -267,7 +363,7 @@ class PolicyService
             return;
         }
 
-        $s3Key = sprintf('%s/mob/%s/%s', $this->environment, $policy->getId(), $filename);
+        $s3Key = $this->getS3Key($policy, $filename);
 
         $result = $this->s3->putObject(array(
             'Bucket' => self::S3_BUCKET,
