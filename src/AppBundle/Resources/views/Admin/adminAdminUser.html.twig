@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+    {% block body %}
+    <div class="container">
+        <h2>so-sure Admin User - {{ user.name }}</h2>
+    <div class="row-fluid">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>{{ user.name }}</a></td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <td>MFA</td>
+                            <td>{% if user.googleAuthenticatorSecret | length > 0 %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>        
+        </div>
+    </div>
+</div>
+{% endblock %}

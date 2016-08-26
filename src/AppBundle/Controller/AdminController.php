@@ -262,6 +262,38 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/admin-users", name="admin_admin_users")
+     * @Template
+     */
+    public function adminAdminUsersAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+
+        $users = $repo->findUsersInRole('ROLE_ADMIN');
+
+        return [
+            'users' => $users,
+        ];
+    }
+
+    /**
+     * @Route("/admin-users/{id}", name="admin_admin_user")
+     * @Template
+     */
+    public function adminAdminUserAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+
+        $user = $repo->find($id);
+
+        return [
+            'user' => $user,
+        ];
+    }
+
+    /**
      * @Route("/policy/{id}", name="admin_policy")
      * @Template("AppBundle::Admin/claimsPolicy.html.twig")
      */

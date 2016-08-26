@@ -9,6 +9,9 @@ security:
         ROLE_ADMIN:       ROLE_USER,ROLE_CLAIMS
         ROLE_SUPER_ADMIN: ROLE_ADMIN
 
+    access_decision_manager:
+        strategy: unanimous
+
     providers:
         fos_userbundle:
             id: fos_user.user_provider.username
@@ -56,7 +59,7 @@ security:
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
-        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ 217.158.0.52 ] }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ 217.158.0.52, 127.0.0.1, 10.0.2.2 ] }
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/purchase/, role: ROLE_USER }

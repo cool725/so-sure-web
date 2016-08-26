@@ -48,7 +48,8 @@
         "knplabs/knp-snappy-bundle": "^1.4",
         "peerj/peerj-user-security-bundle": "^0.1.0",
         "dpn/xml-sitemap-bundle": "^2.0",
-        "domnikl/statsd-bundle": "^1.1"
+        "domnikl/statsd-bundle": "^1.1",
+        "scheb/two-factor-bundle": "^2.6"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

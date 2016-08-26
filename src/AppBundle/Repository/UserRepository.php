@@ -13,6 +13,25 @@ class UserRepository extends DocumentRepository
 {
     use PhoneTrait;
 
+    public function findUsersInRole($role)
+    {
+        $qb = $this->createQueryBuilder();
+        // Horrible structure in FOSUserBundle for roles, which is an object
+        // with numeric properties e.g. { "0": "ROLE_ADMIN" }
+        // Assume max of 6 possible roles per user - currently only using 1
+        // TODO: See about transforming the role object to a string and regex that?
+        // or perhaps its possible to get to the user with the max size for the roles object
+        // and use that as a basis
+        for ($i = 0; $i <= 5; $i++) {
+            $roleName = sprintf('roles.%d', $i);
+            $qb->addOr($qb->expr()->field($roleName)->equals($role));
+        }
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
     public function existsUser($email, $facebookId = null, $mobileNumber = null)
     {
         $qb = $this->createQueryBuilder();
