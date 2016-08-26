@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+    {% block body %}
+    <div class="container">
+        <h2>so-sure Admin User - {{ user.name }}</h2>
+    <div class="row-fluid">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>{{ user.name }}</a></td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <td>MFA</td>
+                            <td>
+                            {% if user.googleAuthenticatorSecret | length > 0 %}
+                                {{ user.googleAuthenticatorSecret }}
+                                <br />
+                                <img src="{{ mfa_image_url }}" />
+                                <br />
+                                {{ form_start(disable_mfa_form) }}
+                                {{ form_widget(disable_mfa_form.disable, {'label': 'Disable MFA', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
+                                {{ form_end(disable_mfa_form) }}
+                            {% else %}
+                                {{ form_start(enable_mfa_form) }}
+                                {{ form_widget(enable_mfa_form.enable, {'label': 'Enable MFA', 'attr': {'class': 'btn btn-primary'}}) }}
+                                {{ form_end(enable_mfa_form) }}
+                            {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>        
+        </div>
+    </div>
+</div>
+{% endblock %}

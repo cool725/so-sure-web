@@ -60,3 +60,11 @@ redirect_jobs:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /jobs
         permanent: true
+
+_security_logout:
+    path: /logout
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /logout
+        permanent: true
+    

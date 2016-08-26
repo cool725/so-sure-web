@@ -9,6 +9,7 @@ use GeoJson\Geometry\Point;
 use AppBundle\Document\Invitation\Invitation;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
@@ -16,7 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @Gedmo\Loggable
  *
  */
-class User extends BaseUser
+class User extends BaseUser implements TwoFactorInterface
 {
     use ArrayToApiArrayTrait;
     use PhoneTrait;
@@ -74,6 +75,12 @@ class User extends BaseUser
 
     /** @MongoDB\Date() */
     protected $created;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $googleAuthenticatorSecret;
 
     /**
      * @MongoDB\Field(type="string")
@@ -396,6 +403,16 @@ class User extends BaseUser
     public function setEmailVerified($emailVerified)
     {
         $this->emailVerified = $emailVerified;
+    }
+
+    public function getGoogleAuthenticatorSecret()
+    {
+        return $this->googleAuthenticatorSecret;
+    }
+
+    public function setGoogleAuthenticatorSecret($googleAuthenticatorSecret)
+    {
+        $this->googleAuthenticatorSecret = $googleAuthenticatorSecret;
     }
 
     public function getFirstName()

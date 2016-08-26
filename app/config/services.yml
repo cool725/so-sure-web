@@ -456,3 +456,8 @@ services:
             router:      "@router"
         tags:
             - { name: dpn_xml_sitemap.generator }
+    
+    two_factor.persister:
+        class: AppBundle\Service\DoctrinePersister
+        arguments:
+            dm:          "@doctrine_mongodb.odm.default_document_manager"

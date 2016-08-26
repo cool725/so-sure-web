@@ -13,6 +13,7 @@ parameters:
     cognito_developer_login: 'login.so-sure.com'
     default_sender_address: 'hello@wearesosure.com'
     default_sender_name: 'so-sure'
+    #scheb_two_factor.security_voter.class: AppBundle\Security\TwoFactorVoter#£
 
 framework:
     #esi:             ~
@@ -221,3 +222,43 @@ domnikl_statsd:
         class: \Domnikl\Statsd\Connection\Socket # or Blackhole to disable metrics
         port: 8125 # default is 8125
         host: "localhost" # default is localhost
+
+scheb_two_factor:
+
+    # Trusted computer feature
+    trusted_computer:
+        enabled: true                  # If the trusted computer feature should be enabled
+        cookie_name: sosure-trusted    # Name of the trusted computer cookie
+        cookie_lifetime: 604800          # Lifetime of the trusted computer cookie - 7 days
+        cookie_secure: true           # Set the 'Secure' (HTTPS Only) flag on the trusted_computer cookie
+
+    # Regex pattern of paths you want to exclude from two-factor authentication.
+    # Useful to exclude Assetic paths or other files from being blocked.
+    # Example: ^/(css|js|images)/
+    exclude_pattern: ^/(css|js|images)/
+
+    # POST/GET parameter names
+    parameter_names:
+        auth_code: _auth_code          # Name of the parameter containing the authentication code
+        trusted: _trusted              # Name of the parameter containing the trusted flag
+
+    # Google Authenticator config
+    google:
+        enabled: true                      # If Google Authenticator should be enabled, default false
+#        server_name: wearesosure.com       # Server name used in QR code
+        issuer: "so-sure %kernel.environment%"   # Issuer name used in QR code
+        template: SchebTwoFactorBundle:Authentication:form.html.twig   # Template used to render the authentication form
+
+    # The service which is used to persist data in the user object. By default Doctrine is used. If your entity is
+    # managed by something else (e.g. an API), you have to implement a custom persister
+    persister: two_factor.persister
+
+    # If your Doctrine user object is managed by a model manager, which is not the default one, you have to
+    # set this option. Name of entity manager or null, which uses the default one.
+    model_manager_name: ~
+
+    # The security token classes, which trigger two-factor authentication.
+    # By default the bundle only reacts to Symfony's username+password authentication. If you want to enable
+    # two-factor authentication for other authentication methods, add their security token classes.
+    security_tokens:
+        - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken

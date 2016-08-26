@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+    {% block body %}
+    <div class="container">
+        <h2>so-sure Admin Users</h2>
+    {% if users.count == 0 %}
+    <div class="row-fluid">
+        <h2>No users found</h2>
+    </div>
+    {% else %}
+    <div class="row-fluid">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>MFA</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr class="{% if user.googleAuthenticatorSecret | length <= 0 %}danger{% endif %}">
+                            <td><a href="{{ path('admin_admin_user', {id: user.id}) }}">{{ user.name }}</a></td>
+                            <td>{{ user.email }}</td>
+                            <td>{% if user.googleAuthenticatorSecret | length > 0 %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>        
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
