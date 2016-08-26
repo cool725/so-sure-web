@@ -287,9 +287,43 @@ class AdminController extends BaseController
         $repo = $dm->getRepository(User::class);
 
         $user = $repo->find($id);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+        $disableMFAForm = $this->get('form.factory')
+            ->createNamedBuilder('disable_mfa_form')->add('disable', SubmitType::class)
+            ->getForm();
+        $enableMFAForm = $this->get('form.factory')
+            ->createNamedBuilder('enable_mfa_form')->add('enable', SubmitType::class)
+            ->getForm();
+        $mfaImageUrl = $this->get("scheb_two_factor.security.google_authenticator")->getUrl($user);
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('disable_mfa_form')) {
+                $disableMFAForm->handleRequest($request);
+                if ($disableMFAForm->isValid()) {
+                    $user->setGoogleAuthenticatorSecret(null);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_admin_user', ['id' => $id]);
+                }
+            } elseif ($request->request->has('enable_mfa_form')) {
+                $enableMFAForm->handleRequest($request);
+                if ($enableMFAForm->isValid()) {
+                    $secret = $this->get("scheb_two_factor.security.google_authenticator")->generateSecret();
+                    $user->setGoogleAuthenticatorSecret($secret);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_admin_user', ['id' => $id]);
+                }
+            }
+        }
 
         return [
             'user' => $user,
+            'disable_mfa_form' => $disableMFAForm->createView(),
+            'enable_mfa_form' => $enableMFAForm->createView(),
+            'mfa_image_url' => $mfaImageUrl
         ];
     }
 

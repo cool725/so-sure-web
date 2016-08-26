@@ -21,7 +21,7 @@
                     </thead>
                     <tbody>
                     {% for user in users %}
-                        <tr>
+                        <tr class="{% if user.googleAuthenticatorSecret | length <= 0 %}danger{% endif %}">
                             <td><a href="{{ path('admin_admin_user', {id: user.id}) }}">{{ user.name }}</a></td>
                             <td>{{ user.email }}</td>
                             <td>{% if user.googleAuthenticatorSecret | length > 0 %}Yes{% else %}No{% endif %}</td>

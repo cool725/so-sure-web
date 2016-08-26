@@ -10,7 +10,7 @@ class DoctrinePersister implements PersisterInterface
     protected $dm;
 
     /**
-     * @param DocumentManager  $dm
+     * @param DocumentManager $dm
      */
     public function __construct(
         DocumentManager $dm
