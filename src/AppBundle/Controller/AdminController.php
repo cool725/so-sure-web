@@ -265,7 +265,7 @@ class AdminController extends BaseController
      * @Route("/admin-users", name="admin_admin_users")
      * @Template
      */
-    public function adminAdminUsersAction(Request $request)
+    public function adminAdminUsersAction()
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
