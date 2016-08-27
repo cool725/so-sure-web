@@ -17,7 +17,7 @@
                 <div class="error-text" style="padding-bottom: 10px;">{{ error|trans({}, 'FOSUserBundle') }}</div>
             {% endif %}
             <div class="form-group">
-                    <input type="checkbox" id="remember_me" name="_remember_me" value="on" />
+                    <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} />
                     <label for="remember_me">Remember me</label>
             </div>
             <div class="form-group">

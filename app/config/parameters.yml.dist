@@ -90,3 +90,5 @@ parameters:
     apple_app_download:  'https://itunes.apple.com/gb/app/so-sure/id1094307449'
 
     expected_claim_frequency: 0.2
+
+    davies_ip: 10.0.2.2
