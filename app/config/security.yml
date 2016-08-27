@@ -53,13 +53,17 @@ security:
 
                 oauth_user_provider:
                     service: app.user # hwi_oauth.user.provider
+            remember_me:
+                secret:   '%secret%'
+                lifetime: 43200 # 12 hours in seconds
+                path:     /
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
-        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ 217.158.0.52, 127.0.0.1, 10.0.2.2 ] }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ %davies_ip% ] }
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/purchase/, role: ROLE_USER }
