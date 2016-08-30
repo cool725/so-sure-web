@@ -40,7 +40,8 @@ abstract class Policy
     const STATUS_UNPAID = 'unpaid';
 
     const CANCELLED_UNPAID = 'unpaid';
-    const CANCELLED_FRAUD = 'fraud';
+    const CANCELLED_ACTUAL_FRAUD = 'actual-fraud';
+    const CANCELLED_SUSPECTED_FRAUD = 'suspected-fraud';
     const CANCELLED_USER_REQUESTED = 'user-requested';
     const CANCELLED_COOLOFF = 'cooloff';
     const CANCELLED_BADRISK = 'badrisk';
@@ -250,6 +251,9 @@ abstract class Policy
         return $this->id;
     }
 
+    /**
+     * Although rare, payments can include refunds
+     */
     public function getPayments()
     {
         return $this->payments;
@@ -260,6 +264,60 @@ abstract class Policy
         $payment->setPolicy($this);
         $payment->calculateSplit();
         $this->payments->add($payment);
+    }
+
+    /**
+     * Successful Payments
+     */
+    public function getSuccessfulPayments()
+    {
+        $payments = $this->getPayments();
+        if (is_object($payments)) {
+            $payments = $payments->toArray();
+        }
+        if (!$this->getPayments()) {
+            return [];
+        }
+
+        return array_filter($payments, function ($payment) {
+            return $payment->isSuccess();
+        });
+    }
+
+    /**
+     * Payments filtered by credits (pos amount)
+     */
+    public function getSuccessfulPaymentCredits()
+    {
+        return array_filter($this->getSuccessfulPayments(), function ($payment) {
+            return $payment->getAmount() > 0;
+        });
+    }
+
+    public function getLastSuccessfulPaymentCredit()
+    {
+        $payments = $this->getSuccessfulPaymentCredits();
+        if (count($payments) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($payments, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $payments[0];
+    }
+
+    /**
+     * Payments filtered by debits (neg amount)
+     */
+    public function getSuccessfulPaymentDebits()
+    {
+        return array_filter($this->getSuccessfulPayments(), function ($payment) {
+            return $payment->getAmount() <= 0;
+        });
     }
 
     public function getUser()
@@ -1059,6 +1117,11 @@ abstract class Policy
         return true;
     }
 
+    public function validateRefundAmount($payment)
+    {
+        return $payment->getAmount() == $this->getPremiumInstallmentPrice();
+    }
+
     public function isWithinCooloffPeriod($date = null)
     {
         if ($date == null) {
@@ -1077,27 +1140,6 @@ abstract class Policy
         return $this->getEnd()->diff($date)->days < 30;
     }
 
-    public function getLastSuccessfulPayment()
-    {
-        $successfulPayments = [];
-        foreach ($this->getPayments() as $payment) {
-            if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
-                $successfulPayments[] = $payment;
-            }
-        }
-
-        if (count($successfulPayments) == 0) {
-            return null;
-        }
-
-        // sort high to low
-        usort($successfulPayments, function ($a, $b) {
-            return $a->getDate() < $b->getDate();
-        });
-
-        return $successfulPayments[0];
-    }
-
     public function shouldExpirePolicy($date = null)
     {
         if (!$this->isValidPolicy()) {
@@ -1105,7 +1147,7 @@ abstract class Policy
         }
 
         // if its a valid policy without a payment, probably it should be expired
-        if (!$this->getLastSuccessfulPayment()) {
+        if (!$this->getLastSuccessfulPaymentCredit()) {
             throw new \Exception(sprintf(
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
@@ -1117,7 +1159,7 @@ abstract class Policy
         }
 
         // Max month is 31 days + 30 days cancellation
-        return $this->getLastSuccessfulPayment()->getDate()->diff($date)->days > 61;
+        return $this->getLastSuccessfulPaymentCredit()->getDate()->diff($date)->days > 61;
     }
 
     public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)

@@ -302,7 +302,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->addPayment(new JudoPayment());
 
-        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_FRAUD, new \DateTime('2016-02-10'));
+        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-02-10'));
         $this->assertEquals(2, $policy->getPolicyLength());
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2, $policy->getTotalPremiumPrice());
         $this->assertEquals($policy->getPremium()->getGwp() * 2, $policy->getTotalGwp());

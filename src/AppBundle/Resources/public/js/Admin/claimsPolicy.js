@@ -5,3 +5,7 @@ $('.confirm-cancel').on("click",function() {
 $('.confirm-update').on("click",function() {
     return confirm('Are you sure you want to update this imei???  You probably should NOT be updating.');
 });
+
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});

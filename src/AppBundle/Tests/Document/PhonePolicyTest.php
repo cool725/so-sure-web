@@ -1265,7 +1265,7 @@ class PhonePolicyTest extends WebTestCase
         );
     }
 
-    public function testGetLastSuccessfulPayment()
+    public function testGetLastSuccessfulPaymentCredit()
     {
         $policy = new PhonePolicy();
         $policy->setPhone(static::$phone);
@@ -1276,7 +1276,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
-        $this->assertNull($policy->getLastSuccessfulPayment());
+        $this->assertNull($policy->getLastSuccessfulPaymentCredit());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1286,7 +1286,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1296,7 +1296,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1306,7 +1306,17 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
-        $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+
+        // Neg payment (debit/refund) should be ignored
+        $payment = new JudoPayment();
+        $payment->setAmount(0 - static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setDate(new \DateTime('2016-03-15'));
+        $policy->addPayment($payment);
+
+        $date = new \DateTime('2016-02-15');
+        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
     }
 
     /**

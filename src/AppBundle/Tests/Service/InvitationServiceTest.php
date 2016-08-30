@@ -406,7 +406,7 @@ class InvitationServiceTest extends WebTestCase
         $future->add(new \DateInterval('P3D'));
         $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
 
-        self::$invitationService->cancel($invitation, Policy::CANCELLED_FRAUD);
+        self::$invitationService->cancel($invitation, Policy::CANCELLED_ACTUAL_FRAUD);
 
         $this->assertTrue($invitation->isCancelled());
         $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
@@ -706,7 +706,7 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-02-01'));
 
         // Now Cancel policy
-        self::$policyService->cancel($policyInvitee, Policy::CANCELLED_FRAUD, new \DateTime('2016-04-03'));
+        self::$policyService->cancel($policyInvitee, Policy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-04-03'));
 
         $userInvitee = static::createUser(
             static::$userManager,
