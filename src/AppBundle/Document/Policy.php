@@ -818,6 +818,83 @@ abstract class Policy
         }
     }
 
+    public function getRefundAmount($date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        // Just in case - make sure we don't refund for non-cancelled policies
+        if (!$this->isCancelled()) {
+            return 0;
+        }
+
+        // 3 factors determine refund amount
+        // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
+        if ($this->getCancelledReason() == Policy::CANCELLED_UNPAID ||
+            $this->getCancelledReason() == Policy::CANCELLED_ACTUAL_FRAUD ||
+            $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
+            // Never refund for certain cancellation reasons
+            return 0;
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED) {
+            // user has 30 days from when they requested cancellation
+            // however, as we don't easily have a scheduled cancellation
+            // we will start with a manual cancellation that should be done
+            // 30 days after they requested, such that the cancellation will be immediate then
+            if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+                return 0;
+            } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+                if ($this->hasMonetaryClaimed(true)) {
+                    return 0;
+                } else {
+                    return $this->monthlyProratedRefundAmount($date);
+                }
+            }
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+            // Cooloff should always refund full amount (which should be equal to the last payment)
+            $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
+            $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+
+            return $paymentToRefund->getAmount();
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_DISPOSSESSION ||
+            $this->getCancelledReason() == Policy::CANCELLED_WRECKAGE) {
+            if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+                $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
+                $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+
+                return $paymentToRefund->getAmount();
+            } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+                return $this->monthlyProratedRefundAmount($date);
+            }
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_BADRISK) {
+            throw new \UnexpectedValueException('Badrisk is not implemented');
+        }
+    }
+
+    public function monthlyProratedRefundAmount($date = null)
+    {
+        $remainingMonths = $this->getRemainingMonthsInPolicy($date);
+        // Refund is from next month's anniversary, so subtracting 1 month from remaning months is same
+        $remainingMonths--;
+        if ($remainingMonths >= 1) {
+            return $this->getPremium()->getMonthlyPremiumPrice() * $remainingMonths;
+        } else {
+            return 0;
+        }
+    }
+
+    public function getRemainingMonthsInPolicy($date)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        // Policy end date may already be changed to now, so use the original end date
+        $months = $date->diff($this->getStaticEnd())->m;
+
+        return $months;
+    }
+
     public function getRemainingTotalPremiumPrice($payments)
     {
         return $this->toTwoDp($this->getTotalPremiumPrice() - $this->getTotalPremiumPrice($payments));
@@ -1117,9 +1194,18 @@ abstract class Policy
         return true;
     }
 
-    public function validateRefundAmount($payment)
+    public function validateRefundAmountIsInstallmentPrice($payment)
     {
-        return $payment->getAmount() == $this->getPremiumInstallmentPrice();
+        if ($payment->getAmount() != $this->getPremiumInstallmentPrice()) {
+            throw new \InvalidArgumentException(sprintf(
+                'Failed to validate [policy %s] refund amount (%f) does not match premium price (%f)',
+                $this->getPolicyNumber(),
+                $payment->getAmount(),
+                $this->getPremiumInstallmentPrice() ? $this->getPremiumInstallmentPrice() : -1
+            ));
+        }
+
+        return true;
     }
 
     public function isWithinCooloffPeriod($date = null)
