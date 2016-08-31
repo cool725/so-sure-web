@@ -40,7 +40,8 @@ abstract class Policy
     const STATUS_UNPAID = 'unpaid';
 
     const CANCELLED_UNPAID = 'unpaid';
-    const CANCELLED_FRAUD = 'fraud';
+    const CANCELLED_ACTUAL_FRAUD = 'actual-fraud';
+    const CANCELLED_SUSPECTED_FRAUD = 'suspected-fraud';
     const CANCELLED_USER_REQUESTED = 'user-requested';
     const CANCELLED_COOLOFF = 'cooloff';
     const CANCELLED_BADRISK = 'badrisk';
@@ -250,6 +251,9 @@ abstract class Policy
         return $this->id;
     }
 
+    /**
+     * Although rare, payments can include refunds
+     */
     public function getPayments()
     {
         return $this->payments;
@@ -260,6 +264,60 @@ abstract class Policy
         $payment->setPolicy($this);
         $payment->calculateSplit();
         $this->payments->add($payment);
+    }
+
+    /**
+     * Successful Payments
+     */
+    public function getSuccessfulPayments()
+    {
+        $payments = $this->getPayments();
+        if (is_object($payments)) {
+            $payments = $payments->toArray();
+        }
+        if (!$this->getPayments()) {
+            return [];
+        }
+
+        return array_filter($payments, function ($payment) {
+            return $payment->isSuccess();
+        });
+    }
+
+    /**
+     * Payments filtered by credits (pos amount)
+     */
+    public function getSuccessfulPaymentCredits()
+    {
+        return array_filter($this->getSuccessfulPayments(), function ($payment) {
+            return $payment->getAmount() > 0;
+        });
+    }
+
+    public function getLastSuccessfulPaymentCredit()
+    {
+        $payments = $this->getSuccessfulPaymentCredits();
+        if (count($payments) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($payments, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $payments[0];
+    }
+
+    /**
+     * Payments filtered by debits (neg amount)
+     */
+    public function getSuccessfulPaymentDebits()
+    {
+        return array_filter($this->getSuccessfulPayments(), function ($payment) {
+            return $payment->getAmount() <= 0;
+        });
     }
 
     public function getUser()
@@ -670,7 +728,7 @@ abstract class Policy
         $this->setPolicyTerms($terms);
     }
 
-    public function create($seq, $prefix = null, $startDate = null)
+    public function create($seq, $prefix = null, \DateTime $startDate = null)
     {
         // Only create 1 time
         if ($this->getPolicyNumber()) {
@@ -758,6 +816,93 @@ abstract class Policy
         } else {
             return null;
         }
+    }
+
+    public function getRefundAmount($date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        // Just in case - make sure we don't refund for non-cancelled policies
+        if (!$this->isCancelled()) {
+            return 0;
+        }
+
+        // 3 factors determine refund amount
+        // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
+        if ($this->getCancelledReason() == Policy::CANCELLED_UNPAID ||
+            $this->getCancelledReason() == Policy::CANCELLED_ACTUAL_FRAUD ||
+            $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
+            // Never refund for certain cancellation reasons
+            return 0;
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED) {
+            // user has 30 days from when they requested cancellation
+            // however, as we don't easily have a scheduled cancellation
+            // we will start with a manual cancellation that should be done
+            // 30 days after they requested, such that the cancellation will be immediate then
+            if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+                return 0;
+            } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+                if ($this->hasMonetaryClaimed(true)) {
+                    return 0;
+                } else {
+                    // Still need to validate rules with Salva - for now, don't refund
+                    // return $this->monthlyProratedRefundAmount($date);
+                    return 0;
+                }
+            }
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+            // Cooloff should always refund full amount (which should be equal to the last payment)
+            $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
+            $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+
+            return $paymentToRefund->getAmount();
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_DISPOSSESSION ||
+            $this->getCancelledReason() == Policy::CANCELLED_WRECKAGE) {
+            if ($this->hasMonetaryClaimed(true)) {
+                return 0;
+            } else {
+                // Still need to validate rules with Salva - for now, don't refund
+                /*
+                if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+                    $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
+                    $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+    
+                    return $paymentToRefund->getAmount();
+                } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+                    return $this->monthlyProratedRefundAmount($date);
+                }
+                */
+                return 0;
+            }
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_BADRISK) {
+            throw new \UnexpectedValueException('Badrisk is not implemented');
+        }
+    }
+
+    public function monthlyProratedRefundAmount($date = null)
+    {
+        $remainingMonths = $this->getRemainingMonthsInPolicy($date);
+        // Refund is from next month's anniversary, so subtracting 1 month from remaning months is same
+        $remainingMonths--;
+        if ($remainingMonths >= 1) {
+            return $this->getPremium()->getMonthlyPremiumPrice() * $remainingMonths;
+        } else {
+            return 0;
+        }
+    }
+
+    public function getRemainingMonthsInPolicy($date)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        // Policy end date may already be changed to now, so use the original end date
+        $months = $date->diff($this->getStaticEnd())->m;
+
+        return $months;
     }
 
     public function getRemainingTotalPremiumPrice($payments)
@@ -1059,6 +1204,20 @@ abstract class Policy
         return true;
     }
 
+    public function validateRefundAmountIsInstallmentPrice($payment)
+    {
+        if ($payment->getAmount() != $this->getPremiumInstallmentPrice()) {
+            throw new \InvalidArgumentException(sprintf(
+                'Failed to validate [policy %s] refund amount (%f) does not match premium price (%f)',
+                $this->getPolicyNumber(),
+                $payment->getAmount(),
+                $this->getPremiumInstallmentPrice() ? $this->getPremiumInstallmentPrice() : -1
+            ));
+        }
+
+        return true;
+    }
+
     public function isWithinCooloffPeriod($date = null)
     {
         if ($date == null) {
@@ -1077,27 +1236,6 @@ abstract class Policy
         return $this->getEnd()->diff($date)->days < 30;
     }
 
-    public function getLastSuccessfulPayment()
-    {
-        $successfulPayments = [];
-        foreach ($this->getPayments() as $payment) {
-            if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
-                $successfulPayments[] = $payment;
-            }
-        }
-
-        if (count($successfulPayments) == 0) {
-            return null;
-        }
-
-        // sort high to low
-        usort($successfulPayments, function ($a, $b) {
-            return $a->getDate() < $b->getDate();
-        });
-
-        return $successfulPayments[0];
-    }
-
     public function shouldExpirePolicy($date = null)
     {
         if (!$this->isValidPolicy()) {
@@ -1105,7 +1243,7 @@ abstract class Policy
         }
 
         // if its a valid policy without a payment, probably it should be expired
-        if (!$this->getLastSuccessfulPayment()) {
+        if (!$this->getLastSuccessfulPaymentCredit()) {
             throw new \Exception(sprintf(
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
@@ -1117,7 +1255,7 @@ abstract class Policy
         }
 
         // Max month is 31 days + 30 days cancellation
-        return $this->getLastSuccessfulPayment()->getDate()->diff($date)->days > 61;
+        return $this->getLastSuccessfulPaymentCredit()->getDate()->diff($date)->days > 61;
     }
 
     public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)

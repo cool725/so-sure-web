@@ -1265,7 +1265,7 @@ class PhonePolicyTest extends WebTestCase
         );
     }
 
-    public function testGetLastSuccessfulPayment()
+    public function testGetLastSuccessfulPaymentCredit()
     {
         $policy = new PhonePolicy();
         $policy->setPhone(static::$phone);
@@ -1276,7 +1276,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
-        $this->assertNull($policy->getLastSuccessfulPayment());
+        $this->assertNull($policy->getLastSuccessfulPaymentCredit());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1286,7 +1286,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1296,7 +1296,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1306,7 +1306,17 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
-        $this->assertEquals($date, $policy->getLastSuccessfulPayment()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+
+        // Neg payment (debit/refund) should be ignored
+        $payment = new JudoPayment();
+        $payment->setAmount(0 - static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setDate(new \DateTime('2016-03-15'));
+        $policy->addPayment($payment);
+
+        $date = new \DateTime('2016-02-15');
+        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
     }
 
     /**
@@ -1416,7 +1426,7 @@ class PhonePolicyTest extends WebTestCase
         static::$dm->persist($user);
         static::$dm->flush();
 
-        $policy->cancel(new \DateTime("2016-01-02"));
+        $policy->cancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-02"));
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-01")));
     }
 
@@ -1465,5 +1475,231 @@ class PhonePolicyTest extends WebTestCase
         foreach ($policy->getActiveSCodes() as $scode) {
             $this->assertTrue(in_array($scode->getCode(), [$scodeB->getCode(), $scodeC->getCode()]));
         }
+    }
+    
+
+    public function testPolicyActualFraudNoRefund()
+    {
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $monthlyPolicy->cancel(PhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-02-01'));
+        $this->assertEquals(0, $monthlyPolicy->getRefundAmount());
+
+        $yearlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1
+        );
+        $yearlyPolicy->cancel(PhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-02-01'));
+        $this->assertEquals(0, $yearlyPolicy->getRefundAmount());
+    }
+
+    public function testPolicySuspectedFraudNoRefund()
+    {
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $monthlyPolicy->cancel(PhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2016-02-01'));
+        $this->assertEquals(0, $monthlyPolicy->getRefundAmount());
+
+        $yearlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1
+        );
+        $yearlyPolicy->cancel(PhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2016-02-01'));
+        $this->assertEquals(0, $yearlyPolicy->getRefundAmount());
+    }
+
+    public function testPolicyUnpaidNoRefund()
+    {
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $monthlyPolicy->cancel(PhonePolicy::CANCELLED_UNPAID, new \DateTime('2016-02-01'));
+        $this->assertEquals(0, $monthlyPolicy->getRefundAmount());
+
+        $yearlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1
+        );
+        $yearlyPolicy->cancel(PhonePolicy::CANCELLED_UNPAID, new \DateTime('2016-02-01'));
+        $this->assertEquals(0, $yearlyPolicy->getRefundAmount());
+    }
+
+    public function testPolicyCooloffFullRefund()
+    {
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $monthlyPolicy->cancel(PhonePolicy::CANCELLED_COOLOFF, new \DateTime('2016-01-10'));
+        $this->assertEquals(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $monthlyPolicy->getRefundAmount()
+        );
+
+        $yearlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1
+        );
+        $yearlyPolicy->cancel(PhonePolicy::CANCELLED_COOLOFF, new \DateTime('2016-01-10'));
+        $this->assertEquals(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            $yearlyPolicy->getRefundAmount()
+        );
+    }
+
+    public function testPolicyUserRequestedRefund()
+    {
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $monthlyPolicy->cancel(PhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
+        $this->assertEquals(0, $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10')));
+
+        $yearlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1
+        );
+        $yearlyPolicy->cancel(PhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
+        $this->assertEquals(0, $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10')));
+        /* Waiting on agreemnt with salva
+        $this->assertEquals(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 9,
+            $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
+        );
+        */
+
+        $yearlyPolicyWithClaim = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1
+        );
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $yearlyPolicyWithClaim->addClaim($claim);
+        $this->assertTrue($yearlyPolicyWithClaim->hasMonetaryClaimed(true));
+        $yearlyPolicyWithClaim->cancel(PhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
+        $this->assertEquals(0, $yearlyPolicyWithClaim->getRefundAmount());
+    }
+
+    public function testPolicyWreckageRefund()
+    {
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $monthlyPolicy->cancel(PhonePolicy::CANCELLED_WRECKAGE, new \DateTime('2016-02-10'));
+        $this->assertEquals(0, $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10')));
+        /* waiting on agreement with salva
+        $this->assertEquals(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
+        );
+        */
+
+        $yearlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1
+        );
+        $yearlyPolicy->cancel(PhonePolicy::CANCELLED_WRECKAGE, new \DateTime('2016-02-10'));
+        $this->assertEquals(0, $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10')));
+        /* waiting on agreement with salva
+        $this->assertEquals(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 9,
+            $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
+        );
+        */
+    }
+
+    public function testPolicyDispossessionRefund()
+    {
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $monthlyPolicy->cancel(PhonePolicy::CANCELLED_DISPOSSESSION, new \DateTime('2016-02-10'));
+        $this->assertEquals(0, $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10')));
+        /* waiting on agreement with salva
+        $this->assertEquals(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
+        );
+        */
+
+        $yearlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1
+        );
+        $yearlyPolicy->cancel(PhonePolicy::CANCELLED_DISPOSSESSION, new \DateTime('2016-02-10'));
+        $this->assertEquals(0, $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10')));
+        /* waiting on agreement with salva
+        $this->assertEquals(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 9,
+            $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
+        );
+        */
+    }
+
+    private function createPolicyForCancellation($amount, $commission, $installments)
+    {
+        $user = new User();
+        $user->setEmail(self::generateEmail(sprintf('cancel-policy-%d', rand(1, 9999999)), $this));
+        self::$dm->persist($user);
+        self::$dm->flush();
+
+        self::addAddress($user);
+        self::$dm->flush();
+
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$phone);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"));
+        $policy->setPremiumInstallments($installments);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($amount);
+        $payment->setTotalCommission($commission);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setDate(new \DateTime('2016-01-01'));
+        $policy->addPayment($payment);
+        self::$dm->persist($user);
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        return $policy;
+    }
+
+    public function testRemainingMonthsInPolicy()
+    {
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $this->assertEquals(11, $monthlyPolicy->getRemainingMonthsInPolicy(new \DateTime('2016-01-01 01:00')));
+        $this->assertEquals(11, $monthlyPolicy->getRemainingMonthsInPolicy(new \DateTime('2016-01-02')));
+        $this->assertEquals(10, $monthlyPolicy->getRemainingMonthsInPolicy(new \DateTime('2016-02-01')));
+        $this->assertEquals(1, $monthlyPolicy->getRemainingMonthsInPolicy(new \DateTime('2016-11-30')));
+        $this->assertEquals(0, $monthlyPolicy->getRemainingMonthsInPolicy(new \DateTime('2016-12-01')));
     }
 }

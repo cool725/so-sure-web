@@ -18,7 +18,8 @@ class CancelPolicyType extends AbstractType
     {
         $policy = $builder->getData()->getPolicy();
         $data = [
-            Policy::CANCELLED_FRAUD => 'Fraud (actual)',
+            Policy::CANCELLED_ACTUAL_FRAUD => 'Fraud (actual)',
+            Policy::CANCELLED_SUSPECTED_FRAUD => 'Fraud (suspected)',
             Policy::CANCELLED_DISPOSSESSION => 'Dispossession',
             Policy::CANCELLED_WRECKAGE => 'Wreckage',
         ];

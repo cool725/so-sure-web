@@ -20,13 +20,14 @@
             {{ form_label(cancel_form.cancellationReason, 'Reason') }}
             {{ form_errors(cancel_form.cancellationReason) }}
             {{ form_widget(cancel_form.cancellationReason, { 'separator': '---Unlikely Reasons---' }) }}
-        <i class="fa fa-question-circle" title="
-Cooloff: only visible if within 14 days and no pending claims
-User Request: any other user requested reason beyond cooloff
-Unpaid: only visible if status is unpaid, but should only be cancelled after 30 days
-Fraud: should only be used in cases where it can be proven
-Dispossession: only for cases where a phone has been lost but claim not approved
-Wreckage: only for cases where a phone is damaged beyond use but claim not approved
+        <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true" title="Cancellation Reasons" data-content="
+<b>Cooloff</b>: only visible if within 14 days and no pending claims<br />
+<b>User Request</b>: any other user requested reason beyond cooloff<br />
+<b>Unpaid</b>: only visible if status is unpaid, but should only be cancelled after 30 days<br />
+<b>Fraud (actual)</b>: should only be used in cases where it can be proven<br />
+<b>Fraud (suspected)</b>: use with caution as likely to cause lawsuits<br />
+<b>Dispossession</b>: only for cases where a phone has been lost but claim not approved<br />
+<b>Wreckage</b>: only for cases where a phone is damaged beyond use but claim not approved
 "></i>
         </div>
         {{ form_widget(cancel_form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}

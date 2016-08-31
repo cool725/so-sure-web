@@ -27,7 +27,8 @@ class SalvaExportService
 
     const CANCELLED_REPLACE = 'new_cover_to_be_issued';
     const CANCELLED_UNPAID = 'debt';
-    const CANCELLED_FRAUD = 'annulment';
+    const CANCELLED_ACTUAL_FRAUD = 'annulment';
+    const CANCELLED_SUSPECTED_FRAUD = 'annulment';
     const CANCELLED_USER_REQUESTED = 'withdrawal_client';
     const CANCELLED_COOLOFF = 'withdrawal';
     const CANCELLED_BADRISK = 'claim';
@@ -447,8 +448,10 @@ class SalvaExportService
         if (!$reason) {
             if ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_UNPAID) {
                 $reason = self::CANCELLED_UNPAID;
-            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_FRAUD) {
-                $reason = self::CANCELLED_FRAUD;
+            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_ACTUAL_FRAUD) {
+                $reason = self::CANCELLED_ACTUAL_FRAUD;
+            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_SUSPECTED_FRAUD) {
+                $reason = self::CANCELLED_SUSPECTED_FRAUD;
             } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_USER_REQUESTED) {
                 $reason = self::CANCELLED_USER_REQUESTED;
             } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_COOLOFF) {

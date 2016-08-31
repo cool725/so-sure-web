@@ -31,22 +31,11 @@ class RefundListener
     public function onPolicyCancelledEvent(PolicyEvent $event)
     {
         $policy = $event->getPolicy();
-        if (!$policy->isCancelled() ||
-            $policy->getCancelledReason() != Policy::CANCELLED_COOLOFF ||
-            !$policy->isWithinCooloffPeriod()
-        ) {
-            return;
+
+        $payment = $policy->getLastSuccessfulPaymentCredit();
+        $refundAmount = $policy->getRefundAmount();
+        if ($refundAmount > 0) {
+            $this->judopayService->refund($payment, $refundAmount);
         }
-
-        if (count($policy->getPayments()) != 1) {
-            $this->logger->error(sprintf(
-                'Unable to auto-refund policy %s as has 0 or more than 1 payments',
-                $policy->getPolicyNumber()
-            ));
-
-            return;
-        }
-
-        $this->judopayService->refund($policy->getPayments()[0]);
     }
 }
