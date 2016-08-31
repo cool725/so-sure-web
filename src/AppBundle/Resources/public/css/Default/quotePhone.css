@@ -9,9 +9,9 @@
     background: -ms-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
     background: linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
-    padding-top: 40px;
-    padding-bottom: 40px;
-    min-height: 400px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    min-height: 500px;
     position: relative;
 
 }
@@ -52,10 +52,10 @@
     border-top: 1px solid #efefef;
 }
 .phone-fact-body {
-    font-size: 13px;
+    font-size: 14px;
 }
 .view-quote .panel-body .coverage {
-    font-size: 12px;
+    font-size: 14px;
     text-align: left;
 }
 .view-quote .panel-body .coverage ul, li {
@@ -78,7 +78,7 @@
     text-decoration: none;
 }
 .view-quote .panel-body .not-covered {
-    font-size: 12px;
+    font-size: 14px;
     text-align: left;
 }
 .view-quote .panel-body .not-covered ul, li {
@@ -110,7 +110,7 @@
     border-bottom-left-radius: 3px;
 }
 .got-a-question {
-    font-size: 12px;
+    font-size: 14px;
     padding-bottom: -20px;
 }
 }
