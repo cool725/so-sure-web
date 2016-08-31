@@ -8,6 +8,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Address;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
+use AppBundle\Document\JudoPayment;
 use AppBundle\Classes\Salva;
 
 trait UserClassTrait
@@ -115,9 +116,10 @@ trait UserClassTrait
         }
 
         if ($addPayment && $policy->getPhone()) {
-            $payment = new GocardlessPayment();
+            $payment = new JudoPayment();
             $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
             $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+            $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $policy->addPayment($payment);
         }
 

@@ -728,7 +728,7 @@ abstract class Policy
         $this->setPolicyTerms($terms);
     }
 
-    public function create($seq, $prefix = null, $startDate = null)
+    public function create($seq, $prefix = null, \DateTime $startDate = null)
     {
         // Only create 1 time
         if ($this->getPolicyNumber()) {

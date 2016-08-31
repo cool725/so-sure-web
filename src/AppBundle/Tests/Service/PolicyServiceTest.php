@@ -33,6 +33,7 @@ class PolicyServiceTest extends WebTestCase
     protected static $dm;
     protected static $policyRepo;
     protected static $userManager;
+    protected static $judopay;
 
     public static function setUpBeforeClass()
     {
@@ -49,6 +50,7 @@ class PolicyServiceTest extends WebTestCase
          self::$policyRepo = self::$dm->getRepository(Policy::class);
          self::$userManager = self::$container->get('fos_user.user_manager');
          self::$policyService = self::$container->get('app.policy');
+         self::$judopay = self::$container->get('app.judopay');
     }
 
     public function tearDown()
@@ -317,7 +319,23 @@ class PolicyServiceTest extends WebTestCase
             static::generateEmail('salva-cooloff', $this),
             'bar'
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt($receiptId);
+        $policy->addPayment($payment);
+
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'));

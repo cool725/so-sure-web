@@ -1426,7 +1426,7 @@ class PhonePolicyTest extends WebTestCase
         static::$dm->persist($user);
         static::$dm->flush();
 
-        $policy->cancel(new \DateTime("2016-01-02"));
+        $policy->cancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-02"));
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-01")));
     }
 
@@ -1568,7 +1568,7 @@ class PhonePolicyTest extends WebTestCase
             12
         );
         $monthlyPolicy->cancel(PhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
-        $this->assertEquals(0, $monthlyPolicy->getRefundAmount());
+        $this->assertEquals(0, $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10')));
 
         $yearlyPolicy = $this->createPolicyForCancellation(
             static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
@@ -1577,8 +1577,8 @@ class PhonePolicyTest extends WebTestCase
         );
         $yearlyPolicy->cancel(PhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
         $this->assertEquals(
-            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 10,
-            $yearlyPolicy->getRefundAmount()
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 9,
+            $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
 
         $yearlyPolicyWithClaim = $this->createPolicyForCancellation(
@@ -1605,7 +1605,7 @@ class PhonePolicyTest extends WebTestCase
         $monthlyPolicy->cancel(PhonePolicy::CANCELLED_WRECKAGE, new \DateTime('2016-02-10'));
         $this->assertEquals(
             static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            $monthlyPolicy->getRefundAmount()
+            $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
 
         $yearlyPolicy = $this->createPolicyForCancellation(
@@ -1615,8 +1615,8 @@ class PhonePolicyTest extends WebTestCase
         );
         $yearlyPolicy->cancel(PhonePolicy::CANCELLED_WRECKAGE, new \DateTime('2016-02-10'));
         $this->assertEquals(
-            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 10,
-            $yearlyPolicy->getRefundAmount()
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 9,
+            $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
     }
 
@@ -1630,7 +1630,7 @@ class PhonePolicyTest extends WebTestCase
         $monthlyPolicy->cancel(PhonePolicy::CANCELLED_DISPOSSESSION, new \DateTime('2016-02-10'));
         $this->assertEquals(
             static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            $monthlyPolicy->getRefundAmount()
+            $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
 
         $yearlyPolicy = $this->createPolicyForCancellation(
@@ -1640,19 +1640,23 @@ class PhonePolicyTest extends WebTestCase
         );
         $yearlyPolicy->cancel(PhonePolicy::CANCELLED_DISPOSSESSION, new \DateTime('2016-02-10'));
         $this->assertEquals(
-            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 10,
-            $yearlyPolicy->getRefundAmount()
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 9,
+            $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
     }
 
     private function createPolicyForCancellation($amount, $commission, $installments)
     {
+        $user = new User();
+        $user->setEmail(self::generateEmail(sprintf('cancel-policy-%d', rand(1, 9999999)), $this));
+        self::$dm->persist($user);
+        self::$dm->flush();
+
+        self::addAddress($user);
+        self::$dm->flush();
+
         $policy = new PhonePolicy();
         $policy->setPhone(static::$phone);
-
-        $user = new User();
-        $user->setEmail(self::generateEmail(sprintf('policy-%d', rand(1, 9999999)), $this));
-        self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"));
         $policy->setPremiumInstallments($installments);
