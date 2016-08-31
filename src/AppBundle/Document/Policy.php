@@ -847,7 +847,9 @@ abstract class Policy
                 if ($this->hasMonetaryClaimed(true)) {
                     return 0;
                 } else {
-                    return $this->monthlyProratedRefundAmount($date);
+                    // Still need to validate rules with Salva - for now, don't refund
+                    // return $this->monthlyProratedRefundAmount($date);
+                    return 0;
                 }
             }
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
@@ -858,13 +860,21 @@ abstract class Policy
             return $paymentToRefund->getAmount();
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_DISPOSSESSION ||
             $this->getCancelledReason() == Policy::CANCELLED_WRECKAGE) {
-            if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-                $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
-                $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
-
-                return $paymentToRefund->getAmount();
-            } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
-                return $this->monthlyProratedRefundAmount($date);
+            if ($this->hasMonetaryClaimed(true)) {
+                return 0;
+            } else {
+                // Still need to validate rules with Salva - for now, don't refund
+                /*
+                if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+                    $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
+                    $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+    
+                    return $paymentToRefund->getAmount();
+                } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+                    return $this->monthlyProratedRefundAmount($date);
+                }
+                */
+                return 0;
             }
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_BADRISK) {
             throw new \UnexpectedValueException('Badrisk is not implemented');
