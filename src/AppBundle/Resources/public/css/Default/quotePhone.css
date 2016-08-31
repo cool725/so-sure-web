@@ -9,9 +9,9 @@
     background: -ms-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
     background: linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
-    padding-top: 50px;
-    padding-bottom: 100px;
-    min-height: 600px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    min-height: 400px;
     position: relative;
 
 }
@@ -78,7 +78,7 @@
     text-decoration: none;
 }
 .view-quote .panel-body .not-covered {
-    font-size: 14px;
+    font-size: 12px;
     text-align: left;
 }
 .view-quote .panel-body .not-covered ul, li {
