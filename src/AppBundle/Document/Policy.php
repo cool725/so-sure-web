@@ -807,7 +807,7 @@ abstract class Policy
         }
     }
 
-    private function getPremiumPlan()
+    public function getPremiumPlan()
     {
         if ($this->getPremiumInstallments() == 1) {
             return self::PLAN_YEARLY;

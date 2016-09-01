@@ -2,6 +2,7 @@
 namespace AppBundle\Classes;
 
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Policy;
 
 class Salva
 {
@@ -36,6 +37,21 @@ class Salva
             return 0;
         } else {
             throw new \Exception('Months can not be negative');
+        }
+    }
+
+    public function getTotalCommission(Policy $policy)
+    {
+        if ($policy->getPremiumPlan() == Policy::PLAN_MONTHLY) {
+            if ($policy->isFinalMonthlyPayment()) {
+                return self::FINAL_MONTHLY_TOTAL_COMMISSION;
+            } else {
+                return self::MONTHLY_TOTAL_COMMISSION;
+            }
+        } elseif ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
+            return self::YEARLY_TOTAL_COMMISSION;
+        } else {
+            return null;
         }
     }
 }
