@@ -7,6 +7,10 @@ use AppBundle\Classes\ClientUrl;
 
 class PushService
 {
+    const DISPLAY_POPUP = 'popup';
+    const DISPLAY_NONE = 'none';
+    const DISPLAY_INLINE = 'inline';
+
     const MESSAGE_GENERAL = 'general';
 
     // sent to inviter
@@ -14,6 +18,10 @@ class PushService
 
     // sent to invitee
     const MESSAGE_INVITATION = 'invitation';
+
+    // these are currently mixpanel events
+    const MESSAGE_RATEMYAPP = 'ratemyapp';
+    const MESSAGE_PROMO = 'promo';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -47,19 +55,18 @@ class PushService
     public function send($messageType, $arn, $message, $badge = null)
     {
         $this->logger->debug(sprintf('Push triggered to %s %s', $arn, $message));
-        $url = $this->getUrl($messageType);
         $this->sns->publish([
            'TargetArn' => $arn,
            'MessageStructure' => 'json',
             'Message' => json_encode([
-                'APNS' => json_encode($this->generateAPNSMessage($message, $url, $badge)),
-                'APNS_SANDBOX' => json_encode($this->generateAPNSMessage($message, $url, $badge)),
-                'GCM' => json_encode($this->generateGCMMessage($message, $url)),
+                'APNS' => json_encode($this->generateAPNSMessage($messageType, $message, $badge)),
+                'APNS_SANDBOX' => json_encode($this->generateAPNSMessage($messageType, $message, $badge)),
+                'GCM' => json_encode($this->generateGCMMessage($messageType, $message)),
             ])
         ]);
     }
 
-    public function getUrl($messageType)
+    public function getUri($messageType)
     {
         if ($messageType == self::MESSAGE_GENERAL) {
             return null;
@@ -72,20 +79,40 @@ class PushService
         }
     }
 
+    public function getDisplay($messageType)
+    {
+        if ($messageType == self::MESSAGE_GENERAL) {
+            return self::DISPLAY_POPUP;
+        } elseif ($messageType == self::MESSAGE_CONNECTED) {
+            return self::DISPLAY_POPUP;
+        } elseif ($messageType == self::MESSAGE_INVITATION) {
+            return self::DISPLAY_POPUP;
+        } else {
+            return null;
+        }
+    }
+
+    public function getRefresh($messageType)
+    {
+        if ($messageType == self::MESSAGE_GENERAL) {
+            return null;
+        } elseif ($messageType == self::MESSAGE_CONNECTED) {
+            return true;
+        } elseif ($messageType == self::MESSAGE_INVITATION) {
+            return true;
+        } else {
+            return null;
+        }
+    }
+
     /**
      * @see https://developers.google.com/cloud-messaging/http-server-ref#notification-payload-support
      */
-    private function generateGCMMessage($message, $url = null)
+    public function generateGCMMessage($messageType, $message)
     {
         $gcm['data']['message'] = $message;
 
-        // Currently required due to https://github.com/so-sure/product-backlog/wiki/Push-Notification-Rules
-        // Proposed ticket to remove https://app.clubhouse.io/sosure/story/210/change-to-push-notification-rules
-        $gcm['data']['type'] = 'alert';
-
-        if ($url) {
-            $gcm['data']['url'] = $url;
-        }
+        $gcm['data'] = array_merge($gcm['data'], $this->getCustomData($messageType));
 
         return $gcm;
     }
@@ -95,7 +122,7 @@ class PushService
      * @see https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/TheNotificationPayload.html
      * @codingStandardsIgnoreEnd
      */
-    private function generateAPNSMessage($message, $url = null, $badge = null, $newContent = null)
+    public function generateAPNSMessage($messageType, $message, $badge = null, $newContent = null)
     {
         if ($badge && $newContent) {
             throw new \Exception('Silent notifications can not contain badge updates');
@@ -116,14 +143,30 @@ class PushService
         }
 
         // custom data
-        if ($url) {
-            $apns['url'] = $url;
-        }
-
-        // Currently required due to https://github.com/so-sure/product-backlog/wiki/Push-Notification-Rules
-        // Proposed ticket to remove https://app.clubhouse.io/sosure/story/210/change-to-push-notification-rules
-        $apns['type'] = 'alert';
+        $apns = array_merge($apns, $this->getCustomData($messageType));
 
         return $apns;
+    }
+
+    public function getCustomData($messageType)
+    {
+        $data = [];
+        $uri = $this->getUri($messageType);
+        if ($uri) {
+            $data['uri'] = $uri;
+        }
+        $display = $this->getDisplay($messageType);
+        if ($display) {
+            $data['display'] = $display;
+        }
+        $refresh = $this->getRefresh($messageType);
+        if ($refresh) {
+            $data['refresh'] = $refresh;
+        }
+
+        // Depreciated field, but keep as alert to always display message
+        $data['type'] = 'alert';
+
+        return $data;
     }
 }
