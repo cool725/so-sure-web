@@ -1,4 +1,4 @@
-    <div class="text-center" style="background-color: {{ policy.riskColour }}; color: black;">
+    <div class="text-center" style="background-color: {{ policy.riskColour }}; color: white; font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
       Risk: {{ policy.riskReason }} ({{ policy.risk }})
     </div>
     <ul class="nav nav-tabs nav-justified">
@@ -47,7 +47,7 @@
                                     data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
                                     data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
                                     >Show Alternatives</button>
-                        
+
                         </td>
                     </tr>
                     <tr>

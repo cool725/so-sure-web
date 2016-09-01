@@ -1,5 +1,12 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'bundles/app/css/Default/claimHandling.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
 {% block body %}
 <div class="container" id="claim-handling">
     <h2>Search</h2>
