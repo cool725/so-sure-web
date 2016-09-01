@@ -807,7 +807,7 @@ abstract class Policy
         }
     }
 
-    private function getPremiumPlan()
+    public function getPremiumPlan()
     {
         if ($this->getPremiumInstallments() == 1) {
             return self::PLAN_YEARLY;
@@ -942,9 +942,17 @@ abstract class Policy
 
     public function getTotalBrokerFee($payments = null)
     {
+        $includeFinalCommission = false;
+        if ($payments) {
+            foreach ($payments as $payment) {
+                if ($payment->getTotalCommission() == Salva::FINAL_MONTHLY_TOTAL_COMMISSION) {
+                    $includeFinalCommission = true;
+                }
+            }
+        }
         $salva = new Salva();
-        // TODO: Includes final monthly fee?
-        return $salva->sumBrokerFee($this->getMonthsForCancellationCalc($payments));
+
+        return $salva->sumBrokerFee($this->getMonthsForCancellationCalc($payments), $includeFinalCommission);
     }
 
     public function getMonthsForCancellationCalc($payments = null)
@@ -1042,6 +1050,25 @@ abstract class Policy
         }
 
         return $this->toTwoDp($totalCommission);
+    }
+
+    public function getOutstandingPremium()
+    {
+        return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
+    }
+
+    public function isFinalMonthlyPayment()
+    {
+        if ($this->getPremiumPlan() != self::PLAN_MONTHLY) {
+            return false;
+        }
+
+        // If there's 1 payment outstanding
+        if ($this->getOutstandingPremium() == $this->getPremiumInstallmentPrice()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function getRiskColour()

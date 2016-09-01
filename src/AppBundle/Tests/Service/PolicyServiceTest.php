@@ -386,10 +386,13 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->addPayment(new JudoPayment());
 
-        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getTotalPremiumPrice([1]));
-        $this->assertEquals($policy->getPremium()->getGwp(), $policy->getTotalGwp([1]));
-        $this->assertEquals($policy->getPremium()->getIpt(), $policy->getTotalIpt([1]));
-        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee([1]));
+        $payment = new JudoPayment();
+        $payment->setAmount('1');
+
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getTotalPremiumPrice([$payment]));
+        $this->assertEquals($policy->getPremium()->getGwp(), $policy->getTotalGwp([$payment]));
+        $this->assertEquals($policy->getPremium()->getIpt(), $policy->getTotalIpt([$payment]));
+        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee([$payment]));
     }
 
     public function testScodeUnique()

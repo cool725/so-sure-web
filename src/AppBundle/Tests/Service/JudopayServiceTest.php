@@ -11,6 +11,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Classes\Salva;
 
 /**
  * @group functional-net
@@ -182,6 +183,26 @@ class JudopayServiceTest extends WebTestCase
     }
 
     public function testJudoAdd()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-add', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token');
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+    }
+
+    public function testJudoCommission()
     {
         $user = $this->createValidUser(static::generateEmail('judo-add', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -373,5 +394,73 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
         // 11 + 4
         $this->assertEquals(15, count($policy->getScheduledPayments()));
+    }
+
+    public function testCommission()
+    {
+        $this->clearEmail(static::$container);
+        $user = $this->createValidUser(static::generateEmail('judo-commission', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
+            throw new \Exception('Payment failed');
+        }
+
+        // @codingStandardsIgnoreStart
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+        );
+        // @codingStandardsIgnoreEnd
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertEquals(
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            $policy->getLastSuccessfulPaymentCredit()->getTotalCommission()
+        );
+
+        for ($i = 1; $i <= 10; $i++) {
+            $scheduledPayment = $policy->getNextScheduledPayment();
+            $payment = new JudoPayment();
+            $payment->setResult(JudoPayment::RESULT_SUCCESS);
+            $payment->setAmount($scheduledPayment->getAmount());
+            self::$judopay->setCommission($policy, $payment);
+
+            self::$judopay->processTokenPayResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
+            $policy->addPayment($payment);
+            $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
+            $this->assertEquals(
+                Salva::MONTHLY_TOTAL_COMMISSION,
+                $policy->getLastSuccessfulPaymentCredit()->getTotalCommission()
+            );
+        }
+
+        $this->assertTrue($policy->isFinalMonthlyPayment());
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        $payment = new JudoPayment();
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setAmount($scheduledPayment->getAmount());
+        self::$judopay->setCommission($policy, $payment);
+
+        self::$judopay->processTokenPayResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
+        $policy->addPayment($payment);
+        self::$dm->flush();
+        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
+        $this->assertEquals(
+            Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
     }
 }

@@ -2,6 +2,7 @@
 namespace AppBundle\Classes;
 
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Policy;
 
 class Salva
 {
@@ -21,12 +22,36 @@ class Salva
 
     const SALVA_TIMEZONE = "Europe/London";
 
-    public function sumBrokerFee($months)
+    public function sumBrokerFee($months, $includeFinalCommission)
     {
         if ($months == 12) {
             return self::YEARLY_TOTAL_COMMISSION;
+        } elseif ($months >= 1) {
+            if ($includeFinalCommission) {
+                return $this->toTwoDp(self::MONTHLY_TOTAL_COMMISSION * ($months - 1)
+                    + self::FINAL_MONTHLY_TOTAL_COMMISSION);
+            } else {
+                return $this->toTwoDp(self::MONTHLY_TOTAL_COMMISSION * $months);
+            }
+        } elseif ($months == 0) {
+            return 0;
+        } else {
+            throw new \Exception('Months can not be negative');
         }
+    }
 
-        return $this->toTwoDp(self::MONTHLY_TOTAL_COMMISSION * $months);
+    public function getTotalCommission(Policy $policy)
+    {
+        if ($policy->getPremiumPlan() == Policy::PLAN_MONTHLY) {
+            if ($policy->isFinalMonthlyPayment()) {
+                return self::FINAL_MONTHLY_TOTAL_COMMISSION;
+            } else {
+                return self::MONTHLY_TOTAL_COMMISSION;
+            }
+        } elseif ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
+            return self::YEARLY_TOTAL_COMMISSION;
+        } else {
+            return null;
+        }
     }
 }
