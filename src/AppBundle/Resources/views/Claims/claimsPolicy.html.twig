@@ -1,5 +1,12 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'bundles/app/css/Default/claimHandling.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
@@ -7,12 +14,12 @@
         '@AppBundle/Resources/public/js/Claims/phoneAlternativesModal.js'
     %}
     <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}            
+    {% endjavascripts %}
 {% endblock %}
 
 {% block body %}
 <div class="container">
-    <h2>so-sure Claims - {{policy.user.name }}</h2>
+    <h2>{{policy.user.name }}'s Policy</h2>
     <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <p class="text-center"><strong>Run ClaimsCheck</strong></p>
         <p>
@@ -27,12 +34,12 @@
                     {{ form_label(formClaimsCheck.type, 'Type of claim', {'label_attr': {'class': 'col-sm-4'}}) }}
                     {{ form_errors(formClaimsCheck.type) }}
                     {{ form_widget(formClaimsCheck.type, {'attr': {'class': 'col-sm-3'}}) }}
-                </div>                
+                </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
-                    {{ form_widget(formClaimsCheck.run, {'label': 'Run ClaimsCheck', 'attr': {'class': 'btn btn-success'}}) }}
-                </div>                
+                    {{ form_widget(formClaimsCheck.run, {'label': 'Run ClaimsCheck', 'attr': {'class': 'btn btn-primary'}}) }}
+                </div>
             </div>
         </div>
         {{ form_end(formClaimsCheck) }}
@@ -43,7 +50,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="row">
-                    <div class="col-md-12">                
+                    <div class="col-md-12">
                         <div class="form-group">
                             {{ form_label(formClaim.number, 'Claim Number', {'label_attr': {'class': 'col-sm-4'}}) }}
                             {{ form_errors(formClaim.number) }}
@@ -57,7 +64,7 @@
                             {{ form_label(formClaim.type, 'Claim Type', {'label_attr': {'class': 'col-sm-4'}}) }}
                             {{ form_errors(formClaim.type) }}
                             {{ form_widget(formClaim.type, {'attr': {'class': 'col-sm-3'}}) }}
-                        </div>                
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -66,7 +73,7 @@
                             {{ form_label(formClaim.status, '', {'label_attr': {'class': 'col-sm-4'}}) }}
                             {{ form_errors(formClaim.status) }}
                             {{ form_widget(formClaim.status, {'attr': {'class': 'col-sm-3'}}) }}
-                        </div>                
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -75,7 +82,7 @@
                             {{ form_label(formClaim.suspected_fraud, '', {'label_attr': {'class': 'col-sm-4'}}) }}
                             {{ form_errors(formClaim.suspected_fraud) }}
                             {{ form_widget(formClaim.suspected_fraud, {'attr': {'class': 'col-sm-3'}}) }}
-                        </div>                
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -85,7 +92,7 @@
                             {{ form_label(formClaim.shouldCancelPolicy, '', {'label_attr': {'class': 'col-sm-4'}}) }}
                             {{ form_errors(formClaim.shouldCancelPolicy) }}
                             {{ form_widget(formClaim.shouldCancelPolicy, {'attr': {'class': 'col-sm-3'}}) }}
-                        </div>                
+                        </div>
                     </div>
                 </div>
             </div>
@@ -101,14 +108,14 @@
                             {{ form_label(formClaim.force, '', {'label_attr': {'class': 'col-sm-4'}}) }}
                             {{ form_errors(formClaim.force) }}
                             {{ form_widget(formClaim.force, {'attr': {'class': 'col-sm-6'}}) }}
-                        </div>                
+                        </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             {{ form_label(formClaim.crime_ref, 'Crime Ref (Lost/Stolen)', {'label_attr': {'class': 'col-sm-4'}}) }}
                             {{ form_errors(formClaim.crime_ref) }}
                             {{ form_widget(formClaim.crime_ref, {'attr': {'class': 'col-sm-3'}}) }}
-                        </div>                
+                        </div>
                     </div>
                 </div>
             </div>
@@ -119,12 +126,12 @@
                     {{ form_label(formClaim.notes, '', {'label_attr': {'class': 'col-sm-2'}}) }}
                     {{ form_errors(formClaim.notes) }}
                     {{ form_widget(formClaim.notes, {'attr': {'class': 'col-sm-10'}}) }}
-                </div>                
+                </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
-                    {{ form_widget(formClaim.record, {'label': 'Record claim', 'attr': {'class': 'btn btn-success'}}) }}
-                </div>                
+                    {{ form_widget(formClaim.record, {'label': 'Record claim', 'attr': {'class': 'btn btn-primary'}}) }}
+                </div>
             </div>
         </div>
         {{ form_end(formClaim) }}

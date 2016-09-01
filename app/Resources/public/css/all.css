@@ -38,9 +38,6 @@ strong {
     font-style: bold;
     font-weight: 700;
 }
-td {
-    width: 50%;
-}
 ul, li {
     margin: auto;
 }
@@ -269,7 +266,6 @@ h1, h2, h3, h4, h5, h6 {
 .login #password, #fos_user_resetting_form_new_second {
     margin-top: 0px;
 }
-
 .flash {
     padding: 5px;
     border-radius: 5px;
