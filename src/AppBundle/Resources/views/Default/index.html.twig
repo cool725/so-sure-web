@@ -18,7 +18,16 @@
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Default/index.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
 {% block body %}
+
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <section class="hero">
@@ -76,7 +85,7 @@
                 </div>
             </div>
         </div>
-        <a href="#learn-more" style="color: #fff;"><div class="mouse"></div></a>
+        <a id="scroll-indicator" href="#learn-more" style="color: #fff;"><div class="mouse"></div></a>
     </section>
 
     {% include 'AppBundle::Default/howItWorks.html.twig' %}
@@ -286,6 +295,5 @@
             </li>
         </ul>
     </div>
-
 </div>
 {% endblock %}

@@ -14,6 +14,7 @@
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
     'components/Chart.js/Chart.js'
     'bundles/app/js/Default/connections.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -49,7 +50,7 @@
 
                                 </p>
                                 <h5>£{{ phone_price.monthlyPremiumPrice }}</h5>
-                                <p>What You Could Get Back <a href="#connections"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
+                                <p>What You Could Get Back <a id="connections-info-icon" href="#connections"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
                                 </p>
                                 <h5>£{{ phone_price.maxPot }}
                                     with
