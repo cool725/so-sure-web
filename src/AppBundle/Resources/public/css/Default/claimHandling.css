@@ -23,7 +23,7 @@
   padding: 8px 8px 8px 5px;
 }
 
-.badge {
+#claimPolicyItem .badge {
   padding: 4px 10px 4px 10px;
   margin-left: 10px;
   background-color: #3399ff !important;
