@@ -204,7 +204,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoCommission()
     {
-        $user = $this->createValidUser(static::generateEmail('judo-add', $this));
+        $user = $this->createValidUser(static::generateEmail('judo-commission', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
