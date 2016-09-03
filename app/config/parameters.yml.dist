@@ -92,3 +92,5 @@ parameters:
     expected_claim_frequency: 0.2
 
     davies_ip: 10.0.2.2
+
+    sosure_employee_cookie_value: 'changeme'
