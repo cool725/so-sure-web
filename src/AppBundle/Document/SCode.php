@@ -68,7 +68,16 @@ class SCode
 
     public function generateRandomCode()
     {
-        $this->setCode(substr(base64_encode(uniqid(mt_rand(), true)), 0, 8));
+        $randBase64 = $this->removeDisallowedBase64Chars(base64_encode(random_bytes(9)));
+        $this->setCode(substr($randBase64, 0, 8));
+    }
+
+    public function removeDisallowedBase64Chars($string)
+    {
+        $string = str_replace('/', '', $string);
+        $string = str_replace('=', '', $string);
+
+        return $string;
     }
 
     public static function isValidSCode($scode)
