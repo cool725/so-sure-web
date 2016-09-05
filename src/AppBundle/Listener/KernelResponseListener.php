@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class KernelResponseListener
 {
     const SOSURE_EMPLOYEE_COOKIE_NAME = 'sosure-employee';
-    const SOSURE_EMPLOYEE_COOKIE_LENGTH = 604800; // 7 days 
+    const SOSURE_EMPLOYEE_COOKIE_LENGTH = 604800; // 7 days
     protected $tokenStorage;
     protected $authChecker;
     protected $adminCookieValue;
