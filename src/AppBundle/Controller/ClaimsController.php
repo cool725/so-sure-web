@@ -161,10 +161,13 @@ class ClaimsController extends BaseController
                         }
                     }
                     $claimsService = $this->get('app.claims');
-                    $claimsService->addClaim($policy, $claim);
-                    $this->addFlash('success', sprintf('Claim %s is added', $claim->getNumber()));
+                    if ($claimsService->addClaim($policy, $claim)) {
+                        $this->addFlash('success', sprintf('Claim %s is added', $claim->getNumber()));
 
-                    return $this->redirectToRoute('claims_policy', ['id' => $id]);
+                        return $this->redirectToRoute('claims_policy', ['id' => $id]);
+                    } else {
+                        $this->addFlash('error', sprintf('Duplicate claim number %s', $claim->getNumber()));
+                    }
                 }
             } elseif ($request->request->has('claimscheck')) {
                 $formClaimsCheck->handleRequest($request);

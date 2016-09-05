@@ -68,4 +68,31 @@ class ClaimsServiceTest extends WebTestCase
         $this->assertEquals($policy->getId(), $lostPhone->getPolicy()->getId());
         $this->assertEquals($policy->getPhone()->getId(), $lostPhone->getPhone()->getId());
     }
+
+    public function testDuplicateClaim()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('original', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        
+        $claimNumber = rand(1, 999999);
+
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $claim->setNumber($claimNumber);
+        $this->assertTrue(static::$claimsService->addClaim($policy, $claim));
+
+        $claimDup = new Claim();
+        $claimDup->setStatus(Claim::STATUS_APPROVED);
+        $claimDup->setType(Claim::TYPE_THEFT);
+        $claimDup->setNumber($claimNumber);
+        $claimsService = self::$container->get('app.claims');
+
+        $this->assertFalse($claimsService->addClaim($policy, $claimDup));
+    }
 }

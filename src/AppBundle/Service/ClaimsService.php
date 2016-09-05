@@ -64,6 +64,12 @@ class ClaimsService
 
     public function addClaim(Policy $policy, Claim $claim)
     {
+        $repo = $this->dm->getRepository(Claim::class);
+        $duplicate = $repo->findOneBy(['number' => (string) $claim->getNumber()]);
+        if ($duplicate) {
+            return false;
+        }
+
         $policy->addClaim($claim);
         $this->dm->flush();
 
@@ -71,6 +77,8 @@ class ClaimsService
         if ($claim->getShouldCancelPolicy()) {
             $this->notifyPolicyShouldBeCancelled($policy, $claim);
         }
+
+        return true;
     }
 
     public function processClaim(Claim $claim)
