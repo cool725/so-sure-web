@@ -71,28 +71,37 @@ class ClaimsServiceTest extends WebTestCase
 
     public function testDuplicateClaim()
     {
-        $user = static::createUser(
+        $userA = static::createUser(
             static::$userManager,
-            static::generateEmail('original', $this),
+            static::generateEmail('dup-a', $this),
             'bar'
         );
-        $phone = static::getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $phoneA = static::getRandomPhone(static::$dm);
+        $policyA = static::initPolicy($userA, static::$dm, $phoneA, null, true, true);
         
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('dup-b', $this),
+            'bar'
+        );
+        $phoneB = static::getRandomPhone(static::$dm);
+        $policyB = static::initPolicy($userB, static::$dm, $phoneB, null, true, true);
+
         $claimNumber = rand(1, 999999);
 
-        $claim = new Claim();
-        $claim->setStatus(Claim::STATUS_APPROVED);
-        $claim->setType(Claim::TYPE_THEFT);
-        $claim->setNumber($claimNumber);
-        $this->assertTrue(static::$claimsService->addClaim($policy, $claim));
+        $claimA = new Claim();
+        $claimA->setStatus(Claim::STATUS_APPROVED);
+        $claimA->setType(Claim::TYPE_THEFT);
+        $claimA->setNumber($claimNumber);
+        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimA));
 
-        $claimDup = new Claim();
-        $claimDup->setStatus(Claim::STATUS_APPROVED);
-        $claimDup->setType(Claim::TYPE_THEFT);
-        $claimDup->setNumber($claimNumber);
-        $claimsService = self::$container->get('app.claims');
-
-        $this->assertFalse($claimsService->addClaim($policy, $claimDup));
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_INREVIEW);
+        $claimB->setType(Claim::TYPE_THEFT);
+        $claimB->setNumber($claimNumber);
+        // same policy, same number, different status allowed
+        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimB));
+        // not allowed for diff policy
+        $this->assertFalse(static::$claimsService->addClaim($policyB, $claimB));
     }
 }
