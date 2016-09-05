@@ -34,6 +34,7 @@ framework:
     trusted_proxies: ~
     session:
         handler_id: snc_redis.session.handler
+        cookie_httponly: true
     fragments:       ~
     http_method_override: true
 
