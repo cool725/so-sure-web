@@ -50,27 +50,28 @@ class Connection
     protected $date;
 
     /**
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $value;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $promoValue;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $initialValue;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */

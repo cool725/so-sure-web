@@ -34,6 +34,7 @@ use AppBundle\Exception\ConnectedInvitationException;
 use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Exception\ValidationException;
 
 use AppBundle\Service\RateLimitService;
 use AppBundle\Security\UserVoter;

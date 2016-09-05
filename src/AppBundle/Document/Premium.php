@@ -17,19 +17,19 @@ abstract class Premium
     use CurrencyTrait;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      */
     protected $gwp;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      */
     protected $ipt;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=1)
      * @MongoDB\Field(type="float")
      */
     protected $iptRate;

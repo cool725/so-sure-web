@@ -179,21 +179,21 @@ abstract class Policy
     protected $staticEnd;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */
     protected $potValue;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */
     protected $historicalMaxPotValue;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */

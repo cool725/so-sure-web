@@ -174,56 +174,56 @@ class Claim
     protected $processed;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $excess;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=1000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $unauthorizedCalls = 0;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=500)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $accessories = 0;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $phoneReplacementCost;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $transactionFees;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $claimHandlingFees = 0;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $reservedValue;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */

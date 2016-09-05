@@ -58,7 +58,7 @@ class Phone
     protected $devices;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=20000)
      * @MongoDB\Field(type="float")
      */
     protected $memory;
@@ -67,13 +67,13 @@ class Phone
     protected $phonePrices = array();
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      */
     protected $initialPrice;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      */
     protected $replacementPrice;

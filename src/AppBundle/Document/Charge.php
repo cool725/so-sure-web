@@ -65,7 +65,7 @@ class Charge
     public $handler;
 
     /**
-     * @Assert\Type("float")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */

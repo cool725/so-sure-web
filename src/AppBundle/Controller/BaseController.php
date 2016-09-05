@@ -15,7 +15,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Classes\ApiErrorCode;
-use AppBundle\Exceptions\ValidationException;
+use AppBundle\Exception\ValidationException;
 
 use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;

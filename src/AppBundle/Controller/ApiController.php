@@ -21,6 +21,8 @@ use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
+use AppBundle\Exception\ValidationException;
+
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
