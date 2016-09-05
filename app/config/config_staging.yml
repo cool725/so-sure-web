@@ -14,6 +14,9 @@ framework:
 #        metadata_cache_driver: apc
 #        result_cache_driver: apc
 #        query_cache_driver: apc
+framework:
+    session:
+        cookie_secure: true
 
 monolog:
     channels: ['receperio']

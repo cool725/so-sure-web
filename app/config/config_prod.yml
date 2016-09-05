@@ -4,6 +4,8 @@ imports:
 framework:
     # 10.* required for the elb load balancing health check
     trusted_hosts: ['wearesosure.com', '10\.\d+\.\d+\.\d+']
+    session:
+        cookie_secure: true
 #    validation:
 #        cache: validator.mapping.cache.apc
 #    serializer:
