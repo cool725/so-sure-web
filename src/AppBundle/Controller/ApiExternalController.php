@@ -40,7 +40,7 @@ class ApiExternalController extends BaseController
             if ($request->get('zendesk_key') != $zendeskKey) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Invalid key', 404);
             }
-            $userToken = trim($request->request->get('user_token'));
+            $userToken = $this->getRequestString($request, 'user_token');
             if (strlen($userToken) == 0) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }

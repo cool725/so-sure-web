@@ -72,8 +72,8 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
-            $postcode = trim($request->get('postcode'));
-            $number = trim($request->get('number'));
+            $postcode = $this->getRequestString($request, 'postcode');
+            $number = $this->getRequestString($request, 'number');
 
             $lookup = $this->get('app.address');
             if (!$address = $lookup->getAddress($postcode, $number, $this->getUser())) {
@@ -450,7 +450,7 @@ class ApiAuthController extends BaseController
 
             $invitationService = $this->get('app.invitation');
             // avoid sending email/sms invitations if testing
-            if ($request->get('debug')) {
+            if ($this->getRequestBool($request, 'debug')) {
                 $invitationService->setDebug(true);
             }
 
@@ -865,7 +865,7 @@ class ApiAuthController extends BaseController
 
             $this->denyAccessUnlessGranted('view', $user);
             $debug = false;
-            if ($request->get('debug')) {
+            if ($this->getRequestBool($request, 'debug')) {
                 $debug = true;
             }
 

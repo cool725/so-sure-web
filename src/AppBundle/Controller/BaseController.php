@@ -23,6 +23,17 @@ abstract class BaseController extends Controller
 {
     use PhoneTrait;
 
+    public function getRequestString($request, $field)
+    {
+        // Cast to string to avoid possible array injections which could lead to nosql injections
+        return trim((string) $request->get($field));
+    }
+
+    protected function getRequestBool($request, $field)
+    {
+        return filter_var($this->getRequestString($request, $field), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
+
     protected function getManager()
     {
         return $this->get('doctrine_mongodb.odm.default_document_manager');
@@ -156,7 +167,7 @@ abstract class BaseController extends Controller
     protected function validateQueryFields(Request $request, $fields)
     {
         foreach ($fields as $field) {
-            if (strlen(trim($request->get($field))) == 0) {
+            if (strlen($this->getRequestString($request, $field)) == 0) {
                 return false;
             }
         }
@@ -180,14 +191,14 @@ abstract class BaseController extends Controller
 
     protected function mobileToMongoSearch($form, $qb, $formField, $mongoField, $run = false)
     {
-        $data = $form->get($formField)->getData();
+        $data = (string) $form->get($formField)->getData();
 
         return $this->dataToMongoSearch($qb, $this->normalizeUkMobile($data), $mongoField, $run);
     }
 
     protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false)
     {
-        $data = $form->get($formField)->getData();
+        $data = (string) $form->get($formField)->getData();
 
         return $this->dataToMongoSearch($qb, $data, $mongoField, $run);
     }

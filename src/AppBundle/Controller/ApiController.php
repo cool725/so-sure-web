@@ -37,7 +37,7 @@ class ApiController extends BaseController
     public function loginAction(Request $request)
     {
         try {
-            if ($request->get('debug')) {
+            if ($this->getRequestBool($request, 'debug')) {
                 throw new \Exception('Debug Exception Test');
             }
 
@@ -149,10 +149,10 @@ class ApiController extends BaseController
     public function quoteAction(Request $request)
     {
         try {
-            $make = trim($request->get('make'));
-            $device = trim($request->get('device'));
-            $memory = (float) trim($request->get('memory'));
-            $rooted = filter_var($request->get('rooted'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            $make = $this->getRequestString($request, 'make');
+            $device = $this->getRequestString($request, 'device');
+            $memory = (float) $this->getRequestString($request, 'memory');
+            $rooted = $this->getRequestBool($request, 'rooted');
 
             $phones = $this->getQuotes($make, $device, true);
             if (!$phones) {
@@ -197,7 +197,7 @@ class ApiController extends BaseController
                 /*
                 $dm = $this->getManager();
                 $repo = $dm->getRepository(PhonePolicy::class);
-                if ($repo->isPromoLaunch() && !$request->get('debug')) {
+                if ($repo->isPromoLaunch() && !$this->getRequestBool($request, 'debug')) {
                     $promoAddition = PhonePolicy::PROMO_LAUNCH_VALUE;
                     $isPromoLaunch = true;
                 }
@@ -233,7 +233,7 @@ class ApiController extends BaseController
 
             // Rooted is missing in the pre-launch app where, which returns the MSRP pricing data if phone not found
             // but for newer mobile versions, we should return an unable to insure if the phone isn't found
-            if (strlen(trim($request->get('rooted'))) > 0 && !$deviceFound) {
+            if (strlen($this->getRequestString($request, 'rooted')) > 0 && !$deviceFound) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
             }
 
@@ -242,7 +242,7 @@ class ApiController extends BaseController
                 'device_found' => $deviceFound,
             ];
 
-            if ($request->get('debug')) {
+            if ($this->getRequestBool($request, 'debug')) {
                 $response['memory_found'] = $memoryFound;
                 $response['rooted'] = $rooted;
                 $response['different_make'] = $differentMake;
@@ -269,7 +269,7 @@ class ApiController extends BaseController
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
-            $email = strtolower($request->get('email'));
+            $email = strtolower($this->getRequestString($request, 'email'));
             $user = $repo->findOneBy(['emailCanonical' => $email]);
             if (!$user) {
                 return $this->getErrorJsonResponse(
@@ -466,7 +466,7 @@ class ApiController extends BaseController
                 'latest_policy_terms',
                 [
                     'policy_key' => $this->getParameter('policy_key'),
-                    'maxPotValue' => $request->get('maxPotValue'),
+                    'maxPotValue' => $this->getRequestString($request, 'maxPotValue'),
                 ],
                 false
             );
@@ -644,8 +644,8 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            $platform = $request->get('platform');
-            $version = $request->get('version');
+            $platform = $this->getRequestString($request, 'platform');
+            $version = $this->getRequestString($request, 'version');
             $redis = $this->get('snc_redis.default');
 
             if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
