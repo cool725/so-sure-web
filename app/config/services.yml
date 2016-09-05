@@ -415,6 +415,17 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
+    app.listener.response:
+        class:   AppBundle\Listener\KernelResponseListener
+        arguments:
+            tokenStorage:     "@security.token_storage"
+            authChecker:      "@security.authorization_checker"
+            adminCookieValue: "%sosure_employee_cookie_value%"
+            logger:           "@logger"
+            environment:      "%kernel.environment%"
+        tags:
+            -  { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
     app.form.type.usersearch:
         class: AppBundle\Form\Type\UserSearchType
         arguments: ["@request_stack"]

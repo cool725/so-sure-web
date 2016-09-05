@@ -5,9 +5,9 @@ security:
     encoders:
         FOS\UserBundle\Model\UserInterface: sha512
 
+    # WARNING! see AppBundle\Listener\KernelResponseListener - ROLE_ADMIN needs to be directly assigned until fixed
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER,ROLE_CLAIMS
-        ROLE_SUPER_ADMIN: ROLE_ADMIN
 
     access_decision_manager:
         strategy: unanimous
