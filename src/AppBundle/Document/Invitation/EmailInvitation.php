@@ -3,13 +3,18 @@
 namespace AppBundle\Document\Invitation;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\Invitation\EmailInvitationRepository")
  */
 class EmailInvitation extends Invitation
 {
-    /** @MongoDB\Field(type="string", nullable=false) */
+    /**
+     * @Assert\Email(strict=true)
+     * @MongoDB\Field(type="string", nullable=false)
+     */
     protected $email;
 
     public function isSingleUse()

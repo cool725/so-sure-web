@@ -3,6 +3,8 @@
 namespace AppBundle\Document\OptOut;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
@@ -20,10 +22,16 @@ abstract class OptOut
      */
     protected $id;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $created;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @Assert\Choice({"all", "invitations"})
+     * @MongoDB\Field(type="string")
+     */
     protected $category;
 
     public function __construct()

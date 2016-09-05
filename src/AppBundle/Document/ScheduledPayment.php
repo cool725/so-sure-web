@@ -4,6 +4,8 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ScheduledPaymentRepository")
@@ -25,30 +27,35 @@ class ScheduledPayment
     protected $id;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $created;
 
     /**
+     * @Assert\Choice({"scheduled", "success", "failed", "cancelled"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $status;
 
     /**
+     * @Assert\Choice({"scheduled", "rescheduled"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $type;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $scheduled;
 
     /**
+     * @Assert\Type("float")
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */

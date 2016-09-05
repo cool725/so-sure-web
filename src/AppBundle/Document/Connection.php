@@ -4,6 +4,8 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
@@ -41,6 +43,7 @@ class Connection
     protected $linkedPolicy;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
@@ -53,18 +56,21 @@ class Connection
     protected $value;
 
     /**
+     * @Assert\Type("float")
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $promoValue;
 
     /**
+     * @Assert\Type("float")
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $initialValue;
 
     /**
+     * @Assert\Type("float")
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */

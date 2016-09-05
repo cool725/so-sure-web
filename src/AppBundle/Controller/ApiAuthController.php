@@ -386,6 +386,8 @@ class ApiAuthController extends BaseController
                 'device' => $data['phone_policy']['device'],
                 'memory' => $data['phone_policy']['memory'],
             ]));
+            
+            $this->validateObject($policy);
 
             $dm->persist($policy);
             $dm->flush();
@@ -395,6 +397,8 @@ class ApiAuthController extends BaseController
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api newPolicy.', ['exception' => $e]);
 
@@ -671,10 +675,13 @@ class ApiAuthController extends BaseController
                 throw new \Exception('duplicate code');
             }
             $policy->addSCode($scode);
+            $this->validateObject($scode);
 
             return new JsonResponse($scode->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (NotFoundHttpException $e) {
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_NOT_FOUND,
@@ -982,11 +989,7 @@ class ApiAuthController extends BaseController
                 $userChanged = true;
             }
 
-            $validator = $this->get('validator');
-            $errors = $validator->validate($user);
-            if (count($errors) > 0) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, (string) $errors);
-            }
+            $this->validateObject($user);
 
             if ($userChanged) {
                 $dm->flush();
@@ -995,6 +998,8 @@ class ApiAuthController extends BaseController
             return new JsonResponse($user->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api updateUser.', ['exception' => $e]);
 
@@ -1038,12 +1043,16 @@ class ApiAuthController extends BaseController
             $address->setPostcode($data['postcode']);
             $user->setBillingAddress($address);
 
+            $this->validateObject($address);
+
             $dm->persist($address);
             $dm->flush();
 
             return new JsonResponse($user->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api addUserAddress.', ['exception' => $e]);
 

@@ -4,6 +4,8 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Classes\Salva;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhoneRepository")
@@ -35,10 +37,18 @@ class Phone
      */
     protected $id;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
     protected $make;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
     protected $model;
 
     /**
@@ -47,61 +57,118 @@ class Phone
      */
     protected $devices;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @Assert\Type("float")
+     * @MongoDB\Field(type="float")
+     */
     protected $memory;
 
     /** @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice") */
     protected $phonePrices = array();
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @Assert\Type("float")
+     * @MongoDB\Field(type="float")
+     */
     protected $initialPrice;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @Assert\Type("float")
+     * @MongoDB\Field(type="float")
+     */
     protected $replacementPrice;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @Assert\Url(protocols = {"http", "https"})
+     * @MongoDB\Field(type="string")
+     */
     protected $initialPriceUrl;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
     protected $os;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
     protected $initialOsVersion;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
     protected $upgradeOsVersion;
 
-    /** @MongoDB\Field(type="int") */
+    /**
+     * @Assert\Type("int")
+     * @MongoDB\Field(type="int")
+     */
     protected $processorSpeed;
 
-    /** @MongoDB\Field(type="int") */
+    /**
+     * @Assert\Type("int")
+     * @MongoDB\Field(type="int")
+     */
     protected $processorCores;
 
-    /** @MongoDB\Field(type="int") */
+    /**
+     * @Assert\Type("int")
+     * @MongoDB\Field(type="int")
+     */
     protected $ram;
 
-    /** @MongoDB\Field(type="boolean") */
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
     protected $ssd;
 
-    /** @MongoDB\Field(type="int") */
+    /**
+     * @Assert\Type("int")
+     * @MongoDB\Field(type="int")
+     */
     protected $screenPhysical;
 
-    /** @MongoDB\Field(type="int") */
+    /**
+     * @Assert\Type("int")
+     * @MongoDB\Field(type="int")
+     */
     protected $screenResolutionWidth;
 
-    /** @MongoDB\Field(type="int") */
+    /**
+     * @Assert\Type("int")
+     * @MongoDB\Field(type="int")
+     */
     protected $screenResolutionHeight;
 
-    /** @MongoDB\Field(type="int") */
+    /**
+     * @Assert\Type("int")
+     * @MongoDB\Field(type="int")
+     */
     protected $camera;
 
-    /** @MongoDB\Field(type="boolean") */
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
     protected $lte;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $releaseDate;
 
-    /** @MongoDB\Field(type="boolean") */
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
     protected $active;
 
     /**

@@ -3,6 +3,8 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
@@ -17,11 +19,13 @@ class Lead
     protected $id;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      */
     protected $created;
 
     /**
+     * @AppAssert\Mobile()
      * @MongoDB\Field(type="string")
      */
     protected $mobileNumber;

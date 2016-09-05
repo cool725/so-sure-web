@@ -5,6 +5,8 @@ namespace AppBundle\Document\File;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document()
@@ -22,6 +24,7 @@ abstract class UploadFile extends S3File
     private $fileName;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @var \DateTime
      */

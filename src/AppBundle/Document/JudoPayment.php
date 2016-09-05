@@ -4,6 +4,8 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\JudoPaymentRepository")
@@ -15,24 +17,32 @@ class JudoPayment extends Payment
     const RESULT_DECLINED = "Declined";
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $result;
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="100")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $message;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="4")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $cardLastFour;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

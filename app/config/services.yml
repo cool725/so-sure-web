@@ -444,6 +444,11 @@ services:
         tags:
             - { name: form.type }
 
+    app.validator.alphanumeric:
+        class: AppBundle\Validator\Constraints\AlphanumericValidator
+        tags:
+            - { name: validator.constraint_validator }
+
     rollbar.voter.notfound:
         class: AppBundle\Security\NotFoundHttpExceptionVoter
         tags:

@@ -3,11 +3,15 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /** @MongoDB\EmbeddedDocument */
 class JudoPaymentMethod extends PaymentMethod
 {
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      */
     protected $customerToken;
@@ -18,11 +22,15 @@ class JudoPaymentMethod extends PaymentMethod
     protected $cardTokens = array();
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      */
     protected $cardToken;
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      */
     protected $cardTokenHash;

@@ -3,6 +3,8 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\EmbeddedDocument
@@ -12,13 +14,22 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 abstract class Price
 {
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $validFrom;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $validTo;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @Assert\Type("float")
+     * @MongoDB\Field(type="float")
+     */
     protected $gwp;
 
     public function __construct()

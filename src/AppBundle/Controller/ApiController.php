@@ -317,12 +317,15 @@ class ApiController extends BaseController
                 );
             }
             $user->setReferred($referralUser);
+            $this->validateObject($user);
             $dm->flush();
 
             $launchUser = $this->get('app.user.launch');
             $url = $launchUser->getShortLink($user->getId());
 
             return new JsonResponse(['url' => $url]);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api referralAddAction.', ['exception' => $e]);
 
@@ -599,11 +602,7 @@ class ApiController extends BaseController
                 $scode->addAcceptor($user);
             }
 
-            $validator = $this->get('validator');
-            $errors = $validator->validate($user);
-            if (count($errors) > 0) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, (string) $errors);
-            }
+            $this->validateObject($user);
 
             $launchUser = $this->get('app.user.launch');
             $addedUser = $launchUser->addUser($user);
@@ -626,6 +625,8 @@ class ApiController extends BaseController
             }
 
             return new JsonResponse($user->toApiArray($identityId, $token));
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api userAction.', ['exception' => $e]);
 

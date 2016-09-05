@@ -7,9 +7,10 @@ use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use GeoJson\Geometry\Point;
 use AppBundle\Document\Invitation\Invitation;
-use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
@@ -73,45 +74,66 @@ class User extends BaseUser implements TwoFactorInterface
      */
     protected $receivedInvitations;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $created;
 
     /**
+     * @Assert\Length(min="0", max="50")
+     * @AppAssert\Alphanumeric()
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $googleAuthenticatorSecret;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $firstName;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $lastName;
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $facebookId;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="250")
+     * @MongoDB\Field(type="string")
+     */
     protected $facebookAccessToken;
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $token;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @Assert\Length(min="0", max="100")
+     * @AppAssert\Token()
+     * @MongoDB\Field(type="string")
+     */
     protected $snsEndpoint;
 
     /**
@@ -127,19 +149,21 @@ class User extends BaseUser implements TwoFactorInterface
     protected $paymentMethod;
 
     /**
-     * @Assert\Regex(pattern="/^(00447[1-9]\d{8,8}|\+447[1-9]\d{8,8})$/")
+     * @AppAssert\Mobile()
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $mobileNumber;
 
     /**
+     * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $mobileVerified;
 
     /**
+     * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
@@ -151,18 +175,22 @@ class User extends BaseUser implements TwoFactorInterface
     protected $policies;
 
     /**
+     * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $preLaunch = false;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $referer;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */

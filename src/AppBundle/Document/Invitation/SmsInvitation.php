@@ -4,6 +4,8 @@ namespace AppBundle\Document\Invitation;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Document\PhoneTrait;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\Invitation\SmsInvitationRepository")
@@ -12,7 +14,10 @@ class SmsInvitation extends Invitation
 {
     use PhoneTrait;
 
-    /** @MongoDB\Field(type="string", nullable=false) */
+    /**
+     * @AppAssert\Mobile()
+     * @MongoDB\Field(type="string", nullable=false)
+     */
     protected $mobile;
 
     public function isSingleUse()

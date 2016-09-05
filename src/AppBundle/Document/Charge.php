@@ -4,6 +4,8 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
@@ -31,12 +33,14 @@ class Charge
     protected $id;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $createdDate;
 
     /**
+     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -61,12 +65,15 @@ class Charge
     public $handler;
 
     /**
+     * @Assert\Type("float")
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $amount = 0;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

@@ -15,6 +15,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Classes\ApiErrorCode;
+use AppBundle\Exceptions\ValidationException;
 
 use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;
@@ -301,5 +302,14 @@ abstract class BaseController extends Controller
         $phone = $phoneRepo->findOneBy(['model' => 'iPhone 6S', 'memory' => 16]);
 
         return $phone;
+    }
+    
+    protected function validateObject($object)
+    {
+        $validator = $this->get('validator');
+        $errors = $validator->validate($object);
+        if (count($errors) > 0) {
+            throw new ValidationException((string) $errors);
+        }
     }
 }

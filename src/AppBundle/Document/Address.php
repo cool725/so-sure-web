@@ -6,6 +6,8 @@ namespace AppBundle\Document;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\EmbeddedDocument
@@ -22,33 +24,57 @@ class Address
     protected $id;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $created;
 
     /**
+     * @Assert\Choice({"billing"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $type;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $line1;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $line2;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $line3;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $city;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $postcode;
 
     public function __construct()
