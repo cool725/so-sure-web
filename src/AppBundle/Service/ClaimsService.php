@@ -64,6 +64,22 @@ class ClaimsService
 
     public function addClaim(Policy $policy, Claim $claim)
     {
+        $repo = $this->dm->getRepository(Claim::class);
+
+        // Claim state for same claim number may change
+        // (not yet sure if we want a new claim record vs update claim record)
+        // Regardless, same claim number for different policies is not allowed
+        // Also same claim number on same policy with same state is not allowed
+        $duplicates = $repo->findBy(['number' => (string) $claim->getNumber()]);
+        foreach ($duplicates as $duplicate) {
+            if ($policy->getId() != $duplicate->getPolicy()->getId()) {
+                return false;
+            }
+            if ($claim->getStatus() == $duplicate->getStatus()) {
+                return false;
+            }
+        }
+
         $policy->addClaim($claim);
         $this->dm->flush();
 
@@ -71,6 +87,8 @@ class ClaimsService
         if ($claim->getShouldCancelPolicy()) {
             $this->notifyPolicyShouldBeCancelled($policy, $claim);
         }
+
+        return true;
     }
 
     public function processClaim(Claim $claim)
