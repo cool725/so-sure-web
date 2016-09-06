@@ -439,6 +439,8 @@ class ApiController extends BaseController
             }
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Endpoint added', 200);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api snsAction.', ['exception' => $e]);
 

@@ -398,8 +398,6 @@ class PolicyServiceTest extends WebTestCase
     public function testScodeUnique()
     {
         $scode = new SCode();
-        $validator = static::$container->get('validator');
-        $this->assertEquals(1, count($validator->validate($scode)));
         static::$dm->persist($scode);
         static::$dm->flush();
 

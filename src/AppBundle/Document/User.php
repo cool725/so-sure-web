@@ -130,7 +130,7 @@ class User extends BaseUser implements TwoFactorInterface
     protected $token;
 
     /**
-     * @Assert\Length(min="0", max="100")
+     * @Assert\Length(min="0", max="150")
      * @AppAssert\Token()
      * @MongoDB\Field(type="string")
      */

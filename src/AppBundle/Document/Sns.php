@@ -23,7 +23,7 @@ class Sns
     protected $created;
 
     /**
-     * @Assert\Length(min="35", max="100")
+     * @Assert\Length(min="35", max="150")
      * @AppAssert\Token()
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true)
@@ -31,21 +31,21 @@ class Sns
     protected $endpoint;
 
     /**
-     * @Assert\Length(min="35", max="100")
+     * @Assert\Length(min="35", max="150")
      * @AppAssert\Token()
      * @MongoDB\Field(type="string")
      */
     protected $all;
 
     /**
-     * @Assert\Length(min="35", max="100")
+     * @Assert\Length(min="35", max="150")
      * @AppAssert\Token()
      * @MongoDB\Field(type="string")
      */
     protected $unregistered;
 
     /**
-     * @Assert\Length(min="35", max="100")
+     * @Assert\Length(min="35", max="150")
      * @AppAssert\Token()
      * @MongoDB\Field(type="string")
      */

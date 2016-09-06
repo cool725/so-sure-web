@@ -98,7 +98,8 @@ class SCode
 
     public function deactivate()
     {
-        $this->setCode(base64_encode(uniqid(mt_rand(), true)));
+        // see policy service::uniqueSCode for reason behind creating a new code
+        $this->generateRandomCode();
         $this->setActive(false);
     }
 

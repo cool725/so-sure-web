@@ -4,7 +4,7 @@ namespace AppBundle\Tests\Listener;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Listener\DoctrineValidationListener;
+use AppBundle\Listener\ValidationListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Event\ObjectEvent;
 use AppBundle\Document\User;
@@ -42,12 +42,12 @@ class ValidationListenerTest extends WebTestCase
     }
 
     /**
-     * @expectedException ValidationException
+     * @expectedException AppBundle\Exception\ValidationException
      */
     public function testUserWithInvalidEmail()
     {
         $user = new User();
-        $user->setEmail('bad-email');
+        $user->setFirstName('invalid first name$[]');
 
         $event = new ObjectEvent($user);
         $listener = new ValidationListener(
@@ -58,7 +58,7 @@ class ValidationListenerTest extends WebTestCase
     }
 
     /**
-     * @expectedException ValidationException
+     * @expectedException AppBundle\Exception\ValidationException
      */
     public function testUserWithInvalidEmailActual()
     {

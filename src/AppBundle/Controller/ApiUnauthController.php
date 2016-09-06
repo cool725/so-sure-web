@@ -78,6 +78,8 @@ class ApiUnauthController extends BaseController
             list($identityId, $token) = $cognitoIdentity->getCognitoIdToken($user, $data['cognito_id']);
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api unauthTokenAction.', ['exception' => $e]);
 
