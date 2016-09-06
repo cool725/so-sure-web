@@ -208,7 +208,7 @@ abstract class Policy
     protected $promoCode;
 
     /**
-     * @Assert\Type("int")
+     * @Assert\Range(min=0,max=12)
      * @MongoDB\Field(type="integer")
      * @Gedmo\Versioned
      */

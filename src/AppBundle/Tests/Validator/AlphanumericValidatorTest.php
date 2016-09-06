@@ -45,7 +45,7 @@ class AlphanumericValidatorTest extends \PHPUnit_Framework_TestCase
         $validator = $this->configureValidator(self::$constraint->message);
 
         // disallowed character
-        $validator->validate('!', self::$constraint);
+        $validator->validate('$', self::$constraint);
     }
 
     /**

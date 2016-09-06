@@ -378,6 +378,22 @@ services:
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
+    doctrine.listener.validation:
+        class:   AppBundle\Listener\DoctrineValidationListener
+        arguments:
+            dispatcher:  "@event_dispatcher"
+        tags:
+            -  { name: doctrine_mongodb.odm.event_listener, event: prePersist }
+            -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
+
+    app.listener.validation:
+        class:   AppBundle\Listener\ValidationListener
+        arguments:
+            validator: "@validator"
+            logger:    "@logger"
+        tags:
+            -  { name: kernel.event_listener, event: event.validate, method: onValidateEvent }
+
     app.listener.invitation:
         class:   AppBundle\Listener\InvitationListener
         arguments:

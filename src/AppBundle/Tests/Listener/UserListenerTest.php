@@ -118,14 +118,15 @@ class UserListenerTest extends WebTestCase
             'mobile'
         );
 
+        $mobile = static::generateRandomMobile();
         $invitation = new SmsInvitation();
         $invitation->setInviter($testUserMobile);
-        $invitation->setMobile('13123');
+        $invitation->setMobile($mobile);
         self::$dm->persist($invitation);
         self::$dm->flush();
 
         $user = new User();
-        $user->setMobileNumber('13123');
+        $user->setMobileNumber($mobile);
         $user->setEmail(self::generateEmail('mobile-match', $this));
         self::$dm->persist($user);
 

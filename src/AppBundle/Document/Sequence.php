@@ -19,7 +19,6 @@ class Sequence
     protected $name;
 
     /**
-     * @Assert\Type("int")
      * @MongoDB\Field(type="int")
      */
     protected $seq;

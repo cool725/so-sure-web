@@ -30,7 +30,7 @@ class User extends BaseUser implements TwoFactorInterface
     protected $id;
 
     /**
-     * @Assert\Email(strict=true)
+     * @Assert\Email(strict=false)
      * @Gedmo\Versioned
      */
     protected $email;

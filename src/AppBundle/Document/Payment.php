@@ -38,42 +38,42 @@ abstract class Payment
     protected $date;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $amount;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $gwp;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $ipt;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $totalCommission;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $coverholderCommission;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */

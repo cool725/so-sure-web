@@ -63,7 +63,7 @@ abstract class Invitation
     protected $nextReinvited;
 
     /**
-     * @Assert\Type("int")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="integer")
      */
     protected $reinvitedCount;
@@ -234,7 +234,7 @@ abstract class Invitation
         return $this->lastReinvited;
     }
 
-    public function setLastReinvited($lastReinvited)
+    public function setLastReinvited(\DateTime $lastReinvited)
     {
         $this->lastReinvited = $lastReinvited;
     }
@@ -244,7 +244,7 @@ abstract class Invitation
         return $this->nextReinvited;
     }
 
-    public function setNextReinvited($nextReinvited)
+    public function setNextReinvited(\DateTime $nextReinvited = null)
     {
         $this->nextReinvited = $nextReinvited;
     }
@@ -280,7 +280,7 @@ abstract class Invitation
         if ($this->getReinvitedCount() < $this->getMaxReinvitations()) {
             $this->setNextReinvited($date->add(new \DateInterval('P1D')));
         } else {
-            $this->setNextReinvited(null);
+            $this->setNextReinvited();
         }
 
         $this->reinvitedCount++;

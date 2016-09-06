@@ -240,13 +240,14 @@ class InvitationServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
+        $mobile = static::generateRandomMobile();
         $optOut = new SmsOptOut();
-        $optOut->setMobile('11234');
+        $optOut->setMobile($mobile);
         $optOut->setCategory(SmsOptOut::OPTOUT_CAT_INVITATIONS);
         static::$dm->persist($optOut);
         static::$dm->flush();
 
-        $invitation = self::$invitationService->inviteBySms($policy, '11234');
+        $invitation = self::$invitationService->inviteBySms($policy, $mobile);
         $this->assertNull($invitation);
     }
 
@@ -259,13 +260,14 @@ class InvitationServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
+        $mobile = static::generateRandomMobile();
         $optOut = new SmsOptOut();
-        $optOut->setMobile('112345');
+        $optOut->setMobile($mobile);
         $optOut->setCategory(EmailOptOut::OPTOUT_CAT_ALL);
         static::$dm->persist($optOut);
         static::$dm->flush();
 
-        $invitation = self::$invitationService->inviteBySms($policy, '112345');
+        $invitation = self::$invitationService->inviteBySms($policy, $mobile);
         $this->assertNull($invitation);
     }
 
@@ -278,7 +280,7 @@ class InvitationServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
 
-        $invitation = self::$invitationService->inviteBySms($policy, '1123456');
+        $invitation = self::$invitationService->inviteBySms($policy, static::generateRandomMobile());
         $this->assertTrue($invitation instanceof SmsInvitation);
     }
 
@@ -307,7 +309,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
 
         // allow reinvitation
-        $invitation->setNextReinvited('2016-01-01');
+        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
         self::$invitationService->reinvite($invitation);
 
         $this->assertEquals(1, $invitation->getReinvitedCount());
@@ -766,7 +768,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof EmailInvitation);
 
         // allow reinvitation
-        $invitation->setNextReinvited('2016-01-01');
+        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
         // but set pot value to maxpot
         $policy->setPotValue($policy->getMaxPot());
 
@@ -797,7 +799,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof EmailInvitation);
 
         // allow reinvitation
-        $invitation->setNextReinvited('2016-01-01');
+        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);

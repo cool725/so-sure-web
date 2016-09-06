@@ -45,7 +45,7 @@ class Phone
     protected $make;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
+     * @AppAssert\Token()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      */
@@ -106,19 +106,19 @@ class Phone
     protected $upgradeOsVersion;
 
     /**
-     * @Assert\Type("int")
+     * @Assert\Range(min=0,max=20000)
      * @MongoDB\Field(type="int")
      */
     protected $processorSpeed;
 
     /**
-     * @Assert\Type("int")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="int")
      */
     protected $processorCores;
 
     /**
-     * @Assert\Type("int")
+     * @Assert\Range(min=0,max=200000)
      * @MongoDB\Field(type="int")
      */
     protected $ram;
@@ -130,25 +130,25 @@ class Phone
     protected $ssd;
 
     /**
-     * @Assert\Type("int")
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="int")
      */
     protected $screenPhysical;
 
     /**
-     * @Assert\Type("int")
+     * @Assert\Range(min=0,max=20000)
      * @MongoDB\Field(type="int")
      */
     protected $screenResolutionWidth;
 
     /**
-     * @Assert\Type("int")
+     * @Assert\Range(min=0,max=20000)
      * @MongoDB\Field(type="int")
      */
     protected $screenResolutionHeight;
 
     /**
-     * @Assert\Type("int")
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="int")
      */
     protected $camera;
@@ -195,9 +195,9 @@ class Phone
         $this->model = $model;
         $this->devices = $devices;
         $this->memory = $memory;
-        $this->initialPrice = $initialPrice;
-        $this->replacementPrice = $replacementPrice;
-        $this->initialPriceUrl = $initialPriceUrl;
+        $this->initialPrice = strlen($initialPrice) > 0 ? $initialPrice : null;
+        $this->replacementPrice = strlen($replacementPrice) > 0 ? $replacementPrice : null;
+        $this->initialPriceUrl = strlen($initialPriceUrl) > 0 ? $initialPriceUrl : null;
 
         $phonePrice = $this->getCurrentPhonePrice();
         if (!$phonePrice) {
@@ -223,19 +223,19 @@ class Phone
         $lte,
         $releaseDate
     ) {
-        $this->os = $os;
-        $this->initialOsVersion = $initialOsVersion;
-        $this->upgradeOsVersion = $upgradeOsVersion;
-        $this->processorSpeed = $processorSpeed;
-        $this->processorCores = $processorCores;
-        $this->ram = $ram;
-        $this->ssd = $ssd;
-        $this->screenPhysical = $screenPhysical;
-        $this->screenResolutionWidth = $screenResolutionWidth;
-        $this->screenResolutionHeight = $screenResolutionHeight;
-        $this->camera = $camera;
-        $this->lte = $lte;
-        $this->releaseDate = $releaseDate;
+        $this->os = strlen($os) > 0 ? $os : null;
+        $this->initialOsVersion = strlen($initialOsVersion) > 0 ? $initialOsVersion : null;
+        $this->upgradeOsVersion = strlen($upgradeOsVersion) > 0 ? $upgradeOsVersion : null;
+        $this->processorSpeed = strlen($processorSpeed) > 0 ? $processorSpeed : null;
+        $this->processorCores = strlen($processorCores) > 0 ? $processorCores : null;
+        $this->ram = strlen($ram) > 0 ? $ram : null;
+        $this->ssd = strlen($ssd) > 0 ? $ssd : null;
+        $this->screenPhysical = strlen($screenPhysical) > 0 ? $screenPhysical : null;
+        $this->screenResolutionWidth = strlen($screenResolutionWidth) > 0 ? $screenResolutionWidth : null;
+        $this->screenResolutionHeight = strlen($screenResolutionHeight) > 0 ? $screenResolutionHeight : null;
+        $this->camera = strlen($camera) > 0 ? $camera : null;
+        $this->lte = strlen($lte) > 0 ? $lte : null;
+        $this->releaseDate = is_object($releaseDate) ? $releaseDate : null;
     }
 
     public function getOs()

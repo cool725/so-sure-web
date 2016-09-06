@@ -91,12 +91,13 @@ class InvitationListenerTest extends WebTestCase
 
     public function testSmsInvitationInvitee()
     {
-        self::$testUser2->setMobileNumber('1212');
+        $mobile = static::generateRandomMobile();
+        self::$testUser2->setMobileNumber($mobile);
         self::$dm->flush();
 
         $invitation = new SmsInvitation();
         $invitation->setInviter(self::$testUser);
-        $invitation->setMobile('1212');
+        $invitation->setMobile($mobile);
         self::$dm->persist($invitation);
 
         $event = new InvitationEvent($invitation);
@@ -111,12 +112,13 @@ class InvitationListenerTest extends WebTestCase
 
     public function testSmsPreventSameUser()
     {
-        self::$testUser3->setMobileNumber('1214');
+        $mobile = static::generateRandomMobile();
+        self::$testUser3->setMobileNumber($mobile);
         self::$dm->flush();
 
         $invitation = new SmsInvitation();
         $invitation->setInviter(self::$testUser3);
-        $invitation->setMobile('1214');
+        $invitation->setMobile($mobile);
         self::$dm->persist($invitation);
 
         $event = new InvitationEvent($invitation);

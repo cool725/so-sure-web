@@ -78,7 +78,7 @@ class SCode
 
     public function generateRandomCode()
     {
-        $randBase64 = $this->removeDisallowedBase64Chars(base64_encode(random_bytes(9)));
+        $randBase64 = $this->removeDisallowedBase64Chars(base64_encode(random_bytes(12)));
         $this->setCode(substr($randBase64, 0, 8));
     }
 
@@ -86,6 +86,7 @@ class SCode
     {
         $string = str_replace('/', '', $string);
         $string = str_replace('=', '', $string);
+        $string = str_replace('+', '', $string);
 
         return $string;
     }

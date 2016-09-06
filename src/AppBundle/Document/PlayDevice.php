@@ -17,29 +17,29 @@ class PlayDevice
     protected $id;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
+     * @AppAssert\Token()
      * @Assert\Length(min="1", max="150")
      * @MongoDB\Field(type="string")
      */
     protected $retailBranding;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="50")
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="150")
      * @MongoDB\Field(type="string")
      */
     protected $marketingName;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
+     * @AppAssert\Token()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      */
     protected $device;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="50")
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="100")
      * @MongoDB\Field(type="string")
      */
     protected $model;
