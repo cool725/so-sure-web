@@ -449,6 +449,21 @@ services:
         tags:
             - { name: validator.constraint_validator }
 
+    app.validator.alphanumericspacedot:
+        class: AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.token:
+        class: AppBundle\Validator\Constraints\TokenValidator
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.mobile:
+        class: AppBundle\Validator\Constraints\MobileValidator
+        tags:
+            - { name: validator.constraint_validator }
+
     rollbar.voter.notfound:
         class: AppBundle\Security\NotFoundHttpExceptionVoter
         tags:
