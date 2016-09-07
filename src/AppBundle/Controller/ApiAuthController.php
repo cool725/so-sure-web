@@ -83,7 +83,7 @@ class ApiAuthController extends BaseController
 
             return new JsonResponse($address->toApiArray());
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {

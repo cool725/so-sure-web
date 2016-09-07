@@ -756,6 +756,19 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals('Bar', $user->getLastName());
     }
 
+    public function testUserValidation()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $birthday = new \DateTime('1980-01-01');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => $this->generateEmail('user-validation', $this),
+            'first_name' => ['$ne' => '1'],
+            'last_name' => 'bar',
+        ));
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
     public function testUserCreateIp()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
@@ -773,7 +786,7 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals('GB', $fooUser->getIdentityLog()->getCountry());
         $this->assertEquals([-0.13,51.5], $fooUser->getIdentityLog()->getLoc()->coordinates);
     }
-    
+
     public function testUserCreateCampaign()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
