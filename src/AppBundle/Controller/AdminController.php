@@ -12,6 +12,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\User;
@@ -392,7 +393,7 @@ class AdminController extends BaseController
             'imei_form' => $imeiForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
-            'policy_history' => $this->getPhonePolicyHistory($policy->getId()),
+            'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
         ];
     }
@@ -434,7 +435,7 @@ class AdminController extends BaseController
 
         $dm = $this->getManager();
         $paymentRepo = $dm->getRepository(JudoPayment::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phonePolicyRepo = $dm->getRepository(Policy::class);
         $s3FileRepo = $dm->getRepository(S3File::class);
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);

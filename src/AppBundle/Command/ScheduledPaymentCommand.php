@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\ScheduledPayment;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 
 class ScheduledPaymentCommand extends ContainerAwareCommand
 {
@@ -55,7 +55,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
             $this->displayScheduledPayment($scheduledPayment, $output);
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
         } elseif ($policyNumber) {
-            $policyRepo = $dm->getRepository(PhonePolicy::class);
+            $policyRepo = $dm->getRepository(Policy::class);
             $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));

@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use DOMDocument;
 use DOMXPath;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\JudoPayment;
@@ -102,7 +102,7 @@ class SalvaExportService
         $this->environment = $environment;
     }
 
-    public function transformPolicy(PhonePolicy $policy = null, $version = null)
+    public function transformPolicy(SalvaPhonePolicy $policy = null, $version = null)
     {
         if ($policy) {
             if (!$policy->getPremiumInstallmentCount()) {
@@ -111,7 +111,7 @@ class SalvaExportService
             if ($version) {
                 $payments = $policy->getPaymentsForSalvaVersions()[$version];
 
-                $status = PhonePolicy::STATUS_CANCELLED;
+                $status = SalvaPhonePolicy::STATUS_CANCELLED;
                 $totalPremium = $policy->getTotalPremiumPrice($payments);
                 $premiumPaid = $policy->getPremiumPaid($payments);
                 $totalIpt = $policy->getTotalIpt($payments);
@@ -135,7 +135,7 @@ class SalvaExportService
                 $connections = count($policy->getConnections());
                 $potValue = $policy->getPotValue();
                 $promoPotValue = $policy->getPromoPotValue();
-                $terminationDate = $policy->getStatus() == PhonePolicy::STATUS_CANCELLED ?
+                $terminationDate = $policy->getStatus() == SalvaPhonePolicy::STATUS_CANCELLED ?
                     $policy->getEnd():
                     null;
             }
@@ -211,7 +211,7 @@ class SalvaExportService
         $lines = [];
         $paidPremium = 0;
         $paidBrokerFee = 0;
-        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
         $lines[] = sprintf("%s\n", $this->formatLine($this->transformPolicy(null)));
         foreach ($repo->getAllPoliciesForExport($date, $this->environment) as $policy) {
             foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
@@ -420,7 +420,7 @@ class SalvaExportService
         return $data;
     }
 
-    public function sendPolicy(PhonePolicy $phonePolicy)
+    public function sendPolicy(SalvaPhonePolicy $phonePolicy)
     {
         $xml = $this->createXml($phonePolicy);
         $this->logger->info($xml);
@@ -435,7 +435,7 @@ class SalvaExportService
         return $responseId;
     }
 
-    public function cancelPolicy(PhonePolicy $phonePolicy, $reason = null)
+    public function cancelPolicy(SalvaPhonePolicy $phonePolicy, $reason = null)
     {
         $date = $phonePolicy->getEnd();
 
@@ -446,21 +446,21 @@ class SalvaExportService
         }
 
         if (!$reason) {
-            if ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_UNPAID) {
+            if ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_UNPAID) {
                 $reason = self::CANCELLED_UNPAID;
-            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_ACTUAL_FRAUD) {
+            } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD) {
                 $reason = self::CANCELLED_ACTUAL_FRAUD;
-            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_SUSPECTED_FRAUD) {
+            } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD) {
                 $reason = self::CANCELLED_SUSPECTED_FRAUD;
-            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_USER_REQUESTED) {
+            } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_USER_REQUESTED) {
                 $reason = self::CANCELLED_USER_REQUESTED;
-            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_COOLOFF) {
+            } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_COOLOFF) {
                 $reason = self::CANCELLED_COOLOFF;
-            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_BADRISK) {
+            } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_BADRISK) {
                 $reason = self::CANCELLED_BADRISK;
-            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_DISPOSSESSION) {
+            } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_DISPOSSESSION) {
                 $reason = self::CANCELLED_DISPOSSESSION ;
-            } elseif ($phonePolicy->getCancelledReason() == PhonePolicy::CANCELLED_WRECKAGE) {
+            } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_WRECKAGE) {
                 $reason = self::CANCELLED_WRECKAGE;
             } else {
                 $reason = self::CANCELLED_OTHER;
@@ -497,7 +497,7 @@ class SalvaExportService
                 if (!isset($data['policyId']) || !$data['policyId'] || !isset($data['action']) || !$data['action']) {
                     throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
-                $repo = $this->dm->getRepository(PhonePolicy::class);
+                $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
                 $policy = $repo->find($data['policyId']);
                 $action = $data['action'];
                 if (isset($data['cancel_reason'])) {
@@ -560,7 +560,7 @@ class SalvaExportService
         return $count;
     }
 
-    public function queue(PhonePolicy $policy, $action, $retryAttempts = 0)
+    public function queue(SalvaPhonePolicy $policy, $action, $retryAttempts = 0)
     {
         if (!in_array($action, [self::QUEUE_CANCELLED, self::QUEUE_CREATED, self::QUEUE_UPDATED])) {
             throw new \Exception(sprintf('Unknown queue action %s', $action));
@@ -584,7 +584,7 @@ class SalvaExportService
         return true;
     }
 
-    private function incrementPolicyNumber(PhonePolicy $policy)
+    private function incrementPolicyNumber(SalvaPhonePolicy $policy)
     {
         $date = new \DateTime();
         $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
@@ -657,7 +657,7 @@ class SalvaExportService
         return $clonedDate->format("Y-m-d\TH:i:00");
     }
 
-    public function cancelXml(PhonePolicy $phonePolicy, $reason, $date)
+    public function cancelXml(SalvaPhonePolicy $phonePolicy, $reason, $date)
     {
         if ($reason == self::CANCELLED_REPLACE) {
             // Make sure policy was incremented prior to calling
@@ -709,7 +709,7 @@ class SalvaExportService
         return $dom->saveXML();
     }
 
-    public function createXml(PhonePolicy $phonePolicy)
+    public function createXml(SalvaPhonePolicy $phonePolicy)
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
 

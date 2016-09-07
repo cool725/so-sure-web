@@ -193,7 +193,7 @@ class ClaimsController extends BaseController
             'formClaimsCheck' => $formClaimsCheck->createView(),
             'fraud' => $checks,
             'policy_route' => 'claims_policy',
-            'policy_history' => $this->getPhonePolicyHistory($policy->getId()),
+            'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
         ];
     }

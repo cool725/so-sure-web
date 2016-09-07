@@ -10,7 +10,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
-use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Document\PolicyTerms;

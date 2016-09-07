@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 
 class WeeklyEmailCommand extends ContainerAwareCommand
 {
@@ -33,7 +33,7 @@ class WeeklyEmailCommand extends ContainerAwareCommand
         $logger = $this->getContainer()->get('logger');
         $policyService = $this->getContainer()->get('app.policy');
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        $repo = $dm->getRepository(Policy::class);
         $policies = $repo->getWeeklyEmail($this->getContainer()->getParameter('kernel.environment'));
 
         $count = 0;

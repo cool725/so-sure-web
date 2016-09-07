@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 
 class PolicyQueueCommand extends ContainerAwareCommand
 {
@@ -83,7 +83,7 @@ class PolicyQueueCommand extends ContainerAwareCommand
     private function getPolicy($policyId)
     {
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        $repo = $dm->getRepository(Policy::class);
 
         return $repo->find($policyId);
     }
