@@ -241,7 +241,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
 
-        $payment = $policy->getPayments()[0];
+        $payment = $policy->getLastSuccessfulPaymentCredit();
 
         $refund = self::$judopay->refund($payment);
         $this->assertEquals('Success', $refund->getResult());
