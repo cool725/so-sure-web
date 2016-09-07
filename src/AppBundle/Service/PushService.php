@@ -139,7 +139,7 @@ class PushService
             $apns['aps']['badge'] = $badge;
         }
         if ($newContent) {
-            $apns['apps']['content-available'] = 1;
+            $apns['aps']['content-available'] = 1;
         }
 
         // custom data
