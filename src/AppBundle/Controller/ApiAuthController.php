@@ -101,10 +101,11 @@ class ApiAuthController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (!isset($data['action'])) {
+            if (!$this->validateFields($data, ['action'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
-            if ($data['action'] == 'accept' && !isset($data['policy_id'])) {
+            $action = $this->getDataString($data, 'action');
+            if ($action == 'accept' && !isset($data['policy_id'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -130,18 +131,18 @@ class ApiAuthController extends BaseController
 
             $invitationService = $this->get('app.invitation');
 
-            if ($data['action'] == 'accept') {
+            if ($action == 'accept') {
                 $this->denyAccessUnlessGranted('accept', $invitation);
-                $policy = $policyRepo->find($data['policy_id']);
+                $policy = $policyRepo->find($this->getDataString($data, 'policy_id'));
                 // TODO: Validation user hasn't exceeded pot amout
                 $invitationService->accept($invitation, $policy);
-            } elseif ($data['action'] == 'reject') {
+            } elseif ($action == 'reject') {
                 $this->denyAccessUnlessGranted('reject', $invitation);
                 $invitationService->reject($invitation);
-            } elseif ($data['action'] == 'cancel') {
+            } elseif ($action == 'cancel') {
                 $this->denyAccessUnlessGranted('cancel', $invitation);
                 $invitationService->cancel($invitation);
-            } elseif ($data['action'] == 'reinvite') {
+            } elseif ($action == 'reinvite') {
                 $this->denyAccessUnlessGranted('reinvite', $invitation);
                 //\Doctrine\Common\Util\Debug::dump($invitation);
                 $invitationService->reinvite($invitation);
@@ -218,15 +219,16 @@ class ApiAuthController extends BaseController
             if (!isset($data['phone_policy'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
+            $phonePolicyData = $data['phone_policy'];
 
             if (!$this->validateFields(
-                $data['phone_policy'],
+                $phonePolicyData,
                 ['imei', 'make', 'device', 'memory', 'rooted', 'validation_data']
             )) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            if ($data['phone_policy']['rooted']) {
+            if ($this->getDataBool($phonePolicyData, 'rooted')) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED,
                     'Not able to insure rooted devices at the moment',
@@ -298,7 +300,7 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
-            $imei = str_replace(' ', '', $data['phone_policy']['imei']);
+            $imei = str_replace(' ', '', $this->getDataString($phonePolicyData, 'imei'));
             if (!$imeiValidator->isImei($imei)) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_POLICY_IMEI_INVALID,
@@ -315,9 +317,9 @@ class ApiAuthController extends BaseController
             }
 
             $phone = $this->getPhone(
-                $data['phone_policy']['make'],
-                $data['phone_policy']['device'],
-                $data['phone_policy']['memory']
+                $this->getDataString($phonePolicyData, 'make'),
+                $this->getDataString($phonePolicyData, 'device'),
+                $this->getDataString($phonePolicyData, 'memory')
             );
             if (!$phone) {
                 return $this->getErrorJsonResponse(
@@ -330,8 +332,8 @@ class ApiAuthController extends BaseController
             try {
                 $jwtValidator->validate(
                     $this->getCognitoIdentityId($request),
-                    (string) $data['phone_policy']['validation_data'],
-                    ['imei' => $data['phone_policy']['imei']]
+                    $this->getDataString($phonePolicyData, 'validation_data'),
+                    ['imei' => $this->getDataString($phonePolicyData, 'imei')]
                 );
             } catch (\InvalidArgumentException $argE) {
                 return $this->getErrorJsonResponse(
@@ -353,9 +355,7 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $serialNumber = isset($data['phone_policy']['serial_number']) ?
-                $data['phone_policy']['serial_number'] :
-                null;
+            $serialNumber = $this->getDataString($phonePolicyData, 'serial_number');
 
             // Checking against blacklist should be last check to possible avoid costs
             if (!$imeiValidator->checkImei($phone, $imei, $this->getUser())) {
@@ -391,9 +391,9 @@ class ApiAuthController extends BaseController
 
             $policy->init($user, $latestTerms);
             $policy->setPhoneData(json_encode([
-                'make' => $data['phone_policy']['make'],
-                'device' => $data['phone_policy']['device'],
-                'memory' => $data['phone_policy']['memory'],
+                'make' => $this->getDataString($phonePolicyData, 'make'),
+                'device' => $this->getDataString($phonePolicyData, 'device'),
+                'memory' => $this->getDataString($phonePolicyData, 'memory'),
             ]));
             
             $this->validateObject($policy);
@@ -470,10 +470,10 @@ class ApiAuthController extends BaseController
             }
 
             $data = json_decode($request->getContent(), true)['body'];
-            $email = isset($data['email']) ? $data['email'] : null;
-            $mobile = isset($data['mobile']) ? $data['mobile'] : null;
-            $name = isset($data['name']) ? $data['name'] : null;
-            $scode = isset($data['scode']) ? $data['scode'] : null;
+            $email = $this->getDataString($data, 'email');
+            $mobile = $this->getDataString($data, 'mobile');
+            $name = $this->getDataString($data, 'name');
+            $scode = $this->getDataString($data, 'scode');
             try {
                 $invitation  = null;
                 if ($email && $validator->isValid($email)) {
@@ -568,6 +568,7 @@ class ApiAuthController extends BaseController
         try {
             $this->get('statsd')->startTiming("api.payPolicy");
             $data = json_decode($request->getContent(), true)['body'];
+            $judoData = null;
             if (isset($data['bank_account'])) {
                 // Not doing anymore, but too many tests currently expect gocardless, so allow for non-prod
                 if ($this->getParameter('kernel.environment') == 'prod') {
@@ -582,13 +583,11 @@ class ApiAuthController extends BaseController
             } elseif (isset($data['braintree'])) {
                 // Not allow braintree
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-                if (!$this->validateFields($data['braintree'], ['nonce'])) {
-                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-                }
             } elseif (isset($data['judo'])) {
                 if (!$this->validateFields($data['judo'], ['consumer_token', 'receipt_id'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
+                $judoData = $data['judo'];
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
@@ -625,14 +624,14 @@ class ApiAuthController extends BaseController
                 );
             } elseif (isset($data['braintree'])) {
                 throw new \Exception('Braintree is no longer supported');
-            } elseif (isset($data['judo'])) {
+            } elseif ($judoData) {
                 $judo = $this->get('app.judopay');
                 $judo->add(
                     $policy,
-                    $data['judo']['receipt_id'],
-                    $data['judo']['consumer_token'],
-                    isset($data['judo']['card_token']) ? $data['judo']['card_token'] : null,
-                    isset($data['judo']['device_dna']) ? $data['judo']['device_dna'] : null
+                    $this->getDataString($judoData, 'receipt_id'),
+                    $this->getDataString($judoData, 'consumer_token'),
+                    $this->getDataString($judoData, 'card_token'),
+                    $this->getDataString($judoData, 'device_dna')
                 );
             }
             $this->get('statsd')->endTiming("api.payPolicy");
@@ -673,12 +672,12 @@ class ApiAuthController extends BaseController
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
-            $policy = $repo->find($data['policy_id']);
+            $policy = $repo->find($this->getDataString($data, 'policy_id'));
             if (!$policy) {
                 throw new NotFoundHttpException();
             }
             $this->denyAccessUnlessGranted('edit', $policy);
-            if ($data['type'] == SCode::TYPE_STANDARD && $policy->getStandardSCode()) {
+            if ($this->getDataString($data, 'type') == SCode::TYPE_STANDARD && $policy->getStandardSCode()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
                     'Only 1 standard active code is allowed',
@@ -687,7 +686,7 @@ class ApiAuthController extends BaseController
             }
 
             $scode = new SCode();
-            $scode->setType($data['type']);
+            $scode->setType($this->getDataString($data, 'type'));
             $scodeRepo = $dm->getRepository(SCode::class);
             if ($scodeRepo->findOneBy(['code' => $scode->getCode()])) {
                 // TODO: Change to while loop
@@ -934,9 +933,9 @@ class ApiAuthController extends BaseController
             $data = json_decode($request->getContent(), true)['body'];
             // $this->get('logger')->info(sprintf('Update user %s', json_encode($data)));
 
-            $email = isset($data['email']) ? trim($data['email']) : null;
-            $facebookId = isset($data['facebook_id']) ? trim($data['facebook_id']) : null;
-            $mobileNumber = isset($data['mobile_number']) ? trim($data['mobile_number']) : null;
+            $email = $this->getDataString($data, 'email');
+            $facebookId = $this->getDataString($data, 'facebook_id');
+            $mobileNumber = $this->getDataString($data, 'mobile_number');
             $userExists = $repo->existsAnotherUser($user, $email, $facebookId, $mobileNumber);
             if ($userExists) {
                 return $this->getErrorJsonResponse(
@@ -957,9 +956,8 @@ class ApiAuthController extends BaseController
                 $user->setEmail($email);
                 $userChanged = true;
             }
-            if (isset($data['first_name']) &&
-                strlen($data['first_name']) > 0 &&
-                $data['first_name'] != $user->getFirstName()) {
+            if ($this->isDataStringPresent($data, 'first_name') &&
+                $this->getDataString($data, 'first_name') != $user->getFirstName()) {
                 if ($user->hasValidPolicy()) {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
@@ -967,12 +965,11 @@ class ApiAuthController extends BaseController
                         422
                     );
                 }
-                $user->setFirstName($data['first_name']);
+                $user->setFirstName($this->getDataString($data, 'first_name'));
                 $userChanged = true;
             }
-            if (isset($data['last_name']) &&
-                strlen($data['last_name']) > 0 &&
-                $data['last_name'] != $user->getLastName()) {
+            if ($this->isDataStringPresent($data, 'last_name') &&
+                $this->getDataString($data, 'last_name') != $user->getLastName()) {
                 if ($user->hasValidPolicy()) {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
@@ -980,18 +977,18 @@ class ApiAuthController extends BaseController
                         422
                     );
                 }
-                $user->setLastName($data['last_name']);
+                $user->setLastName($this->getDataString($data, 'last_name'));
                 $userChanged = true;
             }
 
-            if (isset($data['facebook_id']) && strlen($data['facebook_id']) > 0 &&
-                isset($data['facebook_access_token']) && strlen($data['facebook_access_token']) > 0 ) {
-                $user->setFacebookId($data['facebook_id']);
-                $user->setFacebookAccessToken($data['facebook_access_token']);
+            if ($this->isDataStringPresent($data, 'facebook_id') &&
+                $this->isDataStringPresent($data, 'facebook_access_token')) {
+                $user->setFacebookId($this->getDataString($data, 'facebook_id'));
+                $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
                 $userChanged = true;
             }
 
-            if (isset($data['birthday']) && strlen($data['birthday']) > 0) {
+            if ($this->isDataStringPresent($data, 'birthday')) {
                 $birthday = $this->validateBirthday($data);
                 if ($birthday instanceof Response) {
                     return $birthday;
@@ -1000,9 +997,9 @@ class ApiAuthController extends BaseController
                 $userChanged = true;
             }
 
-            if (isset($data['scode']) && strlen($data['scode']) > 0) {
+            if ($this->isDataStringPresent($data, 'scode')) {
                 $scodeRepo = $dm->getRepository(SCode::class);
-                $scode = $scodeRepo->findOneBy(['code' => $data['scode']]);
+                $scode = $scodeRepo->findOneBy(['code' => $this->getDataString($data, 'scode')]);
                 if (!$scode || !$scode->isActive()) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'SCode missing', 404);
                 }
@@ -1010,12 +1007,12 @@ class ApiAuthController extends BaseController
                 $userChanged = true;
             }
 
-            if (isset($data['sns_endpoint']) && strlen($data['sns_endpoint']) > 0) {
-                $oldEndpointUsers = $repo->findBy(['snsEndpoint' => $data['sns_endpoint']]);
+            if ($this->isDataStringPresent($data, 'sns_endpoint')) {
+                $oldEndpointUsers = $repo->findBy(['snsEndpoint' => $this->getDataString($data, 'sns_endpoint')]);
                 foreach ($oldEndpointUsers as $oldEndpointUser) {
                     $oldEndpointUser->setSnsEndpoint(null);
                 }
-                $user->setSnsEndpoint($data['sns_endpoint']);
+                $user->setSnsEndpoint($this->getDataString($data, 'sns_endpoint'));
                 $userChanged = true;
             }
 
@@ -1058,7 +1055,7 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('edit', $user);
 
             $addressValidator = $this->get('app.address');
-            if (!$addressValidator->validatePostcode($data['postcode'])) {
+            if (!$addressValidator->validatePostcode($this->getDataString($data, 'postcode'))) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_INVALID_ADDRESS,
                     "Invalid postcode",
@@ -1067,12 +1064,12 @@ class ApiAuthController extends BaseController
             }
 
             $address = new Address();
-            $address->setType($data['type']);
-            $address->setLine1($data['line1']);
-            $address->setLine2(isset($data['line2']) ? $data['line2'] : null);
-            $address->setLine3(isset($data['line3']) ? $data['line3'] : null);
-            $address->setCity($data['city']);
-            $address->setPostcode($data['postcode']);
+            $address->setType($this->getDataString($data, 'type'));
+            $address->setLine1($this->getDataString($data, 'line1'));
+            $address->setLine2($this->getDataString($data, 'line2'));
+            $address->setLine3($this->getDataString($data, 'line3'));
+            $address->setCity($this->getDataString($data, 'city'));
+            $address->setPostcode($this->getDataString($data, 'postcode'));
             $user->setBillingAddress($address);
 
             $this->validateObject($address);

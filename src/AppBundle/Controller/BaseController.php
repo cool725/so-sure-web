@@ -24,11 +24,39 @@ abstract class BaseController extends Controller
 {
     use PhoneTrait;
 
+    public function isDataStringPresent($data, $field)
+    {
+        return strlen($this->getDataString($data, $field)) > 0;
+    }
+
+    protected function getDataBool($data, $field)
+    {
+        return filter_var($this->getDataString($data, $field), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
+
+    public function getDataString($data, $field)
+    {
+        if (!isset($data[$field])) {
+            return null;
+        }
+
+        $value = $data[$field];
+
+        // Cast to string to avoid possible array injections which could lead to nosql injections
+        if (is_array($value)) {
+            throw new ValidationException(sprintf('Expected string, not array (%s)', json_encode($value)));
+        }
+        return trim((string) $value);
+    }
+
     public function getRequestString($request, $field)
     {
         // Cast to string to avoid possible array injections which could lead to nosql injections
         if (is_array($request->get($field))) {
-            throw new ValidationException(sprintf('Expected string, not array (%s)', json_encode($request->get($field))));
+            throw new ValidationException(sprintf(
+                'Expected string, not array (%s)',
+                json_encode($request->get($field))
+            ));
         }
         return trim((string) $request->get($field));
     }
@@ -233,7 +261,7 @@ abstract class BaseController extends Controller
         if (!isset($data['birthday'])) {
             return null;
         }
-        $birthday = \DateTime::createFromFormat(\DateTime::ATOM, $data['birthday']);
+        $birthday = \DateTime::createFromFormat(\DateTime::ATOM, $this->getDataString($data, 'birthday'));
         if (!$birthday) {
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_INVALD_DATA_FORMAT,

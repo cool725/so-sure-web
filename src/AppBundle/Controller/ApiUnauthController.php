@@ -41,7 +41,7 @@ class ApiUnauthController extends BaseController
             }
 
             $identity = $this->get('app.user.cognitoidentity');
-            $user = $identity->loadUserByUserToken($data['token']);
+            $user = $identity->loadUserByUserToken($this->getDataString($data, 'token'));
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Invalid token', 403);
             }
@@ -75,7 +75,10 @@ class ApiUnauthController extends BaseController
             }
 
             $cognitoIdentity = $this->get('app.cognito.identity');
-            list($identityId, $token) = $cognitoIdentity->getCognitoIdToken($user, $data['cognito_id']);
+            list($identityId, $token) = $cognitoIdentity->getCognitoIdToken(
+                $user,
+                $this->getDataString($data, 'cognito_id')
+            );
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (ValidationException $ex) {

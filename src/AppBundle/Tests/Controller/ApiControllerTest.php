@@ -1022,6 +1022,12 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
+    public function testVersionValidation()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version[$ne]=1');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
     public function testVersionMissingParam()
     {
         $crawler = self::$client->request('GET', '/api/v1/version?platform=ios');

@@ -44,12 +44,16 @@ class ApiController extends BaseController
             }
 
             $data = json_decode($request->getContent(), true)['body'];
+            $emailUserData = null;
+            $facebookUserData = null;
             if (isset($data['email_user'])) {
-                if (!$this->validateFields($data['email_user'], ['email', 'password'])) {
+                $emailUserData = $data['email_user'];
+                if (!$this->validateFields($emailUserData, ['email', 'password'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
             } elseif (isset($data['facebook_user'])) {
-                if (!$this->validateFields($data['facebook_user'], ['facebook_id', 'facebook_access_token'])) {
+                $facebookUserData = $data['facebook_user'];
+                if (!$this->validateFields($facebookUserData, ['facebook_id', 'facebook_access_token'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
             } else {
@@ -59,11 +63,11 @@ class ApiController extends BaseController
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $user = null;
-            if (isset($data['email_user'])) {
-                $email = strtolower($data['email_user']['email']);
+            if ($emailUserData) {
+                $email = strtolower($this->getDataString($emailUserData, 'email'));
                 $user = $repo->findOneBy(['emailCanonical' => $email]);
-            } elseif (isset($data['facebook_user'])) {
-                $facebookId = trim($data['facebook_user']['facebook_id']);
+            } elseif ($facebookUserData) {
+                $facebookId = $this->getDataString($facebookUserData, 'facebook_id');
                 $user = $repo->findOneBy(['facebookId' => $facebookId]);
             }
             if (!$user) {
@@ -107,19 +111,22 @@ class ApiController extends BaseController
                 );
             }
 
-            if (isset($data['email_user'])) {
+            if ($emailUserData) {
                 $encoderService = $this->get('security.encoder_factory');
                 $encoder = $encoderService->getEncoder($user);
                 if (!$encoder->isPasswordValid(
                     $user->getPassword(),
-                    $data['email_user']['password'],
+                    $this->getDataString($emailUserData, 'password'),
                     $user->getSalt()
                 )) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid password', 403);
                 }
-            } elseif (isset($data['facebook_user'])) {
+            } elseif ($facebookUserData) {
                 $facebookService = $this->get('app.facebook');
-                if (!$facebookService->validateToken($user, trim($data['facebook_user']['facebook_access_token']))) {
+                if (!$facebookService->validateToken(
+                    $user,
+                    $this->getDataString($facebookUserData, 'facebook_access_token')
+                )) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                 }
                 // TODO: Here we would either add a session linking a facebook_id to a cognito session
@@ -316,8 +323,8 @@ class ApiController extends BaseController
             if (!$this->validateFields($data, ['email', 'referral_code'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
-            $email = strtolower($data['email']);
-            $referralCode = $data['referral_code'];
+            $email = strtolower($this->getDataString($data, 'email'));
+            $referralCode = $this->getDataString($data, 'referral_code');
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
@@ -360,7 +367,7 @@ class ApiController extends BaseController
             if (!$this->validateFields($data, ['email'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
-            $email = strtolower($data['email']);
+            $email = strtolower($this->getDataString($data, 'email'));
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
@@ -432,10 +439,10 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing endpoint', 400);
             }
 
-            $endpoint = $data['endpoint'];
-            $platform = isset($data['platform']) ? $data['platform'] : null;
-            $version = isset($data['version']) ? $data['version'] : null;
-            $oldEndpoint = isset($data['old_endpoint']) ? $data['old_endpoint'] : null;
+            $endpoint = $this->getDataString($data, 'endpoint');
+            $platform = $this->getDataString($data, 'platform');
+            $version = $this->getDataString($data, 'version');
+            $oldEndpoint = $this->getDataString($data, 'old_endpoint');
             $this->snsSubscribe('all', $endpoint);
             $this->snsSubscribe('unregistered', $endpoint);
             if ($platform) {
@@ -524,7 +531,7 @@ class ApiController extends BaseController
             }
 
             $identity = $this->get('app.user.cognitoidentity');
-            $user = $identity->loadUserByUserToken($data['token']);
+            $user = $identity->loadUserByUserToken($this->getDataString($data, 'token'));
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Invalid token', 403);
             }
@@ -585,14 +592,14 @@ class ApiController extends BaseController
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
-            $facebookId = isset($data['facebook_id']) ? $data['facebook_id'] : null;
-            $mobileNumber = isset($data['mobile_number']) ? $data['mobile_number'] : null;
-            $userExists = $repo->existsUser($data['email'], $facebookId, $mobileNumber);
+            $facebookId = $this->getDataString($data, 'facebook_id');
+            $mobileNumber = $this->getDataString($data, 'mobile_number');
+            $userExists = $repo->existsUser($this->getDataString($data, 'email'), $facebookId, $mobileNumber);
             if ($userExists) {
                 // Special case for prelaunch users - allow them to 'create' an account without
                 // being recreated in account in the db.  This is only allowed once per user
                 // and is only because the prelaunch app didn't do anything other than record email address
-                $user = $repo->findOneBy(['emailCanonical' => strtolower($data['email'])]);
+                $user = $repo->findOneBy(['emailCanonical' => strtolower($this->getDataString($data, 'email'))]);
                 if ($user && $user->isPreLaunch() && !$user->getLastLogin() && count($user->getPolicies()) == 0) {
                     $user->resetToken();
                     $user->setLastLogin(new \DateTime());
@@ -609,25 +616,23 @@ class ApiController extends BaseController
             }
 
             $user->setEnabled(true);
-            $user->setEmail($data['email']);
-            $user->setFirstName(isset($data['first_name']) ? ucfirst($data['first_name']) : null);
-            $user->setLastName(isset($data['last_name']) ? ucfirst($data['last_name']) : null);
-            $user->setFacebookId(isset($data['facebook_id']) ? $data['facebook_id'] : null);
-            $user->setFacebookAccessToken(
-                isset($data['facebook_access_token']) ? $data['facebook_access_token'] : null
-            );
-            $user->setSnsEndpoint(isset($data['sns_endpoint']) ? $data['sns_endpoint'] : null);
+            $user->setEmail($this->getDataString($data, 'email'));
+            $user->setFirstName(isset($data['first_name']) ? ucfirst($this->getDataString($data, 'first_name')) : null);
+            $user->setLastName(isset($data['last_name']) ? ucfirst($this->getDataString($data, 'last_name')) : null);
+            $user->setFacebookId($this->getDataString($data, 'facebook_id'));
+            $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
+            $user->setSnsEndpoint($this->getDataString($data, 'sns_endpoint'));
             $user->setMobileNumber($mobileNumber);
-            $user->setReferer(isset($data['referer']) ? $data['referer'] : null);
+            $user->setReferer($this->getDataString($data, 'referer'));
             $birthday = $this->validateBirthday($data);
             if ($birthday instanceof Response) {
                 return $birthday;
             }
             $user->setBirthday($birthday);
             $user->setIdentityLog($this->getIdentityLog($request));
-            if (isset($data['scode']) && strlen($data['scode']) > 0) {
+            if ($this->isDataStringPresent($data, 'scode')) {
                 $scodeRepo = $dm->getRepository(SCode::class);
-                $scode = $scodeRepo->findOneBy(['code' => $data['scode']]);
+                $scode = $scodeRepo->findOneBy(['code' => $this->getDataString($data, 'scode')]);
                 if (!$scode || !$scode->isActive()) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'SCode missing', 404);
                 }
