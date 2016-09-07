@@ -16,6 +16,7 @@ class PhoneType extends AbstractType
     {
         $builder
             ->add('phone', DocumentType::class, [
+                    'placeholder' => 'Select your device',
                     'class' => 'AppBundle:Phone',
                     'query_builder' => function (DocumentRepository $dr) {
                         return $dr->findActive();
