@@ -433,8 +433,6 @@ class ApiAuthController extends BaseController
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (ValidationException $ex) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api getPolicy.', ['exception' => $e]);
 
@@ -731,8 +729,6 @@ class ApiAuthController extends BaseController
                 'Unable to find policy/code',
                 404
             );
-        } catch (ValidationException $ex) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api getPolicySCodeAction.', ['exception' => $e]);
 
@@ -768,8 +764,11 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, sprintf('%s inactivated', $code), 200);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        /*
+         * Nothing client can do for Validation Exception, so 500 response should be returned
         } catch (ValidationException $ex) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        */
         } catch (NotFoundHttpException $e) {
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_NOT_FOUND,
@@ -819,8 +818,6 @@ class ApiAuthController extends BaseController
             return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (ValidationException $ex) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api getPolicyTerms.', ['exception' => $e]);
 
@@ -839,8 +836,6 @@ class ApiAuthController extends BaseController
             return new JsonResponse(['secret' => $this->getParameter('api_secret')]);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (ValidationException $ex) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api getSecret.', ['exception' => $e]);
 
@@ -868,8 +863,6 @@ class ApiAuthController extends BaseController
             return new JsonResponse($user->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (ValidationException $ex) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api getCurrentUser.', ['exception' => $e]);
 
@@ -900,8 +893,6 @@ class ApiAuthController extends BaseController
             return new JsonResponse($user->toApiArray(null, null, $debug));
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (ValidationException $ex) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api getUser.', ['exception' => $e]);
 

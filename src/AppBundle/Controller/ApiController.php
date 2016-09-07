@@ -128,6 +128,8 @@ class ApiController extends BaseController
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
             return new JsonResponse($user->toApiArray($identityId, $token));
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api loginAction.', ['exception' => $e]);
 
@@ -251,6 +253,8 @@ class ApiController extends BaseController
             }
 
             return new JsonResponse($response);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api quoteAction.', ['exception' => $e]);
 
@@ -286,6 +290,8 @@ class ApiController extends BaseController
             $url = $launchUser->getShortLink($user->getId());
 
             return new JsonResponse(['url' => $url]);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api referralAction.', ['exception' => $e]);
 
@@ -395,6 +401,8 @@ class ApiController extends BaseController
             );
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Reset password email sent', 200);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api resetAction.', ['exception' => $e]);
 
@@ -536,6 +544,8 @@ class ApiController extends BaseController
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api tokenAction.', ['exception' => $e]);
 
@@ -672,6 +682,8 @@ class ApiController extends BaseController
             }
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+        } catch (ValidationException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api versionAction.', ['exception' => $e]);
 
