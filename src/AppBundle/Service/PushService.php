@@ -153,15 +153,15 @@ class PushService
         $data = [];
         $uri = $this->getUri($messageType);
         if ($uri) {
-            $data['uri'] = $uri;
+            $data['ss']['uri'] = $uri;
         }
         $display = $this->getDisplay($messageType);
         if ($display) {
-            $data['display'] = $display;
+            $data['ss']['display'] = $display;
         }
         $refresh = $this->getRefresh($messageType);
         if ($refresh) {
-            $data['refresh'] = $refresh;
+            $data['ss']['refresh'] = $refresh;
         }
 
         // Depreciated field, but keep as alert to always display message
