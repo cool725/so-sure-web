@@ -83,6 +83,8 @@ class ApiAuthController extends BaseController
 
             return new JsonResponse($address->toApiArray());
         } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api addressAction.', ['exception' => $e]);
@@ -185,6 +187,8 @@ class ApiAuthController extends BaseController
                 422
             );
         } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api processInvitation.', ['exception' => $e]);
@@ -403,6 +407,8 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api newPolicy.', ['exception' => $e]);
@@ -543,6 +549,8 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api newInvitation.', ['exception' => $e]);
@@ -641,6 +649,8 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api payPolicy.', ['exception' => $e]);
@@ -690,6 +700,8 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (NotFoundHttpException $e) {
             return $this->getErrorJsonResponse(
@@ -1013,6 +1025,8 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api updateUser.', ['exception' => $e]);
@@ -1066,6 +1080,8 @@ class ApiAuthController extends BaseController
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api addUserAddress.', ['exception' => $e]);

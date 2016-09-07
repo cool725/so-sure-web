@@ -79,6 +79,8 @@ class ApiUnauthController extends BaseController
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api unauthTokenAction.', ['exception' => $e]);
