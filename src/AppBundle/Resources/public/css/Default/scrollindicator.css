@@ -1,6 +1,6 @@
 .mouse {
   position: absolute;
-  bottom: -8%;
+  bottom: -9%;
   left: 50%;
   width: 50px;
   height: 50px;
@@ -23,6 +23,6 @@
 }
 @media (max-width:550px) {
   .mouse {
-    bottom: -6%;
+    bottom: -7%;
   }
 }
