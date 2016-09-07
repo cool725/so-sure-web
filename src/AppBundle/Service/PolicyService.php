@@ -305,6 +305,10 @@ class PolicyService
         }
 
         $this->snappyPdf->setOption('orientation', 'Landscape');
+        $this->snappyPdf->setOption('lowquality', false);
+        $this->snappyPdf->setOption('page-size', 'A4');
+        $this->snappyPdf->setOption('margin-top', '0');
+        $this->snappyPdf->setOption('margin-bottom', '0');
         $this->snappyPdf->generateFromHtml(
             $this->templating->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]),
             $tmpFile
@@ -337,6 +341,8 @@ class PolicyService
         }
 
         $this->snappyPdf->setOption('orientation', 'Portrait');
+        $this->snappyPdf->setOption('page-size', 'A4');
+        $this->snappyPdf->setOption('margin-top', '20mm');
         $this->snappyPdf->generateFromHtml(
             $this->templating->render('AppBundle:Pdf:policySchedule.html.twig', ['policy' => $policy]),
             $tmpFile
