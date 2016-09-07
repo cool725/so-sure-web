@@ -36,16 +36,17 @@ class PushServiceTest extends WebTestCase
     public function testCustomDataMessageGeneral()
     {
         $data = self::$push->getCustomData(PushService::MESSAGE_GENERAL);
-        $this->assertEquals(['display' => 'popup', 'type' => 'alert'], $data);
+        $this->assertEquals(['ss' => ['display' => 'popup'], 'type' => 'alert'], $data);
     }
 
     public function testCustomDataMessageConnected()
     {
         $data = self::$push->getCustomData(PushService::MESSAGE_CONNECTED);
-        $this->assertEquals([
-            'uri' => 'sosure://open/pot',
-            'display' => 'popup',
-            'refresh' => true,
+        $this->assertEquals(['ss' => [
+                'uri' => 'sosure://open/pot',
+                'display' => 'popup',
+                'refresh' => true,
+            ],
             'type' => 'alert'
         ], $data);
     }
@@ -53,10 +54,11 @@ class PushServiceTest extends WebTestCase
     public function testCustomDataMessageInvitation()
     {
         $data = self::$push->getCustomData(PushService::MESSAGE_INVITATION);
-        $this->assertEquals([
-            'uri' => 'sosure://open/pot',
-            'display' => 'popup',
-            'refresh' => true,
+        $this->assertEquals(['ss' => [
+                'uri' => 'sosure://open/pot',
+                'display' => 'popup',
+                'refresh' => true,
+            ],
             'type' => 'alert'
         ], $data);
     }
@@ -66,7 +68,7 @@ class PushServiceTest extends WebTestCase
         $data = self::$push->generateGCMMessage(PushService::MESSAGE_GENERAL, 'foo');
         $this->assertEquals(['data' => [
             'message' => 'foo',
-            'display' => 'popup',
+            'ss' => ['display' => 'popup'],
             'type' => 'alert'
         ]], $data);
     }
@@ -76,7 +78,7 @@ class PushServiceTest extends WebTestCase
         $data = self::$push->generateAPNSMessage(PushService::MESSAGE_GENERAL, 'foo');
         $this->assertEquals([
             'aps' => ['alert' => 'foo'],
-            'display' => 'popup',
+            'ss' => ['display' => 'popup'],
             'type' => 'alert'
         ], $data);
     }
