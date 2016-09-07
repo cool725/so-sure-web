@@ -27,6 +27,9 @@ abstract class BaseController extends Controller
     public function getRequestString($request, $field)
     {
         // Cast to string to avoid possible array injections which could lead to nosql injections
+        if (is_array($request->get($field))) {
+            throw new ValidationException(sprintf('Expected string, not array (%s)', json_encode($request->get($field))));
+        }
         return trim((string) $request->get($field));
     }
 

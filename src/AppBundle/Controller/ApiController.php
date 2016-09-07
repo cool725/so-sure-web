@@ -129,7 +129,7 @@ class ApiController extends BaseController
 
             return new JsonResponse($user->toApiArray($identityId, $token));
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
@@ -256,7 +256,7 @@ class ApiController extends BaseController
 
             return new JsonResponse($response);
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
@@ -295,7 +295,7 @@ class ApiController extends BaseController
 
             return new JsonResponse(['url' => $url]);
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
@@ -339,7 +339,7 @@ class ApiController extends BaseController
 
             return new JsonResponse(['url' => $url]);
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
@@ -410,7 +410,7 @@ class ApiController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Reset password email sent', 200);
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
@@ -458,7 +458,7 @@ class ApiController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Endpoint added', 200);
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
@@ -500,6 +500,10 @@ class ApiController extends BaseController
             $policyTermsUrl = sprintf("%s%s", $this->getParameter('api_base_url'), $policyTermsRoute);
 
             return new JsonResponse($latestTerms->toApiArray($policyTermsUrl));
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api getLatestPolicyTerms.', ['exception' => $e]);
 
@@ -557,7 +561,7 @@ class ApiController extends BaseController
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
@@ -654,7 +658,7 @@ class ApiController extends BaseController
 
             return new JsonResponse($user->toApiArray($identityId, $token));
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
@@ -699,7 +703,7 @@ class ApiController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
         } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {

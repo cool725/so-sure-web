@@ -240,6 +240,15 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue(stripos($getData["view_url"], 'Version') >= 0);
     }
 
+    public function testGetPolicyTermsValidation()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = '/api/v1/policy/terms?maxPotValue[$ne]=1&_method=GET';
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
     // quote
     
     /**
@@ -254,6 +263,13 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue(count($data['quotes']) > 2);
         // Make sure we're not returning all the quotes
         $this->assertTrue(count($data['quotes']) < 10);
+    }
+
+    public function testQuoteValidation()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&make[$ne]=1');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
     public function testQuoteA0001()
@@ -432,6 +448,13 @@ class ApiControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', sprintf('/api/v1/referral?email=%s', $user->getEmail()));
         $data = $this->verifyResponse(200);
         $this->assertContains("http://goo.gl", $data['url']);
+    }
+
+    public function testReferralValidation()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = self::$client->request('GET', sprintf('/api/v1/referral?email[$ne]=1'));
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
     public function testReferralCreate()
