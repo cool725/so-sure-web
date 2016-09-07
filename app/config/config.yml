@@ -37,6 +37,7 @@ framework:
         cookie_httponly: true
     fragments:       ~
     http_method_override: true
+    validation: { enable_annotations: true }
 
 # Twig Configuration
 twig:

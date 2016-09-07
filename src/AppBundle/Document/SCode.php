@@ -4,6 +4,8 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document()
@@ -20,12 +22,15 @@ class SCode
     protected $id;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $createdDate;
 
     /**
+     * @Assert\Length(min="2", max="50")
+     * @AppAssert\Alphanumeric()
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true)
      * @Gedmo\Versioned
@@ -33,6 +38,7 @@ class SCode
     protected $code;
 
     /**
+     * @Assert\Choice({"standard", "paygroup"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -44,10 +50,14 @@ class SCode
      */
     protected $policy;
 
-    /** @MongoDB\Field(type="boolean") */
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
     protected $active;
 
     /**
+     * @Assert\Url(protocols = {"http", "https"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -68,7 +78,7 @@ class SCode
 
     public function generateRandomCode()
     {
-        $randBase64 = $this->removeDisallowedBase64Chars(base64_encode(random_bytes(9)));
+        $randBase64 = $this->removeDisallowedBase64Chars(base64_encode(random_bytes(12)));
         $this->setCode(substr($randBase64, 0, 8));
     }
 
@@ -76,6 +86,7 @@ class SCode
     {
         $string = str_replace('/', '', $string);
         $string = str_replace('=', '', $string);
+        $string = str_replace('+', '', $string);
 
         return $string;
     }
@@ -87,7 +98,8 @@ class SCode
 
     public function deactivate()
     {
-        $this->setCode(base64_encode(uniqid(mt_rand(), true)));
+        // see policy service::uniqueSCode for reason behind creating a new code
+        $this->generateRandomCode();
         $this->setActive(false);
     }
 

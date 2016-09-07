@@ -3,6 +3,8 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\EmbeddedDocument
@@ -14,13 +16,22 @@ abstract class Premium
 {
     use CurrencyTrait;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @Assert\Range(min=0,max=200)
+     * @MongoDB\Field(type="float")
+     */
     protected $gwp;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @Assert\Range(min=0,max=200)
+     * @MongoDB\Field(type="float")
+     */
     protected $ipt;
 
-    /** @MongoDB\Field(type="float") */
+    /**
+     * @Assert\Range(min=0,max=1)
+     * @MongoDB\Field(type="float")
+     */
     protected $iptRate;
 
     public function __construct()

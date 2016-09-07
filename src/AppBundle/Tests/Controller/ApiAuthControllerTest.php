@@ -71,6 +71,14 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals("BX1 1LT", $data['postcode']);
     }
 
+    public function testAddressValidation()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = '/api/v1/auth/address?postcode[$ne]=BX11LT&_method=GET';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
     public function testAddressRateLimited()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -360,6 +368,37 @@ class ApiAuthControllerTest extends BaseControllerTest
             'policy_id' => $inviteePolicyData['id']
         ]);
         $data = $this->verifyResponse(200);
+    }
+
+    public function testInvitationValidation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-validation-invitee', $this),
+            'foo'
+        );
+        $inviteeCognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($inviteeCognitoIdentityId, $user);
+        $inviteePolicyData = $this->verifyResponse(200);
+        $this->payPolicy($user, $inviteePolicyData['id']);
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invitation-validation', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('user-claimaccept-invitee', $this),
+            'name' => ['$ne' => 'invite claimaccept test'],
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
     public function testInvitationAcceptWithClaims()
@@ -1967,6 +2006,17 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('barfoo', $result['facebook_id']);
     }
 
+    public function testUpdateUserValidation()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $data = [
+            'first_name' => ['$ne' => 'bar']
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
     public function testUpdateUserDifferentUser()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -2209,6 +2259,21 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals($data['line1'], $result['addresses'][0]['line1']);
         $this->assertEquals($data['city'], $result['addresses'][0]['city']);
         $this->assertEquals($data['postcode'], $result['addresses'][0]['postcode']);
+    }
+
+    public function testUserAddressValidation()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'line2' => ['$ne' => '1'],
+            'city' => 'London',
+            'postcode' => 'BX11LT',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
     public function testUserAddAddressDifferentUser()

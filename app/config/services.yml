@@ -378,6 +378,22 @@ services:
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
+    doctrine.listener.validation:
+        class:   AppBundle\Listener\DoctrineValidationListener
+        arguments:
+            dispatcher:  "@event_dispatcher"
+        tags:
+            -  { name: doctrine_mongodb.odm.event_listener, event: prePersist }
+            -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
+
+    app.listener.validation:
+        class:   AppBundle\Listener\ValidationListener
+        arguments:
+            validator: "@validator"
+            logger:    "@logger"
+        tags:
+            -  { name: kernel.event_listener, event: event.validate, method: onValidateEvent }
+
     app.listener.invitation:
         class:   AppBundle\Listener\InvitationListener
         arguments:
@@ -443,6 +459,26 @@ services:
         arguments: ["@app.imei"]
         tags:
             - { name: form.type }
+
+    app.validator.alphanumeric:
+        class: AppBundle\Validator\Constraints\AlphanumericValidator
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.alphanumericspacedot:
+        class: AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.token:
+        class: AppBundle\Validator\Constraints\TokenValidator
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.mobile:
+        class: AppBundle\Validator\Constraints\MobileValidator
+        tags:
+            - { name: validator.constraint_validator }
 
     rollbar.voter.notfound:
         class: AppBundle\Security\NotFoundHttpExceptionVoter

@@ -3,6 +3,8 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
@@ -14,16 +16,32 @@ class PlayDevice
      */
     protected $id;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="150")
+     * @MongoDB\Field(type="string")
+     */
     protected $retailBranding;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="150")
+     * @MongoDB\Field(type="string")
+     */
     protected $marketingName;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
     protected $device;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="100")
+     * @MongoDB\Field(type="string")
+     */
     protected $model;
 
     public function __construct()

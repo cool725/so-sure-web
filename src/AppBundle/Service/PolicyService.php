@@ -276,6 +276,8 @@ class PolicyService
             return $this->uniqueSCode($policy, $count + 1);
         }
 
+        // scode created during the policy generation should not yet be persisted to the db
+        // so if it does exist, its a duplicate code
         $exists = $repo->findOneBy(['code' => $scode->getCode()]);
         if ($exists) {
             // removing scode from policy seems to be problematic, so change code and make inactive

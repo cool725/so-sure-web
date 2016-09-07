@@ -41,7 +41,7 @@ class ApiUnauthController extends BaseController
             }
 
             $identity = $this->get('app.user.cognitoidentity');
-            $user = $identity->loadUserByUserToken($data['token']);
+            $user = $identity->loadUserByUserToken($this->getDataString($data, 'token'));
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Invalid token', 403);
             }
@@ -75,9 +75,16 @@ class ApiUnauthController extends BaseController
             }
 
             $cognitoIdentity = $this->get('app.cognito.identity');
-            list($identityId, $token) = $cognitoIdentity->getCognitoIdToken($user, $data['cognito_id']);
+            list($identityId, $token) = $cognitoIdentity->getCognitoIdToken(
+                $user,
+                $this->getDataString($data, 'cognito_id')
+            );
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api unauthTokenAction.', ['exception' => $e]);
 

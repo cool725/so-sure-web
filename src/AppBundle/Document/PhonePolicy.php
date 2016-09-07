@@ -4,6 +4,8 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
@@ -31,12 +33,16 @@ class PhonePolicy extends Policy
     protected $phoneData;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $imei;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

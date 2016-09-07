@@ -47,7 +47,17 @@ class LoadPlayDeviceData implements FixtureInterface, ContainerAwareInterface
     private function newPlayDevice($manager, $retailBranding, $marketingName, $device, $model)
     {
         $playDevice = new PlayDevice();
-        $playDevice->init($retailBranding, $marketingName, $device, $model);
+        $playDevice->init($this->strip($retailBranding), $this->strip($marketingName), $this->strip($device), $this->strip($model));
         $manager->persist($playDevice);
+    }
+
+    private function strip($data)
+    {
+        $data = preg_replace('/\\x[a-f0-9]{2,2}/', '', $data);
+        $data = str_replace("'", "", $data);
+        $data = str_replace("\\t", "", $data);
+        $data = str_replace("\\", "", $data);
+
+        return $data;
     }
 }

@@ -5,6 +5,8 @@ namespace AppBundle\Document\Invitation;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Document\User;
 use AppBundle\Document\GravatarTrait;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
@@ -24,28 +26,52 @@ abstract class Invitation
      */
     protected $id;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $created;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $cancelled;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $accepted;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $rejected;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $lastReinvited;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $nextReinvited;
 
-    /** @MongoDB\Field(type="integer") */
+    /**
+     * @Assert\Range(min=0,max=200)
+     * @MongoDB\Field(type="integer")
+     */
     protected $reinvitedCount;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @Assert\Choice({"sent", "failed"})
+     * @MongoDB\Field(type="string")
+     */
     protected $status;
 
     /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="sentInvitations") */
@@ -57,10 +83,17 @@ abstract class Invitation
     /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="invitations") */
     protected $policy;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @Assert\Url(protocols = {"http", "https"})
+     * @MongoDB\Field(type="string")
+     */
     protected $link;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="0", max="250")
+     * @MongoDB\Field(type="string")
+     */
     protected $name;
 
     abstract public function isSingleUse();
@@ -201,7 +234,7 @@ abstract class Invitation
         return $this->lastReinvited;
     }
 
-    public function setLastReinvited($lastReinvited)
+    public function setLastReinvited(\DateTime $lastReinvited)
     {
         $this->lastReinvited = $lastReinvited;
     }
@@ -211,7 +244,7 @@ abstract class Invitation
         return $this->nextReinvited;
     }
 
-    public function setNextReinvited($nextReinvited)
+    public function setNextReinvited(\DateTime $nextReinvited = null)
     {
         $this->nextReinvited = $nextReinvited;
     }
@@ -247,7 +280,7 @@ abstract class Invitation
         if ($this->getReinvitedCount() < $this->getMaxReinvitations()) {
             $this->setNextReinvited($date->add(new \DateInterval('P1D')));
         } else {
-            $this->setNextReinvited(null);
+            $this->setNextReinvited();
         }
 
         $this->reinvitedCount++;

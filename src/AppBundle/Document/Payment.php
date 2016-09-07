@@ -6,6 +6,8 @@ use AppBundle\Classes\Salva;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
@@ -22,54 +24,64 @@ abstract class Payment
     protected $id;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $created;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $date;
 
     /**
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $amount;
 
     /**
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $gwp;
 
     /**
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $ipt;
 
     /**
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $totalCommission;
 
     /**
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $coverholderCommission;
 
     /**
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $brokerCommission;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(sparse=true)
      * @Gedmo\Versioned
@@ -83,6 +95,8 @@ abstract class Payment
     protected $policy;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

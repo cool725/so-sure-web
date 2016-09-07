@@ -4,6 +4,8 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ClaimRepository")
@@ -47,168 +49,203 @@ class Claim
     public $replacementPhone;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $replacementImei;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $recordedDate;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $lossDate;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $notificationDate;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $replacementReceivedDate;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $createdDate;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $closedDate;
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $number;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $description;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $location;
 
     /**
+     * @Assert\Choice({"loss", "theft", "damage", "warranty", "extended-warranty"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $type;
 
     /**
+     * @Assert\Choice({"in-review", "approved", "settled", "declined", "withdrawn"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $status;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $daviesStatus;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $notes;
 
     /**
+     * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $suspectedFraud;
 
     /**
+     * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $shouldCancelPolicy;
 
     /**
+     * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $processed;
 
     /**
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $excess;
 
     /**
+     * @Assert\Range(min=0,max=1000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $unauthorizedCalls = 0;
 
     /**
+     * @Assert\Range(min=0,max=500)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $accessories = 0;
 
     /**
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $phoneReplacementCost;
 
     /**
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $transactionFees;
 
     /**
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $claimHandlingFees = 0;
 
     /**
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $reservedValue;
 
     /**
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $incurred;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $force;
 
     /**
+     * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $crimeRef;
 
     /**
+     * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */

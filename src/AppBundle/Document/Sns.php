@@ -3,6 +3,8 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
@@ -14,19 +16,39 @@ class Sns
      */
     protected $id;
 
-    /** @MongoDB\Date() */
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     */
     protected $created;
 
-    /** @MongoDB\Field(type="string") @MongoDB\Index(unique=true) */
+    /**
+     * @Assert\Length(min="35", max="150")
+     * @AppAssert\Token()
+     * @MongoDB\Field(type="string")
+     * @MongoDB\Index(unique=true)
+     */
     protected $endpoint;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @Assert\Length(min="35", max="150")
+     * @AppAssert\Token()
+     * @MongoDB\Field(type="string")
+     */
     protected $all;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @Assert\Length(min="35", max="150")
+     * @AppAssert\Token()
+     * @MongoDB\Field(type="string")
+     */
     protected $unregistered;
 
-    /** @MongoDB\Field(type="string") */
+    /**
+     * @Assert\Length(min="35", max="150")
+     * @AppAssert\Token()
+     * @MongoDB\Field(type="string")
+     */
     protected $registered;
 
     /** @MongoDB\Field(type="collection") */

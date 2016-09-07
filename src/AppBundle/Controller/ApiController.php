@@ -21,6 +21,8 @@ use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
+use AppBundle\Exception\ValidationException;
+
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,17 +39,21 @@ class ApiController extends BaseController
     public function loginAction(Request $request)
     {
         try {
-            if ($request->get('debug')) {
+            if ($this->getRequestBool($request, 'debug')) {
                 throw new \Exception('Debug Exception Test');
             }
 
             $data = json_decode($request->getContent(), true)['body'];
+            $emailUserData = null;
+            $facebookUserData = null;
             if (isset($data['email_user'])) {
-                if (!$this->validateFields($data['email_user'], ['email', 'password'])) {
+                $emailUserData = $data['email_user'];
+                if (!$this->validateFields($emailUserData, ['email', 'password'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
             } elseif (isset($data['facebook_user'])) {
-                if (!$this->validateFields($data['facebook_user'], ['facebook_id', 'facebook_access_token'])) {
+                $facebookUserData = $data['facebook_user'];
+                if (!$this->validateFields($facebookUserData, ['facebook_id', 'facebook_access_token'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
             } else {
@@ -57,11 +63,11 @@ class ApiController extends BaseController
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $user = null;
-            if (isset($data['email_user'])) {
-                $email = strtolower($data['email_user']['email']);
+            if ($emailUserData) {
+                $email = strtolower($this->getDataString($emailUserData, 'email'));
                 $user = $repo->findOneBy(['emailCanonical' => $email]);
-            } elseif (isset($data['facebook_user'])) {
-                $facebookId = trim($data['facebook_user']['facebook_id']);
+            } elseif ($facebookUserData) {
+                $facebookId = $this->getDataString($facebookUserData, 'facebook_id');
                 $user = $repo->findOneBy(['facebookId' => $facebookId]);
             }
             if (!$user) {
@@ -105,19 +111,22 @@ class ApiController extends BaseController
                 );
             }
 
-            if (isset($data['email_user'])) {
+            if ($emailUserData) {
                 $encoderService = $this->get('security.encoder_factory');
                 $encoder = $encoderService->getEncoder($user);
                 if (!$encoder->isPasswordValid(
                     $user->getPassword(),
-                    $data['email_user']['password'],
+                    $this->getDataString($emailUserData, 'password'),
                     $user->getSalt()
                 )) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid password', 403);
                 }
-            } elseif (isset($data['facebook_user'])) {
+            } elseif ($facebookUserData) {
                 $facebookService = $this->get('app.facebook');
-                if (!$facebookService->validateToken($user, trim($data['facebook_user']['facebook_access_token']))) {
+                if (!$facebookService->validateToken(
+                    $user,
+                    $this->getDataString($facebookUserData, 'facebook_access_token')
+                )) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                 }
                 // TODO: Here we would either add a session linking a facebook_id to a cognito session
@@ -126,6 +135,10 @@ class ApiController extends BaseController
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
             return new JsonResponse($user->toApiArray($identityId, $token));
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api loginAction.', ['exception' => $e]);
 
@@ -149,10 +162,10 @@ class ApiController extends BaseController
     public function quoteAction(Request $request)
     {
         try {
-            $make = trim($request->get('make'));
-            $device = trim($request->get('device'));
-            $memory = (float) trim($request->get('memory'));
-            $rooted = filter_var($request->get('rooted'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            $make = $this->getRequestString($request, 'make');
+            $device = $this->getRequestString($request, 'device');
+            $memory = (float) $this->getRequestString($request, 'memory');
+            $rooted = $this->getRequestBool($request, 'rooted');
 
             $phones = $this->getQuotes($make, $device, true);
             if (!$phones) {
@@ -197,7 +210,7 @@ class ApiController extends BaseController
                 /*
                 $dm = $this->getManager();
                 $repo = $dm->getRepository(PhonePolicy::class);
-                if ($repo->isPromoLaunch() && !$request->get('debug')) {
+                if ($repo->isPromoLaunch() && !$this->getRequestBool($request, 'debug')) {
                     $promoAddition = PhonePolicy::PROMO_LAUNCH_VALUE;
                     $isPromoLaunch = true;
                 }
@@ -233,7 +246,7 @@ class ApiController extends BaseController
 
             // Rooted is missing in the pre-launch app where, which returns the MSRP pricing data if phone not found
             // but for newer mobile versions, we should return an unable to insure if the phone isn't found
-            if (strlen(trim($request->get('rooted'))) > 0 && !$deviceFound) {
+            if (strlen($this->getRequestString($request, 'rooted')) > 0 && !$deviceFound) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
             }
 
@@ -242,13 +255,17 @@ class ApiController extends BaseController
                 'device_found' => $deviceFound,
             ];
 
-            if ($request->get('debug')) {
+            if ($this->getRequestBool($request, 'debug')) {
                 $response['memory_found'] = $memoryFound;
                 $response['rooted'] = $rooted;
                 $response['different_make'] = $differentMake;
             }
 
             return new JsonResponse($response);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api quoteAction.', ['exception' => $e]);
 
@@ -269,7 +286,7 @@ class ApiController extends BaseController
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
-            $email = strtolower($request->get('email'));
+            $email = strtolower($this->getRequestString($request, 'email'));
             $user = $repo->findOneBy(['emailCanonical' => $email]);
             if (!$user) {
                 return $this->getErrorJsonResponse(
@@ -284,6 +301,10 @@ class ApiController extends BaseController
             $url = $launchUser->getShortLink($user->getId());
 
             return new JsonResponse(['url' => $url]);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api referralAction.', ['exception' => $e]);
 
@@ -302,8 +323,8 @@ class ApiController extends BaseController
             if (!$this->validateFields($data, ['email', 'referral_code'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
-            $email = strtolower($data['email']);
-            $referralCode = $data['referral_code'];
+            $email = strtolower($this->getDataString($data, 'email'));
+            $referralCode = $this->getDataString($data, 'referral_code');
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
@@ -317,12 +338,17 @@ class ApiController extends BaseController
                 );
             }
             $user->setReferred($referralUser);
+            $this->validateObject($user);
             $dm->flush();
 
             $launchUser = $this->get('app.user.launch');
             $url = $launchUser->getShortLink($user->getId());
 
             return new JsonResponse(['url' => $url]);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api referralAddAction.', ['exception' => $e]);
 
@@ -341,7 +367,7 @@ class ApiController extends BaseController
             if (!$this->validateFields($data, ['email'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
-            $email = strtolower($data['email']);
+            $email = strtolower($this->getDataString($data, 'email'));
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
@@ -390,6 +416,10 @@ class ApiController extends BaseController
             );
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Reset password email sent', 200);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api resetAction.', ['exception' => $e]);
 
@@ -409,10 +439,10 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing endpoint', 400);
             }
 
-            $endpoint = $data['endpoint'];
-            $platform = isset($data['platform']) ? $data['platform'] : null;
-            $version = isset($data['version']) ? $data['version'] : null;
-            $oldEndpoint = isset($data['old_endpoint']) ? $data['old_endpoint'] : null;
+            $endpoint = $this->getDataString($data, 'endpoint');
+            $platform = $this->getDataString($data, 'platform');
+            $version = $this->getDataString($data, 'version');
+            $oldEndpoint = $this->getDataString($data, 'old_endpoint');
             $this->snsSubscribe('all', $endpoint);
             $this->snsSubscribe('unregistered', $endpoint);
             if ($platform) {
@@ -434,6 +464,10 @@ class ApiController extends BaseController
             }
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Endpoint added', 200);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api snsAction.', ['exception' => $e]);
 
@@ -466,13 +500,17 @@ class ApiController extends BaseController
                 'latest_policy_terms',
                 [
                     'policy_key' => $this->getParameter('policy_key'),
-                    'maxPotValue' => $request->get('maxPotValue'),
+                    'maxPotValue' => $this->getRequestString($request, 'maxPotValue'),
                 ],
                 false
             );
             $policyTermsUrl = sprintf("%s%s", $this->getParameter('api_base_url'), $policyTermsRoute);
 
             return new JsonResponse($latestTerms->toApiArray($policyTermsUrl));
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api getLatestPolicyTerms.', ['exception' => $e]);
 
@@ -493,7 +531,7 @@ class ApiController extends BaseController
             }
 
             $identity = $this->get('app.user.cognitoidentity');
-            $user = $identity->loadUserByUserToken($data['token']);
+            $user = $identity->loadUserByUserToken($this->getDataString($data, 'token'));
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Invalid token', 403);
             }
@@ -529,6 +567,10 @@ class ApiController extends BaseController
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api tokenAction.', ['exception' => $e]);
 
@@ -550,14 +592,14 @@ class ApiController extends BaseController
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
-            $facebookId = isset($data['facebook_id']) ? $data['facebook_id'] : null;
-            $mobileNumber = isset($data['mobile_number']) ? $data['mobile_number'] : null;
-            $userExists = $repo->existsUser($data['email'], $facebookId, $mobileNumber);
+            $facebookId = $this->getDataString($data, 'facebook_id');
+            $mobileNumber = $this->getDataString($data, 'mobile_number');
+            $userExists = $repo->existsUser($this->getDataString($data, 'email'), $facebookId, $mobileNumber);
             if ($userExists) {
                 // Special case for prelaunch users - allow them to 'create' an account without
                 // being recreated in account in the db.  This is only allowed once per user
                 // and is only because the prelaunch app didn't do anything other than record email address
-                $user = $repo->findOneBy(['emailCanonical' => strtolower($data['email'])]);
+                $user = $repo->findOneBy(['emailCanonical' => strtolower($this->getDataString($data, 'email'))]);
                 if ($user && $user->isPreLaunch() && !$user->getLastLogin() && count($user->getPolicies()) == 0) {
                     $user->resetToken();
                     $user->setLastLogin(new \DateTime());
@@ -574,36 +616,30 @@ class ApiController extends BaseController
             }
 
             $user->setEnabled(true);
-            $user->setEmail($data['email']);
-            $user->setFirstName(isset($data['first_name']) ? ucfirst($data['first_name']) : null);
-            $user->setLastName(isset($data['last_name']) ? ucfirst($data['last_name']) : null);
-            $user->setFacebookId(isset($data['facebook_id']) ? $data['facebook_id'] : null);
-            $user->setFacebookAccessToken(
-                isset($data['facebook_access_token']) ? $data['facebook_access_token'] : null
-            );
-            $user->setSnsEndpoint(isset($data['sns_endpoint']) ? $data['sns_endpoint'] : null);
+            $user->setEmail($this->getDataString($data, 'email'));
+            $user->setFirstName(isset($data['first_name']) ? ucfirst($this->getDataString($data, 'first_name')) : null);
+            $user->setLastName(isset($data['last_name']) ? ucfirst($this->getDataString($data, 'last_name')) : null);
+            $user->setFacebookId($this->getDataString($data, 'facebook_id'));
+            $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
+            $user->setSnsEndpoint($this->getDataString($data, 'sns_endpoint'));
             $user->setMobileNumber($mobileNumber);
-            $user->setReferer(isset($data['referer']) ? $data['referer'] : null);
+            $user->setReferer($this->getDataString($data, 'referer'));
             $birthday = $this->validateBirthday($data);
             if ($birthday instanceof Response) {
                 return $birthday;
             }
             $user->setBirthday($birthday);
             $user->setIdentityLog($this->getIdentityLog($request));
-            if (isset($data['scode']) && strlen($data['scode']) > 0) {
+            if ($this->isDataStringPresent($data, 'scode')) {
                 $scodeRepo = $dm->getRepository(SCode::class);
-                $scode = $scodeRepo->findOneBy(['code' => $data['scode']]);
+                $scode = $scodeRepo->findOneBy(['code' => $this->getDataString($data, 'scode')]);
                 if (!$scode || !$scode->isActive()) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'SCode missing', 404);
                 }
                 $scode->addAcceptor($user);
             }
 
-            $validator = $this->get('validator');
-            $errors = $validator->validate($user);
-            if (count($errors) > 0) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, (string) $errors);
-            }
+            $this->validateObject($user);
 
             $launchUser = $this->get('app.user.launch');
             $addedUser = $launchUser->addUser($user);
@@ -626,6 +662,10 @@ class ApiController extends BaseController
             }
 
             return new JsonResponse($user->toApiArray($identityId, $token));
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api userAction.', ['exception' => $e]);
 
@@ -644,8 +684,8 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            $platform = $request->get('platform');
-            $version = $request->get('version');
+            $platform = $this->getRequestString($request, 'platform');
+            $version = $this->getRequestString($request, 'version');
             $redis = $this->get('snc_redis.default');
 
             if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
@@ -667,6 +707,10 @@ class ApiController extends BaseController
             }
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api versionAction.', ['exception' => $e]);
 

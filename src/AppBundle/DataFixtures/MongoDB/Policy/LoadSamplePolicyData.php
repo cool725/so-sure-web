@@ -95,7 +95,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user = new User();
         $user->setFirstName($this->faker->firstName);
         $user->setLastName($this->faker->lastName);
-        $user->setMobileNumber($this->faker->mobileNumber);
+        while ($mobile = $this->faker->mobileNumber) {
+            $user->setMobileNumber($mobile);
+            // faker can return 070 type numbers, which are disallowed
+            if (preg_match('/7[1-9]\d{8,8}$/', $mobile)) {
+                break;
+            }
+        }
 
         // Use the first/last name as the user portion of the email address so they vaugely match
         // Keep the random portion of the email domain though
@@ -111,9 +117,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setLine1($this->faker->streetAddress);
+        $address->setLine1(trim(preg_replace('/[\\n\\r]+/', ' ', $this->faker->streetAddress)));
         $address->setCity($this->faker->city);
-        $address->setPostcode($this->faker->address);
+        $address->setPostcode($this->faker->postcode);
 
         $user->setBillingAddress($address);
 

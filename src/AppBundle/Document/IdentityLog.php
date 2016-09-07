@@ -4,6 +4,8 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\EmbeddedDocument
@@ -12,18 +14,23 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class IdentityLog
 {
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="100")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $cognitoId;
 
     /**
+     * @Assert\Ip
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $ip;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="0", max="100")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

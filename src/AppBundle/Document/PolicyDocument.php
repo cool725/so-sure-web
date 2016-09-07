@@ -3,6 +3,8 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
@@ -17,7 +19,10 @@ class PolicyDocument
      */
     protected $id;
 
-    /** @MongoDB\Field(type="boolean") */
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
     protected $latest;
 
     /** @MongoDB\Field(type="string") */

@@ -7,6 +7,8 @@ use Doctrine\ODM\MongoDB\PersistentCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\File\S3File;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
@@ -81,18 +83,24 @@ abstract class Policy
     protected $user;
 
     /**
+     * @Assert\Choice({"pending", "active", "cancelled", "expired", "unpaid"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $status;
 
     /**
+     * @Assert\Choice({
+     *  "unpaid", "actual-fraud", "suspected-fraud", "user-requested",
+     *  "cooloff", "badrisk", "dispossession", "wreckage"
+     * })
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $cancelledReason;
 
     /**
+     * @Assert\Regex(pattern="/^[a-zA-Z]+\/\d{4,4}\/\d{5,20}$/")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
@@ -100,6 +108,8 @@ abstract class Policy
     protected $policyNumber;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -141,54 +151,64 @@ abstract class Policy
     protected $claims = array();
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $created;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $start;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $end;
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
     protected $staticEnd;
 
     /**
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */
     protected $potValue;
 
     /**
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */
     protected $historicalMaxPotValue;
 
     /**
+     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */
     protected $promoPotValue;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="5", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $promoCode;
 
     /**
+     * @Assert\Range(min=0,max=12)
      * @MongoDB\Field(type="integer")
      * @Gedmo\Versioned
      */
@@ -218,6 +238,7 @@ abstract class Policy
     protected $salvaPolicyResults = array();
 
     /**
+     * @Assert\DateTime()
      * @MongoDB\Date()
      */
     protected $lastEmailed;
