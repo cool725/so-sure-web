@@ -48,7 +48,7 @@ class SalvaPhonePolicyTest extends WebTestCase
 
     public function testGetSalvaVersion()
     {
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setStart(new \DateTime('2016-01-01'));
         $this->assertNull($policy->getSalvaVersion(new \DateTime('2016-01-01')));
         
@@ -60,7 +60,7 @@ class SalvaPhonePolicyTest extends WebTestCase
 
     public function testIncrementSalvaPolicyNumber()
     {
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setStart(new \DateTime('2016-01-01'));
         $this->assertEquals(0, count($policy->getSalvaPolicyNumbers()));
         
@@ -73,7 +73,7 @@ class SalvaPhonePolicyTest extends WebTestCase
 
     public function testSalvaTerminationDate()
     {
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setStart(new \DateTime('2016-01-01'));
         $this->assertNull($policy->getSalvaTerminationDate());
 
@@ -84,7 +84,7 @@ class SalvaPhonePolicyTest extends WebTestCase
 
     public function testGetSalvaStartDate()
     {
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setStart(new \DateTime('2016-01-01'));
         $this->assertEquals(new \DateTime('2016-01-01'), $policy->getSalvaStartDate());
 

@@ -1619,7 +1619,7 @@ class PhonePolicyTest extends WebTestCase
             Salva::MONTHLY_TOTAL_COMMISSION,
             12
         );
-        $monthlyPolicy->cancel(SalvaSalvaPhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
+        $monthlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
         $this->assertEquals(0, $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10')));
 
         $yearlyPolicy = $this->createPolicyForCancellation(
@@ -1627,7 +1627,7 @@ class PhonePolicyTest extends WebTestCase
             Salva::YEARLY_TOTAL_COMMISSION,
             1
         );
-        $yearlyPolicy->cancel(PhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
+        $yearlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
         $this->assertEquals(0, $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10')));
         /* Waiting on agreemnt with salva
         $this->assertEquals(
