@@ -106,20 +106,16 @@ class SalvaExportService
     {
         if ($policy) {
             if (!$policy->getPremiumInstallmentCount()) {
+                //\Doctrine\Common\Util\Debug::dump($policy);
                 throw new \Exception('Invalid policy payment');
             }
+            $startDate = $policy->getSalvaStartDate($version);
             if ($version) {
                 $payments = $policy->getPaymentsForSalvaVersions()[$version];
 
                 $status = SalvaPhonePolicy::STATUS_CANCELLED;
-                $totalPremium = $policy->getTotalPremiumPrice($payments);
                 $premiumPaid = $policy->getPremiumPaid($payments);
-                $totalIpt = $policy->getTotalIpt($payments);
-                $totalBroker = $policy->getTotalBrokerFee($payments);
                 $brokerPaid = $policy->getTotalCommissionPaid($payments);
-                $connections = 0;
-                $potValue = 0;
-                $promoPotValue = 0;
                 $terminationDate = $policy->getSalvaTerminationDate($version) ?
                     $policy->getSalvaTerminationDate($version) :
                     null;
@@ -127,67 +123,61 @@ class SalvaExportService
                 $allPayments = $policy->getPaymentsForSalvaVersions(false);
 
                 $status = $policy->getStatus();
-                $totalPremium = $policy->getRemainingTotalPremiumPrice($allPayments);
                 $premiumPaid = $policy->getRemainingPremiumPaid($allPayments);
-                $totalIpt = $policy->getRemainingTotalIpt($allPayments);
-                $totalBroker = $policy->getRemainingTotalBrokerFee($allPayments);
                 $brokerPaid = $policy->getRemainingTotalCommissionPaid($allPayments);
-                $connections = count($policy->getConnections());
-                $potValue = $policy->getPotValue();
-                $promoPotValue = $policy->getPromoPotValue();
                 $terminationDate = $policy->getStatus() == SalvaPhonePolicy::STATUS_CANCELLED ?
                     $policy->getEnd():
                     null;
             }
 
             $data = [
-                $policy->getSalvaPolicyNumber($version),
+                $policy->getSalvaPolicyNumber($version), // 0
                 $status,
                 $this->adjustDate($policy->getSalvaStartDate($version)),
                 $this->adjustDate($policy->getStaticEnd()),
                 $terminationDate ? $this->adjustDate($terminationDate) : '',
-                $policy->getUser()->getId(),
+                $policy->getUser()->getId(), // 5
                 $policy->getUser()->getFirstName(),
                 $policy->getUser()->getLastName(),
                 $policy->getPhone()->getMake(),
                 $policy->getPhone()->getModel(),
-                $policy->getPhone()->getMemory(),
+                $policy->getPhone()->getMemory(), // 10
                 $policy->getImei(),
                 $policy->getPhone()->getInitialPrice(),
                 $policy->getPremiumInstallmentCount(),
                 $policy->getPremiumInstallmentPrice(),
-                $totalPremium,
+                $policy->getTotalPremiumPrice($version), // 15
                 $premiumPaid,
-                $totalIpt,
-                $totalBroker,
+                $policy->getTotalIpt($version),
+                $policy->getTotalBrokerFee($version),
                 $brokerPaid,
-                $connections,
-                $potValue,
-                $promoPotValue
+                $policy->getSalvaConnections($version), // 20
+                $policy->getSalvaPotValue($version),
+                $policy->getSalvaPromoPotValue($version)
             ];
         } else {
             $data = [
-                'PolicyNumber',
+                'PolicyNumber', // 0
                 'Status',
                 'InceptionDate',
                 'EndDate',
                 'TerminationDate',
-                'CustomerId',
+                'CustomerId', // 5
                 'FirstName',
                 'LastName',
                 'Make',
                 'Model',
-                'Memory',
+                'Memory', // 10
                 'Imei',
                 'EstimatedPhonePrice',
                 'NumberInstallments',
                 'InstallmentAmount',
-                'TotalPremium',
+                'TotalPremium', // 15
                 'PaidPremium',
                 'TotalIpt',
                 'TotalBrokerFee',
                 'PaidBrokerFee',
-                'NumberConnections',
+                'NumberConnections', // 20
                 'PotValue',
                 'MarkertingPotValue',
             ];
@@ -212,18 +202,18 @@ class SalvaExportService
         $paidPremium = 0;
         $paidBrokerFee = 0;
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
-        $lines[] = sprintf("%s\n", $this->formatLine($this->transformPolicy(null)));
+        $lines[] = sprintf("%s", $this->formatLine($this->transformPolicy(null)));
         foreach ($repo->getAllPoliciesForExport($date, $this->environment) as $policy) {
             foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
                 $data = $this->transformPolicy($policy, $version);
                 $paidPremium += $data[16];
                 $paidBrokerFee += $data[19];
-                $lines[] =  sprintf("%s\n", $this->formatLine($data));
+                $lines[] =  sprintf("%s", $this->formatLine($data));
             }
             $data = $this->transformPolicy($policy);
             $paidPremium += $data[16];
             $paidBrokerFee += $data[19];
-            $lines[] =  sprintf("%s\n", $this->formatLine($data));
+            $lines[] =  sprintf("%s", $this->formatLine($data));
         }
 
         if ($s3) {
@@ -233,7 +223,7 @@ class SalvaExportService
                 $date->format('m'),
                 $date->format('U')
             );
-            $key = $this->uploadS3($lines, $filename, 'policies', $date->format('Y'));
+            $key = $this->uploadS3(implode("\n", $lines), $filename, 'policies', $date->format('Y'));
 
             $file = new SalvaPolicyFile();
             $file->setBucket(self::S3_BUCKET);
@@ -259,7 +249,7 @@ class SalvaExportService
         $total = 0;
         $numPayments = 0;
         $repo = $this->dm->getRepository(JudoPayment::class);
-        $lines[] = sprintf("%s\n", $this->formatLine($this->transformPayment(null)));
+        $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null)));
         foreach ($repo->getAllPaymentsForExport($date) as $payment) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
@@ -268,7 +258,7 @@ class SalvaExportService
             $data = $this->transformPayment($payment);
             $total += $data[2];
             $numPayments++;
-            $lines[] = sprintf("%s\n", $this->formatLine($data));
+            $lines[] = sprintf("%s", $this->formatLine($data));
         }
 
         if ($s3) {
@@ -278,7 +268,7 @@ class SalvaExportService
                 $date->format('m'),
                 $date->format('U')
             );
-            $key = $this->uploadS3($lines, $filename, 'payments', $date->format('Y'));
+            $key = $this->uploadS3(implode("\n", $lines), $filename, 'payments', $date->format('Y'));
 
             $file = new SalvaPaymentFile();
             $file->setBucket(self::S3_BUCKET);
@@ -302,14 +292,14 @@ class SalvaExportService
 
         $lines = [];
         $repo = $this->dm->getRepository(Claim::class);
-        $lines[] =  sprintf("%s\n", $this->formatLine($this->transformClaim(null)));
+        $lines[] =  sprintf("%s", $this->formatLine($this->transformClaim(null)));
         foreach ($repo->getAllClaimsForExport($date, $days) as $claim) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$claim->getPolicy()->isValidPolicy()) {
                 continue;
             }
             $data = $this->transformClaim($claim);
-            $lines[] = sprintf("%s\n", $this->formatLine($data));
+            $lines[] = sprintf("%s", $this->formatLine($data));
         }
 
         if ($s3) {
@@ -320,7 +310,7 @@ class SalvaExportService
                 $date->format('d'),
                 $date->format('U')
             );
-            $this->uploadS3($lines, $filename, 'claims', $date->format('Y'));
+            $this->uploadS3(implode("\n", $lines), $filename, 'claims', $date->format('Y'));
         }
 
         return $lines;
@@ -431,6 +421,8 @@ class SalvaExportService
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
         $phonePolicy->addSalvaPolicyResults($responseId, false);
+        $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_ACTIVE);
+        $this->dm->flush();
 
         return $responseId;
     }
@@ -476,8 +468,44 @@ class SalvaExportService
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
         $phonePolicy->addSalvaPolicyResults($responseId, true);
+        if ($phonePolicy->getSalvaStatus() == SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED) {
+            $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_CANCELLED);
+            $this->dm->flush();
+        } elseif ($phonePolicy->getSalvaStatus() == SalvaPhonePolicy::SALVA_STATUS_PENDING_REPLACEMENT_CANCEL) {
+            $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_PENDING_REPLACEMENT_CREATE);
+            $this->dm->flush();
+        } else {
+            $this->logger->warning(sprintf(
+                'Unknown salva status %s for policy %s',
+                $phonePolicy->getSalvaStatus(),
+                $phonePolicy->getId()
+            ));
+        }
 
         return $responseId;
+    }
+
+    public function processPolicy(SalvaPhonePolicy $policy, $action, $cancelReason = null)
+    {
+        if ($policy->getSalvaStatus() == SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED) {
+            throw new \UnexpectedValueException(sprintf(
+                'Unable to process policy %s (wait status prior to cancellation?). Requeuing',
+                $policy->getId()
+            ));
+        }
+
+        if ($action == self::QUEUE_CREATED) {
+            $this->sendPolicy($policy);
+        } elseif ($action == self::QUEUE_CANCELLED) {
+            $this->cancelPolicy($policy, $cancelReason);
+        } else {
+            throw new \Exception(sprintf(
+                'Unknown action %s for policyId: %s',
+                $data['action'],
+                $data['policyId']
+            ));
+        }
+        $this->dm->flush();
     }
 
     public function process($max)
@@ -507,18 +535,7 @@ class SalvaExportService
                     throw new \Exception(sprintf('Unable to find policyId: %s', $data['policyId']));
                 }
 
-                if ($action == self::QUEUE_CREATED) {
-                    $this->sendPolicy($policy);
-                } elseif ($action == self::QUEUE_CANCELLED) {
-                    $this->cancelPolicy($policy, $cancelReason);
-                } else {
-                    throw new \Exception(sprintf(
-                        'Unknown action %s for policyId: %s',
-                        $data['action'],
-                        $data['policyId']
-                    ));
-                }
-                $this->dm->flush();
+                $this->processPolicy($policy, $action, $cancelReason);
 
                 $count = $count + 1;
             } catch (\Exception $e) {
@@ -584,11 +601,14 @@ class SalvaExportService
         return true;
     }
 
-    private function incrementPolicyNumber(SalvaPhonePolicy $policy)
+    public function incrementPolicyNumber(SalvaPhonePolicy $policy, \DateTime $date = null)
     {
-        $date = new \DateTime();
+        if (!$date) {
+            $date = new \DateTime();
+        }
         $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         $policy->incrementSalvaPolicyNumber($date);
+        $policy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_PENDING_REPLACEMENT_CANCEL);
         $this->dm->flush();
     }
 
@@ -700,7 +720,7 @@ class SalvaExportService
             $this->adjustDate($date)
         ));
 
-        $usedPremium = $phonePolicy->getTotalGwp($payments);
+        $usedPremium = $phonePolicy->getUsedGwp($version, $reason == self::CANCELLED_REPLACE);
 
         $usedFinalPremium = $dom->createElement('n1:usedFinalPremium', $usedPremium);
         $usedFinalPremium->setAttribute('n2:currency', 'GBP');
@@ -777,8 +797,7 @@ class SalvaExportService
         $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_imei', $phonePolicy->getImei()));
         $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_value', $phone->getInitialPrice()));
 
-        $allPayments = $phonePolicy->getPaymentsForSalvaVersions(false);
-        $tariff = $phonePolicy->getRemainingTotalGwp($allPayments);
+        $tariff = $phonePolicy->getTotalGwp();
         $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_base_tariff', $tariff));
 
         return $dom->saveXML();

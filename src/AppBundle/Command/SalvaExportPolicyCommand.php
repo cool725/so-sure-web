@@ -37,6 +37,7 @@ class SalvaExportPolicyCommand extends ContainerAwareCommand
         $s3 = true === $input->getOption('s3');
         $date = new \DateTime($input->getOption('date'));
         $salva = $this->getContainer()->get('app.salva');
-        $output->write($salva->exportPolicies($s3, $date));
+        $data = $salva->exportPolicies($s3, $date);
+        $output->write(implode(PHP_EOL, $data));
     }
 }

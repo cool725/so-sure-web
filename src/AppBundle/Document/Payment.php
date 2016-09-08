@@ -188,6 +188,12 @@ abstract class Payment
         } elseif ($this->areEqualToFourDp($totalCommission, Salva::FINAL_MONTHLY_TOTAL_COMMISSION)) {
             $this->coverholderCommission = Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION;
             $this->brokerCommission = Salva::FINAL_MONTHLY_BROKER_COMMISSION;
+        } else {
+            // Partial refund
+            $salva = new Salva();
+            $split = $salva->getProrataSplit($totalCommission);
+            $this->coverholderCommission = $split['coverholder'];
+            $this->brokerCommission = $split['broker'];
         }
     }
 

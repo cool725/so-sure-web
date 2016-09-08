@@ -10,6 +10,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Phone;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
@@ -34,6 +35,7 @@ class PolicyServiceTest extends WebTestCase
     protected static $policyRepo;
     protected static $userManager;
     protected static $judopay;
+    protected static $phone;
 
     public static function setUpBeforeClass()
     {
@@ -51,6 +53,9 @@ class PolicyServiceTest extends WebTestCase
          self::$userManager = self::$container->get('fos_user.user_manager');
          self::$policyService = self::$container->get('app.policy');
          self::$judopay = self::$container->get('app.judopay');
+
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
     }
 
     public function tearDown()
@@ -67,6 +72,7 @@ class PolicyServiceTest extends WebTestCase
             static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false, true);
+        static::$policyService->create($policy);
         static::$policyService->cancel($policy, Policy::CANCELLED_USER_REQUESTED);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
@@ -316,20 +322,25 @@ class PolicyServiceTest extends WebTestCase
             'bar',
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         static::$policyService->setEnvironment('test');
 
-        $policy->addPayment(new JudoPayment());
+        static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice(), Salva::MONTHLY_TOTAL_COMMISSION);
 
-        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-02-10'));
-        $this->assertEquals(2, $policy->getPolicyLength());
-        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2, $policy->getTotalPremiumPrice());
-        $this->assertEquals($policy->getPremium()->getGwp() * 2, $policy->getTotalGwp());
-        $this->assertEquals($policy->getPremium()->getIpt() * 2, $policy->getTotalIpt());
-        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION * 2, $policy->getTotalBrokerFee());
+        // 61 days (366/12 * 2)
+        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-02-02'));
+        // 6.99 / month
+        $this->assertEquals(13.75, $policy->getTotalPremiumPrice());
+        // 6.38 / month rough - (6.99 * 12 / (1.095)) * 61 / 366  = 12.77
+        $this->assertEquals(12.56, $policy->getUsedGwp());
+        $this->assertEquals(12.56, $policy->getTotalGwp());
+        // 0.61 / month rough - 6.38 * 12 * 0.095 * 61/366 = 1.21
+        $this->assertEquals(1.19, $policy->getTotalIpt());
+        // 0.89 / month
+        $this->assertEquals(1.76, $policy->getTotalBrokerFee());
     }
 
     public function testSalvaCooloff()
@@ -365,6 +376,7 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->cancel($policy, PhonePolicy::CANCELLED_COOLOFF, new \DateTime('2016-01-10'));
         $this->assertEquals(0, $policy->getTotalPremiumPrice());
         $this->assertEquals(0, $policy->getTotalGwp());
+        $this->assertEquals(0, $policy->getUsedGwp());
         $this->assertEquals(0, $policy->getTotalIpt());
         $this->assertEquals(0, $policy->getTotalBrokerFee());
     }
@@ -383,12 +395,22 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         static::$policyService->setEnvironment('test');
 
-        for ($i = 1; $i <= 11; $i++) {
-            $policy->addPayment(new JudoPayment());
+        for ($i = 1; $i <= 10; $i++) {
+            static::addPayment(
+                $policy,
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION
+            );
         }
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::FINAL_MONTHLY_TOTAL_COMMISSION
+        );
 
         $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getTotalPremiumPrice());
         $this->assertEquals($policy->getPremium()->getYearlyGwp(), $policy->getTotalGwp());
+        $this->assertEquals($policy->getPremium()->getYearlyGwp(), $policy->getUsedGwp());
         $this->assertEquals($policy->getPremium()->getYearlyIpt(), $policy->getTotalIpt());
         $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee());
     }
@@ -412,10 +434,10 @@ class PolicyServiceTest extends WebTestCase
         $payment = new JudoPayment();
         $payment->setAmount('1');
 
-        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getTotalPremiumPrice([$payment]));
-        $this->assertEquals($policy->getPremium()->getGwp(), $policy->getTotalGwp([$payment]));
-        $this->assertEquals($policy->getPremium()->getIpt(), $policy->getTotalIpt([$payment]));
-        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee([$payment]));
+        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getTotalPremiumPrice());
+        $this->assertEquals($policy->getPremium()->getYearlyGwp(), $policy->getTotalGwp());
+        $this->assertEquals($policy->getPremium()->getYearlyIpt(), $policy->getTotalIpt());
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee());
     }
 
     public function testScodeUnique()

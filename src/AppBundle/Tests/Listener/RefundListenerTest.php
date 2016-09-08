@@ -70,7 +70,7 @@ class RefundListenerTest extends WebTestCase
 
         $this->assertTrue($policy->isValidPolicy());
         
-        $listener = new RefundListener(static::$judopayService, static::$logger);
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger);
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
     }
 }
