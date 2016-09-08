@@ -435,7 +435,7 @@ class AdminController extends BaseController
 
         $dm = $this->getManager();
         $paymentRepo = $dm->getRepository(JudoPayment::class);
-        $phonePolicyRepo = $dm->getRepository(Policy::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
         $s3FileRepo = $dm->getRepository(S3File::class);
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
