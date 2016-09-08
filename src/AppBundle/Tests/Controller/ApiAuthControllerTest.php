@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\SCode;
@@ -1150,7 +1150,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => $receiptId,
         ]]);
         $policyData = $this->verifyResponse(200);
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
         $this->assertEquals('launch', $policyData['promo_code']);
         $this->assertEquals(6, $policyData['pot']['max_connections']);
@@ -1257,7 +1257,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => $receiptId,
         ]]);
         $policyData = $this->verifyResponse(200);
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
@@ -1267,12 +1267,12 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => $receiptId,
         ]]);
         $policyData = $this->verifyResponse(200);
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
 
         // Ensure that policy creation didn't run twice
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $repo->find($policyData['id']);
         $this->assertEquals(11, count($policy->getScheduledPayments()));
     }
@@ -1305,15 +1305,15 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => $receiptId,
         ]]);
         $policyData = $this->verifyResponse(200);
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
 
         // Ensure that policy creation didn't run twice
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $repo->find($policyData['id']);
         $this->assertEquals(11, count($policy->getScheduledPayments()));
-        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
         $dm->flush();
 
         $receiptId = $judopay->testPay(
@@ -1331,14 +1331,14 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => $receiptId,
         ]]);
         $policyData = $this->verifyResponse(200);
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $repo->find($policyData['id']);
         $this->assertEquals(11, count($policy->getScheduledPayments()));
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policy->getStatus());
 
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
         $this->assertEquals('monthly', $policyData['premium_plan']);
@@ -1463,7 +1463,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->payPolicy($inviter, $policyData['id']);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $policyRepo->find($policyData['id']);
         $scode = $policy->getStandardSCode()->getCode();
 
@@ -1656,7 +1656,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->payPolicy($user, $policyId);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $policyRepo->find($policyId);
         $oldCode = $policy->getStandardSCode()->getCode();
         $policy->getStandardSCode()->setActive(false);
@@ -1742,7 +1742,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->payPolicy($user, $policyId);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $policyRepo->find($policyId);
         $sCode = $policy->getStandardSCode();
 
@@ -1781,7 +1781,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->payPolicy($user, $policyId);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $policyRepo->find($policyId);
         $sCode = $policy->getStandardSCode();
 
@@ -1813,7 +1813,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->payPolicy($user, $policyId);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $policyRepo->find($policyId);
         $sCode = $policy->getStandardSCode()->getCode();
 
@@ -1822,7 +1822,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $getData = $this->verifyResponse(200);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $policyRepo->find($policyId);
         $this->assertNull($policy->getStandardSCode());
     }
@@ -1842,7 +1842,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->payPolicy($user, $policyId);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $policyRepo->find($policyId);
         $sCode = $policy->getStandardSCode();
 
@@ -2361,7 +2361,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $userRepo = $dm->getRepository(User::class);
         $user = $userRepo->find($user->getId());
 
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $policyRepo->find($policyId);
 
         $payment = new JudoPayment();
@@ -2372,7 +2372,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $user->addPolicy($policy);
 
         static::$policyService->create($policy);
-        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         $dm->flush();
         $this->assertNotNull($payment->getId());
         $this->assertNotNull($policy->getUser());
@@ -2388,7 +2388,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'last_name' => 'bar',
         ]]);
         $policyData = $this->verifyResponse(200);
-        $this->assertEquals(PhonePolicy::STATUS_PENDING, $policyData['status']);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_PENDING, $policyData['status']);
         $this->assertEquals($policyId, $policyData['id']);
         */
     }

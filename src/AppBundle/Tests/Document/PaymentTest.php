@@ -3,7 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\PhonePrice;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 
@@ -29,7 +29,7 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
         $date = new \DateTime('2016-05-01');
         $premium = $phonePrice->createPremium($date);
 
-        $phonePolicy = new PhonePolicy();
+        $phonePolicy = new SalvaPhonePolicy();
         $phonePolicy->setPremium($premium);
 
         $payment = new JudoPayment();

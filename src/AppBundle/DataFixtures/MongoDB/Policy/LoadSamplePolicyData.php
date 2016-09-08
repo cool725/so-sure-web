@@ -4,7 +4,7 @@ namespace AppBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
@@ -150,7 +150,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $startDate = new \DateTime();
         $startDate->sub(new \DateInterval(sprintf("P%dD", rand(0, 120))));
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setPhone($phone);
         $policy->setImei($this->generateRandomImei());
         $policy->init($user, $latestTerms);
@@ -191,7 +191,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $manager->persist($policy);
         $policy->create(-5000 + $count, null, $startDate);
-        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
 
         $policyService = $this->container->get('app.policy');
         $policyService->generateScheduledPayments($policy, $startDate);
@@ -220,7 +220,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $connectionA->setLinkedUser($userA);
             $connectionA->setLinkedPolicy($policyA);
             $connectionA->setValue($policyB->getAllowedConnectionValue());
-            if ($policyB->getPromoCode() == PhonePolicy::PROMO_LAUNCH) {
+            if ($policyB->getPromoCode() == SalvaPhonePolicy::PROMO_LAUNCH) {
                 $connectionA->setPromoValue($policyB->getAllowedPromoConnectionValue());
             }
 
@@ -228,7 +228,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $connectionB->setLinkedUser($userB);
             $connectionB->setLinkedPolicy($policyB);
             $connectionB->setValue($policyA->getAllowedConnectionValue());
-            if ($policyA->getPromoCode() == PhonePolicy::PROMO_LAUNCH) {
+            if ($policyA->getPromoCode() == SalvaPhonePolicy::PROMO_LAUNCH) {
                 $connectionB->setPromoValue($policyA->getAllowedPromoConnectionValue());
             }
     

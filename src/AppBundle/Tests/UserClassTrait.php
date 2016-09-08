@@ -4,7 +4,7 @@ namespace AppBundle\Tests;
 
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Address;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
@@ -23,7 +23,7 @@ trait UserClassTrait
         $user = new User();
         self::addAddress($user);
 
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setUser($user);
 
         if ($init) {
@@ -107,7 +107,7 @@ trait UserClassTrait
     ) {
         self::addAddress($user);
 
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setImei(self::generateRandomImei());
         $policy->init($user, self::getLatestPolicyTerms($dm));
 

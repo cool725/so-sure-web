@@ -14,6 +14,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Sns;
@@ -344,7 +345,7 @@ class ApiAuthController extends BaseController
             }
 
             $dm = $this->getManager();
-            $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+            $phonePolicyRepo = $dm->getRepository(SalvaPhonePolicy::class);
 
             // TODO: Once a lost/stolen imei store is setup, will want to check there as well.
             if (!$phonePolicyRepo->isMissingOrExpiredOnlyPolicy($imei)) {
@@ -379,7 +380,7 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $policy = new PhonePolicy();
+            $policy = new SalvaPhonePolicy();
             $policy->setImei($imei);
             $policy->setSerialNumber($serialNumber);
             $policy->setPhone($phone);

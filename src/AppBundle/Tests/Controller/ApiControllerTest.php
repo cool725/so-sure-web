@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Sns;
-use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 

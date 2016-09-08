@@ -317,11 +317,11 @@ abstract class BaseController extends Controller
         return $userHistory;
     }
 
-    protected function getPhonePolicyHistory($policyId)
+    protected function getSalvaPhonePolicyHistory($policyId)
     {
         $dm = $this->getManager();
         $logRepo = $dm->getRepository(LogEntry::class);
-        $policyHistory = $logRepo->findBy(['objectClass' => PhonePolicy::class, 'objectId' => $policyId]);
+        $policyHistory = $logRepo->findBy(['objectClass' => SalvaPhonePolicy::class, 'objectId' => $policyId]);
 
         return $policyHistory;
     }

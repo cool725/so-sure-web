@@ -12,6 +12,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\CurrencyTrait;
@@ -547,7 +548,7 @@ class JudopayService
         $webpaymentDetails = $webPayment->create();
         $payment->setReference($webpaymentDetails["reference"]);
 
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setUser($user);
         $policy->setPhone($phone);
         $policy->addPayment($payment);

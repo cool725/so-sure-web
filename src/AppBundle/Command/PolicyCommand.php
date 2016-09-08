@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\User;
 
@@ -18,7 +18,7 @@ class PolicyCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('sosure:policy')
+            ->setName('sosure:salva-phone-policy')
             ->setDescription('Manually create a policy')
             ->addArgument(
                 'email',
@@ -45,7 +45,7 @@ class PolicyCommand extends ContainerAwareCommand
         $device = $input->getArgument('device');
         $phone = $this->getPhone($device);
         $policyService = $this->getContainer()->get('app.policy');
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setUser($this->getUser($email));
         $policy->setPhone($this->getPhone($device));
         $policy->setImei($imei);

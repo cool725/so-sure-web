@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 
 class SalvaQueuePolicyCommand extends ContainerAwareCommand
 {
@@ -69,7 +69,7 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
 
         if ($policyNumber) {
             $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-            $repo = $dm->getRepository(PhonePolicy::class);
+            $repo = $dm->getRepository(SalvaPhonePolicy::class);
             $phonePolicy = $repo->findOneBy(['policyNumber' => $policyNumber]);
 
             if ($cancel) {

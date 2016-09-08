@@ -5,7 +5,7 @@ namespace AppBundle\Listener;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Event\PolicyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -26,7 +26,7 @@ class DoctrineSalvaListener
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
         $document = $eventArgs->getDocument();
-        if ($document instanceof PhonePolicy) {
+        if ($document instanceof SalvaPhonePolicy) {
             if (!$document->isValidPolicy()) {
                 return;
             }
@@ -57,7 +57,7 @@ class DoctrineSalvaListener
             foreach ($fields as $field) {
                 if ($eventArgs->hasChangedField($field)) {
                     foreach ($document->getPolicies() as $policy) {
-                        if ($policy instanceof PhonePolicy && $policy->isValidPolicy()) {
+                        if ($policy instanceof SalvaPhonePolicy && $policy->isValidPolicy()) {
                             return $this->triggerEvent($policy, PolicyEvent::EVENT_UPDATED);
                         }
                     }
@@ -66,7 +66,7 @@ class DoctrineSalvaListener
         }
     }
 
-    private function triggerEvent(PhonePolicy $phonePolicy, $eventType)
+    private function triggerEvent(SalvaPhonePolicy $phonePolicy, $eventType)
     {
         $event = new PolicyEvent($phonePolicy);
         $this->dispatcher->dispatch($eventType, $event);

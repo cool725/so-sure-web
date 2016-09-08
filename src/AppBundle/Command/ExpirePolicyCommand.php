@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\User;
 
@@ -27,9 +27,9 @@ class ExpirePolicyCommand extends ContainerAwareCommand
     {
         $policyService = $this->getContainer()->get('app.policy');
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $dm->getRepository(Policy::class);
 
-        $policies = $policyRepo->findBy(['status' => PhonePolicy::STATUS_UNPAID]);
+        $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
         $count = 0;
         foreach ($policies as $policy) {
             if ($policy->shouldExpirePolicy()) {

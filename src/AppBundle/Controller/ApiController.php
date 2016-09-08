@@ -17,6 +17,7 @@ use AppBundle\Document\Sns;
 use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Classes\ApiErrorCode;
@@ -209,9 +210,9 @@ class ApiController extends BaseController
                 // but might want to have a promo in the quote in the future, so leaving code commented out
                 /*
                 $dm = $this->getManager();
-                $repo = $dm->getRepository(PhonePolicy::class);
+                $repo = $dm->getRepository(SalvaPhonePolicy::class);
                 if ($repo->isPromoLaunch() && !$this->getRequestBool($request, 'debug')) {
-                    $promoAddition = PhonePolicy::PROMO_LAUNCH_VALUE;
+                    $promoAddition = SalvaPhonePolicy::PROMO_LAUNCH_VALUE;
                     $isPromoLaunch = true;
                 }
                 */

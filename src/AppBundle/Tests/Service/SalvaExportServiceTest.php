@@ -4,7 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
-use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Classes\Salva;
@@ -64,7 +64,7 @@ class SalvaExportServiceTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy);
 
         $xml = static::$salva->createXml($policy);
@@ -73,13 +73,13 @@ class SalvaExportServiceTest extends WebTestCase
 
     public function testNonProdInvalidPolicyQueue()
     {
-        $this->assertTrue(static::$salva->queue(new PhonePolicy(), SalvaExportService::QUEUE_CREATED));
+        $this->assertTrue(static::$salva->queue(new SalvaPhonePolicy(), SalvaExportService::QUEUE_CREATED));
     }
 
     public function testProdInvalidPolicyQueue()
     {
         static::$salva->setEnvironment('prod');
-        $this->assertFalse(static::$salva->queue(new PhonePolicy(), SalvaExportService::QUEUE_CREATED));
+        $this->assertFalse(static::$salva->queue(new SalvaPhonePolicy(), SalvaExportService::QUEUE_CREATED));
         static::$salva->setEnvironment('test');
     }
 
