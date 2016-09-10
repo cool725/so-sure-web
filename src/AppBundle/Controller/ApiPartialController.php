@@ -91,4 +91,13 @@ class ApiPartialController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
+
+    /**
+     * @Route("/ping", name="api_partial_ping")
+     * @Method({"GET"})
+     */
+    public function pingAuthAction()
+    {
+        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+    }
 }

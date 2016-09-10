@@ -56,6 +56,14 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
         $this->assertEquals(CognitoIdentityAuthenticator::ANON_USER_AUTH_PATH, $token->getUser());
     }
 
+    public function testPartialPathToken()
+    {
+        $cognitoIdentityId = self::$cognito->getId();
+        $request = $this->getPartialRequest($cognitoIdentityId);
+        $token = self::$auth->createToken($request, 'login.so-sure.com');
+        $this->assertEquals(CognitoIdentityAuthenticator::ANON_USER_PARTIAL_AUTH_PATH, $token->getUser());
+    }
+
     /**
      * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
@@ -74,6 +82,25 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
         $token = self::$auth->createToken($request, 'login.so-sure.com');
         $authToken = self::$auth->authenticateToken($token, self::$userProvider, 'login.so-sure.com');
         $this->assertEquals('auth@security.so-sure.com', $authToken->getUser()->getEmail());
+    }
+
+    public function testPartialAuthenticate()
+    {
+        $user = static::createUser(self::$userManager, 'partial@security.so-sure.com', 'foo');
+        $cognitoIdentityId = static::authUser(self::$cognito, $user);
+        $request = $this->getPartialRequest($cognitoIdentityId);
+        $token = self::$auth->createToken($request, 'login.so-sure.com');
+        $authToken = self::$auth->authenticateToken($token, self::$userProvider, 'login.so-sure.com');
+        $this->assertEquals('partial@security.so-sure.com', $authToken->getUser()->getEmail());
+    }
+
+    public function testPartialUnAuth()
+    {
+        $cognitoIdentityId = self::$cognito->getId();
+        $request = $this->getPartialRequest($cognitoIdentityId);
+        $token = self::$auth->createToken($request, 'login.so-sure.com');
+        $authToken = self::$auth->authenticateToken($token, self::$userProvider, 'login.so-sure.com');
+        $this->assertEquals(CognitoIdentityAuthenticator::ANON_USER_PARTIAL_AUTH_PATH, $authToken->getUser());
     }
 
     /**
@@ -151,7 +178,12 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
     {
         return $this->getRequest($cognitoIdentityId, '/api/v1/auth/ping?_method=GET', 'POST');
     }
-    
+
+    private function getPartialRequest($cognitoIdentityId)
+    {
+        return $this->getRequest($cognitoIdentityId, '/api/v1/partial/ping?_method=GET', 'POST');
+    }
+
     private function getRequest($cognitoIdentityId, $path = "/", $method = "GET")
     {
         $request = new Request();
