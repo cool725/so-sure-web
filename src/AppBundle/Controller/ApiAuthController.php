@@ -717,38 +717,6 @@ class ApiAuthController extends BaseController
     }
 
     /**
-     * @Route("/scode/{code}", name="api_auth_get_scode")
-     * @Method({"GET"})
-     */
-    public function getSCodeAction($code)
-    {
-        try {
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(Policy::class);
-
-            $scodeRepo = $dm->getRepository(SCode::class);
-            $scode = $scodeRepo->findOneBy(['code' => $code]);
-            if (!$scode || !$scode->isActive()) {
-                throw new NotFoundHttpException();
-            }
-
-            return new JsonResponse($scode->toApiArray());
-        } catch (AccessDeniedException $ade) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (NotFoundHttpException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_NOT_FOUND,
-                'Unable to find policy/code',
-                404
-            );
-        } catch (\Exception $e) {
-            $this->get('logger')->error('Error in api getPolicySCodeAction.', ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
-    }
-
-    /**
      * @Route("/scode/{code}", name="api_auth_delete_scode")
      * @Method({"DELETE"})
      */

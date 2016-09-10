@@ -27,6 +27,7 @@ use AppBundle\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @Route("/api/v1")
@@ -466,6 +467,36 @@ class ApiController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api getLatestPolicyTerms.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/scode/{code}", name="api_get_scode")
+     * @Method({"GET"})
+     */
+    public function getSCodeAction($code)
+    {
+        try {
+            $dm = $this->getManager();
+            $scodeRepo = $dm->getRepository(SCode::class);
+            $scode = $scodeRepo->findOneBy(['code' => $code]);
+            if (!$scode || !$scode->isActive()) {
+                throw new NotFoundHttpException();
+            }
+
+            return new JsonResponse($scode->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (NotFoundHttpException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find policy/code',
+                404
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api getSCodeAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
