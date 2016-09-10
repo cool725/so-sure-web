@@ -39,7 +39,7 @@ class ApiPartialControllerTest extends BaseControllerTest
         $this->assertTrue(strlen($sns->getAll()) > 0);
         $this->assertTrue(strlen($sns->getUnregistered()) > 0);
 
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/sns', array(
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/partial/sns', array(
             'endpoint' => $endpoint2,
             'old_endpoint' => $endpoint1,
         ));
