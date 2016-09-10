@@ -565,6 +565,49 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
     }
 
+    // GET /scode/{id}
+
+    /**
+     *
+     */
+    public function testGetSCode()
+    {
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(SCode::class);
+        $sCode = $repo->findOneBy(['active' => true, 'type' => 'standard']);
+        $this->assertNotNull($sCode);
+
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = sprintf('/api/v1/scode/%s?_method=GET', $sCode->getCode());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(200);
+        $this->assertEquals(8, strlen($getData['code']));
+        $this->assertEquals(SCode::TYPE_STANDARD, $getData['type']);
+        $this->assertEquals(true, $getData['active']);
+
+        $shareUrl = self::$router->generate('scode', ['code' => $sCode->getCode()]);
+        $this->assertTrue(stripos($getData["share_link"], $shareUrl) >= 0);
+        $this->assertTrue(stripos($getData["share_link"], 'http') >= 0);
+    }
+
+    public function testGetInactiveSCode()
+    {
+        $s = new SCode();
+        $s->setActive(false);
+        static::$dm->persist($s);
+        static::$dm->flush();
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(SCode::class);
+        $sCode = $repo->findOneBy(['active' => false, 'type' => 'standard']);
+        $this->assertNotNull($sCode);
+
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = sprintf('/api/v1/scode/%s?_method=GET', $sCode->getCode());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
     // token
 
     /**
