@@ -347,13 +347,21 @@ class JudopayService
         }
     }
 
-    public function scheduledPayment(ScheduledPayment $scheduledPayment, $prefix = null)
+    public function scheduledPayment(ScheduledPayment $scheduledPayment, $prefix = null, $date = null)
     {
         if (!$scheduledPayment->isBillable($prefix)) {
             throw new \Exception(sprintf(
                 'Scheduled payment %s is not billable (status: %s)',
                 $scheduledPayment->getId(),
                 $scheduledPayment->getStatus()
+            ));
+        }
+
+        if (!$scheduledPayment->canBeRun($date)) {
+            throw new \Exception(sprintf(
+                'Scheduled payment %s can not yet be run (scheduled: %s)',
+                $scheduledPayment->getId(),
+                $scheduledPayment->getScheduled()->format('Y-m-d H:i:s')
             ));
         }
 

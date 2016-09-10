@@ -169,4 +169,13 @@ class ScheduledPayment
                 $this->getPolicy()->isValidPolicy($prefix) &&
                 $this->getPolicy()->isBillablePolicy();
     }
+
+    public function canBeRun(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        return $this->getScheduled() <= $date;
+    }
 }
