@@ -11,6 +11,7 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 
 use AppBundle\Document\User;
+use AppBundle\Document\Sns;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhoneTrait;
@@ -342,5 +343,93 @@ abstract class BaseController extends Controller
         if (count($errors) > 0) {
             throw new ValidationException((string) $errors);
         }
+    }
+
+    protected function getArnForTopic($topic)
+    {
+        switch ($topic) {
+            case 'all':
+                return $this->getParameter('sns_prelaunch_all');
+            case 'registered':
+                return $this->getParameter('sns_prelaunch_registered');
+            case 'unregistered':
+                return $this->getParameter('sns_prelaunch_unregistered');
+        }
+
+        return null;
+    }
+
+    protected function snsSubscribe($topic, $endpoint)
+    {
+        $topicArn = $this->getArnForTopic($topic);
+        if (!$topicArn) {
+            return;
+        }
+
+        $client = $this->get('aws.sns');
+        $result = $client->subscribe(array(
+            // TopicArn is required
+            'TopicArn' => $topicArn,
+            // Protocol is required
+            'Protocol' => 'application',
+            'Endpoint' => $endpoint,
+        ));
+        $subscriptionArn = $result['SubscriptionArn'];
+
+        $dm = $this->getManager();
+        $snsRepo = $dm->getRepository(Sns::class);
+        $sns = $snsRepo->findOneBy(['endpoint' => $endpoint]);
+        if (!$sns) {
+            $sns = new Sns();
+            $sns->setEndpoint($endpoint);
+            $dm->persist($sns);
+        }
+        switch ($topic) {
+            case 'all':
+                $sns->setAll($subscriptionArn);
+                break;
+            case 'registered':
+                $sns->setRegistered($subscriptionArn);
+                break;
+            case 'unregistered':
+                $sns->setUnregistered($subscriptionArn);
+                break;
+            default:
+                $sns->addOthers($topic, $subscriptionArn);
+        }
+
+        $dm->flush();
+    }
+
+    protected function snsUnsubscribe($topic, $endpoint)
+    {
+        $dm = $this->getManager();
+        $snsRepo = $dm->getRepository(Sns::class);
+        $sns = $snsRepo->findOneBy(['endpoint' => $endpoint]);
+        $subscriptionArn = null;
+        switch ($topic) {
+            case 'all':
+                $subscriptionArn = $sns->getAll();
+                $sns->setAll(null);
+                break;
+            case 'registered':
+                $subscriptionArn = $sns->getRegistered();
+                $sns->setRegistered(null);
+                break;
+            case 'unregistered':
+                $subscriptionArn = $sns->getUnregistered();
+                $sns->getUnregistered(null);
+                break;
+        }
+
+        if (!$subscriptionArn) {
+            return;
+        }
+
+        $client = $this->get('aws.sns');
+        $result = $client->unsubscribe(array(
+            'SubscriptionArn' => $subscriptionArn,
+        ));
+        $dm->flush();
     }
 }
