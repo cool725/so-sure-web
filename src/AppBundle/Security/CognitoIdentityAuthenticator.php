@@ -20,7 +20,9 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
 {
     const ANON_USER_UNAUTH_PATH = 'anon:unauth';
     const ANON_USER_AUTH_PATH = 'anon:auth';
+    const ANON_USER_PARTIAL_AUTH_PATH = 'anon:partial';
     const AUTH_PATH = '/api/v1/auth';
+    const PARTIAL_AUTH_PATH = '/api/v1/partial';
 
     protected $httpUtils;
     protected $logger;
@@ -83,11 +85,14 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
         $user = self::ANON_USER_UNAUTH_PATH;
         $cognitoIdentityId = $this->getCognitoIdentityId($request->getContent());
 
-        if (stripos($request->getPathInfo(), self::AUTH_PATH) !== false) {
+        if (stripos($request->getPathInfo(), self::PARTIAL_AUTH_PATH) !== false) {
+            $user = self::PARTIAL_AUTH_PATH;
+        } elseif (stripos($request->getPathInfo(), self::AUTH_PATH) !== false) {
             $user = self::ANON_USER_AUTH_PATH;
         }
 
-        if ($user == self::ANON_USER_AUTH_PATH && !$cognitoIdentityId) {
+        if (($user == self::ANON_USER_AUTH_PATH || $user == self::ANON_USER_PARTIAL_AUTH_PATH) &&
+            !$cognitoIdentityId) {
             throw new BadCredentialsException('No Cognito Identifier found');
         }
 
