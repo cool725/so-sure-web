@@ -469,7 +469,7 @@ class PolicyServiceTest extends WebTestCase
         $updatedPolicy = $policyRepo->find($policy->getId());
 
         $updatedPremium = $updatedPolicy->getPremium();
-        \Doctrine\Common\Util\Debug::dump($updatedPremium);
+        //\Doctrine\Common\Util\Debug::dump($updatedPremium);
         $this->assertNotEquals($premium, $updatedPremium);
         $this->assertEquals(0.1, $updatedPremium->getIptRate());
     }
