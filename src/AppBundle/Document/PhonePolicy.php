@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use AppBundle\Exception\InvalidPremiumException;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
@@ -277,6 +278,31 @@ class PhonePolicy extends Policy
             return $this->getPremium()->getYearlyPremiumPrice();
         } else {
             return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() * 0.8);
+        }
+    }
+
+    /**
+     * If the premium is initialized prior to an ipt rate change
+     * and then created after, the IPT would be incorrect
+     */
+    public function validatePremium($adjust, \DateTime $date = null)
+    {
+        $phonePrice = $this->getPhone()->getCurrentPhonePrice($date);
+        if (!$phonePrice) {
+            throw new \UnexpectedValueException(sprintf('Missing phone price'));
+        }
+        $expectedPremium = $phonePrice->createPremium($date);
+
+        if ($this->getPremium()!= $expectedPremium) {
+            if ($adjust) {
+                $this->setPremium($expectedPremium);
+            } else {
+                throw new InvalidPremiumException(sprintf(
+                    'Ipt rate %f is not valid (should be %f)',
+                    $this->getPremium()->getIptRate(),
+                    $this->getIptRate($date)
+                ));
+            }
         }
     }
 

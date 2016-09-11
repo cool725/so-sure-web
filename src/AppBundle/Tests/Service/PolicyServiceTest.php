@@ -415,4 +415,54 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         $this->assertNotEquals($policy->getStandardSCode()->getCode(), $scode->getCode());
     }
+
+    public function testValidatePremiumIptRateChange()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('vpreium-rate', $this),
+            'bar'
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-09-30'),
+            true
+        );
+        $premium = $policy->getPremium();
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-10-01'));
+        static::$policyService->setEnvironment('test');
+
+        $this->assertNotEquals($premium, $policy->getPremium());
+        $this->assertEquals(0.095, $premium->getIptRate());
+        $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
+    }
+
+    public function testValidatePremiumNormal()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('vpreium-normal', $this),
+            'bar'
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-09-01'),
+            true
+        );
+        $premium = $policy->getPremium();
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-09-01'));
+        static::$policyService->setEnvironment('test');
+
+        $this->assertEquals($premium, $policy->getPremium());
+    }
 }

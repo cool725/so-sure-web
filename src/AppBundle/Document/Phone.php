@@ -188,8 +188,12 @@ class Phone
         $devices = null,
         $initialPrice = null,
         $replacementPrice = null,
-        $initialPriceUrl = null
+        $initialPriceUrl = null,
+        \DateTime $date = null
     ) {
+        if (!$date) {
+            $date = new \DateTime();
+        }
         $this->active = true;
         $this->make = $make;
         $this->model = $model;
@@ -202,7 +206,7 @@ class Phone
         $phonePrice = $this->getCurrentPhonePrice();
         if (!$phonePrice) {
             $phonePrice = new PhonePrice();
-            $phonePrice->setValidFrom(new \DateTime());
+            $phonePrice->setValidFrom($date);
             $this->addPhonePrice($phonePrice);
         }
         $phonePrice->setMonthlyPremiumPrice($premium);
