@@ -4,7 +4,7 @@ namespace AppBundle\Document;
 
 trait CurrencyTrait
 {
-    public function getIptRate(\DateTime $date = null)
+    protected function getCurrentIptRate(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -19,7 +19,7 @@ trait CurrencyTrait
 
     protected function withIpt($basePrice)
     {
-        return $this->toTopTwoDp($basePrice * (1+$this->getIptRate()));
+        return $this->toTopTwoDp($basePrice * (1+$this->getCurrentIptRate()));
     }
 
     protected function toTopTwoDp($float)

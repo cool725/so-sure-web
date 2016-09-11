@@ -10,6 +10,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Classes\Salva;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 trait UserClassTrait
 {
@@ -28,15 +29,20 @@ trait UserClassTrait
 
         if ($init) {
             $policy->init($user, self::getLatestPolicyTerms(static::$dm));
-            $policy->create(rand(1, 999999));
             $policy->setPhone(self::$phone);
+            $policy->create(rand(1, 999999));
         }
 
         return $policy;
     }
 
-    public static function createUser($userManager, $email, $password, $phone = null)
-    {
+    public static function createUser(
+        $userManager,
+        $email,
+        $password,
+        $phone = null,
+        \Doctrine\ODM\MongoDB\DocumentManager $dm = null
+    ) {
         $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setPlainPassword($password);
@@ -53,6 +59,9 @@ trait UserClassTrait
         }
 
         $userManager->updateUser($user, true);
+        if ($dm) {
+            $dm->persist($user);
+        }
 
         return $user;
     }
@@ -124,6 +133,9 @@ trait UserClassTrait
         }
 
         if ($createPolicy) {
+            if (!$phone) {
+                throw new \Exception('Attempted to create policy without setting a phone');
+            }
             $policy->create(rand(1, 999999), 'TEST', $date);
         }
 

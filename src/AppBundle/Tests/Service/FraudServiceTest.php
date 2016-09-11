@@ -54,7 +54,7 @@ class FraudServiceTest extends WebTestCase
         );
         self::$dm->persist($user);
 
-        $policy = static::initPolicy($user, static::$dm, null, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, static::getRandomPhone(static::$dm), null, false, true);
 
         // policy will set address
         $address = $user->getBillingAddress();
@@ -94,7 +94,7 @@ class FraudServiceTest extends WebTestCase
         $gocardless = new GocardlessPaymentMethod();
         $gocardless->addAccount('1', $account);
         $user->setPaymentMethod($gocardless);
-        $policy = static::initPolicy($user, static::$dm, null, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, static::getRandomPhone(static::$dm), null, false, true);
 
         $user2 = static::createUser(
             static::$userManager,
@@ -108,7 +108,7 @@ class FraudServiceTest extends WebTestCase
         $gocardless2 = new GocardlessPaymentMethod();
         $gocardless2->addAccount('1', $account);
         $user2->setPaymentMethod($gocardless2);
-        $policy2 = static::initPolicy($user2, static::$dm, null, null, false, true);
+        $policy2 = static::initPolicy($user2, static::$dm, static::getRandomPhone(static::$dm), null, false, true);
         self::$dm->persist($user2);
         self::$dm->flush();
 
@@ -134,7 +134,7 @@ class FraudServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->addCardToken('1', $account);
         $user->setPaymentMethod($judo);
-        $policy = static::initPolicy($user, static::$dm, null, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, static::getRandomPhone(static::$dm), null, false, true);
 
         $user2 = static::createUser(
             static::$userManager,
@@ -149,7 +149,7 @@ class FraudServiceTest extends WebTestCase
         $judo2 = new JudoPaymentMethod();
         $judo2->addCardToken('1', $account);
         $user2->setPaymentMethod($judo2);
-        $policy2 = static::initPolicy($user2, static::$dm, null, null, false, true);
+        $policy2 = static::initPolicy($user2, static::$dm, static::getRandomPhone(static::$dm), null, false, true);
         self::$dm->persist($user2);
         self::$dm->flush();
 

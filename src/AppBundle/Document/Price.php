@@ -14,6 +14,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 abstract class Price
 {
+    use CurrencyTrait;
+
     /**
      * @Assert\DateTime()
      * @MongoDB\Date()
@@ -68,7 +70,7 @@ abstract class Price
 
     public function getIpt(\DateTime $date = null)
     {
-        return $this->toTwoDp($this->getGwp() * $this->getIptRate($date));
+        return $this->toTwoDp($this->getGwp() * $this->getCurrentIptRate($date));
     }
 
     public function getMonthlyPremiumPrice()
@@ -88,7 +90,7 @@ abstract class Price
 
     public function setMonthlyPremiumPrice($premium, \DateTime $date = null)
     {
-        $this->setGwp($premium / (1 + $this->getIptRate($date)));
+        $this->setGwp($premium / (1 + $this->getCurrentIptRate($date)));
     }
 
     abstract public function createPremium();
@@ -97,6 +99,6 @@ abstract class Price
     {
         $premium->setGwp($this->getGwp());
         $premium->setIpt($this->getIpt($date));
-        $premium->setIptRate($this->getIptRate($date));
+        $premium->setIptRate($this->getCurrentIptRate($date));
     }
 }
