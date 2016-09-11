@@ -60,14 +60,14 @@ class PhonePolicy extends Policy
         return $this->phone;
     }
 
-    public function setPhone(Phone $phone)
+    public function setPhone(Phone $phone, \DateTime $date = null)
     {
         $this->phone = $phone;
         if (!$phone->getCurrentPhonePrice()) {
             throw new \Exception('Phone must have a price');
         }
 
-        $this->setPremium($phone->getCurrentPhonePrice()->createPremium());
+        $this->setPremium($phone->getCurrentPhonePrice()->createPremium($date));
     }
 
     public function getImei()
@@ -300,7 +300,7 @@ class PhonePolicy extends Policy
                 throw new InvalidPremiumException(sprintf(
                     'Ipt rate %f is not valid (should be %f)',
                     $this->getPremium()->getIptRate(),
-                    $this->getIptRate($date)
+                    $this->getCurrentIptRate($date)
                 ));
             }
         }

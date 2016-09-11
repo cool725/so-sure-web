@@ -1806,4 +1806,29 @@ class PhonePolicyTest extends WebTestCase
         );
         $this->assertEquals(0, $monthlyPolicy->getOutstandingPremium());
     }
+
+    /**
+     * @expectedException AppBundle\Exception\InvalidPremiumException
+     */
+    public function testValidatePremiumException()
+    {
+        $user = new User();
+        $user->setEmail(self::generateEmail('validate-premium-exception', $this));
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone, new \DateTime('2016-01-01'));
+        $policy->validatePremium(false, new \DateTime("2016-10-01"));
+    }
+
+    public function testValidatePremium()
+    {
+        $user = new User();
+        $user->setEmail(self::generateEmail('validate-premium', $this));
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone, new \DateTime('2016-01-01'));
+        $premium = $policy->getPremium();
+        $policy->validatePremium(true, new \DateTime("2016-10-01"));
+        $this->assertNotEquals($premium, $policy->getPremium());
+        $this->assertEquals(0.095, $premium->getIptRate());
+        $this->assertEquals(0.1, $policy->getPremium()->getIptRate());
+    }
 }
