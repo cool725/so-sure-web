@@ -62,9 +62,11 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('cancel', $this),
-            'bar'
+            'bar',
+            null,
+            static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, null, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false, true);
         static::$policyService->cancel($policy, Policy::CANCELLED_USER_REQUESTED);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
@@ -76,7 +78,9 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('create', $this),
-            'bar'
+            'bar',
+            null,
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         static::$policyService->create($policy);
@@ -90,7 +94,9 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('create-policyNumber', $this),
-            'bar'
+            'bar',
+            null,
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
@@ -112,7 +118,9 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             'create-policyNumber@so-sure.com',
-            'bar'
+            'bar',
+            null,
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
@@ -131,7 +139,9 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('create-dup', $this),
-            'bar'
+            'bar',
+            null,
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
@@ -171,7 +181,9 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             'scheduled-invalidamount@so-sure.com',
-            'bar'
+            'bar',
+            null,
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
 
@@ -186,7 +198,9 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             'scheduled-monthly@so-sure.com',
-            'bar'
+            'bar',
+            null,
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
 
@@ -213,7 +227,9 @@ class PolicyServiceTest extends WebTestCase
             $user = static::createUser(
                 static::$userManager,
                 sprintf('scheduled-monthly-%d@so-sure.com', $actualDay),
-                'bar'
+                'bar',
+                null,
+                static::$dm
             );
             $date = new \DateTime(sprintf('2016-01-%d', $actualDay));
             $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
@@ -242,7 +258,8 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             'scheduled-failed-monthly@so-sure.com',
-            'bar'
+            'bar',
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
 
@@ -260,7 +277,8 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             'scheduled-yearly@so-sure.com',
-            'bar'
+            'bar',
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
 
@@ -283,7 +301,8 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             'scheduled-missing@so-sure.com',
-            'bar'
+            'bar',
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
         static::$policyService->create($policy);
@@ -294,7 +313,8 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('salva-cancel', $this),
-            'bar'
+            'bar',
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
@@ -317,7 +337,8 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('salva-cooloff', $this),
-            'bar'
+            'bar',
+            static::$dm
         );
         $phone = $this->getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
@@ -353,7 +374,8 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('salva-full', $this),
-            'bar'
+            'bar',
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
@@ -376,7 +398,8 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('salva-partial', $this),
-            'bar'
+            'bar',
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
@@ -404,7 +427,8 @@ class PolicyServiceTest extends WebTestCase
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('scode', $this),
-            'bar'
+            'bar',
+            static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
@@ -414,5 +438,69 @@ class PolicyServiceTest extends WebTestCase
 
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         $this->assertNotEquals($policy->getStandardSCode()->getCode(), $scode->getCode());
+    }
+
+    public function testValidatePremiumIptRateChange()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('vpreium-rate', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-09-30'),
+            true
+        );
+        $premium = $policy->getPremium();
+        $this->assertEquals(0.095, $premium->getIptRate());
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-10-01'));
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $policyRepo->find($policy->getId());
+
+        $updatedPremium = $updatedPolicy->getPremium();
+        //\Doctrine\Common\Util\Debug::dump($updatedPremium);
+        $this->assertNotEquals($premium, $updatedPremium);
+        $this->assertEquals(0.1, $updatedPremium->getIptRate());
+    }
+
+    public function testValidatePremiumNormal()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('vpreium-normal', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-09-01'),
+            true
+        );
+        $premium = $policy->getPremium();
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-09-01'));
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $policyRepo->find($policy->getId());
+
+        $this->assertEquals($premium, $updatedPolicy->getPremium());
     }
 }

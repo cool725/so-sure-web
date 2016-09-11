@@ -287,7 +287,8 @@ class LoadPhoneData implements FixtureInterface, ContainerAwareInterface
                 $devices, // $devices
                 str_replace('£', '', $data[7]), // $initialPrice
                 str_replace('£', '', $data[6]), // $replacementPrice
-                $data[8] // $initialPriceUrl
+                $data[8], // $initialPriceUrl
+                new \DateTime('2016-01-01')
             );
 
             $resolution = explode('x', str_replace(' ', '', $data[17]));

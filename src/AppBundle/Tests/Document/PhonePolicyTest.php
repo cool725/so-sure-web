@@ -181,9 +181,9 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
         $policyA = new SalvaPhonePolicy();
         $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policyA->setPhone(self::$phone);
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
-        $policyA->setPhone(self::$phone);
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_HIGH, $policyA->getRisk(new \DateTime("2016-01-10")));
     }
 
@@ -193,9 +193,9 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
         $policyA = new SalvaPhonePolicy();
         $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policyA->setPhone(self::$phone);
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
-        $policyA->setPhone(self::$phone);
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_MEDIUM, $policyA->getRisk(new \DateTime("2016-02-10")));
     }
 
@@ -205,9 +205,9 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
         $policyA = new SalvaPhonePolicy();
         $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policyA->setPhone(self::$phone);
         $policyA->create(rand(1, 999999));
         $policyA->setStart(new \DateTime("2016-01-01"));
-        $policyA->setPhone(self::$phone);
         $policyA->setPotValue(0);
 
         $connectionA = new Connection();
@@ -295,6 +295,8 @@ class PhonePolicyTest extends WebTestCase
         $policyNumber = rand(1000, 999999);
         $policyA = new SalvaPhonePolicy();
         $policyB = new SalvaPhonePolicy();
+        $policyA->setPhone(static::$phone);
+        $policyB->setPhone(static::$phone);
         $policyA->create($policyNumber);
         $policyB->create($policyNumber);
         self::$dm->persist($policyA);
@@ -639,9 +641,9 @@ class PhonePolicyTest extends WebTestCase
         $user->setCreated(new \DateTime('2017-01-01'));
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
-        $policy->setPhone(self::$phone);
         $policy->setPotValue(80);
     }
 
@@ -659,9 +661,9 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPromoCode(SalvaPhonePolicy::PROMO_LAUNCH);
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
-        $policy->setPhone(self::$phone);
         $policy->setPotValue(120);
     }
     
@@ -676,9 +678,9 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPromoCode(SalvaPhonePolicy::PROMO_LAUNCH);
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
-        $policy->setPhone(self::$phone);
         $policy->setPotValue(80);
     }
 
@@ -688,6 +690,7 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999), null, new \DateTime('2016-01-01 16:00'));
         $this->assertEquals(
             new \DateTime('2016-12-31 23:59:59', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
@@ -701,6 +704,7 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999), null, new \DateTime('2016-07-01 16:00'));
         $this->assertEquals(
             new \DateTime('2017-06-30 23:59:59', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
@@ -714,20 +718,9 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999), null, new \DateTime('2016-04-19 16:00'));
         $this->assertEquals(new \DateTime('2016-06-18 16:00'), $policy->getConnectionCliffDate());
-    }
-
-    public function testCurrentIptRate()
-    {
-        $policy = new SalvaPhonePolicy();
-        $this->assertEquals(0.095, $policy->getIptRate(new \DateTime('2016-04-01')));
-    }
-
-    public function testNewIptRate()
-    {
-        $policy = new SalvaPhonePolicy();
-        $this->assertEquals(0.1, $policy->getIptRate(new \DateTime('2016-10-01')));
     }
 
     public function testHasMonetaryClaimed()
@@ -757,9 +750,9 @@ class PhonePolicyTest extends WebTestCase
 
         $policy = new SalvaPhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999));
         $policy->setStart(new \DateTime("2016-01-01"));
-        $policy->setPhone(self::$phone);
 
         $policy->setPotValue(20);
         $this->assertEquals(20, $policy->getHistoricalMaxPotValue());
@@ -1812,5 +1805,30 @@ class PhonePolicyTest extends WebTestCase
             Salva::MONTHLY_TOTAL_COMMISSION
         );
         $this->assertEquals(0, $monthlyPolicy->getOutstandingPremium());
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\InvalidPremiumException
+     */
+    public function testValidatePremiumException()
+    {
+        $user = new User();
+        $user->setEmail(self::generateEmail('validate-premium-exception', $this));
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone, new \DateTime('2016-01-01'));
+        $policy->validatePremium(false, new \DateTime("2016-10-01"));
+    }
+
+    public function testValidatePremium()
+    {
+        $user = new User();
+        $user->setEmail(self::generateEmail('validate-premium', $this));
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone, new \DateTime('2016-01-01'));
+        $premium = $policy->getPremium();
+        $policy->validatePremium(true, new \DateTime("2016-10-01"));
+        $this->assertNotEquals($premium, $policy->getPremium());
+        $this->assertEquals(0.095, $premium->getIptRate());
+        $this->assertEquals(0.1, $policy->getPremium()->getIptRate());
     }
 }
