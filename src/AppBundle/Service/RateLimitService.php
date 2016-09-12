@@ -54,6 +54,7 @@ class RateLimitService
     public static $excludedIps = [
         "62.253.24.186", // runway east
         "86.3.184.79", // patrick home
+        "213.205.252.108", // hackerhouse
     ];
 
     /** @var LoggerInterface */
