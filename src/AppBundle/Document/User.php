@@ -645,6 +645,7 @@ class User extends BaseUser implements TwoFactorInterface
           'has_valid_policy' => $this->hasValidPolicy(),
           'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
           'image_url' => $this->getImageUrl(),
+          'sns_endpoint' => $this->getSnsEndpoint() ? $this->getSnsEndpoint() : null,
         ];
     }
 }

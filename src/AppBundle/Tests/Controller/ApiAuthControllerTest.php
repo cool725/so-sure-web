@@ -2117,6 +2117,11 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('foo', $changedUserC->getSnsEndpoint());
         $this->assertNull($changedUserA->getSnsEndpoint());
         $this->assertNull($changedUserB->getSnsEndpoint());
+
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET', $userC->getId());
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, []);
+        $result = $this->verifyResponse(200);
+        $this->assertEquals('foo', $result['sns_endpoint']);
     }
 
     public function testUpdateUserChangeNameWithPolicy()
