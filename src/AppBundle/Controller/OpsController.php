@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Document\User;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * @Route("/ops")
@@ -47,5 +48,13 @@ class OpsController extends BaseController
     public function exceptionAction()
     {
         throw new \Exception('Exception');
+    }
+
+    /**
+     * @Route("/exception503", name="ops_exception_503")
+     */
+    public function exceptionDeniedAction()
+    {
+        throw new HttpException(503);
     }
 }
