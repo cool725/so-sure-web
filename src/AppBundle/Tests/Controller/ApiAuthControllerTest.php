@@ -2250,6 +2250,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'imei' => $imei,
             'make' => 'OnePlus',
             'device' => 'A0001',
+            'serial_number' => 'foo',
             'memory' => 63,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),

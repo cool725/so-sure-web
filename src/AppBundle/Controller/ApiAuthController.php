@@ -387,13 +387,6 @@ class ApiAuthController extends BaseController
             }
             $policy->addCheckmendCertData($imeiValidator->getCertId(), $imeiValidator->getResponseData());
 
-            $policy = new SalvaPhonePolicy();
-            $policy->setImei($imei);
-            $policy->setSerialNumber($serialNumber);
-            $policy->setPhone($phone);
-            $policy->setIdentityLog($this->getIdentityLog($request));
-            $policy->addCheckmendCertData($imeiValidator->getCertId(), $imeiValidator->getResponseData());
-
             $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
 

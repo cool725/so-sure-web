@@ -293,6 +293,9 @@ class ReceperioService extends BaseImeiService
         }
 
         if ($this->getEnvironment() != 'prod') {
+            $this->responseData = 'imei';
+            $this->certId = 'imei';
+
             return true;
         }
 
@@ -456,6 +459,9 @@ class ReceperioService extends BaseImeiService
         }
 
         if ($this->getEnvironment() != 'prod') {
+            $this->responseData = 'serial';
+            $this->certId = 'serial';
+
             return true;
         }
 
@@ -493,6 +499,7 @@ class ReceperioService extends BaseImeiService
                 $this->dm->persist($charge);
                 $this->dm->flush();
             }
+            $this->certId = null;
             $this->responseData = $data;
 
             return $this->validateSamePhone($phone, $serialNumber, $data);

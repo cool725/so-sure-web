@@ -136,7 +136,12 @@ class PhonePolicy extends Policy
             'response' => $response,
         ];
 
-        $this->checkmendCerts[$now->format('U')] = serialize($data);
+        // in the case of an imei check & serial check running at the same time, just increment the later by a second
+        $timestamp = $now->format('U');
+        while (isset($this->checkmendCerts[$timestamp])) {
+            $timestamp++;
+        }
+        $this->checkmendCerts[$timestamp] = serialize($data);
     }
 
     public function getTotalConnectionValue(\DateTime $date = null)
