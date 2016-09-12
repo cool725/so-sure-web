@@ -55,6 +55,7 @@ class RateLimitService
         "62.253.24.186", // runway east
         "86.3.184.79", // patrick home
         "213.205.252.108", // hackerhouse
+        "86.7.88.160", // hackerhouse
     ];
 
     /** @var LoggerInterface */
