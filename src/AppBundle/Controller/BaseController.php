@@ -345,27 +345,32 @@ abstract class BaseController extends Controller
         }
     }
 
-    protected function getArnForTopic($topic)
+    protected function getFullTopicName($topic)
     {
-        switch ($topic) {
-            case 'all':
-                return $this->getParameter('sns_prelaunch_all');
-            case 'registered':
-                return $this->getParameter('sns_prelaunch_registered');
-            case 'unregistered':
-                return $this->getParameter('sns_prelaunch_unregistered');
-        }
+        $environment = $this->getParameter('kernel.environment');
+        $topic = str_replace('.', '-', $topic);
 
-        return null;
+        return sprintf('App_%s_%s', ucfirst($environment), ucfirst($topic));
     }
 
-    protected function snsSubscribe($topic, $endpoint)
+    protected function getArnForTopic($topic)
     {
-        $topicArn = $this->getArnForTopic($topic);
-        if (!$topicArn) {
-            return;
-        }
+        $baseArn = $this->getParameter('sns_base_arn');
 
+        return sprintf('%s:%s', $baseArn, $this->getFullTopicName($topic));
+    }
+
+    protected function createTopic($topic)
+    {
+        $topicName = $this->getFullTopicName($topic);
+        $client = $this->get('aws.sns');
+        $result = $client->createTopic(array(
+            'Name' => $topicName,
+        ));
+    }
+
+    protected function snsClientSubscribe($topicArn, $endpoint)
+    {
         $client = $this->get('aws.sns');
         $result = $client->subscribe(array(
             // TopicArn is required
@@ -374,31 +379,51 @@ abstract class BaseController extends Controller
             'Protocol' => 'application',
             'Endpoint' => $endpoint,
         ));
-        $subscriptionArn = $result['SubscriptionArn'];
 
-        $dm = $this->getManager();
-        $snsRepo = $dm->getRepository(Sns::class);
-        $sns = $snsRepo->findOneBy(['endpoint' => $endpoint]);
-        if (!$sns) {
-            $sns = new Sns();
-            $sns->setEndpoint($endpoint);
-            $dm->persist($sns);
-        }
-        switch ($topic) {
-            case 'all':
-                $sns->setAll($subscriptionArn);
-                break;
-            case 'registered':
-                $sns->setRegistered($subscriptionArn);
-                break;
-            case 'unregistered':
-                $sns->setUnregistered($subscriptionArn);
-                break;
-            default:
-                $sns->addOthers($topic, $subscriptionArn);
-        }
+        return $result['SubscriptionArn'];
+    }
 
-        $dm->flush();
+    protected function snsSubscribe($topic, $endpoint)
+    {
+        try {
+            $topicArn = $this->getArnForTopic($topic);
+            if (!$topicArn) {
+                return;
+            }
+
+            try {
+                $subscriptionArn = $this->snsClientSubscribe($topicArn, $endpoint);
+            } catch (\Exception $e) {
+                $this->createTopic($topic);
+                $subscriptionArn = $this->snsClientSubscribe($topicArn, $endpoint);
+            }
+
+            $dm = $this->getManager();
+            $snsRepo = $dm->getRepository(Sns::class);
+            $sns = $snsRepo->findOneBy(['endpoint' => $endpoint]);
+            if (!$sns) {
+                $sns = new Sns();
+                $sns->setEndpoint($endpoint);
+                $dm->persist($sns);
+            }
+            switch ($topic) {
+                case 'all':
+                    $sns->setAll($subscriptionArn);
+                    break;
+                case 'registered':
+                    $sns->setRegistered($subscriptionArn);
+                    break;
+                case 'unregistered':
+                    $sns->setUnregistered($subscriptionArn);
+                    break;
+                default:
+                    $sns->addOthers($topic, $subscriptionArn);
+            }
+
+            $dm->flush();
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Failed sns sub to topic: %s Ex: %s', $topic, $e->getMessage()));
+        }
     }
 
     protected function snsUnsubscribe($topic, $endpoint)
