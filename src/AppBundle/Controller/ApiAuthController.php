@@ -357,6 +357,16 @@ class ApiAuthController extends BaseController
             }
 
             $serialNumber = $this->getDataString($phonePolicyData, 'serial_number');
+            // For phones without a serial number, run check on imei
+            if (!$serialNumber) {
+                $serialNumber = $imei;
+            }
+
+            $policy = new SalvaPhonePolicy();
+            $policy->setPhone($phone);
+            $policy->setImei($imei);
+            $policy->setSerialNumber($serialNumber);
+            $policy->setIdentityLog($this->getIdentityLog($request));
 
             // Checking against blacklist should be last check to possible avoid costs
             if (!$imeiValidator->checkImei($phone, $imei, $this->getUser())) {
@@ -366,11 +376,7 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
-
-            // For phones without a serial number, run check on imei
-            if (!$serialNumber) {
-                $serialNumber = $imei;
-            }
+            $policy->addCheckmendCertData($imeiValidator->getCertId(), $imeiValidator->getResponseData());
 
             if (!$imeiValidator->checkSerial($phone, $serialNumber, $this->getUser())) {
                 return $this->getErrorJsonResponse(
@@ -379,6 +385,7 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
+            $policy->addCheckmendCertData($imeiValidator->getCertId(), $imeiValidator->getResponseData());
 
             $policy = new SalvaPhonePolicy();
             $policy->setImei($imei);
