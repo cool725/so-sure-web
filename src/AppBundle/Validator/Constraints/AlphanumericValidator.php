@@ -30,7 +30,7 @@ class AlphanumericValidator extends ConstraintValidator
         if ($exact) {
             $regex = sprintf('/^%s$/u', $regex);
         } else {
-            $regex = sprintf('/%s/u', $regex);            
+            $regex = sprintf('/%s/u', $regex);
         }
 
         return $regex;

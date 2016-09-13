@@ -464,13 +464,13 @@ abstract class BaseController extends Controller
     {
         $validator = new AlphanumericSpaceDotValidator();
 
-        return $validator->conform(substr($value, 0, $length));        
+        return $validator->conform(substr($value, 0, $length));
     }
 
     protected function conformAlphanumeric($value, $length)
     {
         $validator = new AlphanumericValidator();
 
-        return $validator->conform(substr($value, 0, $length));        
+        return $validator->conform(substr($value, 0, $length));
     }
 }

@@ -82,7 +82,11 @@ class ApiAuthControllerTest extends BaseControllerTest
     public function testAddressQuote()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/address?postcode=%s&number=%s&_method=GET', urlencode('RG47RG'), urlencode("flat 6, 17 st peter's court"));
+        $url = sprintf(
+            '/api/v1/auth/address?postcode=%s&number=%s&_method=GET',
+            urlencode('RG47RG'),
+            urlencode("flat 6, 17 st peter's court")
+        );
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
         /* actual data
