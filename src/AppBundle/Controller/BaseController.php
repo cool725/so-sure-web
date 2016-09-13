@@ -20,6 +20,8 @@ use AppBundle\Exception\ValidationException;
 
 use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
+use AppBundle\Validator\Constraints\AlphanumericValidator;
 
 abstract class BaseController extends Controller
 {
@@ -456,5 +458,19 @@ abstract class BaseController extends Controller
             'SubscriptionArn' => $subscriptionArn,
         ));
         $dm->flush();
+    }
+
+    protected function conformAlphanumericSpaceDot($value, $length)
+    {
+        $validator = new AlphanumericSpaceDotValidator();
+
+        return $validator->conform(substr($value, 0, $length));        
+    }
+
+    protected function conformAlphanumeric($value, $length)
+    {
+        $validator = new AlphanumericValidator();
+
+        return $validator->conform(substr($value, 0, $length));        
     }
 }

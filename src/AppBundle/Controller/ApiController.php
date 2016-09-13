@@ -607,7 +607,7 @@ class ApiController extends BaseController
             $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
             $user->setSnsEndpoint($this->getDataString($data, 'sns_endpoint'));
             $user->setMobileNumber($mobileNumber);
-            $user->setReferer($this->getDataString($data, 'referer'));
+            $user->setReferer($this->conformAlphanumericSpaceDot($this->getDataString($data, 'referer'), 500));
             $birthday = $this->validateBirthday($data);
             if ($birthday instanceof Response) {
                 return $birthday;

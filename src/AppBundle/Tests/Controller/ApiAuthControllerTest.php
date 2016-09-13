@@ -79,6 +79,14 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    public function testAddressQuote()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = '/api/v1/auth/address?postcode=BX11LT&number=a\'&_method=GET';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+    }
+
     public function testAddressRateLimited()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
