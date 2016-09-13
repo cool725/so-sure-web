@@ -182,7 +182,7 @@ class User extends BaseUser implements TwoFactorInterface
     protected $preLaunch = false;
 
     /**
-     * @AppAssert\Alphanumeric()
+     * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="0", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
