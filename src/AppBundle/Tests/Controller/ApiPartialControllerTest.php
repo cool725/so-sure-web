@@ -29,6 +29,8 @@ class ApiPartialControllerTest extends BaseControllerTest
         $cognitoIdentityId = $this->getUnauthIdentity();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/partial/sns', array(
             'endpoint' => $endpoint1,
+            'platform' => 'Android',
+            'version' => '0.0.0',
         ));
         $data = $this->verifyResponse(200);
 

@@ -74,9 +74,7 @@ parameters:
     salva_username: ''
     salva_password: ''
 
-    sns_prelaunch_all: ''
-    sns_prelaunch_registered: ''
-    sns_prelaunch_unregistered: ''
+    sns_base_arn: ''
 
     plivo_authid:        'cannotbeblank'
     plivo_authtoken:     'cannotbeblank'
