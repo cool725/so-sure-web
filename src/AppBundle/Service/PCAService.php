@@ -95,11 +95,16 @@ class PCAService
             // ignore free check
             if ($postcode != "WR53DA") {
                 $charge = new Charge();
-                $charge->setType(Charge::TYPE_ADDRESS);
-                $charge->setUser($user);
-                $charge->setDetails(sprintf('%s, %s', $postcode, $number));
-                $this->dm->persist($charge);
-                $this->dm->flush();
+                try {
+                    $charge->setType(Charge::TYPE_ADDRESS);
+                    $charge->setUser($user);
+                    $charge->setDetails(sprintf('%s, %s', $postcode, $number));
+                    $this->dm->persist($charge);
+                    $this->dm->flush();
+                } catch (\Exception $e) {
+                    // Better to swallow this than fail
+                    $this->logger->warning('Error saving address charge.', ['exception' => $e]);
+                }
             }
 
             return $address;

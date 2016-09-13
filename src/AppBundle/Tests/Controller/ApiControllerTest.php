@@ -751,6 +751,28 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals('Bar', $user->getLastName());
     }
 
+    public function testUserCreateBadReferer()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $birthday = new \DateTime('1980-01-01');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('user-bad-referer', $this),
+            'birthday' => $birthday->format(\DateTime::ATOM),
+            'first_name' => 'foo',
+            'last_name' => 'bar',
+            // exepect $ to be stripped
+            'referer' => 'utm_source=$(not%20set)&utm_medium=(not%20set)',
+        ));
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->find($data['id']);
+        $this->assertTrue($user !== null);
+        $this->assertEquals('utm_source=(not%20set)&utm_medium=(not%20set)', $user->getReferer());
+    }
+
     public function testUserValidation()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();

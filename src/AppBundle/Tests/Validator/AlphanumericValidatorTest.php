@@ -30,6 +30,7 @@ class AlphanumericValidatorTest extends \PHPUnit_Framework_TestCase
 
         // standard alphanumeric
         $validator->validate('aA1', self::$constraint);
+        //$validator->validate("'", self::$constraint);
     }
 
     public function testValidatorAccented()
