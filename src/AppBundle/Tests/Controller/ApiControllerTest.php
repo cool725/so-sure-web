@@ -736,6 +736,7 @@ class ApiControllerTest extends BaseControllerTest
             'birthday' => $birthday->format(\DateTime::ATOM),
             'first_name' => 'foo',
             'last_name' => 'bar',
+            'referer' => 'utm_source=(not%20set)&utm_medium=(not%20set)',
         ));
         $data = $this->verifyResponse(200);
         $this->assertEquals('api-new-user@api.bar.com', $data['email']);
