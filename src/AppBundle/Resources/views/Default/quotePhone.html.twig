@@ -14,6 +14,7 @@
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
     'components/Chart.js/Chart.js'
     'bundles/app/js/Default/connections.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -34,7 +35,7 @@
           <div id="navchange"></div>
             <h1 class="text-center">Your Quote</h1>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="panel panel-primary your-device">
                         <div class="panel-heading">
                             <h3 class="panel-title">1. Device &amp; Cost</h3>
@@ -49,8 +50,7 @@
 
                                 </p>
                                 <h5>£{{ phone_price.monthlyPremiumPrice }}</h5>
-                                <p>What You Could Get Back
-
+                                <p>What You Could Get Back <a id="connections-info-icon" href="#connections"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
                                 </p>
                                 <h5>£{{ phone_price.maxPot }}
                                     with
@@ -65,7 +65,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             <h3 class="panel-title">2. Policy Details</h3>
@@ -130,28 +130,36 @@
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="col-md-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">3. Ready to pay?</h3>
+                        </div>
+                        <div class="panel-body">
+                          <p>
+                            Download Now To Pay
+                          </p>
+                          <h5>Available for iOS &amp; Android</h5>
+                        <div class="col-sm-12 text-center" style="padding-bottom:20px;">
+                            <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store"></img>
+                            </a>
+                        </div>
+                        <div class="col-sm-12 text-center">
+                            <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play"></img>
+                            </a>
+                        </div>
+                        <div class="quote-card-footer">
+                            <p class="phone-fact-title">Want us to send you a download link?</p>
+                            <p class="phone-fact-body">Enter your phone number <a href="http://wearesosure.com/text-me-the-app">here</a>.</p>
+                        </div>
+                    </div>
+                  </div>
+                  </div>
+          </div>
         </div>
-        <div class="container" id="app-store">
-            <div class="row download-app">
-              <div class="text-break">
-                  <div class="line"></div>
-                  download our app to continue
-                  <div class="line"></div>
-              </div>
-                <div class="col-md-6 text-right">
-                    <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
-                        <img src="{{ cdn_url }}/images/icons/download-badge-app-store.svg" alt="Download so-sure on the App Store"></img>
-                    </a>
-                </div>
-                <div class="col-md-6 text-left">
-                    <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
-                        <img src="{{ cdn_url }}/images/icons/download-badge-google-play.svg" alt="Get so-sure on Google Play"></img>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+      </div>
 
     <div class="connections" id="connections">
         <div class="container">

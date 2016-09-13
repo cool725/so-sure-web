@@ -10,9 +10,10 @@
     background: linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
     padding-top: 50px;
-    padding-bottom: 100px;
-    min-height: 600px;
+    padding-bottom: 50px;
+    min-height: 550px;
     position: relative;
+
 }
 .view-quote h1 {
     color: #fff;
@@ -51,7 +52,7 @@
     border-top: 1px solid #efefef;
 }
 .phone-fact-body {
-    font-size: 13px;
+    font-size: 14px;
 }
 .view-quote .panel-body .coverage {
     font-size: 14px;
@@ -109,19 +110,19 @@
     border-bottom-left-radius: 3px;
 }
 .got-a-question {
-    font-size: 12px;
+    font-size: 14px;
     padding-bottom: -20px;
 }
 }
 /* Page Scroll Indictor */
 
-.scroll-indicator {
+/*.scroll-indicator {
     position: absolute;
     bottom: 10px;
     width: 100%;
     text-align: center;
     color: #fff;
-}
+}*/
 
 /* Connections Indicator */
 
