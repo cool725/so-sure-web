@@ -75,7 +75,8 @@ class ApiAuthController extends BaseController
             }
 
             $postcode = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'postcode'), 10);
-            $number = $this->conformAlphanumeric($this->getRequestString($request, 'number'), 10);
+            // although it says number, some people will try to put in their address
+            $number = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'number'), 50);
 
             $lookup = $this->get('app.address');
             if (!$address = $lookup->getAddress($postcode, $number, $this->getUser())) {

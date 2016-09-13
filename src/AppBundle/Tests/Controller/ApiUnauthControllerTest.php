@@ -93,6 +93,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
     }
 
+    /* code was temporarily commented out
     public function testTokenUnauthRateLimited()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
@@ -106,4 +107,5 @@ class ApiUnauthControllerTest extends BaseControllerTest
         }
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
+    */
 }
