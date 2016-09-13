@@ -65,6 +65,7 @@ class ApiUnauthController extends BaseController
                 );
             }
 
+            /*
             $rateLimit = $this->get('app.ratelimit');
             if (!$rateLimit->allowedByDevice(
                 RateLimitService::DEVICE_TYPE_TOKEN,
@@ -73,6 +74,7 @@ class ApiUnauthController extends BaseController
             )) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
+            */
 
             $cognitoIdentity = $this->get('app.cognito.identity');
             list($identityId, $token) = $cognitoIdentity->getCognitoIdToken(
