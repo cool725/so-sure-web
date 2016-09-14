@@ -136,6 +136,42 @@ class RateLimitService
     }
 
     /**
+     * Is the call allowed
+     *
+     * @param string $type TYPE_ADDRESS|TYPE_IMEI
+     * @param string $ip
+     *
+     * @return boolean
+     */
+    public function allowedByIp($type, $ip)
+    {
+        $ipKey = sprintf(self::KEY_FORMAT, $type, $ip);
+
+        $ipRequests = $this->redis->incr($ipKey);
+        $maxIpRequests = self::$maxIpRequests[$type];
+
+        $this->redis->expire($ipKey, self::$cacheTimes[$type]);
+
+        // ignore rate limiting for some ips
+        if (in_array($ip, self::$excludedIps)) {
+            return true;
+        }
+
+        // rate limit only for prod, or test
+        if (!in_array($this->environment, ['prod', 'test'])) {
+            return true;
+        }
+
+        // ip should always be higher as may be multiple users behind a nat
+        if ($ipRequests > $maxIpRequests) {
+            $this->logger->warning(sprintf('Rate limit exceeded for %s (%s)', $type, $ip));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Unused for now, but may need similiar functionality in the future...
      * Is the call allowed for a specific key
      *
