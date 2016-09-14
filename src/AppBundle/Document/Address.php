@@ -71,7 +71,7 @@ class Address
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="250")
+     * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

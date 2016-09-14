@@ -446,7 +446,7 @@ class ApiControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', sprintf('/api/v1/referral?email=%s', $user->getEmail()));
         $data = $this->verifyResponse(200);
-        $this->assertContains("http://goo.gl", $data['url']);
+        $this->assertContains("https://goo.gl", $data['url']);
     }
 
     public function testReferralValidation()
@@ -747,6 +747,28 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue($user !== null);
         $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
         $this->assertEquals($birthday->format(\DateTime::ATOM), $user->getBirthday()->format(\DateTime::ATOM));
+        $this->assertEquals('Foo', $user->getFirstName());
+        $this->assertEquals('Bar', $user->getLastName());
+    }
+
+    public function testUserBadName()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $birthday = new \DateTime('1980-01-01');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('user-bad-name', $this),
+            'birthday' => $birthday->format(\DateTime::ATOM),
+            'first_name' => 'foo$',
+            'last_name' => 'bar$',
+        ));
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->findOneBy(['email' => static::generateEmail('user-bad-name', $this)]);
+        $this->assertTrue($user !== null);
+        $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
         $this->assertEquals('Foo', $user->getFirstName());
         $this->assertEquals('Bar', $user->getLastName());
     }

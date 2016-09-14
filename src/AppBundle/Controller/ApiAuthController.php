@@ -474,7 +474,7 @@ class ApiAuthController extends BaseController
             $data = json_decode($request->getContent(), true)['body'];
             $email = $this->getDataString($data, 'email');
             $mobile = $this->getDataString($data, 'mobile');
-            $name = $this->getDataString($data, 'name');
+            $name = $this->conformAlphanumericSpaceDot($this->getDataString($data, 'name'), 250);
             $scode = $this->getDataString($data, 'scode');
             try {
                 $invitation  = null;
@@ -927,7 +927,7 @@ class ApiAuthController extends BaseController
                 $userChanged = true;
             }
             if ($this->isDataStringPresent($data, 'first_name') &&
-                $this->getDataString($data, 'first_name') != $user->getFirstName()) {
+                $this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50) != $user->getFirstName()) {
                 if ($user->hasValidPolicy()) {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
@@ -935,11 +935,11 @@ class ApiAuthController extends BaseController
                         422
                     );
                 }
-                $user->setFirstName($this->getDataString($data, 'first_name'));
+                $user->setFirstName($this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50));
                 $userChanged = true;
             }
             if ($this->isDataStringPresent($data, 'last_name') &&
-                $this->getDataString($data, 'last_name') != $user->getLastName()) {
+                $this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50) != $user->getLastName()) {
                 if ($user->hasValidPolicy()) {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
@@ -947,7 +947,7 @@ class ApiAuthController extends BaseController
                         422
                     );
                 }
-                $user->setLastName($this->getDataString($data, 'last_name'));
+                $user->setLastName($this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50));
                 $userChanged = true;
             }
 
@@ -1035,10 +1035,10 @@ class ApiAuthController extends BaseController
 
             $address = new Address();
             $address->setType($this->getDataString($data, 'type'));
-            $address->setLine1($this->getDataString($data, 'line1'));
-            $address->setLine2($this->getDataString($data, 'line2'));
-            $address->setLine3($this->getDataString($data, 'line3'));
-            $address->setCity($this->getDataString($data, 'city'));
+            $address->setLine1($this->conformAlphanumericSpaceDot($this->getDataString($data, 'line1'), 250));
+            $address->setLine2($this->conformAlphanumericSpaceDot($this->getDataString($data, 'line2'), 250));
+            $address->setLine3($this->conformAlphanumericSpaceDot($this->getDataString($data, 'line3'), 250));
+            $address->setCity($this->conformAlphanumericSpaceDot($this->getDataString($data, 'city'), 250));
             $address->setPostcode($this->getDataString($data, 'postcode'));
             $user->setBillingAddress($address);
 
