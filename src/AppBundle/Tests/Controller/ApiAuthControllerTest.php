@@ -1362,6 +1362,35 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('monthly', $policyData['premium_plan']);
     }
 
+    // policy/{id}/terms
+
+    /**
+     *
+     */
+    public function testPolicyTerms()
+    {
+        $user = self::createUser(self::$userManager, self::generateEmail('policy-ok-terms', $this), 'foo', true);
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->clearRateLimit();
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'OnePlus',
+            'device' => 'A0001',
+            'memory' => 63,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+            'serial_number' => "23423423342",
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf('/api/v1/auth/policy/%s/terms?_method=GET', $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+    }
+
     // policy/{id}/invitation
 
     /**

@@ -212,7 +212,9 @@ class ApiController extends BaseController
                 /*
                 $dm = $this->getManager();
                 $repo = $dm->getRepository(SalvaPhonePolicy::class);
-                if ($repo->isPromoLaunch() && !$this->getRequestBool($request, 'debug')) {
+                $tmpPolicy = new PhonePolicy();
+                $prefix = $tmpPolicy->getPolicyNumberPrefix();
+                if ($repo->isPromoLaunch($prefix) && !$this->getRequestBool($request, 'debug')) {
                     $promoAddition = SalvaPhonePolicy::PROMO_LAUNCH_VALUE;
                     $isPromoLaunch = true;
                 }

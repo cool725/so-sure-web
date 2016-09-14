@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Document\PolicyTerms;
@@ -36,6 +37,12 @@ class ApiViewController extends BaseController
             throw $this->createNotFoundException('Missing max pot value');
         }
 
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+
+        $tmpPolicy = new PhonePolicy();
+        $prefix = $tmpPolicy->getPolicyNumberPrefix();
+
         $maxPotVaue = $request->get('maxPotValue');
         $maxConnections = ceil($maxPotVaue / 10);
         $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
@@ -43,6 +50,7 @@ class ApiViewController extends BaseController
             'maxPotValue' => $maxPotVaue,
             'maxConnections' => $maxConnections,
             'yearlyPremium' => $yearlyPremium,
+            'promo_code' => $repo->isPromoLaunch($prefix) ? 'launch' : null,
         );
     }
 
@@ -67,10 +75,12 @@ class ApiViewController extends BaseController
         $maxPotVaue = $request->get('maxPotValue');
         $maxConnections = ceil($maxPotVaue / 10);
         $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
+        $promoCode = $policy->getPromoCode();
         return array(
             'maxPotValue' => $maxPotVaue,
             'maxConnections' => $maxConnections,
             'yearlyPremium' => $yearlyPremium,
+            'promo_code' => $promoCode,
         );
     }
 }

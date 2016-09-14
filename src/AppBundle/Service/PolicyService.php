@@ -167,7 +167,7 @@ class PolicyService
         }
         if ($policy instanceof PhonePolicy) {
             $repo = $this->dm->getRepository(PhonePolicy::class);
-            if ($repo->isPromoLaunch()) {
+            if ($repo->isPromoLaunch($policy->getPolicyNumberPrefix())) {
                 $policy->setPromoCode(Policy::PROMO_LAUNCH);
             }
         }

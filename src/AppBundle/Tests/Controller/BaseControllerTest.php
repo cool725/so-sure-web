@@ -56,6 +56,13 @@ class BaseControllerTest extends WebTestCase
         return static::authUser(self::$identity, $user);
     }
 
+    protected function verifyResponseHtml($statusCode = 200)
+    {
+        $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode());
+
+        return self::$client->getResponse()->getContent();
+    }
+
     protected function verifyResponse($statusCode, $errorCode = null)
     {
         $data = json_decode(self::$client->getResponse()->getContent(), true);

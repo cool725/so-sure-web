@@ -24,26 +24,6 @@ class PhonePolicyRepository extends PolicyRepository
             ->count() == 0;
     }
 
-    /**
-     * All policies that have been created (excluding so-sure test ones)
-     */
-    public function countAllPolicies()
-    {
-        $policy = new PhonePolicy();
-
-        return $this->createQueryBuilder()
-            ->field('status')->in([
-                Policy::STATUS_PENDING,
-                Policy::STATUS_ACTIVE,
-                Policy::STATUS_CANCELLED,
-                Policy::STATUS_EXPIRED,
-                Policy::STATUS_UNPAID
-            ])
-            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
-            ->getQuery()
-            ->execute()
-            ->count();
-    }
 
     /**
      * All policies that are active (excluding so-sure test ones)
