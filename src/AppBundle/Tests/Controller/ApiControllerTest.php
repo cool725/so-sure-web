@@ -446,7 +446,7 @@ class ApiControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', sprintf('/api/v1/referral?email=%s', $user->getEmail()));
         $data = $this->verifyResponse(200);
-        $this->assertContains("http://goo.gl", $data['url']);
+        $this->assertContains("https://goo.gl", $data['url']);
     }
 
     public function testReferralValidation()
