@@ -25,7 +25,7 @@ class AlphanumericValidator extends ConstraintValidator
     private function getRegex($exact = true)
     {
         // main concerns are around [] (php array) and $ (mongodb expression)
-        $expr = preg_quote('');
+        $expr = preg_quote('-');
         $regex = sprintf('[%sa-zA-Z0-9\x{00C0}-\x{017F}]*', $expr);
         if ($exact) {
             $regex = sprintf('/^%s$/u', $regex);
