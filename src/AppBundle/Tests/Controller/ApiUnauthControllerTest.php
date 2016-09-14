@@ -93,13 +93,12 @@ class ApiUnauthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
     }
 
-    /* code was temporarily commented out
     public function testTokenUnauthRateLimited()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('unauth-ratelimit', $this), 'bar');
 
-        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_TOKEN] + 1; $i++) {
+        for ($i = 1; $i <= RateLimitService::$maxIpRequests[RateLimitService::DEVICE_TYPE_TOKEN] + 1; $i++) {
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/unauth/token', [
                 'token' => $user->getToken(),
                 'cognito_id' => self::$identity->getId(),
@@ -107,5 +106,4 @@ class ApiUnauthControllerTest extends BaseControllerTest
         }
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
-    */
 }
