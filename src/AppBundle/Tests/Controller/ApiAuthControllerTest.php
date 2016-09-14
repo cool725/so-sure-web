@@ -1504,6 +1504,28 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('foo bar', $data['name']);
     }
 
+    public function testNameConformInvitation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('invite-name-conform', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'name' => 'functional test$',
+            'email' => $this->generateEmail('invite-name-conform-invite', $this)
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('functional test', $data['name']);
+    }
+
     public function testSCodeValidationInvitation()
     {
         $user = self::createUser(
@@ -1917,6 +1939,21 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals($birthday, $user->getBirthday());
     }
 
+    public function testUpdateUserBadName()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
+        $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
+        $birthday = new \DateTime('1980-01-01');
+        $data = [
+            'first_name' => 'bar$',
+            'last_name' => 'foo$',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(200);
+        $this->assertEquals('bar', $result['first_name']);
+        $this->assertEquals('foo', $result['last_name']);
+    }
+
     public function testUpdateFacebook()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
@@ -2205,6 +2242,31 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals($data['line1'], $result['addresses'][0]['line1']);
         $this->assertEquals($data['city'], $result['addresses'][0]['city']);
         $this->assertEquals($data['postcode'], $result['addresses'][0]['postcode']);
+    }
+
+    public function testUserAddAddressBadLines()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1$',
+            'line2' => 'address line 2$',
+            'line3' => 'address line 3$',
+            'city' => 'London$',
+            'postcode' => 'BX11LT',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(200);
+        $this->assertEquals(self::$testUser->getEmailCanonical(), $result['email']);
+        $this->assertTrue(isset($result['addresses']));
+        $this->assertTrue(isset($result['addresses'][0]));
+        $this->assertEquals($data['type'], $result['addresses'][0]['type']);
+        $this->assertEquals('address line 1', $result['addresses'][0]['line1']);
+        $this->assertEquals('address line 2', $result['addresses'][0]['line2']);
+        $this->assertEquals('address line 3', $result['addresses'][0]['line3']);
+        $this->assertEquals('London', $result['addresses'][0]['city']);
+        $this->assertEquals('BX11LT', $result['addresses'][0]['postcode']);
     }
 
     public function testUserAddressValidation()

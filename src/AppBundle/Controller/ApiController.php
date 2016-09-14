@@ -601,8 +601,16 @@ class ApiController extends BaseController
 
             $user->setEnabled(true);
             $user->setEmail($this->getDataString($data, 'email'));
-            $user->setFirstName(isset($data['first_name']) ? ucfirst($this->getDataString($data, 'first_name')) : null);
-            $user->setLastName(isset($data['last_name']) ? ucfirst($this->getDataString($data, 'last_name')) : null);
+            $user->setFirstName(
+                isset($data['first_name']) ?
+                ucfirst($this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50)) :
+                null
+            );
+            $user->setLastName(
+                isset($data['last_name']) ?
+                ucfirst($this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50)) :
+                null
+            );
             $user->setFacebookId($this->getDataString($data, 'facebook_id'));
             $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
             $user->setSnsEndpoint($this->getDataString($data, 'sns_endpoint'));
