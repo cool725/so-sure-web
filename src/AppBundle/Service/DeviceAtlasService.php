@@ -90,7 +90,10 @@ class DeviceAtlasService
         // Known issue where iphones are not detectable
         if ($manufacturer != "Apple" && $model != "iPhone") {
             $missing = sprintf("%s %s %s %s", $manufacturer, $marketingName, $model, $osVersion);
-            $this->logger->warning(sprintf('Mobile web browser (Phone: %s) is not in our db (or device name mismatch)', $missing));
+            $this->logger->warning(sprintf(
+                'Mobile web browser (Phone: %s) is not in our db (or device name mismatch)',
+                $missing
+            ));
         }
 
         return $manufacturer;
