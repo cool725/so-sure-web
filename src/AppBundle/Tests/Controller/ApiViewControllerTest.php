@@ -99,7 +99,8 @@ class ApiViewControllerTest extends BaseControllerTest
         $policy = $this->createPolicy($user, true);
         $data = $this->checkPolicy($policy, true);
 
-        $pdf = self::$container->get('templating')->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]);
+        $templating = self::$container->get('templating');
+        $pdf = $templating->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]);
 
         $data = chunk_split(trim(preg_replace('/\s+/', ' ', strip_tags($data))), 200);
         $pdf = chunk_split(trim(preg_replace('/\s+/', ' ', strip_tags($pdf))), 200);
