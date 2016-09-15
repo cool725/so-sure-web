@@ -373,7 +373,22 @@
 
 <p>If one of your Group’s mobile phone is no longer insured by so-sure part way through your annual policy, we will allow you to replace that connection at the same value within the 30 days following your connection leaving the service.</p>
 
-<!-- TODO: Insert Promotion Copy -->
+{% if promo_code is defined and promo_code == 'launch' %}
+    <p>
+        As your policy has a promotion code "{{ promo_code|upper }}", so-sure is offering you in the first year of you being insured by so-sure:
+    </p>
+    <ol type="i">
+        <li>
+            when a connection is eligible for a £10 contribution to your Reward Pot, we will contribute £15 to your Reward Pot instead of £10, and
+        </li>
+        <li>
+            the maximum value of your Reward Pot is 100% of the value of the price of your mobile phone insurance with so-sure. 
+        </li>
+    </ol>
+    <p>
+        All other terms and conditions apply.
+    </p>
+{% endif %}
 
 <p>All payments assume that no deduction is required by way of taxation. If we are obliged by law to make such deduction, then the Reward Pot payments shall be reduced accordingly.</p>
 

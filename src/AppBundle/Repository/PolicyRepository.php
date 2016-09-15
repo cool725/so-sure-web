@@ -11,9 +11,30 @@ class PolicyRepository extends DocumentRepository
 {
     use DateTrait;
 
-    public function isPromoLaunch()
+    public function isPromoLaunch($policyPrefix)
     {
-        return $this->countAllPolicies() < 1000;
+        return $this->countAllPolicies($policyPrefix) < 1000;
+    }
+
+    /**
+     * All policies that have been created (excluding so-sure test ones)
+     *
+     * @param string $policyPrefix
+     */
+    public function countAllPolicies($policyPrefix)
+    {
+        return $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_PENDING,
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_CANCELLED,
+                Policy::STATUS_EXPIRED,
+                Policy::STATUS_UNPAID
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
+            ->getQuery()
+            ->execute()
+            ->count();
     }
 
     public function getWeeklyEmail($environment)

@@ -335,7 +335,10 @@ class DefaultController extends BaseController
             }
         }
 
-        $isPromo = $phonePolicyRepo->isPromoLaunch();
+        $tmpPolicy = new PhonePolicy();
+        $prefix = $tmpPolicy->getPolicyNumberPrefix();
+        $isPromo = $phonePolicyRepo->isPromoLaunch($prefix);
+
         $maxPot = $phone->getCurrentPhonePrice()->getMaxPot($isPromo);
         $additionalValue = 0;
         if ($isPromo) {
