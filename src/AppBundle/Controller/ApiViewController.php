@@ -50,7 +50,9 @@ class ApiViewController extends BaseController
             'maxPotValue' => $maxPotVaue,
             'maxConnections' => $maxConnections,
             'yearlyPremium' => $yearlyPremium,
-            'promo_code' => $repo->isPromoLaunch($prefix) ? 'launch' : null,
+            'promo_code' => null,
+            // don't display promo values
+            // 'promo_code' => $repo->isPromoLaunch($prefix) ? 'launch' : null,
         );
     }
 
