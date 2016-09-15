@@ -29,7 +29,7 @@ class ApiViewControllerTest extends BaseControllerTest
         $url = sprintf('/view/policy/terms?maxPotValue=62.8&policy_key=%s', $policyKey);
         $crawler = self::$client->request('GET', $url);
         $data = self::verifyResponseHtml(200);
-        $this->assertContains('promotion code "LAUNCH"', $data);
+        $this->assertNotContains('promotion code "LAUNCH"', $data);
     }
 
     public function testPolicyTermsPromo()
