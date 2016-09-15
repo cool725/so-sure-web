@@ -486,7 +486,7 @@ class AdminController extends BaseController
             'month' => $month,
             'paymentTotals' => $paymentTotals,
             // TODO: query will eve
-            'activePolicies' => $phonePolicyRepo->countAllActivePolicies($date),
+            'activePolicies' => $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date),
             'files' => $s3FileRepo->getAllFiles($date),
         ];
     }

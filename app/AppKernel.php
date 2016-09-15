@@ -43,6 +43,7 @@ class AppKernel extends Kernel
             new Dpn\XmlSitemapBundle\DpnXmlSitemapBundle(),
             new Domnikl\StatsdBundle\DomniklStatsdBundle(),
             new Scheb\TwoFactorBundle\SchebTwoFactorBundle(),
+            new Nexy\SlackBundle\NexySlackBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

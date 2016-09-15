@@ -264,3 +264,8 @@ scheb_two_factor:
     # two-factor authentication for other authentication methods, add their security token classes.
     security_tokens:
         - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+
+nexy_slack:
+
+    # The Slack API Incoming WebHooks URL.
+    endpoint:             %slack_webhook%
