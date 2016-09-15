@@ -113,7 +113,9 @@ class ApiViewControllerTest extends BaseControllerTest
 
         // top and bottom of api is slightly different - best to add to pdf version to avoid replacing unindented areas
         $pdf = sprintf('so-sure Policy Document%s', $pdf);
+        // @codingStandardsIgnoreStart
         $pdf = sprintf('%s Contact details Address: so-sure Limited, 10 Finsbury Square, London EC2A 1AF Email: support@wearesosure.com', $pdf);
+        // @codingStandardsIgnoreEnd
 
         // delete extra spaces, and chunk into 200 chars to make comparision easier
         $data = trim(preg_replace('/\s+/', ' ', $data));
