@@ -49,7 +49,8 @@
         "peerj/peerj-user-security-bundle": "^0.1.0",
         "dpn/xml-sitemap-bundle": "^2.0",
         "domnikl/statsd-bundle": "^1.1",
-        "scheb/two-factor-bundle": "^2.6"
+        "scheb/two-factor-bundle": "^2.6",
+        "nexylan/slack-bundle": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

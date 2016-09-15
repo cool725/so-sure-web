@@ -28,9 +28,21 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are active (excluding so-sure test ones)
      */
-    public function countAllActivePolicies(\DateTime $date = null)
+    public function countAllActivePoliciesToEndOfMonth(\DateTime $date = null)
     {
         $nextMonth = $this->endOfMonth($date);
+
+        return $this->countAllActivePolicies($nextMonth);
+    }
+
+    /**
+     * All policies that are active (excluding so-sure test ones)
+     */
+    public function countAllActivePolicies(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
 
         $policy = new PhonePolicy();
 
@@ -39,7 +51,7 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_ACTIVE,
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
-            ->field('start')->lt($nextMonth)
+            ->field('start')->lte($date)
             ->getQuery()
             ->execute()
             ->count();
