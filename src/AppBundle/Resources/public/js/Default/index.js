@@ -15,3 +15,9 @@
             scrollTop: $("#connections").offset().top
         }, 1500);
     });
+
+    $("#quote-scroll-indicator").click(function() {
+        $('html, body').animate({
+            scrollTop: $("#connections").offset().top
+        }, 1500);
+    });

@@ -9,9 +9,9 @@
     background: -ms-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
     background: linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
-    padding-top: 50px;
-    padding-bottom: 50px;
-    min-height: 550px;
+    padding-top: 30px;
+    padding-bottom: 40px;
+    min-height: 500px;
     position: relative;
 
 }
@@ -127,7 +127,6 @@
 /* Connections Indicator */
 
 .connections {
-    position: relative;
     background-color: #FFF;
     padding-top: 50px;
     padding-bottom: 105px;

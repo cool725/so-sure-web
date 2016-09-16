@@ -26,11 +26,12 @@
     'bundles/app/css/Default/quotePhone.css'
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
     'bundles/app/css/Default/connections.css'
+    'bundles/app/css/Default/scrollindicator.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
-    <div class="view-quote">
+  <section class="view-quote">
         <div class="container">
           <div id="navchange"></div>
             <h1 class="text-center">Your Quote</h1>
@@ -159,9 +160,10 @@
                   </div>
           </div>
         </div>
-      </div>
+          <a id="quote-scroll-indicator" href="#connections" style="color: #fff;"><div class="mouse"></div></a>
+      </section>
 
-    <div class="connections" id="connections">
+    <section class="connections" id="connections">
         <div class="container">
             <h3>
               Do you want 80% of your money back at the end of the year?
@@ -196,9 +198,9 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="download-now" id="download-now">
+<section class="download-now" id="download-now">
     <div class="container">
         <h3>Ready for better? Download our app now.</h3>
         {% if is_promo %}
@@ -219,6 +221,6 @@
         </div>
     </div>
 </div>
-</div>
+</section>
 
 {% endblock %}
