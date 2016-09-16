@@ -1,6 +1,6 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}{{ invitation.inviterName }} invited you to join so-sure - join today and we’ll reward both of you{% endblock %}
+{% block title %}{{ invitation.inviterName }} invited you to connect on so-sure - join today and we’ll reward both of you{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 		<h1>
@@ -10,7 +10,7 @@
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">Your friend, <strong>{{ invitation.inviterName }}</strong>, just got their phone covered with so-sure – better &amp; up to 80% cheaper phone insurance designed for friends.<br>
 			  <br>
-			  <strong>Join today and we'll reward both of you!</strong></span><br>
+			  <strong>Connect today and we'll reward both of you!</strong></span><br>
 			  &nbsp;
 		   </div>
 		</div>
