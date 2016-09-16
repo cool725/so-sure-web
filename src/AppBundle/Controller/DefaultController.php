@@ -85,7 +85,7 @@ class DefaultController extends BaseController
                 }
             } elseif ($request->request->has('launch_phone')) {
                 $formPhone->handleRequest($request);
-                if ($formPhone->isValid()) {
+                if ($formPhone->isValid() && $policy->getPhone()) {
                     if ($policy->getPhone()->getMemory()) {
                         return $this->redirectToRoute('quote_make_model_memory', [
                             'make' => $policy->getPhone()->getMake(),
