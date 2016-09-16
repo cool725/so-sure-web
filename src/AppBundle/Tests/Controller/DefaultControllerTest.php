@@ -33,6 +33,17 @@ class DefaultControllerTest extends BaseControllerTest
         $this->assertGreaterThan(10, count($values));
     }
 
+    public function testIndexInvalid()
+    {
+        $crawler = self::$client->request('GET', '/');
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('Quote me')->form();
+        $form['launch_phone[phone]'] = '';
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+    }
+
     public function testQuotePhoneRouteMakeModelMemory()
     {
         $crawler = self::$client->request('GET', self::$router->generate('quote_make_model_memory', [
