@@ -8,7 +8,7 @@
       ><i class="fa fa-book"></i></button>
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
       data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}"
-      data-ipt-rate="{{ phone.iptRate }}"
+      data-ipt-rate="{{ phone.currentIptRate }}"
       data-phone="{{ phone.toEditArray()|json_encode }}"><i class="fa fa-edit"></i></button>
   <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
           data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}"><i class="fa fa-trash"></i></button>

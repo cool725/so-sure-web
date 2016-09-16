@@ -4,7 +4,7 @@ namespace AppBundle\Document;
 
 trait CurrencyTrait
 {
-    protected function getCurrentIptRate(\DateTime $date = null)
+    public function getCurrentIptRate(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
