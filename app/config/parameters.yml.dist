@@ -92,4 +92,4 @@ parameters:
     davies_ip: 10.0.2.2
 
     sosure_employee_cookie_value: 'changeme'
-    slack_webhook: ''
+    slack_webhook: 'http://dev.so-sure.net'
