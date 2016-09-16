@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\DataFixtures\ORM;
+namespace AppBundle\DataFixtures\MongoDB\PlayDevice;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
