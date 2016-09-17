@@ -76,6 +76,25 @@
                 <h3>Select from our most popular devices</h3>
                 <p>Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
                 <div class="row">
+                  <div class="col-md-4">
+                      <div id="device-logo">
+                          <img src="{{ cdn_url }}/images/home/phone-logos/Apple_iPhone_7_Logo.svg" alt="Get your iPhone 7 insured today!"></img>
+                          <div id="memory-select">
+                              <h5>Select memory</h5>
+                              <ul>
+                                <li>
+                                    <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 7', 'memory': '32'}) }}">32GB</a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 7', 'memory': '128'}) }}">128GB</a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 7', 'memory': '256'}) }}">256GB</a>
+                                </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
                     <div class="col-md-4">
                         <div id="device-logo">
                             <img src="{{ cdn_url }}/images/home/phone-logos/Samsung_Galaxy_S7_logo.svg" alt="Get your Samsung Galaxy S7 insured today!"></img>
@@ -108,27 +127,27 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div id="device-logo">
-                            <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_6_Logo.svg" alt="Get your iPhone 6 insured today!"></img>
-                            <div id="memory-select">
-                                <h5>Select memory</h5>
-                                <ul>
-                                    <li>
-                                        <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '16'}) }}">16GB</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '64'}) }}">64GB</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '128'}) }}">128GB</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                  </div>
                 <div class="row">
+                  <div class="col-md-4">
+                      <div id="device-logo">
+                          <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_6_Logo.svg" alt="Get your iPhone 6 insured today!"></img>
+                          <div id="memory-select">
+                              <h5>Select memory</h5>
+                              <ul>
+                                  <li>
+                                      <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '16'}) }}">16GB</a>
+                                  </li>
+                                  <li>
+                                      <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '64'}) }}">64GB</a>
+                                  </li>
+                                  <li>
+                                      <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '128'}) }}">128GB</a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
                     <div class="col-md-4">
                         <div id="device-logo">
                             <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_SE_logo.svg" alt="Get your Samsung iPhone SE insured today!"></img>
@@ -164,21 +183,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div id="device-logo">
-                            <img src="{{ cdn_url }}/images/home/phone-logos/Samsung_Galaxy_S5_logo.svg" alt="Get your Samsung Galaxy S5 insured today"></img>
-                            <div id="memory-select">
-                                <h5>Select memory</h5>
-                                <ul>
-                                    <li>
-                                        <a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S5', 'memory': '16'}) }}">16GB</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S5', 'memory': '32'}) }}">32GB</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
