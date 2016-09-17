@@ -25,4 +25,7 @@
   .mouse {
     bottom: -7%;
   }
+  .view-quote .mouse {
+    bottom: -4%;
+  }
 }
