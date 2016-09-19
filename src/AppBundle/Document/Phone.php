@@ -437,7 +437,7 @@ class Phone
         }
     }
 
-    public function policyProfit($claimFrequency)
+    public function policyProfit($claimFrequency, $consumerPayout, $iptRebate)
     {
         $price = $this->getReplacementPrice();
         if (!$price && $this->getSuggestedReplacement()) {
@@ -448,9 +448,13 @@ class Phone
         }
 
         // Avg Excess + Expected Recycling - Claims handling fee - Claims Check fee - replacement phone price
-        $costOfClaims = 56 + 19 - 14 - 1 - $price;
-        $nwt = $this->getCurrentPhonePrice()->getYearlyGwp() - Salva::YEARLY_TOTAL_COMMISSION;
-        $profit = $nwt + $costOfClaims * $claimFrequency;
+        $netCostOfClaims = 56 + 19 - 14 - 1 - $price;
+
+        $uwReceived = $this->getCurrentPhonePrice()->getYearlyGwp() - Salva::YEARLY_COVERHOLDER_COMMISSION;
+        $nwp = $uwReceived - $consumerPayout;
+        $uwPrefReturn = ($nwp * 0.08);
+
+        $profit = $nwp + $iptRebate + ($netCostOfClaims * $claimFrequency) - $uwPrefReturn;
 
         return $this->toTopTwoDp($profit);
     }

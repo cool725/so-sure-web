@@ -57,7 +57,9 @@ twig:
         branch_pot_url: %branch_pot_url%
         branch_share_url: %branch_share_url%
         branch_policy_url: %branch_policy_url%
-        expected_claim_frequency: %expected_claim_frequency%
+        expected_claim_frequency: 0.2
+        consumer_payout: 17.2
+        ipt_rebate: 1.5
         davies_ip: %davies_ip%
 
 doctrine_mongodb:
