@@ -416,8 +416,8 @@ class InvitationService
         }
 
         // If there was a concellation in the network, new connection should replace the cancelled connection
-        $this->addConnection($inviteePolicy, $invitation->getInviter(), $inviterPolicy, $date);
-        $this->addConnection($inviterPolicy, $invitation->getInvitee(), $inviteePolicy, $date);
+        $this->addConnection($inviteePolicy, $invitation->getInviter(), $inviterPolicy, $invitation, $date);
+        $this->addConnection($inviterPolicy, $invitation->getInvitee(), $inviteePolicy, $invitation, $date);
 
         $invitation->setAccepted($date);
 
@@ -429,8 +429,13 @@ class InvitationService
         $this->sendPush($invitation, PushService::MESSAGE_CONNECTED);
     }
 
-    protected function addConnection(Policy $policy, User $linkedUser, Policy $linkedPolicy, \DateTime $date = null)
-    {
+    protected function addConnection(
+        Policy $policy,
+        User $linkedUser,
+        Policy $linkedPolicy,
+        Invitation $invitation,
+        \DateTime $date = null
+    ) {
         if ($policy->getId() == $linkedPolicy->getId()) {
             throw new \Exception('Unable to connect to the same policy');
         }
@@ -448,6 +453,8 @@ class InvitationService
         $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);
         $connection->setPromoValue($promoConnectionValue);
+        $connection->setInvitation($invitation);
+        $connection->setInitialInvitationDate($invitation->getCreated());
         $policy->addConnection($connection);
         $policy->updatePotValue();
     }

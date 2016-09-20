@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use AppBundle\Document\Invitation\Invitation;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
@@ -35,6 +36,19 @@ class Connection
      * @Gedmo\Versioned
      */
     protected $sourcePolicy;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Invitation\Invitation", cascade={"persist"})
+     * @Gedmo\Versioned
+     */
+    protected $invitation;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $initialInvitationDate;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="Policy")
@@ -106,6 +120,26 @@ class Connection
     public function setLinkedUser(User $user)
     {
         $this->linkedUser = $user;
+    }
+
+    public function getInvitation()
+    {
+        return $this->invitation;
+    }
+
+    public function setInvitation(Invitation $invitation)
+    {
+        $this->invitation = $invitation;
+    }
+
+    public function getInitialInvitationDate()
+    {
+        return $this->initialInvitationDate;
+    }
+
+    public function setInitialInvitationDate(\DateTime $initialInvitationDate)
+    {
+        $this->initialInvitationDate = $initialInvitationDate;
     }
 
     public function getSourceUser()
