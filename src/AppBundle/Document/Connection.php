@@ -38,7 +38,7 @@ class Connection
     protected $sourcePolicy;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Invitation")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Invitation\Invitation", cascade={"persist"})
      * @Gedmo\Versioned
      */
     protected $invitation;
