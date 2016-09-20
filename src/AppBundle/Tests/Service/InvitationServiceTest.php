@@ -660,6 +660,8 @@ class InvitationServiceTest extends WebTestCase
             if ($connection->getLinkedPolicy()->getId() == $policyInvitee->getId()) {
                 $connectionFound = true;
                 $this->assertEquals(2, $connection->getTotalValue());
+                $this->assertEquals($invitation->getId(), $connection->getInvitation()->getId());
+                $this->assertEquals($invitation->getCreated(), $connection->getInitialInvitationDate());
             }
         }
         $this->assertTrue($connectionFound);
@@ -670,6 +672,8 @@ class InvitationServiceTest extends WebTestCase
             if ($connection->getLinkedPolicy()->getId() == $inviterPolicy->getId()) {
                 $connectionFound = true;
                 $this->assertEquals(10, $connection->getTotalValue());
+                $this->assertEquals($invitation->getId(), $connection->getInvitation()->getId());
+                $this->assertEquals($invitation->getCreated(), $connection->getInitialInvitationDate());
             }
         }
         $this->assertTrue($connectionFound);
