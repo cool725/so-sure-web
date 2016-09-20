@@ -55,15 +55,21 @@ class PushService
     public function send($messageType, $arn, $message, $badge = null)
     {
         $this->logger->debug(sprintf('Push triggered to %s %s', $arn, $message));
-        $this->sns->publish([
-           'TargetArn' => $arn,
-           'MessageStructure' => 'json',
-            'Message' => json_encode([
-                'APNS' => json_encode($this->generateAPNSMessage($messageType, $message, $badge)),
-                'APNS_SANDBOX' => json_encode($this->generateAPNSMessage($messageType, $message, $badge)),
-                'GCM' => json_encode($this->generateGCMMessage($messageType, $message)),
-            ])
-        ]);
+        try {
+            $this->sns->publish([
+               'TargetArn' => $arn,
+               'MessageStructure' => 'json',
+                'Message' => json_encode([
+                    'APNS' => json_encode($this->generateAPNSMessage($messageType, $message, $badge)),
+                    'APNS_SANDBOX' => json_encode($this->generateAPNSMessage($messageType, $message, $badge)),
+                    'GCM' => json_encode($this->generateGCMMessage($messageType, $message)),
+                ])
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf('Failed to push %s to %s', $message, $arn));
+
+            return false;
+        }
     }
 
     public function getUri($messageType)
