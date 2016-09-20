@@ -24,7 +24,6 @@ framework:
         strict_requirements: ~
     form:            ~
     csrf_protection: ~
-    validation:      { enable_annotations: true }
     #serializer:      { enable_annotations: true }
     templating:
         engines: ['twig']
@@ -100,7 +99,7 @@ monolog:
     channels: ['receperio']
 
 assetic:
-    bundles:        [ AppBundle ]
+    bundles:        [ AppBundle, FOSUserBundle ]
     debug:          '%kernel.debug%'
     use_controller: '%kernel.debug%'
     filters:
