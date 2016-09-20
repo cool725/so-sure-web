@@ -40,6 +40,7 @@ class UserSearchType extends AbstractType
             ->add('policy', TextType::class, ['required' => false])
             ->add('status', ChoiceType::class, [
                 'required' => false,
+                'data' => Policy::STATUS_ACTIVE,
                 'choices' => [
                     null => 'All',
                     Policy::STATUS_PENDING => Policy::STATUS_PENDING,

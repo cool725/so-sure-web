@@ -74,6 +74,8 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Mobile</th>
+                        <th>Facebook</th>
+                        <th>State</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -85,6 +87,8 @@
                             <td>{{ user.firstname }} {{ user.lastname }}</td>
                             <td>{{ user.email }}</td>
                             <td>{{ user.mobileNumber }}</td>
+                            <td>{% if user.facebookId | length > 0 %}Yes{% else %}No{% endif %}</td>
+                            <td>{% if user.locked %}locked{% elseif user.enabled %}enabled{% else %}disabled{%endif %}</td>
                         </tr>
                         {% endfor %}
                         {% if user.policies|length == 0 %}
@@ -94,6 +98,8 @@
                             <td>{{ user.firstname }} {{ user.lastname }}</td>
                             <td>{{ user.email }}</td>
                             <td>{{ user.mobileNumber }}</td>
+                            <td>{% if user.facebookId | length > 0 %}<img src="http://graph.facebook.com/{{ user.facebookId }}/picture" />{% else %}No{% endif %}</td>
+                            <td>{% if user.locked %}locked{% elseif user.enabled %}enabled{% else %}disabled{%endif %}</td>
                         </tr>
                         {% endif %}
                     {% endfor %}

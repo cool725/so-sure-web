@@ -29,6 +29,7 @@ use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
 use AppBundle\Form\Type\YearMonthType;
 use AppBundle\Form\Type\JudoFileType;
+use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -351,6 +352,9 @@ class AdminController extends BaseController
         $imeiForm = $this->get('form.factory')
             ->createNamedBuilder('imei_form', ImeiType::class, $policy)
             ->getForm();
+        $facebookForm = $this->get('form.factory')
+            ->createNamedBuilder('facebook_form', FacebookType::class, $policy)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -383,6 +387,18 @@ class AdminController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('facebook_form')) {
+                $facebookForm->handleRequest($request);
+                if ($facebookForm->isValid()) {
+                    $policy->getUser()->resetFacebook();
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s facebook cleared.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -391,6 +407,7 @@ class AdminController extends BaseController
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
             'imei_form' => $imeiForm->createView(),
+            'facebook_form' => $facebookForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

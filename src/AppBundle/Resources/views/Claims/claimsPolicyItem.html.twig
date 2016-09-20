@@ -66,6 +66,10 @@
                 <h3>Pot</h3>
                 <table class="table table-striped">
                     <tr>
+                        <td>Invitations</td>
+                        <td>{{ policy.invitations|length }}</td>
+                    </tr>
+                    <tr>
                         <td>Connections</td>
                         <td>
                           <strong>{{ policy.connections|length }}</strong>&nbsp;:&nbsp;
@@ -198,6 +202,10 @@
                     <td>Billing Address</td>
                     <td>{{ policy.user.billingAddress }}</td>
                 </tr>
+                <tr>
+                    <td>State</td>
+                    <td>{% if policy.user.locked %}locked{% elseif policy.user.enabled %}enabled{% else %}disabled{%endif %}</td>
+                </tr>
             </table>
         </div>
         <div role="tabpanel" class="tab-pane" id="history">
@@ -248,8 +256,17 @@
                           {{ form_errors(imei_form.imei) }}
                           {{ form_widget(imei_form.imei) }}
                       </div>
-                      {{ form_widget(imei_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-update'}}) }}
+                      {{ form_widget(imei_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-imei-update'}}) }}
                       {{ form_end(imei_form) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Facebook</td>
+                    <td>
+                      {% if policy.user.facebookId | length > 0 %}<img src="http://graph.facebook.com/{{ policy.user.facebookId }}/picture" />{% else %}Not present{% endif %}  
+                      {{ form_start(facebook_form, {'attr': {'class': 'form-inline'}}) }}
+                      {{ form_widget(facebook_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-danger confirm-facebook-clear'}}) }}
+                      {{ form_end(facebook_form) }}
                     </td>
                 </tr>
             </table>
