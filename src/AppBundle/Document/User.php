@@ -408,6 +408,12 @@ class User extends BaseUser implements TwoFactorInterface
         return $this->facebookAccessToken;
     }
 
+    public function resetFacebook()
+    {
+        $this->setFacebookId(null);
+        $this->setFacebookAccessToken(null);
+    }
+
     public function getFacebookId()
     {
         return $this->facebookId;
