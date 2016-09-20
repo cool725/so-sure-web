@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d7e9071b05fe6e3e27006a8ea24e43ea",
-    "content-hash": "b1694f8457f7940737223aef5b3e3926",
+    "hash": "bdd6841063aa0a11fd31db352cec8030",
+    "content-hash": "9dea4f5632acb560584bb64cc475354b",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -4702,6 +4702,70 @@
                 "monitoring"
             ],
             "time": "2016-07-05 15:50:29"
+        },
+        {
+            "name": "rollerworks/password-strength-bundle",
+            "version": "v1.5.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rollerworks/PasswordStrengthBundle.git",
+                "reference": "0169b29f48bf7440c12d3a00f9cc560245998447"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rollerworks/PasswordStrengthBundle/zipball/0169b29f48bf7440c12d3a00f9cc560245998447",
+                "reference": "0169b29f48bf7440c12d3a00f9cc560245998447",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "symfony/console": "^2.3.3|^3.0",
+                "symfony/framework-bundle": "^2.3.3|^3.0",
+                "symfony/validator": "^2.3.20|^3.0"
+            },
+            "require-dev": {
+                "matthiasnoback/symfony-dependency-injection-test": "^0.7.4",
+                "matthiasnoback/symfony-service-definition-validator": "^1.2.2",
+                "phpunit/phpunit": "~4.4|^5.2.9",
+                "sllh/php-cs-fixer-styleci-bridge": "^1.4"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Rollerworks\\Bundle\\PasswordStrengthBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastiaan Stok",
+                    "email": "s.stok@rollercapes.net"
+                },
+                {
+                    "name": "Luis Cordova",
+                    "email": "cordoval@gmail.com"
+                },
+                {
+                    "name": "Community contributions",
+                    "homepage": "https://github.com/rollerworks/PasswordStrengthBundle/contributors"
+                }
+            ],
+            "description": "Password-strength validator bundle for Symfony",
+            "keywords": [
+                "bundle",
+                "password",
+                "symfony",
+                "validator"
+            ],
+            "time": "2016-04-28 14:13:45"
         },
         {
             "name": "scheb/two-factor-bundle",

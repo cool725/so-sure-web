@@ -1,4 +1,4 @@
 FOS\UserBundle\Form\Model\ChangePassword:
   properties:
     new:
-      - Length: { min: 8, minMessage: "Password must be at least 8 characters", groups: [ ChangePassword, ResetPassword ] }
+      - Rollerworks\Bundle\PasswordStrengthBundle\Validator\Constraints\PasswordStrength: { minStrength: 3, minLength: 8, message: "Your password must be at least 8 characters and have a mixture of digits, special characters and uppercase and lower letters." }
