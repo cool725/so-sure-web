@@ -1,0 +1,4 @@
+FOS\UserBundle\Form\Model\ChangePassword:
+  properties:
+    new:
+      - Length: { min: 8, minMessage: "Password must be at least 8 characters", groups: [ ChangePassword, ResetPassword ] }
