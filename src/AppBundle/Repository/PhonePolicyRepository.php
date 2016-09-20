@@ -38,21 +38,26 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are active (excluding so-sure test ones)
      */
-    public function countAllActivePolicies(\DateTime $date = null)
+    public function countAllActivePolicies(\DateTime $endDate = null, \DateTime $startDate = null)
     {
-        if (!$date) {
-            $date = new \DateTime();
+        if (!$endDate) {
+            $endDate = new \DateTime();
         }
 
         $policy = new PhonePolicy();
 
-        return $this->createQueryBuilder()
+        $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
-            ->field('start')->lte($date)
-            ->getQuery()
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+
+        $qb->field('start')->lte($endDate);
+        if ($startDate) {
+            $qb->field('start')->gte($startDate);
+        }
+
+        return $qb->getQuery()
             ->execute()
             ->count();
     }

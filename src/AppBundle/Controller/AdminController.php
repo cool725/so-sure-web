@@ -16,6 +16,8 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\User;
+use AppBundle\Document\Connection;
+use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\File\BarclaysFile;
@@ -275,6 +277,52 @@ class AdminController extends BaseController
 
         return [
             'users' => $users,
+        ];
+    }
+
+    /**
+     * @Route("/reports", name="admin_reports")
+     * @Template
+     */
+    public function adminReportsAction(Request $request)
+    {
+        $start = $request->get('start');
+        $end = $request->get('end');
+        if (!$start) {
+            $start = new \DateTime();
+            $start->sub(new \DateInterval('P7D'));
+        } else {
+            $start = new \DateTime($start);
+        }
+        if (!$end) {
+            $end = new \DateTime();
+        } else {
+            $end = new \DateTime($end);
+        }
+
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $connectionRepo = $dm->getRepository(Connection::class);
+        $invitationRepo = $dm->getRepository(Invitation::class);
+
+        $newPolicies = $policyRepo->countAllActivePolicies($end, $start);
+        $totalPolicies = $policyRepo->countAllActivePolicies();
+
+        $newConnections = $connectionRepo->count($start, $end);
+        $totalConnections = $connectionRepo->count();
+
+        $newInvitations = $invitationRepo->count($start, $end);
+        $totalInvitations = $invitationRepo->count();
+
+        return [
+            'start' => $start,
+            'end' => $end,
+            'total_polices' => $totalPolicies,
+            'new_policies' => $newPolicies,
+            'total_connections' => $totalConnections,
+            'new_connections' => $newConnections,
+            'total_invitations' => $totalInvitations,
+            'new_invitations' => $newInvitations,
         ];
     }
 

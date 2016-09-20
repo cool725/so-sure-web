@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\Invitation\InvitationRepository")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("invitation_type")
  * @MongoDB\DiscriminatorMap({"email"="EmailInvitation", "sms"="SmsInvitation"})

@@ -59,4 +59,20 @@ class ConnectionRepository extends DocumentRepository
 
         return false;
     }
+
+    public function count(\DateTime $start = null, \DateTime $end = null)
+    {
+        $qb = $this->createQueryBuilder();
+
+        if ($start) {
+            $qb->field('date')->gte($start);
+        }
+        if ($end) {
+            $qb->field('date')->lte($end);
+        }
+
+        return $qb->getQuery()
+            ->execute()
+            ->count();
+    }
 }
