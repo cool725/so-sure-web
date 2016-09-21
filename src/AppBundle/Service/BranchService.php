@@ -97,27 +97,49 @@ class BranchService
     {
         $data = array_merge($data, [
             //'$desktop_url' => $this->router->generate('', true),
-            '$ios_url' => $this->appleLink($source),
-            '$android_url' => $this->googleLink($source),
+            '$ios_url' => $this->downloadAppleLink($source),
+            '$android_url' => $this->downloadGoogleLink($source),
         ]);
 
         return $this->send($data, $this->marketing($marketing));
     }
 
+    public function generateSCode($code)
+    {
+        $marketing = ['channel' => 'app', 'campaign' => 'scode'];
+        $data = [
+            'scode' => $code,
+            '$deeplink_path' => sprintf('invite/scode/%s', $code),
+            '$desktop_url' => $this->router->generate('scode', ['code' => $code], true),
+            '$ios_url' => $this->downloadAppleLink('app'),
+            '$android_url' => $this->downloadGoogleLink('app'),
+        ];
+
+        return $this->send($data, $this->marketing($marketing), $code);
+    }
+
     protected function marketing($marketing)
     {
         return array_merge($marketing, [
-           "sdk" => "api",
+            // add marketing data here?
         ]);
     }
 
-    protected function send($data, $marketing)
+    protected function send($data, $marketing, $alias = null)
     {
         try {
             $body = array_merge($marketing, [
                 'branch_key' => $this->branchKey,
-                'data' => json_encode($data)
+                'data' => json_encode($data),
+                "sdk" => "api"
             ]);
+
+            if ($alias) {
+                $body = array_merge($body, [
+                    'alias' => $alias
+                ]);
+            }
+
             $key = sprintf('%s:%s', self::BRANCH_REDIS_KEY, sha1(json_encode($body)));
             if ($url = $this->redis->get($key)) {
                 return $url;

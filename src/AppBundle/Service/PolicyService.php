@@ -66,6 +66,8 @@ class PolicyService
 
     protected $redis;
 
+    protected $branch;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -100,6 +102,7 @@ class PolicyService
      * @param string           $defaultSenderName
      * @param                  $statsd
      * @param                  $redis
+     * @param                  $branch
      */
     public function __construct(
         DocumentManager $dm,
@@ -117,7 +120,8 @@ class PolicyService
         $defaultSenderAddress,
         $defaultSenderName,
         $statsd,
-        $redis
+        $redis,
+        $branch
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -135,6 +139,7 @@ class PolicyService
         $this->defaultSenderName = $defaultSenderName;
         $this->statsd = $statsd;
         $this->redis = $redis;
+        $this->branch = $branch;
     }
 
     public function create(Policy $policy, \DateTime $date = null)
@@ -173,8 +178,12 @@ class PolicyService
         }
 
         $scode = $this->uniqueSCode($policy);
-        $link = $this->router->generate('scode', ['code' => $scode->getCode()], true);
-        $shortLink = $this->shortLink->addShortLink($link);
+        $shortLink = $this->branch->generateSCode($scode->getCode());
+        // branch is preferred, but can fallback to old website version if branch is down
+        if (!$shortLink) {
+            $link = $this->router->generate('scode', ['code' => $scode->getCode()], true);
+            $shortLink = $this->shortLink->addShortLink($link);
+        }
         $scode->setShareLink($shortLink);
         $this->dm->flush();
 

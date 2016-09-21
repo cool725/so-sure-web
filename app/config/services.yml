@@ -275,7 +275,8 @@ services:
             defaultSenderAddress: "%default_sender_address%"
             defaultSenderName:    "%default_sender_name%"
             statsd:               "@statsd"
-            redis:          "@snc_redis.default"
+            redis:                "@snc_redis.default"
+            branch:               "@app.branch"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService
