@@ -45,6 +45,7 @@ class AppKernel extends Kernel
             new Scheb\TwoFactorBundle\SchebTwoFactorBundle(),
             new Nexy\SlackBundle\NexySlackBundle(),
             new Rollerworks\Bundle\PasswordStrengthBundle\RollerworksPasswordStrengthBundle(),
+            new Nelmio\SecurityBundle\NelmioSecurityBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {
