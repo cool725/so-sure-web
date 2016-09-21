@@ -7,7 +7,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\DateTrait;
 
-class PolicyRepository extends DocumentRepository
+class PolicyRepository extends BaseDocumentRepository
 {
     use DateTrait;
 
