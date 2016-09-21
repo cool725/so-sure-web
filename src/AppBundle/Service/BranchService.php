@@ -106,6 +106,11 @@ class BranchService
 
     public function generateSCode($code)
     {
+        // don't generate scodes for testing
+        if ($this->environment == 'test') {
+            return null;
+        }
+
         $marketing = ['channel' => 'app', 'campaign' => 'scode'];
         $data = [
             'scode' => $code,
