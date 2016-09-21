@@ -443,7 +443,7 @@ class Phone
         if (!$price && $this->getSuggestedReplacement()) {
             $price = $this->getSuggestedReplacement()->getReplacementPrice();
         }
-        if (!$price) {
+        if (!$price || $price == 0) {
             return null;
         }
 
