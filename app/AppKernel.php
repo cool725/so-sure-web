@@ -44,6 +44,7 @@ class AppKernel extends Kernel
             new Domnikl\StatsdBundle\DomniklStatsdBundle(),
             new Scheb\TwoFactorBundle\SchebTwoFactorBundle(),
             new Nexy\SlackBundle\NexySlackBundle(),
+            new Rollerworks\Bundle\PasswordStrengthBundle\RollerworksPasswordStrengthBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {
