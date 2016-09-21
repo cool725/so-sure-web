@@ -495,6 +495,14 @@ services:
         tags:
             - { name: staffim_rollbar.report_voter }
 
+    rollbar.voter.accessdenied:
+        class: AppBundle\Security\AccessDeniedHttpExceptionVoter
+        arguments:
+            requestStack: "@request_stack"
+            ips:          "%sosure_ips%"
+        tags:
+            - { name: staffim_rollbar.report_voter }
+
     sitemap.phone:
         class: AppBundle\Service\PhoneSitemapGenerator
         arguments:
