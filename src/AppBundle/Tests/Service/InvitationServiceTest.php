@@ -667,6 +667,8 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($connectionFound);
 
         $inviteePolicy = $repo->find($policyInvitee->getId());
+        // user created before invitation, so shouldn't be set
+        $this->assertNull($inviteePolicy->getUser()->getLeadSource());
         $connectionFound = false;
         foreach ($inviteePolicy->getConnections() as $connection) {
             if ($connection->getLinkedPolicy()->getId() == $inviterPolicy->getId()) {
@@ -677,6 +679,32 @@ class InvitationServiceTest extends WebTestCase
             }
         }
         $this->assertTrue($connectionFound);
+    }
+
+    public function testInviteLeadSource()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-inviter-lead', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, new \DateTime('2016-01-01'), false, true);
+        $this->assertTrue($policy->isPolicy());
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-accept-lead', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-accept-lead', $this),
+            'bar'
+        );
+        $repo = static::$dm->getRepository(User::class);
+        $userInviteeUpdated = $repo->find($userInvitee->getId());
+        $this->assertEquals('invitation', $userInviteeUpdated->getLeadSource());
     }
 
     public function testAcceptWithCancelled30days()
