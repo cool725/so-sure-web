@@ -301,10 +301,15 @@ class AdminController extends BaseController
             $end = new \DateTime($end);
         }
 
+        $excludedPolicyIds = $this->getParameter('report_excluded_policy_ids');
         $dm = $this->getManager();
+
         $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo->setExcludedPolicyIds($excludedPolicyIds);
         $connectionRepo = $dm->getRepository(Connection::class);
+        $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
         $invitationRepo = $dm->getRepository(Invitation::class);
+        $invitationRepo->setExcludedPolicyIds($excludedPolicyIds);
 
         $newPolicies = $policyRepo->countAllActivePolicies($end, $start);
         $totalPolicies = $policyRepo->countAllActivePolicies();

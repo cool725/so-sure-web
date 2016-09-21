@@ -7,7 +7,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\DateTrait;
 
-class PhonePolicyRepository extends PolicyRepository
+class PhonePolicyRepository extends BaseDocumentRepository
 {
     use DateTrait;
 
@@ -55,6 +55,9 @@ class PhonePolicyRepository extends PolicyRepository
         $qb->field('start')->lte($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
+        }
+        if ($this->excludedPolicyIds) {
+            $this->addExcludedPolicyQuery($qb, 'id');
         }
 
         return $qb->getQuery()

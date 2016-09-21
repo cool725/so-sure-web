@@ -4,8 +4,9 @@ namespace AppBundle\Repository\Invitation;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
+use AppBundle\Repository\BaseDocumentRepository;
 
-class InvitationRepository extends DocumentRepository
+class InvitationRepository extends BaseDocumentRepository
 {
     public function count(\DateTime $start = null, \DateTime $end = null)
     {
@@ -16,6 +17,9 @@ class InvitationRepository extends DocumentRepository
         }
         if ($end) {
             $qb->field('created')->lte($end);
+        }
+        if ($this->excludedPolicyIds) {
+            $this->addExcludedPolicyQuery($qb, 'policy.$id');
         }
 
         return $qb->getQuery()

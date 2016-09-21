@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 
-class ConnectionRepository extends DocumentRepository
+class ConnectionRepository extends BaseDocumentRepository
 {
     use PhoneTrait;
 
@@ -69,6 +69,10 @@ class ConnectionRepository extends DocumentRepository
         }
         if ($end) {
             $qb->field('date')->lte($end);
+        }
+        if ($this->excludedPolicyIds) {
+            $this->addExcludedPolicyQuery($qb, 'sourcePolicy.$id');
+            $this->addExcludedPolicyQuery($qb, 'linkedPolicy.$id');
         }
 
         return $qb->getQuery()
