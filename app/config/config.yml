@@ -13,6 +13,8 @@ parameters:
     cognito_developer_login: 'login.so-sure.com'
     default_sender_address: 'hello@wearesosure.com'
     default_sender_name: 'so-sure'
+    report_excluded_policy_ids:
+        - 57d829aa04e76f403c74ab39 # Dylan
 
 framework:
     #esi:             ~

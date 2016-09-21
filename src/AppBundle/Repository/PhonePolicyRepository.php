@@ -56,6 +56,9 @@ class PhonePolicyRepository extends PolicyRepository
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
+        if ($this->excludedPolicyIds) {
+            $this->addExcludedPolicyQuery($qb, 'id');
+        }
 
         return $qb->getQuery()
             ->execute()
