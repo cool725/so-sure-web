@@ -49,6 +49,13 @@ class User extends BaseUser implements TwoFactorInterface
     protected $referred;
 
     /**
+     * @Assert\Choice({"invitation", "scode"})
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $leadSource;
+
+    /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
      */
@@ -274,6 +281,16 @@ class User extends BaseUser implements TwoFactorInterface
         return $this->referrals;
     }
 
+    public function setLeadSource($source)
+    {
+        $this->leadSource = $source;
+    }
+
+    public function getLeadSource()
+    {
+        return $this->leadSource;
+    }
+
     public function getBillingAddress()
     {
         return $this->billingAddress;
@@ -364,6 +381,10 @@ class User extends BaseUser implements TwoFactorInterface
     {
         $invitation->setInvitee($this);
         $this->receivedInvitations[] = $invitation;
+
+        if (!$this->getLeadSource() && $invitation->getCreated() < $this->getCreated()) {
+            $this->setLeadSource('invitation');
+        }
     }
 
     public function getReceivedInvitations()
@@ -584,6 +605,9 @@ class User extends BaseUser implements TwoFactorInterface
     public function setAcceptedSCode(SCode $scode)
     {
         $this->acceptedSCode = $scode;
+        if (!$this->getLeadSource()) {
+            $this->setLeadSource('scode');
+        }
     }
 
     public function hasSoSureEmail()
