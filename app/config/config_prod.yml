@@ -76,3 +76,9 @@ staffim_rollbar:
             - PDOException
         parameters:
             key: unknown
+
+nelmio_security:
+    # forced HTTPS handling, don't combine with flexible mode
+    forced_ssl:
+        hsts_max_age: 600 # initial testing
+        hsts_subdomains: true
