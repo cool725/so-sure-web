@@ -15,6 +15,8 @@ parameters:
     default_sender_name: 'so-sure'
     report_excluded_policy_ids:
         - 57d829aa04e76f403c74ab39 # Dylan
+    sosure_ips:
+        - 86.26.167.103
 
 framework:
     #esi:             ~
