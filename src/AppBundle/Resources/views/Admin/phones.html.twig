@@ -28,8 +28,8 @@
 {% import _self as this %}
 {% block body %}
 <div class="container">
-    <div class="bg-info" style="border-radius: 10px;">
-    <p class="text-center"><strong>Find phones</strong></p>
+    <div class="bg-info" style="border-radius: 10px; padding: 10px;">
+    <h4 class="text-center"><strong>Phones</strong></h4>
     <div class="row">
     {{ form_start(form) }}
         <div class="form-group">
@@ -88,6 +88,7 @@
                     </thead>
                     <tbody>
                     {% for phone in phones %}
+                      {% set phoneProfit = phone.policyProfit(expected_claim_frequency, consumer_payout, ipt_rebate) %}
                         <tr {% if not phone.active %}class="danger"{% endif %}>
                             <td>{{ phone }}
                             {% if phone.shouldBeRetired %}<span class="text-danger"><i class="glyphicon glyphicon-time" title="{{ phone.monthAge }} months old"></i></span>{% endif %}
@@ -107,8 +108,8 @@
                                     £{{ phone.replacementPrice|number_format(2, '.', ',') }}
                                 {% endif %}
                             </td>
-                            <td><span class="{% if phone.policyProfit(expected_claim_frequency, consumer_payout, ipt_rebate) > 0 %}text-success{% else %}text-warning{%endif %}">
-                            £{{ phone.policyProfit(expected_claim_frequency, consumer_payout, ipt_rebate)|number_format(2, '.', ',') }}
+                            <td><span class="{% if phoneProfit > 0 %}text-success{% else %}text-warning{%endif %}">
+                            {% if phoneProfit is null %}unknown{% else %}{{ phoneProfit|number_format(2, '.', ',') }}{% endif %}
                             </span>
                             </td>
                             <td>£{{ phone.initialPrice|number_format(2, '.', ',') }}</td>
