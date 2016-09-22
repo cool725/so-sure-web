@@ -292,13 +292,21 @@ class PhonePolicyTest extends WebTestCase
      */
     public function testDuplicatePolicyNumberFails()
     {
+        $userA = new User();
+        self::addAddress($userA);
+        $userB = new User();
+        self::addAddress($userB);
         $policyNumber = rand(1000, 999999);
         $policyA = new SalvaPhonePolicy();
         $policyB = new SalvaPhonePolicy();
+        $policyA->setUser($userA);
+        $policyB->setUser($userB);
         $policyA->setPhone(static::$phone);
         $policyB->setPhone(static::$phone);
         $policyA->create($policyNumber);
         $policyB->create($policyNumber);
+        self::$dm->persist($userA);
+        self::$dm->persist($userB);
         self::$dm->persist($policyA);
         self::$dm->persist($policyB);
         self::$dm->flush();

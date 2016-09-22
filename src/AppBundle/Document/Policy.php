@@ -705,6 +705,10 @@ abstract class Policy
         if (count($this->getSCodes()) == 0) {
             $this->addSCode(new SCode());
         }
+        if (!$this->getUser()) {
+            throw new \Exception('Missing user for policy');
+        }
+
         $this->setLeadSource($this->getUser()->getLeadSource());
     }
 

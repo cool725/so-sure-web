@@ -352,17 +352,33 @@ class AdminController extends BaseController
         $data['newSCodeInvitations'] = $invitationRepo->count($newSCodePolicies, $start, $end);
         $data['totalSCodeInvitations'] = $invitationRepo->count($totalSCodePolicies);
 
-        $data['newAvgInvitations'] = $data['newPolicies'] > 0 ? $data['newInvitations'] / $data['newPolicies'] : 'n/a';
-        $data['totalAvgInvitations'] = $data['totalPolicies'] > 0 ? $data['totalInvitations'] / $data['totalPolicies'] : 'n/a';
+        $data['newAvgInvitations'] = $data['newPolicies'] > 0 ?
+            $data['newInvitations'] / $data['newPolicies'] :
+            'n/a';
+        $data['totalAvgInvitations'] = $data['totalPolicies'] > 0 ?
+            $data['totalInvitations'] / $data['totalPolicies'] :
+            'n/a';
 
-        $data['newAvgDirectInvitations'] = $data['newDirectPolicies'] > 0 ? $data['newDirectInvitations'] / $data['newDirectPolicies'] : 'n/a';
-        $data['totalAvgDirectInvitations'] = $data['totalDirectPolicies'] > 0 ? $data['totalDirectInvitations'] / $data['totalDirectPolicies'] : 'n/a';
+        $data['newAvgDirectInvitations'] = $data['newDirectPolicies'] > 0 ?
+            $data['newDirectInvitations'] / $data['newDirectPolicies'] :
+            'n/a';
+        $data['totalAvgDirectInvitations'] = $data['totalDirectPolicies'] > 0 ?
+            $data['totalDirectInvitations'] / $data['totalDirectPolicies'] :
+            'n/a';
 
-        $data['newAvgInvitationInvitations'] = $data['newInvitationPolicies'] > 0 ? $data['newInvitationInvitations'] / $data['newInvitationPolicies'] : 'n/a';
-        $data['totalAvgInvitationInvitations'] = $data['totalInvitationPolicies'] > 0 ? $data['totalInvitationInvitations'] / $data['totalInvitationPolicies'] : 'n/a';
+        $data['newAvgInvitationInvitations'] = $data['newInvitationPolicies'] > 0 ?
+            $data['newInvitationInvitations'] / $data['newInvitationPolicies'] :
+            'n/a';
+        $data['totalAvgInvitationInvitations'] = $data['totalInvitationPolicies'] > 0 ?
+            $data['totalInvitationInvitations'] / $data['totalInvitationPolicies'] :
+            'n/a';
 
-        $data['newAvgSCodeInvitations'] = $data['newSCodePolicies'] > 0 ? $data['newSCodeInvitations'] / $data['newSCodePolicies'] : 'n/a';
-        $data['totalAvgSCodeInvitations'] = $data['totalSCodePolicies'] > 0 ? $data['totalSCodeInvitations'] / $data['totalSCodePolicies'] : 'n/a';
+        $data['newAvgSCodeInvitations'] = $data['newSCodePolicies'] > 0 ?
+            $data['newSCodeInvitations'] / $data['newSCodePolicies'] :
+            'n/a';
+        $data['totalAvgSCodeInvitations'] = $data['totalSCodePolicies'] > 0 ?
+            $data['totalSCodeInvitations'] / $data['totalSCodePolicies'] :
+            'n/a';
 
         return [
             'start' => $start,
