@@ -1635,6 +1635,9 @@ class ApiAuthControllerTest extends BaseControllerTest
             if ($invitation['id'] == $invitationData['id']) {
                 $foundInvitation = true;
                 $this->assertEquals(self::$testUser2->getId(), $invitation['inviter_id']);
+                // http://aruljohn.com/gravatar/
+                // bar@auth-api.so-sure.com (testUser2) -> 0b1cac52ee6250748998bf4e2ccc29b1
+                $this->assertEquals('https://www.gravatar.com/avatar/0b1cac52ee6250748998bf4e2ccc29b1?d=404&s=100', $invitation['image_url']);
             }
         }
         $this->assertTrue($foundInvitation);
