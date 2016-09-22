@@ -149,8 +149,9 @@ services:
     app.geoip:
         class: AppBundle\Service\MaxMindIpService
         arguments:
-            logger: "@logger"
-            db:     "%geoip_db%"
+            logger:     "@logger"
+            cityDb:     "%geoip_city_db%"
+            countryDb:  "%geoip_country_db%"
 
     app.cognito.identity:
         class: AppBundle\Service\CognitoIdentityService
