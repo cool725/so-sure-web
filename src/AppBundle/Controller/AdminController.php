@@ -238,7 +238,7 @@ class AdminController extends BaseController
             if ($imeiService->isImei($sosure)) {
                 return new RedirectResponse($this->generateUrl('admin_users', ['imei' => $sosure]));
             } else {
-                return new RedirectResponse($this->generateUrl('admin_users', ['facebookId' => $sosure]));    
+                return new RedirectResponse($this->generateUrl('admin_users', ['facebookId' => $sosure]));
             }
         }
 
