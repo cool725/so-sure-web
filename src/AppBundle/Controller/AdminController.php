@@ -287,6 +287,7 @@ class AdminController extends BaseController
      */
     public function adminReportsAction(Request $request)
     {
+        $data = [];
         $start = $request->get('start');
         $end = $request->get('end');
         if (!$start) {
@@ -318,24 +319,57 @@ class AdminController extends BaseController
         $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
         $invitationRepo->setExcludedPolicyIds($excludedPolicyIds);
 
-        $newPolicies = $policyRepo->countAllActivePolicies($end, $start);
-        $totalPolicies = $policyRepo->countAllActivePolicies();
+        $data['newPolicies'] = $policyRepo->countAllActivePolicies($end, $start);
+        $data['totalPolicies'] = $policyRepo->countAllActivePolicies();
+
+        $newDirectPolicies = $policyRepo->findAllActivePolicies(null, $start, $end);
+        $data['newDirectPolicies'] = $newDirectPolicies->count();
+        $totalDirectPolicies = $policyRepo->findAllActivePolicies(null);
+        $data['totalDirectPolicies'] = $totalDirectPolicies->count();
+
+        $newInvitationPolicies = $policyRepo->findAllActivePolicies('invitation', $start, $end);
+        $data['newInvitationPolicies'] = $newInvitationPolicies->count();
+        $totalInvitationPolicies = $policyRepo->findAllActivePolicies('invitation');
+        $data['totalInvitationPolicies'] = $totalInvitationPolicies->count();
+
+        $newSCodePolicies = $policyRepo->findAllActivePolicies('scode', $start, $end);
+        $data['newSCodePolicies'] = $newSCodePolicies->count();
+        $totalSCodePolicies = $policyRepo->findAllActivePolicies('scode');
+        $data['totalSCodePolicies'] = $totalSCodePolicies->count();
 
         $newConnections = $connectionRepo->count($start, $end);
         $totalConnections = $connectionRepo->count();
 
-        $newInvitations = $invitationRepo->count($start, $end);
-        $totalInvitations = $invitationRepo->count();
+        $data['newInvitations'] = $invitationRepo->count(null, $start, $end);
+        $data['totalInvitations'] = $invitationRepo->count();
+
+        $data['newDirectInvitations'] = $invitationRepo->count($newDirectPolicies, $start, $end);
+        $data['totalDirectInvitations'] = $invitationRepo->count($totalDirectPolicies);
+
+        $data['newInvitationInvitations'] = $invitationRepo->count($newInvitationPolicies, $start, $end);
+        $data['totalInvitationInvitations'] = $invitationRepo->count($totalInvitationPolicies);
+
+        $data['newSCodeInvitations'] = $invitationRepo->count($newSCodePolicies, $start, $end);
+        $data['totalSCodeInvitations'] = $invitationRepo->count($totalSCodePolicies);
+
+        $data['newAvgInvitations'] = $data['newPolicies'] > 0 ? $data['newInvitations'] / $data['newPolicies'] : 'n/a';
+        $data['totalAvgInvitations'] = $data['totalPolicies'] > 0 ? $data['totalInvitations'] / $data['totalPolicies'] : 'n/a';
+
+        $data['newAvgDirectInvitations'] = $data['newDirectPolicies'] > 0 ? $data['newDirectInvitations'] / $data['newDirectPolicies'] : 'n/a';
+        $data['totalAvgDirectInvitations'] = $data['totalDirectPolicies'] > 0 ? $data['totalDirectInvitations'] / $data['totalDirectPolicies'] : 'n/a';
+
+        $data['newAvgInvitationInvitations'] = $data['newInvitationPolicies'] > 0 ? $data['newInvitationInvitations'] / $data['newInvitationPolicies'] : 'n/a';
+        $data['totalAvgInvitationInvitations'] = $data['totalInvitationPolicies'] > 0 ? $data['totalInvitationInvitations'] / $data['totalInvitationPolicies'] : 'n/a';
+
+        $data['newAvgSCodeInvitations'] = $data['newSCodePolicies'] > 0 ? $data['newSCodeInvitations'] / $data['newSCodePolicies'] : 'n/a';
+        $data['totalAvgSCodeInvitations'] = $data['totalSCodePolicies'] > 0 ? $data['totalSCodeInvitations'] / $data['totalSCodePolicies'] : 'n/a';
 
         return [
             'start' => $start,
             'end' => $end,
-            'total_polices' => $totalPolicies,
-            'new_policies' => $newPolicies,
+            'data' => $data,
             'total_connections' => $totalConnections,
             'new_connections' => $newConnections,
-            'total_invitations' => $totalInvitations,
-            'new_invitations' => $newInvitations,
             'excluded_policies' => $excludedPolicyNumbers,
         ];
     }

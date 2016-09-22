@@ -1831,4 +1831,19 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(0.095, $premium->getIptRate());
         $this->assertEquals(0.1, $policy->getPremium()->getIptRate());
     }
+
+    public function testLeadSource()
+    {
+        $user = new User();
+        $user->setLeadSource('scode');
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        // Most tests should be against non-prelaunch users
+        $user->setCreated(new \DateTime('2017-01-01'));
+
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->setPhone(self::$phone);
+        $policy->create(rand(1, 999999));
+        $this->assertEquals('scode', $policy->getLeadSource());
+    }
 }

@@ -20,4 +20,14 @@ class BaseDocumentRepository extends DocumentRepository
     {
         $qb->field($field)->notIn($this->excludedPolicyIds);
     }
+
+    public function transformMongoIds($array, $method)
+    {
+        $ids = [];
+        foreach ($array as $item) {
+            $ids[] = new \MongoId(call_user_func([$item, $method]));
+        }
+
+        return $ids;
+    }
 }

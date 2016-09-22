@@ -8,9 +8,13 @@ use AppBundle\Repository\BaseDocumentRepository;
 
 class InvitationRepository extends BaseDocumentRepository
 {
-    public function count(\DateTime $start = null, \DateTime $end = null)
+    public function count($policies = null, \DateTime $start = null, \DateTime $end = null)
     {
         $qb = $this->createQueryBuilder();
+
+        if ($policies) {
+            $qb->field('policy.$id')->in($this->transformMongoIds($policies, 'getId'));
+        }
 
         if ($start) {
             $qb->field('created')->gte($start);
