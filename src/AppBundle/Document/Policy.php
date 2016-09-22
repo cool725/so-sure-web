@@ -253,6 +253,13 @@ abstract class Policy
      */
     protected $policyFiles = array();
 
+    /**
+     * @Assert\Choice({"invitation", "scode"})
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $leadSource;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -640,6 +647,16 @@ abstract class Policy
         $this->policyFiles[] = $file;
     }
 
+    public function setLeadSource($source)
+    {
+        $this->leadSource = $source;
+    }
+
+    public function getLeadSource()
+    {
+        return $this->leadSource;
+    }
+
     public function init(User $user, PolicyDocument $terms)
     {
         $user->addPolicy($this);
@@ -688,6 +705,11 @@ abstract class Policy
         if (count($this->getSCodes()) == 0) {
             $this->addSCode(new SCode());
         }
+        if (!$this->getUser()) {
+            throw new \Exception('Missing user for policy');
+        }
+
+        $this->setLeadSource($this->getUser()->getLeadSource());
     }
 
     abstract public function validatePremium($adjust, \DateTime $date);

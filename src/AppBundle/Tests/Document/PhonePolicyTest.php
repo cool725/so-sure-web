@@ -44,8 +44,16 @@ class PhonePolicyTest extends WebTestCase
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
     }
 
+    public function setUp()
+    {
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+    }
+
     public function tearDown()
     {
+        self::$dm->clear();
     }
 
     public function testEmptyPolicyReturnsCorrectApiData()
@@ -178,6 +186,8 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyNoConnectionsPre30()
     {
         $user = new User();
+        $user->setEmail(static::generateEmail('risk-policy-pre-30', $this));
+        self::$dm->persist($user);
         self::addAddress($user);
         $policyA = new SalvaPhonePolicy();
         $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
@@ -190,6 +200,8 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyNoConnectionsPost30()
     {
         $user = new User();
+        $user->setEmail(static::generateEmail('risk-policy-post-30', $this));
+        self::$dm->persist($user);
         self::addAddress($user);
         $policyA = new SalvaPhonePolicy();
         $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
@@ -202,6 +214,8 @@ class PhonePolicyTest extends WebTestCase
     public function testGetRiskPolicyConnectionsZeroPot()
     {
         $user = new User();
+        $user->setEmail(static::generateEmail('risk-policy-no-pot', $this));
+        self::$dm->persist($user);
         self::addAddress($user);
         $policyA = new SalvaPhonePolicy();
         $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
@@ -292,14 +306,28 @@ class PhonePolicyTest extends WebTestCase
      */
     public function testDuplicatePolicyNumberFails()
     {
+        $userA = new User();
+        $userA->setEmail(static::generateEmail('duplicate-policy-a', $this));
+        self::addAddress($userA);
+        $userB = new User();
+        $userB->setEmail(static::generateEmail('duplicate-policy-b', $this));
+        self::addAddress($userB);
+        self::$dm->persist($userA);
+        self::$dm->persist($userB);
+        self::$dm->flush();
+
         $policyNumber = rand(1000, 999999);
         $policyA = new SalvaPhonePolicy();
-        $policyB = new SalvaPhonePolicy();
+        $policyA->init($userA, self::getLatestPolicyTerms(static::$dm));
         $policyA->setPhone(static::$phone);
-        $policyB->setPhone(static::$phone);
         $policyA->create($policyNumber);
-        $policyB->create($policyNumber);
         self::$dm->persist($policyA);
+        self::$dm->flush();
+
+        $policyB = new SalvaPhonePolicy();
+        $policyB->init($userB, self::getLatestPolicyTerms(static::$dm));
+        $policyB->setPhone(static::$phone);
+        $policyB->create($policyNumber);
         self::$dm->persist($policyB);
         self::$dm->flush();
     }
@@ -476,6 +504,8 @@ class PhonePolicyTest extends WebTestCase
     public function testConnectionValue()
     {
         $user = new User();
+        $user->setEmail(static::generateEmail('connection-value', $this));
+        self::$dm->persist($user);
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         $policy->setUser($user);
@@ -555,6 +585,7 @@ class PhonePolicyTest extends WebTestCase
     public function testAllowedConnectionValue()
     {
         $user = new User();
+        $user->setEmail(static::generateEmail('allowed-connection-value', $this));
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         $policy->setUser($user);
@@ -581,6 +612,7 @@ class PhonePolicyTest extends WebTestCase
     public function testPotFilled()
     {
         $user = new User();
+        $user->setEmail(static::generateEmail('pot-filled', $this));
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         $policy->setUser($user);
@@ -746,6 +778,7 @@ class PhonePolicyTest extends WebTestCase
     public function testHistoricalMaxPotValue()
     {
         $user = new User();
+        $user->setEmail(static::generateEmail('historical-maxpot', $this));
         self::addAddress($user);
 
         $policy = new SalvaPhonePolicy();
@@ -1071,6 +1104,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('installment-yearly', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1132,6 +1166,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('broker-fee-paid', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1154,6 +1189,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('savla-policynumber', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1170,6 +1206,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('salva-version', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1190,6 +1227,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('remianing-broker-fee-paid', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1222,6 +1260,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('total-broker-fee', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1316,6 +1355,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('last-successful-payment-credit', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1373,6 +1413,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('expire-policy-missing-payment', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1388,6 +1429,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('expire-policy', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1430,6 +1472,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('can-cancel-policy', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1446,6 +1489,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('can-cancel-policy-unpaid', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1481,6 +1525,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('can-cancel-policy-expired', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1496,6 +1541,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('is-within-cooloff', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999));
@@ -1814,6 +1860,7 @@ class PhonePolicyTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail(self::generateEmail('validate-premium-exception', $this));
+        self::$dm->persist($user);
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone, new \DateTime('2016-01-01'));
         $policy->validatePremium(false, new \DateTime("2016-10-01"));
@@ -1823,6 +1870,7 @@ class PhonePolicyTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail(self::generateEmail('validate-premium', $this));
+        self::$dm->persist($user);
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone, new \DateTime('2016-01-01'));
         $premium = $policy->getPremium();
@@ -1830,5 +1878,22 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNotEquals($premium, $policy->getPremium());
         $this->assertEquals(0.095, $premium->getIptRate());
         $this->assertEquals(0.1, $policy->getPremium()->getIptRate());
+    }
+
+    public function testLeadSource()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('lead-source', $this));
+        self::$dm->persist($user);
+        $user->setLeadSource('scode');
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        // Most tests should be against non-prelaunch users
+        $user->setCreated(new \DateTime('2017-01-01'));
+
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->setPhone(self::$phone);
+        $policy->create(rand(1, 999999));
+        $this->assertEquals('scode', $policy->getLeadSource());
     }
 }

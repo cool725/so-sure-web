@@ -21,7 +21,12 @@
     {% block body %}
     <div class="container">
         <h2>so-sure Reports</h2>
-        <p>Excludes Policies: {{ excluded_policies|join }}</p>
+        <p>Excludes Policies: 
+            {% for excluded_policy in excluded_policies %}
+            <a href="{{ path('admin_policy', {'id': excluded_policy.id }) }}">{{ excluded_policy.policyNumber }}</a>
+            {% endfor %}
+            {% if excluded_policies|length == 0 %}n/a{% endif %}
+        </p>
 <div class="container">
     <form method="GET">
     <div class='col-md-4'>
@@ -65,8 +70,31 @@
                     <tbody>
                         <tr>
                             <td>Policies</td>
-                            <td>{{ new_policies }}</td>
-                            <td>{{ total_polices }}</td>
+                            <td>{{ data.newPolicies }}</td>
+                            <td>{{ data.totalPolicies }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 30px">Policies (Direct)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{{ data.newDirectPolicies }}</td>
+                            <td>{{ data.totalDirectPolicies }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 30px">Policies (Invitation)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{{ data.newInvitationPolicies }}</td>
+                            <td>{{ data.totalInvitationPolicies }}</td>
+                        </tr>
+                            <td style="padding-left: 30px">Policies (SCode)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{{ data.newSCodePolicies }}</td>
+                            <td>{{ data.totalSCodePolicies }}</td>
                         </tr>
                         <tr>
                             <td>Connections</td>
@@ -78,29 +106,69 @@
                         </tr>
                         <tr>
                             <td>Invitations</td>
-                            <td>{{ new_invitations }}
+                            <td>{{ data.newInvitations }}
         <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
            title="Details" data-content="New invitation across all policies during period"></i>
                             </td>
-                            <td>{{ total_invitations }}</td>
+                            <td>{{ data.totalInvitations }}</td>
                         </tr>
                         <tr>
-                            <td><del>Avg # of Invitations per policy</del></td>
-                            <td></td>
-                            <td></td>
+                            <td style="padding-left: 30px">Invitations (Direct)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{{ data.newDirectInvitations }}</td>
+                            <td>{{ data.totalDirectInvitations }}</td>
                         </tr>
                         <tr>
-                            <td><del>Avg # of Invitations per policy (Direct)</del></td>
-                            <td></td>
-                            <td></td>
+                            <td style="padding-left: 30px">Invitations (Invitation)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{{ data.newInvitationInvitations }}</td>
+                            <td>{{ data.totalInvitationInvitations }}</td>
+                        </tr>
+                            <td style="padding-left: 30px">Invitations (SCode)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{{ data.newSCodeInvitations }}</td>
+                            <td>{{ data.totalSCodeInvitations }}</td>
                         </tr>
                         <tr>
-                            <td><del>Avg # of Invitations per policy (Invited)</del></td>
-                            <td></td>
-                            <td></td>
+                            <td>Avg # of Invitations per policy</td>
+                            <td>{{ data.newAvgInvitations }}</td>
+                            <td>{{ data.totalAvgInvitations }}</td>
                         </tr>
                         <tr>
-                            <td><del>Avg hours to connect</del></td>
+                            <td style="padding-left: 30px">Avg # of Invitations per policy (Direct)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{{ data.newAvgDirectInvitations }}</td>
+                            <td>{{ data.totalAvgDirectInvitations }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 30px">Avg # of Invitations per policy (Invitation)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{{ data.newAvgInvitationInvitations }}</td>
+                            <td>{{ data.totalAvgInvitationInvitations }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 30px">Avg # of Invitations per policy (SCode)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{{ data.newAvgSCodeInvitations }}</td>
+                            <td>{{ data.totalAvgSCodeInvitations }}</td>
+                        </tr>
+                        <tr>
+                            <td><del>Avg hours to connect</del>
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
                             <td></td>
                             <td></td>
                         </tr>
