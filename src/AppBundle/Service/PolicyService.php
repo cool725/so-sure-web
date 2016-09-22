@@ -487,6 +487,12 @@ class PolicyService
             return;
         }
 
+        $repo = $this->dm->getRepository(EmailOptOut::class);
+        $optOut = $repo->findOptOut($policy->getUser()->getEmail(), EmailOptOut::OPTOUT_CAT_WEEKLY)->count();
+        if ($optOut > 0) {
+            return;
+        }
+
         try {
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('Your so-sure weekly email'))
@@ -503,12 +509,16 @@ class PolicyService
 
             $this->mailer->send($message);
             $policy->setLastEmailed(new \DateTime());
+
+            return true;
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
                 'Failed sending policy weekly email to %s. Ex: %s',
                 $policy->getUser()->getEmail(),
                 $e->getMessage()
             ));
+            
+            return false;
         }
     }
 

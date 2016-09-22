@@ -16,6 +16,7 @@ abstract class OptOut
 {
     const OPTOUT_CAT_ALL = 'all';
     const OPTOUT_CAT_INVITATIONS = 'invitations';
+    const OPTOUT_CAT_WEEKLY = 'weekly';
 
     /**
      * @MongoDB\Id
@@ -29,10 +30,17 @@ abstract class OptOut
     protected $created;
 
     /**
-     * @Assert\Choice({"all", "invitations"})
+     * @Assert\Choice({"all", "invitations", "weekly"})
      * @MongoDB\Field(type="string")
      */
     protected $category;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(max="500")
+     * @MongoDB\Field(type="string")
+     */
+    protected $notes;
 
     public function __construct()
     {
@@ -57,5 +65,15 @@ abstract class OptOut
     public function setCategory($category)
     {
         $this->category = $category;
+    }
+
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
     }
 }
