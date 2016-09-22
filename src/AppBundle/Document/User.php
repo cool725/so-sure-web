@@ -669,7 +669,7 @@ class User extends BaseUser implements TwoFactorInterface
           'addresses' => $addresses,
           'mobile_number' => $this->getMobileNumber(),
           'policies' => $this->eachApiArray($this->policies),
-          'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), $debug),
+          'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), true, $debug),
           'has_cancelled_policy' => $this->hasCancelledPolicy(),
           'has_unpaid_policy' => $this->hasUnpaidPolicy(),
           'has_valid_policy' => $this->hasValidPolicy(),

@@ -329,7 +329,20 @@ abstract class Invitation
         return null;
     }
 
-    public function toApiArray($debug = null)
+    public function getInviterImageUrl($size = 100)
+    {
+        if ($this->getInviter()) {
+            return $this->getInviter()->getImageUrl();
+        }
+
+        if ($this instanceof EmailInvitation) {
+            return $this->gravatarImage($this->getInviter()->getEmail(), $size);
+        }
+
+        return null;
+    }
+
+    public function toApiArray($isReceivedInvitation = false, $debug = null)
     {
         $data = [
             'id' => $this->getId(),
@@ -343,8 +356,13 @@ abstract class Invitation
             'next_reinvite_date' =>  $this->getNextReinvited() ?
                 $this->getNextReinvited()->format(\DateTime::ATOM) :
                 null,
-            'image_url' => $this->getInviteeImageUrl(),
         ];
+
+        if ($isReceivedInvitation) {
+            $data['image_url'] = $this->getInviterImageUrl();
+        } else {
+            $data['image_url'] = $this->getInviteeImageUrl();
+        }
 
         if ($debug) {
             $data = array_merge($data, [

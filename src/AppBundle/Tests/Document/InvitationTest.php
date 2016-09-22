@@ -101,6 +101,10 @@ class InvitationTest extends WebTestCase
 
     public function testImageUrlLinkedUser()
     {
+        $inviter = new User();
+        $inviter->setEmail('bar@foo.com');
+        $inviter->setFacebookId('2');
+
         $user = new User();
         $user->setEmail('foo@bar.com');
         $user->setFacebookId('1');
@@ -109,10 +113,17 @@ class InvitationTest extends WebTestCase
         $invitation->setEmail('foo@bar.com');
         $invitation->setName('Foo Bar');
         $invitation->setInvitee($user);
+        $invitation->setInviter($inviter);
 
         $api = $invitation->toApiArray();
         $this->assertEquals(
             'https://graph.facebook.com/1/picture?width=100&height=100',
+            $api['image_url']
+        );
+
+        $api = $invitation->toApiArray(true);
+        $this->assertEquals(
+            'https://graph.facebook.com/2/picture?width=100&height=100',
             $api['image_url']
         );
     }
