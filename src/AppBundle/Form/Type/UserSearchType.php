@@ -38,6 +38,8 @@ class UserSearchType extends AbstractType
             ->add('postcode', TextType::class, ['required' => false])
             ->add('lastname', TextType::class, ['required' => false])
             ->add('policy', TextType::class, ['required' => false])
+            ->add('imei', TextType::class, ['required' => false])
+            ->add('facebookId', TextType::class, ['required' => false])
             ->add('status', ChoiceType::class, [
                 'required' => false,
                 'data' => Policy::STATUS_ACTIVE,
@@ -48,6 +50,17 @@ class UserSearchType extends AbstractType
                     Policy::STATUS_CANCELLED => Policy::STATUS_CANCELLED,
                     Policy::STATUS_EXPIRED => Policy::STATUS_EXPIRED,
                     Policy::STATUS_UNPAID => Policy::STATUS_UNPAID,
+                ]
+            ])
+            ->add('sosure', ChoiceType::class, [
+                'required' => false,
+                'choices' => [
+                    'IMEI' => [
+                        '355424073417084' => 'Patrick iPhone',
+                    ],
+                    'Facebook' => [
+                        '10153878106240169' => 'Patrick'
+                    ]
                 ]
             ])
             ->add('search', SubmitType::class)

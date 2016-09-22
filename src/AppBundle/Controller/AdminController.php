@@ -232,10 +232,21 @@ class AdminController extends BaseController
         $users = $repo->createQueryBuilder();
         $form = $this->createForm(UserSearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
+        $sosure = $form->get('sosure')->getData();
+        if ($sosure) {
+            $imeiService = $this->get('app.imei');
+            if ($imeiService->isImei($sosure)) {
+                return new RedirectResponse($this->generateUrl('admin_users', ['imei' => $sosure]));
+            } else {
+                return new RedirectResponse($this->generateUrl('admin_users', ['facebookId' => $sosure]));    
+            }
+        }
+
         $this->formToMongoSearch($form, $users, 'email', 'email');
         $this->formToMongoSearch($form, $users, 'lastname', 'lastName');
         $this->formToMongoSearch($form, $users, 'mobile', 'mobileNumber');
         $this->formToMongoSearch($form, $users, 'postcode', 'billingAddress.postcode');
+        $this->formToMongoSearch($form, $users, 'facebookId', 'facebookId');
 
         $policyRepo = $dm->getRepository(Policy::class);
         $policiesQb = $policyRepo->createQueryBuilder();
@@ -248,6 +259,13 @@ class AdminController extends BaseController
         }
         $policiesQb = $policyRepo->createQueryBuilder();
         if ($policies = $this->formToMongoSearch($form, $policiesQb, 'status', 'status', true)) {
+            $userIds = [];
+            foreach ($policies as $policy) {
+                $userIds[] = $policy->getUser()->getId();
+            }
+            $users->field('id')->in($userIds);
+        }
+        if ($policies = $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei', true)) {
             $userIds = [];
             foreach ($policies as $policy) {
                 $userIds[] = $policy->getUser()->getId();

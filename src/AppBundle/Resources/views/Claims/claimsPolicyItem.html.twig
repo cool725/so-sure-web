@@ -263,7 +263,12 @@
                 <tr>
                     <td>Facebook</td>
                     <td>
-                      {% if policy.user.facebookId | length > 0 %}<img src="https://graph.facebook.com/{{ policy.user.facebookId }}/picture" />{% else %}Not present{% endif %}  
+                      {% if policy.user.facebookId | length > 0 %}
+                            <img src="https://graph.facebook.com/{{ policy.user.facebookId }}/picture" />
+                            {{ policy.user.facebookId }}
+                      {% else %}
+                          Not present
+                      {% endif %}  
                       {{ form_start(facebook_form, {'attr': {'class': 'form-inline'}}) }}
                       {{ form_widget(facebook_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-danger confirm-facebook-clear'}}) }}
                       {{ form_end(facebook_form) }}
