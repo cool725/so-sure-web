@@ -21,7 +21,12 @@
     {% block body %}
     <div class="container">
         <h2>so-sure Reports</h2>
-        <p>Excludes Policies: {{ excluded_policies|join }}</p>
+        <p>Excludes Policies: 
+            {% for excluded_policy in excluded_policies %}
+            <a href="{{ path('admin_policy', {'id': excluded_policy.id }) }}">{{ excluded_policy.policyNumber }}</a>
+            {% endfor %}
+            {% if excluded_policies|length == 0 %}n/a{% endif %}
+        </p>
 <div class="container">
     <form method="GET">
     <div class='col-md-4'>

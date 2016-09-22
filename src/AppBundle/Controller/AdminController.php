@@ -308,11 +308,13 @@ class AdminController extends BaseController
         $invitationRepo = $dm->getRepository(Invitation::class);
 
         $excludedPolicyIds = [];
-        $excludedPolicyNumbers = [];
+        $excludedPolicies = [];
         foreach ($this->getParameter('report_excluded_policy_ids') as $excludedPolicyId) {
             $excludedPolicyIds[] = new \MongoId($excludedPolicyId);
             $policy = $policyRepo->find($excludedPolicyId);
-            $excludedPolicyNumbers[] = $policy->getPolicyNumber();
+            if ($policy) {
+                $excludedPolicies[] = $policy;
+            }
         }
 
         $policyRepo->setExcludedPolicyIds($excludedPolicyIds);
@@ -386,7 +388,7 @@ class AdminController extends BaseController
             'data' => $data,
             'total_connections' => $totalConnections,
             'new_connections' => $newConnections,
-            'excluded_policies' => $excludedPolicyNumbers,
+            'excluded_policies' => $excludedPolicies,
         ];
     }
 
