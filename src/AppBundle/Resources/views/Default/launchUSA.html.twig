@@ -1,0 +1,81 @@
+{% set og_title = 'Coming to the US soon!' %}
+{% set og_image = cdn_url ~ '/images/so-sure-welcome.png' %}
+{% set hide_nav = true %}
+{% set hide_footer = true %}
+{% extends 'base.html.twig' %}
+
+{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Coming soon to the US!"/>
+    <meta name="keywords" content="mobile phone insurance, social insurance"/>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'bundles/app/css/Default/index.css'
+    'bundles/app/css/Default/launch-usa.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Default/index.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+
+    <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <section class="hero-usa">
+        <div class="container">
+            <div id="navchange"></div>
+            <div class="row" id="welcome">
+                <div class="col-md-12">
+                    <div>
+                        <h1 class="text-center">🇺🇸 🇺🇸 Coming soon to the USA! 🇺🇸 🇺🇸</h1>
+                       <h2 class="text-center">Insure with friends.
+                        <br>Get up to 80% of your money back.
+                       </h2>
+                    </div>
+                    <div>
+                        <h4 class="text-center" id="hero-description">Introducing so-sure, a better kind of insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container" id="get-quote">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="device-select">
+                        {{ form_start(form_launch) }}
+                        <div class="input-group">
+                            {{ form_widget(form_launch.email, { 'attr': {'class': 'form-control', 'placeholder': 'Interested? Enter your email so as to be one of the first'}}) }}
+                            <span class="input-group-btn">
+                                {{ form_widget(form_launch.save, {'label': 'Keep me informed', 'attr': {'class': 'btn btn-primary'}}) }}
+                            </span>
+                        </div>
+                        {{ form_end(form_launch) }}
+                    </div>
+                </div>
+            </div>
+            <p class="text-center">
+              {{ form_start(form_uk) }}
+              {{ form_widget(form_uk.click, {'label': '🇬🇧 🇬🇧 In the UK? Click here to get a quote! 🇬🇧 🇬🇧', 'attr': {'class': 'btn-link'}}) }}
+              {{ form_end(form_launch) }}
+            </p>
+        </div>
+    </section>
+
+
+<!-- Analytics -->
+
+  <div id="fb-root"></div>
+  <div id="ss-root" data-fb-id="{{ fb_appid }}"
+       data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"
+       ></div>
+
+{% endblock %}

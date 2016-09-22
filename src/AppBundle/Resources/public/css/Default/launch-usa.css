@@ -1,0 +1,11 @@
+body {
+    background: rgba(51, 153, 255, 1);
+}
+
+.hero-usa {
+    padding-top: 100px;
+    padding-bottom: 100px;
+    min-height: 500px;
+    color: #fff;
+    position: relative;
+}

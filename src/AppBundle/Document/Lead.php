@@ -13,6 +13,9 @@ class Lead
 {
     use PhoneTrait;
 
+    const SOURCE_TEXT_ME = 'text-me';
+    const SOURCE_LAUNCH_USA = 'launch-usa';
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -29,6 +32,18 @@ class Lead
      * @MongoDB\Field(type="string")
      */
     protected $mobileNumber;
+
+    /**
+     * @Assert\Email(strict=false)
+     * @MongoDB\Field(type="string")
+     */
+    protected $email;
+
+    /**
+     * @Assert\Choice({"text-me", "launch-usa"})
+     * @MongoDB\Field(type="string")
+     */
+    protected $source;
 
     public function __construct()
     {
@@ -48,5 +63,25 @@ class Lead
     public function setMobileNumber($mobile)
     {
         $this->mobileNumber = $this->normalizeUkMobile($mobile);
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    public function setSource($source)
+    {
+        $this->source = $source;
     }
 }

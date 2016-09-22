@@ -68,7 +68,9 @@
 
         {% block body %}{% endblock %}
 
-        {% include '::footer.html.twig' %}
+        {% if not hide_footer is defined or hide_footer != 1 %}
+            {% include '::footer.html.twig' %}
+        {% endif %}
 
         {% if use_cdn %}
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
