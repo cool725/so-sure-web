@@ -73,6 +73,13 @@ class MaxMindIpService
         return $this->data;
     }
 
+    public function findCountry($ip)
+    {
+        $this->find($ip);
+
+        return $this->getCountry();
+    }
+
     public function getData()
     {
         return $this->data;

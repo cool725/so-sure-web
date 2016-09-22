@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -15,6 +16,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\SmsAppLinkType;
+use AppBundle\Form\Type\LeadEmailType;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Lead;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -32,6 +34,13 @@ class DefaultController extends BaseController
      */
     public function indexAction(Request $request)
     {
+        $geoip = $this->get('app.geoip');
+        //$ip = "72.229.28.185";
+        $ip = $request->getClientIp();
+        $country = $request->getSession()->get('country');
+        if ($country != 'uk' && $geoip->findCountry($ip) == "US") {
+            return $this->redirectToRoute('launch_usa');
+        }
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $phoneRepo = $dm->getRepository(Phone::class);
@@ -145,6 +154,51 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/usa", name="launch_usa")
+     * @Template
+     */
+    public function launchUSAAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $lead = new Lead();
+        $lead->setSource(Lead::SOURCE_LAUNCH_USA);
+
+        $formLaunch = $this->get('form.factory')
+            ->createNamedBuilder('launch_usa', LeadEmailType::class, $lead)
+            ->getForm();
+        $formUK = $this->get('form.factory')
+            ->createNamedBuilder('uk')
+            ->add('click', SubmitType::class)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            $existingUser = null;
+            if ($request->request->has('launch_usa')) {
+                $formLaunch->handleRequest($request);
+                if ($formLaunch->isValid()) {
+                    $dm->persist($lead);
+                    $dm->flush();
+
+                    $this->addFlash('success', sprintf(
+                        "Thanks!  We'll keep you updated with any announcements"
+                    ));
+
+                    return $this->redirectToRoute('launch_usa');
+                }
+            } elseif ($request->request->has('uk')) {
+                $request->getSession()->set('country', 'uk');
+
+                return $this->redirectToRoute('homepage');
+            }
+        }
+
+        return [
+            'form_launch' => $formLaunch->createView(),
+            'form_uk' => $formUK->createView(),
+        ];
+    }
+
+    /**
      * @Route("/alpha", name="alpha")
      * @Template
      */
@@ -207,6 +261,7 @@ class DefaultController extends BaseController
                 if ($sms->send($ukMobileNumber, $message)) {
                     $lead = new Lead();
                     $lead->setMobileNumber($ukMobileNumber);
+                    $lead->setSource(Lead::SOURCE_TEXT_ME);
                     $dm->persist($lead);
                     $dm->flush();
                     $this->addFlash('success', sprintf(
