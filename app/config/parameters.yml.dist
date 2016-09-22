@@ -63,7 +63,8 @@ parameters:
     branch_key: ''
     drift_key: ''
     zendesk_jwt_secret: 'cannotbeblank'
-    geoip_db: '/var/geoip/GeoLite2-City.mmdb'
+    geoip_city_db:     '/var/geoip/GeoLite2-City.mmdb'
+    geoip_country_db:  '/var/geoip/GeoIP2-Country.mmdb'
 
     gsma_apikey:  ''
     gsma_username: ''
