@@ -17,6 +17,9 @@ use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\Connection;
+use AppBundle\Document\OptOut\OptOut;
+use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
@@ -27,6 +30,8 @@ use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
+use AppBundle\Form\Type\EmailOptOutType;
+use AppBundle\Form\Type\SmsOptOutType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
 use AppBundle\Form\Type\YearMonthType;
@@ -280,6 +285,63 @@ class AdminController extends BaseController
             'pager' => $pager,
             'form' => $form->createView(),
             'policy_route' => 'admin_policy',
+        ];
+    }
+
+    /**
+     * @Route("/optout", name="admin_optout")
+     * @Template
+     */
+    public function adminOptOutAction(Request $request)
+    {
+        $dm = $this->getManager();
+
+        $emailOptOut = new EmailOptOut();
+        $smsOptOut = new SmsOptOut();
+
+        $emailForm = $this->get('form.factory')
+            ->createNamedBuilder('email_form', EmailOptOutType::class, $emailOptOut)
+            ->getForm();
+        $smsForm = $this->get('form.factory')
+            ->createNamedBuilder('sms_form', SmsOptOutType::class, $smsOptOut)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('email_form')) {
+                $emailForm->handleRequest($request);
+                if ($emailForm->isValid()) {
+                    $dm->persist($emailOptOut);
+                    $dm->flush();
+
+                    return new RedirectResponse($this->generateUrl('admin_optout'));
+                } else {
+                    $this->addFlash('error', sprintf(
+                        'Unable to add optout. %s',
+                        (string) $emailForm->getErrors()
+                    ));
+                }
+            } elseif ($request->request->has('sms_form')) {
+                $smsForm->handleRequest($request);
+                if ($smsForm->isValid()) {
+                    $dm->persist($smsOptOut);
+                    $dm->flush();
+
+                    return new RedirectResponse($this->generateUrl('admin_optout'));
+                } else {
+                    $this->addFlash('error', sprintf(
+                        'Unable to add optout. %s',
+                        (string) $smsForm->getErrors()
+                    ));
+                }
+            }
+        }
+        $repo = $dm->getRepository(OptOut::class);
+        $oupouts = $repo->findAll();
+
+        return [
+            'optouts' => $oupouts,
+            'email_form' => $emailForm->createView(),
+            'sms_form' => $smsForm->createView(),
         ];
     }
 
