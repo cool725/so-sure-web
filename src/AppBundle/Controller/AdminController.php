@@ -301,14 +301,21 @@ class AdminController extends BaseController
             $end = new \DateTime($end);
         }
 
-        $excludedPolicyIds = $this->getParameter('report_excluded_policy_ids');
         $dm = $this->getManager();
-
         $policyRepo = $dm->getRepository(PhonePolicy::class);
-        $policyRepo->setExcludedPolicyIds($excludedPolicyIds);
         $connectionRepo = $dm->getRepository(Connection::class);
-        $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
         $invitationRepo = $dm->getRepository(Invitation::class);
+
+        $excludedPolicyIds = [];
+        $excludedPolicyNumbers = [];
+        foreach ($this->getParameter('report_excluded_policy_ids') as $excludedPolicyId) {
+            $excludedPolicyIds[] = new \MongoId($excludedPolicyId);
+            $policy = $policyRepo->find($excludedPolicyId);
+            $excludedPolicyNumbers[] = $policy->getPolicyNumber();
+        }
+
+        $policyRepo->setExcludedPolicyIds($excludedPolicyIds);
+        $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
         $invitationRepo->setExcludedPolicyIds($excludedPolicyIds);
 
         $newPolicies = $policyRepo->countAllActivePolicies($end, $start);
@@ -329,6 +336,7 @@ class AdminController extends BaseController
             'new_connections' => $newConnections,
             'total_invitations' => $totalInvitations,
             'new_invitations' => $newInvitations,
+            'excluded_policies' => $excludedPolicyNumbers,
         ];
     }
 
