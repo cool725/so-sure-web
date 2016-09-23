@@ -40,9 +40,9 @@
         })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
         <!-- End Google Tag Manager -->
 
-        {% if not hide_nav is defined or hide_nav != 1 %}
+        {% block nav %}
             {% include '::nav.html.twig' %}
-        {% endif %}
+        {% endblock %}
 
         {% if app.session.isStarted %}
             {% if app.session.flashBag.peekAll | length > 0 %}
@@ -68,9 +68,9 @@
 
         {% block body %}{% endblock %}
 
-        {% if not hide_footer is defined or hide_footer != 1 %}
+        {% block footer %}
             {% include '::footer.html.twig' %}
-        {% endif %}
+        {% endblock %}
 
         {% if use_cdn %}
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
