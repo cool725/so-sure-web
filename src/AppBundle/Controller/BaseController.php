@@ -14,6 +14,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Sns;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Exception\ValidationException;

@@ -106,7 +106,13 @@
                     {% for user in users %}
                         {% for policy in user.policies %}
                         <tr>
-                            <td><a href="{{ path(policy_route, {id: policy.id}) }}">{{ policy.policyNumber }}</a></td>
+                            <td><a href="{{ path(policy_route, {id: policy.id}) }}">
+                                {% if policy.policyNumber|length %}
+                                    {{ policy.policyNumber }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </a></td>
                             <td>{{ policy.status }}</td>
                             <td>{{ user.firstname }} {{ user.lastname }}</td>
                             <td>{{ user.email }}</td>
