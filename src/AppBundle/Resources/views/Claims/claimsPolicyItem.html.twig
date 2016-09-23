@@ -18,7 +18,13 @@
                 <table class="table table-striped">
                     <tr>
                         <td>Policy Number</td>
-                        <td>{{ policy.policyNumber }}</td>
+                        <td>
+                            {% if policy.policyNumber|length %}
+                                {{ policy.policyNumber }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <td>Policy Status</td>
