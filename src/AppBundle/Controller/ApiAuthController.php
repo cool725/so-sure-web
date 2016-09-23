@@ -646,7 +646,12 @@ class ApiAuthController extends BaseController
                 422
             );
         } catch (\DomainException $e) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED, 'Receipt not valid', 422);
+            $this->get('logger')->error(sprintf(
+                'Duplicate receipt id %s.',
+                $this->getDataString($judoData, 'receipt_id')
+            ), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED, 'Payment not valid', 422);
         } catch (PaymentDeclinedException $e) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
         } catch (AccessDeniedException $ade) {
