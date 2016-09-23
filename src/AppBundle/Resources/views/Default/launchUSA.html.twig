@@ -1,8 +1,9 @@
 {% set og_title = 'Coming to the US soon!' %}
 {% set og_image = cdn_url ~ '/images/so-sure-welcome.png' %}
-{% set hide_nav = true %}
-{% set hide_footer = true %}
 {% extends 'base.html.twig' %}
+
+{% block footer %}{% endblock %}
+{% block nav %}{% include '::logo_nav.html.twig' %}{% endblock %}
 
 {% block title %}so-sure - Welcome to Social Insurance{% endblock %}
 {% block meta %}
