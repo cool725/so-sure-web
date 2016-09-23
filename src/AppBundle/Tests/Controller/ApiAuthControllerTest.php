@@ -1187,6 +1187,55 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(2, $lowConnectionValue);
     }
 
+    public function testNewPoliciesJudopayDuplicateReceiptNotAllowed()
+    {
+        $userB = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-judopay-dupB', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($userB);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $userB);
+        $dataB = $this->verifyResponse(200);
+
+        $userA = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-judopay-dupA', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($userA);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $userA);
+        $dataA = $this->verifyResponse(200);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $receiptId = $judopay->testPay(
+            $userA,
+            $dataA['id'],
+            '6.99',
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $dataA['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => '55779911',
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
+
+        $cognitoIdentityId = $this->getAuthUser($userB);
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $dataB['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => '55779911',
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED);
+    }
+
     public function testNewPolicyJudopayDeclined()
     {
         $user = self::createUser(
@@ -2417,6 +2466,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $dm->persist($payment);
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
         $user->addPolicy($policy);
 

@@ -645,6 +645,8 @@ class ApiAuthController extends BaseController
                 'Invalid premium paid',
                 422
             );
+        } catch (\DomainException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED, 'Receipt not valid', 422);
         } catch (PaymentDeclinedException $e) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
         } catch (AccessDeniedException $ade) {

@@ -98,6 +98,7 @@ abstract class Payment
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
+     * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $receipt;
