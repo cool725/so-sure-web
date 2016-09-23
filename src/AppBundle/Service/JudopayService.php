@@ -231,6 +231,14 @@ class JudopayService
     public function validateReceipt(Policy $policy, $receiptId, $cardToken)
     {
         $transactionDetails = $this->getReceipt($receiptId);
+        $repo = $this->dm->getRepository(JudoPayment::class);
+        $exists = $repo->findOneBy(['receipt' => $transactionDetails["receiptId"]]);
+        if ($exists) {
+            throw new \DomainException(sprintf(
+                "Receipt %s has already been used to pay for a policy",
+                $transactionDetails['receiptId']
+            ));
+        }
 
         $payment = new JudoPayment();
         $payment->setReference($transactionDetails["yourPaymentReference"]);
