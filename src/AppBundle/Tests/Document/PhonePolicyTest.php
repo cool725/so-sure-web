@@ -894,6 +894,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         for ($i = 0; $i < 11; $i++) {
@@ -920,6 +921,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $this->assertEquals(0, $policy->getPremiumPaid());
@@ -940,6 +942,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $this->assertEquals(0, $policy->getPremiumPaid());
@@ -960,6 +963,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $this->assertEquals(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(), $policy->getPremiumPaid());
@@ -974,6 +978,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $this->assertNull($policy->getPremiumInstallmentCount());
@@ -1008,6 +1013,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
         $policy->setPremiumInstallments(1);
@@ -1030,6 +1036,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
         $policy->setPremiumInstallments(12);
@@ -1056,6 +1063,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
         $policy->setPremiumInstallments(12);
@@ -1085,6 +1093,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
         $policy->setPremiumInstallments(12);
@@ -1114,6 +1123,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
         // not using policy service here, so simulate what's done there
         $policy->setPremiumInstallments(1);
@@ -1155,6 +1165,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $this->assertEquals(0, $policy->getTotalCommissionPaid());
@@ -1177,6 +1188,7 @@ class PhonePolicyTest extends WebTestCase
             $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
             $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
+            $payment->setReceipt(rand(1, 999999));
             $policy->addPayment($payment);
         }
 
@@ -1238,6 +1250,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $policy->incrementSalvaPolicyNumber(new \DateTime("2016-01-03"));
@@ -1271,6 +1284,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee());
@@ -1292,6 +1306,7 @@ class PhonePolicyTest extends WebTestCase
             $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $payment->setDate(new \DateTime(sprintf('2016-0%d-01', $i)));
+            $payment->setReceipt(rand(1, 999999));
             $policy->addPayment($payment);
         }
 
@@ -1368,6 +1383,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
@@ -1378,6 +1394,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $payment->setDate(new \DateTime('2016-02-01'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
@@ -1388,6 +1405,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-02-15'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
@@ -1398,6 +1416,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setAmount(0 - static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-03-15'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
@@ -1440,6 +1459,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
@@ -1450,6 +1470,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $payment->setDate(new \DateTime('2016-02-01'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
@@ -1460,6 +1481,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-02-08'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-02-09")));
@@ -1783,6 +1805,7 @@ class PhonePolicyTest extends WebTestCase
         $payment->setTotalCommission($commission);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
         return $payment;

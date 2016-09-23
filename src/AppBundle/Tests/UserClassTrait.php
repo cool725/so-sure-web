@@ -129,6 +129,7 @@ trait UserClassTrait
             $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
             $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
+            $payment->setReceipt(rand(1, 999999));
             $policy->addPayment($payment);
         }
 

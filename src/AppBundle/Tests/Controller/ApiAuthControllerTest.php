@@ -2466,6 +2466,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $dm->persist($payment);
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
         $user->addPolicy($policy);
 
