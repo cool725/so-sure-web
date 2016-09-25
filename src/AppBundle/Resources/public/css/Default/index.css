@@ -95,7 +95,8 @@
 }
 #get-quote a {
     color: #202532;
-    font-size: 11px;
+    font-size: 12px;
+    margin-top: 10px;
     text-decoration: underline;
 }
 #get-quote button.btn {
@@ -127,17 +128,14 @@
     color: #202532;
     border-top: 2px solid #efefef;
 }
-#learn-more p {
-    color: #626B78;
-}
 #learn-more img {
-    width: 70%;
+    width: 65%;
 }
-#learn-more h4 {
+#learn-more h3 {
     padding-top: 140px;
 }
 @media (max-width:992px) {
-    #learn-more h4 {
+    #learn-more h3 {
         padding-top: 0;
     }
     #learn-more .text-right, #learn-more .text-left {
@@ -146,7 +144,7 @@
 }
 @media (max-width:543px) {
     #learn-more img {
-        width: 95%;
+        width: 90%;
         padding-top: 20px;
     }
 }
@@ -182,12 +180,6 @@
 .popular-devices .row {
     text-align: left;
     margin-top: 40px;
-}
-.popular-devices p {
-    color: #626B78;
-    font-weight: 300;
-    font-family: "Avenir LT Std 35 Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    line-height: 24px;
 }
 #memory-select {
     position: absolute;
@@ -228,6 +220,20 @@
 }
 #device-logo:focus #memory-select {
     opacity: 0.96;
+}
+
+/* BENEFITS */
+.benefits {
+  background-color: #FFF;
+  padding: 60px 20px 100px 20px;
+  text-align: center;
+  color: #202532;
+  border-top: 2px solid #efefef;
+}
+.benefits img {
+  width: 25%;
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
 /* SOCIAL PROOF */
@@ -274,12 +280,6 @@
     color: #202532;
     font-weight: normal;
     font-size: 18px;
-}
-.social-proof p {
-    color: #626B78;
-    font-size: 15px;
-    font-family: "Avenir LT Std 35 Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    line-height: 24px;
 }
 .social-proof p i {
     vertical-align: middle;
