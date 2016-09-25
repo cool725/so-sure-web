@@ -388,11 +388,11 @@ class ApiAuthController extends BaseController
                 $imei,
                 $serialNumber,
                 $this->getIdentityLog($request),
-                [
+                json_encode([
                     'make' => $this->getDataString($phonePolicyData, 'make'),
                     'device' => $this->getDataString($phonePolicyData, 'device'),
                     'memory' => $this->getDataString($phonePolicyData, 'memory'),
-                ]
+                ])
             );
             $policy->addCheckmendCertData($imeiCertId, $imeiResponse);
             $policy->addCheckmendCertData($serialCertId, $serialResponse);
