@@ -349,10 +349,6 @@ abstract class Policy
 
     public function setUser(User $user)
     {
-        if (!$user->getBillingAddress()) {
-            throw new \Exception('User must have a billing address');
-        }
-
         $this->user = $user;
     }
 
@@ -665,6 +661,13 @@ abstract class Policy
 
     public function create($seq, $prefix = null, \DateTime $startDate = null)
     {
+        if (!$this->getUser()) {
+            throw new \Exception('Missing user for policy');
+        }
+        if (!$this->getUser()->getBillingAddress()) {
+            throw new \Exception('User must have a billing address');
+        }
+
         // Only create 1 time
         if ($this->getPolicyNumber()) {
             return;
@@ -704,9 +707,6 @@ abstract class Policy
         $this->setStatus(self::STATUS_PENDING);
         if (count($this->getSCodes()) == 0) {
             $this->addSCode(new SCode());
-        }
-        if (!$this->getUser()) {
-            throw new \Exception('Missing user for policy');
         }
 
         $this->setLeadSource($this->getUser()->getLeadSource());
