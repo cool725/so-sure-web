@@ -1165,6 +1165,10 @@ abstract class Policy
 
     public function isWithinCooloffPeriod($date = null)
     {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
         if ($date == null) {
             $date = new \DateTime();
         }
