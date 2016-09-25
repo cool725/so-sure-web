@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
@@ -135,6 +136,23 @@ class PolicyService
         $this->defaultSenderName = $defaultSenderName;
         $this->statsd = $statsd;
         $this->redis = $redis;
+    }
+
+    public function init(User $user, $phone, $imei, $serialNumber, $identityLog = null, $phoneData = null)
+    {
+        // TODO: items in POST /policy should be moved to service and service called here
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone($phone);
+        $policy->setImei($imei);
+        $policy->setSerialNumber($serialNumber);
+        $policy->setIdentityLog($identityLog);
+        $policy->setPhoneData($phoneData);
+
+        $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $policy->init($user, $latestTerms);
+
+        return $policy;
     }
 
     public function create(Policy $policy, \DateTime $date = null)

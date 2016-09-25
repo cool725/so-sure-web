@@ -794,6 +794,12 @@ class ApiAuthControllerTest extends BaseControllerTest
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::BLACKLISTED_IMEI]),
         ]]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED);
+
+        // Ensure that policy wasn't created
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->find($user->getId());
+        $this->assertEquals(0, count($user->getPolicies()));
     }
 
     public function testNewPolicyLostStolenImei()

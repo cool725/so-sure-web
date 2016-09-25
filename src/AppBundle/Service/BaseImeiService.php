@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use AppBundle\Document\Phone;
 use AppBundle\Document\LostPhone;
+use AppBundle\Document\SalvaPhonePolicy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class BaseImeiService
@@ -51,6 +52,20 @@ class BaseImeiService
         $phones = $repo->findBy(['imei' => (string) $imei]);
 
         return count($phones) > 0;
+    }
+
+    /**
+     * Check if imei is already assigned to another policy
+     *
+     * @param string $imei
+     *
+     * @return boolean
+     */
+    public function isDuplicatePolicyImei($imei)
+    {
+        $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
+
+        return !$repo->isMissingOrExpiredOnlyPolicy($imei);
     }
 
     /**

@@ -99,7 +99,7 @@
                         <th>Email</th>
                         <th>Mobile</th>
                         <th>Facebook</th>
-                        <th>State</th>
+                        <th>User Status</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -115,7 +115,13 @@
                             </a></td>
                             <td>{{ policy.status }}</td>
                             <td>{{ user.firstname }} {{ user.lastname }}</td>
-                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.email }}</a>
+                                {% else %}
+                                    {{ user.email }}
+                                {% endif %}
+                            </td>
                             <td>{{ user.mobileNumber }}</td>
                             <td>{% if user.facebookId | length > 0 %}Yes{% else %}No{% endif %}</td>
                             <td>{% if user.locked %}locked{% elseif user.enabled %}enabled{% else %}disabled{%endif %}</td>
@@ -126,7 +132,13 @@
                             <td>N/A</td>
                             <td>N/A</td>
                             <td>{{ user.firstname }} {{ user.lastname }}</td>
-                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.email }}</a>
+                                {% else %}
+                                    {{ user.email }}
+                                {% endif %}
+                            </td>
                             <td>{{ user.mobileNumber }}</td>
                             <td>{% if user.facebookId | length > 0 %}<img src="http://graph.facebook.com/{{ user.facebookId }}/picture" />{% else %}No{% endif %}</td>
                             <td>{% if user.locked %}locked{% elseif user.enabled %}enabled{% else %}disabled{%endif %}</td>

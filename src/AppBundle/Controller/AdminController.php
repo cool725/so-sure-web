@@ -15,6 +15,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Connection;
 use AppBundle\Document\OptOut\OptOut;
@@ -32,6 +33,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\EmailOptOutType;
 use AppBundle\Form\Type\SmsOptOutType;
+use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
 use AppBundle\Form\Type\YearMonthType;
@@ -605,6 +607,95 @@ class AdminController extends BaseController
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
+        ];
+    }
+
+    /**
+     * @Route("/user/{id}", name="admin_user")
+     * @Template
+     */
+    public function adminUserAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->find($id);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        $resetForm = $this->get('form.factory')
+            ->createNamedBuilder('reset_form')
+            ->add('reset', SubmitType::class)
+            ->getForm();
+
+        $policyData = new SalvaPhonePolicy();
+        $policyForm = $this->get('form.factory')
+            ->createNamedBuilder('policy_form', PartialPolicyType::class, $policyData)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('reset_form')) {
+                $resetForm->handleRequest($request);
+                if ($resetForm->isValid()) {
+                    if (null === $user->getConfirmationToken()) {
+                        /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
+                        $tokenGenerator = $this->get('fos_user.util.token_generator');
+                        $user->setConfirmationToken($tokenGenerator->generateToken());
+                    }
+
+                    $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
+                    $user->setPasswordRequestedAt(new \DateTime());
+                    $this->get('fos_user.user_manager')->updateUser($user);
+
+                    $this->addFlash(
+                        'success',
+                        'Reset email was sent.'
+                    );
+
+                    return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
+                }
+            } elseif ($request->request->has('policy_form')) {
+                $policyForm->handleRequest($request);
+                if ($policyForm->isValid()) {
+                    $imeiValidator = $this->get('app.imei');
+                    if (!$imeiValidator->isImei($policyData->getImei()) ||
+                        $imeiValidator->isLostImei($policyData->getImei()) ||
+                        $imeiValidator->isDuplicatePolicyImei($policyData->getImei())) {
+                        $this->addFlash(
+                            'error',
+                            'Imei is invalid, lost, or duplicate'
+                        );
+
+                        return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
+                    }
+
+                    // TODO: run checkmend
+                    // TODO: Ensure address is present
+                    $policyService = $this->get('app.policy');
+                    $newPolicy = $policyService->init(
+                        $user,
+                        $policyData->getPhone(),
+                        $policyData->getImei(),
+                        $policyData->getSerialNumber()
+                    );
+
+                    $dm->persist($newPolicy);
+                    $dm->flush();
+
+                    $this->addFlash(
+                        'success',
+                        'Partial policy was added'
+                    );
+
+                    return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
+                }
+            }
+        }
+
+        return [
+            'user' => $user,
+            'reset_form' => $resetForm->createView(),
+            'policy_form' => $policyForm->createView(),
         ];
     }
 

@@ -317,6 +317,13 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
+            if ($imeiValidator->isDuplicatePolicyImei($imei)) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI,
+                    'Imei is already registered for a policy',
+                    422
+                );
+            }
 
             $phone = $this->getPhone(
                 $this->getDataString($phonePolicyData, 'make'),
@@ -346,28 +353,12 @@ class ApiAuthController extends BaseController
             }
 
             $dm = $this->getManager();
-            $phonePolicyRepo = $dm->getRepository(SalvaPhonePolicy::class);
-
-            // TODO: Once a lost/stolen imei store is setup, will want to check there as well.
-            if (!$phonePolicyRepo->isMissingOrExpiredOnlyPolicy($imei)) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI,
-                    'Imei is already registered for a policy',
-                    422
-                );
-            }
 
             $serialNumber = $this->getDataString($phonePolicyData, 'serial_number');
             // For phones without a serial number, run check on imei
             if (!$serialNumber) {
                 $serialNumber = $imei;
             }
-
-            $policy = new SalvaPhonePolicy();
-            $policy->setPhone($phone);
-            $policy->setImei($imei);
-            $policy->setSerialNumber($serialNumber);
-            $policy->setIdentityLog($this->getIdentityLog($request));
 
             // Checking against blacklist should be last check to possible avoid costs
             if (!$imeiValidator->checkImei($phone, $imei, $this->getUser())) {
@@ -377,7 +368,8 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
-            $policy->addCheckmendCertData($imeiValidator->getCertId(), $imeiValidator->getResponseData());
+            $imeiCertId = $imeiValidator->getCertId();
+            $imeiResponse = $imeiValidator->getResponseData();
 
             if (!$imeiValidator->checkSerial($phone, $serialNumber, $this->getUser())) {
                 return $this->getErrorJsonResponse(
@@ -386,18 +378,25 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
-            $policy->addCheckmendCertData($imeiValidator->getCertId(), $imeiValidator->getResponseData());
+            $serialCertId = $imeiValidator->getCertId();
+            $serialResponse = $imeiValidator->getResponseData();
 
-            $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
-            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+            $policyService = $this->get('app.policy');
+            $policy = $policyService->init(
+                $user,
+                $phone,
+                $imei,
+                $serialNumber,
+                $this->getIdentityLog($request),
+                [
+                    'make' => $this->getDataString($phonePolicyData, 'make'),
+                    'device' => $this->getDataString($phonePolicyData, 'device'),
+                    'memory' => $this->getDataString($phonePolicyData, 'memory'),
+                ]
+            );
+            $policy->addCheckmendCertData($imeiCertId, $imeiResponse);
+            $policy->addCheckmendCertData($serialCertId, $serialResponse);
 
-            $policy->init($user, $latestTerms);
-            $policy->setPhoneData(json_encode([
-                'make' => $this->getDataString($phonePolicyData, 'make'),
-                'device' => $this->getDataString($phonePolicyData, 'device'),
-                'memory' => $this->getDataString($phonePolicyData, 'memory'),
-            ]));
-            
             $this->validateObject($policy);
 
             $dm->persist($policy);
