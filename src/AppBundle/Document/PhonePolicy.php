@@ -124,6 +124,11 @@ class PhonePolicy extends Policy
         $this->checkmendCerts[$key] = $value;
     }
 
+    public function addCheckmendSerialData($response)
+    {
+        $this->addCheckmendCertData('serial', $response);
+    }
+
     public function addCheckmendCertData($certId, $response)
     {
         if (!$certId || strlen(trim($certId)) == 0) {

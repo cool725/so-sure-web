@@ -610,7 +610,7 @@ class AdminController extends BaseController
                             $serialNumber= $policy->getImei();
                         }
                         $imeiService->checkSerial($policy->getPhone(), $serialNumber, $policy->getUser());
-                        $policy->addCheckmendCertData($imeiService->getCertId(), $imeiService->getResponseData());
+                        $policy->addCheckmendSerialData($imeiService->getResponseData());
                         $dm->flush();
                         $this->addFlash(
                             'warning',

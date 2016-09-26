@@ -222,7 +222,6 @@ class ReceperioService extends BaseImeiService
             return null;
         }
 
-        // TODO: Should we record the checkImei result against the policy as well as the certid
         $result = $this->checkImei($phone, $imei, $user);
         $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData());
         $this->dm->flush();
@@ -262,8 +261,9 @@ class ReceperioService extends BaseImeiService
             return null;
         }
 
-        // TODO: Should we record the checkSerial result against the policy
         $result = $this->checkSerial($phone, $serialNumber, $user);
+        $policy->addCheckmendSerialData($this->getResponseData());
+        $this->dm->flush();
         if (!$result) {
             $this->logger->error(sprintf(
                 'Serial %s failed validation and policy %s should be investigated (cancelled?)',
@@ -460,7 +460,6 @@ class ReceperioService extends BaseImeiService
 
         if ($this->getEnvironment() != 'prod') {
             $this->responseData = 'serial';
-            $this->certId = 'serial';
 
             return true;
         }

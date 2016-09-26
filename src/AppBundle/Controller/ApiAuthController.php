@@ -378,7 +378,6 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
-            $serialCertId = $imeiValidator->getCertId();
             $serialResponse = $imeiValidator->getResponseData();
 
             $policyService = $this->get('app.policy');
@@ -395,7 +394,7 @@ class ApiAuthController extends BaseController
                 ])
             );
             $policy->addCheckmendCertData($imeiCertId, $imeiResponse);
-            $policy->addCheckmendCertData($serialCertId, $serialResponse);
+            $policy->addCheckmendSerialData($serialResponse);
 
             $this->validateObject($policy);
 
