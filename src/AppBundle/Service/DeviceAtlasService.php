@@ -83,6 +83,9 @@ class DeviceAtlasService
     public function sendAll()
     {
         $html = implode('<br>', $this->getMissing());
+        if (!$html) {
+            $html = 'No missing browsers';
+        }
         $this->mailerService->send('Mobile browsers not in db', 'tech@so-sure.com', $html);
     }
 
