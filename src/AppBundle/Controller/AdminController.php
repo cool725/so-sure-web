@@ -614,12 +614,12 @@ class AdminController extends BaseController
                         $dm->flush();
                         $this->addFlash(
                             'warning',
-                            sprintf('(Re)ran Receperio Checkes for Policy %s. Check results below.', $policy->getPolicyNumber())
+                            '(Re)ran Receperio Checkes. Check results below.'
                         );
                     } else {
                         $this->addFlash(
                             'error',
-                            sprintf('Unable to run receperio checks as no imei number for Policy %s.', $policy->getPolicyNumber())
+                            'Unable to run receperio checks (no imei number)'
                         );
                     }
 
