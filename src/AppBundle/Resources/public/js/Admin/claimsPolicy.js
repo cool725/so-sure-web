@@ -10,6 +10,10 @@ $('.confirm-facebook-clear').on("click",function() {
     return confirm('Are you sure you want to clear this facebook user??? They will not be able to login with facebook anymore.');
 });
 
+$('.confirm-imei-rerun').on("click",function() {
+    return confirm('Are you sure you want to rerun the imei/serial number checks? This costs £0.07.');
+});
+
 $(document).ready(function(){
     $('[data-toggle="popover"]').popover();
 });

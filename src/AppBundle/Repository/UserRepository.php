@@ -75,15 +75,20 @@ class UserRepository extends DocumentRepository
             ->count() > 0;
     }
 
-    public function findPostcode(User $user)
+    public function getDuplicatePostcodeCount(User $user)
     {
+        if (!$user->getBillingAddress() || !$user->getBillingAddress()->getPostcode()) {
+            return null;
+        }
+
         $qb = $this->createQueryBuilder();
         $qb->field('id')->notEqual($user->getId());
         $qb->field('billingAddress.postcode')->equals($user->getBillingAddress()->getPostcode());
 
         return $qb
             ->getQuery()
-            ->execute();
+            ->execute()
+            ->count();
     }
 
     public function findBankAccount(User $user)

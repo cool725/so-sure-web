@@ -532,6 +532,7 @@ class AdminController extends BaseController
     {
         $policyService = $this->get('app.policy');
         $fraudService = $this->get('app.fraud');
+        $imeiService = $this->get('app.imei');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
@@ -549,6 +550,9 @@ class AdminController extends BaseController
             ->getForm();
         $facebookForm = $this->get('form.factory')
             ->createNamedBuilder('facebook_form', FacebookType::class, $policy)
+            ->getForm();
+        $receperioForm = $this->get('form.factory')
+            ->createNamedBuilder('receperio_form')->add('rerun', SubmitType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -594,6 +598,33 @@ class AdminController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('receperio_form')) {
+                $receperioForm->handleRequest($request);
+                if ($receperioForm->isValid()) {
+                    if ($policy->getImei()) {
+                        $imeiService->checkImei($policy->getPhone(), $policy->getImei(), $policy->getUser());
+                        $policy->addCheckmendCertData($imeiService->getCertId(), $imeiService->getResponseData());
+
+                        $serialNumber = $policy->getSerialNumber();
+                        if (!$serialNumber) {
+                            $serialNumber= $policy->getImei();
+                        }
+                        $imeiService->checkSerial($policy->getPhone(), $serialNumber, $policy->getUser());
+                        $policy->addCheckmendCertData($imeiService->getCertId(), $imeiService->getResponseData());
+                        $dm->flush();
+                        $this->addFlash(
+                            'warning',
+                            '(Re)ran Receperio Checkes. Check results below.'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unable to run receperio checks (no imei number)'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -603,6 +634,7 @@ class AdminController extends BaseController
             'cancel_form' => $cancelForm->createView(),
             'imei_form' => $imeiForm->createView(),
             'facebook_form' => $facebookForm->createView(),
+            'receperio_form' => $receperioForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
