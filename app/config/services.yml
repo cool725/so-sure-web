@@ -181,8 +181,10 @@ services:
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService
         arguments:
-            logger: "@logger"
-            dm:     "@doctrine_mongodb.odm.default_document_manager"
+            logger:        "@logger"
+            dm:            "@doctrine_mongodb.odm.default_document_manager"
+            redis:         "@snc_redis.default"
+            mailerService: "@app.mailer"
 
     app.sms:
         class: AppBundle\Service\SmsService
@@ -277,6 +279,16 @@ services:
             defaultSenderName:    "%default_sender_name%"
             statsd:               "@statsd"
             redis:          "@snc_redis.default"
+
+    app.mailer:
+        class: AppBundle\Service\MailerService
+        arguments:
+            mailer:               "@mailer"
+            smtp:                 "@swiftmailer.transport.real"
+            templating:           "@templating"
+            router:               "@api.router"
+            defaultSenderAddress: "%default_sender_address%"
+            defaultSenderName:    "%default_sender_name%"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService
