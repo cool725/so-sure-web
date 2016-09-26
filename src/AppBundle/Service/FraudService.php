@@ -31,7 +31,7 @@ class FraudService
     public function runChecks(Policy $policy)
     {
         $data = [
-            'duplicate_postcode' => count($this->getDuplicatePostcode($policy)),
+            'duplicate_postcode' => $this->getDuplicatePostcode($policy),
             'duplicate_bank_accounts' => $this->getDuplicateBankAccounts($policy),
             'network_cancellations' => count($policy->getNetworkCancellations()),
         ];
@@ -53,7 +53,7 @@ class FraudService
         $user = $policy->getUser();
         $userRepo = $this->dm->getRepository(User::class);
 
-        return $userRepo->findPostcode($user);
+        return $userRepo->getDuplicatePostcodeCount($user);
     }
 
     public function getDuplicateBankAccounts(Policy $policy)

@@ -14,7 +14,6 @@
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="policy">
-            {% if policy.isPolicy %}
                 <table class="table table-striped">
                     <tr>
                         <td>Policy Number</td>
@@ -22,31 +21,38 @@
                             {% if policy.policyNumber|length %}
                                 {{ policy.policyNumber }}
                             {% else %}
-                                N/A
+                                N/A 
                             {% endif %}
                         </td>
                     </tr>
                     <tr>
                         <td>Policy Status</td>
                         <td>
-                          {{ policy.status }}
+                          {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
                           {% if policy.cancelledReason %}
                             / {{ policy.cancelledReason }}
                           {% endif %}
                         </td>
                     </tr>
+                    {% if policy.isPolicy %}
                     <tr>
                         <td>Policy Dates</td>
                         <td>{{ policy.start|date }} - {{ policy.end|date }}</td>
                     </tr>
+                    {% endif %}
+                    {% if policy.isPolicy %}
                     <tr>
                         <td>Policy Payments</td>
                         <td>Paid £{{ policy.premiumPaid }} of £{{ policy.premium.yearlyPremiumPrice }}</td>
                     </tr>
+                    {% endif %}
+                    {% if policy.isPolicy %}
                     <tr>
                         <td>Policy Installments</td>
                         <td>{{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice }}</td>
                     </tr>
+                    {% endif %}
+                    {% if policy.phone %}
                     <tr>
                         <td>Phone</td>
                         <td>{{ policy.phone }}
@@ -57,6 +63,7 @@
 
                         </td>
                     </tr>
+                    {% endif %}
                     <tr>
                       <td>ClaimsCheck Cert Id</td>
                       <td>
@@ -66,9 +73,16 @@
                         {% if policy.checkmendCerts|length == 0 %}
                           Certs not present
                         {% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            {{ form_start(receperio_form, {'attr': {'class': 'form-inline'}}) }}
+                            {{ form_widget(receperio_form.rerun, {'label': 'Re-run check', 'attr': {'class': 'btn btn-danger confirm-imei-rerun'}}) }}
+                            {{ form_end(receperio_form) }}
+                          </td>
+                        {% endif %}
                       </td>
                     </tr>
                 </table>
+                {% if policy.isPolicy %}
                 <h3>Pot</h3>
                 <table class="table table-striped">
                     <tr>
@@ -89,6 +103,7 @@
                         <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
                     </tr>
                 </table>
+                {% endif %}
                 <h3>Anti Fraud Checks</h3>
                 <table class="table table-striped">
                     <tr>
@@ -101,7 +116,7 @@
                     </tr>
                     <tr>
                         <td>Other Users w/same postcode</td>
-                        <td>{{ fraud.duplicate_postcode }}</td>
+                        <td>{% if fraud.duplicate_postcode %}{{ fraud.duplicate_postcode }}{% else %}N/A{% endif %}</td>
                     </tr>
                     <tr>
                         <td>Other Users w/possibly same card (same last 4, type, exp date)</td>
@@ -116,9 +131,6 @@
                       <td>{{ fraud.network_cancellations }}</td>
                     </tr>
                 </table>
-            {% else %}
-                <h4>No policy</h4>
-            {% endif %}
         </div>
         <div role="tabpanel" class="tab-pane" id="claims">
             {% if policy.claims|length > 0 %}
