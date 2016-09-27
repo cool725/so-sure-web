@@ -16,6 +16,7 @@ class RateLimitServiceTest extends WebTestCase
     protected static $container;
     protected static $rateLimit;
     protected static $redis;
+    protected static $dm;
 
     public static function setUpBeforeClass()
     {
@@ -30,6 +31,7 @@ class RateLimitServiceTest extends WebTestCase
          //each test method, do this in setUp() instead
          self::$rateLimit = self::$container->get('app.ratelimit');
          self::$redis = self::$container->get('snc_redis.default');
+         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
     }
 
     public function tearDown()
@@ -71,6 +73,29 @@ class RateLimitServiceTest extends WebTestCase
                 }
             }
         }
+    }
+
+    public function testUserRateLimits()
+    {
+        $rates = [
+            RateLimitService::DEVICE_TYPE_USER_LOGIN,
+        ];
+        $repo = static::$dm->getRepository(User::class);
+        $user = $repo->findOneBy([]);
+        $rateLimited = false;
+
+        foreach ($rates as $type) {
+            for ($i = 1; $i < 100; $i++) {
+                $userLimited = self::$rateLimit->allowedByUser($user);
+                if ($i <= RateLimitService::$maxRequests[$type]) {
+                    $this->assertTrue($userLimited);
+                    $rateLimited = true;
+                } else {
+                    $this->assertFalse($userLimited);
+                }
+            }
+        }
+        $this->assertTrue($rateLimited);
     }
 
     /*
