@@ -73,7 +73,7 @@ h1, h2, h3, h4, h5, h6 {
     border: 0;
     background: transparent;
     display: block;
-    border-bottom: 2px solid #efefef;
+    padding: 20px;
 }
 .container .navbar-header {
     padding-bottom: 5px;
@@ -83,31 +83,27 @@ h1, h2, h3, h4, h5, h6 {
 }
 .navbar .btn {
     font-size: 13px !important;
-    color: #fff !important;
-    padding: 10px 10px !important;
-    border-radius: 4px;
-    line-height: 10px;
-    margin-top: 12px;
+    color: #202532 !important;
+    padding: 10px 15px !important;
+    border-radius: 30px;
+    -moz-border-radius: 30px;
+    -webkit-border-radius: 30px;
+    line-height: 15px;
+    margin-top: 9px;
     margin-left: 10px !important;
     letter-spacing: 0;
     text-transform: none;
-    background: #3399ff;
-    border: 2px solid !important;
-    border-color: #3399ff !important;
+    background: #fff;
+    border: 2px solid #efefef !important;
 }
 .navbar-default .navbar-nav> li> a {
     font-size: 13px;
     padding-top: 20px;
-    color: #202532;
-}
-.navbar-default .navbar-nav li> a:hover {
-    color: #3399ff !important;
+    color: #3399ff;
 }
 .navbar-default .navbar-nav li> a:focus {
-    color: #3399ff !important;
-}
-.navbar-default .navbar-nav li> .btn:hover {
-    border-color: #3399ff !important;
+    border-color: #efefef !important;
+    color: #202532 !important;
 }
 .navbar-toggle {
     background-color: transparent;
@@ -167,12 +163,14 @@ h1, h2, h3, h4, h5, h6 {
 /* TEXT LINE BREAK */
 
 .text-break {
-    color: #fff;
+    color: #202532;
+    padding: 40px;
+    font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .text-break .line {
-    border-bottom: 1px solid #fff;
+    border-bottom: 2px solid #efefef;
     display: inline-block;
-    width: 30%;
+    width: 40%;
     vertical-align: middle;
 }
 .text-break-dark {

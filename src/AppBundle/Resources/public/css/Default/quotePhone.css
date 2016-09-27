@@ -34,6 +34,7 @@
 .view-quote .panel-body h5 {
     padding-bottom: 20px;
     font-size: 19px;
+    color: #202532;
 }
 .quote-card-footer {
   position: absolute;
@@ -112,17 +113,8 @@
 .got-a-question {
     font-size: 14px;
     padding-bottom: -20px;
+  }
 }
-}
-/* Page Scroll Indictor */
-
-/*.scroll-indicator {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-    color: #fff;
-}*/
 
 /* Connections Indicator */
 
