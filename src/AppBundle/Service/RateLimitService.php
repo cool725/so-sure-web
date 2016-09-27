@@ -23,6 +23,7 @@ class RateLimitService
     const DEVICE_TYPE_POLICY = 'policy';
     const DEVICE_TYPE_RESET = 'reset';
     const DEVICE_TYPE_TOKEN = 'token';
+    const DEVICE_TYPE_USER_LOGIN = 'user-login';
 
     public static $cacheTimes = [
         self::DEVICE_TYPE_IMEI => 86400, // 1 day
@@ -31,6 +32,7 @@ class RateLimitService
         self::DEVICE_TYPE_POLICY => 604800, // 7 days
         self::DEVICE_TYPE_RESET => 3600, // 1 hour
         self::DEVICE_TYPE_TOKEN => 600, // 10 minutes
+        self::DEVICE_TYPE_USER_LOGIN => 3600, // 10 minutes
     ];
 
     public static $maxRequests = [
@@ -40,6 +42,7 @@ class RateLimitService
         self::DEVICE_TYPE_POLICY => 1,
         self::DEVICE_TYPE_RESET => 2,
         self::DEVICE_TYPE_TOKEN => 10,
+        self::DEVICE_TYPE_USER_LOGIN => 10,
     ];
 
     public static $maxIpRequests = [
@@ -129,6 +132,42 @@ class RateLimitService
         // ip should always be higher as may be multiple users behind a nat
         if ($ipRequests > $maxIpRequests || $cognitoRequests > $maxCognitoRequests) {
             $this->logger->warning(sprintf('Rate limit exceeded for %s (%s/%s)', $type, $ip, $cognitoId));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Is the call allowed - special case for user login
+     *
+     * @param string $user
+     *
+     * @return boolean
+     */
+    public function allowedByUser($user)
+    {
+        $type = self::DEVICE_TYPE_USER_LOGIN;
+        $userKey = sprintf(self::KEY_FORMAT, $type, $user->getId());
+
+        $userRequests = $this->redis->incr($userKey);
+        $maxRequests = self::$maxRequests[$type];
+
+        $this->redis->expire($userRequests, self::$cacheTimes[$type]);
+
+        // rate limit only for prod, or test
+        if (!in_array($this->environment, ['prod', 'test'])) {
+            return true;
+        }
+
+        if ($userRequests > $maxRequests) {
+            $this->logger->warning(sprintf(
+                'Rate limit exceeded for %s (%s/%s)',
+                $type,
+                $user->getName(),
+                $user->getId()
+            ));
+
             return false;
         }
 

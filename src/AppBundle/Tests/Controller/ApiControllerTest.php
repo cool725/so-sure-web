@@ -73,6 +73,27 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue(strlen($data['cognito_token']['token']) > 10);
     }
 
+    public function testRateLimitLoginLocksUser()
+    {
+        self::$redis->flushdb();
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('rate-limit-login', $this), 'bar');
+        for ($i = 0; $i < 25; $i++) {
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+                'email' => static::generateEmail('rate-limit-login', $this),
+                'password' => 'notbar'
+            ]));
+        }
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
+
+        // For some reason, querying with the same client/dm is not updating getting the latest record
+        $client = static::createClient();
+        $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->findOneBy(['emailCanonical' => strtolower(static::generateEmail('rate-limit-login', $this))]);
+        $this->assertTrue($user->isLocked());
+    }
+
     public function testLoginNoUserType()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();

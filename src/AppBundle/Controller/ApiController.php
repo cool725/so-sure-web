@@ -76,6 +76,13 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
 
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowedByUser($user)) {
+                // If rate limiting occurs for a user, then the user should be locked
+                $user->setLocked(true);
+                $dm->flush();
+            }
+
             /* Apple appears to have problems logging in
              * so may want to re-enable for releases
             if ($user->getEmailCanonical() == "apple@so-sure.com") {
@@ -84,15 +91,6 @@ class ApiController extends BaseController
                 return new JsonResponse($user->toApiArray($identityId, $token));
             }
             */
-
-            $rateLimit = $this->get('app.ratelimit');
-            if (!$rateLimit->allowedByDevice(
-                RateLimitService::DEVICE_TYPE_LOGIN,
-                $this->getCognitoIdentityIp($request),
-                $this->getCognitoIdentityId($request)
-            )) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
-            }
 
             // soft delete
             if ($user->isExpired()) {
@@ -111,6 +109,15 @@ class ApiController extends BaseController
                     'User account is suspended - contact us',
                     422
                 );
+            }
+
+            // In order for the locked, logic to occur, must be before rate limiting
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_LOGIN,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
             if ($emailUserData) {
