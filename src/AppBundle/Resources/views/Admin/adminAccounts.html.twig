@@ -4,74 +4,35 @@
 
 {{ form_start(yearMonthForm) }}
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-md-6">
         <h1>so-sure Accounts for {{ month }} / {{ year }}</h1>
     </div>
     <div class="col-md-2">
-        <div class="form-group">
+        <div class="form-group" style="padding-top: 25px;">
             {{ form_label(yearMonthForm.month, 'Month') }}
             {{ form_errors(yearMonthForm.month) }}
             {{ form_widget(yearMonthForm.month) }}
         </div>                
     </div>
     <div class="col-md-2">
-        <div class="form-group">
+        <div class="form-group" style="padding-top: 25px;">
             {{ form_label(yearMonthForm.year, 'Year') }}
             {{ form_errors(yearMonthForm.year) }}
             {{ form_widget(yearMonthForm.year) }}
         </div>                
     </div>
-    <div class="col-md-1">
-        <div class="form-group">
-            {{ form_widget(yearMonthForm.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}
+    <div class="col-md-2">
+        <div class="form-group" style="padding-top: 15px;">
+            {{ form_widget(yearMonthForm.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}&nbsp;
+            <a target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}"><i class="fa fa-print"></i></a>
         </div>                
     </div>
 </div>
 {{ form_end(yearMonthForm) }}
+<h4>Note that # of policies may not be accurate when viewed historically until <a href="https://app.clubhouse.io/sosure/story/787/past-reporting">ch787</a> is complete.</h4>
 
-<table class="table table-striped">
-    <tr class="info">
-        <td>Total for month</td>
-        <td>£{{ paymentTotals.total|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td>Paid in</td>
-        <td>£{{ paymentTotals.received|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td>Refunded</td>
-        <td>£{{ paymentTotals.refunded|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td>Total Commissions (so-sure + Afl)</td>
-        <td>£{{ paymentTotals.totalCommission|number_format(2, '.', ',') }} ( {{ paymentTotals.totalCommissionPercent |number_format(1, '.', ',')}}% )</td>
-    </tr>
-    <tr class="success">
-        <td>so-sure Commission</td>
-        <td>£{{ paymentTotals.coverholderCommission|number_format(2, '.', ',') }} ( {{ paymentTotals.coverholderCommissionPercent |number_format(1, '.', ',')}}% )</td>
-    </tr>
-    <tr class="danger">
-        <td>Salva</td>
-        <td>£{{ paymentTotals.totalUnderwriter|number_format(2, '.', ',') }} ( {{ paymentTotals.totalUnderwriterPercent |number_format(1, '.', ',')}}% )</td>
-    </tr>
-    <tr class="danger">
-        <td>Afl Commission</td>
-        <td>£{{ paymentTotals.brokerCommission|number_format(2, '.', ',') }} ( {{ paymentTotals.brokerCommissionPercent |number_format(1, '.', ',')}}% )</td>
-    </tr>
-    <tr>
-        <td>Number of Payments Received</td>
-        <td>{{ paymentTotals.numPayments }}</td>
-    </tr>
-    <tr>
-        <td>Average Payment Amount</td>
-        <td>{% if paymentTotals.avgPayment %}£{{ paymentTotals.avgPayment|number_format(2, '.', ',')  }}{% else %}n/a{% endif %}</td>
-    </tr>
-    <tr>
-        <td>Number of Active Policies (as of end {{ month }} / {{ year }}) <br />
-        * <i>May not be very accurate when viewed historically</i></td>
-        <td>{{ activePolicies }}</td>
-    </tr>
-</table>
+{% include 'AppBundle:Admin:adminAccountsData.html.twig' %}
+
 {{ form_start(judoForm) }}
 <div class="row">
     <div class="col-md-7">

@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
@@ -748,6 +749,41 @@ class AdminController extends BaseController
             'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
         ];
+    }
+
+    /**
+     * @Route("/accounts/{year}/{month}", name="admin_accounts_print")
+     */
+    public function adminAccountsPrintAction($year, $month)
+    {
+        $date = new \DateTime(sprintf('%d-%d-01', $year, $month));
+
+        $dm = $this->getManager();
+        $paymentRepo = $dm->getRepository(JudoPayment::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+
+        $payments = $paymentRepo->getAllPaymentsForExport($date);
+        $paymentTotals = Payment::sumPayments($payments, $this->getParameter('kernel.environment') == 'prod');
+
+        $templating = $this->get('templating');
+        $snappyPdf = $this->get('knp_snappy.pdf');
+        $snappyPdf->setOption('orientation', 'Landscape');
+        $snappyPdf->setOption('page-size', 'A4');
+        $html = $templating->render('AppBundle:Pdf:adminAccounts.html.twig', [
+            'year' => $year,
+            'month' => $month,
+            'paymentTotals' => $paymentTotals,
+            'activePolicies' => $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date),
+        ]);
+
+        return new Response(
+            $snappyPdf->getOutputFromHtml($html),
+            200,
+            array(
+                'Content-Type'          => 'application/pdf',
+                'Content-Disposition'   => sprintf('attachment; filename="so-sure-%d-%d.pdf"', $year, $month)
+            )
+        );
     }
 
     /**
