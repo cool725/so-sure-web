@@ -4,26 +4,27 @@
 
 {{ form_start(yearMonthForm) }}
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-md-6">
         <h1>so-sure Accounts for {{ month }} / {{ year }}</h1>
     </div>
     <div class="col-md-2">
-        <div class="form-group">
+        <div class="form-group" style="padding-top: 25px;">
             {{ form_label(yearMonthForm.month, 'Month') }}
             {{ form_errors(yearMonthForm.month) }}
             {{ form_widget(yearMonthForm.month) }}
         </div>                
     </div>
     <div class="col-md-2">
-        <div class="form-group">
+        <div class="form-group" style="padding-top: 25px;">
             {{ form_label(yearMonthForm.year, 'Year') }}
             {{ form_errors(yearMonthForm.year) }}
             {{ form_widget(yearMonthForm.year) }}
         </div>                
     </div>
-    <div class="col-md-1">
-        <div class="form-group">
-            {{ form_widget(yearMonthForm.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}
+    <div class="col-md-2">
+        <div class="form-group" style="padding-top: 15px;">
+            {{ form_widget(yearMonthForm.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}&nbsp;
+            <a target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}"><i class="fa fa-print"></i></a>
         </div>                
     </div>
 </div>
