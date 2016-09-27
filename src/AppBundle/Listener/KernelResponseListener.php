@@ -17,23 +17,20 @@ class KernelResponseListener
     protected $adminCookieValue;
     protected $logger;
     protected $environment;
+    protected $domain;
 
-    public function __construct($tokenStorage, $authChecker, $adminCookieValue, $logger, $environment)
+    public function __construct($tokenStorage, $authChecker, $adminCookieValue, $logger, $environment, $domain)
     {
         $this->tokenStorage = $tokenStorage;
         $this->authChecker = $authChecker;
         $this->adminCookieValue = $adminCookieValue;
         $this->logger = $logger;
         $this->environment = $environment;
+        $this->domain = $domain;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        // Only set cookie for prod
-        if ($this->environment != 'prod') {
-            return;
-        }
-
         $response = $event->getResponse();
         $request  = $event->getRequest();
 
@@ -59,13 +56,16 @@ class KernelResponseListener
             return;
         }
 
+        $secure = $this->environment == 'prod';
+
         // create/update cookie
         $cookie = new Cookie(
             self::SOSURE_EMPLOYEE_COOKIE_NAME,
             $this->adminCookieValue,
             time() + self::SOSURE_EMPLOYEE_COOKIE_LENGTH,
-            '.wearesosure.com',
-            true,
+            '/',
+            $this->domain,
+            $secure,
             true
         );
 

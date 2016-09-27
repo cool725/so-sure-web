@@ -453,6 +453,7 @@ services:
             adminCookieValue: "%sosure_employee_cookie_value%"
             logger:           "@logger"
             environment:      "%kernel.environment%"
+            domain:           "%sosure_employee_cookie_domain%"
         tags:
             -  { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
