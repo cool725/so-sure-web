@@ -87,7 +87,6 @@ class RateLimitService
      * @param string $ip
      * @param string $cognitoId
      *
-     * @return boolean
      */
     public function clearByDevice($type, $ip, $cognitoId)
     {
@@ -95,6 +94,20 @@ class RateLimitService
         $cognitoIdKey = sprintf(self::KEY_FORMAT, $type, $cognitoId);
         $this->redis->del($ipKey);
         $this->redis->del($cognitoIdKey);
+    }
+
+    /**
+     * Clear the rate limit
+     *
+     * @param User $user
+     *
+     */
+    public function clearByUser($user)
+    {
+        $type = self::DEVICE_TYPE_USER_LOGIN;
+        $userKey = sprintf(self::KEY_FORMAT, $type, $user->getId());
+
+        $this->redis->del($userKey);
     }
 
     /**
