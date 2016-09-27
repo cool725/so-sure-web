@@ -14,6 +14,11 @@ use AppBundle\Service\RateLimitService;
  */
 class ApiControllerTest extends BaseControllerTest
 {
+    public function setUp()
+    {
+        self::$redis->flushdb();
+    }
+
     // login
 
     /**
@@ -75,7 +80,6 @@ class ApiControllerTest extends BaseControllerTest
 
     public function testRateLimitLoginLocksUser()
     {
-        self::$redis->flushdb();
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('rate-limit-login', $this), 'bar');
         for ($i = 0; $i < 25; $i++) {
@@ -205,12 +209,17 @@ class ApiControllerTest extends BaseControllerTest
 
     public function testLoginRateLimited()
     {
-        $user = static::createUser(self::$userManager, static::generateEmail('invalid-user', $this), 'bar');
+        $userA = static::createUser(self::$userManager, static::generateEmail('invalid-userA', $this), 'bar');
+        $userB = static::createUser(self::$userManager, static::generateEmail('invalid-userB', $this), 'bar');
         $cognitoIdentityId = $this->getUnauthIdentity();
 
-        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_LOGIN] + 1; $i++) {
+        for ($i = 1; $i <= ceil(RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_LOGIN] / 2) + 1; $i++) {
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
-                'email' => static::generateEmail('invalid-user', $this),
+                'email' => static::generateEmail('invalid-userA', $this),
+                'password' => 'invalid'
+            ]));
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+                'email' => static::generateEmail('invalid-userB', $this),
                 'password' => 'invalid'
             ]));
         }
@@ -552,35 +561,42 @@ class ApiControllerTest extends BaseControllerTest
     public function testResetClearsLogin()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, static::generateEmail('user-reset-clear', $this), 'bar');
-        $this->assertNull($user->getConfirmationToken());
+        $userA = static::createUser(self::$userManager, static::generateEmail('user-reset-clearA', $this), 'bar');
+        $userB = static::createUser(self::$userManager, static::generateEmail('user-reset-clearB', $this), 'bar');
+        $this->assertNull($userA->getConfirmationToken());
+        $this->assertNull($userB->getConfirmationToken());
 
-        for ($i = 1; $i <= RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_LOGIN]; $i++) {
+        for ($i = 1; $i <= ceil(RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_LOGIN] / 2); $i++) {
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
-                'email' => static::generateEmail('user-reset-clear', $this),
+                'email' => static::generateEmail('user-reset-clearA', $this),
+                'password' => 'foo'
+            ]));
+            $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+                'email' => static::generateEmail('user-reset-clearB', $this),
                 'password' => 'foo'
             ]));
             $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
         }
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
-            'email' => static::generateEmail('user-reset-clear', $this),
+            'email' => static::generateEmail('user-reset-clearA', $this),
             'password' => 'foo'
         ]));
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/reset', array(
-            'email' => static::generateEmail('user-reset-clear', $this)
+            'email' => static::generateEmail('user-reset-clearA', $this)
         ));
         $data = $this->verifyResponse(200);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
-            'email' => static::generateEmail('user-reset-clear', $this),
+            'email' => static::generateEmail('user-reset-clearA', $this),
             'password' => 'foo'
         ]));
         $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
-            'email' => static::generateEmail('user-reset-clear', $this),
+            'email' => static::generateEmail('user-reset-clearA', $this),
             'password' => 'bar'
         ]));
         $data = $this->verifyResponse(200);
