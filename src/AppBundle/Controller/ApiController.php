@@ -77,6 +77,7 @@ class ApiController extends BaseController
             }
 
             $rateLimit = $this->get('app.ratelimit');
+            // Success logins should clear the rate limit (further below)
             if (!$rateLimit->allowedByUser($user)) {
                 // If rate limiting occurs for a user, then the user should be locked
                 $user->setLocked(true);
@@ -142,6 +143,9 @@ class ApiController extends BaseController
                 // or on the client side, the cognito id returned, could be linked to the login
             }
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
+
+            // User has successfully logged in, so clear the rate limit
+            $rateLimit->clearByUser($user);
 
             return new JsonResponse($user->toApiArray($identityId, $token));
         } catch (ValidationException $ex) {

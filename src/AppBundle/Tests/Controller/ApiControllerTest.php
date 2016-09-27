@@ -98,6 +98,34 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue($user->isLocked());
     }
 
+    public function testSuccessLoginDoesNotLocksUser()
+    {
+        $rateLimit = new RateLimitService(static::$redis, static::$container->get('logger'), 'test');
+
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, static::generateEmail('rate-limit-login-ok', $this), 'bar');
+        for ($i = 0; $i < 11; $i++) {
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+                'email' => static::generateEmail('rate-limit-login-ok', $this),
+                'password' => 'bar'
+            ]));
+
+            $rateLimit->clearByDevice(
+                RateLimitService::DEVICE_TYPE_LOGIN,
+                '127.0.0.1',
+                $cognitoIdentityId
+            );        
+        }
+        $data = $this->verifyResponse(200);
+
+        // For some reason, querying with the same client/dm is not updating getting the latest record
+        $client = static::createClient();
+        $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->findOneBy(['emailCanonical' => strtolower(static::generateEmail('rate-limit-login-ok', $this))]);
+        $this->assertFalse($user->isLocked());
+    }
+
     public function testLoginNoUserType()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
