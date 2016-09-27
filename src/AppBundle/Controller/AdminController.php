@@ -754,7 +754,7 @@ class AdminController extends BaseController
     /**
      * @Route("/accounts/{year}/{month}", name="admin_accounts_print")
      */
-    public function adminAccountsPrintAction(Request $request, $year, $month)
+    public function adminAccountsPrintAction($year, $month)
     {
         $date = new \DateTime(sprintf('%d-%d-01', $year, $month));
 
