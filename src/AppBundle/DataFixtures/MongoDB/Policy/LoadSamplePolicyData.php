@@ -168,7 +168,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
             $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
-            $payment->setReceipt(rand(1, 999999));
+            $payment->setReceipt(rand(1, 999999) + rand(1, 999999));
             $policy->addPayment($payment);
         } else {
             $months = rand(1, 12);

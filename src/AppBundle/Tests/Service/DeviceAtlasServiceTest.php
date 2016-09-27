@@ -93,6 +93,15 @@ class DeviceAtlasServiceTest extends WebTestCase
         $this->assertEquals("One", $phone->getModel());
     }
 
+    public function testNokiaN95PopulatesMissing()
+    {
+        $userAgent = "Mozilla/5.0 (SymbianOS/9.2; U; Series60/3.1 NokiaN95/";
+
+        $phone = self::$deviceAtlas->getPhone($this->getRequest($userAgent));
+        $this->assertEquals('Nokia', $phone);
+        $this->assertEquals(1, count(self::$deviceAtlas->getMissing()));
+    }
+
     private function getRequest($userAgent)
     {
         $request = Request::create(
