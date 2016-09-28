@@ -176,3 +176,14 @@
     width: 100%;
     text-align: center;
 }
+
+.circle {
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  border-radius: 50%;
+  font-size: 50px;
+  color: #fff;
+  text-align: center;
+  background: #3399FF
+}
