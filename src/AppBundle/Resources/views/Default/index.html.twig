@@ -30,31 +30,35 @@
 
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-    <section class="hero">
+    <section class="hero light-gradient align-middle">
+      <div class="vertical-align-wrap">
+        <div class="vertical-align-middle">
         <div class="container">
-            <div class="row" id="welcome">
+            <div class="row">
                 <div class="col-md-12">
                     <div>
                         <h1 class="text-center">Insure your phone with friends.
                             <br>Get up to 80% of your money back.
                         </h1>
                     </div>
-                    <div>
-                        <p class="text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
+                    <div style="padding-top: 20px;">
+                        <p class="lead text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="container">
-            <div class="row">
+            <div class="row" style="padding-top: 20px;">
                 <div class="col-md-6 text-right">
                     <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
                 </div>
                 <div class="col-md-6 text-left">
-                    <a class="btn btn-info" id="learn-more-btn">Learn more <i class="fa fa-chevron-down"></i></a>
+                    <a class="btn btn-info" id="learn-more-btn">Learn more
+                        <i class="fa fa-chevron-down"></i>
+                    </a>
                 </div>
             </div>
         </div>
+      </div>
+    </div>
     </section>
 
     <section class="benefits" id="benefits">
@@ -66,8 +70,8 @@
             <div class="row centered">
                 <div class="col-md-4">
                     <img src="{{ cdn_url }}/images/home/benefits-icons/safe.svg" alt="You're covered for theft, loss and accidental damage as standard."></img>
-                    <h4 class="text center">You're (actually) covered</h4>
-                    <p class="text center">For a small monthly fee, you're covered for theft, loss and accidental damage. Finally, the peace of mind you've been looking for.</p>
+                    <h4 class="text-center">You're (actually) covered</h4>
+                    <p class="text-center">For a small monthly fee, you're covered for theft, loss and accidental damage. Finally, the peace of mind you've been looking for.</p>
                 </div>
                 <div class="col-md-4">
                     <img src="{{ cdn_url }}/images/home/benefits-icons/coins.svg" alt="We're already 30% cheaper than the networks before you connect with anyone!"></img>
@@ -76,8 +80,8 @@
                 </div>
                 <div class="col-md-4">
                     <img src="{{ cdn_url }}/images/home/benefits-icons/clock.svg" alt=""></img>
-                    <h4 class="text center">Great service &amp; speedy replacement</h4>
-                    <p class="text center">24/7 UK-based claims support and once you're claim is approved, we'll aim to get you a replacement phone the next-working day.</p>
+                    <h4 class="text-center">Great service &amp; speedy replacement</h4>
+                    <p class="text-center">24/7 UK-based claims support and once your claim is approved, we'll aim to get you a replacement phone the next-working day.</p>
                 </div>
             </div>
         </div>
@@ -86,11 +90,10 @@
     {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
     <section class="popular-devices" id="get-quote">
-        <h2>Get a quote</h2>
-        <p class="text-center">Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
-        <div class="container" id="select-phone">
-            <div class="row">
-                <div class="col-sm-12">
+            <h2>Get a quote</h2>
+            <p>Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
+            <div class="row" id="select-phone">
+                <div class="col-sm-12 text-center">
                     <div class="device-select">
                         {{ form_start(form_phone) }}
                         <div class="input-group">
@@ -102,10 +105,10 @@
                         {{ form_end(form_phone) }}
                     </div>
                 </div>
-            </div>
             <p class="text-center">
                 <a href="mailto:hello@wearesosure.com">Don't see your device? Let us know.</a>
             </p>
+          </div>
         </div>
 
         <div class="text-break">
@@ -115,9 +118,9 @@
         </div>
 
         <div class="container">
-          <p>
-            Select from our most popular devices below.
-          </p>
+            <p>
+                Select from our most popular devices.
+            </p>
             <div class="row">
                 <div class="col-md-4">
                     <div id="device-logo">
@@ -174,67 +177,10 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div id="device-logo">
-                        <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_6_Logo.svg" alt="Get your iPhone 6 insured today!"></img>
-                        <div id="memory-select">
-                            <h5>Select memory</h5>
-                            <ul>
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '16'}) }}">16GB</a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '64'}) }}">64GB</a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6', 'memory': '128'}) }}">128GB</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div id="device-logo">
-                        <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_SE_logo.svg" alt="Get your Samsung iPhone SE insured today!"></img>
-                        <div id="memory-select">
-                            <h5>Select memory</h5>
-                            <ul>
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone SE', 'memory': '16'}) }}">16GB</a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone SE', 'memory': '64'}) }}">64GB</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div id="device-logo">
-                        <img src="{{ cdn_url }}/images/home/phone-logos/GalaxyS6_Logo.svg" alt="Get your Samsung Galaxy S6 insured today"></img>
-                        <div id="memory-select">
-                            <h5>Select memory</h5>
-                            <ul>
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S6', 'memory': '32'}) }}">32GB</a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S6', 'memory': '64'}) }}">64GB</a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S6', 'memory': '128'}) }}">128GB</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 
-    <section>
-        <div class="social-proof">
+    <section class="social-proof">
             <div class="container">
                 <h2>Why insurance needs to change</h2>
                 <p class="text-center">Don't take our word for it, just look at these disgruntled people. This is why we're commited to giving you the best possible experience.</p>
@@ -269,7 +215,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
     <div class="pre-footer">

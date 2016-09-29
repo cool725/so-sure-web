@@ -1,14 +1,5 @@
 /* HERO */
 
-.hero {
-    background: #fff;
-    padding-top: 100px;
-    padding-bottom: 100px;
-    min-height: 500px;
-    color: #202532;
-    position: relative;
-}
-
 @media (max-width: 543px) {
     .hero {
         padding-top: 50px;
@@ -25,8 +16,8 @@
 
 @media (min-width: 992px) {
     #hero-description {
-        padding-left: 175px;
-        padding-right: 175px;
+        padding-left: 150px;
+        padding-right: 150px;
     }
 }
 
@@ -40,7 +31,7 @@
 
 .hero .btn-info {
     padding: 12px 30px;
-    border: 2px solid #efefef;
+    border: 2px solid #202532;
     background: none !important;
     border-radius: 30px;
     -moz-border-radius: 30px;
@@ -56,6 +47,9 @@
     .hero .text-right {
         text-align: center;
     }
+    .hero .btn-info {
+      margin-top: 15px;
+    }
 }
 
 /* GET QUOTE */
@@ -65,14 +59,11 @@
     padding-top: 10px;
     padding-bottom: 10px;
     background-color: rgba(255, 255, 255, 0.5);
-    width: 60%;
     border-radius: 5px;
 }
 
 @media (max-width: 767px) {
     #select-phone {
-        width: 90%;
-        border-radius: 2px;
         padding-top: 5px;
         padding-bottom: 5px;
     }
@@ -93,7 +84,7 @@
     vertical-align: middle;
     font-size: 16px;
     line-height: 1.5;
-    width: 100%;
+    width: 75%;
 }
 
 #launch_phone_phone {
@@ -120,10 +111,10 @@
 }
 
 #select-phone a {
+    margin-top: 20px;
+}
+#select-phone a:hover {
     color: #202532;
-    font-size: 12px;
-    margin-top: 10px;
-    text-decoration: underline;
 }
 
 #select-phone button.btn {
@@ -131,13 +122,15 @@
   border-radius: 30px;
   -moz-border-radius: 30px;
   -webkit-border-radius: 30px;
-  margin-left: 10px;
+  margin-left: 10px !important;
 }
 
 @media (max-width: 767px) {
  #select-phone button.btn {
    margin-top: 10px;
    margin-bottom: 10px;
+   width: 100%;
+   margin-left: none;
  }
 }
 

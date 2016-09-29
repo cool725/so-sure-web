@@ -26,12 +26,16 @@
 
 /* Global */
 
+html {
+  height: 100%;
+}
+
 body {
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 15px;
+    /*font-size: 15px;*/
     line-height: 1.42857143;
-    color: #626B78;
-    background-color: #ffffff
+    background-color: #ffffff;
+    height: 100%;
 }
 strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -58,6 +62,7 @@ ul, li {
 }
 h1, h2, h3, h4, h5, h6 {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #202532;
 }
 @media (max-width: 500px) {
     h1 {
@@ -71,9 +76,9 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 1000;
     margin-bottom: 0;
     border: 0;
-    background: transparent;
+    background: rgba(0,0,0,0.0);
     display: block;
-    padding: 20px;
+    padding: 15px;
 }
 .container .navbar-header {
     padding-bottom: 5px;
@@ -94,16 +99,19 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: 0;
     text-transform: none;
     background: #fff;
-    border: 2px solid #efefef !important;
+    border: 2px solid #202532 !important;
 }
 .navbar-default .navbar-nav> li> a {
     font-size: 13px;
     padding-top: 20px;
-    color: #3399ff;
+    color: #202532;
+}
+.navbar-default .navbar-nav li> a:hover {
+    color: #3399ff !important;
 }
 .navbar-default .navbar-nav li> a:focus {
     border-color: #efefef !important;
-    color: #202532 !important;
+    color: #3399ff !important;
 }
 .navbar-toggle {
     background-color: transparent;
@@ -119,8 +127,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 @media (max-width: 767px) {
     .navbar-default .navbar-collapse {
-        background-color: #fff;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+      background-color: #fff;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+      border: 2px solid #efefef;
+      border-radius: 4px;
     }
     .navbar-default .navbar-nav> li> a {
         color: #3399ff !important;
@@ -281,4 +291,39 @@ h1, h2, h3, h4, h5, h6 {
 }
 .download-now p {
     color: #626B78;
+}
+
+/* Section Tools */
+.section {
+  position: relative;
+}
+.align-middle {
+  background-size: 100% auto;
+  height: 100%;
+  position: relative;
+}
+.vertical-align-wrap {
+  width: 100%;
+  height: 80%;
+  display: table;
+}
+.vertical-align-middle {
+  vertical-align: middle;
+  display: table-cell;
+  text-align: center;
+}
+.light-gradient {
+  background: #Efefef; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to top, #efefef , #FFFFFF); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to top, #efefef , #FFFFFF); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+.brand-gradient {
+  background: rgba(51, 153, 255, 1);
+  background: -moz-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
+  background: -webkit-gradient(left bottom, right top, color-stop(50%, rgba(51, 153, 255, 1)), color-stop(100%, rgba(0, 204, 255, 1)));
+  background: -webkit-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
+  background: -o-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
+  background: -ms-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
+  background: linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
+  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1);
 }

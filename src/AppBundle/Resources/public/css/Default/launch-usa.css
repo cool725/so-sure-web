@@ -1,11 +1,49 @@
+html {
+  height: 100%;
+}
 body {
-    background: rgba(51, 153, 255, 1);
+  margin: 0 0 150px;
+  height: 100%;
+}
+
+footer{
+  width: 100%;
+  border-top: 2px solid #efefef;
+  color: #202532;
+}
+
+footer a {
+  color: #202532;
+}
+
+footer a:hover {
+  color: #3399ff;
+  text-decoration: none;
 }
 
 .hero-usa {
-    padding-top: 100px;
-    padding-bottom: 100px;
-    min-height: 500px;
-    color: #fff;
-    position: relative;
+  background: #Efefef; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to top, #efefef , #FFFFFF); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to top, #efefef , #FFFFFF); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background-size: 100% auto;
+  height: 100%;
+  position: relative;
+}
+
+.hero-usa .btn-primary, .hero-usa .btn-info {
+    padding: 12px 30px;
+    border-radius: 30px;
+    -moz-border-radius: 30px;
+    -webkit-border-radius: 30px;
+}
+@media (max-width:992px) {
+    .hero-usa .text-left {
+        text-align: center;
+    }
+    .hero-usa .text-right {
+        text-align: center;
+    }
+    .hero-usa .btn-info {
+      margin-top: 20px;
+    }
 }
