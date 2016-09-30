@@ -170,8 +170,8 @@ abstract class Payment
 
     public function calculateSplit()
     {
-        $this->setIpt($this->getPolicy()->getPremium()->getIptRate() * $this->getAmount());
-        $this->setGwp($this->getAmount() - $this->getIpt());
+        $this->setGwp($this->getAmount() / (1 + $this->getPolicy()->getPremium()->getIptRate()));
+        $this->setIpt($this->getAmount() - $this->getGwp());
     }
 
     public function setTotalCommission($totalCommission)
