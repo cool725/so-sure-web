@@ -731,7 +731,10 @@ class ApiController extends BaseController
      */
     private function unknownDevice($device, $memory)
     {
-        if ($device == "" || $device == "generic_x86" || $device == "generic_x86_64" || $device == "Simulator") {
+        if (in_array($device, [
+            "", "generic_x86", "generic_x86_64", "Simulator",
+            "iPad4,4", "iPad5,2", "iPad5,3", "iPad5,4", "iPad6,7", "iPad6,8", "iPad Air", "iPad Air 2"
+        ])) {
             return false;
         }
 
