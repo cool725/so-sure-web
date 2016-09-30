@@ -16,6 +16,12 @@ class Initial extends LoadPhoneData implements FixtureInterface
     {
         $this->loadPreLaunchMSRP($manager);
         $this->loadCsv($manager, 'devices.csv');
+
+        // For non-prod, we want the sii available as its a test device
+        $repo = $manager->getRepository(Phone::class);
+        $sii = $repo->findOneBy(['devices' => 'GT-I9100', 'memory' => 16]);
+        $sii->setActive(true);
+        $manager->flush();
     }
 
     protected function loadPreLaunchMSRP(ObjectManager $manager)
