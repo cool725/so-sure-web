@@ -54,4 +54,27 @@ class Salva
             return null;
         }
     }
+
+    public function getProrataSplit($commission)
+    {
+        $rate = $commission / self::YEARLY_TOTAL_COMMISSION;
+        if ($rate > 1) {
+            throw new \InvalidArgumentException(sprintf('Commission %f is larger than yearly', $commission));
+        }
+
+        $broker = $this->toTwoDp($rate * self::YEARLY_BROKER_COMMISSION);
+        $coverholderExpected = $this->toTwoDp($rate * self::YEARLY_COVERHOLDER_COMMISSION);
+
+        // In order to avoid errors in calculation due to rounding, only round on 1 element and substract
+        // Validate that the expected value is not much than 1p difference
+        $coverholderActual = $commission - $broker;
+        if (abs($coverholderExpected - $coverholderActual) > 0.01) {
+            throw new \Exception(sprintf('Failed to accurately split total commission %f', $commission));
+        }
+
+        return [
+            'broker' => $broker,
+            'coverholder' => $coverholderActual,
+        ];
+    }
 }

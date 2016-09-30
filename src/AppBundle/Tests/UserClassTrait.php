@@ -19,7 +19,7 @@ trait UserClassTrait
         return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
     }
 
-    public static function createUserPolicy($init = false)
+    public static function createUserPolicy($init = false, $date = null)
     {
         $user = new User();
         self::addAddress($user);
@@ -30,7 +30,7 @@ trait UserClassTrait
         if ($init) {
             $policy->init($user, self::getLatestPolicyTerms(static::$dm));
             $policy->setPhone(self::$phone);
-            $policy->create(rand(1, 999999));
+            $policy->create(rand(1, 999999), 'TEST', $date);
         }
 
         return $policy;
@@ -112,7 +112,8 @@ trait UserClassTrait
         $phone = null,
         $date = null,
         $addPayment = false,
-        $createPolicy = false
+        $createPolicy = false,
+        $monthly = true
     ) {
         self::addAddress($user);
 
@@ -121,13 +122,26 @@ trait UserClassTrait
         $policy->init($user, self::getLatestPolicyTerms($dm));
 
         if ($phone) {
-            $policy->setPhone($phone);
+            $policy->setPhone($phone, $date);
         }
 
-        if ($addPayment && $policy->getPhone()) {
+        if ($addPayment) {
+            if (!$policy->getPhone()) {
+                throw new \Exception('Missing phone for adding payment');
+            }
             $payment = new JudoPayment();
-            $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+            if ($date) {
+                $payment->setDate($date);
+            }
+            if ($monthly) {
+                $policy->setPremiumInstallments(12);
+                $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+                $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+            } else {
+                $policy->setPremiumInstallments(1);
+                $payment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+                $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+            }
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $payment->setReceipt(rand(1, 999999));
             $policy->addPayment($payment);
@@ -137,6 +151,7 @@ trait UserClassTrait
             if (!$phone) {
                 throw new \Exception('Attempted to create policy without setting a phone');
             }
+
             $policy->create(rand(1, 999999), 'TEST', $date);
         }
 
@@ -144,6 +159,22 @@ trait UserClassTrait
         $dm->flush();
 
         return $policy;
+    }
+
+    public static function addPayment($policy, $amount, $commission)
+    {
+        $payment = new JudoPayment();
+        $payment->setAmount($amount);
+        $payment->setTotalCommission($commission);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
+        $policy->addPayment($payment);
+    }
+
+    public static function connectPolicies($invitationService, $policyA, $policyB, $date)
+    {
+        $invitation = $invitationService->inviteByEmail($policyA, $policyB->getUser()->getEmail());
+        $invitationService->accept($invitation, $policyB, $date);
     }
 
     public static function getLatestPolicyTerms(\Doctrine\ODM\MongoDB\DocumentManager $dm)

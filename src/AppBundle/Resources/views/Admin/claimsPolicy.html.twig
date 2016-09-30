@@ -33,7 +33,7 @@
         {{ form_widget(cancel_form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
         {{ form_end(cancel_form) }}
         <br />
-        <i>Cooloff will auto-refund the policy payment</i>
+        <i>If cancellation list is empty, then most likely this is an open claim that must be resolved first.</i>
     </div>
     {% include 'AppBundle::Claims/claimsPolicyItem.html.twig' %}
 </div>
