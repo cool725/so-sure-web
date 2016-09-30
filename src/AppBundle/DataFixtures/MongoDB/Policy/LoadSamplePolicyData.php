@@ -39,9 +39,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        $this->newPolicyTerms($manager);
-        $manager->flush();
-
         $users = $this->newUsers($manager);
         $manager->flush();
 
@@ -63,14 +60,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->newPolicy($manager, $user, $count);
 
         $manager->flush();
-    }
-
-    private function newPolicyTerms($manager)
-    {
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(true);
-        $policyTerms->setVersion('Version 1 May 2016');
-        $manager->persist($policyTerms);
     }
 
     private function newUsers($manager)
@@ -181,7 +170,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
                 }
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
-                $payment->setReceipt(rand(1, 999999));
+                $payment->setReceipt(rand(1, 999999) + rand(1, 999999));
                 $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));
                 if (rand(0, 3) == 0) {
