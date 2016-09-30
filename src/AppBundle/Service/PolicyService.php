@@ -74,6 +74,11 @@ class PolicyService
         $this->mailer = $mailer;
     }
 
+    public function setDispatcher($dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
     /**
      * Environment is injected into constructed and should only
      * be overwriten for a few test cases.
@@ -174,7 +179,7 @@ class PolicyService
         }
 
         if ($policy->isValidPolicy($prefix)) {
-            return;
+            return false;
         }
 
         if (count($policy->getScheduledPayments()) > 0) {
@@ -207,9 +212,14 @@ class PolicyService
 
         $this->queueMessage($policy);
 
-        $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
+        }
 
         $this->statsd->endTiming("policy.create");
+
+        return true;
     }
 
     private function queueMessage($policy)
@@ -459,7 +469,11 @@ class PolicyService
 
         $this->cancelledPolicyEmail($policy);
         $this->networkCancelledPolicyEmails($policy);
-        $this->dispatcher->dispatch(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
+
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            $this->dispatcher->dispatch(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
+        }
     }
 
     /**

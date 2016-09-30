@@ -114,7 +114,7 @@ class ApiControllerTest extends BaseControllerTest
                 RateLimitService::DEVICE_TYPE_LOGIN,
                 '127.0.0.1',
                 $cognitoIdentityId
-            );        
+            );
         }
         $data = $this->verifyResponse(200);
 

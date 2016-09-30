@@ -36,6 +36,18 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Only display payments that should be run'
             )
+            ->addOption(
+                'prefix',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy prefix'
+            )
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Pretent its this date'
+            )
         ;
     }
 
@@ -43,7 +55,13 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
     {
         $id = $input->getOption('id');
         $policyNumber = $input->getOption('policyNumber');
+        $date = $input->getOption('date');
         $show = true === $input->getOption('show');
+        $prefix = $input->getOption('prefix');
+        $scheduledDate = null;
+        if ($date) {
+            $scheduledDate = new \DateTime($date);
+        }
 
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $logger = $this->getContainer()->get('logger');
@@ -51,7 +69,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         $repo = $dm->getRepository(ScheduledPayment::class);
         if ($id) {
             $scheduledPayment = $repo->find($id);
-            $scheduledPayment = $judoPay->scheduledPayment($scheduledPayment);
+            $scheduledPayment = $judoPay->scheduledPayment($scheduledPayment, $prefix, $scheduledDate);
             $this->displayScheduledPayment($scheduledPayment, $output);
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
         } elseif ($policyNumber) {

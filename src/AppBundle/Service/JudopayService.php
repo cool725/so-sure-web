@@ -531,7 +531,6 @@ class JudopayService
     {
         // TODO: Should this only be for success payments?
         $salva = new Salva();
-        $salva->getTotalCommission($policy);
         $payment->setTotalCommission($salva->getTotalCommission($policy));
     }
 
@@ -610,14 +609,18 @@ class JudopayService
      * Refund a payment
      *
      * @param JudoPayment $payment
-     * @param float       $amount  Amount to refund (or null for entire initial amount)
+     * @param float       $amount         Amount to refund (or null for entire initial amount)
+     * @param float       $totalCommision Total commission amount to refund (or null for entire amount from payment)
      *
      * @return JudoPayment
      */
-    public function refund(JudoPayment $payment, $amount = null)
+    public function refund(JudoPayment $payment, $amount = null, $totalCommision = null)
     {
         if (!$amount) {
             $amount = $payment->getAmount();
+        }
+        if (!$totalCommision) {
+            $totalCommision = $payment->getTotalCommission();
         }
 
         // Refund is a negative payment
@@ -655,7 +658,7 @@ class JudopayService
         $refund->setResult($refundModelDetails["result"]);
         $refund->setMessage($refundModelDetails["message"]);
 
-        $refund->setRefundTotalCommission($payment->getTotalCommission());
+        $refund->setRefundTotalCommission($totalCommision);
 
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
