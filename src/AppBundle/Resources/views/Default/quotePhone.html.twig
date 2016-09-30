@@ -20,104 +20,134 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    'bundles/app/css/Default/index.css'
-    'bundles/app/css/Default/quotePhone.css'
-    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
-    'bundles/app/css/Default/connections.css'
-    'bundles/app/css/Default/scrollindicator.css'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    {% stylesheets 'bundles/app/css/Default/index.css' 'bundles/app/css/Default/quotePhone.css' 'components/seiyria-bootstrap-slider/bootstrap-slider.min.css' 'bundles/app/css/Default/connections.css' 'bundles/app/css/Default/scrollindicator.css' %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
-  <section class="view-quote">
+    <section class="view-quote">
         <div class="container">
-          <div id="navchange"></div>
-            <h1 class="text-center">Insure with friends.</h1>
-            <h1 class="text-center">Get up to 80% of your money back.</h1>
-            <p>Introducing social insurance. Get your mobile phone insured with friends & get up to 80% of your money back when none of you claim.</p>
+            <h1 class="text-center">Your Quote</h1>
             <div class="row">
+              <div class="panel panel-primary">
                 <div class="col-md-12">
-                    <div class="panel panel-primary">
+                <div class="col-md-6">
+                    <div class="quote-panel-left">
                         <div class="row">
-                              <div class="col-md-6">
-                                    <span>
-                                        <p>Device</p>
-                                        <h5>{{ phone }}</h5>
-                                        <p>Monthly Cost</p>
-                                        <h5>£{{ phone_price.monthlyPremiumPrice }}</h5>
-                                        <p>Covered for</p>
-                                        <h5>Theft, Loss, Accidental Damage</h5>
-                                        <p>
-                                          <a href="#" data-toggle="modal" data-target="#more-info">More information</a>
-                                        </p>
-                                    </span>
-                                    
-                              </div>
-                              <div class="col-md-6">
-                                    <span>
-                                          {% set start_friends = phone_price.maxConnections - 1 %}
-                                          {% set start_value = start_friends * connection_value %}
-                                          {% if start_value > phone_price.maxPot %}
-                                            {% set start_value = phone_price.maxPot %}
-                                          {% endif %}
-                                          
-                                                
-                                          <h5>AND HERE'S THE COOL BIT</h5>
-                                          <div class="row">
-                                                <div class="col-md-4">
-                                                      If you insure with
-                                                      <span id="num_friends" style="color: #3399FF">{{ start_friends }} friends</span>
-                                                </div>
-                                                <div class="col-md-8">
-                                                      <form>
-                                                      <input type="text" class="span2" value=""
-                                                             data-slider-min="0"
-                                                             data-slider-max="{{ phone_price.maxConnections }}"
-                                                             data-slider-maxpot="{{ phone_price.maxPot }}"
-                                                             data-slider-step="1"
-                                                             data-slider-value="{{ start_friends }}"
-                                                             data-slider-id="connection-slider" id="slider-value"
-                                                             data-slider-handle="round"
-                                                             data-slider-connection-value="{{ connection_value }}" />
-                                                      &nbsp;
-                                                      </form>
-                                                      
-                                                </div>
-                                          </div>
-                                          <div class="row">
-                                                <div class="col-md-6">
-                                                      At the end of the year, if no one claims, we'll give you back:
-                                                </div>
-                                                <div class="col-md-6">
-                                                      <div id="money_back" class="circle">£{{ start_value }}</div>
-                                                </div>
-                                          </div>
-                                    </span>
-                              </div>
+                            <div class="col-md-12">
+                                <span>
+                                    <p>Device</p>
+                                    <h4>{{ phone }}</h4>
+                                    <br>
+                                    <p>Monthly Cost</p>
+                                    <h4>£{{ phone_price.monthlyPremiumPrice }}</h4>
+                                    <br>
+                                    <p>Covered for</p>
+                                    <h4>Theft, Loss, Accidental Damage</h4>
+                                    <p>
+                                        <a href="#" data-toggle="modal" data-target="#more-info">More information</a>
+                                    </p>
+                                </span>
+                            </div>
                         </div>
-                        
-                        
                     </div>
                 </div>
-            </div>
-        </div>
-        
-          <a id="quote-scroll-indicator" href="#connections" style="color: #fff;"><div class="mouse"></div></a>
-      </section>
+                <div class="col-md-6">
+                    <div class="quote-panel-right">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span>
+                                    {% set start_friends = phone_price.maxConnections - 1 %}
+                                    {% set start_value = start_friends * connection_value %}
+                                    {% if start_value > phone_price.maxPot %}
+                                        {% set start_value = phone_price.maxPot %}
+                                    {% endif %}
 
-    <section class="connections" id="connections">
+                                    <h4>AND HERE'S THE COOL BIT</h4>
+                                    <div class="row">
+                                        <div class="col-sm-4" style="padding-top: 35px;">
+                                            <p class="text-left" style="margin-bottom: -10px;">
+                                                If you connect with
+                                            </p>
+                                            <h3 class="text-left">
+                                                <span id="num_friends" style="color: #3399FF">{{ start_friends }}
+                                                    friends</span>
+                                            </h3>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <p class="text-left" style="padding-top: 30px;">
+                                            <form>
+                                                <input
+                                                    type="text"
+                                                    class="span2"
+                                                    value=""
+                                                    data-slider-min="0"
+                                                    data-slider-max="{{ phone_price.maxConnections }}"
+                                                    data-slider-maxpot="{{ phone_price.maxPot }}"
+                                                    data-slider-step="1"
+                                                    data-slider-value="{{ start_friends }}"
+                                                    data-slider-id="connection-slider"
+                                                    id="slider-value"
+                                                    data-slider-handle="round"
+                                                    data-slider-connection-value="{{ connection_value }}"/>
+                                                &nbsp;
+                                            </form>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="text-left" style="padding-top: 30px;">
+                                              At the end of the year, if no one claims, we'll give you back:
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="money_back" class="circle">£{{ start_value }}</div>
+                                        </div>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="padding-top: 30px; padding-bottom: 10px;">
+                <div class="col-sm-12">
+                  <p class="text-center">
+                    <a class="btn btn-primary">Let's get started</a>
+                  </p>
+                </div>
+              </div>
+                <div class="row" style="border-top: 2px solid #efefef; font-size: 12px; padding-top: 10px;">
+                <div class="col-sm-12">
+                  <p class="text-center">
+                    Not your device? Select another phone here.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="faqs">
         <div class="container">
-            <h3>
-              Do you want 80% of your money back at the end of the year?
+            <h3 class="text-center">
+                Got a question? Just ask our team.
             </h3>
+            <div class="row">
+              <div class="col-md-12">
+                <div id="chat-container" style="height: 500px;">
+              </div>
+              </div>
+            </div>
             <div class="explainer">
                 <div class="row">
                     <h4>Frequently Asked Questions</h4>
                     <div class="col-md-6">
                         <h5>How does it work?</h5>
                         <p>You still pay £{{ phone_price.monthlyPremiumPrice|number_format(2, '.', ',') }}
-                            monthly for a year, but for each friend that also insures with us we’ll <a href="https://help.wearesosure.com/hc/en-us/sections/201888645-Your-Reward-Pot" target="_blank">add up to £10 your Reward Pot</a>.</p>
+                            monthly for a year, but for each friend that also insures with us we’ll
+                            <a href="https://help.wearesosure.com/hc/en-us/sections/201888645-Your-Reward-Pot" target="_blank">add up to £10 your Reward Pot</a>.</p>
                     </div>
                     <div class="col-md-6">
                         <h5>How do I get money back?</h5>
@@ -125,7 +155,8 @@
                     </div>
                     <div class="col-md-6">
                         <h5>What happens if someone claims?</h5>
-                        <p>If someone claims, your <a href="https://help.wearesosure.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">Reward Pot will go towards helping them get their phone back</a>. They’ll do the same if something happens to you.</p>
+                        <p>If someone claims, your
+                            <a href="https://help.wearesosure.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">Reward Pot will go towards helping them get their phone back</a>. They’ll do the same if something happens to you.</p>
                     </div>
                     <div class="col-md-6">
                         <h5>Is this a joke?</h5>
@@ -141,8 +172,8 @@
     <div class="container">
         <h3>Ready for better? Download our app now.</h3>
         {% if is_promo %}
-        <p>As an added bonus, if you become one of our first 1,000 customers we'll give you up to
-            <strong>£15 for each connection</strong>, allowing you to get your 1st year of insurance for free!</p>
+            <p>As an added bonus, if you become one of our first 1,000 customers we'll give you up to
+                <strong>£15 for each connection</strong>, allowing you to get your 1st year of insurance for free!</p>
         {% endif %}
         <div class="row download-app">
             <div class="col-md-6 text-right">
@@ -160,14 +191,16 @@
 </div>
 </section>
 
-    <div class="modal fade" id="more-info" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+<div class="modal fade" id="more-info" tabindex="-1" role="dialog">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
             <h4 class="modal-title">More information</h4>
-          </div>
-          <div class="modal-body">
+        </div>
+        <div class="modal-body">
             <h4>What you are covered for?</h4>
             <p>If you take reasonable care of your phone and don't knowingly put it at risk you are covered for:</p>
             <ul>
@@ -186,9 +219,19 @@
                 <li>Excess – You need to pay each time you make a successful claim. £50 for Damage or Breakdown. £70 for Theft or Loss.</li>
                 <li>More than two theft or loss claims in the same year.</li>
             </ul>
-          </div>
         </div>
-      </div>
     </div>
+</div>
+</div>
+
+<!-- Smooch Embedded -->
+<script src="https://cdn.smooch.io/smooch.min.js"></script>
+<script>
+    Smooch.init({
+    appToken: 'aa83ed9x7259nh17sl5px0oga',
+    embedded: true
+    });
+    Smooch.render(document.getElementById('chat-container'));
+</script>
 
 {% endblock %}
