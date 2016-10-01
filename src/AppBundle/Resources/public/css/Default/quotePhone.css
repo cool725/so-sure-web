@@ -99,14 +99,12 @@
     background: white;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
     text-align: center;
-    height: 400px;
+    height: 100%;
 }
 .quote-panel-left {
-    border-radius: 4px 0px 0px 4px !important;
     padding: 20px 25px 20px 25px;
 }
 .quote-panel-right {
-    border-radius: 0 4px 4px 0 !important;
     padding: 20px 25px 20px 25px;
 }
 
@@ -120,6 +118,19 @@
     padding-bottom: -20px;
   }
 }
+@media (min-width: 992px) {
+  .view-quote .panel-primary {
+    height: 400px;
+  }
+}
+@media (max-width: 992px) {
+  .view-quote p.text-left, .view-quote h3.text-left {
+  text-align: center;
+  }
+  .quote-panel-left {
+      border-bottom: 2px solid #efefef;
+  }
+}
 
 /* Connections Indicator */
 
@@ -131,8 +142,10 @@
     color: #202532;
     border-top: #efefef 2px solid;
 }
-.reward-pot {
-    padding: 20px;
+@media (max-width: 992px) {
+.reward-pot  p.text-left, .reward-pot h3.text-left {
+    text-align: center;
+  }
 }
 .connections p {
     font-size: 15px;
@@ -155,7 +168,7 @@
 @media (max-width:767px) {
   .connections .explainer p {
       text-align: center;
-}
+    }
 }
 
 /* Page Scroll Indictor */
@@ -173,7 +186,11 @@
     width: 100%;
     text-align: center;
 }
-
+@media (max-width: 992px) {
+#money_back {
+  margin-top: 20px;
+  }
+}
 .circle {
   width: 100px;
   height: 100px;
@@ -196,6 +213,8 @@
 
 #sk-container.sk-embedded {
 	font-family: inherit !important;
+	border-radius: 4px !important;
+	border: 2px solid #efefef;
 }
 
 #sk-container.sk-embedded #sk-header {
@@ -205,4 +224,10 @@
 #sk-container.sk-embedded #sk-conversation .sk-intro-section {
 	background-color: #efefef;
 	border-radius: 4px !important;
+}
+#sk-container.sk-embedded #sk-conversation .sk-intro-section {
+	display: none;
+}
+#sk-container.sk-embedded #sk-conversation {
+	padding-top: 10px;
 }

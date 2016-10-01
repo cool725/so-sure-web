@@ -9,7 +9,7 @@
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
 }
 #connection-slider {
-	width: 90% !important;
+	width: 60% !important;
 	height: 35px !important;
 }
 #connection-slider .slider-handle {
@@ -28,4 +28,10 @@
 }
 #connectionsChartLegend ul li span {
 	padding-right: 5px;
+}
+
+@media (min-width: 992px) {
+	#connection-slider {
+		width: 90% !important;
+	}
 }

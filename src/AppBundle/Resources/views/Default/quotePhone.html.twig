@@ -63,10 +63,10 @@
                                     {% endif %}
 
                                     <h4>AND HERE'S THE COOL BIT</h4>
-                                    <div class="row">
+                                    <div class="row reward-pot">
                                         <div class="col-sm-4" style="padding-top: 35px;">
                                             <p class="text-left" style="margin-bottom: -10px;">
-                                                If you connect with
+                                                Connect with
                                             </p>
                                             <h3 class="text-left">
                                                 <span id="num_friends" style="color: #3399FF">{{ start_friends }}
@@ -94,13 +94,13 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row row-centered">
                                         <div class="col-md-6">
                                             <p class="text-left" style="padding-top: 30px;">
                                               At the end of the year, if no one claims, we'll give you back:
                                             </p>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 col-centered">
                                             <div id="money_back" class="circle">£{{ start_value }}</div>
                                         </div>
                                     </div>
@@ -129,36 +129,42 @@
       </div>
     </section>
 
-    <section class="faqs">
-        <div class="container">
+    <section>
+        <div class="container support-chat">
             <h3 class="text-center">
                 Got a question? Just ask our team.
             </h3>
+            <p class="text-center">
+              Just ask our team a question below or check out our Help Centre.
+            </p>
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
                 <div id="chat-container" style="height: 500px;">
               </div>
+              <div class="col-md-3"></div>
               </div>
             </div>
-            <div class="explainer">
+          </div>
+            <div class="container faqs">
                 <div class="row">
-                    <h4>Frequently Asked Questions</h4>
-                    <div class="col-md-6">
+                    <h4 class="text-center">Frequently Asked Questions</h4>
+                    <div class="col-md-6 text-center">
                         <h5>How does it work?</h5>
                         <p>You still pay £{{ phone_price.monthlyPremiumPrice|number_format(2, '.', ',') }}
                             monthly for a year, but for each friend that also insures with us we’ll
                             <a href="https://help.wearesosure.com/hc/en-us/sections/201888645-Your-Reward-Pot" target="_blank">add up to £10 your Reward Pot</a>.</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 text-center">
                         <h5>How do I get money back?</h5>
                         <p>If at the end of the year neither you nor your friends have made a claim, you'll get whatever is in your Reward Pot back.</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 text-center">
                         <h5>What happens if someone claims?</h5>
                         <p>If someone claims, your
                             <a href="https://help.wearesosure.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">Reward Pot will go towards helping them get their phone back</a>. They’ll do the same if something happens to you.</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 text-center">
                         <h5>Is this a joke?</h5>
                         <p>No. We just like careful people. If you connect with your friends and you all look after your phones we'll reward you! It's that simple.</p>
                     </div>
@@ -198,7 +204,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
-            <h4 class="modal-title">More information</h4>
+            <h4 class="modal-title">Coverage Summary</h4>
         </div>
         <div class="modal-body">
             <h4>What you are covered for?</h4>
