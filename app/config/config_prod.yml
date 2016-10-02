@@ -77,3 +77,10 @@ staffim_rollbar:
         parameters:
             key: unknown
 
+nelmio_security:
+    # forced HTTPS handling, don't combine with flexible mode
+    forced_ssl:
+        hsts_max_age: 3600 # 1 hour until we verify
+        hsts_subdomains: true
+        whitelist:
+            - ^/ops/status
