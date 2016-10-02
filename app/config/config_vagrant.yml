@@ -3,7 +3,6 @@ imports:
 
 framework:
     trusted_hosts: ['127.0.0.1', 'localhost', 'dev.so-sure.net', '10\.\d+\.\d+\.\d+']
-    trusted_proxies: ['127.0.0.1']
     router:
         resource: "%kernel.root_dir%/config/routing_dev.yml"
         strict_requirements: true
