@@ -32,7 +32,6 @@ html {
 
 body {
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    /*font-size: 15px;*/
     line-height: 1.42857143;
     background-color: #ffffff;
     height: 100%;
@@ -64,11 +63,6 @@ h1, h2, h3, h4, h5, h6 {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #202532;
 }
-@media (max-width: 500px) {
-    h1 {
-        font-size: 34px;
-    }
-}
 
 /* NAVIGATION */
 
@@ -87,7 +81,7 @@ h1, h2, h3, h4, h5, h6 {
     padding-bottom: 5px;
 }
 .navbar .btn {
-    font-size: 13px !important;
+    font-size: 14px !important;
     color: #202532 !important;
     padding: 10px 15px !important;
     border-radius: 30px;
@@ -101,13 +95,16 @@ h1, h2, h3, h4, h5, h6 {
     background: #fff;
     border: 2px solid #202532 !important;
 }
+.navbar .btn:hover {
+  color: #202532 !important;
+}
 .navbar-default .navbar-nav> li> a {
-    font-size: 13px;
+    font-size: 14px;
     padding-top: 20px;
     color: #202532;
 }
 .navbar-default .navbar-nav li> a:hover {
-    color: #3399ff !important;
+    color: #3399ff;
 }
 .navbar-default .navbar-nav li> a:focus {
     border-color: #efefef !important;

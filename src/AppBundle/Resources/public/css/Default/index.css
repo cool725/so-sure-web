@@ -1,6 +1,10 @@
 /* HERO */
 
-@media (max-width: 543px) {
+.hero {
+  height: 600px;
+}
+
+@media (max-width: 992px) {
     .hero {
         padding-top: 50px;
     }
@@ -13,7 +17,6 @@
 #welcome h1 {
     margin-bottom: 20px;
 }
-
 @media (min-width: 992px) {
     #hero-description {
         padding-left: 150px;
@@ -112,11 +115,12 @@
 
 #select-phone a {
     margin-top: 20px;
+    font-size: 14px;
 }
-#select-phone a:hover {
+#select-phone a:hover, a:focus {
+    text-decoration: none !important;
     color: #202532;
 }
-
 #select-phone button.btn {
   padding: 10px 30px;
   border-radius: 30px;
@@ -141,7 +145,6 @@
     background-color: #FFF;
     padding: 60px 20px 100px 20px;
     text-align: center;
-    color: #202532;
     border-top: 2px solid #efefef;
 }
 
@@ -181,7 +184,6 @@
     background-color: #FFF;
     padding: 60px 20px 100px 20px;
     text-align: center;
-    color: #202532;
     border-top: 2px solid #efefef;
 }
 
@@ -232,6 +234,7 @@
 #memory-select a, #memory-select a:hover, #memory-select a:focus {
     text-decoration: none;
     text-transform: uppercase;
+    font-size: 14px;
 }
 
 #memory-select ul {
@@ -241,7 +244,7 @@
 
 #memory-select li {
     padding-top: 10px;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 #memory-select button.btn {
@@ -266,7 +269,6 @@
     background-color: #FFF;
     padding: 60px 20px 100px 20px;
     text-align: center;
-    color: #202532;
     border-top: 2px solid #efefef;
 }
 
@@ -284,33 +286,7 @@
     background-color: #FFF;
     padding: 60px 20px 100px 20px;
     text-align: center;
-    color: #202532;
     border-top: 2px solid #efefef;
-}
-
-.social-proof h2, .social-proof h3, .social-proof h4, .social-proof h5 {
-    color: #202532;
-}
-
-.social-proof h2 {
-    margin-bottom: 20px;
-    margin-top: 40px;
-    font-size: 28px;
-    color: #202532;
-    letter-spacing: -0.02em;
-}
-
-.social-proof h4 {
-    line-height: 28px;
-    margin-bottom: 100px;
-    color: #474F5C;
-    font-weight: 300;
-    font-size: 18px;
-    font-family: "Avenir LT Std 35 Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-.social-proof img {
-    width: 80px;
 }
 
 .social-proof .row {
@@ -324,22 +300,8 @@
         display: inline;
     }
 }
-
-.social-proof .row h3 {
-    color: #202532;
-    font-weight: normal;
-    font-size: 18px;
-}
-
-.social-proof p i {
-    vertical-align: middle;
-}
-
 @media (max-width: 767px) {
-    .social-proof p {
-        max-width: 100%;
-    }
-    .social-proof .row {
+.social-proof .row {
         text-align: center;
     }
 }
@@ -367,7 +329,7 @@
 .pre-footer p {
     color: #999;
     color: #737e90;
-    font-size: 14px;
+    font-size: 16px;
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
     line-height: 28px;
 }

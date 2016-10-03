@@ -30,7 +30,7 @@
 
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-    <section class="hero light-gradient align-middle">
+    <section class="hero light-gradient">
       <div class="vertical-align-wrap">
         <div class="vertical-align-middle">
         <div class="container">
@@ -65,7 +65,7 @@
         <div class="container">
             <div class="row centered">
                 <h2 class="text-center">Why we're better</h2>
-                <p class="text-center">We're committed to making it as easy as possible for you and your friends to get covered, get rewarded and make a claim.</p>
+                <p class="lead text-center" id="hero-description">We're committed to making it as easy as possible for you and your friends to get covered, get rewarded and make a claim.</p>
             </div>
             <div class="row centered">
                 <div class="col-md-4">
@@ -90,8 +90,9 @@
     {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
     <section class="popular-devices" id="get-quote">
+      <div class="container">
             <h2>Get a quote</h2>
-            <p>Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
+            <p class="lead text-center" id="hero-description">Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
             <div class="row" id="select-phone">
                 <div class="col-sm-12 text-center">
                     <div class="device-select">
@@ -118,7 +119,7 @@
         </div>
 
         <div class="container">
-            <p>
+            <p class="lead text-center" id="hero-description">
                 Select from our most popular devices.
             </p>
             <div class="row">
@@ -126,7 +127,7 @@
                     <div id="device-logo">
                         <img src="{{ cdn_url }}/images/home/phone-logos/Apple_iPhone_7_Logo.svg" alt="Get your iPhone 7 insured today!"></img>
                         <div id="memory-select">
-                            <h5>Select memory</h5>
+                            <h4>Select memory</h4>
                             <ul>
                                 <li>
                                     <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 7', 'memory': '32'}) }}">32GB</a>
@@ -145,7 +146,7 @@
                     <div id="device-logo">
                         <img src="{{ cdn_url }}/images/home/phone-logos/Samsung_Galaxy_S7_logo.svg" alt="Get your Samsung Galaxy S7 insured today!"></img>
                         <div id="memory-select">
-                            <h5>Select memory</h5>
+                            <h4>Select memory</h4>
                             <ul>
                                 <li>
                                     <a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S7', 'memory': '32'}) }}">32GB</a>
@@ -161,7 +162,7 @@
                     <div id="device-logo">
                         <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_6s_Logo.svg" alt="Get your iPhone 6S insured today!"></img>
                         <div id="memory-select">
-                            <h5>Select memory</h5>
+                            <h4>Select memory</h4>
                             <ul>
                                 <li>
                                     <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6S', 'memory': '16'}) }}">16GB</a>
@@ -178,12 +179,13 @@
                 </div>
             </div>
         </div>
+      </div>
     </section>
 
     <section class="social-proof">
             <div class="container">
                 <h2>Why insurance needs to change</h2>
-                <p class="text-center">Don't take our word for it, just look at these disgruntled people. This is why we're commited to giving you the best possible experience.</p>
+                <p class="lead text-center" id="hero-description">Don't take our word for it, just look at these disgruntled people. This is why we're commited to giving you the best possible experience.</p>
                 <div class="row centered">
                     <div class="col-md-4">
                         <blockquote class="twitter-tweet" lang="en">
