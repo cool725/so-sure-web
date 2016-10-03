@@ -209,7 +209,7 @@ class Phone
             $phonePrice->setValidFrom($date);
             $this->addPhonePrice($phonePrice);
         }
-        $phonePrice->setMonthlyPremiumPrice($premium);
+        $phonePrice->setMonthlyPremiumPrice($premium, $date);
     }
 
     public function setDetails(

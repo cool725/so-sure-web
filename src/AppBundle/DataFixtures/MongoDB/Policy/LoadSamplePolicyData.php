@@ -154,7 +154,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (rand(0, 1) == 0) {
             $payment = new JudoPayment();
             $payment->setDate($paymentDate);
-            $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+            $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(clone $startDate));
             $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $payment->setReceipt(rand(1, 999999) + rand(1, 999999));
@@ -164,7 +164,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             for ($i = 1; $i <= $months; $i++) {
                 $payment = new JudoPayment();
                 $payment->setDate(clone $paymentDate);
-                $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+                $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(clone $startDate));
                 $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
                 if ($months == 12) {
                     $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);

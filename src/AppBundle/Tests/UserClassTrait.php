@@ -29,7 +29,7 @@ trait UserClassTrait
 
         if ($init) {
             $policy->init($user, self::getLatestPolicyTerms(static::$dm));
-            $policy->setPhone(self::$phone);
+            $policy->setPhone(self::$phone, $date);
             $policy->create(rand(1, 999999), 'TEST', $date);
         }
 
@@ -161,7 +161,7 @@ trait UserClassTrait
         return $policy;
     }
 
-    public static function addPayment($policy, $amount, $commission)
+    public static function addPayment($policy, $amount, $commission, $date = null)
     {
         $payment = new JudoPayment();
         $payment->setAmount($amount);

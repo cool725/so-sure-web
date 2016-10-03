@@ -14,6 +14,8 @@ use AppBundle\Exception\InvalidPremiumException;
  */
 class PhonePolicy extends Policy
 {
+    use CurrencyTrait;
+
     const STANDARD_VALUE = 10;
     const AGED_VALUE = 2;
     const NETWORK_CLAIM_VALUE = 2;
@@ -67,7 +69,7 @@ class PhonePolicy extends Policy
             throw new \Exception('Phone must have a price');
         }
 
-        $this->setPremium($phone->getCurrentPhonePrice()->createPremium($date));
+        $this->setPremium($phone->getCurrentPhonePrice($date)->createPremium($date));
     }
 
     public function getImei()
@@ -264,7 +266,7 @@ class PhonePolicy extends Policy
 
     public function getMaxConnections(\DateTime $date = null)
     {
-        if (!$this->isPolicy() || $this->getConnectionValue($date) == 0) {
+        if (!$this->isPolicy() || $this->areEqualToFourDp($this->getConnectionValue($date), 0)) {
             return 0;
         }
         if (!$this->getUser()) {
