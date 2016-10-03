@@ -57,7 +57,7 @@ trait CurrencyTrait
 
     public function areEqualToFourDp($float1, $float2)
     {
-        if (is_null($float1) || is_null($float2)) {
+        if (null === $float1 || null === $float2) {
             return false;
         }
 

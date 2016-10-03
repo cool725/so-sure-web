@@ -161,7 +161,7 @@ trait UserClassTrait
         return $policy;
     }
 
-    public static function addPayment($policy, $amount, $commission, $date = null)
+    public static function addPayment($policy, $amount, $commission)
     {
         $payment = new JudoPayment();
         $payment->setAmount($amount);
