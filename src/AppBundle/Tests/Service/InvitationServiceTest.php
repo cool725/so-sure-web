@@ -844,6 +844,10 @@ class InvitationServiceTest extends WebTestCase
     {
         $policy = $this->createAndLink(static::generateEmail('user-reduction', $this), new \DateTime('2016-01-01'));
 
+        // gwp has now changed as figures are being added post
+        $this->assertEquals(67.10, $policy->getMaxPot());
+        //$this->assertEquals(66.72, $policy->getMaxPot());
+
         for ($i = 1; $i <= 6; $i++) {
             $this->createAndLink(
                 static::generateEmail(sprintf('invite-accept-%d', $i), $this),

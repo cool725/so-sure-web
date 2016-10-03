@@ -49,4 +49,18 @@ trait CurrencyTrait
     {
         return number_format(round($float, 2), 2, ".", ",");
     }
+
+    public function areEqualToTwoDp($float1, $float2)
+    {
+        return abs($float1 - $float2) < 0.001;
+    }
+
+    public function areEqualToFourDp($float1, $float2)
+    {
+        if (null === $float1 || null === $float2) {
+            return false;
+        }
+
+        return abs($float1 - $float2) < 0.00001;
+    }
 }

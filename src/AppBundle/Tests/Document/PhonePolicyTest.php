@@ -1270,7 +1270,7 @@ class PhonePolicyTest extends WebTestCase
     public function testGetTotalBrokerFee()
     {
         $policy = new SalvaPhonePolicy();
-        $policy->setPhone(static::$phone);
+        $policy->setPhone(static::$phone, new \DateTime("2016-01-01"));
 
         $user = new User();
         $user->setEmail(static::generateEmail('total-broker-fee', $this));
@@ -1297,6 +1297,8 @@ class PhonePolicyTest extends WebTestCase
 
         $allPayments = $policy->getPaymentsForSalvaVersions(false);
         $this->assertEquals(76.60, $policy->getRemainingTotalGwp($allPayments));
+        // 6.35gwp - 6.99 premium * 12 = 83.88 - 6.99 = 76.89
+        //$this->assertEquals(76.89, $policy->getRemainingTotalGwp($allPayments));
 
         $policy->incrementSalvaPolicyNumber(new \DateTime("2016-01-03"));
 

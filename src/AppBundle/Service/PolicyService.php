@@ -9,6 +9,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -24,6 +25,8 @@ use AppBundle\Exception\InvalidPremiumException;
 
 class PolicyService
 {
+    use CurrencyTrait;
+
     const S3_BUCKET = 'policy.so-sure.com';
     const KEY_POLICY_QUEUE = 'policy:queue';
 
@@ -434,10 +437,13 @@ class PolicyService
                 continue;
             }
 
-            if ($paymentItem->getAmount() == $policy->getPremium()->getYearlyPremiumPrice()) {
+            if ($this->areEqualToFourDp($paymentItem->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
                 $policy->setPremiumInstallments(1);
                 return;
-            } elseif ($paymentItem->getAmount() == $policy->getPremium()->getMonthlyPremiumPrice()) {
+            } elseif ($this->areEqualToFourDp(
+                $paymentItem->getAmount(),
+                $policy->getPremium()->getMonthlyPremiumPrice()
+            )) {
                 $policy->setPremiumInstallments(12);
                 for ($i = 1; $i <= 11; $i++) {
                     $scheduledDate = clone $date;
@@ -452,9 +458,11 @@ class PolicyService
                 return;
             } else {
                 throw new InvalidPremiumException(sprintf(
-                    'Invalid payment %f for policy %s',
+                    'Invalid payment %f for policy %s [Expected %f or %f]',
                     $paymentItem->getAmount(),
-                    $policy->getId()
+                    $policy->getId(),
+                    $policy->getPremium()->getYearlyPremiumPrice(),
+                    $policy->getPremium()->getMonthlyPremiumPrice()
                 ));
             }
         }

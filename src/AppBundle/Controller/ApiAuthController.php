@@ -638,6 +638,12 @@ class ApiAuthController extends BaseController
 
             return new JsonResponse($policy->toApiArray());
         } catch (InvalidPremiumException $e) {
+            $this->get('logger')->error(sprintf(
+                'Invalid premium policy %s receipt %s.',
+                $id,
+                $this->getDataString($judoData, 'receipt_id')
+            ), ['exception' => $e]);
+
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_POLICY_PAYMENT_INVALID_AMOUNT,
                 'Invalid premium paid',
