@@ -242,7 +242,7 @@ class SalvaPhonePolicyTest extends WebTestCase
         // initial policy creation
         $policy = static::createUserPolicy(true, new \DateTime('2016-01-01'));
         $policy->setId(rand(1, 999999));
-        $policy->setPhone(self::$phone);
+        $policy->setPhone(self::$phone, new \DateTime('2016-01-01'));
         if ($annual) {
             $policy->setPremiumInstallments(1);
             static::addPayment($policy, 83.88, Salva::YEARLY_TOTAL_COMMISSION);
@@ -282,7 +282,7 @@ class SalvaPhonePolicyTest extends WebTestCase
         // initial policy creation
         $policy = static::createUserPolicy(true, new \DateTime('2016-01-01'));
         $policy->setId(rand(1, 999999));
-        $policy->setPhone(self::$phone);
+        $policy->setPhone(self::$phone, new \DateTime('2016-01-01'));
         $policy->setPremiumInstallments(12);
         static::addPayment($policy, 6.99, Salva::MONTHLY_TOTAL_COMMISSION);
 

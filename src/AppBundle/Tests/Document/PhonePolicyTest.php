@@ -1707,26 +1707,26 @@ class PhonePolicyTest extends WebTestCase
     public function testProratedRefundAmount()
     {
         $monthlyPolicy = $this->createPolicyForCancellation(
-            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(new \DateTime('2016-02-10')),
             Salva::MONTHLY_TOTAL_COMMISSION,
             12
         );
-        $used = static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice() *
+        $used = static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(new \DateTime('2016-02-10')) *
             $monthlyPolicy->getProrataMultiplier(new \DateTime('2016-02-10'));
-        $paid = static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        $paid = static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(new \DateTime('2016-02-10'));
         $this->assertEquals(
             $this->toTwoDp($paid - $used),
             $monthlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10'))
         );
 
         $yearlyPolicy = $this->createPolicyForCancellation(
-            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(new \DateTime('2016-02-10')),
             Salva::YEARLY_TOTAL_COMMISSION,
             1
         );
-        $used = static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice() *
+        $used = static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(new \DateTime('2016-02-10')) *
             $yearlyPolicy->getProrataMultiplier(new \DateTime('2016-02-10'));
-        $paid = static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice();
+        $paid = static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(new \DateTime('2016-02-10'));
         $this->assertEquals(
             $this->toTwoDp($paid - $used),
             $yearlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10'))
