@@ -752,7 +752,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/accounts/{year}/{month}", name="admin_accounts_print")
+     * @Route("/accounts/print/{year}/{month}", name="admin_accounts_print")
      */
     public function adminAccountsPrintAction($year, $month)
     {
