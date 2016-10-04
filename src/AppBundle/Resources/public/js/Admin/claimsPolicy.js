@@ -14,6 +14,14 @@ $('.confirm-imei-rerun').on("click",function() {
     return confirm('Are you sure you want to rerun the imei/serial number checks? This costs £0.07.');
 });
 
+
 $(document).ready(function(){
     $('[data-toggle="popover"]').popover();
+
+    $('.datetimepicker').datetimepicker({
+        format: "DD-MM-YYYY HH:mm",
+        allowInputToggle: true,
+        showTodayButton: true,
+        useCurrent: false 
+    });
 });
