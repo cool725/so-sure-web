@@ -149,7 +149,8 @@
 }
 
 #learn-more img {
-    width: 65%;
+  width: 55%;
+  padding-top: 55px;
 }
 
 #learn-more h3 {

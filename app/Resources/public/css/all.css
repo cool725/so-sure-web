@@ -107,8 +107,8 @@ h1, h2, h3, h4, h5, h6 {
     color: #3399ff;
 }
 .navbar-default .navbar-nav li> a:focus {
-    border-color: #efefef !important;
-    color: #3399ff !important;
+    border-color: #202352 !important;
+    color: #202352 !important;
 }
 .navbar-toggle {
     background-color: transparent;
