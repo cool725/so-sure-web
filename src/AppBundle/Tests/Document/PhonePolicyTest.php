@@ -1280,7 +1280,9 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
-        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(new \DateTime("2016-01-01")));
+        $payment->setAmount(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(new \DateTime("2016-01-01"))
+        );
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setDate(new \DateTime('2016-01-01'));
