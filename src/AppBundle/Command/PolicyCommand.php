@@ -40,6 +40,12 @@ class PolicyCommand extends ContainerAwareCommand
                 InputArgument::REQUIRED,
                 'memory'
             )
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'date to create'
+            )
         ;
     }
 
@@ -49,6 +55,13 @@ class PolicyCommand extends ContainerAwareCommand
         $imei = $input->getArgument('imei');
         $device = $input->getArgument('device');
         $memory = $input->getArgument('memory');
+        $date = $input->getOption('date');
+        if ($date) {
+            $date = new \DateTime($date);
+        } else {
+            $date = new \DateTime();
+        }
+
         $phone = $this->getPhone($device, $memory);
 
         $policyService = $this->getContainer()->get('app.policy');
@@ -63,7 +76,7 @@ class PolicyCommand extends ContainerAwareCommand
 
         $policy = new SalvaPhonePolicy();
         $policy->setUser($user);
-        $policy->setPhone($phone);
+        $policy->setPhone($phone, $date);
         $policy->setImei($imei);
 
         $dm->persist($policy);
@@ -72,7 +85,7 @@ class PolicyCommand extends ContainerAwareCommand
         $details = $judopay->testPayDetails(
             $user,
             $policy->getId(),
-            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
             '4976 0000 0000 3436',
             '12/20',
             '452',
@@ -84,18 +97,11 @@ class PolicyCommand extends ContainerAwareCommand
             $details['receiptId'],
             $details['consumer']['consumerToken'],
             $details['cardDetails']['cardToken'],
-            "{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}"
+            "{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}",
+            $date
         );
         // @codingStandardsIgnoreEnd
 
-        /*
-        $payment = new JudoPayment();
-        $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt($receiptId);
-        $policy->addPayment($payment);
-        */
-        $policyService->create($policy);
         $output->writeln(sprintf('Created Policy %s / %s', $policy->getPolicyNumber(), $policy->getId()));
     }
 
@@ -104,7 +110,7 @@ class PolicyCommand extends ContainerAwareCommand
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
 
-        return $repo->findOneBy(['emailCanonical' => $email]);
+        return $repo->findOneBy(['emailCanonical' => strtolower($email)]);
     }
 
     private function getPhone($device, $memory = null)

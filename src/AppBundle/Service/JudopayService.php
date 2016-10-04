@@ -143,7 +143,7 @@ class JudopayService
      * @param string $cardToken     Can be null if card is declined
      * @param string $deviceDna     Optional device dna data (json encoded) for judoshield
      */
-    public function add(Policy $policy, $receiptId, $consumerToken, $cardToken, $deviceDna = null)
+    public function add(Policy $policy, $receiptId, $consumerToken, $cardToken, $deviceDna = null, \DateTime $date = null)
     {
         $this->statsd->startTiming("judopay.add");
         // if already active, don't re-run
@@ -166,7 +166,7 @@ class JudopayService
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken);
 
         $this->validateUser($policy->getUser());
-        $this->policyService->create($policy);
+        $this->policyService->create($policy, $date);
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $this->dm->flush();
 

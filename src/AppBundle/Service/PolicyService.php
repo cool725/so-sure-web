@@ -424,6 +424,8 @@ class PolicyService
     {
         if (!$date) {
             $date = new \DateTime();
+        } else {
+            $date = clone $date;
         }
 
         // To allow billing on same date every month, 28th is max allowable day on month

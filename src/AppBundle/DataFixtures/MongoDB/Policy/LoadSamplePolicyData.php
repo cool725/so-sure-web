@@ -84,6 +84,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user = new User();
         $user->setFirstName($this->faker->firstName);
         $user->setLastName($this->faker->lastName);
+        $user->setBirthday(new \DateTime('1980-01-01'));
         while ($mobile = $this->faker->mobileNumber) {
             $user->setMobileNumber($mobile);
             // faker can return 070 type numbers, which are disallowed
