@@ -30,7 +30,7 @@ class SalvaExportService
     const CANCELLED_ACTUAL_FRAUD = 'annulment';
     const CANCELLED_SUSPECTED_FRAUD = 'annulment';
     const CANCELLED_USER_REQUESTED = 'withdrawal_client';
-    const CANCELLED_COOLOFF = 'withdrawal';
+    const CANCELLED_COOLOFF = 'annulment';
     const CANCELLED_BADRISK = 'claim';
     const CANCELLED_OTHER = 'other';
     const CANCELLED_DISPOSSESSION = 'dispossession';
