@@ -37,8 +37,8 @@ class DefaultController extends BaseController
         $geoip = $this->get('app.geoip');
         //$ip = "72.229.28.185";
         $ip = $request->getClientIp();
-        $country = $request->getSession()->get('country');
-        if ($country != 'uk' && $geoip->findCountry($ip) == "US") {
+        $site = $request->get('site');
+        if ($geoip->findCountry($ip) == "US" && $site != 'uk') {
             return $this->redirectToRoute('launch_usa');
         }
         $dm = $this->getManager();
@@ -159,43 +159,7 @@ class DefaultController extends BaseController
      */
     public function launchUSAAction(Request $request)
     {
-        $dm = $this->getManager();
-        $lead = new Lead();
-        $lead->setSource(Lead::SOURCE_LAUNCH_USA);
-
-        $formLaunch = $this->get('form.factory')
-            ->createNamedBuilder('launch_usa', LeadEmailType::class, $lead)
-            ->getForm();
-        $formUK = $this->get('form.factory')
-            ->createNamedBuilder('uk')
-            ->add('click', SubmitType::class)
-            ->getForm();
-
-        if ('POST' === $request->getMethod()) {
-            $existingUser = null;
-            if ($request->request->has('launch_usa')) {
-                $formLaunch->handleRequest($request);
-                if ($formLaunch->isValid()) {
-                    $dm->persist($lead);
-                    $dm->flush();
-
-                    $this->addFlash('success', sprintf(
-                        "Thanks!  We'll keep you updated with any announcements"
-                    ));
-
-                    return $this->redirectToRoute('launch_usa');
-                }
-            } elseif ($request->request->has('uk')) {
-                $request->getSession()->set('country', 'uk');
-
-                return $this->redirectToRoute('homepage');
-            }
-        }
-
-        return [
-            'form_launch' => $formLaunch->createView(),
-            'form_uk' => $formUK->createView(),
-        ];
+        return [];
     }
 
     /**
