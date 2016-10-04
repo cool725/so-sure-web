@@ -90,7 +90,7 @@ abstract class Price
 
     public function setMonthlyPremiumPrice($premium, \DateTime $date = null)
     {
-        $this->setGwp($premium / (1 + $this->getCurrentIptRate($date)));
+        $this->setGwp($this->toTwoDp($premium / (1 + $this->getCurrentIptRate($date))));
     }
 
     abstract public function createPremium();
