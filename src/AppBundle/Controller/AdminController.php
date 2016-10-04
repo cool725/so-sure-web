@@ -548,7 +548,7 @@ class AdminController extends BaseController
             ->createNamedBuilder('cancel_form', CancelPolicyType::class, $cancel)
             ->getForm();
         $pendingCancelForm = $this->get('form.factory')
-            ->createNamedBuilder('pending_cancel_form', PendingPolicyCancellationType::class, $cancel)
+            ->createNamedBuilder('pending_cancel_form', PendingPolicyCancellationType::class, $policy)
             ->getForm();
         $imeiForm = $this->get('form.factory')
             ->createNamedBuilder('imei_form', ImeiType::class, $policy)
@@ -648,6 +648,7 @@ class AdminController extends BaseController
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
+            'pending_cancel_form' => $pendingCancelForm->createView(),
             'imei_form' => $imeiForm->createView(),
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),

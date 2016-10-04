@@ -15,7 +15,11 @@ class PendingPolicyCancellationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('pendingCancellation', DateTimeType::class)
+            ->add('pendingCancellation', DateTimeType::class, [
+                'widget' => 'single_text',
+                'html5' => false,
+                'attr' => ['class' => 'datetimepicker']
+            ])
             ->add('cancel', SubmitType::class)
         ;
     }

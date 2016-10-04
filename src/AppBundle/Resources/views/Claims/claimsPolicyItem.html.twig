@@ -3,7 +3,7 @@
       Risk: {{ policy.riskReason }} ({{ policy.risk }})
     </div>
     {% if policy.pendingCancellation %}
-    <div class="text-center" style="background-color: danger; color: white; font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
+    <div class="text-center" style="background-color: red; color: white; font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
       Policy is pending cancellation. {{ policy.pendingCancellation | date }}
     </div>
     {% endif %}
