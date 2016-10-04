@@ -37,7 +37,7 @@
                     {% if policy.isPolicy %}
                     <tr>
                         <td>Policy Dates</td>
-                        <td>{{ policy.start|date }} - {{ policy.end|date }}</td>
+                        <td>{{ policy.start | date('d M Y H:i', 'Europe/London') }} - {{ policy.end | date('d M Y H:i', 'Europe/London') }}</td>
                     </tr>
                     {% endif %}
                     {% if policy.isPolicy %}
