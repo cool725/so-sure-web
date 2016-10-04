@@ -400,6 +400,15 @@ class SalvaExportServiceTest extends WebTestCase
         $this->validateStaticPolicyData($data, $updatedPolicy);
     }
 
+    public function testBasicCooloffExportMonthlyPoliciesXml()
+    {
+        $policy = $this->createPolicy('basic-export-cooloff-xml', new \DateTime('2016-01-01'));
+
+        $this->cancelPolicy($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">0.00</n1:usedFinalPremium>', $xml);
+    }
+
     public function testBasicCooloffExportYearlyPolicies()
     {
         $policy = $this->createPolicy('basic-export-yearly-cooloff', new \DateTime('2016-01-01'), false);
@@ -420,6 +429,15 @@ class SalvaExportServiceTest extends WebTestCase
         $this->validatePolicyPayments($data, $updatedPolicy, 0);
         $this->validateFullRefundPolicyAmounts($data);
         $this->validateStaticPolicyData($data, $updatedPolicy);
+    }
+
+    public function testBasicCooloffExportYearlyPoliciesXml()
+    {
+        $policy = $this->createPolicy('basic-export-yearly-cooloff-xml', new \DateTime('2016-01-01'), false);
+
+        $this->cancelPolicy($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">0.00</n1:usedFinalPremium>', $xml);
     }
 
     public function testCooloffConnecedHasNoConnectionsPolicies()
@@ -465,5 +483,15 @@ class SalvaExportServiceTest extends WebTestCase
         $this->validateProratedPolicyPayments($data, $updatedPolicy, 152);
         $this->validateProratedPolicyAmounts($data, $updatedPolicy, 152);
         $this->validateStaticPolicyData($data, $updatedPolicy);
+    }
+
+    public function testBasicWreckageExportYearlyPoliciesXml()
+    {
+        $policy = $this->createPolicy('basic-export-yearly-wreckage-xml', new \DateTime('2016-01-01'), false);
+
+        $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
+        // 77.10 * 151 / 366 = 31.81
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">31.81</n1:usedFinalPremium>', $xml);
     }
 }
