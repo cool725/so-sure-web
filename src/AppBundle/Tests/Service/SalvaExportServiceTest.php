@@ -491,7 +491,18 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
         $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
-        // 77.10 * 151 / 366 = 31.81
+        // 6.38 gwp / 76.60 yearly gpw  * 152 / 366 = 31.81q
         $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">31.81</n1:usedFinalPremium>', $xml);
+    }
+
+    public function testVersionedWreckageExportYearlyPoliciesXml()
+    {
+        $policy = $this->createPolicy('versioned-export-yearly-wreckage-xml', new \DateTime('2016-01-01'), false);
+
+        static::$salva->incrementPolicyNumber($policy, new \DateTime('2016-01-31 01:00'));
+
+        $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.32</n1:usedFinalPremium>', $xml);
     }
 }

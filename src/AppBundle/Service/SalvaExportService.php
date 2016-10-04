@@ -679,7 +679,6 @@ class SalvaExportService
 
     public function cancelXml(SalvaPhonePolicy $phonePolicy, $reason, $date)
     {
-        $isVersioned = true;
         if ($reason == self::CANCELLED_REPLACE) {
             // Make sure policy was incremented prior to calling
             $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
@@ -691,9 +690,6 @@ class SalvaExportService
             }
         } else {
             $version = $phonePolicy->getLatestSalvaPolicyNumberVersion();
-            if ($version == 1) {
-                $isVersioned = false;
-            }
         }
 
         $policyNumber = $phonePolicy->getSalvaPolicyNumber($version);
@@ -724,8 +720,8 @@ class SalvaExportService
             $this->adjustDate($date)
         ));
 
-        if ($isVersioned) {
-            $usedPremium = $phonePolicy->getUsedGwp($version, $reason == self::CANCELLED_REPLACE);
+        if ($reason == self::CANCELLED_REPLACE) {
+            $usedPremium = $phonePolicy->getUsedGwp($version, true);
         } else {
             $usedPremium = $phonePolicy->getUsedGwp(null, false);
         }
