@@ -46,6 +46,13 @@ class PolicyCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'date to create'
             )
+            ->addOption(
+                'payments',
+                null,
+                InputOption::VALUE_REQUIRED,
+                '1 for yearly, 12 monthly',
+                12
+            )
         ;
     }
 
@@ -55,6 +62,7 @@ class PolicyCommand extends ContainerAwareCommand
         $imei = $input->getArgument('imei');
         $device = $input->getArgument('device');
         $memory = $input->getArgument('memory');
+        $payments = $input->getOption('payments');
         $date = $input->getOption('date');
         if ($date) {
             $date = new \DateTime($date);
@@ -82,10 +90,18 @@ class PolicyCommand extends ContainerAwareCommand
         $dm->persist($policy);
         $dm->flush();
 
+        if ($payments == 12) {
+            $amount = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date);
+        } elseif ($payments = 1) {
+            $amount = $phone->getCurrentPhonePrice()->getYearlyPremiumPrice($date);
+        } else {
+            throw new \Exception('1 or 12 payments only');
+        }
+
         $details = $judopay->testPayDetails(
             $user,
             $policy->getId(),
-            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
+            $amount,
             '4976 0000 0000 3436',
             '12/20',
             '452',
