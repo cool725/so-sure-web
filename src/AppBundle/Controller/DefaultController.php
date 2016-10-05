@@ -157,7 +157,7 @@ class DefaultController extends BaseController
      * @Route("/usa", name="launch_usa")
      * @Template
      */
-    public function launchUSAAction(Request $request)
+    public function launchUSAAction()
     {
         return [];
     }
