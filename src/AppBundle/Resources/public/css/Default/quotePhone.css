@@ -13,11 +13,14 @@
     padding-bottom: 40px;
     min-height: 500px;
     position: relative;
-
+    color: #fff;
 }
 .view-quote h1 {
     color: #fff;
     padding-bottom: 10px;
+}
+.view-quote .panel-primary {
+  color: #202532 !important;
 }
 .view-quote .panel-primary > .panel-heading {
     letter-spacing: 3px;
@@ -194,7 +197,7 @@
 .circle {
   width: 110px;
   height: 110px;
-  line-height: 120px;
+  line-height: 110px;
   border-radius: 50%;
   font-size: 28px;
   color: #fff;
@@ -247,8 +250,10 @@
 /* Frequently Asked Questions */
 
 .faqs {
-  padding: 30px 20px 60px 20px;
-  max-width: 750px
+  padding-top: 30px;
+  padding-bottom: 60px;
+  padding-left: 150px;
+  padding-right: 150px;
 }
 
 /* Download Now */

@@ -26,7 +26,10 @@
 {% block body %}
     <section class="view-quote">
         <div class="container">
-            <h1 class="text-center">Your Quote</h1>
+            <h1 class="text-center">Here's your quote</h1>
+            <p class="lead text-center" id="hero-description">
+              We think that we've finally made insurance worth it for careful people. However, if for any reason you're not satisfied, we'll happily give you your money back within 14 days.
+            </p>
             <div class="row">
               <div class="panel panel-primary">
                 <div class="col-md-12">
@@ -149,22 +152,22 @@
             <div class="container faqs">
               <h3 class="text-center" style="padding-bottom: 30px;">Frequently Asked Questions</h3>
                 <div class="row">
-                    <div class="col-md-12 text-left">
-                        <h4>How does it work?</h4>
+                    <div class="col-md-12 text-center">
+                        <h4>How does it actually work?</h4>
                         <p>You still pay £{{ phone_price.monthlyPremiumPrice|number_format(2, '.', ',') }}
                             monthly for a year, but for each friend that also insures with us we’ll
                             <a href="https://help.wearesosure.com/hc/en-us/sections/201888645-Your-Reward-Pot" target="_blank">add up to £10 your Reward Pot</a>.</p>
                     </div>
-                    <div class="col-md-12 text-left">
+                    <div class="col-md-12 text-center">
                         <h4>How do I get money back?</h4>
                         <p>If at the end of the year neither you nor your friends have made a claim, you'll get whatever is in your Reward Pot back.</p>
                     </div>
-                    <div class="col-md-12 text-left">
+                    <div class="col-md-12 text-center">
                         <h4>What happens if someone claims?</h4>
                         <p>If someone claims, your
                             <a href="https://help.wearesosure.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">Reward Pot will go towards helping them get their phone back</a>. They’ll do the same if something happens to you.</p>
                     </div>
-                    <div class="col-md-12 text-left">
+                    <div class="col-md-12 text-center">
                         <h4>Is this a joke?</h4>
                         <p>No. We just like careful people. If you connect with your friends and you all look after your phones we'll reward you! It's that simple.</p>
                     </div>
