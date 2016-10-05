@@ -3,6 +3,8 @@
 @media (max-width: 992px) {
     .hero {
         padding-top: 50px;
+        padding-bottom: 50px;
+        min-height: 400px;
     }
 }
 
