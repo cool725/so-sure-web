@@ -42,7 +42,7 @@
                                     <h4>£{{ phone_price.monthlyPremiumPrice }}</h4>
                                     <br>
                                     <p>Covered for</p>
-                                    <h4>Theft, Loss, Accidental Damage</h4>
+                                    <h4>Theft, Loss &amp; Accidental Damage</h4>
                                     <p>
                                         <a href="#" data-toggle="modal" data-target="#more-info">More information</a>
                                     </p>
@@ -112,14 +112,14 @@
                 <div class="row" style="padding-top: 30px; padding-bottom: 10px;">
                 <div class="col-sm-12">
                   <p class="text-center">
-                    <a class="btn btn-primary">Let's get started</a>
+                    <a class="btn btn-primary" id="get-started">Let's get started</a>
                   </p>
                 </div>
               </div>
-                <div class="row" style="border-top: 2px solid #efefef; font-size: 12px; padding-top: 10px;">
+                <div class="row" style="border-top: 2px solid #efefef; font-size: 14px; padding-top: 10px;">
                 <div class="col-sm-12">
                   <p class="text-center">
-                    Not your device? Select another phone here.
+                    Not your device? Select another phone <a href="/#get-quote">here</a>.
                   </p>
                 </div>
               </div>
@@ -131,41 +131,41 @@
 
     <section>
         <div class="container support-chat">
-            <h3 class="text-center">
-                Got a question? Just ask us!
-            </h3>
-            <p class="text-center">
+            <h2 class="text-center">
+                Got a question?
+            </h2>
+            <p class="lead text-center" id="hero-description">
               Ask our team a question below or check out our <a href="help.wearesosure.com">Help Centre</a>.
             </p>
             <div class="row">
-              <div class="col-md-3"></div>
-              <div class="col-md-6">
+              <div class="col-md-4"></div>
+              <div class="col-md-4">
                 <div id="chat-container" style="height: 500px;">
               </div>
-              <div class="col-md-3"></div>
+              <div class="col-md-4"></div>
               </div>
             </div>
           </div>
             <div class="container faqs">
+              <h3 class="text-center" style="padding-bottom: 30px;">Frequently Asked Questions</h3>
                 <div class="row">
-                    <h4 class="text-center">Frequently Asked Questions</h4>
-                    <div class="col-md-6 text-center">
-                        <h5>How does it work?</h5>
+                    <div class="col-md-12 text-left">
+                        <h4>How does it work?</h4>
                         <p>You still pay £{{ phone_price.monthlyPremiumPrice|number_format(2, '.', ',') }}
                             monthly for a year, but for each friend that also insures with us we’ll
                             <a href="https://help.wearesosure.com/hc/en-us/sections/201888645-Your-Reward-Pot" target="_blank">add up to £10 your Reward Pot</a>.</p>
                     </div>
-                    <div class="col-md-6 text-center">
-                        <h5>How do I get money back?</h5>
+                    <div class="col-md-12 text-left">
+                        <h4>How do I get money back?</h4>
                         <p>If at the end of the year neither you nor your friends have made a claim, you'll get whatever is in your Reward Pot back.</p>
                     </div>
-                    <div class="col-md-6 text-center">
-                        <h5>What happens if someone claims?</h5>
+                    <div class="col-md-12 text-left">
+                        <h4>What happens if someone claims?</h4>
                         <p>If someone claims, your
                             <a href="https://help.wearesosure.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">Reward Pot will go towards helping them get their phone back</a>. They’ll do the same if something happens to you.</p>
                     </div>
-                    <div class="col-md-6 text-center">
-                        <h5>Is this a joke?</h5>
+                    <div class="col-md-12 text-left">
+                        <h4>Is this a joke?</h4>
                         <p>No. We just like careful people. If you connect with your friends and you all look after your phones we'll reward you! It's that simple.</p>
                     </div>
                 </div>
@@ -176,20 +176,21 @@
 
 <section class="download-now" id="download-now">
     <div class="container">
-        <h3>Ready for better? Download our app now.</h3>
+        <h2>The next bit is via the app</h2>
+          <p class="lead text-center" id="hero-description">It makes sense, we are a mobile insurance provider after all!</p>
         {% if is_promo %}
-            <p>As an added bonus, if you become one of our first 1,000 customers we'll give you up to
-                <strong>£15 for each connection</strong>, allowing you to get your 1st year of insurance for free!</p>
+            <p class="lead text-center" id="hero-description">As an added bonus, become one our first 1,000 customers &amp; we'll give you up to
+                <strong>£15 for each connection</strong>. You could also get your 1st year of insurance for free!</p>
         {% endif %}
         <div class="row download-app">
             <div class="col-md-6 text-right">
                 <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download it on the App Store"></img>
+                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
                 </a>
             </div>
             <div class="col-md-6 text-left">
                 <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get it on Google Play"></img>
+                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
                 </a>
             </div>
         </div>
@@ -215,11 +216,13 @@
                 <li>Breakdown (including faults)</li>
                 <li>Loss</li>
             </ul>
+            <br>
             <p>In the event of theft or loss you are also covered for:</p>
             <ul>
                 <li>Unauthorised network charges (up to £1,000 including VAT)</li>
                 <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
             </ul>
+            <br>
             <h4>What you are NOT covered for?</h4>
             <ul>
                 <li>Excess – You need to pay each time you make a successful claim. £50 for Damage or Breakdown. £70 for Theft or Loss.</li>

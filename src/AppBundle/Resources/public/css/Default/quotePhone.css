@@ -192,11 +192,11 @@
   }
 }
 .circle {
-  width: 100px;
-  height: 100px;
-  line-height: 100px;
+  width: 110px;
+  height: 110px;
+  line-height: 120px;
   border-radius: 50%;
-  font-size: 30px;
+  font-size: 28px;
   color: #fff;
   text-align: center;
   background: #3399FF;
@@ -211,14 +211,20 @@
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
 }
 
+.support-chat {
+  padding: 60px 50px 0 50px;
+}
+
 #sk-container.sk-embedded {
 	font-family: inherit !important;
 	border-radius: 4px !important;
 	border: 2px solid #efefef;
+  position: relative !important;
+  height: 500px !important;
 }
 
 #sk-container.sk-embedded #sk-header {
-	display: none;
+	background-color: #efefef !important;
 }
 
 #sk-container.sk-embedded #sk-conversation .sk-intro-section {
@@ -230,4 +236,31 @@
 }
 #sk-container.sk-embedded #sk-conversation {
 	padding-top: 10px;
+}
+#sk-container.sk-embedded #sk-footer {
+  height: 40px !important;
+}
+.sk-logo {
+	display: none !important;
+}
+
+/* Frequently Asked Questions */
+
+.faqs {
+  padding: 30px 20px 60px 20px;
+  max-width: 750px
+}
+
+/* Download Now */
+
+.download-now {
+    background-color: #FFF;
+    padding: 100px 20px 100px 20px;
+    text-align: center;
+    color: #202532;
+    border-top: #efefef 2px solid;
+    min-height: 500px;
+}
+.download-now p {
+    color: #626B78;
 }

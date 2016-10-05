@@ -4,20 +4,8 @@
        });
     });
 
-    $("#scroll-indicator").click(function() {
+    $("#get-started").click(function() {
         $('html, body').animate({
-            scrollTop: $("#learn-more").offset().top
-        }, 1500);
-    });
-
-    $("#connections-info-icon").click(function() {
-        $('html, body').animate({
-            scrollTop: $("#connections").offset().top
-        }, 1500);
-    });
-
-    $("#quote-scroll-indicator").click(function() {
-        $('html, body').animate({
-            scrollTop: $("#connections").offset().top
+            scrollTop: $("#download-now").offset().top
         }, 1500);
     });

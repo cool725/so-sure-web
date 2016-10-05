@@ -287,15 +287,3 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 20px;
     margin-top: 20px;
 }
-/* Download Now */
-
-.download-now {
-    background-color: #FFF;
-    padding: 60px 20px 100px 20px;
-    text-align: center;
-    color: #202532;
-    border-top: #efefef 2px solid;
-}
-.download-now p {
-    color: #626B78;
-}
