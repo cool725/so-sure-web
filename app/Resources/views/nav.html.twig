@@ -22,7 +22,7 @@
                 <li><a class="nav-item" href="http://help.wearesosure.com" target="_blank">Help Centre</a></li>
                 <li><a class="nav-item" href="https://wearesosure.zendesk.com/hc/en-us/sections/201886655-Making-a-Claim" target="_blank">Make a Claim</a></li>
                 <li>
-                    <a class="btn" href="{{ path('sms_app_link') }}">Text Me The App</a>
+                    <a class="btn btn-info" href="{{ path('sms_app_link') }}">Text Me The App</a>
                 </li>
                 {% if app.user is not null and app.user %}
                   {% if is_granted('ROLE_ADMIN') %}

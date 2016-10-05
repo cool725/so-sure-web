@@ -4,9 +4,15 @@
        });
     });
 
-    $("#scroll-indicator").click(function() {
+    $("#get-quote-btn").click(function() {
         $('html, body').animate({
-            scrollTop: $("#learn-more").offset().top
+            scrollTop: $("#get-quote").offset().top
+        }, 1500);
+    });
+
+    $("#learn-more-btn").click(function() {
+        $('html, body').animate({
+            scrollTop: $("#benefits").offset().top
         }, 1500);
     });
 

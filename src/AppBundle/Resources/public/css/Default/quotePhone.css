@@ -1,19 +1,9 @@
 /* VIEW QUOTE */
 
 .view-quote {
-    background: rgba(51,153,255,1);
-    background: -moz-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    background: -webkit-gradient(left bottom, right top, color-stop(50%, rgba(51,153,255,1)), color-stop(100%, rgba(0,204,255,1)));
-    background: -webkit-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    background: -o-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    background: -ms-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    background: linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
-    padding-top: 30px;
-    padding-bottom: 40px;
-    min-height: 500px;
+    min-height: 600px;
     position: relative;
-
+    padding-top: 30px;
 }
 .view-quote h1 {
     color: #fff;
@@ -32,8 +22,8 @@
     font-size: 14px;
 }
 .view-quote .panel-body h5 {
-    padding-bottom: 20px;
     font-size: 19px;
+    color: #202532;
 }
 .quote-card-footer {
   position: absolute;
@@ -94,7 +84,6 @@
     border-color: #3399ff;
 }
 .view-quote .panel-primary {
-    flex: 1 0 210px;
     padding: 5px 8px 0px;
     margin: 0 -1px 39px 0;
     border: 1px solid #efefef;
@@ -112,17 +101,8 @@
 .got-a-question {
     font-size: 14px;
     padding-bottom: -20px;
+  }
 }
-}
-/* Page Scroll Indictor */
-
-/*.scroll-indicator {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-    color: #fff;
-}*/
 
 /* Connections Indicator */
 
