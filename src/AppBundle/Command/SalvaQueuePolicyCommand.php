@@ -54,6 +54,12 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Show items in the queue'
             )
+            ->addOption(
+                'requeue-date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Testing only! If requeuing for updated, set the policy change date'
+            )
         ;
     }
 
@@ -66,6 +72,11 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
         $requeue = $input->getOption('requeue');
         $show = true === $input->getOption('show');
         $process = $input->getOption('process');
+        $requeueDateOption = $input->getOption('requeue-date');
+        $requeueDate = null;
+        if ($requeueDateOption) {
+            $requeueDate = new \DateTime($requeueDateOption);
+        }
 
         if ($policyNumber) {
             $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
@@ -80,7 +91,7 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
                     $responseId
                 ));
             } elseif ($requeue) {
-                $salva->queue($phonePolicy, $requeue);
+                $salva->queue($phonePolicy, $requeue, 0, $requeueDate);
                 $output->writeln(sprintf("Policy %s was successfully requeued for %s.", $policyNumber, $requeue));
             } else {
                 if (!$phonePolicy) {

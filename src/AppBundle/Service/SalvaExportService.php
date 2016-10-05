@@ -577,7 +577,7 @@ class SalvaExportService
         return $count;
     }
 
-    public function queue(SalvaPhonePolicy $policy, $action, $retryAttempts = 0)
+    public function queue(SalvaPhonePolicy $policy, $action, $retryAttempts = 0, \DateTime $date = null)
     {
         if (!in_array($action, [self::QUEUE_CANCELLED, self::QUEUE_CREATED, self::QUEUE_UPDATED])) {
             throw new \Exception(sprintf('Unknown queue action %s', $action));
@@ -590,7 +590,7 @@ class SalvaExportService
 
         // Increment policy number should be done outside the queue process
         if ($action == self::QUEUE_UPDATED) {
-            $this->incrementPolicyNumber($policy);
+            $this->incrementPolicyNumber($policy, $date);
 
             $this->queueMessage($policy->getId(), self::QUEUE_CANCELLED, $retryAttempts, self::CANCELLED_REPLACE);
             $this->queueMessage($policy->getId(), self::QUEUE_CREATED, $retryAttempts);
