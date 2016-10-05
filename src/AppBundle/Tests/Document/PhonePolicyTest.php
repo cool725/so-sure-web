@@ -1293,9 +1293,9 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee());
 
         $version = $policy->incrementSalvaPolicyNumber(new \DateTime("2016-01-03"));
-        // 2 days (10.72 * 2/366) = 0.06
-        $this->assertEquals('0.06', $policy->getTotalBrokerFee($version));
-        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION - 0.06, $policy->getTotalBrokerFee());
+        // 3 days (10.72 * 3/366) = 0.06
+        $this->assertEquals('0.09', $policy->getTotalBrokerFee($version));
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION - 0.09, $policy->getTotalBrokerFee());
     }
 
     public function testGetLastSuccessfulPaymentCredit()
@@ -1683,11 +1683,11 @@ class PhonePolicyTest extends WebTestCase
             12
         );
 
-        $this->assertEquals(0, $policy->getDaysInPolicy(new \DateTime('2016-01-01')));
-        $this->assertEquals(0, $policy->getDaysInPolicy(new \DateTime('2016-01-01 15:00')));
-        $this->assertEquals(1, $policy->getDaysInPolicy(new \DateTime('2016-01-02')));
-        $this->assertEquals(30, $policy->getDaysInPolicy(new \DateTime('2016-01-31')));
-        $this->assertEquals(40, $policy->getDaysInPolicy(new \DateTime('2016-02-10')));
+        $this->assertEquals(1, $policy->getDaysInPolicy(new \DateTime('2016-01-01')));
+        $this->assertEquals(1, $policy->getDaysInPolicy(new \DateTime('2016-01-01 15:00')));
+        $this->assertEquals(2, $policy->getDaysInPolicy(new \DateTime('2016-01-02')));
+        $this->assertEquals(31, $policy->getDaysInPolicy(new \DateTime('2016-01-31')));
+        $this->assertEquals(41, $policy->getDaysInPolicy(new \DateTime('2016-02-10')));
     }
 
     public function testProrataMultiplier()
@@ -1698,10 +1698,10 @@ class PhonePolicyTest extends WebTestCase
             12
         );
 
-        $this->assertEquals(0, $policy->getProrataMultiplier(new \DateTime('2016-01-01')));
-        $this->assertEquals(0.0027, $this->toFourDp($policy->getProrataMultiplier(new \DateTime('2016-01-02'))));
-        $this->assertEquals(0.0820, $this->toFourDp($policy->getProrataMultiplier(new \DateTime('2016-01-31'))));
-        $this->assertEquals(0.1093, $this->toFourDp($policy->getProrataMultiplier(new \DateTime('2016-02-10'))));
+        $this->assertEquals(0.0027, $this->toFourDp($policy->getProrataMultiplier(new \DateTime('2016-01-01'))));
+        $this->assertEquals(0.0055, $this->toFourDp($policy->getProrataMultiplier(new \DateTime('2016-01-02'))));
+        $this->assertEquals(0.0847, $this->toFourDp($policy->getProrataMultiplier(new \DateTime('2016-01-31'))));
+        $this->assertEquals(0.1120, $this->toFourDp($policy->getProrataMultiplier(new \DateTime('2016-02-10'))));
     }
 
     public function testProratedRefundAmount()

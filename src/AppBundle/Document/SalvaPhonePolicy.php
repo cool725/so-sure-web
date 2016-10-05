@@ -201,6 +201,39 @@ class SalvaPhonePolicy extends PhonePolicy
         $this->setSalvaStatus(self::SALVA_STATUS_WAIT_CANCELLED);
     }
 
+    public function hasSalvaPreviousVersionPastMidnight($version = null)
+    {
+        if (!$this->isPolicy() || !$this->getSalvaStartDate($version)) {
+            throw new \Exception('Unable to determine days in salva policy as policy is not valid');
+        }
+
+        if (!isset($this->getSalvaPolicyNumbers()[$version + 1])) {
+            $currentStartDate = $this->getSalvaStartDate($version + 1);
+        } else {
+            $currentStartDate = $this->getSalvaStartDate(null);
+        }
+        $previousStartDate = $this->getSalvaStartDate($version);
+
+        /*
+        print PHP_EOL . $version . PHP_EOL;
+        print $previousStartDate->format(\DateTime::ATOM) . PHP_EOL;
+        print $currentStartDate->format(\DateTime::ATOM) . PHP_EOL;
+        */
+
+        // at least 1 full day, always
+        if ($previousStartDate->diff($currentStartDate)->days > 0) {
+            return true;
+        }
+
+        // Otherwise, for less than 1 day, has the midnight boundary been passed
+        $midnight = $this->endOfDay(clone $previousStartDate);
+        if ($currentStartDate >= $midnight) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getSalvaDaysInPolicy($version = null)
     {
         if (!$this->isPolicy() || !$this->getSalvaStartDate($version)) {
@@ -210,6 +243,12 @@ class SalvaPhonePolicy extends PhonePolicy
         $startDate = $this->getSalvaStartDate($version);
         $endDate = null;
         if ($version) {
+            // if we're versioned, the previous period was already billed for the start date
+            // if that's the case, then adjust the start date to beginning of next day only for prorate date calcs
+            if ($version > 1) {
+                $startDate = $this->endOfDay($startDate);
+            }
+
             $endDate = $this->getSalvaTerminationDate($version);
         } elseif ($this->getStatus() == SalvaPhonePolicy::STATUS_CANCELLED) {
             if ($this->isRefundAllowed()) {
@@ -221,11 +260,37 @@ class SalvaPhonePolicy extends PhonePolicy
 
         if (!$endDate) {
             $endDate = clone $this->getStaticEnd();
-            // We'll never be at quite 365 days due to time ending at 23:59, so add extra day
-            $endDate = $endDate->add(new \DateInterval('P1D'));
+            // due to adjusting the end date to beginning of next day below,
+            // TODO: Refactor
+            if (!$version && count($this->getSalvaPolicyNumbers()) > 0) {
+                $endDate = $endDate->sub(new \DateInterval('P1D'));
+            }
         }
 
-        return $startDate->diff($endDate)->days;
+        // special case to count first day, if versioned on first day
+        if ($this->getStart()->diff($endDate)->days == 0 && $version == 1) {
+            return 1;
+        }
+
+        // same day versioning
+        if ($endDate < $startDate) {
+            return 0;
+        }
+
+        // always bill to end of day (next day 00:00) to account for partial days
+        $endDate = $this->endOfDay($endDate);
+
+        $diff = $startDate->diff($endDate);
+        $days = $diff->days;
+
+        /*
+        print PHP_EOL . $version . '=> ' . $days . PHP_EOL;
+        print $startDate->format(\DateTime::ATOM) . PHP_EOL;
+        print $endDate->format(\DateTime::ATOM) . PHP_EOL;
+        print_r($diff);
+        */
+
+        return $days;
     }
 
     public function getSalvaProrataMultiplier($version = null)

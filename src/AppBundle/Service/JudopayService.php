@@ -143,8 +143,14 @@ class JudopayService
      * @param string $cardToken     Can be null if card is declined
      * @param string $deviceDna     Optional device dna data (json encoded) for judoshield
      */
-    public function add(Policy $policy, $receiptId, $consumerToken, $cardToken, $deviceDna = null, \DateTime $date = null)
-    {
+    public function add(
+        Policy $policy,
+        $receiptId,
+        $consumerToken,
+        $cardToken,
+        $deviceDna = null,
+        \DateTime $date = null
+    ) {
         $this->statsd->startTiming("judopay.add");
         // if already active, don't re-run
         if ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {

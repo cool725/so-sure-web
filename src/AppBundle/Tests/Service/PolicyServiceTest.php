@@ -333,14 +333,14 @@ class PolicyServiceTest extends WebTestCase
         // 61 days (366/12 * 2)
         static::$policyService->cancel($policy, PhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-02-02'));
         // 6.99 / month
-        $this->assertEquals(13.75, $policy->getTotalPremiumPrice());
+        $this->assertEquals(13.98, $policy->getTotalPremiumPrice());
         // 6.38 / month rough - (6.99 * 12 / (1.095)) * 61 / 366  = 12.77
-        $this->assertEquals(12.56, $policy->getUsedGwp());
-        $this->assertEquals(12.56, $policy->getTotalGwp());
+        $this->assertEquals(12.77, $policy->getUsedGwp());
+        $this->assertEquals(12.77, $policy->getTotalGwp());
         // 0.61 / month rough - 6.38 * 12 * 0.095 * 61/366 = 1.21
-        $this->assertEquals(1.19, $policy->getTotalIpt());
-        // 0.89 / month
-        $this->assertEquals(1.76, $policy->getTotalBrokerFee());
+        $this->assertEquals(1.21, $policy->getTotalIpt());
+        // 0.89 / month rough - 10.72 * 61/366 = 1.78
+        $this->assertEquals(1.79, $policy->getTotalBrokerFee());
     }
 
     public function testSalvaCooloff()

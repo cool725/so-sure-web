@@ -932,8 +932,14 @@ abstract class Policy
         if (!$date) {
             $date = new \DateTime();
         }
+        $date = $this->endOfDay($date);
 
-        $days = $this->getStart()->diff($date)->days;
+        $diff = $this->getStart()->diff($date);
+        $days = $diff->days;
+        // Partial days count as a full day
+        if ($diff->h > 0 || $diff->i > 0 || $diff->s > 0) {
+            $days++;
+        }
 
         return $days;
     }
