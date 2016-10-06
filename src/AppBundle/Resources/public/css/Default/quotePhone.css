@@ -12,9 +12,6 @@
 .clickable {
     cursor: pointer;
 }
-.view-quote .align-middle {
-  height: none !important;
-}
 .view-quote .panel-primary {
     border: 2px solid #efefef;
     padding: 5px 8px 0px;
@@ -176,6 +173,9 @@
 }
 .sk-logo {
 	display: none !important;
+}
+.unread-badge {
+  display: none !important;
 }
 
 /* Frequently Asked Questions */

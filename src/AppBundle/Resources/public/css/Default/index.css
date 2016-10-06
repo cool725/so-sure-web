@@ -1,5 +1,9 @@
 /* HERO */
 
+.hero {
+  height: 600px;
+}
+
 @media (max-width: 992px) {
     .hero {
         padding-top: 50px;
