@@ -917,7 +917,33 @@ class ApiAuthController extends BaseController
             $email = $this->getDataString($data, 'email');
             $facebookId = $this->getDataString($data, 'facebook_id');
             $mobileNumber = $this->getDataString($data, 'mobile_number');
-            $userExists = $repo->existsAnotherUser($user, $email, $facebookId, $mobileNumber);
+
+            $userChanged = false;
+
+            // only need to check for dups for these fields if they have changed
+            $emailCheck = null;
+            $mobileCheck = null;
+            $facebookCheck = null;
+
+            if (strlen($mobileNumber) > 0 && $user->getMobileNumber() != $mobileNumber) {
+                $user->setMobileNumber($mobileNumber);
+                $mobileCheck = $mobileNumber;
+                $userChanged = true;
+            }
+            if (strlen($email) > 0 && $user->getEmailCanonical() != strtolower($email)) {
+                $user->setEmail($email);
+                $emailCheck = $email;
+                $userChanged = true;
+            }
+            if ($this->isDataStringPresent($data, 'facebook_id') &&
+                $this->isDataStringPresent($data, 'facebook_access_token')) {
+                $user->setFacebookId($this->getDataString($data, 'facebook_id'));
+                $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
+                $facebookCheck = $user->getFacebookId();
+                $userChanged = true;
+            }
+
+            $userExists = $repo->existsAnotherUser($user, $emailCheck, $facebookCheck, $mobileCheck);
             if ($userExists) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_EXISTS,
@@ -926,17 +952,6 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $userChanged = false;
-            if (strlen($mobileNumber) > 0) {
-                $user->setMobileNumber($mobileNumber);
-                $userChanged = true;
-            }
-
-            if (strlen($email) > 0) {
-                // TODO: Send email to both old & new email addresses
-                $user->setEmail($email);
-                $userChanged = true;
-            }
             if ($this->isDataStringPresent($data, 'first_name') &&
                 $this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50) != $user->getFirstName()) {
                 if ($user->hasValidPolicy()) {
@@ -959,13 +974,6 @@ class ApiAuthController extends BaseController
                     );
                 }
                 $user->setLastName($this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50));
-                $userChanged = true;
-            }
-
-            if ($this->isDataStringPresent($data, 'facebook_id') &&
-                $this->isDataStringPresent($data, 'facebook_access_token')) {
-                $user->setFacebookId($this->getDataString($data, 'facebook_id'));
-                $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
                 $userChanged = true;
             }
 
