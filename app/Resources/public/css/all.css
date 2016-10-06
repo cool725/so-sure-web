@@ -64,6 +64,21 @@ h1, h2, h3, h4, h5, h6 {
     color: #202532;
 }
 
+/* Global Tools */
+
+/* centered columns styles */
+.row-centered {
+    text-align:center;
+}
+.col-centered {
+    display:inline-block;
+    float:none;
+    /* reset the text-align */
+    text-align:left;
+    /* inline-block space fix */
+    margin-right:-4px;
+}
+
 /* NAVIGATION */
 
 .navbar-default {
@@ -231,7 +246,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 @media (max-width:543px) {
     .download-app img {
-        width: 40%;
+        width: 50%;
     }
 }
 
@@ -299,7 +314,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
   position: relative;
 }
-@media (max-height: 400px) {
+@media (max-height: 500px) {
 .align-middle {
     min-height: 450px;
   }

@@ -22,6 +22,6 @@ $(document).ready(function(){
         format: "DD-MM-YYYY HH:mm",
         allowInputToggle: true,
         showTodayButton: true,
-        useCurrent: false 
+        useCurrent: false
     });
 });

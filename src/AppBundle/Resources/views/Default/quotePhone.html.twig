@@ -12,8 +12,7 @@
     {{ parent() }}
     {% javascripts
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
-    'components/Chart.js/Chart.js'
-    'bundles/app/js/Default/connections.js'
+    'bundles/app/js/Default/slider.js'
     '@AppBundle/Resources/public/js/Default/index.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
@@ -21,176 +20,159 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    'bundles/app/css/Default/index.css'
-    'bundles/app/css/Default/quotePhone.css'
-    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
-    'bundles/app/css/Default/connections.css'
-    'bundles/app/css/Default/scrollindicator.css'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    {% stylesheets 'bundles/app/css/Default/index.css' 'bundles/app/css/Default/quotePhone.css' 'components/seiyria-bootstrap-slider/bootstrap-slider.min.css' 'bundles/app/css/Default/connections.css' 'bundles/app/css/Default/scrollindicator.css' %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
   <section class="view-quote light-gradient">
+    <div class="vertical-align-wrap">
+      <div class="vertical-align-middle">
         <div class="container">
-          <div id="navchange"></div>
-            <h1 class="text-center">Your Quote</h1>
+            <h1 class="text-center">Your quote</h1>
+            <p class="lead text-center" id="hero-description">
+              We've finally made phone insurance worthwhile for careful people. However, if for any reason you're not satisfied, we'll happily give you your money back within 14 days.
+            </p>
             <div class="row">
-                <div class="col-md-4">
-                    <div class="panel panel-primary your-device">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">1. Device &amp; Cost</h3>
-                        </div>
-                        <div class="panel-body">
-                            <span>
-                                <p>Device
-
-                                </p>
-                                <h5>{{ phone }}</h5>
-                                <p>Monthly Cost
-
-                                </p>
-                                <h5>£{{ phone_price.monthlyPremiumPrice }}</h5>
-                                <p>What You Could Get Back <a id="connections-info-icon" href="#connections"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
-                                </p>
-                                <h5>£{{ phone_price.maxPot }}
-                                    with
-                                    {{ phone_price.maxConnections }}
-                                    connections</h5>
-                                <div class="quote-card-footer">
-                                    <p class="phone-fact-title">Not your device?</p>
-                                    <p class="phone-fact-body">Select your phone
-                                        <a href="{{ path('homepage') }}">here</a>.</p>
-                                </div>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">2. Policy Details</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p>Coverage Summary
-                            </p>
-                            <h5>Theft, Loss &amp; Accidental Damage</h5>
-                            <p>More Information
-                            </p>
-                            <div class="panel-group" role="tablist" aria-multiselectable="true" id="accordion-2">
-                                <div class="panel panel-info coverage">
-                                    <div class="panel-heading coverage clickable" role="tab">
-                                        <h4 class="panel-title coverage">
-                                            <a role="button" data-toggle="collapse" data-parent="#accordion-2" aria-expanded="false" href="#accordion-2 .item-1">What you are covered for<i class="indicator fa fa-chevron-down pull-right"></i>
-                                            </a>
-                                        </h4>
-                                    </div>
-                                    <div class="panel-collapse collapse item-1 coverage" role="tabpanel">
-                                        <div class="panel-body coverage">
-                                            <span>
-                                                <p>If you take reasonable care of your phone and don't knowingly put it at risk you are covered for:</p>
-                                                <ul>
-                                                    <li>Theft</li>
-                                                    <li>Accidental Damage</li>
-                                                    <li>Breakdown (including faults)</li>
-                                                    <li>Loss</li>
-                                                </ul>
-                                                <p>In the event of theft or loss you are also covered for:</p>
-                                                <ul>
-                                                    <li>Unauthorised network charges (up to £1,000 including VAT)</li>
-                                                    <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
-                                                </ul>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="panel panel-info not-covered">
-                                    <div class="panel-heading not-covered clickable" role="tab">
-                                        <h4 class="panel-title not-covered">
-                                            <a role="button" data-toggle="collapse" data-parent="#accordion-2" aria-expanded="false" href="#accordion-2 .item-2">What you are NOT covered for<i class="indicator fa fa-chevron-down pull-right"></i>
-                                            </a>
-                                        </h4>
-                                    </div>
-                                    <div class="panel-collapse collapse item-2 not-covered" role="tabpanel">
-                                        <div class="panel-body not-covered">
-                                            <span>
-                                                <ul>
-                                                    <li>Excess – You need to pay each time you make a successful claim. £50 for Damage or Breakdown. £70 for Theft or Loss.</li>
-                                                    <li>More than two theft or loss claims in the same year.</li>
-                                                </ul>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="quote-card-footer">
-                                <p class="phone-fact-title">Got a question?</p>
-                                <p class="phone-fact-body">Drop us an
-                                    <a href="mailto:support@weareosure.com">email</a>. We're always happy to chat.</p>
+              <div class="panel panel-primary">
+                <div class="col-md-12">
+                <div class="col-md-6">
+                    <div class="quote-panel-left">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span>
+                                    <p>Device</p>
+                                    <h4>{{ phone }}</h4>
+                                    <br>
+                                    <p>Monthly Cost</p>
+                                    <h4>£{{ phone_price.monthlyPremiumPrice }}</h4>
+                                    <br>
+                                    <p>Covered for</p>
+                                    <h4>Theft, Loss &amp; Accidental Damage</h4>
+                                    <p>
+                                        <a href="#" data-toggle="modal" data-target="#more-info">More information</a>
+                                    </p>
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">3. Ready to pay?</h3>
-                        </div>
-                        <div class="panel-body">
-                          <p>
-                            Download Now To Pay
-                          </p>
-                          <h5>Available for iOS &amp; Android</h5>
-                        <div class="col-sm-12 text-center" style="padding-bottom:20px;">
-                            <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
-                                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store"></img>
-                            </a>
-                        </div>
-                        <div class="col-sm-12 text-center">
-                            <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
-                                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play"></img>
-                            </a>
-                        </div>
-                        <div class="quote-card-footer">
-                            <p class="phone-fact-title">Want us to send you a download link?</p>
-                            <p class="phone-fact-body">Enter your phone number <a href="http://wearesosure.com/text-me-the-app">here</a>.</p>
+                <div class="col-md-6">
+                    <div class="quote-panel-right">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span>
+                                    {% set start_friends = phone_price.maxConnections - 1 %}
+                                    {% set start_value = start_friends * connection_value %}
+                                    {% if start_value > phone_price.maxPot %}
+                                        {% set start_value = phone_price.maxPot %}
+                                    {% endif %}
+
+                                    <h4>AND HERE'S THE COOL BIT</h4>
+                                    <div class="row reward-pot">
+                                        <div class="col-sm-4" style="padding-top: 35px;">
+                                            <p class="text-left" style="margin-bottom: -10px;">
+                                                Connect with
+                                            </p>
+                                            <h3 class="text-left">
+                                                <span id="num_friends" style="color: #3399FF">{{ start_friends }}
+                                                    friends</span>
+                                            </h3>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <p class="text-left" style="padding-top: 30px;">
+                                            <form>
+                                                <input
+                                                    type="text"
+                                                    class="span2"
+                                                    value=""
+                                                    data-slider-min="0"
+                                                    data-slider-max="{{ phone_price.maxConnections }}"
+                                                    data-slider-maxpot="{{ phone_price.maxPot }}"
+                                                    data-slider-step="1"
+                                                    data-slider-value="{{ start_friends }}"
+                                                    data-slider-id="connection-slider"
+                                                    id="slider-value"
+                                                    data-slider-handle="round"
+                                                    data-slider-connection-value="{{ connection_value }}"/>
+                                                &nbsp;
+                                            </form>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="row row-centered">
+                                        <div class="col-md-6">
+                                            <p class="text-left" style="padding-top: 30px;">
+                                              At the end of the year, if no one claims, we'll give you back:
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 col-centered">
+                                            <div id="money_back" class="circle">£{{ start_value }}</div>
+                                        </div>
+                                    </div>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                  </div>
-                  </div>
+                </div>
+                <div class="row" style="padding-top: 30px; padding-bottom: 10px;">
+                <div class="col-sm-12">
+                  <p class="text-center">
+                    <a class="btn btn-primary" id="get-started">Let's get started</a>
+                  </p>
+                </div>
+              </div>
+                <div class="row" style="border-top: 2px solid #efefef; font-size: 14px; padding-top: 10px;">
+                <div class="col-sm-12">
+                  <p class="text-center">
+                    Not your device? Select another phone <a href="/#get-quote">here</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
+    </div>
+    </div>
+    </section>
 
-    <section class="connections" id="connections">
-        <div class="container">
-            <h2>
-              Do you want 80% of your money back at the end of the year?
+    <section>
+        <div class="container support-chat">
+            <h2 class="text-center">
+                Got a question?
             </h2>
-            <p>
-                <div id="connectionLegend"></div>
+            <p class="lead text-center" id="hero-description">
+              Ask our team a question below or check out our <a href="help.wearesosure.com">Help Centre</a>.
             </p>
-            <div class="reward-pot">
-                {% include 'AppBundle:Default:connections.html.twig' %}
+            <div class="row">
+              <div class="col-md-4"></div>
+              <div class="col-md-4">
+                <div id="chat-container" style="height: 500px;">
+              </div>
+              <div class="col-md-4"></div>
+              </div>
             </div>
-            <div class="explainer">
+          </div>
+            <div class="container faqs">
+              <h3 class="text-center" style="padding-bottom: 30px;">Frequently Asked Questions</h3>
                 <div class="row">
-                    <h4>Frequently Asked Questions</h4>
-                    <div class="col-md-6">
-                        <h5>How does it work?</h5>
+                    <div class="col-md-12 text-left">
+                        <h4>How does it actually work?</h4>
                         <p>You still pay £{{ phone_price.monthlyPremiumPrice|number_format(2, '.', ',') }}
-                            monthly for a year, but for each friend that also insures with us we’ll <a href="https://help.wearesosure.com/hc/en-us/sections/201888645-Your-Reward-Pot" target="_blank">add up to £10 your Reward Pot</a>.</p>
+                            monthly for a year, but for each friend that also insures with us we’ll
+                            <a href="https://help.wearesosure.com/hc/en-us/sections/201888645-Your-Reward-Pot" target="_blank">add up to £10 your Reward Pot</a>.</p>
                     </div>
-                    <div class="col-md-6">
-                        <h5>How do I get money back?</h5>
+                    <div class="col-md-12 text-left">
+                        <h4>How do I get money back?</h4>
                         <p>If at the end of the year neither you nor your friends have made a claim, you'll get whatever is in your Reward Pot back.</p>
                     </div>
-                    <div class="col-md-6">
-                        <h5>What happens if someone claims?</h5>
-                        <p>If someone claims, your <a href="https://help.wearesosure.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">Reward Pot will go towards helping them get their phone back</a>. They’ll do the same if something happens to you.</p>
+                    <div class="col-md-12 text-left">
+                        <h4>What happens if someone claims?</h4>
+                        <p>If someone claims, your
+                            <a href="https://help.wearesosure.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">Reward Pot will go towards helping them get their phone back</a>. They’ll do the same if something happens to you.</p>
                     </div>
-                    <div class="col-md-6">
-                        <h5>Is this a joke?</h5>
+                    <div class="col-md-12 text-left">
+                        <h4>Is this a joke?</h4>
                         <p>No. We just like careful people. If you connect with your friends and you all look after your phones we'll reward you! It's that simple.</p>
                     </div>
                 </div>
@@ -201,25 +183,71 @@
 
 <section class="download-now" id="download-now">
     <div class="container">
-        <h2>Ready for better? Download our app now.</h2>
+        <h2>The next bit is via the app</h2>
+          <p class="lead text-center" id="hero-description">It makes sense, we are a mobile insurance provider after all!</p>
         {% if is_promo %}
-        <p>As an added bonus, if you become one of our first 1,000 customers we'll give you up to
-            <strong>£15 for each connection</strong>, allowing you to get your 1st year of insurance for free!</p>
+            <p class="lead text-center" id="hero-description">As an added bonus, become one our first 1,000 customers &amp; we'll give you up to
+                <strong>£15 for each connection</strong>. You could also get your 1st year of insurance for free!</p>
         {% endif %}
         <div class="row download-app">
             <div class="col-md-6 text-right">
                 <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download it on the App Store"></img>
+                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
                 </a>
             </div>
             <div class="col-md-6 text-left">
                 <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get it on Google Play"></img>
+                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
                 </a>
             </div>
         </div>
     </div>
 </div>
 </section>
+
+<div class="modal fade" id="more-info" tabindex="-1" role="dialog">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Coverage Summary</h4>
+        </div>
+        <div class="modal-body">
+            <h4>What you are covered for?</h4>
+            <p>If you take reasonable care of your phone and don't knowingly put it at risk you are covered for:</p>
+            <ul>
+                <li>Theft</li>
+                <li>Accidental Damage</li>
+                <li>Breakdown (including faults)</li>
+                <li>Loss</li>
+            </ul>
+            <br>
+            <p>In the event of theft or loss you are also covered for:</p>
+            <ul>
+                <li>Unauthorised network charges (up to £1,000 including VAT)</li>
+                <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
+            </ul>
+            <br>
+            <h4>What you are NOT covered for?</h4>
+            <ul>
+                <li>Excess – You need to pay each time you make a successful claim. £50 for Damage or Breakdown. £70 for Theft or Loss.</li>
+                <li>More than two theft or loss claims in the same year.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Smooch Embedded -->
+<script src="https://cdn.smooch.io/smooch.min.js"></script>
+<script>
+    Smooch.init({
+    appToken: 'aa83ed9x7259nh17sl5px0oga',
+    embedded: true
+    });
+    Smooch.render(document.getElementById('chat-container'));
+</script>
 
 {% endblock %}

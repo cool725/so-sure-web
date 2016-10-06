@@ -1,7 +1,7 @@
     $('#phone_phone').change(function() {
-       $.get('/price/' + this.value + '/', function(data) {
-        $('#policy-price').text('£' + data.price);
-       });
+        $.get('/price/' + this.value + '/', function(data) {
+            $('#policy-price').text('£' + data.price);
+        });
     });
 
     $("#get-quote-btn").click(function() {
@@ -16,14 +16,8 @@
         }, 1500);
     });
 
-    $("#connections-info-icon").click(function() {
+    $("#get-started").click(function() {
         $('html, body').animate({
-            scrollTop: $("#connections").offset().top
-        }, 1500);
-    });
-
-    $("#quote-scroll-indicator").click(function() {
-        $('html, body').animate({
-            scrollTop: $("#connections").offset().top
+            scrollTop: $("#download-now").offset().top
         }, 1500);
     });
