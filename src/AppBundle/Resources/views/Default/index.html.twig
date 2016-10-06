@@ -31,34 +31,42 @@
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <section class="hero light-gradient align-middle">
-      <div class="vertical-align-wrap">
-        <div class="vertical-align-middle">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div>
-                        <h1 class="text-center">Insure your phone with friends.
-                            <br>Get up to 80% of your money back.
-                        </h1>
+        <div class="vertical-align-wrap">
+            <div class="vertical-align-middle">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <h1 class="text-left">Insure your phone with friends.
+                                <br>Get up to 80% of your money back.
+                            </h1>
+                            <div style="padding-top: 20px;">
+                                <p class="lead text-left">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
+                            </div>
+                            <div class="row" style="padding-top: 20px;">
+                                <div class="col-md-12 text-left">
+                                    <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
+                                    <a class="btn btn-info" id="learn-more-btn">Learn more
+                                        <i class="fa fa-chevron-down"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="explainer-video">
+                                <a href="" class="explainer-video-caption" data-toggle="modal" data-target="#modal-fullscreen">
+                                    <img src="{{ cdn_url }}/images/home/explainer-video-overlay.png" class="">
+                                    <div class="explainer-video-caption-hover"></div>
+                                </a>
+                              </div>
+                                <div class="text-center">
+                                        <h6 style="text-transform: uppercase">Discover how Social Insurance works</h6>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div style="padding-top: 20px;">
-                        <p class="lead text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="row" style="padding-top: 20px;">
-                <div class="col-md-6 text-right">
-                    <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
-                </div>
-                <div class="col-md-6 text-left">
-                    <a class="btn btn-info" id="learn-more-btn">Learn more
-                        <i class="fa fa-chevron-down"></i>
-                    </a>
                 </div>
             </div>
         </div>
-      </div>
-    </div>
     </section>
 
     <section class="benefits" id="benefits">
@@ -90,7 +98,7 @@
     {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
     <section class="popular-devices" id="get-quote">
-      <div class="container">
+        <div class="container">
             <h2>Get a quote</h2>
             <p class="lead text-center" id="hero-description">Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
             <div class="row" id="select-phone">
@@ -106,10 +114,10 @@
                         {{ form_end(form_phone) }}
                     </div>
                 </div>
-            <p class="text-center">
-                <a href="mailto:hello@wearesosure.com">Don't see your device? Let us know.</a>
-            </p>
-          </div>
+                <p class="text-center">
+                    <a href="mailto:hello@wearesosure.com">Don't see your device? Let us know.</a>
+                </p>
+            </div>
         </div>
 
         <div class="text-break">
@@ -176,62 +184,78 @@
                 </div>
             </div>
         </div>
-      </div>
-    </section>
+    </div>
+</section>
 
-    <section class="social-proof">
-            <div class="container">
-                <h2>Why insurance needs to change</h2>
-                <p class="lead text-center" id="hero-description">Don't take our word for it, just look at these disgruntled people. This is why we're commited to giving you the best possible experience.</p>
-                <div class="row centered">
-                    <div class="col-md-4">
-                        <blockquote class="twitter-tweet" lang="en">
-                            <p lang="en" dir="ltr">
-                                <a href="https://twitter.com/AskNationwide">@AskNationwide</a>
-                                why is your mobile phone insurance claim process via paper and post?
-                                <a href="https://twitter.com/hashtag/1980s?src=hash">#1980s</a>
-                                <a href="https://twitter.com/hashtag/slow?src=hash">#slow</a>
-                                <a href="https://twitter.com/hashtag/needsarethink?src=hash">#needsarethink</a>
-                            </p>&mdash; Kerrie Colford (@kerriecolford)
-                            <a href="https://twitter.com/kerriecolford/status/684687370843779072">January 6, 2016</a>
-                        </blockquote>
-                    </div>
-                    <div class="col-md-4">
-                        <blockquote class="twitter-tweet" lang="en">
-                            <p lang="en" dir="ltr">Bad service
-                                <a href="https://twitter.com/AskLloydsBank">@AskLloydsBank</a>
-                                Acc upgrade met with advisor saying &quot;computer says no&quot; just cos I didn&#39;t want your mobile insurance bundled in.</p>&mdash; Tom R. (@Tomptati0n)
-                            <a href="https://twitter.com/Tomptati0n/status/614420014419083267">June 26, 2015</a>
-                        </blockquote>
-                    </div>
-                    <div class="col-md-4">
-                        <blockquote class="twitter-tweet" lang="en">
-                            <p lang="en" dir="ltr">incredibly poor ecommerce experience from
-                                <a href="https://twitter.com/EE">@EE</a>
-                                apparently if you upgrade via the mobile site, they REMOVE your insurance!</p>&mdash; Robert Nicholson (@RobBothan)
-                            <a href="https://twitter.com/RobBothan/status/684056441360105472">January 4, 2016</a>
-                        </blockquote>
-                    </div>
-                </div>
+<section class="social-proof">
+    <div class="container">
+        <h2>Why insurance needs to change</h2>
+        <p class="lead text-center" id="hero-description">Don't take our word for it, just look at these disgruntled people. This is why we're commited to giving you the best possible experience.</p>
+        <div class="row centered">
+            <div class="col-md-4">
+                <blockquote class="twitter-tweet" lang="en">
+                    <p lang="en" dir="ltr">
+                        <a href="https://twitter.com/AskNationwide">@AskNationwide</a>
+                        why is your mobile phone insurance claim process via paper and post?
+                        <a href="https://twitter.com/hashtag/1980s?src=hash">#1980s</a>
+                        <a href="https://twitter.com/hashtag/slow?src=hash">#slow</a>
+                        <a href="https://twitter.com/hashtag/needsarethink?src=hash">#needsarethink</a>
+                    </p>&mdash; Kerrie Colford (@kerriecolford)
+                    <a href="https://twitter.com/kerriecolford/status/684687370843779072">January 6, 2016</a>
+                </blockquote>
             </div>
-    </section>
-
-    <div class="pre-footer">
-        <div class="row">
-            <div class="col-sm-6 col-a">
-                <h4>
-                    <a href="http://help.wearesosure.com">Learn More</a>
-                </h4>
-                <p>Learn more about how Social Insurance works and why you should join us. We also cover all the basics to help you understand exactly what you're paying for.</p>
+            <div class="col-md-4">
+                <blockquote class="twitter-tweet" lang="en">
+                    <p lang="en" dir="ltr">Bad service
+                        <a href="https://twitter.com/AskLloydsBank">@AskLloydsBank</a>
+                        Acc upgrade met with advisor saying &quot;computer says no&quot; just cos I didn&#39;t want your mobile insurance bundled in.</p>&mdash; Tom R. (@Tomptati0n)
+                    <a href="https://twitter.com/Tomptati0n/status/614420014419083267">June 26, 2015</a>
+                </blockquote>
             </div>
-
-            <div class="col-sm-6 col-b">
-                <h4>
-                    <a href="https://wearesosure.zendesk.com/hc/en-us/articles/207523059-Our-mission">Our Mission</a>
-                </h4>
-                <p>Insurance is rubbish. We're making it better by returning it to
-                    <a href="https://blog.wearesosure.com/how-insurance-works-ccba082dcbe#.r4cj6kbnw" target="_blank">how it all started</a>. We call this Social Insurance. First mobile phones, then the world!</p>
+            <div class="col-md-4">
+                <blockquote class="twitter-tweet" lang="en">
+                    <p lang="en" dir="ltr">incredibly poor ecommerce experience from
+                        <a href="https://twitter.com/EE">@EE</a>
+                        apparently if you upgrade via the mobile site, they REMOVE your insurance!</p>&mdash; Robert Nicholson (@RobBothan)
+                    <a href="https://twitter.com/RobBothan/status/684056441360105472">January 4, 2016</a>
+                </blockquote>
             </div>
         </div>
     </div>
+</section>
+
+<div class="pre-footer">
+    <div class="row">
+        <div class="col-sm-6 col-a">
+            <h4>
+                <a href="http://help.wearesosure.com">Learn More</a>
+            </h4>
+            <p>Learn more about how Social Insurance works and why you should join us. We also cover all the basics to help you understand exactly what you're paying for.</p>
+        </div>
+
+        <div class="col-sm-6 col-b">
+            <h4>
+                <a href="https://wearesosure.zendesk.com/hc/en-us/articles/207523059-Our-mission">Our Mission</a>
+            </h4>
+            <p>Insurance is rubbish. We're making it better by returning it to
+                <a href="https://blog.wearesosure.com/how-insurance-works-ccba082dcbe#.r4cj6kbnw" target="_blank">how it all started</a>. We call this Social Insurance. First mobile phones, then the world!</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-fullscreen fade" id="modal-fullscreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="responsive-container">
+        <iframe src="https://player.vimeo.com/video/185840373?autoplay=1&title=0&byline=0&portrait=0" width="1280" height="720" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
