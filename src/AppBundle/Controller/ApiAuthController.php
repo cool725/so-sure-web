@@ -918,29 +918,19 @@ class ApiAuthController extends BaseController
             $facebookId = $this->getDataString($data, 'facebook_id');
             $mobileNumber = $this->getDataString($data, 'mobile_number');
 
-            $userChanged = false;
-
             // only need to check for dups for these fields if they have changed
             $emailCheck = null;
-            $mobileCheck = null;
-            $facebookCheck = null;
-
-            if (strlen($mobileNumber) > 0 && $user->getMobileNumber() != $mobileNumber) {
-                $user->setMobileNumber($mobileNumber);
-                $mobileCheck = $mobileNumber;
-                $userChanged = true;
-            }
             if (strlen($email) > 0 && $user->getEmailCanonical() != strtolower($email)) {
-                $user->setEmail($email);
                 $emailCheck = $email;
-                $userChanged = true;
             }
+            $mobileCheck = null;
+            if (strlen($mobileNumber) > 0 && $user->getMobileNumber() != $mobileNumber) {
+                $mobileCheck = $mobileNumber;
+            }
+            $facebookCheck = null;
             if ($this->isDataStringPresent($data, 'facebook_id') &&
-                $this->isDataStringPresent($data, 'facebook_access_token')) {
-                $user->setFacebookId($this->getDataString($data, 'facebook_id'));
-                $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
+                $user->getFacebookId() != $facebookId) {
                 $facebookCheck = $user->getFacebookId();
-                $userChanged = true;
             }
 
             $userExists = $repo->existsAnotherUser($user, $emailCheck, $facebookCheck, $mobileCheck);
@@ -950,6 +940,23 @@ class ApiAuthController extends BaseController
                     'Another user exists with those details',
                     422
                 );
+            }
+
+            $userChanged = false;
+            if (strlen($mobileNumber) > 0 && $user->getMobileNumber() != $mobileNumber) {
+                $user->setMobileNumber($mobileNumber);
+                $userChanged = true;
+            }
+            if (strlen($email) > 0 && $user->getEmailCanonical() != strtolower($email)) {
+                $user->setEmail($email);
+                $userChanged = true;
+            }
+            if ($this->isDataStringPresent($data, 'facebook_id') &&
+                $this->isDataStringPresent($data, 'facebook_access_token') &&
+                $user->getFacebookId() != $facebookId) {
+                $user->setFacebookId($facebookId);
+                $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
+                $userChanged = true;
             }
 
             if ($this->isDataStringPresent($data, 'first_name') &&

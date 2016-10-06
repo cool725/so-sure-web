@@ -2333,6 +2333,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $userB->setMobileNumber($mobile);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm->persist($userA);
+        $dm->persist($userB);
         $dm->flush();
 
         // Attempting to update fields that are the same.  As they're not changing
