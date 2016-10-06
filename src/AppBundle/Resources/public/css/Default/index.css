@@ -1,12 +1,10 @@
 /* HERO */
 
-.hero {
-  height: 600px;
-}
-
 @media (max-width: 992px) {
     .hero {
         padding-top: 50px;
+        padding-bottom: 50px;
+        min-height: 400px;
     }
 }
 
@@ -50,8 +48,12 @@
     .hero .text-right {
         text-align: center;
     }
+    .hero .btn-primary {
+      width: 250px;
+    }
     .hero .btn-info {
       margin-top: 15px;
+      width: 250px
     }
 }
 
@@ -126,7 +128,7 @@
   border-radius: 30px;
   -moz-border-radius: 30px;
   -webkit-border-radius: 30px;
-  margin-left: 10px !important;
+  margin-left: 10px;
 }
 
 @media (max-width: 767px) {
@@ -134,7 +136,7 @@
    margin-top: 10px;
    margin-bottom: 10px;
    width: 100%;
-   margin-left: none;
+   margin-left: 0px;
  }
 }
 
@@ -274,7 +276,6 @@
 }
 
 .benefits img {
-    width: 25%;
     height: 150px;
     padding-top: 30px;
     padding-bottom: 30px;
