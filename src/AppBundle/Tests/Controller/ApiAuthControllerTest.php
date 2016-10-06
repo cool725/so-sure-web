@@ -2314,6 +2314,42 @@ class ApiAuthControllerTest extends BaseControllerTest
         $result = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    public function testUpdateUserDupUserWithoutChange()
+    {
+        $mobile = self::generateRandomMobile();
+        $facebookId = rand(1, 999999);
+        $userA = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-dup-a', $this),
+            'foo'
+        );
+        $userA->setMobileNumber($mobile);
+
+        $userB = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-dup-b', $this),
+            'foo'
+        );
+        $userB->setMobileNumber($mobile);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm->persist($userA);
+        $dm->persist($userB);
+        $dm->flush();
+
+        // Attempting to update fields that are the same.  As they're not changing
+        // the dup user detection should not trigger
+        $cognitoIdentityId = $this->getAuthUser($userB);
+        $url = sprintf('/api/v1/auth/user/%s', $userB->getId());
+        $data = [
+            'mobile_number' => $mobile,
+            'facebook_id' => $facebookId,
+            'facebook_access_token' => 'zy',
+        ];
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(200);
+    }
+
     // user/{id}/address
 
     /**
