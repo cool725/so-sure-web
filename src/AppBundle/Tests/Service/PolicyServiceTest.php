@@ -235,7 +235,7 @@ class PolicyServiceTest extends WebTestCase
             $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
 
             $payment = new GocardlessPayment();
-            $payment->setAmount($policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+            $payment->setAmount($policy->getPhone()->getCurrentPhonePrice($date)->getMonthlyPremiumPrice($date));
             $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $policy->addPayment($payment);
 
@@ -341,17 +341,17 @@ class PolicyServiceTest extends WebTestCase
             static::$dm
         );
         $phone = $this->getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone);
+        $policy = static::initPolicy($user, static::$dm, $phone, new \DateTime('2016-01-01'));
         $receiptId = self::$judopay->testPay(
             $user,
             $policy->getId(),
-            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(new \DateTime('2016-01-01')),
             '4976 0000 0000 3436',
             '12/20',
             '452'
         );
         $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice(new \DateTime('2016-01-01')));
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setReceipt($receiptId);

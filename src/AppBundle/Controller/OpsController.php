@@ -32,9 +32,14 @@ class OpsController extends BaseController
             fwrite($temp, "t");
             fclose($temp);
 
-            return new JsonResponse([
+            $response = new JsonResponse([
                 'status' => 'Ok',
             ]);
+
+            // Disable HSTS for status check - otherwise elb healthcheck will fail
+            $response->headers->set('Strict-Transport-Security', 'max-age=0');
+
+            return $response;
         } catch (\Exception $e) {
             return new JsonResponse([
                 'status' => 'Error',

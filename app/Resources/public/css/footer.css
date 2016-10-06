@@ -1,9 +1,9 @@
   /* FOOTER */
 
 .footer {
-    /*position: relative;*/
+    position: relative;
     z-index: 100;
-    padding: 20px 0 20px 0;
+    padding: 20px 0 45px 0;
     background: #202532;
     color: #fff;
     text-align: center;

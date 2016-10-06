@@ -179,6 +179,13 @@ abstract class Policy
     protected $staticEnd;
 
     /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $pendingCancellation;
+
+    /**
      * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
@@ -380,6 +387,16 @@ abstract class Policy
     public function setStaticEnd(\DateTime $staticEnd)
     {
         $this->staticEnd = $staticEnd;
+    }
+
+    public function getPendingCancellation()
+    {
+        return $this->pendingCancellation;
+    }
+
+    public function setPendingCancellation(\DateTime $pendingCancellation)
+    {
+        $this->pendingCancellation = $pendingCancellation;
     }
 
     public function getStatus()
@@ -982,7 +999,7 @@ abstract class Policy
         }
 
         // If there's 1 payment outstanding
-        if ($this->getOutstandingPremium() == $this->getPremiumInstallmentPrice()) {
+        if ($this->areEqualToFourDp($this->getOutstandingPremium(), $this->getPremiumInstallmentPrice())) {
             return true;
         } else {
             return false;
@@ -1026,7 +1043,7 @@ abstract class Policy
                 // a self claim can be before the pot is adjusted.  also a pot zero is not always due to a self claim
                 return self::RISK_CONNECTED_SELF_CLAIM;
                 // return self::RISK_LEVEL_HIGH;
-            } elseif ($this->getPotValue() == 0) {
+            } elseif ($this->areEqualToFourDp($this->getPotValue(), 0)) {
                 return self::RISK_CONNECTED_POT_ZERO;
             }
 
@@ -1417,7 +1434,7 @@ abstract class Policy
         if (!$this->isPolicy()) {
             throw new \Exception('Not yet a policy - does not make sense to check this now.');
         }
-        return $this->getPotValue() == $this->getMaxPot();
+        return $this->areEqualToFourDp($this->getPotValue(), $this->getMaxPot());
     }
 
     public function getConnectionValues()

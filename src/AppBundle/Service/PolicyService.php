@@ -9,6 +9,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -24,6 +25,8 @@ use AppBundle\Exception\InvalidPremiumException;
 
 class PolicyService
 {
+    use CurrencyTrait;
+
     const S3_BUCKET = 'policy.so-sure.com';
     const KEY_POLICY_QUEUE = 'policy:queue';
 
@@ -72,6 +75,11 @@ class PolicyService
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
+    }
+
+    public function setDispatcher($dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -174,7 +182,7 @@ class PolicyService
         }
 
         if ($policy->isValidPolicy($prefix)) {
-            return;
+            return false;
         }
 
         if (count($policy->getScheduledPayments()) > 0) {
@@ -207,9 +215,14 @@ class PolicyService
 
         $this->queueMessage($policy);
 
-        $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
+        }
 
         $this->statsd->endTiming("policy.create");
+
+        return true;
     }
 
     private function queueMessage($policy)
@@ -424,10 +437,13 @@ class PolicyService
                 continue;
             }
 
-            if ($paymentItem->getAmount() == $policy->getPremium()->getYearlyPremiumPrice()) {
+            if ($this->areEqualToFourDp($paymentItem->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
                 $policy->setPremiumInstallments(1);
                 return;
-            } elseif ($paymentItem->getAmount() == $policy->getPremium()->getMonthlyPremiumPrice()) {
+            } elseif ($this->areEqualToFourDp(
+                $paymentItem->getAmount(),
+                $policy->getPremium()->getMonthlyPremiumPrice()
+            )) {
                 $policy->setPremiumInstallments(12);
                 for ($i = 1; $i <= 11; $i++) {
                     $scheduledDate = clone $date;
@@ -442,9 +458,11 @@ class PolicyService
                 return;
             } else {
                 throw new InvalidPremiumException(sprintf(
-                    'Invalid payment %f for policy %s',
+                    'Invalid payment %f for policy %s [Expected %f or %f]',
                     $paymentItem->getAmount(),
-                    $policy->getId()
+                    $policy->getId(),
+                    $policy->getPremium()->getYearlyPremiumPrice(),
+                    $policy->getPremium()->getMonthlyPremiumPrice()
                 ));
             }
         }
@@ -459,7 +477,11 @@ class PolicyService
 
         $this->cancelledPolicyEmail($policy);
         $this->networkCancelledPolicyEmails($policy);
-        $this->dispatcher->dispatch(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
+
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            $this->dispatcher->dispatch(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
+        }
     }
 
     /**

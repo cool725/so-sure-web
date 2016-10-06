@@ -1161,7 +1161,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '6.99',
+            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
             '4976 0000 0000 3436',
             '12/20',
             '452'
@@ -1178,7 +1178,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals($data['id'], $policyData['id']);
         $this->assertEquals('launch', $policyData['promo_code']);
         $this->assertEquals(6, $policyData['pot']['max_connections']);
-        $this->assertEquals(83.88, $policyData['pot']['max_value']);
+        // $this->assertEquals(83.88, $policyData['pot']['max_value']);
+        $this->assertEquals(84.24, $policyData['pot']['max_value']);
         $highConnectionValue = 0;
         $lowConnectionValue = null;
         foreach ($policyData['pot']['connection_values'] as $connectionValue) {
@@ -1217,7 +1218,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $userA,
             $dataA['id'],
-            '6.99',
+            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
             '4976 0000 0000 3436',
             '12/20',
             '452'
@@ -1257,7 +1258,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '6.99',
+            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
             '4221 6900 0000 4963',
             '12/20',
             '125'
@@ -1317,7 +1318,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '6.99',
+            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
             '4976 0000 0000 3436',
             '12/20',
             '452'
@@ -1365,7 +1366,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '6.99',
+            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
             '4976 0000 0000 3436',
             '12/20',
             '452'
@@ -1392,7 +1393,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '6.99',
+            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
             '4976 0000 0000 3436',
             '12/20',
             '452'

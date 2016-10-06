@@ -42,6 +42,7 @@ use AppBundle\Form\Type\JudoFileType;
 use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\LloydsFileType;
+use AppBundle\Form\Type\PendingPolicyCancellationType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -546,6 +547,9 @@ class AdminController extends BaseController
         $cancelForm = $this->get('form.factory')
             ->createNamedBuilder('cancel_form', CancelPolicyType::class, $cancel)
             ->getForm();
+        $pendingCancelForm = $this->get('form.factory')
+            ->createNamedBuilder('pending_cancel_form', PendingPolicyCancellationType::class, $policy)
+            ->getForm();
         $imeiForm = $this->get('form.factory')
             ->createNamedBuilder('imei_form', ImeiType::class, $policy)
             ->getForm();
@@ -575,6 +579,17 @@ class AdminController extends BaseController
                     }
 
                     return $this->redirectToRoute('admin_users');
+                }
+            } elseif ($request->request->has('pending_cancel_form')) {
+                $pendingCancelForm->handleRequest($request);
+                if ($pendingCancelForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s is scheduled to be cancelled', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
             } elseif ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
@@ -633,6 +648,7 @@ class AdminController extends BaseController
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
+            'pending_cancel_form' => $pendingCancelForm->createView(),
             'imei_form' => $imeiForm->createView(),
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
@@ -752,7 +768,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/accounts/{year}/{month}", name="admin_accounts_print")
+     * @Route("/accounts/print/{year}/{month}", name="admin_accounts_print")
      */
     public function adminAccountsPrintAction($year, $month)
     {

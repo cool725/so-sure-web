@@ -18,6 +18,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 abstract class Payment
 {
+    use CurrencyTrait;
+
     /**
      * @MongoDB\Id
      */
@@ -170,20 +172,20 @@ abstract class Payment
 
     public function calculateSplit()
     {
-        $this->setIpt($this->getPolicy()->getPremium()->getIptRate() * $this->getAmount());
-        $this->setGwp($this->getAmount() - $this->getIpt());
+        $this->setGwp($this->getAmount() / (1 + $this->getPolicy()->getPremium()->getIptRate()));
+        $this->setIpt($this->getAmount() - $this->getGwp());
     }
 
     public function setTotalCommission($totalCommission)
     {
         $this->totalCommission = $totalCommission;
-        if ($totalCommission == Salva::YEARLY_TOTAL_COMMISSION) {
+        if ($this->areEqualToFourDp($totalCommission, Salva::YEARLY_TOTAL_COMMISSION)) {
             $this->coverholderCommission = Salva::YEARLY_COVERHOLDER_COMMISSION;
             $this->brokerCommission = Salva::YEARLY_BROKER_COMMISSION;
-        } elseif ($totalCommission == Salva::MONTHLY_TOTAL_COMMISSION) {
+        } elseif ($this->areEqualToFourDp($totalCommission, Salva::MONTHLY_TOTAL_COMMISSION)) {
             $this->coverholderCommission = Salva::MONTHLY_COVERHOLDER_COMMISSION;
             $this->brokerCommission = Salva::MONTHLY_BROKER_COMMISSION;
-        } elseif ($totalCommission == Salva::FINAL_MONTHLY_TOTAL_COMMISSION) {
+        } elseif ($this->areEqualToFourDp($totalCommission, Salva::FINAL_MONTHLY_TOTAL_COMMISSION)) {
             $this->coverholderCommission = Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION;
             $this->brokerCommission = Salva::FINAL_MONTHLY_BROKER_COMMISSION;
         }

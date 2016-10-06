@@ -29,6 +29,9 @@ $kernel->loadClassCache();
 // When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
 //Request::enableHttpMethodParameterOverride();
 $request = Request::createFromGlobals();
+// http://symfony.com/doc/current/cookbook/request/load_balancer_reverse_proxy.html
+Request::setTrustedProxies(array('127.0.0.1', $request->server->get('REMOTE_ADDR')));
+
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);

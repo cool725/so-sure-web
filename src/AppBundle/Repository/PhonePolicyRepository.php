@@ -108,7 +108,8 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_UNPAID
-            ]);
+            ])
+            ->field('premiumInstallments')->gt(0);
 
         if ($environment == "prod") {
             $qb->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));

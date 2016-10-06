@@ -15,6 +15,7 @@ parameters:
     default_sender_name: 'so-sure'
     report_excluded_policy_ids:
         - 57d829aa04e76f403c74ab39 # Dylan
+        - 57ef7c67a6b37e5b2359e995 # Patrick
     sosure_ips:
         - 86.26.167.103
 
@@ -64,6 +65,7 @@ twig:
         consumer_payout: 17.2
         ipt_rebate: 1.5
         davies_ip: %davies_ip%
+        environment: %kernel.environment%
 
 doctrine_mongodb:
     connections:

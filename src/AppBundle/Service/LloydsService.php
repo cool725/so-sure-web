@@ -47,7 +47,18 @@ class LloydsService
                     $header = $row;
                 } else {
                     $line = array_combine($header, $row);
-                    $lines[] = $line;
+
+                    $processedDates = explode('8008566', $line['Transaction Description']);
+                    // Expected something like MDIR  8008566SEP21 8008566
+                    if (stripos($line['Transaction Description'], 'MDIR') === false ||
+                        count($processedDates) < 2) {
+                        $this->logger->warning(sprintf(
+                            'Skipping line as unable to parse description. %s',
+                            implode($line)
+                        ));
+                        continue;
+                    }
+                    $processedDate = new \DateTime($processedDates[1]);
 
                     if (is_numeric($line['Credit Amount'])) {
                         $amount = $line['Credit Amount'];
@@ -62,8 +73,6 @@ class LloydsService
                     }
                     $dailyReceived[$receivedDate->format('Ymd')] += $amount;
 
-                    $processedDates = explode('8008566', $line['Transaction Description']);
-                    $processedDate = new \DateTime($processedDates[1]);
                     if (!isset($dailyProcessing[$processedDate->format('Ymd')])) {
                         $dailyProcessing[$processedDate->format('Ymd')] = 0;
                     }
@@ -72,6 +81,7 @@ class LloydsService
                     if (!$maxDate || $maxDate > $receivedDate) {
                         $maxDate = $receivedDate;
                     }
+                    $lines[] = $line;
                 }
             }
             fclose($handle);

@@ -114,7 +114,7 @@ class ApiControllerTest extends BaseControllerTest
                 RateLimitService::DEVICE_TYPE_LOGIN,
                 '127.0.0.1',
                 $cognitoIdentityId
-            );        
+            );
         }
         $data = $this->verifyResponse(200);
 
@@ -350,8 +350,13 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals(0, $data['quotes'][0]['monthly_loss']);
         $this->assertEquals(0, $data['quotes'][0]['yearly_loss']);
 
+        // gwp 5.93 was 6.49 (9.5% ipt), now 6.52 (10% ipt)
+        $this->assertEquals(6.52, $data['quotes'][0]['monthly_premium']);
+        $this->assertEquals(78.24, $data['quotes'][0]['yearly_premium']);
+        /*
         $this->assertEquals(6.49, $data['quotes'][0]['monthly_premium']);
         $this->assertEquals(77.88, $data['quotes'][0]['yearly_premium']);
+        */
 
         /*
          * no longer using promo codes for the quote
@@ -368,7 +373,9 @@ class ApiControllerTest extends BaseControllerTest
         */
         $connectionValue = 10;
         $maxConnections = 7;
-        $maxPot = 62.30;
+        // see above for pricing changes
+        // $maxPot = 62.30;
+        $maxPot = 62.59;
         $this->assertEquals($connectionValue, $data['quotes'][0]['connection_value']);
         $this->assertEquals($maxConnections, $data['quotes'][0]['max_connections']);
         $this->assertEquals($maxPot, $data['quotes'][0]['max_pot']);

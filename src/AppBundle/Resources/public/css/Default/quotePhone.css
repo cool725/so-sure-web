@@ -1,114 +1,42 @@
 /* VIEW QUOTE */
 
 .view-quote {
-    background: rgba(51,153,255,1);
-    background: -moz-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    background: -webkit-gradient(left bottom, right top, color-stop(50%, rgba(51,153,255,1)), color-stop(100%, rgba(0,204,255,1)));
-    background: -webkit-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    background: -o-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    background: -ms-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    background: linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
-    padding-top: 30px;
-    padding-bottom: 40px;
-    min-height: 500px;
-    position: relative;
-    color: #fff;
+    padding: 30px 20px 50px 20px;
 }
 .view-quote h1 {
-    color: #fff;
     padding-bottom: 10px;
 }
 .view-quote .panel-primary {
   color: #202532 !important;
 }
-.view-quote .panel-primary > .panel-heading {
-    letter-spacing: 3px;
-    color: #202532;
-    text-transform: uppercase;
-    background: none;
-}
 .clickable {
     cursor: pointer;
 }
-.view-quote .panel-title {
-    font-size: 14px;
-}
-.view-quote .panel-body h5 {
-    padding-bottom: 20px;
-    font-size: 19px;
-}
-.quote-card-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-}
-.panel-group {
-  padding-bottom: 40px;
-}
-.phone-fact-title {
-    padding-top: 10px;
-    color: #999;
-    font-size: 11px;
-    text-transform: uppercase;
-    border-top: 1px solid #efefef;
-}
-.phone-fact-body {
-    font-size: 14px;
-}
-.view-quote .panel-body .coverage {
-    font-size: 14px;
-    text-align: left;
-}
-.view-quote .panel-body .coverage ul, li {
-    margin: 0px 5px;
-    padding: 10px 5px;
-}
-.view-quote .panel-body .coverage h4 {
-    text-align: center;
-    text-decoration: none;
-}
-.view-quote .panel-body .not-covered h4 {
-    text-align: center;
-    text-decoration: none;
-}
-.panel-title > a {
-    display: inline-block;
-    width: 100%;
-}
-.panel-title > a:hover {
-    text-decoration: none;
-}
-.view-quote .panel-body .not-covered {
-    font-size: 14px;
-    text-align: left;
-}
-.view-quote .panel-body .not-covered ul, li {
-    margin: 0px 5px;
-    padding: 0px 5px;
-}
-.view-quote .panel-info > .panel-heading {
-    color: #fff;
-    background-color: #3399ff;
-    text-align: left;
-}
-.view-quote .panel-info {
-    border-color: #3399ff;
+.view-quote .align-middle {
+  height: none !important;
 }
 .view-quote .panel-primary {
     border: 2px solid #efefef;
+    padding: 5px 8px 0px;
+    margin: 0 -1px 39px 0;
     position: relative;
     background: white;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
     text-align: center;
     height: 100%;
+    margin-top: 20px;
 }
 .quote-panel-left {
     padding: 20px 25px 20px 25px;
 }
 .quote-panel-right {
     padding: 20px 25px 20px 25px;
+}
+.view-quote .btn-primary {
+  padding: 12px 30px;
+  border-radius: 30px;
+  -moz-border-radius: 30px;
+  -webkit-border-radius: 30px;
 }
 
 @media (min-width:767px) {
@@ -123,7 +51,7 @@
 }
 @media (min-width: 992px) {
   .view-quote .panel-primary {
-    height: 400px;
+    height: 420px;
   }
 }
 @media (max-width: 992px) {
@@ -132,6 +60,9 @@
   }
   .quote-panel-left {
       border-bottom: 2px solid #efefef;
+  }
+  .view-quote .btn-primary {
+    width: 250px;
   }
 }
 
@@ -252,8 +183,12 @@
 .faqs {
   padding-top: 30px;
   padding-bottom: 60px;
+}
+@media (min-width: 992px) {
+  .faqs {
   padding-left: 150px;
   padding-right: 150px;
+  }
 }
 
 /* Download Now */

@@ -39,9 +39,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        $this->newPolicyTerms($manager);
-        $manager->flush();
-
         $users = $this->newUsers($manager);
         $manager->flush();
 
@@ -63,14 +60,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->newPolicy($manager, $user, $count);
 
         $manager->flush();
-    }
-
-    private function newPolicyTerms($manager)
-    {
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(true);
-        $policyTerms->setVersion('Version 1 May 2016');
-        $manager->persist($policyTerms);
     }
 
     private function newUsers($manager)
@@ -165,7 +154,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (rand(0, 1) == 0) {
             $payment = new JudoPayment();
             $payment->setDate($paymentDate);
-            $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+            $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(clone $startDate));
             $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $payment->setReceipt(rand(1, 999999) + rand(1, 999999));
@@ -175,13 +164,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             for ($i = 1; $i <= $months; $i++) {
                 $payment = new JudoPayment();
                 $payment->setDate(clone $paymentDate);
-                $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+                $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(clone $startDate));
                 $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
                 if ($months == 12) {
                     $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
                 }
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
-                $payment->setReceipt(rand(1, 999999));
+                $payment->setReceipt(rand(1, 999999) + rand(1, 999999));
                 $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));
                 if (rand(0, 3) == 0) {
