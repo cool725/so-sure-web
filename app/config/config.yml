@@ -65,6 +65,7 @@ twig:
         consumer_payout: 17.2
         ipt_rebate: 1.5
         davies_ip: %davies_ip%
+        environment: %kernel.environment%
 
 doctrine_mongodb:
     connections:

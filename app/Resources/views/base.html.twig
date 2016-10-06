@@ -40,6 +40,10 @@
         })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
         <!-- End Google Tag Manager -->
 
+        {% if environment != 'prod' and app.request.get('hide_env') != '1' %}
+            <div style="background-color: red; text-align: center; color: white;"><strong>{{ environment }}</strong></div>
+        {% endif %}
+
         {% block nav %}
             {% include '::nav.html.twig' %}
         {% endblock %}
