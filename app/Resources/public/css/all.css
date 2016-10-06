@@ -296,10 +296,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .download-now {
     background-color: #FFF;
-    padding: 60px 20px 100px 20px;
+    padding: 80px 20px 150px 20px;
     text-align: center;
     color: #202532;
-    border-top: #efefef 2px solid;
 }
 .download-now p {
     color: #626B78;
