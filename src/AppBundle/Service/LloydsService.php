@@ -52,7 +52,10 @@ class LloydsService
                     // Expected something like MDIR  8008566SEP21 8008566
                     if (stripos($line['Transaction Description'], 'MDIR') === false ||
                         count($processedDates) < 2) {
-                        $this->logger->warning(sprintf('Skipping line as unable to parse description. %s', implode($line)));
+                        $this->logger->warning(sprintf(
+                            'Skipping line as unable to parse description. %s',
+                            implode($line)
+                        ));
                         continue;
                     }
                     $processedDate = new \DateTime($processedDates[1]);
