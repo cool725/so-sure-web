@@ -86,7 +86,7 @@ class DeviceAtlasService
         if (!$html) {
             $html = 'No missing browsers';
         }
-        $this->mailerService->send('Mobile browsers not in db', 'tech@so-sure.com', $html);
+        $this->mailerService->send('Mobile browsers not in db', 'analysis@so-sure.com', $html);
     }
 
     /**
