@@ -746,7 +746,7 @@ class ApiController extends BaseController
         $message = \Swift_Message::newInstance()
             ->setSubject('Unknown Device/Memory')
             ->setFrom('tech@so-sure.com')
-            ->setTo('tech@so-sure.com')
+            ->setTo('analysis@so-sure.com')
             ->setBody($body, 'text/html');
         $this->get('mailer')->send($message);
 
