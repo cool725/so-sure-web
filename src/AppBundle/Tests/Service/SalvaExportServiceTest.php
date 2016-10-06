@@ -208,6 +208,12 @@ class SalvaExportServiceTest extends WebTestCase
         $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION * $numPayments, $data[19], json_encode($data));
     }
 
+    private function validateFullYearPolicyPayments($data, $policy)
+    {
+        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $data[16], json_encode($data));
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $data[19], json_encode($data));
+    }
+
     private function validateProratedPolicyPayments($data, $policy, $days, $daysInYear = 366)
     {
         $this->assertEquals($this->toTwoDp(
@@ -371,6 +377,7 @@ class SalvaExportServiceTest extends WebTestCase
         $refund->setRefundTotalCommission(0 - $refundCommissionAmount);
         $refund->setReceipt(sprintf('R-%s', rand(1, 999999)));
         $refund->setResult(JudoPayment::RESULT_SUCCESS);
+        //$refund->setDate($date->add(new \DateInterval('PT1S')));
         $refund->setDate($date);
 
         $policy->addPayment($refund);
@@ -486,6 +493,39 @@ class SalvaExportServiceTest extends WebTestCase
         $this->validateStaticPolicyData($data, $updatedPolicy);
     }
 
+    public function testExportAleksFailedTest()
+    {
+        $policy = $this->createPolicy('export-failed-test', new \DateTime('2016-10-01'), false);
+
+        $version = static::$salva->incrementPolicyNumber($policy, new \DateTime('2016-10-03'));
+
+        $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-10-05 17:00'));
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+
+        $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
+        $this->assertEquals(2, count($lines));
+        $data1 = explode('","', trim($lines[0], '"'));
+        $data2 = explode('","', trim($lines[1], '"'));
+
+        $this->assertEquals(3, $updatedPolicy->getSalvaDaysInPolicy(1));
+        $this->assertEquals(2, $updatedPolicy->getSalvaDaysInPolicy(null));
+
+        $this->validateStaticPolicyData($data1, $updatedPolicy);
+        $this->validateStaticPolicyData($data2, $updatedPolicy);
+
+        $this->validatePolicyData($data1, $updatedPolicy, 1, Policy::STATUS_CANCELLED, 0);
+        $this->validatePolicyData($data2, $updatedPolicy, 2, Policy::STATUS_CANCELLED, 0);
+
+        // should be the full year's payment
+        $this->validateFullYearPolicyPayments($data1, $updatedPolicy);
+        $this->validateProratedPolicyAmounts($data1, $updatedPolicy, 3, 365);
+
+        // and a big refund
+        $this->validateProratedPolicyPayments($data2, $updatedPolicy, -360, 365);
+        $this->validateProratedPolicyAmounts($data2, $updatedPolicy, 2, 365);
+    }
+
     public function testBasicWreckageExportYearlyPoliciesXml()
     {
         $policy = $this->createPolicy('basic-export-yearly-wreckage-xml', new \DateTime('2016-01-01'), false);
@@ -504,6 +544,7 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
         $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
-        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.53</n1:usedFinalPremium>', $xml);
+        // 6.38 gwp / 76.60 yearly gpw  * (153 - 32) / 366 = 25.32
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.32</n1:usedFinalPremium>', $xml);
     }
 }

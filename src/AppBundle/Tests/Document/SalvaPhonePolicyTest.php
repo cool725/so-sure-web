@@ -143,6 +143,7 @@ class SalvaPhonePolicyTest extends WebTestCase
      */
     public function testGetTotalGwpAnnualNoClaimNonVersioned()
     {
+        // 76.60 * 32 / 366 = 6.70
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_COOLOFF, new \DateTime('2016-01-10'), 0);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-01-10'), 76.60);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2016-01-10'), 76.60);
@@ -154,6 +155,7 @@ class SalvaPhonePolicyTest extends WebTestCase
     public function testGetTotalGwpMonthlyNoClaimNonVersioned()
     {
         // @codingStandardsIgnoreStart
+        // 76.60 / 12 = 6.38
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_COOLOFF, new \DateTime('2016-01-10'), 0, false, false, false);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-01-10'), 6.38, false, false, false);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2016-01-10'), 6.38, false, false, false);
@@ -167,17 +169,20 @@ class SalvaPhonePolicyTest extends WebTestCase
     {
         // @codingStandardsIgnoreStart
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_COOLOFF, new \DateTime('2016-01-10'), -0.42, false, true);
+        // 76.60 - 0.42 = 76.18
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-01-10'), 76.18, false, true);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2016-01-10'), 76.18, false, true);
-        $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-01'), 6.49, false, true);
-        $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_WRECKAGE, new \DateTime('2016-02-01'), 6.49, false, true);
-        $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_DISPOSSESSION, new \DateTime('2016-02-01'), 6.49, false, true);
+        // 76.60 * 32/366 - 0.42 = 6.28
+        $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-01'), 6.28, false, true);
+        $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_WRECKAGE, new \DateTime('2016-02-01'), 6.28, false, true);
+        $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_DISPOSSESSION, new \DateTime('2016-02-01'), 6.28, false, true);
         // @codingStandardsIgnoreEnd
     }
 
     public function testGetTotalGwpMonthlyNoClaimVersioned()
     {
         // @codingStandardsIgnoreStart
+        // 76.60 / 12 = 6.38 - 0.42 = 5.96
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_COOLOFF, new \DateTime('2016-01-10'), -0.42, false, true, false);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-01-10'), 5.96, false, true, false);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2016-01-10'), 5.96, false, true, false);
@@ -202,6 +207,7 @@ class SalvaPhonePolicyTest extends WebTestCase
     public function testGetTotalGwpMonthlyClaimNonVersioned()
     {
         // @codingStandardsIgnoreStart
+        // 76.60 / 12 = 6.38
         // cooloff not possible w/claim
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-01-10'), 6.38, true, false, false);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2016-01-10'), 6.38, true, false, false);
@@ -214,6 +220,7 @@ class SalvaPhonePolicyTest extends WebTestCase
     public function testGetTotalGwpAnnualClaimVersioned()
     {
         // @codingStandardsIgnoreStart
+        // 76.60 - 0.42 = 76.18
         // cooloff not possible w/claim
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-01-10'), 76.18, true, true);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2016-01-10'), 76.18, true, true);
@@ -226,6 +233,7 @@ class SalvaPhonePolicyTest extends WebTestCase
     public function testGetTotalGwpMonthlyClaimVersioned()
     {
         // @codingStandardsIgnoreStart
+        // 76.60 / 12 = 6.38 - 0.42 = 5.96
         // cooloff not possible w/claim
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-01-10'), 5.96, true, true, false);
         $this->runTestTotalGwp(SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2016-01-10'), 5.96, true, true, false);
@@ -353,5 +361,26 @@ class SalvaPhonePolicyTest extends WebTestCase
         $this->assertEquals(1, $policy->getSalvaDaysInPolicy($version));
 
         $this->assertEquals(360, $policy->getSalvaDaysInPolicy(null));
+    }
+
+    public function testGetSalvaDaysInPolicyAleksFailedTest()
+    {
+        $tz = new \DateTimeZone(Salva::SALVA_TIMEZONE);
+        $policy = static::createUserPolicy(true, new \DateTime('2016-10-01', $tz));
+        $this->assertEquals(365, $policy->getSalvaDaysInPolicy(null));
+
+        $version = $policy->incrementSalvaPolicyNumber(new \DateTime('2016-10-03', $tz));
+        $this->assertEquals(3, $policy->getSalvaDaysInPolicy($version));
+        // 84.26 totol premium * 3/365 = 0.69
+        $this->assertEquals(0.69, $policy->getTotalPremiumPrice($version));
+        // 10.72 * 2/365 = 0.09
+        $this->assertEquals(0.09, $policy->getTotalBrokerFee($version));
+
+        $version = $policy->incrementSalvaPolicyNumber(new \DateTime('2016-10-05 17:00', $tz));
+        $this->assertEquals(2, $policy->getSalvaDaysInPolicy($version));
+        // 84.26 totol premium * 2/365 = 0.46
+        $this->assertEquals(0.46, $policy->getTotalPremiumPrice($version));
+        // 10.72 * 2/365 = 0.06
+        $this->assertEquals(0.06, $policy->getTotalBrokerFee($version));
     }
 }

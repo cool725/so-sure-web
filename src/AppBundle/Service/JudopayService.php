@@ -169,7 +169,7 @@ class JudopayService
         }
         $user->setPaymentMethod($judo);
 
-        $payment = $this->validateReceipt($policy, $receiptId, $cardToken);
+        $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $date);
 
         $this->validateUser($policy->getUser());
         $this->policyService->create($policy, $date);
@@ -234,7 +234,7 @@ class JudopayService
      * @param string $receiptId
      * @param string $cardToken Can be null if card is declined
      */
-    public function validateReceipt(Policy $policy, $receiptId, $cardToken)
+    public function validateReceipt(Policy $policy, $receiptId, $cardToken, \DateTime $date = null)
     {
         $transactionDetails = $this->getReceipt($receiptId);
         $repo = $this->dm->getRepository(JudoPayment::class);
@@ -252,6 +252,9 @@ class JudopayService
         $payment->setAmount($transactionDetails["amount"]);
         $payment->setResult($transactionDetails["result"]);
         $payment->setMessage($transactionDetails["message"]);
+        if ($date) {
+            $payment->setDate($date);
+        }
         $policy->addPayment($payment);
 
         $judoPaymentMethod = $policy->getUser()->getPaymentMethod();

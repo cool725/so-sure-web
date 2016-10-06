@@ -252,19 +252,14 @@ class SalvaPhonePolicy extends PhonePolicy
             $endDate = $this->getSalvaTerminationDate($version);
         } elseif ($this->getStatus() == SalvaPhonePolicy::STATUS_CANCELLED) {
             if ($this->isRefundAllowed()) {
-                $endDate = $this->getEnd();
+                $endDate = clone $this->getEnd();
             } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-                $endDate = $this->getNextBillingDate($this->getEnd());
+                $endDate = $this->getNextBillingDate(clone $this->getEnd());
             }
         }
 
         if (!$endDate) {
             $endDate = clone $this->getStaticEnd();
-            // due to adjusting the end date to beginning of next day below,
-            // TODO: Refactor
-            if (!$version && count($this->getSalvaPolicyNumbers()) > 0) {
-                $endDate = $endDate->sub(new \DateInterval('P1D'));
-            }
         }
 
         // special case to count first day, if versioned on first day
@@ -275,6 +270,12 @@ class SalvaPhonePolicy extends PhonePolicy
         // same day versioning
         if ($endDate < $startDate) {
             return 0;
+        }
+
+        // due to adjusting the end date to beginning of next day below,
+        // TODO: Refactor
+        if (!$version && count($this->getSalvaPolicyNumbers()) > 0) {
+            $endDate = $endDate->sub(new \DateInterval('P1D'));
         }
 
         // always bill to end of day (next day 00:00) to account for partial days
