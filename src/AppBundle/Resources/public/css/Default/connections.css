@@ -12,6 +12,11 @@
 	width: 60% !important;
 	height: 35px !important;
 }
+@media (max-width: 543px) {
+	#connection-slider {
+		width: 100% !important;
+	}
+}
 #connection-slider .slider-handle {
 	background: #3399FF;
 }
