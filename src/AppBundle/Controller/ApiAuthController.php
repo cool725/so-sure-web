@@ -679,7 +679,11 @@ class ApiAuthController extends BaseController
         } catch (\InvalidArgumentException $e) {
             $this->get('logger')->error('User is invalid', ['exception' => $e]);
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS, 'User is missing required details', 422);
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
+                'User is missing required details',
+                422
+            );
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
