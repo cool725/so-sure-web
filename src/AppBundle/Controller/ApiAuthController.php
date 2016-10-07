@@ -657,13 +657,33 @@ class ApiAuthController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED, 'Payment not valid', 422);
         } catch (PaymentDeclinedException $e) {
+            $this->get('logger')->info(sprintf(
+                'Payment declined policy %s receipt %s.',
+                $id,
+                $this->getDataString($judoData, 'receipt_id')
+            ), ['exception' => $e]);
+
             // Status should be set to null to avoid trigger monitoring alerts
             $policy->setStatus(null);
             $dm->flush();
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
         } catch (AccessDeniedException $ade) {
+            $this->get('logger')->warning(sprintf(
+                'Access denied policy %s receipt %s.',
+                $id,
+                $this->getDataString($judoData, 'receipt_id')
+            ), ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\InvalidArgumentException $e) {
+            $this->get('logger')->error('User is invalid', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
+                'User is missing required details',
+                422
+            );
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
