@@ -151,6 +151,10 @@ class JudopayService
             return true;
         }
 
+        // Mark policy as pending for monitoring purposes
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $this->dm->flush();
+
         $user = $policy->getUser();
 
         $judo = new JudoPaymentMethod();

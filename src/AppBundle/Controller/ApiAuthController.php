@@ -657,6 +657,10 @@ class ApiAuthController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED, 'Payment not valid', 422);
         } catch (PaymentDeclinedException $e) {
+            // Status should be set to null to avoid trigger monitoring alerts
+            $policy->setStatus(null);
+            $dm->flush();
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);

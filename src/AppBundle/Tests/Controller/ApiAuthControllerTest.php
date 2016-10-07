@@ -1271,6 +1271,13 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => $receiptId,
         ]]);
         $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        $policy = $repo->find($data['id']);
+
+        // ensure status is reset to null to avoid trigger monitoring alerts
+        $this->assertNull($policy->getStatus());
     }
 
     public function testNewPolicyJudopayInvalidPremium()

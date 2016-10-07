@@ -156,6 +156,36 @@ class JudopayServiceTest extends WebTestCase
         $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
     }
 
+    public function testJudoExceptionStatusPending()
+    {
+        $user = $this->createValidUser(static::generateEmail('judo-exception-pending', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $judo = new JudoPaymentMethod();
+        $judo->setCustomerToken('ctoken');
+        $judo->addCardToken('token', null);
+        $user->setPaymentMethod($judo);
+        static::$dm->flush();
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            '1.01',
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        try {
+            $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        } catch (\Exception $e) {
+            // expected exception - ignore
+            $this->assertNotNull($e);
+        }
+
+        $this->assertEquals(Policy::STATUS_PENDING, $policy->getStatus());
+    }
+
     /**
      * @expectedException AppBundle\Exception\PaymentDeclinedException
      */
