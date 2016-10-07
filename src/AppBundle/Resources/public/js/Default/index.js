@@ -21,3 +21,14 @@
             scrollTop: $("#download-now").offset().top
         }, 1500);
     });
+
+    var iframe = document.getElementById('exp-vid');
+    var player = $f(iframe);
+
+    $('.modal').on('hidden.bs.modal', function () {
+      player.api('pause');
+    })
+
+    $('.modal').on('shown.bs.modal', function () {
+      player.api('play');
+    })
