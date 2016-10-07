@@ -5,14 +5,19 @@ namespace AppBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
-/** @MongoDB\EmbeddedDocument */
+/**
+ * @MongoDB\EmbeddedDocument
+ * @Gedmo\Loggable
+*/
 class JudoPaymentMethod extends PaymentMethod
 {
     /**
      * @AppAssert\Token()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
      */
     protected $customerToken;
 
@@ -25,6 +30,7 @@ class JudoPaymentMethod extends PaymentMethod
      * @AppAssert\Token()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
      */
     protected $cardToken;
 
@@ -32,11 +38,13 @@ class JudoPaymentMethod extends PaymentMethod
      * @AppAssert\Token()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
      */
     protected $cardTokenHash;
 
     /**
      * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
      */
     protected $deviceDna;
 

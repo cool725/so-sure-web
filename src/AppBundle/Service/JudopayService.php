@@ -295,6 +295,12 @@ class JudopayService
         } elseif ($this->areEqualToFourDp($payment->getAmount(), $policy->getPremium()->getMonthlyPremiumPrice())) {
             // This is always the first payment, so shouldn't have to worry about the final one
             $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        } else {
+            $this->logger->error(sprintf(
+                'Failed set correct commission for %f (policy %s)',
+                $payment->getAmount(),
+                $policy->getId()
+            ));
         }
 
         return $payment;
