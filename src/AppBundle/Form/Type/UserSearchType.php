@@ -57,7 +57,10 @@ class UserSearchType extends AbstractType
                 'choices' => [
                     'IMEI' => [
                         '355424073417084' => 'Patrick iPhone',
-                        '353287074257748' => 'iPhone 6S Plus'
+                        '353287074257748' => 'iPhone 6S Plus',
+                        '013834002513072' => 'Julien 5c',
+                        '353627075075872' => 'Jamie Nexus 5X',
+                        '359285060633868' => 'Jamie iPhone',
                     ],
                     'Facebook' => [
                         '10153878106240169' => 'Patrick'
