@@ -37,6 +37,10 @@ class InvitationService
     const TYPE_EMAIL_CANCEL = 'cancel';
     const TYPE_EMAIL_INVITE = 'invite';
     const TYPE_EMAIL_REINVITE = 'reinvite';
+    const TYPE_EMAIL_INVITE_USER = 'invite-user';
+
+    const TYPE_SMS_INVITE = 'invite';
+    const TYPE_SMS_INVITE_USER = 'invite-user';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -139,6 +143,22 @@ class InvitationService
         return $invitationUrl;
     }
 
+    public function setInvitee(Invitation $invitation)
+    {
+        $userRepo = $this->dm->getRepository(User::class);
+        if ($invitation instanceof EmailInvitation) {
+            $user = $userRepo->findOneBy(['emailCanonical' => $invitation->getEmail()]);
+            if ($user && $invitation->getInviter()->getId() != $user->getId()) {
+                $invitation->setInvitee($user);
+            }
+        } elseif ($invitation instanceof SmsInvitation) {
+            $user = $userRepo->findOneBy(['mobileNumber' => $invitation->getMobile()]);
+            if ($user && $invitation->getInviter()->getId() != $user->getId()) {
+                $invitation->setInvitee($user);
+            }
+        }
+    }
+
     public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
     {
         $this->validatePolicy($policy);
@@ -187,7 +207,11 @@ class InvitationService
         }
 
         if (!$skipSend) {
-            $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+  	    if ($invitation->getInvitee()) {
+	        $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE_USER);
+	    } else {
+	        $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+	    }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
         }
 
@@ -243,7 +267,11 @@ class InvitationService
         }
 
         if (!$skipSend) {
-            $this->sendSms($invitation);
+            if ($invitation->getInvitee()) {
+                $this->sendSms($invitation, self::TYPE_SMS_INVITE_USER);
+            } else {
+                $this->sendSms($invitation, self::TYPE_SMS_INVITE);
+            }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
         }
 
@@ -328,6 +356,13 @@ class InvitationService
             }
             $to = $invitation->getEmail();
             $subject = sprintf('%s has invited you to so-sure', $invitation->getInviterName());
+        } elseif ($type == self::TYPE_EMAIL_INVITE_USER) {
+            // Only able to do for EmailInvitations
+            if (!$invitation instanceof EmailInvitation) {
+                return;
+            }
+            $to = $invitation->getEmail();
+            $subject = sprintf('%s wants to connect with your on so-sure', $invitation->getInviterName());
         } elseif ($type == self::TYPE_EMAIL_REINVITE) {
             // Only able to do for EmailInvitations
             if (!$invitation instanceof EmailInvitation) {
@@ -375,7 +410,7 @@ class InvitationService
      *
      * @param SmsInvitation $invitation
      */
-    protected function sendSms(SmsInvitation $invitation)
+    protected function sendSms(SmsInvitation $invitation, $type)
     {
         if ($this->debug) {
             // Useful for testing
@@ -384,7 +419,8 @@ class InvitationService
             return;
         }
 
-        $message = $this->templating->render('AppBundle:Sms:invitation.txt.twig', ['invitation' => $invitation]);
+        $smsTemplate = sprintf('AppBundle:Sms:%s.txt.twig', $type);
+        $message = $this->templating->render($smsTemplate, ['invitation' => $invitation]);
         if ($this->sms->send($invitation->getMobile(), $message)) {
             $invitation->setStatus(SmsInvitation::STATUS_SENT);
         } else {
