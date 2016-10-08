@@ -1,0 +1,12 @@
+.doughnut-outer {
+    width: 500px;
+    height: 300px;
+    text-align: center;
+}
+.doughnut-inner {
+   margin-top: -170px;
+   margin-bottom: 100px;
+}
+.doughnut-inner span {
+    font-size: 12px;
+}
