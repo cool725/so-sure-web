@@ -103,7 +103,6 @@ class PhonePolicyRepository extends PolicyRepository
 
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
-                Policy::STATUS_PENDING,
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,

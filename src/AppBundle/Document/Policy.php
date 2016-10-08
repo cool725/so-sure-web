@@ -1357,9 +1357,9 @@ abstract class Policy
 
     public function isBillablePolicy()
     {
-        // We should only bill policies that are pending, active or unpaid
+        // We should only bill policies that are active or unpaid
         // Doesn't make sense to bill expired or cancelled policies
-        return in_array($this->getStatus(), [self::STATUS_PENDING, self::STATUS_ACTIVE, self::STATUS_UNPAID]);
+        return in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]);
     }
 
     public function getSentInvitations()
