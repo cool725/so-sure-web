@@ -378,6 +378,9 @@ class InvitationService
     protected function sendSms(SmsInvitation $invitation)
     {
         if ($this->debug) {
+            // Useful for testing
+            $this->addSmsCharge($invitation);
+
             return;
         }
 
@@ -388,6 +391,11 @@ class InvitationService
             $invitation->setStatus(SmsInvitation::STATUS_FAILED);
         }
 
+        $this->addSmsCharge($invitation);
+    }
+
+    public function addSmsCharge(SmsInvitation $invitation)
+    {
         $charge = new Charge();
         $charge->setType(Charge::TYPE_SMS);
         $charge->setUser($invitation->getInviter());

@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\LostPhone;
@@ -1682,6 +1683,35 @@ class ApiAuthControllerTest extends BaseControllerTest
             'name' => 'functional test',
         ]);
         $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
+    }
+
+    public function testSmsSkipSendInvitation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('sms-skip-send', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'mobile' => '+447700900003',
+            'name' => 'functional test',
+            'skip_send' => true,
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('+447700900003', $data['invitation_detail']);
+        $this->assertEquals('functional test', $data['name']);
+
+        // sending sms should trigger a charge db entry
+        $repo = $dm->getRepository(Charge::class);
+        $charge = $repo->findOneBy(['details' => '+447700900003']);
+        $this->assertNull($charge);
     }
 
     public function testSmsValidationInvitation()
