@@ -286,6 +286,16 @@ h1, h2, h3, h4, h5, h6 {
 .login #password, #fos_user_resetting_form_new_second {
     margin-top: 0px;
 }
+.reset-error-box {
+    border: 2px solid red !important;
+}
+.reset-error {
+    font-weight: bold;
+    color: red;
+}
+.reset-error li {
+    list-style: none;
+}
 .flash {
     padding: 5px;
     border-radius: 5px;
