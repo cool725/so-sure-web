@@ -1,5 +1,5 @@
 {% set include_emoji = 1 %}
-{% extends 'base.html.twig' %}
+{% extends 'ouibounce_base.html.twig' %}
 
 {% block title %}so-sure -
     {{ phone }}{% endblock %}
@@ -13,7 +13,7 @@
     {% javascripts
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
     'bundles/app/js/Default/slider.js'
-    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Default/quote.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
