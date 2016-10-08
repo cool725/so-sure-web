@@ -139,7 +139,7 @@ class InvitationService
         return $invitationUrl;
     }
 
-    public function inviteByEmail(Policy $policy, $email, $name = null)
+    public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
     {
         $this->validatePolicy($policy);
 
@@ -186,13 +186,15 @@ class InvitationService
             $this->dm->flush();
         }
 
-        $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
-        $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+        if (!$skipSend) {
+            $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+            $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+        }
 
         return $invitation;
     }
 
-    public function inviteBySms(Policy $policy, $mobile, $name = null)
+    public function inviteBySms(Policy $policy, $mobile, $name = null, $skipSend = null)
     {
         $mobile = $this->normalizeUkMobile($mobile);
         $this->validatePolicy($policy);
@@ -240,10 +242,10 @@ class InvitationService
             $this->dm->flush();
         }
 
-        $this->sendSms($invitation);
-        $this->dm->flush();
-
-        $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+        if (!$skipSend) {
+            $this->sendSms($invitation);
+            $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+        }
 
         return $invitation;
     }
@@ -392,6 +394,7 @@ class InvitationService
         $charge->setPolicy($invitation->getPolicy());
         $charge->setDetails($invitation->getMobile());
         $this->dm->persist($charge);
+        $this->dm->flush();
     }
 
     protected function validatePolicy(Policy $policy)
