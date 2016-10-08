@@ -721,6 +721,7 @@ abstract class Policy
             $this->getStart()->format("Y"),
             $initialPolicyNumber + $seq
         ));
+        $this->setStatus(self::STATUS_PENDING);
         if (count($this->getSCodes()) == 0) {
             $this->addSCode(new SCode());
         }
