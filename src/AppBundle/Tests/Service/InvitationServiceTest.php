@@ -204,6 +204,31 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof EmailInvitation);
     }
 
+    public function testSmsInvitationInvitee()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('sms-invitee1', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('sms-invitee2', $this),
+            'bar'
+        );
+        $mobile = static::generateRandomMobile();
+        $userInvitee->setMobileNumber($mobile);
+        static::$dm->flush();
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteBySms($policy, $mobile);
+        $this->assertTrue($invitation instanceof SmsInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
+    }
+
     /**
      * @expectedException AppBundle\Exception\DuplicateInvitationException
      */
@@ -502,6 +527,28 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation->isAccepted());
         $this->assertEquals(10, $policy->getPotValue());
         $this->assertEquals(10, $policyInvitee->getPotValue());
+    }
+
+    public function testEmailInvitationInvitee()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-invitee1', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-invitee2', $this),
+            'bar'
+        );
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('user-invitee2', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
     }
 
     /**
