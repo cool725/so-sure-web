@@ -207,11 +207,11 @@ class InvitationService
         }
 
         if (!$skipSend) {
-  	    if ($invitation->getInvitee()) {
-	        $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE_USER);
-	    } else {
-	        $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
-	    }
+            if ($invitation->getInvitee()) {
+                $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE_USER);
+            } else {
+                $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+            }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
         }
 
