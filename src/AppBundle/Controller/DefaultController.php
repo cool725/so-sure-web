@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\User;
@@ -15,6 +16,8 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
+use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\SmsAppLinkType;
 use AppBundle\Form\Type\LeadEmailType;
@@ -417,5 +420,40 @@ class DefaultController extends BaseController
 
             return new RedirectResponse($this->generateUrl('fos_user_security_login'));
         }
+    }
+
+    /**
+     * @Route("/optout", name="optout")
+     * @Template()
+     */
+    public function optOutAction(Request $request)
+    {
+        $form = $this->createFormBuilder()
+            ->add('email', EmailType::class, array(
+                'label' => "Email",
+            ))
+            ->add('decline', SubmitType::class, array(
+                'label' => "Opt out",
+                'attr' => ['class' => 'btn btn-danger'],
+            ))
+            ->getForm();
+
+        $hash = $request->get('hash');
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $hash = urlencode(base64_encode($form->getData()['email']));
+        }
+
+        if ($hash) {
+            $email = base64_decode(urldecode($hash));
+            $invitationService = $this->get('app.invitation');
+            $invitationService->optout($email, EmailOptOut::OPTOUT_CAT_ALL);
+            $invitationService->rejectAllInvitations($email);
+        }
+
+        return array(
+            'email' => $email,
+            'form_optout' => $form->createView(),
+        );
     }
 }
