@@ -197,6 +197,7 @@ class InvitationService
             $invitation->setEmail($email);
             $invitation->setPolicy($policy);
             $invitation->setName($name);
+            $this->setInvitee($invitation);
             $invitation->invite();
             $this->dm->persist($invitation);
             $this->dm->flush();
@@ -257,6 +258,7 @@ class InvitationService
             $invitation->setMobile($mobile);
             $invitation->setPolicy($policy);
             $invitation->setName($name);
+            $this->setInvitee($invitation);
             $invitation->invite();
             $this->dm->persist($invitation);
             $this->dm->flush();
