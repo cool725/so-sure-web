@@ -408,13 +408,6 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.validate, method: onValidateEvent }
 
-    app.listener.invitation:
-        class:   AppBundle\Listener\InvitationListener
-        arguments:
-            dm: "@doctrine_mongodb.odm.default_document_manager"
-        tags:
-            -  { name: kernel.event_listener, event: event.invitation.updated, method: onInvitationEvent }
-
     app.listener.user:
         class:   AppBundle\Listener\UserListener
         arguments:
