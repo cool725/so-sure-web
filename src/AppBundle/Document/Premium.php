@@ -73,33 +73,6 @@ abstract class Premium
         return $this->getGwp() + $this->getIpt();
     }
 
-    public function sumPremiumPrice($months)
-    {
-        if ($months == 12) {
-            return $this->getYearlyPremiumPrice();
-        }
-
-        return $this->toTwoDp($this->getMonthlyPremiumPrice() * $months);
-    }
-
-    public function sumGwp($months)
-    {
-        if ($months == 12) {
-            return $this->getYearlyGwp();
-        }
-
-        return $this->toTwoDp($this->getGwp() * $months);
-    }
-
-    public function sumIpt($months)
-    {
-        if ($months == 12) {
-            return $this->getYearlyIpt();
-        }
-
-        return $this->toTwoDp($this->getIpt() * $months);
-    }
-
     public function getYearlyPremiumPrice()
     {
         return $this->toTwoDp($this->getMonthlyPremiumPrice() * 12);
@@ -114,11 +87,16 @@ abstract class Premium
     public function getYearlyIpt()
     {
         // Calculate based on yearly figure
-        return $this->toTwoDp($this->getYearlyPremiumPrice() - $this->getYearlyGwpActual());
+        return $this->toTwoDp($this->getYearlyIptActual());
     }
 
-    protected function getYearlyGwpActual()
+    public function getYearlyGwpActual()
     {
         return $this->getYearlyPremiumPrice() / (1 + $this->getIptRate());
+    }
+
+    public function getYearlyIptActual()
+    {
+        return $this->getYearlyGwpActual() * $this->getIptRate();
     }
 }

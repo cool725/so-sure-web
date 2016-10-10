@@ -131,7 +131,9 @@ trait UserClassTrait
             }
             $payment = new JudoPayment();
             if ($date) {
-                $payment->setDate($date);
+                $newDate = clone $date;
+                $newDate->add(new \DateInterval('PT1S'));
+                $payment->setDate($newDate);
             }
             if ($monthly) {
                 $policy->setPremiumInstallments(12);

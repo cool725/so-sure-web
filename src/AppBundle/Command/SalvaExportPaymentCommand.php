@@ -46,6 +46,7 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
             $output->writeln(sprintf('Using last month %s', $date->format('Y-m')));
         }
         $salva = $this->getContainer()->get('app.salva');
-        $output->write($salva->exportPayments($s3, $date));
+        $data = $salva->exportPayments($s3, $date);
+        $output->write(implode(PHP_EOL, $data));
     }
 }

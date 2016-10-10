@@ -440,6 +440,7 @@ services:
     app.listener.refund:
         class:   AppBundle\Listener\RefundListener
         arguments:
+            dm:      "@doctrine_mongodb.odm.default_document_manager"
             judopay: "@app.judopay"
             logger:  "@logger"
         tags:

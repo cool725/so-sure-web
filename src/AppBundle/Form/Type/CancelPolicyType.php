@@ -17,22 +17,23 @@ class CancelPolicyType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $policy = $builder->getData()->getPolicy();
-        $data = [
-            Policy::CANCELLED_ACTUAL_FRAUD => 'Fraud (actual)',
-            Policy::CANCELLED_SUSPECTED_FRAUD => 'Fraud (suspected)',
-            Policy::CANCELLED_DISPOSSESSION => 'Dispossession',
-            Policy::CANCELLED_WRECKAGE => 'Wreckage',
-        ];
+        $data = [];
+        $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_ACTUAL_FRAUD, 'Fraud (actual)');
+        $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_SUSPECTED_FRAUD, 'Fraud (suspected)');
+        $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_DISPOSSESSION, 'Dispossession');
+        $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_WRECKAGE, 'Wreckage');
+
         $preferred = [];
         if ($policy->isWithinCooloffPeriod() && !$policy->hasMonetaryClaimed(true)) {
-            $data[Policy::CANCELLED_COOLOFF] = 'Cooloff';
+            $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_COOLOFF, 'Cooloff');
             $preferred[] = Policy::CANCELLED_COOLOFF;
         } else {
-            $data[Policy::CANCELLED_USER_REQUESTED] = 'User Requested';
+            $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_USER_REQUESTED, 'User Requested');
             $preferred[] = Policy::CANCELLED_USER_REQUESTED;
         }
+
         if ($policy->getStatus() == Policy::STATUS_UNPAID) {
-            $data[Policy::CANCELLED_UNPAID] = 'Unpaid';
+            $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_UNPAID, 'Unpaid');
             $preferred[] = Policy::CANCELLED_UNPAID;
         }
 
@@ -40,9 +41,19 @@ class CancelPolicyType extends AbstractType
             ->add('cancellationReason', ChoiceType::class, [
                 'choices' => $data,
                 'preferred_choices' => $preferred,
+                'placeholder' => 'Cancellation reason'
             ])
             ->add('cancel', SubmitType::class)
         ;
+    }
+
+    private function addCancellationReason($data, $policy, $reason, $name)
+    {
+        if ($policy->canCancel($reason)) {
+            $data[$reason] = $name;
+        }
+
+        return $data;
     }
 
     public function configureOptions(OptionsResolver $resolver)

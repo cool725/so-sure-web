@@ -670,6 +670,34 @@ abstract class Policy
         return $this->leadSource;
     }
 
+    public function setId($id)
+    {
+        if ($this->id) {
+            throw new \Exception('Can not reasssign id');
+        }
+
+        $this->id = $id;
+    }
+
+    public function getNextBillingDate($date)
+    {
+        $nextDate = new \DateTime();
+        $nextDate->setTime(0, 0);
+        if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+            $nextDate->setDate($date->format('Y'), $date->format('m'), $this->getStart()->format('d'));
+            if ($nextDate < $date) {
+                $nextDate->add(new \DateInterval('P1M'));
+            }
+        } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+            $nextDate->setDate($date->format('Y'), $this->getStart()->format('m'), $this->getStart()->format('d'));
+            if ($nextDate < $date) {
+                $nextDate->add(new \DateInterval('P1Y'));
+            }
+        }
+
+        return $nextDate;
+    }
+
     public function init(User $user, PolicyDocument $terms)
     {
         $user->addPolicy($this);
@@ -699,6 +727,7 @@ abstract class Policy
             // $startDate->add(new \DateInterval('PT10M'));
         }
 
+        // TODO: move to SalvaPhonePolicy
         // salva needs a end time of 23:59 in local time
         $startDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
 
@@ -730,18 +759,6 @@ abstract class Policy
     }
 
     abstract public function validatePremium($adjust, \DateTime $date);
-
-    public function getPolicyLength()
-    {
-        if (!$this->isPolicy()) {
-            return null;
-        }
-
-        $diff = $this->getEnd()->diff($this->getStart());
-        $months = $diff->y * 12 + $diff->m + $diff->d / 30;
-
-        return (int) ceil($months);
-    }
 
     public function getPremiumInstallmentCount()
     {
@@ -780,7 +797,65 @@ abstract class Policy
         }
     }
 
+    public function isRefundAllowed()
+    {
+        // For all cases, if there's a claim, then no not allow refund
+        // TODO: Should this be open claim???  Possibly shouldn't allow cancellation if there is an option claim
+        if ($this->hasMonetaryClaimed(true)) {
+            return false;
+        }
+
+        if ($this->getCancelledReason() == Policy::CANCELLED_UNPAID ||
+            $this->getCancelledReason() == Policy::CANCELLED_ACTUAL_FRAUD ||
+            $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
+            // Never refund for certain cancellation reasons
+            return false;
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED) {
+            // user has 30 days from when they requested cancellation
+            // however, as we don't easily have a scheduled cancellation
+            // we will start with a manual cancellation that should be done
+            // 30 days after they requested, such that the cancellation will be immediate then
+            return true;
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+            return true;
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_DISPOSSESSION ||
+            $this->getCancelledReason() == Policy::CANCELLED_WRECKAGE) {
+            return true;
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_BADRISK) {
+            throw new \UnexpectedValueException('Badrisk is not implemented');
+        }
+    }
+
     public function getRefundAmount($date = null)
+    {
+        // Just in case - make sure we don't refund for non-cancelled policies
+        if (!$this->isCancelled()) {
+            return 0;
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$this->isRefundAllowed()) {
+            return 0;
+        }
+
+        // 3 factors determine refund amount
+        // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
+
+        if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+            // Cooloff should always refund full amount (which should be equal to the last payment)
+            $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
+            $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+
+            return $paymentToRefund->getAmount();
+        } else {
+            return $this->getProratedRefundAmount($date);
+        }
+    }
+
+    public function getRefundCommissionAmount($date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -791,152 +866,82 @@ abstract class Policy
             return 0;
         }
 
+        if (!$this->isRefundAllowed()) {
+            return 0;
+        }
+
         // 3 factors determine refund amount
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
-        if ($this->getCancelledReason() == Policy::CANCELLED_UNPAID ||
-            $this->getCancelledReason() == Policy::CANCELLED_ACTUAL_FRAUD ||
-            $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
-            // Never refund for certain cancellation reasons
-            return 0;
-        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED) {
-            // user has 30 days from when they requested cancellation
-            // however, as we don't easily have a scheduled cancellation
-            // we will start with a manual cancellation that should be done
-            // 30 days after they requested, such that the cancellation will be immediate then
-            if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-                return 0;
-            } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
-                if ($this->hasMonetaryClaimed(true)) {
-                    return 0;
-                } else {
-                    // Still need to validate rules with Salva - for now, don't refund
-                    // return $this->monthlyProratedRefundAmount($date);
-                    return 0;
-                }
-            }
-        } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+
+        if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
             // Cooloff should always refund full amount (which should be equal to the last payment)
             $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
             $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
 
-            return $paymentToRefund->getAmount();
-        } elseif ($this->getCancelledReason() == Policy::CANCELLED_DISPOSSESSION ||
-            $this->getCancelledReason() == Policy::CANCELLED_WRECKAGE) {
-            if ($this->hasMonetaryClaimed(true)) {
-                return 0;
-            } else {
-                // Still need to validate rules with Salva - for now, don't refund
-                /*
-                if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-                    $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
-                    $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
-    
-                    return $paymentToRefund->getAmount();
-                } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
-                    return $this->monthlyProratedRefundAmount($date);
-                }
-                */
-                return 0;
-            }
-        } elseif ($this->getCancelledReason() == Policy::CANCELLED_BADRISK) {
-            throw new \UnexpectedValueException('Badrisk is not implemented');
-        }
-    }
-
-    public function monthlyProratedRefundAmount($date = null)
-    {
-        $remainingMonths = $this->getRemainingMonthsInPolicy($date);
-        // Refund is from next month's anniversary, so subtracting 1 month from remaning months is same
-        $remainingMonths--;
-        if ($remainingMonths >= 1) {
-            return $this->getPremium()->getMonthlyPremiumPrice() * $remainingMonths;
+            return $paymentToRefund->getTotalCommission();
         } else {
-            return 0;
+            return $this->getProratedRefundCommissionAmount($date);
         }
     }
 
-    public function getRemainingMonthsInPolicy($date)
+    public function getProratedRefundAmount($date = null)
     {
+        $used = $this->getPremium()->getYearlyPremiumPrice() * $this->getProrataMultiplier($date);
+        $paid = $this->getPremiumPaid();
+
+        return $this->toTwoDp($paid - $used);
+    }
+
+    public function getProratedRefundCommissionAmount($date = null)
+    {
+        // TODO: either make abstract to get the total commission, or move to a db collection
+        $used = Salva::YEARLY_TOTAL_COMMISSION * $this->getProrataMultiplier($date);
+        $paid = $this->getTotalCommissionPaid();
+
+        return $this->toTwoDp($paid - $used);
+    }
+
+    public function getDaysInPolicyYear()
+    {
+        if (!$this->isPolicy() || !$this->getStart()) {
+            throw new \Exception('Unable to determine days in policy as policy is not valid');
+        }
+
+        $leapYear = $this->getStart()->format('L');
+        if ($this->getStart()->format('m') > 2) {
+            $leapYear = $this->getStaticEnd()->format('L');
+        }
+
+        if ($leapYear === '1') {
+            return 366;
+        } else {
+            return 365;
+        }
+    }
+
+    public function getProrataMultiplier($date)
+    {
+        return $this->getDaysInPolicy($date) / $this->getDaysInPolicyYear();
+    }
+
+    public function getDaysInPolicy($date)
+    {
+        if (!$this->isPolicy() || !$this->getStart()) {
+            throw new \Exception('Unable to determine days in policy as policy is not valid');
+        }
         if (!$date) {
             $date = new \DateTime();
         }
+        $date = $this->endOfDay($date);
 
-        // Policy end date may already be changed to now, so use the original end date
-        $months = $date->diff($this->getStaticEnd())->m;
-
-        return $months;
-    }
-
-    public function getRemainingTotalPremiumPrice($payments)
-    {
-        return $this->toTwoDp($this->getTotalPremiumPrice() - $this->getTotalPremiumPrice($payments));
-    }
-
-    public function getTotalPremiumPrice($payments = null)
-    {
-        return $this->getPremium()->sumPremiumPrice($this->getMonthsForCancellationCalc($payments));
-    }
-
-    public function getRemainingTotalGwp($payments)
-    {
-        return $this->toTwoDp($this->getTotalGwp() - $this->getTotalGwp($payments));
-    }
-
-    public function getTotalGwp($payments = null)
-    {
-        return $this->getPremium()->sumGwp($this->getMonthsForCancellationCalc($payments));
-    }
-
-    public function getRemainingTotalIpt($payments)
-    {
-        return $this->toTwoDp($this->getTotalIpt() - $this->getTotalIpt($payments));
-    }
-
-    public function getTotalIpt($payments = null)
-    {
-        return $this->getPremium()->sumIpt($this->getMonthsForCancellationCalc($payments));
-    }
-
-    public function getRemainingTotalBrokerFee($payments)
-    {
-        return $this->toTwoDp($this->getTotalBrokerFee() - $this->getTotalBrokerFee($payments));
-    }
-
-    public function getTotalBrokerFee($payments = null)
-    {
-        $includeFinalCommission = false;
-        if ($payments) {
-            foreach ($payments as $payment) {
-                if ($payment->getTotalCommission() == Salva::FINAL_MONTHLY_TOTAL_COMMISSION) {
-                    $includeFinalCommission = true;
-                }
-            }
-        }
-        $salva = new Salva();
-
-        return $salva->sumBrokerFee($this->getMonthsForCancellationCalc($payments), $includeFinalCommission);
-    }
-
-    public function getMonthsForCancellationCalc($payments = null)
-    {
-        // Cooloff should always return 0
-        if ($this->getStatus() == self::STATUS_CANCELLED &&
-            $this->getCancelledReason() == self::CANCELLED_COOLOFF) {
-            return 0;
+        $diff = $this->getStart()->diff($date);
+        $days = $diff->days;
+        // Partial days count as a full day
+        if ($diff->h > 0 || $diff->i > 0 || $diff->s > 0) {
+            $days++;
         }
 
-        if ($payments === null) {
-            if ($this->getStatus() == self::STATUS_CANCELLED) {
-                // If we're cancelled, then just use what payments we've received
-                return count($this->getPayments());
-            }
-
-            // Otherwise entire year
-            return 12;
-        } else {
-            // Payments passed in (for salva date ranges)
-            return count($payments);
-        }
+        return $days;
     }
 
     public function getRemainingPremiumPaid($payments)
@@ -961,6 +966,25 @@ abstract class Policy
         }
 
         return $paid;
+    }
+
+    public function getGwpPaid($payments = null)
+    {
+        $gwp = 0;
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+        if ($payments === null) {
+            $payments = $this->getPayments();
+        }
+
+        foreach ($payments as $payment) {
+            if ($payment->isSuccess()) {
+                $gwp += $payment->getGwp();
+            }
+        }
+
+        return $gwp;
     }
 
     public function getRemainingTotalCommissionPaid($payments)
@@ -1139,15 +1163,36 @@ abstract class Policy
         return $claims;
     }
 
+    public function isClaimInProgress()
+    {
+        foreach ($this->claims as $claim) {
+            if ($claim->isOpen()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function isCancelled()
     {
         return $this->getStatus() == self::STATUS_CANCELLED;
+    }
+
+    public function isCooloffCancelled()
+    {
+        return $this->isCancelled() && $this->getCancelledReason() == self::CANCELLED_COOLOFF;
     }
 
     public function canCancel($reason, $date = null)
     {
         // Doesn't make sense to cancel
         if (in_array($this->getStatus(), [self::STATUS_CANCELLED, self::STATUS_EXPIRED])) {
+            return false;
+        }
+
+        // Any claims must be completed before cancellation is allowed
+        if ($this->isClaimInProgress()) {
             return false;
         }
 
@@ -1390,6 +1435,10 @@ abstract class Policy
     {
         if (!$this->getId()) {
             throw new \Exception('Unable to cancel a policy that is missing an id');
+        }
+
+        if (!$this->canCancel($reason, $date)) {
+            throw new \Exception('Unable to cancel policy');
         }
 
         if ($date == null) {

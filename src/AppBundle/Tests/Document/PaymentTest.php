@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Classes\Salva;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\JudoPayment;
@@ -38,5 +39,30 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
         $payment->calculateSplit();
         $this->assertEquals(4.57, $this->toTwoDp($payment->getGwp()));
         $this->assertEquals(0.43, $this->toTwoDp($payment->getIpt()));
+    }
+
+    public function testTotalCommission()
+    {
+        $payment = new JudoPayment();
+
+        // yearly
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        $this->assertEquals(Salva::YEARLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
+        $this->assertEquals(Salva::YEARLY_BROKER_COMMISSION, $payment->getBrokerCommission());
+
+        // monthly
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $this->assertEquals(Salva::MONTHLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
+        $this->assertEquals(Salva::MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
+
+        // final month
+        $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
+        $this->assertEquals(Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
+        $this->assertEquals(Salva::FINAL_MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
+
+        // partial
+        $payment->setTotalCommission(0.94);
+        $this->assertEquals(0.88, $payment->getCoverholderCommission());
+        $this->assertEquals(0.06, $payment->getBrokerCommission());
     }
 }
