@@ -474,12 +474,13 @@ class ApiAuthController extends BaseController
             $mobile = $this->getDataString($data, 'mobile');
             $name = $this->conformAlphanumericSpaceDot($this->getDataString($data, 'name'), 250);
             $scode = $this->getDataString($data, 'scode');
+            $skipSend = $this->getDataBool($data, 'skip_send');
             try {
                 $invitation  = null;
                 if ($email && $validator->isValid($email)) {
-                    $invitation = $invitationService->inviteByEmail($policy, $email, $name);
+                    $invitation = $invitationService->inviteByEmail($policy, $email, $name, $skipSend);
                 } elseif ($mobile && $this->isValidUkMobile($mobile)) {
-                    $invitation = $invitationService->inviteBySms($policy, $mobile, $name);
+                    $invitation = $invitationService->inviteBySms($policy, $mobile, $name, $skipSend);
                 } elseif ($scode && SCode::isValidSCode($scode)) {
                     $invitation = $invitationService->inviteBySCode($policy, $scode);
                 } else {

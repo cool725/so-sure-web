@@ -139,7 +139,7 @@ class InvitationService
         return $invitationUrl;
     }
 
-    public function inviteByEmail(Policy $policy, $email, $name = null)
+    public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
     {
         $this->validatePolicy($policy);
 
@@ -186,13 +186,15 @@ class InvitationService
             $this->dm->flush();
         }
 
-        $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
-        $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+        if (!$skipSend) {
+            $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+            $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+        }
 
         return $invitation;
     }
 
-    public function inviteBySms(Policy $policy, $mobile, $name = null)
+    public function inviteBySms(Policy $policy, $mobile, $name = null, $skipSend = null)
     {
         $mobile = $this->normalizeUkMobile($mobile);
         $this->validatePolicy($policy);
@@ -240,10 +242,10 @@ class InvitationService
             $this->dm->flush();
         }
 
-        $this->sendSms($invitation);
-        $this->dm->flush();
-
-        $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+        if (!$skipSend) {
+            $this->sendSms($invitation);
+            $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+        }
 
         return $invitation;
     }
@@ -376,6 +378,9 @@ class InvitationService
     protected function sendSms(SmsInvitation $invitation)
     {
         if ($this->debug) {
+            // Useful for testing
+            $this->addSmsCharge($invitation);
+
             return;
         }
 
@@ -386,12 +391,18 @@ class InvitationService
             $invitation->setStatus(SmsInvitation::STATUS_FAILED);
         }
 
+        $this->addSmsCharge($invitation);
+    }
+
+    public function addSmsCharge(SmsInvitation $invitation)
+    {
         $charge = new Charge();
         $charge->setType(Charge::TYPE_SMS);
         $charge->setUser($invitation->getInviter());
         $charge->setPolicy($invitation->getPolicy());
         $charge->setDetails($invitation->getMobile());
         $this->dm->persist($charge);
+        $this->dm->flush();
     }
 
     protected function validatePolicy(Policy $policy)
