@@ -63,14 +63,11 @@ services:
             dm:                   "@doctrine_mongodb.odm.default_document_manager"
             logger:               "@logger"
             policy:               "@app.policy"
-            mailer:               "@mailer"
-            templating:           "@templating"
+            mailer:               "@app.mailer"
             apiToken:             "%judopay_apitoken%"
             apiSecret:            "%judopay_apisecret%"
             judoId:               "%judopay_id%"
             environment:          "%kernel.environment%"
-            defaultSenderAddress: "%default_sender_address%"
-            defaultSenderName:    "%default_sender_name%"
             statsd:               "@statsd"
 
     app.barclays:
@@ -91,7 +88,7 @@ services:
             dm:         "@doctrine_mongodb.odm.default_document_manager"
             logger:     "@logger"
             mailchimp:  "@app.mailchimp.prelaunch"
-            mailer:     "@mailer"
+            mailer:     "@app.mailer"
             templating: "@templating"
             router:     "@api.router"
             shortLink:  "@app.shortlink"
@@ -101,15 +98,13 @@ services:
         arguments:
             dm:                   "@doctrine_mongodb.odm.default_document_manager"
             logger:               "@logger"
-            mailer:               "@mailer"
+            mailer:               "@app.mailer"
             templating:           "@templating"
             router:               "@api.router"
             shortLink:            "@app.shortlink"
             sms:                  "@app.sms"
             rateLimit:            "@app.ratelimit"
             push:                 "@app.push"
-            defaultSenderAddress: "%default_sender_address%"
-            defaultSenderName:    "%default_sender_name%"
 
     app.push:
         class: AppBundle\Service\PushService
@@ -122,12 +117,8 @@ services:
         arguments:
             dm:                   "@doctrine_mongodb.odm.default_document_manager"
             logger:               "@logger"
-            mailer:               "@mailer"
-            templating:           "@templating"
-            router:               "@api.router"
+            mailer:               "@app.mailer"
             environment:          "%kernel.environment%"
-            defaultSenderAddress: "%default_sender_address%"
-            defaultSenderName:    "%default_sender_name%"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
@@ -266,7 +257,7 @@ services:
             dm:                   "@doctrine_mongodb.odm.default_document_manager"
             logger:               "@logger"
             sequence:             "@app.sequence"
-            mailer:               "@mailer"
+            mailer:               "@app.mailer"
             smtp:                 "@swiftmailer.transport.real"
             templating:           "@templating"
             router:               "@api.router"
@@ -275,8 +266,6 @@ services:
             dispatcher:           "@event_dispatcher"
             s3:                   "@aws.s3"
             shortLink:            "@app.shortlink"
-            defaultSenderAddress: "%default_sender_address%"
-            defaultSenderName:    "%default_sender_name%"
             statsd:               "@statsd"
             redis:                "@snc_redis.default"
             branch:               "@app.branch"
@@ -413,10 +402,7 @@ services:
         arguments:
             dm:                   "@doctrine_mongodb.odm.default_document_manager"
             logger:               "@logger"
-            mailer:               "@mailer"
-            templating:           "@templating"
-            defaultSenderAddress: "%default_sender_address%"
-            defaultSenderName:    "%default_sender_name%"
+            mailer:               "@app.mailer"
         tags:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }

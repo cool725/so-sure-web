@@ -39,15 +39,8 @@ class JudopayService
     /** @var PolicyService */
     protected $policyService;
 
-    /** @var \Swift_Mailer */
+    /** @var MailerService */
     protected $mailer;
-    protected $templating;
-
-    /** @var string */
-    protected $defaultSenderAddress;
-
-    /** @var string */
-    protected $defaultSenderName;
 
     protected $statsd;
 
@@ -55,28 +48,22 @@ class JudopayService
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param PolicyService   $policyService
-     * @param \Swift_Mailer   $mailer
-     * @param                 $templating
+     * @param MailerService   $mailer
      * @param string          $apiToken
      * @param string          $apiSecret
      * @param string          $judoId
      * @param string          $environment
-     * @param string          $defaultSenderAddress
-     * @param string          $defaultSenderName
      * @param                 $statsd
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         PolicyService $policyService,
-        \Swift_Mailer $mailer,
-        $templating,
+        MailerService $mailer,
         $apiToken,
         $apiSecret,
         $judoId,
         $environment,
-        $defaultSenderAddress,
-        $defaultSenderName,
         $statsd
     ) {
         $this->dm = $dm;
@@ -84,7 +71,6 @@ class JudopayService
         $this->policyService = $policyService;
         $this->judoId = $judoId;
         $this->mailer = $mailer;
-        $this->templating = $templating;
         $data = array(
            'apiToken' => $apiToken,
            'apiSecret' => $apiSecret,
@@ -94,8 +80,6 @@ class JudopayService
            // 'endpointUrl' => ''
         );
         $this->client = new Judopay($data);
-        $this->defaultSenderAddress = $defaultSenderAddress;
-        $this->defaultSenderName = $defaultSenderName;
         $this->statsd = $statsd;
     }
 
@@ -466,19 +450,14 @@ class JudopayService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $message = \Swift_Message::newInstance()
-            ->setSubject(sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber()))
-            ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
-            ->setTo($policy->getUser()->getEmail())
-            ->setBody(
-                $this->templating->render($htmlTemplate, ['policy' => $policy, 'next' => $next]),
-                'text/html'
-            )
-            ->addPart(
-                $this->templating->render($textTemplate, ['policy' => $policy, 'next' => $next]),
-                'text/plain'
-            );
-        $this->mailer->send($message);
+        $this->mailer->sendTemplate(
+            sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber()),
+            $policy->getUser()->getEmail(),
+            $htmlTemplate,
+            ['policy' => $policy, 'next' => $next],
+            $textTemplate,
+            ['policy' => $policy, 'next' => $next]
+        );
     }
 
     protected function tokenPay(Policy $policy, JudoPaymentMethod $paymentMethod)

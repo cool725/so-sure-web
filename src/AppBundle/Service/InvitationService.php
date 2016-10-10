@@ -48,7 +48,7 @@ class InvitationService
     /** @var DocumentManager */
     protected $dm;
 
-    /** @var \Swift_Mailer */
+    /** @var MailerService */
     protected $mailer;
     protected $templating;
     protected $router;
@@ -68,24 +68,16 @@ class InvitationService
     /** @var boolean */
     protected $debug;
 
-    /** @var string */
-    protected $defaultSenderAddress;
-
-    /** @var string */
-    protected $defaultSenderName;
-
     /**
      * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
-     * @param \Swift_Mailer    $mailer
+     * @param MailerService    $mailer
      * @param                  $templating
      * @param                  $router
      * @param ShortLinkService $shortLink
      * @param SmsService       $sms
      * @param RateLimitService $rateLimit
      * @param PushService      $push
-     * @param string           $defaultSenderAddress
-     * @param string           $defaultSenderName
      */
     public function __construct(
         DocumentManager $dm,
@@ -96,9 +88,7 @@ class InvitationService
         ShortLinkService $shortLink,
         SmsService $sms,
         RateLimitService $rateLimit,
-        PushService $push,
-        $defaultSenderAddress,
-        $defaultSenderName
+        PushService $push
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -109,8 +99,6 @@ class InvitationService
         $this->sms = $sms;
         $this->rateLimit = $rateLimit;
         $this->push = $push;
-        $this->defaultSenderAddress = $defaultSenderAddress;
-        $this->defaultSenderName = $defaultSenderName;
     }
 
     public function setDebug($debug)
@@ -382,20 +370,15 @@ class InvitationService
             throw new \InvalidArgumentException(sprintf('Unknown type %s', $type));
         }
 
-        $message = \Swift_Message::newInstance()
-            ->setSubject($subject)
-            ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
-            ->setTo($to)
-            ->setBody(
-                $this->templating->render($htmlTemplate, ['invitation' => $invitation]),
-                'text/html'
-            )
-            ->addPart(
-                $this->templating->render($textTemplate, ['invitation' => $invitation]),
-                'text/plain'
-            );
         try {
-            $this->mailer->send($message);
+            $this->mailer->sendTemplate(
+                $subject,
+                $to,
+                $htmlTemplate,
+                ['invitation' => $invitation],
+                $textTemplate,
+                ['invitation' => $invitation]
+            );
             $invitation->setStatus(EmailInvitation::STATUS_SENT);
         } catch (\Exception $e) {
             $invitation->setStatus(EmailInvitation::STATUS_FAILED);

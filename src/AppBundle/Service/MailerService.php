@@ -44,26 +44,43 @@ class MailerService
         $to,
         $htmlTemplate,
         $htmlData,
-        $textTemplate,
-        $textData,
-        $attachmentFiles = null
+        $textTemplate = null,
+        $textData = null,
+        $attachmentFiles = null,
+        $bcc = null
     ) {
-        return $this->send(
-            $subject,
-            $to,
-            $this->templating->render($htmlTemplate, $htmlData),
-            $this->templating->render($textTemplate, $textData),
-            $attachmentFiles
-        );
+        if ($textTemplate && $textData) {
+            return $this->send(
+                $subject,
+                $to,
+                $this->templating->render($htmlTemplate, $htmlData),
+                $this->templating->render($textTemplate, $textData),
+                $attachmentFiles,
+                $bcc
+            );
+        } else {
+            return $this->send(
+                $subject,
+                $to,
+                $this->templating->render($htmlTemplate, $htmlData),
+                null,
+                $attachmentFiles,
+                $bcc
+            );
+        }
     }
 
-    public function send($subject, $to, $htmlBody, $textBody = null, $attachmentFiles = null)
+    public function send($subject, $to, $htmlBody, $textBody = null, $attachmentFiles = null, $bcc = null)
     {
         $message = \Swift_Message::newInstance()
             ->setSubject($subject)
             ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
             ->setTo($to)
             ->setBody($htmlBody, 'text/html');
+
+        if ($bcc) {
+            $message->setBcc($bcc);
+        }
 
         if ($textBody) {
             $message->addPart($textBody, 'text/plain');

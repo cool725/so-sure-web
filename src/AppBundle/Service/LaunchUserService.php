@@ -17,7 +17,7 @@ class LaunchUserService
     /** @var MailchimpService */
     protected $mailchimp;
 
-    /** @var \Swift_Mailer */
+    /** @var MailerService */
     protected $mailer;
     protected $templating;
     protected $router;
@@ -29,7 +29,7 @@ class LaunchUserService
      * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
      * @param MailchimpService $mailchimp
-     * @param \Swift_Mailer    $mailer
+     * @param MailerService    $mailer
      * @param                  $templating
      * @param                  $router
      * @param ShortLinkService $shortLink
@@ -38,7 +38,7 @@ class LaunchUserService
         DocumentManager $dm,
         LoggerInterface $logger,
         MailchimpService $mailchimp,
-        \Swift_Mailer $mailer,
+        MailerService $mailer,
         $templating,
         $router,
         ShortLinkService $shortLink
@@ -126,18 +126,13 @@ class LaunchUserService
     public function sendEmail(User $user)
     {
         $referralUrl = $this->getShortLink($user->getId());
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Welcome to so-sure')
-            ->setFrom('hello@wearesosure.com')
-            ->setTo($user->getEmail())
-            ->setBody(
-                $this->templating->render('AppBundle:Email:preLaunch.html.twig', ['referral_url' => $referralUrl]),
-                'text/html'
-            )
-            ->addPart(
-                $this->templating->render('AppBundle:Email:preLaunch.txt.twig', ['referral_url' => $referralUrl]),
-                'text/plain'
-            );
-        $this->mailer->send($message);
+        $this->mailer->sendTemplate(
+            'Welcome to so-sure',
+            $user->getEmail(),
+            'AppBundle:Email:preLaunch.html.twig',
+            ['referral_url' => $referralUrl],
+            'AppBundle:Email:preLaunch.txt.twig',
+            ['referral_url' => $referralUrl]
+        );
     }
 }

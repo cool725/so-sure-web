@@ -39,7 +39,7 @@ class PolicyService
     /** @var SequenceService */
     protected $sequence;
 
-    /** @var \Swift_Mailer */
+    /** @var MailerService */
     protected $mailer;
     protected $smtp;
     protected $templating;
@@ -59,12 +59,6 @@ class PolicyService
 
     /** @var JudopayService */
     protected $judopay;
-
-    /** @var string */
-    protected $defaultSenderAddress;
-
-    /** @var string */
-    protected $defaultSenderName;
 
     protected $statsd;
 
@@ -98,7 +92,7 @@ class PolicyService
      * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
      * @param SequenceService  $sequence
-     * @param \Swift_Mailer    $mailer
+     * @param MailerService    $mailer
      * @param                  $smtp
      * @param                  $templating
      * @param                  $router
@@ -107,8 +101,6 @@ class PolicyService
      * @param                  $dispatcher
      * @param                  $s3
      * @param ShortLinkService $shortLink
-     * @param string           $defaultSenderAddress
-     * @param string           $defaultSenderName
      * @param                  $statsd
      * @param                  $redis
      * @param                  $branch
@@ -117,7 +109,7 @@ class PolicyService
         DocumentManager $dm,
         LoggerInterface $logger,
         SequenceService $sequence,
-        \Swift_Mailer $mailer,
+        MailerService $mailer,
         $smtp,
         $templating,
         $router,
@@ -126,8 +118,6 @@ class PolicyService
         $dispatcher,
         $s3,
         ShortLinkService $shortLink,
-        $defaultSenderAddress,
-        $defaultSenderName,
         $statsd,
         $redis,
         $branch
@@ -144,8 +134,6 @@ class PolicyService
         $this->dispatcher = $dispatcher;
         $this->s3 = $s3;
         $this->shortLink = $shortLink;
-        $this->defaultSenderAddress = $defaultSenderAddress;
-        $this->defaultSenderName = $defaultSenderName;
         $this->statsd = $statsd;
         $this->redis = $redis;
         $this->branch = $branch;
@@ -492,37 +480,16 @@ class PolicyService
     public function newPolicyEmail(Policy $policy, $attachmentFiles = null)
     {
         try {
-            $message = \Swift_Message::newInstance()
-                ->setSubject(sprintf('Your so-sure policy %s', $policy->getPolicyNumber()))
-                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
-                ->setTo($policy->getUser()->getEmail())
-                ->setBody(
-                    $this->templating->render('AppBundle:Email:policy/new.html.twig', ['policy' => $policy]),
-                    'text/html'
-                )
-                ->addPart(
-                    $this->templating->render('AppBundle:Email:policy/new.txt.twig', ['policy' => $policy]),
-                    'text/plain'
-                );
-
-            if ($attachmentFiles) {
-                // If there's attachments, make sure we send directly to smtp, instead of queueing
-                $mailer = new \Swift_Mailer($this->smtp);
-                foreach ($attachmentFiles as $attachmentFile) {
-                    $message->attach(\Swift_Attachment::fromPath($attachmentFile));
-                }
-            } else {
-                $mailer = $this->mailer;
-            }
-
-            $mailer->send($message);
+            $this->mailer->sendTemplate(
+                sprintf('Your so-sure policy %s', $policy->getPolicyNumber()),
+                $policy->getUser()->getEmail(),
+                'AppBundle:Email:policy/new.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:policy/new.txt.twig',
+                ['policy' => $policy],
+                $attachmentFiles
+            );
             $policy->setLastEmailed(new \DateTime());
-
-            if ($attachmentFiles) {
-                foreach ($attachmentFiles as $attachmentFile) {
-                    unlink($attachmentFile);
-                }
-            }
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()));
         }
@@ -545,20 +512,14 @@ class PolicyService
         }
 
         try {
-            $message = \Swift_Message::newInstance()
-                ->setSubject(sprintf('Your so-sure weekly email'))
-                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
-                ->setTo($policy->getUser()->getEmail())
-                ->setBody(
-                    $this->templating->render('AppBundle:Email:policy/weekly.html.twig', ['policy' => $policy]),
-                    'text/html'
-                )
-                ->addPart(
-                    $this->templating->render('AppBundle:Email:policy/weekly.txt.twig', ['policy' => $policy]),
-                    'text/plain'
-                );
-
-            $this->mailer->send($message);
+            $this->mailer->sendTemplate(
+                sprintf('Your so-sure weekly email'),
+                $policy->getUser()->getEmail(),
+                'AppBundle:Email:policy/weekly.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:policy/weekly.txt.twig',
+                ['policy' => $policy]
+            );
             $policy->setLastEmailed(new \DateTime());
 
             return true;
@@ -582,20 +543,16 @@ class PolicyService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $message = \Swift_Message::newInstance()
-            ->setSubject(sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()))
-            ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
-            ->setTo($policy->getUser()->getEmail())
-            ->setBcc('bcc@so-sure.com')
-            ->setBody(
-                $this->templating->render($htmlTemplate, ['policy' => $policy]),
-                'text/html'
-            )
-            ->addPart(
-                $this->templating->render($textTemplate, ['policy' => $policy]),
-                'text/plain'
-            );
-        $this->mailer->send($message);
+        $this->mailer->sendTemplate(
+            sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()),
+            $policy->getUser()->getEmail(),
+            $htmlTemplate,
+            ['policy' => $policy],
+            $textTemplate,
+            ['policy' => $policy],
+            null,
+            'bcc@so-sure.com'
+        );
     }
 
     /**
@@ -610,25 +567,14 @@ class PolicyService
             if ($networkConnection->getLinkedPolicy()->hasMonetaryClaimed()) {
                 continue;
             }
-            $message = \Swift_Message::newInstance()
-                ->setSubject(sprintf('Your friend, %s, cancelled their so-sure policy', $cancelledUser->getName()))
-                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
-                ->setTo($networkConnection->getLinkedUser()->getEmail())
-                ->setBody(
-                    $this->templating->render('AppBundle:Email:policy-cancellation/network.html.twig', [
-                        'policy' => $networkConnection->getLinkedPolicy(),
-                        'cancelledUser' => $cancelledUser
-                    ]),
-                    'text/html'
-                )
-                ->addPart(
-                    $this->templating->render('AppBundle:Email:policy-cancellation/network.txt.twig', [
-                        'policy' => $networkConnection->getLinkedPolicy(),
-                        'cancelledUser' => $cancelledUser
-                    ]),
-                    'text/plain'
-                );
-            $this->mailer->send($message);
+            $this->mailer->sendTemplate(
+                sprintf('Your friend, %s, cancelled their so-sure policy', $cancelledUser->getName()),
+                $networkConnection->getLinkedUser()->getEmail(),
+                'AppBundle:Email:policy-cancellation/network.html.twig',
+                ['policy' => $networkConnection->getLinkedPolicy(), 'cancelledUser' => $cancelledUser],
+                'AppBundle:Email:policy-cancellation/network.txt.twig',
+                ['policy' => $networkConnection->getLinkedPolicy(), 'cancelledUser' => $cancelledUser]
+            );
         }
     }
 }
