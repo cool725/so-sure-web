@@ -1559,7 +1559,10 @@ class ApiAuthControllerTest extends BaseControllerTest
             'name' => 'functional test',
         ]);
         $data = $this->verifyResponse(200);
-        $this->assertEquals(strtolower(self::generateEmail('new-email-rejected-invitee', $this)), $data['invitation_detail']);
+        $this->assertEquals(
+            strtolower(self::generateEmail('new-email-rejected-invitee', $this)),
+            $data['invitation_detail']
+        );
         $this->assertEquals('functional test', $data['name']);
 
         $rejectUrl = sprintf("/api/v1/auth/invitation/%s", $data['id']);
@@ -1597,7 +1600,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
-    public function testNewSmsAndDupInvitation()
+    public function testNewSmsAndCancelledDupInvitation()
     {
         $user = self::createUser(
             self::$userManager,
@@ -1619,11 +1622,18 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('+447700900002', $data['invitation_detail']);
         $this->assertEquals('functional test', $data['name']);
 
+        $cancelUrl = sprintf("/api/v1/auth/invitation/%s", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $cancelUrl, [
+            'action' => 'cancel',
+            'policy_id' => $policyData['id'],
+        ]);
+        $data = $this->verifyResponse(200);
+
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'mobile' => '+447700900002',
             'name' => 'functional test',
         ]);
-        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
+        $data = $this->verifyResponse(200);
     }
 
     public function testNewSmsAndRejectedDupInvitation()
