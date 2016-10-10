@@ -28,7 +28,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  border-radius: 2px;
+  border-radius: 4px;
   -webkit-animation: popin 0.3s;
   animation: popin 0.3s;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
@@ -40,7 +40,7 @@
   width: 60%;
   height: 60%;
   min-height: 350px;
-}
+  }
 }
 #ouibounce-modal .ouibounce-modal-title {
   font-size: 18px;
@@ -48,7 +48,7 @@
   color: #fff;
   padding: 10px;
   margin: 0;
-  border-radius: 2px 2px 0 0;
+  border-radius: 4px 4px 0 0;
   text-align: center;
 }
 #ouibounce-modal h3 {
