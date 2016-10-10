@@ -82,7 +82,7 @@ class InvitationService
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        \Swift_Mailer $mailer,
+        MailerService $mailer,
         $templating,
         $router,
         ShortLinkService $shortLink,
