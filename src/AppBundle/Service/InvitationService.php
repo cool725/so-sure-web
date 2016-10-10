@@ -143,12 +143,6 @@ class InvitationService
     {
         $this->validatePolicy($policy);
 
-        $invitationRepo = $this->dm->getRepository(EmailInvitation::class);
-        $prevInvitations = $invitationRepo->findDuplicate($policy, $email);
-        if (count($prevInvitations) > 0) {
-            throw new DuplicateInvitationException('Email was already invited to this policy');
-        }
-
         $connectionRepo = $this->dm->getRepository(Connection::class);
         if ($connectionRepo->isConnectedByEmail($policy, $email)) {
             throw new ConnectedInvitationException('You are already connected');
@@ -164,17 +158,33 @@ class InvitationService
             throw new SelfInviteException('User can not invite themself');
         }
 
-        $invitation = new EmailInvitation();
-        $invitation->setEmail($email);
-        $invitation->setPolicy($policy);
-        $invitation->setName($name);
-        $invitation->invite();
-        $this->dm->persist($invitation);
-        $this->dm->flush();
+        $invitation = null;
+        $invitationRepo = $this->dm->getRepository(EmailInvitation::class);
+        $prevInvitations = $invitationRepo->findDuplicate($policy, $email);
+        foreach ($prevInvitations as $prevInvitation) {
+            if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
+                throw new DuplicateInvitationException('Email was already invited to this policy');
+            } elseif ($prevInvitation->isCancelled()) {
+                // Reinvitating a cancelled invitation, should re-active invitation
+                $invitation = $prevInvitation;
+                $invitation->setCancelled(null);
+                $this->dm->flush();
+            }
+        }
 
-        $link = $this->getShortLink($invitation);
-        $invitation->setLink($link);
-        $this->dm->flush();
+        if (!$invitation) {
+            $invitation = new EmailInvitation();
+            $invitation->setEmail($email);
+            $invitation->setPolicy($policy);
+            $invitation->setName($name);
+            $invitation->invite();
+            $this->dm->persist($invitation);
+            $this->dm->flush();
+
+            $link = $this->getShortLink($invitation);
+            $invitation->setLink($link);
+            $this->dm->flush();
+        }
 
         $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
         $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
@@ -186,12 +196,6 @@ class InvitationService
     {
         $mobile = $this->normalizeUkMobile($mobile);
         $this->validatePolicy($policy);
-
-        $invitationRepo = $this->dm->getRepository(SmsInvitation::class);
-        $prevInvitations = $invitationRepo->findDuplicate($policy, $mobile);
-        if (count($prevInvitations) > 0) {
-            throw new DuplicateInvitationException('Mobile was already invited to this policy');
-        }
 
         $connectionRepo = $this->dm->getRepository(Connection::class);
         if ($connectionRepo->isConnectedBySms($policy, $mobile)) {
@@ -208,17 +212,33 @@ class InvitationService
             throw new SelfInviteException('User can not invite themself');
         }
 
-        $invitation = new SmsInvitation();
-        $invitation->setMobile($mobile);
-        $invitation->setPolicy($policy);
-        $invitation->setName($name);
-        $invitation->invite();
-        $this->dm->persist($invitation);
-        $this->dm->flush();
+        $invitation = null;
+        $invitationRepo = $this->dm->getRepository(SmsInvitation::class);
+        $prevInvitations = $invitationRepo->findDuplicate($policy, $mobile);
+        foreach ($prevInvitations as $prevInvitation) {
+            if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
+                throw new DuplicateInvitationException('Mobile was already invited to this policy');
+            } elseif ($prevInvitation->isCancelled()) {
+                // Reinvitating a cancelled invitation, should re-active invitation
+                $invitation = $prevInvitation;
+                $invitation->setCancelled(null);
+                $this->dm->flush();
+            }
+        }
 
-        $link = $this->getShortLink($invitation);
-        $invitation->setLink($link);
-        $this->dm->flush();
+        if (!$invitation) {
+            $invitation = new SmsInvitation();
+            $invitation->setMobile($mobile);
+            $invitation->setPolicy($policy);
+            $invitation->setName($name);
+            $invitation->invite();
+            $this->dm->persist($invitation);
+            $this->dm->flush();
+
+            $link = $this->getShortLink($invitation);
+            $invitation->setLink($link);
+            $this->dm->flush();
+        }
 
         $this->sendSms($invitation);
         $this->dm->flush();

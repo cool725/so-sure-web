@@ -1495,7 +1495,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     /**
      *
      */
-    public function testNewEmailAndDupInvitation()
+    public function testNewEmailAndCancelledDupInvitation()
     {
         $user = self::createUser(
             self::$userManager,
@@ -1517,11 +1517,63 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('patrick@so-sure.com', $data['invitation_detail']);
         $this->assertEquals('functional test', $data['name']);
 
+        $cancelUrl = sprintf("/api/v1/auth/invitation/%s", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $cancelUrl, [
+            'action' => 'cancel',
+            'policy_id' => $policyData['id'],
+        ]);
+        $data = $this->verifyResponse(200);
+
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'email' => 'patrick@so-sure.com',
             'name' => 'functional test',
         ]);
-        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
+        $this->verifyResponse(200);
+    }
+
+    public function testNewEmailAndRejectedDupInvitation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-email-rejected', $this),
+            'foo'
+        );
+        $userInvitee = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-email-rejected-invitee', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $cognitoIdentityInviteeId = $this->getAuthUser($userInvitee);
+        $crawler = $this->generatePolicy($cognitoIdentityInviteeId, $userInvitee);
+        $policyInviteeData = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('new-email-rejected-invitee', $this),
+            'name' => 'functional test',
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(strtolower(self::generateEmail('new-email-rejected-invitee', $this)), $data['invitation_detail']);
+        $this->assertEquals('functional test', $data['name']);
+
+        $rejectUrl = sprintf("/api/v1/auth/invitation/%s", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityInviteeId, $rejectUrl, [
+            'action' => 'reject',
+            'policy_id' => $policyInviteeData['id'],
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('new-email-rejected-invitee', $this),
+            'name' => 'functional test',
+        ]);
+        $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
     }
 
     public function testEmailValidationInvitation()
@@ -1572,6 +1624,54 @@ class ApiAuthControllerTest extends BaseControllerTest
             'name' => 'functional test',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
+    }
+
+    public function testNewSmsAndRejectedDupInvitation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-sms-rejected', $this),
+            'foo'
+        );
+        $userInvitee = self::createUser(
+            self::$userManager,
+            self::generateEmail('new-sms-rejected-invitee', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $cognitoIdentityInviteeId = $this->getAuthUser($userInvitee);
+        $crawler = $this->generatePolicy($cognitoIdentityInviteeId, $userInvitee);
+        $policyInviteeData = $this->verifyResponse(200);
+
+        $userInvitee->setMobileNumber('+447700900003');
+        static::$dm->flush();
+
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'mobile' => '+447700900003',
+            'name' => 'functional test',
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('+447700900003', $data['invitation_detail']);
+        $this->assertEquals('functional test', $data['name']);
+
+        $rejectUrl = sprintf("/api/v1/auth/invitation/%s", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityInviteeId, $rejectUrl, [
+            'action' => 'reject',
+            'policy_id' => $policyInviteeData['id'],
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'mobile' => '+447700900003',
+            'name' => 'functional test',
+        ]);
+        $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
     }
 
     public function testSmsValidationInvitation()
