@@ -172,7 +172,7 @@ class SalvaExportServiceTest extends WebTestCase
         $this->assertEquals(1, count($lines));
         $data = explode('","', trim($lines[0], '"'));
 
-        $this->validatePolicyData($data, $updatedPolicy, 1, Policy::STATUS_PENDING, 0);
+        $this->validatePolicyData($data, $updatedPolicy, 1, Policy::STATUS_ACTIVE, 0);
         $this->validatePolicyPayments($data, $updatedPolicy, 1);
         $this->validateFullYearPolicyAmounts($data, $updatedPolicy);
         $this->validateStaticPolicyData($data, $updatedPolicy);
@@ -304,6 +304,10 @@ class SalvaExportServiceTest extends WebTestCase
         static::$policyService->create($policy, $date);
         static::$policyService->setEnvironment('test');
 
+        // Policy needs to be active to export to salva
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+        static::$dm->flush();
+
         $this->assertNotNull($policy->getPremiumInstallmentCount());
 
         return $policy;
@@ -334,7 +338,7 @@ class SalvaExportServiceTest extends WebTestCase
         //$this->validatePartialYearPolicyAmounts($data1, $updatedPolicy, 1);
         $this->validateStaticPolicyData($data1, $updatedPolicy);
 
-        $this->validatePolicyData($data2, $updatedPolicy, 2, Policy::STATUS_PENDING, 0);
+        $this->validatePolicyData($data2, $updatedPolicy, 2, Policy::STATUS_ACTIVE, 0);
         $this->validatePolicyPayments($data2, $updatedPolicy, 0);
         // TODO: Not sure on this one - 366 - 31 = 335
         $this->validateProratedPolicyAmounts($data2, $updatedPolicy, 334);
