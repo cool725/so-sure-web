@@ -15,6 +15,7 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Service\InvitationService;
+use AppBundle\Service\MailerService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
@@ -55,7 +56,14 @@ class InvitationServiceTest extends WebTestCase
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher);
-        $mailer = \Swift_Mailer::newInstance($transport);
+        $mailer = new MailerService(
+            \Swift_Mailer::newInstance($transport),
+            $transport,
+            self::$container->get('templating'),
+            self::$container->get('api.router'),
+            'foo@foo.com',
+            'bar'
+        );
         self::$invitationService = new InvitationService(
             self::$dm,
             self::$container->get('logger'),
@@ -65,9 +73,7 @@ class InvitationServiceTest extends WebTestCase
             self::$container->get('app.shortlink'),
             self::$container->get('app.sms'),
             self::$container->get('app.ratelimit'),
-            self::$container->get('app.push'),
-            '',
-            ''
+            self::$container->get('app.push')
         );
         self::$policyService = self::$container->get('app.policy');
 
