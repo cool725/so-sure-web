@@ -1700,17 +1700,18 @@ class ApiAuthControllerTest extends BaseControllerTest
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'mobile' => '+447700900003',
+            'mobile' => '+447700900004',
             'name' => 'functional test',
             'skip_send' => true,
         ]);
         $data = $this->verifyResponse(200);
-        $this->assertEquals('+447700900003', $data['invitation_detail']);
+        $this->assertEquals('+447700900004', $data['invitation_detail']);
         $this->assertEquals('functional test', $data['name']);
 
         // sending sms should trigger a charge db entry
-        $repo = static::$dm->getRepository(Charge::class);
-        $charge = $repo->findOneBy(['details' => '+447700900003']);
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Charge::class);
+        $charge = $repo->findOneBy(['details' => '+447700900004']);
         $this->assertNull($charge);
     }
 
