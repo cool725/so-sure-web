@@ -84,7 +84,7 @@ class InvitationServiceTest extends WebTestCase
     /**
      * @expectedException AppBundle\Exception\DuplicateInvitationException
      */
-    public function testDuplicateEmailInvitation()
+    public function testDuplicateEmailInvitationRejected()
     {
         $user = static::createUser(
             static::$userManager,
@@ -94,8 +94,27 @@ class InvitationServiceTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite1', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
+        $invitation->setRejected(new \DateTime());
+        static::$dm->flush();
 
         self::$invitationService->inviteByEmail($policy, static::generateEmail('invite1', $this));
+    }
+
+    public function testDuplicateEmailInvitationCancelled()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-cancelled', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite-dup1', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
+        $invitation->setCancelled(new \DateTime());
+        static::$dm->flush();
+
+        $invite = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite-dup1', $this));
+        $this->assertNull($invite->getCancelled());
     }
 
     /**
@@ -188,7 +207,7 @@ class InvitationServiceTest extends WebTestCase
     /**
      * @expectedException AppBundle\Exception\DuplicateInvitationException
      */
-    public function testDuplicateSmsInvitation()
+    public function testDuplicateSmsInvitationRejected()
     {
         $user = static::createUser(
             static::$userManager,
@@ -199,10 +218,30 @@ class InvitationServiceTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $invitation = self::$invitationService->inviteBySms($policy, $mobile);
         $this->assertTrue($invitation instanceof SmsInvitation);
+        $invitation->setRejected(new \DateTime());
+        static::$dm->flush();
 
         self::$invitationService->inviteBySms($policy, self::transformMobile($mobile));
     }
     
+    public function testDuplicateSmsInvitationCancelled()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('smsuser-dup', $this),
+            'bar'
+        );
+        $mobile = static::generateRandomMobile();
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $invitation = self::$invitationService->inviteBySms($policy, $mobile);
+        $this->assertTrue($invitation instanceof SmsInvitation);
+        $invitation->setCancelled(new \DateTime());
+        static::$dm->flush();
+
+        $invite = self::$invitationService->inviteBySms($policy, self::transformMobile($mobile));
+        $this->assertNull($invite->getCancelled());
+    }
+
     /**
      * @expectedException AppBundle\Exception\ConnectedInvitationException
      */
