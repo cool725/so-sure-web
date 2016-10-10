@@ -1709,7 +1709,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('functional test', $data['name']);
 
         // sending sms should trigger a charge db entry
-        $repo = $dm->getRepository(Charge::class);
+        $repo = static::$dm->getRepository(Charge::class);
         $charge = $repo->findOneBy(['details' => '+447700900003']);
         $this->assertNull($charge);
     }
