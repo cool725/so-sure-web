@@ -12,7 +12,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(255,255,255,0.8);
   cursor: pointer;
   -webkit-animation: fadein 0.5s;
   animation: fadein 0.5s;
@@ -31,7 +31,7 @@
   border-radius: 4px;
   -webkit-animation: popin 0.3s;
   animation: popin 0.3s;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
   min-height: 400px;
   min-height: 300px;
 }
@@ -44,7 +44,7 @@
 }
 #ouibounce-modal .ouibounce-modal-title {
   font-size: 18px;
-  background-color: #3399ff;
+  background-color: #202532;
   color: #fff;
   padding: 10px;
   margin: 0;
@@ -53,9 +53,9 @@
 }
 #ouibounce-modal h3 {
   color: #fff;
-  font-size: 1em;
   margin: 0.2em;
   font-weight: 500;
+  padding: 5px;
 }
 #ouibounce-modal .ouibounce-modal-body {
   padding: 20px 35px;
