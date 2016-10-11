@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -384,5 +385,31 @@ class DefaultController extends BaseController
         $view = $this->renderView('AppBundle:Default:apple-app-site-association.json.twig');
 
         return new Response($view, 200, array('Content-Type'=>'application/json'));
+    }
+
+    /**
+     * @Route("/login/digits", name="digits_login")
+     * @Method({"POST"})
+     */
+    public function digitsLoginAction(Request $request)
+    {
+        try {
+            $credentials = $request->request->get('credentials');
+            $provider = $request->request->get('provider');
+            $digits = $this->get('app.digits');
+            $user = $digits->validateUser($provider, $credentials);
+            if (!$user) {
+                throw new \Exception('Unknown user');
+            }
+            $this->get('fos_user.security.login_manager')->loginUser(
+                $this->getParameter('fos_user.firewall_name'),
+                $user);
+
+            return new RedirectResponse($this->generateUrl('user_home'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Unable to login.  Did you create a policy using our app yet?');
+
+            return new RedirectResponse($this->generateUrl('fos_user_login'));
+        }
     }
 }

@@ -4,6 +4,10 @@
     <h1>Welcome back!</h1>
     <div class="login-digits">
         <div class="digits-container"></div>
+        <form method="POST" action="{{ path('digits_login') }}" id="digits-form">
+            <input type="hidden" name="credentials" id="credentials">
+            <input type="hidden" name="provider" id="provider">
+        </form>
         <p><a href="#" class="swap-login">Prefer email login?</a></p>
     </div>
 
@@ -54,13 +58,20 @@ document.getElementById('digits-sdk').onload = function() {
 function onLogin(loginResponse){
   // Send headers to your server and validate user by calling Digits’ API
   var oAuthHeaders = loginResponse.oauth_echo_headers;
-  var verifyData = {body:{oauth_echo_user: {
+  var verifyData = {
     credentials: oAuthHeaders['X-Verify-Credentials-Authorization'],
     provider: oAuthHeaders['X-Auth-Service-Provider']
-  }}};
-
-  $.ajax({url:'/api/v1/login', type: 'POST', data: JSON.stringify(verifyData), dataType: 'json', contentType: 'application/json'})
+  };
+  $('#credentials').val(verifyData.credentials);
+  $('#provider').val(verifyData.provider);
+  $('#digits-form').submit();
+  /*
+  $.post({url:'/login/digits', data: verifyData });
+  */
+    /*
+  $.ajax({url:'/api/v1/login', type: 'POST', data: JSON.stringify({ body: { oauth_echo_user: verifyData }}), dataType: 'json', contentType: 'application/json'})
     .done(function(){ window.reload(); });
+    */
 }
 };
 </script>
