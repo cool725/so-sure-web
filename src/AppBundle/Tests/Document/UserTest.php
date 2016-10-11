@@ -94,7 +94,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
-        $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         $user->addPolicy($policy);
         $this->assertTrue($user->hasValidPolicy());
     }

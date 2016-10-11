@@ -347,7 +347,7 @@ class User extends BaseUser implements TwoFactorInterface
     public function hasValidPolicy()
     {
         foreach ($this->getPolicies() as $policy) {
-            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_PENDING])) {
+            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
                 return true;
             }
         }
