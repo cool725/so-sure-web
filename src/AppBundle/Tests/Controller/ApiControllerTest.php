@@ -300,7 +300,7 @@ class ApiControllerTest extends BaseControllerTest
             'credentials' => sprintf('oauth_consumer_key="%s"', $consumerKey),
         ]));
         $data = $this->verifyResponse(500);
-   }
+    }
 
    // ping
 
