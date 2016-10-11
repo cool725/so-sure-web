@@ -64,4 +64,46 @@ class DigitsServiceTest extends WebTestCase
             throw $e;
         }
     }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testBadCognitoId()
+    {
+        $consumerKey = static::$container->getParameter('digits_consumer_key');
+        try {
+            // @codingStandardsIgnoreStart
+            static::$digits->validateUser(
+                'https://api.digits.com/1.1/sdk/account.json?identity_id=eu-west-1%3A4652472c-586f-4878-9128-ac78906b1e87',
+                sprintf('oauth_consumer_key="%s"', $consumerKey),
+                'eu-west-1'
+            );
+            // @codingStandardsIgnoreEnd
+        } catch (\Exception $e) {
+            $this->assertContains('does not match session', $e->getMessage());
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testGoodCognitoId()
+    {
+        $consumerKey = static::$container->getParameter('digits_consumer_key');
+        try {
+            // @codingStandardsIgnoreStart
+            static::$digits->validateUser(
+                'https://api.digits.com/1.1/sdk/account.json?identity_id=eu-west-1%3A4652472c-586f-4878-9128-ac78906b1e87',
+                sprintf('oauth_consumer_key="%s"', $consumerKey),
+                'eu-west-1:4652472c-586f-4878-9128-ac78906b1e87'
+            );
+            // @codingStandardsIgnoreEnd
+        } catch (\Exception $e) {
+            $this->assertContains('Bad Authentication data.', $e->getMessage());
+
+            throw $e;
+        }
+    }
 }
