@@ -142,6 +142,7 @@ services:
             dm:             "@doctrine_mongodb.odm.default_document_manager"
             logger:         "@logger"
             intercom_token: "%intercom_token%"
+            redis:          "@snc_redis.default"
 
     app.address:
         class: AppBundle\Service\PCAService
@@ -421,6 +422,13 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
+
+    app.listener.user.sync:
+        class:   AppBundle\Listener\UserSyncListener
+        arguments:
+            intercom:               "@app.intercom"
+        tags:
+            -  { name: kernel.event_listener, event: event.user.sync.intercom, method: onIntercomSyncEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener

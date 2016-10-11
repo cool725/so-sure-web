@@ -3,11 +3,14 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
+use AppBundle\Document\OptOut\EmailOptOut;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Intercom\IntercomClient;
 
 class IntercomService
 {
+    const KEY_INTERCOM_QUEUE = 'queue:intercom';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -17,21 +20,26 @@ class IntercomService
     /** @var IntercomClient */
     protected $client;
 
+    protected $redis;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $token
+     * @param                 $redis
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        $token
+        $token,
+        $redis
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->client = new IntercomClient($token, null);
+        $this->redis = $redis;
     }
-    
+
     public function update(User $user)
     {
         if ($user->hasValidPolicy()) {
@@ -42,7 +50,7 @@ class IntercomService
         
         return $resp;
     }
-    
+
     private function updateUser(User $user)
     {
         $data = array(
@@ -66,9 +74,24 @@ class IntercomService
         $data['custom_attributes']['connections'] = $connections;
         $data['custom_attributes']['promo_code'] = $user->isPreLaunch() ? 'launch' : '';
 
+        // Only set the first time
+        if (!$user->getIntercomId()) {
+            if ($user->getIdentityLog() && $user->getIdentityLog()->getIp()) {
+                $data['last_seen_ip'] = $user->getIdentityLog()->getIp();
+            }
+        }
+
         // optout
+        $repo = $this->dm->getRepository(EmailOptOut::class);
+        $optout = $repo->findOneBy(['email' => $user->getEmailCanonical()]);
+        if ($optout) {
+            $data['unsubscribed_from_emails'] = true;
+        }
 
         $resp = $this->client->users->create($data);
+
+        $user->setIntercomId($resp->id);
+        $this->dm->flush();
 
         return $resp;
     }
@@ -76,11 +99,88 @@ class IntercomService
     private function updateLead(User $user)
     {
         $resp = $this->client->leads->create(array(
-            'user_id' => $user->getId(),
             'email' => $user->getEmail(),
             'name' => $user->getName(),
         ));
 
+        $user->setIntercomId($resp->id);
+        $this->dm->flush();
+
         return $resp;
+    }
+
+    public function process($max)
+    {
+        $count = 0;
+        while ($count < $max) {
+            $user = null;
+            try {
+                $queueItem = $this->redis->lpop(self::KEY_INTERCOM_QUEUE);
+                if (!$queueItem) {
+                    return $count;
+                }
+                $data = unserialize($queueItem);
+
+                if (!isset($data['userId']) || !$data['userId']) {
+                    throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
+                }
+                $repo = $this->dm->getRepository(User::class);
+                $user = $repo->find($data['userId']);
+                if (!$user) {
+                    throw new \Exception(sprintf('Unable to find userId: %s', $data['userId']));
+                }
+
+                $this->update($user);
+
+                $count = $count + 1;
+            } catch (\Exception $e) {
+                if ($user) {
+                    $queued = false;
+                    if (isset($data['retryAttempts']) && $data['retryAttempts'] >= 0) {
+                        if ($data['retryAttempts'] < 2) {
+                            $this->queue(
+                                $user,
+                                $data['retryAttempts'] + 1
+                            );
+                            $queued = true;
+                        }
+                    } else {
+                        $this->queue($user);
+                        $queued = true;
+                    }
+                    $this->logger->error(sprintf(
+                        'Error sending user %s to intercom (requeued: %s). Ex: %s',
+                        $user->getId(),
+                        $queued ? 'Yes' : 'No',
+                        $e->getMessage()
+                    ));
+                } else {
+                    $this->logger->error(sprintf(
+                        'Error sending user (Unknown) to intercom (requeued). Ex: %s',
+                        $e->getMessage()
+                    ));
+                }
+
+                throw $e;
+            }
+        }
+
+        return $count;
+    }
+
+    public function queue(User $user, $retryAttempts = 0)
+    {
+        $data = ['userId' => $user->getId(), 'retryAttempts' => $retryAttempts];
+        $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
+    }
+
+    public function clearQueue()
+    {
+        $this->redis->del(self::KEY_INTERCOM_QUEUE);
+    }
+
+    public function getQueueData($max)
+    {
+        return $this->redis->lrange(self::KEY_INTERCOM_QUEUE, 0, $max);
     }
 }
