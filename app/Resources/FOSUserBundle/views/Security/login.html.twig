@@ -2,30 +2,66 @@
 {% block fos_user_content %}
 <div class="container">
     <h1>Welcome back!</h1>
-    <p>
-        Please login below.
-    </p>
-        <form class="form-horizontal" action="{{ path("fos_user_security_check") }}" method="post">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
-            <div class="form-group">
-                    <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email Address"/>
-            </div>
-            <div class="form-group">
-                    <input type="password" id="password" name="_password" required="required" placeholder="Password"/>
-            </div>
-            {% if error %}
-                <div class="error-text" style="padding-bottom: 10px;">{{ error|trans({}, 'FOSUserBundle') }}</div>
-            {% endif %}
-            <div class="form-group">
-                    <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} />
-                    <label for="remember_me">Remember me</label>
-            </div>
-            <div class="form-group">
-                    <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-primary"/>
-            </div>
-            <div class="form-group">
-                <a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
-            </div>
-        </form>
+    <div class="login-digits">
+        <div class="digits-container"></div>
+        <p><a href="#" class="swap-login">Prefer email login?</a></p>
     </div>
+
+    <div class="login-email">
+        <p>
+            Please login below.
+        </p>
+            <form class="form-horizontal" action="{{ path("fos_user_security_check") }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+                <div class="form-group">
+                        <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email Address"/>
+                </div>
+                <div class="form-group">
+                        <input type="password" id="password" name="_password" required="required" placeholder="Password"/>
+                </div>
+                {% if error %}
+                    <div class="error-text" style="padding-bottom: 10px;">{{ error|trans({}, 'FOSUserBundle') }}</div>
+                {% endif %}
+                <div class="form-group">
+                        <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} />
+                        <label for="remember_me">Remember me</label>
+                </div>
+                <div class="form-group">
+                        <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-primary"/>
+                </div>
+                <div class="form-group">
+                    <a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
+                </div>
+            </form>
+        <p><a href="#" class="swap-login">Prefer mobile login?</a></p>
+        </div>
+    </div>
+  <script id="digits-sdk" src="https://cdn.digits.com/1/sdk.js" async></script>
+  <script>
+document.getElementById('digits-sdk').onload = function() {
+    Digits.init({ consumerKey: '{{ digits_consumer_key }}' });
+    Digits.embed({
+      container: '.digits-container',
+        phoneNumber: '+44'
+    })
+   .done(onLogin) /*handle the response*/
+   .fail(function() { alert('fail'); });
+   $('.swap-login').on('click', function() {
+      $('.login-email').toggle();
+      $('.login-digits').toggle();
+   });
+   
+function onLogin(loginResponse){
+  // Send headers to your server and validate user by calling Digits’ API
+  var oAuthHeaders = loginResponse.oauth_echo_headers;
+  var verifyData = {body:{oauth_echo_user: {
+    credentials: oAuthHeaders['X-Verify-Credentials-Authorization'],
+    provider: oAuthHeaders['X-Auth-Service-Provider']
+  }}};
+
+  $.ajax({url:'/api/v1/login', type: 'POST', data: JSON.stringify(verifyData), dataType: 'json', contentType: 'application/json'})
+    .done(function(){ window.reload(); });
+}
+};
+</script>
 {% endblock fos_user_content %}
