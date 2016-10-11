@@ -513,7 +513,7 @@ class PolicyService
 
         try {
             $this->mailer->sendTemplate(
-                sprintf('Your so-sure weekly email'),
+                sprintf('Happy Wednesday!'),
                 $policy->getUser()->getEmail(),
                 'AppBundle:Email:policy/weekly.html.twig',
                 ['policy' => $policy],
@@ -529,7 +529,7 @@ class PolicyService
                 $policy->getUser()->getEmail(),
                 $e->getMessage()
             ));
-            
+
             return false;
         }
     }
