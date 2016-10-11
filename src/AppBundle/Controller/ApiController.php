@@ -83,7 +83,7 @@ class ApiController extends BaseController
                 $credentials = $this->getDataString($oauthEchoUserData, 'credentials');
 
                 $digits = $this->get('app.digits');
-                $user = $digits->validateUser($provider, $credentials);
+                $user = $digits->validateUser($provider, $credentials, $this->getCognitoIdentityId($request));
             }
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);

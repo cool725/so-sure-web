@@ -32,7 +32,7 @@ class DigitsService
         $this->digitsConsumerKey = $digitsConsumerKey;
     }
 
-    public function validateUser($provider, $credentials)
+    public function validateUser($provider, $credentials, $cognitoId = null)
     {
         // @codingStandardsIgnoreStart
         // https://docs.fabric.io/apple/digits/advanced-setup.html#oauth-echo
@@ -48,6 +48,16 @@ class DigitsService
         // Verify the X-Auth-Service-Provider header, by parsing the uri and asserting the domain is api.digits.com, to ensure you are calling Digits.
         if (parse_url($provider, PHP_URL_HOST) != 'api.digits.com') {
             throw new \Exception(sprintf('Invalid digits api host %s', $provider));
+        }
+        
+        $queryData = [];
+        $querystring = parse_str(parse_url($provider, PHP_URL_QUERY), $queryData);
+
+        // Consider adding additional parameters to the signature to tie your app’s own session to the Digits session. Use the alternate form OAuthEchoHeadersToVerifyCredentialsWithParams: to provide additional parameters to include in the OAuth service URL. Verify these parameters are present in the service URL and that the API request succeeds.
+        if ($cognitoId) {
+            if (!isset($queryData['identity_id']) || $cognitoId != $queryData['identity_id']) {
+                throw new \Exception(sprintf('Cognito Id %s does not match session url %s', $cognitoId, $provider));
+            }
         }
 
         $client = new Client();
@@ -71,7 +81,6 @@ class DigitsService
         if ($verificationType != 'sms') {
             throw new \Exception(sprintf('Unknown digits verification type %s', $verificationType));
         }
-        // TODO: Consider adding additional parameters to the signature to tie your app’s own session to the Digits session. Use the alternate form OAuthEchoHeadersToVerifyCredentialsWithParams: to provide additional parameters to include in the OAuth service URL. Verify these parameters are present in the service URL and that the API request succeeds.
         // TODO: Store digits id against user record??
 
         // @codingStandardsIgnoreEnd

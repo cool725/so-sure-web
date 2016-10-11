@@ -408,13 +408,14 @@ class DefaultController extends BaseController
             }
             $this->get('fos_user.security.login_manager')->loginUser(
                 $this->getParameter('fos_user.firewall_name'),
-                $user);
+                $user
+            );
 
             return new RedirectResponse($this->generateUrl('user_home'));
         } catch (\Exception $e) {
             $this->addFlash('error', 'Unable to login.  Did you create a policy using our app yet?');
 
-            return new RedirectResponse("/login");
+            return new RedirectResponse($this->generateUrl('fos_user_security_login'));
         }
     }
 }

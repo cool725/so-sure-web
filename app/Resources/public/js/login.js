@@ -11,7 +11,7 @@ function onLogin(loginResponse) {
 }
 
 document.getElementById('digits-sdk').onload = function() {
-    Digits.init({ consumerKey: $('.login-digits').data('key') });
+    Digits.init({ consumerKey: $('.login-digits').data('key') }).done(function() { $('.digits-loading').hide(); });
     Digits.embed({
       container: '.digits-container',
         phoneNumber: '+44'
@@ -24,5 +24,10 @@ $(function() {
     $('.swap-login').on('click', function() {
       $('.login-email').toggle();
       $('.login-digits').toggle();
-    }); 
+    });
+
+    if ($('.login-digits').data('toggle') == "1") {
+      $('.login-email').toggle();
+      $('.login-digits').toggle();
+    }
 });
