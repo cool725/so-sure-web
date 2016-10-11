@@ -8,6 +8,7 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
+use AppBundle\Service\MailerService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 
@@ -19,38 +20,22 @@ class UserListener
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var \Swift_Mailer */
+    /** @var MailerService */
     protected $mailer;
-    protected $templating;
-
-    /** @var string */
-    protected $defaultSenderAddress;
-
-    /** @var string */
-    protected $defaultSenderName;
 
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param \Swift_Mailer   $mailer
-     * @param                 $templating
-     * @param string          $defaultSenderAddress
-     * @param string          $defaultSenderName
+     * @param MailerService   $mailer
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        \Swift_Mailer $mailer,
-        $templating,
-        $defaultSenderAddress,
-        $defaultSenderName
+        MailerService $mailer
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
-        $this->templating = $templating;
-        $this->defaultSenderAddress = $defaultSenderAddress;
-        $this->defaultSenderName = $defaultSenderName;
     }
 
     /**
@@ -69,19 +54,14 @@ class UserListener
      */
     public function sendUserEmailChangedEmail(User $user, $email)
     {
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Your email has been changed')
-            ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
-            ->setTo($email)
-            ->setBody(
-                $this->templating->render('AppBundle:Email:emailChanged.html.twig', ['user' => $user]),
-                'text/html'
-            )
-            ->addPart(
-                $this->templating->render('AppBundle:Email:emailChanged.txt.twig', ['user' => $user]),
-                'text/plain'
-            );
-        $this->mailer->send($message);
+        $this->mailer->sendTemplate(
+            'Your email has been changed',
+            $email,
+            'AppBundle:Email:emailChanged.html.twig',
+            ['user' => $user],
+            'AppBundle:Email:emailChanged.txt.twig',
+            ['user' => $user]
+        );
     }
 
     /**

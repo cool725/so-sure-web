@@ -18,48 +18,28 @@ class ClaimsService
     /** @var DocumentManager */
     protected $dm;
 
-    /** @var \Swift_Mailer */
+    /** @var MailerService */
     protected $mailer;
-    protected $templating;
-    protected $router;
 
     /** @var string */
     protected $environment;
 
-    /** @var string */
-    protected $defaultSenderAddress;
-
-    /** @var string */
-    protected $defaultSenderName;
-
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param \Swift_Mailer   $mailer
-     * @param                 $templating
-     * @param                 $router
+     * @param MailerService   $mailer
      * @param string          $environment
-     * @param string          $defaultSenderAddress
-     * @param string          $defaultSenderName
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        \Swift_Mailer $mailer,
-        $templating,
-        $router,
-        $environment,
-        $defaultSenderAddress,
-        $defaultSenderName
+        MailerService $mailer,
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
-        $this->templating = $templating;
-        $this->router = $router->getRouter();
         $this->environment = $environment;
-        $this->defaultSenderAddress = $defaultSenderAddress;
-        $this->defaultSenderName = $defaultSenderName;
     }
 
     public function addClaim(Policy $policy, Claim $claim)
@@ -158,19 +138,14 @@ class ClaimsService
                 $templateText = "AppBundle:Email:claim/self.txt.twig";
             }
 
-            $message = \Swift_Message::newInstance()
-                ->setSubject($subject)
-                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
-                ->setTo($policy->getUser()->getEmail())
-                ->setBody(
-                    $this->templating->render($templateHtml, ['claim' => $claim, 'policy' => $policy]),
-                    'text/html'
-                )
-                ->addPart(
-                    $this->templating->render($templateHtml, ['claim' => $claim, 'policy' => $policy]),
-                    'text/plain'
-                );
-            $this->mailer->send($message);
+            $this->mailer->sendTemplate(
+                $subject,
+                $policy->getUser()->getEmail(),
+                $templateHtml,
+                ['claim' => $claim, 'policy' => $policy],
+                $templateText,
+                ['claim' => $claim, 'policy' => $policy]
+            );
         } catch (\Exception $e) {
             $this->logger->error(sprintf("Error in notifyMonetaryClaim. Ex: %s", $e->getMessage()));
         }
@@ -188,15 +163,12 @@ class ClaimsService
             }
             $templateHtml = "AppBundle:Email:claim/shouldBeCancelled.html.twig";
 
-            $message = \Swift_Message::newInstance()
-                ->setSubject($subject)
-                ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
-                ->setTo('support@wearesosure.com')
-                ->setBody(
-                    $this->templating->render($templateHtml, ['claim' => $claim, 'policy' => $policy]),
-                    'text/html'
-                );
-            $this->mailer->send($message);
+            $this->mailer->sendTemplate(
+                $subject,
+                'support@wearesosure.com',
+                $templateHtml,
+                ['claim' => $claim, 'policy' => $policy]
+            );
         } catch (\Exception $e) {
             $this->logger->error(sprintf("Error in notifyPolicyShouldBeCancelled.", ['exception' => $e]));
         }

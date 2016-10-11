@@ -75,10 +75,7 @@ class UserListenerTest extends WebTestCase
         $listener = new UserListener(
             self::$dm,
             self::$container->get('logger'),
-            self::$container->get('mailer'),
-            self::$container->get('templating'),
-            'foo@bar.com',
-            'foo'
+            self::$container->get('app.mailer')
         );
         $listener->onUserUpdatedEvent($event);
 
@@ -135,10 +132,7 @@ class UserListenerTest extends WebTestCase
         $listener = new UserListener(
             self::$dm,
             self::$container->get('logger'),
-            self::$container->get('mailer'),
-            self::$container->get('templating'),
-            'foo@bar.com',
-            'foo'
+            self::$container->get('app.mailer')
         );
         $listener->onUserUpdatedEvent($event);
 
