@@ -2,11 +2,12 @@
 {% block fos_user_content %}
 <div class="container">
     <h1>Welcome back!</h1>
-    <div class="login-digits">
+    <div class="login-digits" data-key="{{ digits_consumer_key }}">
         <div class="digits-container"></div>
         <form method="POST" action="{{ path('digits_login') }}" id="digits-form">
             <input type="hidden" name="credentials" id="credentials">
             <input type="hidden" name="provider" id="provider">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
         </form>
         <p><a href="#" class="swap-login">Prefer email login?</a></p>
     </div>
@@ -41,38 +42,13 @@
         </div>
     </div>
   <script id="digits-sdk" src="https://cdn.digits.com/1/sdk.js" async></script>
-  <script>
-document.getElementById('digits-sdk').onload = function() {
-    Digits.init({ consumerKey: '{{ digits_consumer_key }}' });
-    Digits.embed({
-      container: '.digits-container',
-        phoneNumber: '+44'
-    })
-   .done(onLogin) /*handle the response*/
-   .fail(function() { alert('fail'); });
-   $('.swap-login').on('click', function() {
-      $('.login-email').toggle();
-      $('.login-digits').toggle();
-   });
-   
-function onLogin(loginResponse){
-  // Send headers to your server and validate user by calling Digits’ API
-  var oAuthHeaders = loginResponse.oauth_echo_headers;
-  var verifyData = {
-    credentials: oAuthHeaders['X-Verify-Credentials-Authorization'],
-    provider: oAuthHeaders['X-Auth-Service-Provider']
-  };
-  $('#credentials').val(verifyData.credentials);
-  $('#provider').val(verifyData.provider);
-  $('#digits-form').submit();
-  /*
-  $.post({url:'/login/digits', data: verifyData });
-  */
-    /*
-  $.ajax({url:'/api/v1/login', type: 'POST', data: JSON.stringify({ body: { oauth_echo_user: verifyData }}), dataType: 'json', contentType: 'application/json'})
-    .done(function(){ window.reload(); });
-    */
-}
-};
-</script>
 {% endblock fos_user_content %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '../app/Resources/public/js/login.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}

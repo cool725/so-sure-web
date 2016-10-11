@@ -394,6 +394,11 @@ class DefaultController extends BaseController
     public function digitsLoginAction(Request $request)
     {
         try {
+            $csrf = $request->request->get('_csrf_token');
+            if (!$this->isCsrfTokenValid('authenticate', $csrf)) {
+                throw new \Exception('Invalid csrf');
+            }
+
             $credentials = $request->request->get('credentials');
             $provider = $request->request->get('provider');
             $digits = $this->get('app.digits');
@@ -409,7 +414,7 @@ class DefaultController extends BaseController
         } catch (\Exception $e) {
             $this->addFlash('error', 'Unable to login.  Did you create a policy using our app yet?');
 
-            return new RedirectResponse($this->generateUrl('fos_user_login'));
+            return new RedirectResponse("/login");
         }
     }
 }
