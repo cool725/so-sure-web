@@ -111,6 +111,13 @@ services:
             defaultSenderAddress: "%default_sender_address%"
             defaultSenderName:    "%default_sender_name%"
 
+    app.digits:
+        class: AppBundle\Service\DigitsService
+        arguments:
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+            digitsConsumerKey:    "%digits_consumer_key%"
+
     app.push:
         class: AppBundle\Service\PushService
         arguments:

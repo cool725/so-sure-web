@@ -82,24 +82,8 @@ class ApiController extends BaseController
                 $provider = $this->getDataString($oauthEchoUserData, 'provider');
                 $credentials = $this->getDataString($oauthEchoUserData, 'credentials');
 
-                // @codingStandardsIgnoreStart
-
-                // https://docs.fabric.io/apple/digits/advanced-setup.html#oauth-echo
-                // TODO: Verify the X-Auth-Service-Provider header, by parsing the uri and asserting the domain is api.digits.com, to ensure you are calling Digits.
-                // TODO: Consider adding additional parameters to the signature to tie your app’s own session to the Digits session. Use the alternate form OAuthEchoHeadersToVerifyCredentialsWithParams: to provide additional parameters to include in the OAuth service URL. Verify these parameters are present in the service URL and that the API request succeeds.
-                $client = new Client();
-                $res = $client->request('GET', $provider, ['auth' => $credentials]);
-                $body = (string) $res->getBody();
-                $this->get('logger')->error($body);
-
-                // TODO: Validate that the oauth_consumer_key header value in the X-Verify-Credentials-Authorization matches your oauth consumer key, to ensure the user is logging into your site. You can use an oauth library to parse the header and explicitly match the key value, e.g. parse(params['X-Verify-Credentials-Authorization']).oauth_consumer_key=<your oauth consumer key>.
-                // TODO: Validate the response from the verify_credentials call to ensure the user is successfully logged in
-                // TODO: Login user
-                // TODO: Store digits id against user record??
-
-                // @codingStandardsIgnoreEnd
-
-                throw new \Exception('not yet implemented fully');
+                $digits = $this->get('app.digits');
+                $user = $digits->validateUser($provider, $credentials);
             }
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
