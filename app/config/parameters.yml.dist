@@ -94,3 +94,4 @@ parameters:
     sosure_employee_cookie_domain: '.dev.so-sure.net'
     slack_webhook: 'http://dev.so-sure.net'
     digits_consumer_key: ''
+    allowed_digits_consumer_keys: ''

@@ -17,19 +17,24 @@ class DigitsService
     /** @var string */
     protected $digitsConsumerKey;
 
+    protected $allowedDigitsConsumerKeys;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $digitsConsumerKey
+     * @param string          $allowedDigitsConsumerKeys
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        $digitsConsumerKey
+        $digitsConsumerKey,
+        $allowedDigitsConsumerKeys
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->digitsConsumerKey = $digitsConsumerKey;
+        $this->allowedDigitsConsumerKeys = explode(',', $allowedDigitsConsumerKeys);
     }
 
     public function validateUser($provider, $credentials, $cognitoId = null)
@@ -38,13 +43,21 @@ class DigitsService
         // https://docs.fabric.io/apple/digits/advanced-setup.html#oauth-echo
 
         // Validate that the oauth_consumer_key header value in the X-Verify-Credentials-Authorization matches your oauth consumer key, to ensure the user is logging into your site. You can use an oauth library to parse the header and explicitly match the key value, e.g. parse(params['X-Verify-Credentials-Authorization']).oauth_consumer_key=<your oauth consumer key>.
-        if (strpos($credentials, sprintf('oauth_consumer_key="%s"', $this->digitsConsumerKey)) === false) {
-            throw new \Exception(sprintf(
+        $foundConsumerKey = false;
+        if (preg_match("/oauth_consumer_key=\"([^\"]*)\"/", $credentials, $matches) && isset($matches[1])) {
+            $foundConsumerKey = in_array($matches[1], $this->allowedDigitsConsumerKeys);
+        }
+        if (!$foundConsumerKey) {
+            $message = sprintf(
                 'Invalid digits consumer key %s / %s',
                 $this->digitsConsumerKey,
                 $credentials
-            ));
+            );
+            $this->logger->warning($message);
+
+            throw new \Exception($message);
         }
+
         // Verify the X-Auth-Service-Provider header, by parsing the uri and asserting the domain is api.digits.com, to ensure you are calling Digits.
         if (parse_url($provider, PHP_URL_HOST) != 'api.digits.com') {
             throw new \Exception(sprintf('Invalid digits api host %s', $provider));
