@@ -366,6 +366,18 @@ class User extends BaseUser implements TwoFactorInterface
         return false;
     }
 
+    public function getValidPolicies()
+    {
+        $policies = [];
+        foreach ($this->getPolicies() as $policy) {
+            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
+                $policies[] = $policy;
+            }
+        }
+
+        return $policies;
+    }
+
     public function addSentInvitation(Invitation $invitation)
     {
         $invitation->setInviter($this);

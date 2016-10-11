@@ -95,3 +95,6 @@ parameters:
     slack_webhook: 'http://dev.so-sure.net'
     digits_consumer_key: ''
     allowed_digits_consumer_keys: ''
+
+    intercom_token: ''
+

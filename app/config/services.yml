@@ -136,6 +136,13 @@ services:
             googleApiKey:  "%google_apikey%"
             statsd:        "@statsd"
 
+    app.intercom:
+        class: AppBundle\Service\IntercomService
+        arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
+            logger:         "@logger"
+            intercom_token: "%intercom_token%"
+
     app.address:
         class: AppBundle\Service\PCAService
         arguments:
