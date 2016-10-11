@@ -54,10 +54,10 @@ class DoctrineSalvaListenerTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $this->assertTrue($policy->isValidPolicy());
 
