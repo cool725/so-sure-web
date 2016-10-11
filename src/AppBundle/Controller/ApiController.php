@@ -29,6 +29,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+use GuzzleHttp\Client;
+
 /**
  * @Route("/api/v1")
  */
@@ -58,6 +60,11 @@ class ApiController extends BaseController
                 if (!$this->validateFields($facebookUserData, ['facebook_id', 'facebook_access_token'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
+            } elseif (isset($data['oauth_echo_user'])) {
+                $oauthEchoUserData = $data['oauth_echo_user'];
+                if (!$this->validateFields($oauthEchoUserData, ['provider', 'credentials'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
@@ -71,6 +78,12 @@ class ApiController extends BaseController
             } elseif ($facebookUserData) {
                 $facebookId = $this->getDataString($facebookUserData, 'facebook_id');
                 $user = $repo->findOneBy(['facebookId' => $facebookId]);
+            } elseif ($oauthEchoUserData) {
+                $provider = $this->getDataString($oauthEchoUserData, 'provider');
+                $credentials = $this->getDataString($oauthEchoUserData, 'credentials');
+
+                $digits = $this->get('app.digits');
+                $user = $digits->validateUser($provider, $credentials);
             }
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
