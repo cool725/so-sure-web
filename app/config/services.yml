@@ -423,12 +423,15 @@ services:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
 
-    app.listener.user.sync:
-        class:   AppBundle\Listener\UserSyncListener
+    app.listener.intercom:
+        class:   AppBundle\Listener\IntercomListener
         arguments:
-            intercom:               "@app.intercom"
+            intercom: "@app.intercom"
         tags:
-            -  { name: kernel.event_listener, event: event.user.sync.intercom, method: onIntercomSyncEvent }
+            -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.updated, method: onPolicyUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener

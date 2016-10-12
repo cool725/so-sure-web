@@ -8,7 +8,6 @@ use AppBundle\Document\User;
 class UserEvent extends Event
 {
     const EVENT_UPDATED = 'event.user.updated';
-    const EVENT_SYNC_INTERCOM = 'event.user.sync.intercom';
 
     /** @var User */
     protected $user;
