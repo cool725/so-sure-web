@@ -42,6 +42,10 @@ class IntercomService
 
     public function update(User $user)
     {
+        if ($user->hasSoSureEmail()) {
+            return;
+        }
+
         if ($user->hasValidPolicy()) {
             $resp = $this->updateConvert($user);
         } else {
@@ -53,6 +57,10 @@ class IntercomService
 
     public function updateConvert(User $user)
     {
+        if ($user->hasSoSureEmail()) {
+            return;
+        }
+
         try {
             $resp = $this->updateUser($user);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
@@ -98,9 +106,11 @@ class IntercomService
         $pot = 0;
         $connections = 0;
         foreach ($user->getValidPolicies() as $policy) {
-            $policyValue += $policy->getPremium()->getYearlyPremiumPrice();
-            $pot += $policy->getPotValue();
-            $connections += count($policy->getConnections());
+            if ($policy->isValidPolicy()) {
+                $policyValue += $policy->getPremium()->getYearlyPremiumPrice();
+                $pot += $policy->getPotValue();
+                $connections += count($policy->getConnections());
+            }
         }
 
         $data['custom_attributes']['premium'] = $policyValue;
