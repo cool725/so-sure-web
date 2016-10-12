@@ -1079,6 +1079,69 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($connectionFound);
     }
 
+    public function testOptOut()
+    {
+        $email = static::generateEmail('optout', $this);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(EmailOptOut::class);
+        $this->assertEquals(0, count($repo->findBy(['email' => strtolower($email)])));
+
+        static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_ALL);
+        $this->assertEquals(1, count($repo->findBy(['email' => strtolower($email)])));
+
+        static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_ALL);
+        $this->assertEquals(1, count($repo->findBy(['email' => strtolower($email)])));
+    }
+
+    public function testRejectAllInvitations()
+    {
+        $email = static::generateEmail('reject', $this);
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-rejectA', $this),
+            'bar'
+        );
+        $policyA = static::initPolicy($userA, static::$dm, static::$phone, null, false, true);
+
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('user-rejectB', $this),
+            'bar'
+        );
+        $policyB = static::initPolicy($userB, static::$dm, static::$phone, null, false, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            $email,
+            'bar'
+        );
+        $cancelledInvitation = self::$invitationService->inviteByEmail(
+            $policyA,
+            $email
+        );
+        $this->assertTrue($cancelledInvitation instanceof EmailInvitation);
+        self::$invitationService->cancel($cancelledInvitation);
+
+        $openInvitation = self::$invitationService->inviteByEmail(
+            $policyB,
+            $email
+        );
+        $this->assertTrue($openInvitation instanceof EmailInvitation);
+
+        static::$invitationService->rejectAllInvitations($email);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(EmailInvitation::class);
+
+        $updatedCancelledInvitation = $repo->find($cancelledInvitation->getId());
+        $this->assertTrue($updatedCancelledInvitation->isCancelled());
+        $this->assertFalse($updatedCancelledInvitation->isRejected());
+
+        $updatedOpenInvitaiton = $repo->find($openInvitation->getId());
+        $this->assertTrue($updatedOpenInvitaiton->isRejected());
+    }
+
     private function createAndLink($email, $date, $inviteeEmail = null, $policy = null, $phone = null)
     {
         if ($phone == null) {

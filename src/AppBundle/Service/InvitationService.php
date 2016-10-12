@@ -572,4 +572,30 @@ class InvitationService
 
         return true;
     }
+
+    public function optout($email, $category)
+    {
+        $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
+        $optOut = $optoutRepo->findOneBy(['email' => strtolower($email)]);
+        if (!$optOut) {
+            $optout = new EmailOptOut();
+            $optout->setCategory($category);
+            $optout->setEmail($email);
+
+            $this->dm->persist($optout);
+        }
+        $this->dm->flush();
+    }
+
+    public function rejectAllInvitations($email)
+    {
+        $inviteRepo = $this->dm->getRepository(EmailInvitation::class);
+        $invitations = $inviteRepo->findBy(['email' => strtolower($email)]);
+        foreach ($invitations as $invitation) {
+            if (!$invitation->isProcessed()) {
+                $invitation->setRejected(new \DateTime());
+            }
+        }
+        $this->dm->flush();
+    }
 }
