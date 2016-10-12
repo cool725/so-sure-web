@@ -438,6 +438,7 @@ class DefaultController extends BaseController
             ))
             ->getForm();
 
+        $email = null;
         $hash = $request->get('hash');
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
