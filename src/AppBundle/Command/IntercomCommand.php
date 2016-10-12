@@ -93,7 +93,7 @@ class IntercomCommand extends ContainerAwareCommand
             }
         } elseif ($requeue) {
             $count = 0;
-            foreach ($repo->findAll() as $user) {
+            foreach ($this->getAllUsers() as $user) {
                 $intercom->queue($user);
                 $count++;
             }
@@ -104,15 +104,29 @@ class IntercomCommand extends ContainerAwareCommand
         }
     }
 
+    private function getAllUsers()
+    {
+        $repo = $this->getUserRepository();
+
+        return $repo->findAll();
+    }
+
     private function getUser($email)
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(User::class);
+        $repo = $this->getUserRepository();
         $user = $repo->findOneBy(['emailCanonical' => strtolower($email)]);
         if (!$user) {
             throw new \Exception('unable to find user');
         }
 
         return $user;
+    }
+
+    private function getUserRepository()
+    {
+        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $repo = $dm->getRepository(User::class);
+
+        return $repo;
     }
 }
