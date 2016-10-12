@@ -190,7 +190,7 @@ class User extends BaseUser implements TwoFactorInterface
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="0", max="500")
+     * @Assert\Length(min="0", max="1500")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
