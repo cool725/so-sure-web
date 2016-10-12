@@ -13,7 +13,7 @@
             {{ policy.user.firstname }}!</h1>
         <p class="lead text-center" style="padding-bottom: 20px;">
             This account page is still a work in progress, so it's a bit limited at the moment. However, if you have any ideas of what might be useful to you, we'd love to
-            <a href="mailto:hello@wearesosure.com">them</a>.
+            <a href="mailto:hello@wearesosure.com">hear them</a>.
         </p>
         <div class="col-md-6">
             <div class="panel panel-default">
@@ -50,7 +50,7 @@
                     {{ form_start(email_form, {'attr': {'class': 'form-inline'}}) }}
                     <div class="form-group">
                         {{ form_errors(email_form.email) }}
-                        {{ form_widget(email_form.email) }}
+                        {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email'}}) }}
                     </div>
                     {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-primary'}}) }}&nbsp;
                     {{ form_end(email_form) }}

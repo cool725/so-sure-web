@@ -1,4 +1,5 @@
 $(function(){
+    Chart.defaults.global.defaultFontFamily = '"Avenir LT Std 45 Book","Helvetica Neue",Helvetica,Arial,sans-serif';
     var ctx = document.getElementById("myChart");
     var connections = $('.doughnut-outer').data('connections');
     var invites = $('.doughnut-outer').data('invites');
