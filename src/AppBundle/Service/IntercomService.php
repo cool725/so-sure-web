@@ -106,9 +106,11 @@ class IntercomService
         $pot = 0;
         $connections = 0;
         foreach ($user->getValidPolicies() as $policy) {
-            $policyValue += $policy->getPremium()->getYearlyPremiumPrice();
-            $pot += $policy->getPotValue();
-            $connections += count($policy->getConnections());
+            if ($policy->isValidPolicy()) {
+                $policyValue += $policy->getPremium()->getYearlyPremiumPrice();
+                $pot += $policy->getPotValue();
+                $connections += count($policy->getConnections());
+            }
         }
 
         $data['custom_attributes']['premium'] = $policyValue;
