@@ -43,15 +43,39 @@ class IntercomService
     public function update(User $user)
     {
         if ($user->hasValidPolicy()) {
-            $resp = $this->updateUser($user);
+            try {
+                $resp = $this->updateUser($user);
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                // If the lead exists, we appear to be triggering a 404
+                // Not sure if this is due to using the intercom id in the request, or perhaps an email collision
+                // Regardless, creating the user first doesn't seem to work, so if there is a 404,
+                // convert the lead, then update the user
+                if ($e->getResponse()->getStatusCode() == "404") {
+                    $resp = $this->convertLead($user);
+                    $resp = $this->updateUser($user, true);
+                }
+            }
         } else {
             $resp = $this->updateLead($user);
         }
-        
+
         return $resp;
     }
 
-    private function updateUser(User $user)
+    private function convertLead(User $user)
+    {
+        $data = [
+          "contact" => array("id" => $user->getIntercomId()),
+          "user" => array("user_id" => $user->getId())
+        ];
+
+        $resp = $this->client->leads->convertLead($data);
+        $this->logger->debug(sprintf('Intercom convert lead (userid %s) %s', $user->getId(), json_encode($resp)));
+
+        return $resp;
+    }
+
+    private function updateUser(User $user, $isConverted = false)
     {
         $data = array(
             'user_id' => $user->getId(),
@@ -77,8 +101,8 @@ class IntercomService
         $data['custom_attributes']['connections'] = $connections;
         $data['custom_attributes']['promo_code'] = $user->isPreLaunch() ? 'launch' : '';
 
-        // Only set the first time
-        if (!$user->getIntercomId()) {
+        // Only set the first time, or if the user was converted from a lead
+        if (!$user->getIntercomId() || $isConverted) {
             if ($user->getIdentityLog() && $user->getIdentityLog()->getIp()) {
                 $data['last_seen_ip'] = $user->getIdentityLog()->getIp();
             }
@@ -92,6 +116,7 @@ class IntercomService
         }
 
         $resp = $this->client->users->create($data);
+        $this->logger->debug(sprintf('Intercom create user (userid %s) %s', $user->getId(), json_encode($resp)));
 
         $user->setIntercomId($resp->id);
         $this->dm->flush();
@@ -109,6 +134,7 @@ class IntercomService
             $data['id'] = $user->getIntercomId();
         }
         $resp = $this->client->leads->create($data);
+        $this->logger->debug(sprintf('Intercom create lead (userid %s) %s', $user->getId(), json_encode($resp)));
 
         $user->setIntercomId($resp->id);
         $this->dm->flush();
