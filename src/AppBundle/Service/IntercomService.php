@@ -42,6 +42,10 @@ class IntercomService
 
     public function update(User $user)
     {
+        if ($user->hasSoSureEmail()) {
+            return;
+        }
+
         if ($user->hasValidPolicy()) {
             $resp = $this->updateConvert($user);
         } else {
@@ -53,6 +57,10 @@ class IntercomService
 
     public function updateConvert(User $user)
     {
+        if ($user->hasSoSureEmail()) {
+            return;
+        }
+
         try {
             $resp = $this->updateUser($user);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
