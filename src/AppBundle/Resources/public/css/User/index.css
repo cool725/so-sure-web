@@ -1,0 +1,73 @@
+.reward-pot {
+  min-height: 750px;
+  padding-top: 100px;
+  padding-bottom: 150px;
+}
+.reward-pot h1 {
+  padding-bottom: 20px;
+}
+.reward-pot .btn-primary {
+      padding: 7.25px 25px;
+      border-radius: 4px !important;
+      -moz-border-radius: 30px;
+      -webkit-border-radius: 30px;
+      width: 100px;
+}
+.reward-pot #email_email {
+  padding: 5px 15px 5px 15px;
+  width: 300px;
+  margin-bottom: 0;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border: 2px solid #3399ff;
+}
+.reward-pot .panel-default {
+    border: 2px solid #efefef;
+    padding: 5px 8px 0px;
+    margin: 0 -1px 39px 0;
+    position: relative;
+    background: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+    text-align: center;
+    height: 550px;
+    margin-top: 20px;
+}
+.reward-pot .panel-heading {
+  color: #202532;
+  border-bottom: 2px solid #202532;
+  background: #fff;
+}
+
+@media (max-width:992px) {
+    .reward-pot .btn-primary {
+        width: 200px;
+    }
+    .reward-pot #email_email {
+      width: 200px;
+    }
+  }
+
+.doughnut-outer {
+    width: 500px;
+    height: 300px;
+    text-align: center;
+}
+.doughnut-inner {
+   margin-top: -170px;
+   margin-bottom: 100px;
+}
+.doughnut-inner span {
+    font-size: 12px;
+}
+@media (max-width: 767px) {
+  .doughnut-inner {
+    margin-top: -180px;
+  }
+}
+@media (max-width: 543px) {
+  .doughnut-inner {
+    margin-top: -180px;
+  }
+}
