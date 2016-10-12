@@ -48,6 +48,12 @@ class IntercomCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Requeue the given user (if email param given) or all users'
             )
+            ->addOption(
+                'convert-lead',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Force a lead to user conversion (email address)'
+            )
         ;
     }
 
@@ -58,16 +64,12 @@ class IntercomCommand extends ContainerAwareCommand
         $process = $input->getOption('process');
         $email = $input->getOption('email');
         $requeue = $input->getOption('requeue');
+        $convertLead = $input->getOption('convert-lead');
 
         $intercom = $this->getContainer()->get('app.intercom');
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(User::class);
 
         if ($email) {
-            $user = $repo->findOneBy(['emailCanonical' => strtolower($email)]);
-            if (!$user) {
-                throw new \Exception('unable to find user');
-            }
+            $user = $this->getUser($email);
 
             if ($requeue) {
                 $resp = $intercom->queue($user);
@@ -76,6 +78,10 @@ class IntercomCommand extends ContainerAwareCommand
                 $resp = $intercom->update($user);
                 $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
             }
+        } elseif ($convertLead) {
+            $user = $this->getUser($convertLead);
+            $resp = $intercom->updateConvert($user);
+            $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
         } elseif ($clear) {
             $intercom->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
@@ -96,5 +102,17 @@ class IntercomCommand extends ContainerAwareCommand
             $count = $intercom->process($process);
             $output->writeln(sprintf("Sent %s user updates", $count));
         }
+    }
+
+    private function getUser($email)
+    {
+        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $repo = $dm->getRepository(User::class);
+        $user = $repo->findOneBy(['emailCanonical' => strtolower($email)]);
+        if (!$user) {
+            throw new \Exception('unable to find user');
+        }
+
+        return $user;
     }
 }

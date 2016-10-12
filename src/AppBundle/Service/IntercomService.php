@@ -43,20 +43,26 @@ class IntercomService
     public function update(User $user)
     {
         if ($user->hasValidPolicy()) {
-            try {
-                $resp = $this->updateUser($user);
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                // If the lead exists, we appear to be triggering a 404
-                // Not sure if this is due to using the intercom id in the request, or perhaps an email collision
-                // Regardless, creating the user first doesn't seem to work, so if there is a 404,
-                // convert the lead, then update the user
-                if ($e->getResponse()->getStatusCode() == "404") {
-                    $resp = $this->convertLead($user);
-                    $resp = $this->updateUser($user, true);
-                }
-            }
+            $resp = $this->updateConvert($user);
         } else {
             $resp = $this->updateLead($user);
+        }
+
+        return $resp;
+    }
+
+    public function updateConvert(User $user)
+    {
+        try {
+            $resp = $this->updateUser($user);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // For leads, there should be an intercom id on the so-sure user record (set on creation)
+            // However, as the record is not marked as a user, it will trigger a 404
+            // So, first convert the lead, then update the user
+            if ($e->getResponse()->getStatusCode() == "404") {
+                $resp = $this->convertLead($user);
+                $resp = $this->updateUser($user, true);
+            }
         }
 
         return $resp;
@@ -78,13 +84,14 @@ class IntercomService
     private function updateUser(User $user, $isConverted = false)
     {
         $data = array(
-            'user_id' => $user->getId(),
             'email' => $user->getEmail(),
             'name' => $user->getName(),
             'signed_up_at' => $user->getCreated()->getTimestamp(),
         );
         if ($user->getIntercomId()) {
             $data['id'] = $user->getIntercomId();
+            // user_id can only be set if the user already exists
+            $data['user_id'] = $user->getId();
         }
 
         $policyValue = 0;
