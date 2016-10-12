@@ -4,7 +4,7 @@
 var _ouibounce = ouibounce(document.getElementById('ouibounce-modal'), {
   aggressive: true,
   timer: 0,
-  callback: function() { $('#ouibounce-modal').modal('show'); }
+  callback: function() {  }
 });
 
 $('body').on('click', function() {
