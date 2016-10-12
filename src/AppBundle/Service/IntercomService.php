@@ -59,6 +59,9 @@ class IntercomService
             'name' => $user->getName(),
             'signed_up_at' => $user->getCreated()->getTimestamp(),
         );
+        if ($user->getIntercomId()) {
+            $data['id'] = $user->getIntercomId();
+        }
 
         $policyValue = 0;
         $pot = 0;
@@ -98,10 +101,14 @@ class IntercomService
     
     private function updateLead(User $user)
     {
-        $resp = $this->client->leads->create(array(
+        $data = array(
             'email' => $user->getEmail(),
             'name' => $user->getName(),
-        ));
+        );
+        if ($user->getIntercomId()) {
+            $data['id'] = $user->getIntercomId();
+        }
+        $resp = $this->client->leads->create($data);
 
         $user->setIntercomId($resp->id);
         $this->dm->flush();

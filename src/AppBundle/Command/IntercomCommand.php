@@ -22,7 +22,7 @@ class IntercomCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'email address to sync'
-            )            
+            )
             ->addOption(
                 'clear',
                 null,
@@ -48,7 +48,7 @@ class IntercomCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Requeue the given user (if email param given) or all users'
             )
-       ;
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -87,7 +87,7 @@ class IntercomCommand extends ContainerAwareCommand
             }
         } elseif ($requeue) {
             $count = 0;
-            foreach($repo->findAll() as $user) {
+            foreach ($repo->findAll() as $user) {
                 $intercom->queue($user);
                 $count++;
             }
