@@ -276,9 +276,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .login {
     padding-top: 100px;
-    padding-bottom: 100px;
-    min-height: 400px;
+    padding-bottom: 150px;
+    min-height: 600px;
     text-align: center;
+    height: 80%;
 }
 .login #username, .login #password, #fos_user_resetting_form_new_first, #fos_user_resetting_form_new_second {
     padding: 5px 15px 5px 15px;
@@ -330,6 +331,14 @@ h1, h2, h3, h4, h5, h6 {
   background-size: 100% auto;
   height: 100%;
   position: relative;
+}
+.align-center {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 @media (max-height: 500px) {
 .align-middle {

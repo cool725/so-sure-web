@@ -1,4 +1,4 @@
-$(function(){ 
+$(function(){
     var ctx = document.getElementById("myChart");
     var connections = $('.doughnut-outer').data('connections');
     var invites = $('.doughnut-outer').data('invites');
