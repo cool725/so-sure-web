@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9f2d1ee02c8743aed9e9facdfb64cb0a",
-    "content-hash": "2d49f77b632bd807ae989d3d63fc772d",
+    "hash": "bb8c60b98f24f94fa71fda24ff128708",
+    "content-hash": "f3e929805d1d3c7f3d27e02babde8414",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1331,6 +1331,7 @@
                 "monitoring",
                 "statsd"
             ],
+            "abandoned": true,
             "time": "2016-04-23 09:10:43"
         },
         {
@@ -2484,6 +2485,54 @@
                 "parameters management"
             ],
             "time": "2015-11-10 17:04:01"
+        },
+        {
+            "name": "intercom/intercom-php",
+            "version": "v3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/intercom/intercom-php.git",
+                "reference": "f0b23505170e9ee43687cccf1a7e25738ee05aa5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/intercom/intercom-php/zipball/f0b23505170e9ee43687cccf1a7e25738ee05aa5",
+                "reference": "f0b23505170e9ee43687cccf1a7e25738ee05aa5",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~6.0",
+                "php": ">= 5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Intercom\\": [
+                        "src"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache Version 2"
+            ],
+            "authors": [
+                {
+                    "name": "Intercom Platform Team",
+                    "homepage": "http://intercom.io"
+                }
+            ],
+            "description": "Intercom API client built on top of Guzzle 6",
+            "keywords": [
+                "Guzzle",
+                "api",
+                "intercom",
+                "intercom.io"
+            ],
+            "time": "2016-10-01 20:37:02"
         },
         {
             "name": "ircmaxell/password-compat",

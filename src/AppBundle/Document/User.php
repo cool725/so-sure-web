@@ -209,6 +209,14 @@ class User extends BaseUser implements TwoFactorInterface
      */
     protected $acceptedSCode;
 
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $intercomId;
+
     public function __construct()
     {
         parent::__construct();
@@ -364,6 +372,18 @@ class User extends BaseUser implements TwoFactorInterface
         }
 
         return false;
+    }
+
+    public function getValidPolicies()
+    {
+        $policies = [];
+        foreach ($this->getPolicies() as $policy) {
+            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
+                $policies[] = $policy;
+            }
+        }
+
+        return $policies;
     }
 
     public function addSentInvitation(Invitation $invitation)
@@ -608,6 +628,16 @@ class User extends BaseUser implements TwoFactorInterface
         if (!$this->getLeadSource()) {
             $this->setLeadSource('scode');
         }
+    }
+
+    public function getIntercomId()
+    {
+        return $this->intercomId;
+    }
+
+    public function setIntercomId($intercomId)
+    {
+        $this->intercomId = $intercomId;
     }
 
     public function hasSoSureEmail()

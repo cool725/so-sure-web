@@ -136,6 +136,14 @@ services:
             googleApiKey:  "%google_apikey%"
             statsd:        "@statsd"
 
+    app.intercom:
+        class: AppBundle\Service\IntercomService
+        arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
+            logger:         "@logger"
+            intercom_token: "%intercom_token%"
+            redis:          "@snc_redis.default"
+
     app.address:
         class: AppBundle\Service\PCAService
         arguments:
@@ -414,6 +422,16 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
+
+    app.listener.intercom:
+        class:   AppBundle\Listener\IntercomListener
+        arguments:
+            intercom: "@app.intercom"
+        tags:
+            -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.updated, method: onPolicyUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener
