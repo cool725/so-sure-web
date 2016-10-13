@@ -136,6 +136,30 @@
     </div>
     </section>
 
+    <section class="download-now" id="download-now">
+        <div class="container">
+            <h2>The next bit is via the app</h2>
+              <p class="lead text-center" id="hero-description">It makes sense, we are a mobile insurance provider after all!</p>
+            {% if is_promo %}
+                <p class="lead text-center" id="hero-description">As an added bonus, become one our first 1,000 customers &amp; we'll give you up to
+                    <strong>£15 for each connection</strong>. You could also get your 1st year of insurance for free!</p>
+            {% endif %}
+            <div class="row download-app">
+                <div class="col-md-6 text-right">
+                    <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                        <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+                    </a>
+                </div>
+                <div class="col-md-6 text-left">
+                    <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                        <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+
     <section>
         <div class="container support-chat">
             <h2 class="text-center">
@@ -170,30 +194,6 @@
             </div>
         </div>
     </div>
-</section>
-
-<section class="download-now" id="download-now">
-    <div class="container">
-        <h2>The next bit is via the app</h2>
-          <p class="lead text-center" id="hero-description">It makes sense, we are a mobile insurance provider after all!</p>
-        {% if is_promo %}
-            <p class="lead text-center" id="hero-description">As an added bonus, become one our first 1,000 customers &amp; we'll give you up to
-                <strong>£15 for each connection</strong>. You could also get your 1st year of insurance for free!</p>
-        {% endif %}
-        <div class="row download-app">
-            <div class="col-md-6 text-right">
-                <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-                </a>
-            </div>
-            <div class="col-md-6 text-left">
-                <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
 </section>
 
 <div class="modal fade" id="more-info" tabindex="-1" role="dialog">

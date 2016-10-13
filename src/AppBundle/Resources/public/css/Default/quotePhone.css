@@ -14,13 +14,12 @@
 }
 .view-quote .panel-primary {
     border: 2px solid #efefef;
-    padding: 5px 8px 0px;
     margin: 0 -1px 39px 0;
     position: relative;
     background: white;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
     text-align: center;
-    height: 500px;
+    height: 100%;
     margin-top: 20px;
 }
 .quote-panel-left {
