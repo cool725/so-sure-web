@@ -84,11 +84,11 @@ class IntercomListenerTest extends WebTestCase
         $this->assertEquals($user->getId(), $data['userId']);
     }
     
-    public function testIntercomQueueUpdated()
+    public function testIntercomQueuePolicyPot()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('intercom-queue-updated', $this),
+            static::generateEmail('intercom-queue-policy-pot', $this),
             'bar'
         );
         $policy = new PhonePolicy();
@@ -99,7 +99,7 @@ class IntercomListenerTest extends WebTestCase
         $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
 
         $listener = new IntercomListener(static::$intercomService);
-        $listener->onPolicyUpdatedEvent(new PolicyEvent($policy));
+        $listener->onPolicyPotEvent(new PolicyEvent($policy));
 
         $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));

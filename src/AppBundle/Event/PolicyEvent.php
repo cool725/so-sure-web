@@ -14,6 +14,8 @@ class PolicyEvent extends Event
     // Certain changes to a policy (user) should trigger a new salva version
     const EVENT_SALVA_INCREMENT = 'event.policy.salva_increment';
 
+    const EVENT_UPDATED_POT = 'event.policy.pot';
+
     /** @var PhonePolicy */
     protected $policy;
 
