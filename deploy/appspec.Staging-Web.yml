@@ -6,5 +6,5 @@ files:
 hooks:
   AfterInstall:
     - location: deploy-staging.sh
-      timeout: 600
+      timeout: 1200
       runas: root
