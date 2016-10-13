@@ -573,8 +573,12 @@ class InvitationService
         return true;
     }
 
-    public function optout($email, $category)
+    public function optout($email, $category = null)
     {
+        if (!$category) {
+            $category = EmailOptOut::OPTOUT_CAT_ALL;
+        }
+
         $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
         $optOut = $optoutRepo->findOneBy(['email' => strtolower($email)]);
         if (!$optOut) {

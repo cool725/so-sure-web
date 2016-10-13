@@ -105,4 +105,80 @@ class ApiExternalControllerTest extends BaseControllerTest
 
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
+
+    public function testIntercomValidPing()
+    {
+        $data = '{
+  "type" : "notification_event",
+  "app_id" : "hp8z6qfh",
+  "data" : {
+    "type" : "notification_event_data",
+    "item" : {
+      "type" : "ping",
+      "message" : "something something interzen"
+    }
+  },
+  "links" : { },
+  "id" : null,
+  "topic" : "ping",
+  "delivery_status" : null,
+  "delivery_attempts" : 1,
+  "delivered_at" : 0,
+  "first_sent_at" : 1476349292,
+  "created_at" : 1476349292,
+  "self" : null
+}';
+        $url = sprintf(
+            '/external/intercom'
+        );
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json', "HTTP_X-Hub-Signature" => "sha1=0c0f352a9fd5b775746baca1858a1d11ef31fb24"),
+            $data
+        );
+
+        $data = $this->verifyResponse(200);
+    }
+
+    public function testIntercomInvalidHashPing()
+    {
+        $data = '{
+  "type" : "notification_event",
+  "app_id" : "hp8z6qfh",
+  "data" : {
+    "type" : "notification_event_data",
+    "item" : {
+      "type" : "ping",
+      "message" : "something something interzen"
+    }
+  },
+  "links" : { },
+  "id" : null,
+  "topic" : "ping",
+  "delivery_status" : null,
+  "delivery_attempts" : 1,
+  "delivered_at" : 0,
+  "first_sent_at" : 1476349292,
+  "created_at" : 1476349292,
+  "self" : null
+}';
+        $url = sprintf(
+            '/external/intercom'
+        );
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json', "HTTP_X-Hub-Signature" => "sha1=baca1858a1d11ef31fb24"),
+            $data
+        );
+
+        $data = $this->verifyResponse(500);
+    }
 }

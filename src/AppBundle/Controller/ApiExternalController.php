@@ -97,4 +97,55 @@ class ApiExternalController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
+
+    /**
+     * @Route("/intercom", name="api_external_intercom")
+     * @Method({"POST"})
+     */
+    public function unauthIntercomAction(Request $request)
+    {
+        try {
+            $intercomWebhookKey = $this->getParameter('intercom_webhook_key');
+            $signature = $request->headers->get('X-Hub-Signature');
+            if (explode('=', $signature)[0] != 'sha1') {
+                throw new \Exception(sprintf('Invalid intercom hash %s', $signature));
+            }
+            $signatureSha1 = explode('=', $signature)[1];
+            $data = json_decode($request->getContent(), true);
+
+            if (hash_hmac('sha1', $request->getContent(), $intercomWebhookKey) != $signatureSha1) {
+                throw new \Exception(sprintf('Invalid intercom signature %s', $signature));
+            }
+            if ($data['topic'] == 'ping') {
+                return new JsonResponse('pong');
+            } elseif ($data['topic'] == 'user.unsubscribed') {
+                $item = $data['data']['item'];
+                if ($item['type'] != 'User') {
+                    throw new \Exception(sprintf('Unknown unsub object %s', json_encode($item)));
+                }
+                if (!$item['unsubscribed_from_emails']) {
+                    // TODO: Should we resubscribe?
+                }
+                $dm = $this->getManager();
+                $repo = $dm->getRepository(User::class);
+                $user = $repo->findOneBy(['intercomId' => $item['id']]);
+                if (!$user) {
+                    // User was only created via intercom
+                    // TODO: Maybe we could them query intercom to get the lead/user and get email
+                } else {
+                    $invitation = $this->get('app.invitation');
+                    $invitation->optout($user->getEmail());
+                    $invitation->rejectAllInvitations($user->getEmail());
+                }
+            } else {
+                throw new \Exception(sprintf('Unimplemented topic %s', $data['topic']));
+            }
+
+            return new JsonResponse([]);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api intercom.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
 }
