@@ -439,7 +439,7 @@ services:
             salva: "@app.salva"
         tags:
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
-            -  { name: kernel.event_listener, event: event.policy.updated, method: onPolicyUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.salva_increment, method: onPolicySalvaIncrementEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.listener.refund:

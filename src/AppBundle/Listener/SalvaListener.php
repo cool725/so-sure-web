@@ -34,7 +34,7 @@ class SalvaListener
     /**
      * @param PolicyEvent $event
      */
-    public function onPolicyUpdatedEvent(PolicyEvent $event)
+    public function onPolicySalvaIncrementEvent(PolicyEvent $event)
     {
         $this->queue($event, SalvaExportService::QUEUE_UPDATED);
     }

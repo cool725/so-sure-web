@@ -79,7 +79,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
     private function runPreUpdate($policy, $count, $changeSet, $event = null)
     {
         if (!$event) {
-            $event = PolicyEvent::EVENT_UPDATED;
+            $event = PolicyEvent::EVENT_SALVA_INCREMENT;
         }
         $listener = $this->createListener($policy, $count, $event);
         $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
@@ -88,7 +88,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
 
     private function runPreUpdateUser($user, $policy, $count, $changeSet)
     {
-        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED);
+        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_SALVA_INCREMENT);
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
     }
