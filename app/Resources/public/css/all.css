@@ -269,15 +269,34 @@ h1, h2, h3, h4, h5, h6 {
 .login-email {
     display: none;
 }
-
 .swap-login-wrapper {
     margin-top: 40px;
 }
-
+.login-email .btn-primary, .login-digits .btn-primary {
+  padding: 12px 30px;
+  border-radius: 30px;
+  -moz-border-radius: 30px;
+  -webkit-border-radius: 30px;
+  width: 250px;
+}
+.login-email .btn-info, .login-digits .btn-info {
+  padding: 12px 30px;
+  border: 2px solid #202532;
+  background: none !important;
+  border-radius: 30px;
+  -moz-border-radius: 30px;
+  -webkit-border-radius: 30px;
+  background: none;
+  color: #202532;
+  width: 250px;
+}
+.login-email .btn-info:hover, .login-digits .btn-info:hover {
+  text-decoration: none!important
+}
 .login {
     padding-top: 100px;
     padding-bottom: 150px;
-    min-height: 600px;
+    min-height: 700px;
     text-align: center;
     height: 80%;
 }
@@ -310,6 +329,14 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 5px;
     margin-bottom: 20px;
     margin-top: 20px;
+}
+.digits-container iframe {
+  height: 200px;
+}
+@media (max-width: 543px) {
+  .digits-container iframe {
+    height: 250px;
+  }
 }
 /* Download Now */
 
@@ -369,4 +396,12 @@ h1, h2, h3, h4, h5, h6 {
   background: -ms-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
   background: linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
   filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1);
+}
+
+div.col-sm-7.five-three {
+width: 60% !important;
+}
+
+div.col-sm-5.five-two {
+  width: 40% !important;
 }

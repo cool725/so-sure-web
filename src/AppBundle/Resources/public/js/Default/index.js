@@ -16,13 +16,13 @@
         }, 1500);
     });
 
-    var iframe = document.getElementById('exp-vid');
-    var player = $f(iframe);
+    var iframe = document.querySelector('#exp-vid');
+    var player = new Vimeo.Player(iframe);
 
-    $('.modal').on('hidden.bs.modal', function () {
-      player.api('pause');
+    $('.modal').on('hidden.bs.modal', function() {
+        player.pause();
     })
 
-    $('.modal').on('shown.bs.modal', function () {
-      player.api('play');
+    $('.modal').on('shown.bs.modal', function() {
+        player.play();
     })
