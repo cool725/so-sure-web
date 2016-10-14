@@ -222,6 +222,15 @@ abstract class BaseController extends Controller
      */
     protected function getErrorJsonResponse($errorCode, $description, $httpCode = 422)
     {
+        $request = $this->get('request_stack')->getCurrentRequest();
+        $this->get('logger')->info(sprintf(
+            '%s return %d (%d: %s)',
+            $request->getPathInfo(),
+            $httpCode,
+            $errorCode,
+            $description
+        ));
+
         return new JsonResponse(['code' => $errorCode, 'description' => $description], $httpCode);
     }
 
