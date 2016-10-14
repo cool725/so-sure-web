@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
+use AppBundle\Document\OptOut\EmailOptOut;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -120,22 +121,16 @@ class ApiExternalController extends BaseController
                 return new JsonResponse('pong');
             } elseif ($data['topic'] == 'user.unsubscribed') {
                 $item = $data['data']['item'];
-                if ($item['type'] != 'User') {
+                if ($item['type'] != 'user') {
                     throw new \Exception(sprintf('Unknown unsub object %s', json_encode($item)));
                 }
-                if (!$item['unsubscribed_from_emails']) {
-                    // TODO: Should we resubscribe?
-                }
-                $dm = $this->getManager();
-                $repo = $dm->getRepository(User::class);
-                $user = $repo->findOneBy(['intercomId' => $item['id']]);
-                if (!$user) {
-                    // User was only created via intercom
-                    // TODO: Maybe we could them query intercom to get the lead/user and get email
-                } else {
+
+                // TODO: Should we resubscribe if unsubscribed_from_emails is false?
+                if ($item['unsubscribed_from_emails']) {
                     $invitation = $this->get('app.invitation');
-                    $invitation->optout($user->getEmail());
-                    $invitation->rejectAllInvitations($user->getEmail());
+                    $invitation->optout($item['email'], EmailOptOut::OPTOUT_CAT_AQUIRE);
+                    $invitation->optout($item['email'], EmailOptOut::OPTOUT_CAT_RETAIN);
+                    $invitation->rejectAllInvitations($item['email']);
                 }
             } else {
                 throw new \Exception(sprintf('Unimplemented topic %s', $data['topic']));

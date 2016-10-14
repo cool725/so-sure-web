@@ -580,7 +580,7 @@ class InvitationService
         }
 
         $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
-        $optOut = $optoutRepo->findOneBy(['email' => strtolower($email)]);
+        $optOut = $optoutRepo->findOneBy(['email' => strtolower($email), 'category' => $category]);
         if (!$optOut) {
             $optout = new EmailOptOut();
             $optout->setCategory($category);

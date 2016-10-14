@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 
@@ -180,5 +181,92 @@ class ApiExternalControllerTest extends BaseControllerTest
         );
 
         $data = $this->verifyResponse(500);
+    }
+
+    public function testIntercomValidUnsubUser()
+    {
+        $data = '{
+  "type" : "notification_event",
+  "app_id" : "hp8z6qfh",
+  "data" : {
+    "type" : "notification_event_data",
+    "item" : {
+      "type" : "user",
+      "id" : "57fe33f79d67ab3ae104abb2",
+      "user_id" : "57fe33036362391a20566723",
+      "anonymous" : false,
+      "email" : "patrick@so-sure.com",
+      "name" : "Patrick McAndrew",
+      "pseudonym" : "Grey Rocket",
+      "avatar" : {
+        "type" : "avatar",
+        "image_url" : "https://secure.gravatar.com/avatar/4b60bb2ad56bc22e93add85f5846b052?s=24&d=identicon"
+      },
+      "app_id" : "hp8z6qfh",
+      "companies" : {
+        "type" : "company.list",
+        "companies" : [ ]
+      },
+      "location_data" : { },
+      "last_request_at" : null,
+      "last_seen_ip" : null,
+      "created_at" : "2016-10-12T13:00:39.992Z",
+      "remote_created_at" : "2016-10-12T12:56:35.000Z",
+      "signed_up_at" : "2016-10-12T12:56:35.000Z",
+      "updated_at" : "2016-10-14T10:48:30.838Z",
+      "session_count" : 0,
+      "social_profiles" : {
+        "type" : "social_profile.list",
+        "social_profiles" : [ ]
+      },
+      "unsubscribed_from_emails" : true,
+      "user_agent_data" : null,
+      "tags" : {
+        "type" : "tag.list",
+        "tags" : [ ]
+      },
+      "segments" : {
+        "type" : "segment.list",
+        "segments" : [ ]
+      },
+      "custom_attributes" : {
+        "premium" : 101.88,
+        "pot" : 0,
+        "connections" : 17,
+        "promo_code" : null
+      }
+    }
+  },
+  "links" : { },
+  "id" : "notif_06234660-91fc-11e6-89fb-1189877c22cb",
+  "topic" : "user.unsubscribed",
+  "delivery_status" : "pending",
+  "delivery_attempts" : 1,
+  "delivered_at" : 0,
+  "first_sent_at" : 1476442230,
+  "created_at" : 1476442230,
+  "self" : null
+}';
+        $url = sprintf(
+            '/external/intercom'
+        );
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json', "HTTP_X-Hub-Signature" => "sha1=45142bb1159d87162867a60aa85eea657d2efd5c"),
+            $data
+        );
+
+        $data = $this->verifyResponse(200);
+
+        $repo = self::$dm->getRepository(EmailOptOut::class);
+        $optouts = $repo->findBy(['email' => 'patrick@so-sure.com']);
+        $this->assertGreaterThan(1, count($optouts));
+        foreach ($optouts as $optout) {
+            $this->assertTrue(in_array($optout->getCategory(), [EmailOptOut::OPTOUT_CAT_AQUIRE, EmailOptOut::OPTOUT_CAT_RETAIN]));
+        }
     }
 }

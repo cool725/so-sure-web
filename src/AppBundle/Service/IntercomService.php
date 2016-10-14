@@ -55,9 +55,9 @@ class IntercomService
         return $resp;
     }
 
-    public function updateConvert(User $user)
+    public function updateConvert(User $user, $allowSoSure = false)
     {
-        if ($user->hasSoSureEmail()) {
+        if ($user->hasSoSureEmail() && !$allowSoSure) {
             return;
         }
 

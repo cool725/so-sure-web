@@ -80,7 +80,7 @@ class IntercomCommand extends ContainerAwareCommand
             }
         } elseif ($convertLead) {
             $user = $this->getUser($convertLead);
-            $resp = $intercom->updateConvert($user);
+            $resp = $intercom->updateConvert($user, true);
             $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
         } elseif ($clear) {
             $intercom->clearQueue();

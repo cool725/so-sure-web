@@ -17,6 +17,8 @@ abstract class OptOut
     const OPTOUT_CAT_ALL = 'all';
     const OPTOUT_CAT_INVITATIONS = 'invitations';
     const OPTOUT_CAT_WEEKLY = 'weekly';
+    const OPTOUT_CAT_AQUIRE = 'aquire';
+    const OPTOUT_CAT_RETAIN = 'retain';
 
     /**
      * @MongoDB\Id
@@ -30,7 +32,7 @@ abstract class OptOut
     protected $created;
 
     /**
-     * @Assert\Choice({"all", "invitations", "weekly"})
+     * @Assert\Choice({"all", "invitations", "weekly", "aquire", "retain"})
      * @MongoDB\Field(type="string")
      */
     protected $category;
