@@ -8,7 +8,7 @@ use AppBundle\Listener\DoctrineUserListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use AppBundle\Event\PolicyEvent;
-use AppBundle\Listener\DoctrineSalvaListener;
+use AppBundle\Listener\DoctrinePolicyListener;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @group functional-nonet
  */
-class DoctrineSalvaListenerTest extends WebTestCase
+class DoctrinePolicyListenerTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
@@ -46,11 +46,11 @@ class DoctrineSalvaListenerTest extends WebTestCase
     {
     }
 
-    public function testSalvaPreUpdate()
+    public function testPolicyPreUpdate()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('salva-preupdate', $this),
+            static::generateEmail('policy-preupdate', $this),
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
@@ -62,34 +62,14 @@ class DoctrineSalvaListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
 
         // policy updated
-        $this->runPreUpdate($policy, $this->once(), ['phone.make' => ['Apple', 'Samsung']]);
-        $this->runPreUpdate($policy, $this->once(), ['phone.model' => ['iPhone 5', 'iPhone 6']]);
-        $this->runPreUpdate($policy, $this->once(), ['phone.memory' => ['16', '32']]);
-        $this->runPreUpdate($policy, $this->once(), ['phone.imei' => ['11', '12']]);
-        $this->runPreUpdate($policy, $this->once(), ['phone.initialPrice' => [1, 2]]);
-        $this->runPreUpdate($policy, $this->once(), ['premium.gwp' => [1, 2]]);
-        $this->runPreUpdate($policy, $this->never(), ['premium.ipt' => [1, 2]]);
-
-        // user updated
-        $this->runPreUpdateUser($user, $policy, $this->once(), ['firstName' => ['foo', 'bar']]);
-        $this->runPreUpdateUser($user, $policy, $this->once(), ['lastName' => ['foo', 'bar']]);
-        $this->runPreUpdateUser($user, $policy, $this->never(), ['email' => ['foo@', 'bar@']]);
+        $this->runPreUpdate($policy, $this->once(), ['potValue' => 20]);
+        $this->runPreUpdate($policy, $this->once(), ['promoPotValue' => 20]);
     }
     
-    private function runPreUpdate($policy, $count, $changeSet, $event = null)
+    private function runPreUpdate($policy, $count, $changeSet)
     {
-        if (!$event) {
-            $event = PolicyEvent::EVENT_SALVA_INCREMENT;
-        }
-        $listener = $this->createListener($policy, $count, $event);
+        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_POT);
         $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-    }
-
-    private function runPreUpdateUser($user, $policy, $count, $changeSet)
-    {
-        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_SALVA_INCREMENT);
-        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
     }
 
@@ -104,7 +84,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrineSalvaListener($dispatcher, 'test');
+        $listener = new DoctrinePolicyListener($dispatcher);
 
         return $listener;
     }

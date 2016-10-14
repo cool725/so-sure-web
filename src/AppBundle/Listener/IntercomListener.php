@@ -33,7 +33,7 @@ class IntercomListener
         // TODO: Trigger intercom event
     }
 
-    public function onPolicyUpdatedEvent(PolicyEvent $event)
+    public function onPolicyPotEvent(PolicyEvent $event)
     {
         $this->intercom->queue($event->getPolicy()->getUser());
         // TODO: Trigger intercom event

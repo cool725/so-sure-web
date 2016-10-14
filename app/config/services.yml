@@ -397,6 +397,14 @@ services:
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
+    doctrine.listener.policy:
+        class:   AppBundle\Listener\DoctrinePolicyListener
+        arguments:
+            dispatcher:  "@event_dispatcher"
+            environment: "%kernel.environment%"
+        tags:
+            -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
+
     doctrine.listener.validation:
         class:   AppBundle\Listener\DoctrineValidationListener
         arguments:
@@ -430,7 +438,7 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
-            -  { name: kernel.event_listener, event: event.policy.updated, method: onPolicyUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.listener.salva:
@@ -439,7 +447,7 @@ services:
             salva: "@app.salva"
         tags:
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
-            -  { name: kernel.event_listener, event: event.policy.updated, method: onPolicyUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.salva_increment, method: onPolicySalvaIncrementEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.listener.refund:

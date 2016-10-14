@@ -41,7 +41,7 @@ class DoctrineSalvaListener
             ];
             foreach ($fields as $field) {
                 if ($eventArgs->hasChangedField($field)) {
-                    return $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED);
+                    return $this->triggerEvent($document, PolicyEvent::EVENT_SALVA_INCREMENT);
                 }
             }
         }
@@ -58,7 +58,7 @@ class DoctrineSalvaListener
                 if ($eventArgs->hasChangedField($field)) {
                     foreach ($document->getPolicies() as $policy) {
                         if ($policy instanceof SalvaPhonePolicy && $policy->isValidPolicy()) {
-                            return $this->triggerEvent($policy, PolicyEvent::EVENT_UPDATED);
+                            return $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
                         }
                     }
                 }

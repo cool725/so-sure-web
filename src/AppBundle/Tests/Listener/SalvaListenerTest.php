@@ -75,7 +75,7 @@ class SalvaListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
 
         $listener = new SalvaListener(static::$salvaService);
-        $listener->onPolicyUpdatedEvent(new PolicyEvent($policy));
+        $listener->onPolicySalvaIncrementEvent(new PolicyEvent($policy));
 
         // one cancel, one create
         $this->assertEquals(2, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
