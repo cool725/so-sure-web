@@ -16,7 +16,7 @@
         }, 1500);
     });
 
-    var iframe = document.querySelector('iframe');
+    var iframe = document.querySelector('#exp-vid');
     var player = new Vimeo.Player(iframe);
 
     $('.modal').on('hidden.bs.modal', function() {
