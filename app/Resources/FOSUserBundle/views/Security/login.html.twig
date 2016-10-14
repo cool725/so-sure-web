@@ -3,19 +3,24 @@
 <div class="container">
     <h1>Welcome back!</h1>
     <div class="login-digits" data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
+      <p class="text-centre" style="padding-bottom: 20px;">
+        Just enter your mobile number below, we'll then text you a code. Enter that code and, hey presto, you'll be logged in!
+      </p>
         <div class="digits-loading">
             <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
             <span class="sr-only">Loading...</span>
             <p><a href="javascript: location.reload();">Reload</a></p>
         </div>
+        <div class="digits-container-wrapper">
         <div class="digits-container">
+        </div>
         </div>
         <form method="POST" action="{{ path('digits_login') }}" id="digits-form">
             <input type="hidden" name="credentials" id="credentials">
             <input type="hidden" name="provider" id="provider">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
         </form>
-        <p class="swap-login-wrapper"><a href="#" class="swap-login">Prefer email login?</a></p>
+        <p class="swap-login-wrapper"><a href="#" class="swap-login btn-info">Prefer email login?</a></p>
     </div>
 
     <div class="login-email">
@@ -44,7 +49,7 @@
                     <a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
                 </div>
             </form>
-        <p class="swap-login-wrapper"><a href="#" class="swap-login">Prefer mobile login?</a></p>
+        <p class="swap-login-wrapper"><a href="#" class="swap-login btn-info">Prefer mobile login?</a></p>
         </div>
     </div>
   <script id="digits-sdk" src="https://cdn.digits.com/1/sdk.js" async></script>
