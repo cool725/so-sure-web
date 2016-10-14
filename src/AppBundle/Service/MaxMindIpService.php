@@ -67,7 +67,10 @@ class MaxMindIpService
                 throw new \Exception(sprintf('Unknown query type %s', $queryType));
             }
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Failed to query ip %s Err: %s', $ip, $e->getMessage()));
+            // Exclude certain ips
+            if (!in_array($ip, ['185.153.198.238'])) {
+                $this->logger->error(sprintf('Failed to query ip %s Err: %s', $ip, $e->getMessage()));
+            }
         }
 
         return $this->data;
