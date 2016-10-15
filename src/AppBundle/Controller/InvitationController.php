@@ -37,9 +37,13 @@ class InvitationController extends BaseController
                 'invitation' => $invitation,
             ]);
         } elseif ($this->getUser() !== null) {
-            // As we're not doing anything else on the yet for the user, user really should be logged in
-            // So its probably safe for now to redirect to the app.
-            return $this->redirect($this->getParameter('branch_share_url'));
+            // If user is on their mobile, use branch to redirect to app
+            if ($deviceAtlas->isMobile()) {
+                return $this->redirect($this->getParameter('branch_share_url'));
+            }
+            // otherwise, the standard invitation is ok for now
+            // TODO: Once invitations can be accepted on the web,
+            // we should use branch for everything
         }
 
         $policy = new PhonePolicy();
