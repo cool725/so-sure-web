@@ -11,6 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Scheb\TwoFactorBundle\Model\TrustedComputerInterface;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
@@ -18,7 +19,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @Gedmo\Loggable
  *
  */
-class User extends BaseUser implements TwoFactorInterface
+class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterface
 {
     use ArrayToApiArrayTrait;
     use PhoneTrait;
@@ -216,6 +217,11 @@ class User extends BaseUser implements TwoFactorInterface
      * @Gedmo\Versioned
      */
     protected $intercomId;
+
+    /**
+     * @MongoDB\Field(type="json")
+     */
+    protected $trusted;
 
     public function __construct()
     {
@@ -649,6 +655,22 @@ class User extends BaseUser implements TwoFactorInterface
     public function setIntercomId($intercomId)
     {
         $this->intercomId = $intercomId;
+    }
+
+    public function addTrustedComputer($token, \DateTime $validUntil)
+    {
+        $this->trusted[$token] = $validUntil->format("r");
+    }
+
+    public function isTrustedComputer($token)
+    {
+        if (isset($this->trusted[$token])) {
+            $now = new \DateTime();
+            $validUntil = new \DateTime($this->trusted[$token]);
+            return $now < $validUntil;
+        }
+
+        return false;
     }
 
     public function hasSoSureEmail()
