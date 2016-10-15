@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
+use AppBundle\Document\OptOut\EmailOptOut;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -93,6 +94,51 @@ class ApiExternalController extends BaseController
             return new JsonResponse(['jwt' => $jwt]);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api zenddesk.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/intercom", name="api_external_intercom")
+     * @Method({"POST"})
+     */
+    public function unauthIntercomAction(Request $request)
+    {
+        try {
+            $intercomWebhookKey = $this->getParameter('intercom_webhook_key');
+            $signature = $request->headers->get('X-Hub-Signature');
+            if (explode('=', $signature)[0] != 'sha1') {
+                throw new \Exception(sprintf('Invalid intercom hash %s', $signature));
+            }
+            $signatureSha1 = explode('=', $signature)[1];
+            $data = json_decode($request->getContent(), true);
+
+            if (hash_hmac('sha1', $request->getContent(), $intercomWebhookKey) != $signatureSha1) {
+                throw new \Exception(sprintf('Invalid intercom signature %s', $signature));
+            }
+            if ($data['topic'] == 'ping') {
+                return new JsonResponse('pong');
+            } elseif ($data['topic'] == 'user.unsubscribed') {
+                $item = $data['data']['item'];
+                if ($item['type'] != 'user') {
+                    throw new \Exception(sprintf('Unknown unsub object %s', json_encode($item)));
+                }
+
+                // TODO: Should we resubscribe if unsubscribed_from_emails is false?
+                if ($item['unsubscribed_from_emails']) {
+                    $invitation = $this->get('app.invitation');
+                    $invitation->optout($item['email'], EmailOptOut::OPTOUT_CAT_AQUIRE);
+                    $invitation->optout($item['email'], EmailOptOut::OPTOUT_CAT_RETAIN);
+                    $invitation->rejectAllInvitations($item['email']);
+                }
+            } else {
+                throw new \Exception(sprintf('Unimplemented topic %s', $data['topic']));
+            }
+
+            return new JsonResponse([]);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api intercom.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
