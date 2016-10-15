@@ -38,7 +38,7 @@ class InvitationController extends BaseController
             ]);
         } elseif ($this->getUser() !== null) {
             // If user is on their mobile, use branch to redirect to app
-            if ($deviceAtlas->isMobile()) {
+            if ($deviceAtlas->isMobile($request)) {
                 return $this->redirect($this->getParameter('branch_share_url'));
             }
             // otherwise, the standard invitation is ok for now
