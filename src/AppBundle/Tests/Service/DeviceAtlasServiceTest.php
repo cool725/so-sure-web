@@ -57,6 +57,20 @@ class DeviceAtlasServiceTest extends WebTestCase
         $this->assertEquals("Apple", $phone);
     }
 
+    public function testIsMobile()
+    {
+        // @codingStandardsIgnoreStart
+        // Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_1 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A470a Safari/9537.53
+        $userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_1 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A470a Safari/9537.53";
+        // Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:49.0) Gecko/20100101 Firefox/49.0
+        $desktopAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:49.0) Gecko/20100101 Firefox/49.0";
+        // @codingStandardsIgnoreEnd
+
+        $this->assertTrue(self::$deviceAtlas->isMobile($this->getRequest($userAgent)));
+        $this->assertFalse(self::$deviceAtlas->isMobile($this->getRequest($desktopAgent)));
+        $this->assertNull(self::$deviceAtlas->isMobile($this->getRequest('')));
+    }
+
     public function testNexus4()
     {
         // @codingStandardsIgnoreStart

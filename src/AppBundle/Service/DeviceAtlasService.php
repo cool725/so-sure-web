@@ -70,6 +70,34 @@ class DeviceAtlasService
         return $this->getPhoneFromDetails($manufacturer, $marketingName, $model, $osVersion);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return bool|null
+     */
+    public function isMobile(Request $request)
+    {
+        $userAgent = $request->headers->get('User-Agent');
+        try {
+            $result = DeviceAtlasCloudClient::getDeviceData($userAgent);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+
+            return null;
+        }
+
+        if (!isset($result['properties']) ||
+            !isset($result['properties']['isMobilePhone'])) {
+            return null;
+        }
+
+        if ($result['properties']['isMobilePhone'] == 1) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getMissing()
     {
         $items = [];
