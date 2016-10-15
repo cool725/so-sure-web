@@ -219,7 +219,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $intercomId;
 
     /**
-     * @MongoDB\Field(type="json")
+     * @MongoDB\Field(type="hash")
      */
     protected $trusted;
 

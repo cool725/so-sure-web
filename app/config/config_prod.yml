@@ -11,6 +11,10 @@ framework:
 #    serializer:
 #        cache: serializer.mapping.cache.apc
 
+scheb_two_factor:
+    trusted_computer:
+        cookie_secure: true           # Set the 'Secure' (HTTPS Only) flag on the trusted_computer cookie
+
 #doctrine:
 #    orm:
 #        metadata_cache_driver: apc
