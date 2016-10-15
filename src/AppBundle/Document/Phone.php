@@ -531,7 +531,8 @@ class Phone
     {
         $lines = ['Assumes current IPT Rate!'];
         foreach ($prices as $price) {
-            $lines[] = sprintf("%s - %s @ £%.2f",
+            $lines[] = sprintf(
+                "%s - %s @ £%.2f",
                 $price->getValidFrom()->format(\DateTime::ATOM),
                 $price->getValidTo() ? $price->getValidTo()->format(\DateTime::ATOM) : '...',
                 $price->getMonthlyPremiumPrice()
