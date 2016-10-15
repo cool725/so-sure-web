@@ -437,6 +437,32 @@ class Phone
         }
     }
 
+    public function getSalvaMiniumumBinderMonthlyPremium()
+    {
+        return $this->toTwoDp(0.67 * $this->getSalvaBinderMonthlyPremium());
+    }
+
+    public function getSalvaBinderMonthlyPremium()
+    {
+        if ($this->getInitialPrice() <= 150) {
+            return 3.99 + 1.5;
+        } elseif ($this->getInitialPrice() <= 250) {
+            return 4.99 + 1.5;
+        } elseif ($this->getInitialPrice() <= 400) {
+            return 5.49 + 1.5;
+        } elseif ($this->getInitialPrice() <= 500) {
+            return 5.99 + 1.5;
+        } elseif ($this->getInitialPrice() <= 600) {
+            return 6.99 + 1.5;
+        } elseif ($this->getInitialPrice() <= 750) {
+            return 7.99 + 1.5;
+        } elseif ($this->getInitialPrice() <= 1000) {
+            return 8.99 + 1.5;
+        } else {
+            throw new \Exception('Unknown binder pricing');
+        }
+    }
+
     public function policyProfit($claimFrequency, $consumerPayout, $iptRebate)
     {
         $price = $this->getReplacementPrice();
@@ -473,6 +499,62 @@ class Phone
         }
 
         return null;
+    }
+
+    public function getPreviousPhonePrices(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $previous = [];
+
+        foreach ($this->getPhonePrices() as $phonePrice) {
+            if ($phonePrice->getValidTo() && $phonePrice->getValidTo() <= $date) {
+                $previous[] = $phonePrice;
+            }
+        }
+
+        return $previous;
+    }
+
+    public function getPreviousPhonePricesAsString(\DateTime $date = null)
+    {
+        return $this->getPhonePricesAsString($this->getPreviousPhonePrices($date));
+    }
+
+    public function getFuturePhonePricesAsString(\DateTime $date = null)
+    {
+        return $this->getPhonePricesAsString($this->getFuturePhonePrices($date));
+    }
+
+    public function getPhonePricesAsString($prices)
+    {
+        $lines = ['Assumes current IPT Rate!'];
+        foreach ($prices as $price) {
+            $lines[] = sprintf("%s - %s @ £%.2f",
+                $price->getValidFrom()->format(\DateTime::ATOM),
+                $price->getValidTo() ? $price->getValidTo()->format(\DateTime::ATOM) : '...',
+                $price->getMonthlyPremiumPrice()
+            );
+        }
+
+        return implode(PHP_EOL, $lines);
+    }
+
+    public function getFuturePhonePrices(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $future = [];
+
+        foreach ($this->getPhonePrices() as $phonePrice) {
+            if ($phonePrice->getValidFrom() >= $date) {
+                $future[] = $phonePrice;
+            }
+        }
+
+        return $future;
     }
 
     public function isSameMake($make)
