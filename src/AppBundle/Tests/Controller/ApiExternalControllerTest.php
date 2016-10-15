@@ -138,7 +138,10 @@ class ApiExternalControllerTest extends BaseControllerTest
             $url,
             array(),
             array(),
-            array('CONTENT_TYPE' => 'application/json', "HTTP_X-Hub-Signature" => "sha1=0c0f352a9fd5b775746baca1858a1d11ef31fb24"),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                "HTTP_X-Hub-Signature" => "sha1=0c0f352a9fd5b775746baca1858a1d11ef31fb24"
+            ),
             $data
         );
 
@@ -176,7 +179,10 @@ class ApiExternalControllerTest extends BaseControllerTest
             $url,
             array(),
             array(),
-            array('CONTENT_TYPE' => 'application/json', "HTTP_X-Hub-Signature" => "sha1=baca1858a1d11ef31fb24"),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                "HTTP_X-Hub-Signature" => "sha1=baca1858a1d11ef31fb24"
+            ),
             $data
         );
 
@@ -256,7 +262,10 @@ class ApiExternalControllerTest extends BaseControllerTest
             $url,
             array(),
             array(),
-            array('CONTENT_TYPE' => 'application/json', "HTTP_X-Hub-Signature" => "sha1=45142bb1159d87162867a60aa85eea657d2efd5c"),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                "HTTP_X-Hub-Signature" => "sha1=45142bb1159d87162867a60aa85eea657d2efd5c"
+                ),
             $data
         );
 
@@ -266,7 +275,10 @@ class ApiExternalControllerTest extends BaseControllerTest
         $optouts = $repo->findBy(['email' => 'patrick@so-sure.com']);
         $this->assertGreaterThan(1, count($optouts));
         foreach ($optouts as $optout) {
-            $this->assertTrue(in_array($optout->getCategory(), [EmailOptOut::OPTOUT_CAT_AQUIRE, EmailOptOut::OPTOUT_CAT_RETAIN]));
+            $this->assertTrue(in_array($optout->getCategory(), [
+                EmailOptOut::OPTOUT_CAT_AQUIRE,
+                EmailOptOut::OPTOUT_CAT_RETAIN
+            ]));
         }
     }
 }
