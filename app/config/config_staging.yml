@@ -18,6 +18,10 @@ framework:
     session:
         cookie_secure: true
 
+scheb_two_factor:
+    trusted_computer:
+        cookie_secure: true           # Set the 'Secure' (HTTPS Only) flag on the trusted_computer cookie
+
 monolog:
     channels: ['receperio']
     handlers:
