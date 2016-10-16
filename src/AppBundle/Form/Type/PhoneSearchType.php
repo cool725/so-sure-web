@@ -43,7 +43,7 @@ class PhoneSearchType extends AbstractType
             ->add('active', ChoiceType::class, [
                 'required' => false,
                 'choices' => [true => 'Yes', false => 'No'],
-                'expanded' => true,
+                'expanded' => false,
                 'placeholder' => false,
                 'data' => true,
             ])

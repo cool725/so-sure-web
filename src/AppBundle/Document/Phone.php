@@ -13,6 +13,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 class Phone
 {
     use CurrencyTrait;
+    use ArrayToApiArrayTrait;
 
     const OS_CYANOGEN = 'Cyanogen';
     const OS_ANDROID = 'Android';
@@ -594,7 +595,7 @@ class Phone
         ];
     }
 
-    public function toEditArray()
+    public function toPriceArray(\DateTime $date = null)
     {
         return [
             'make' => $this->getMake(),
@@ -603,6 +604,7 @@ class Phone
             'memory' => $this->getMemory(),
             'gwp' => $this->getCurrentPhonePrice()->getGwp(),
             'active' => $this->getActive(),
+            'prices' => $this->eachApiArray($this->getPhonePrices(), $date),
         ];
     }
 
