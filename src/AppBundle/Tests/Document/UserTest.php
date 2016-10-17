@@ -69,14 +69,15 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($user->hasValidBillingDetails());
     }
 
-    public function testHasCancelledPolicy()
+    public function testHasCancelledPolicyWithUserDeclined()
     {
         $user = new User();
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
         $user->addPolicy($policy);
-        $this->assertTrue($user->hasCancelledPolicy());
+        $this->assertTrue($user->hasCancelledPolicyWithUserUserDeclined());
     }
 
     public function testHasUnpaidPolicy()

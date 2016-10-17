@@ -336,10 +336,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->policies;
     }
 
-    public function hasCancelledPolicy()
+    public function hasCancelledPolicyWithUserUserDeclined()
     {
         foreach ($this->getPolicies() as $policy) {
-            if ($policy->getStatus() == Policy::STATUS_CANCELLED) {
+            if ($policy->isCancelledWithUserDeclined()) {
                 return true;
             }
         }
@@ -733,7 +733,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
           'mobile_number' => $this->getMobileNumber(),
           'policies' => $this->eachApiArray($this->policies),
           'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), true, $debug),
-          'has_cancelled_policy' => $this->hasCancelledPolicy(),
+          'has_cancelled_policy' => $this->hasCancelledPolicyWithUserUserDeclined(),
           'has_unpaid_policy' => $this->hasUnpaidPolicy(),
           'has_valid_policy' => $this->hasValidPolicy(),
           'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,

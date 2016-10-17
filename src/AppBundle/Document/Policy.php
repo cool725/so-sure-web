@@ -1179,6 +1179,16 @@ abstract class Policy
         return $this->getStatus() == self::STATUS_CANCELLED;
     }
 
+    public function isCancelledWithUserDeclined()
+    {
+        return $this->getStatus() == self::STATUS_CANCELLED && in_array($this->getCancelledReason(), [
+            self::CANCELLED_ACTUAL_FRAUD,
+            self::CANCELLED_SUSPECTED_FRAUD,
+            self::CANCELLED_UNPAID,
+            self::CANCELLED_BADRISK
+        ]);
+    }
+
     public function isCooloffCancelled()
     {
         return $this->isCancelled() && $this->getCancelledReason() == self::CANCELLED_COOLOFF;
