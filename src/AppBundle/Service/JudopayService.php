@@ -393,7 +393,7 @@ class JudopayService
             ));
         }
         try {
-            $payment = $this->tokenPay($policy, $policy->getUser()->getPaymentMethod());
+            $payment = $this->tokenPay($policy);
             $this->processTokenPayResult($scheduledPayment, $payment);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         } catch (\Exception $e) {
@@ -460,34 +460,27 @@ class JudopayService
         );
     }
 
-    protected function tokenPay(Policy $policy, JudoPaymentMethod $paymentMethod)
+    public function runTokenPayment(User $user, $amount, $paymentRef, $policyId, $customerRef = null)
     {
-        $consumerToken = $paymentMethod->getCustomerToken();
-        $cardToken = $paymentMethod->getCardToken();
-
-        $amount = $policy->getPremium()->getMonthlyPremiumPrice();
-        $user = $policy->getUser();
-
-        $payment = new JudoPayment();
-        $payment->setAmount($amount);
-        $policy->addPayment($payment);
-        $this->dm->persist($payment);
-        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+        $paymentMethod = $user->getPaymentMethod();
+        if (!$customerRef) {
+            $customerRef = $user->getId();
+        }
 
         // add payment
         $tokenPayment = $this->client->getModel('TokenPayment');
 
         $data = array(
                 'judoId' => $this->judoId,
-                'yourConsumerReference' => $user->getId(),
-                'yourPaymentReference' => $payment->getId(),
+                'yourConsumerReference' => $customerRef,
+                'yourPaymentReference' => $paymentRef,
                 'yourPaymentMetaData' => [
-                    'policy_id' => $policy->getId(),
+                    'policy_id' => $policyId,
                 ],
                 'amount' => $amount,
                 'currency' => 'GBP',
-                'consumerToken' => $consumerToken,
-                'cardToken' => $cardToken,
+                'consumerToken' => $paymentMethod->getCustomerToken(),
+                'cardToken' => $paymentMethod->getCardToken(),
                 'emailAddress' => $user->getEmail(),
                 'mobileNumber' => $user->getMobileNumber(),
         );
@@ -504,10 +497,26 @@ class JudopayService
         try {
             $tokenPaymentDetails = $tokenPayment->create();
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Error running token payment %s. Ex: %s', $payment->getId(), $e));
+            $this->logger->error(sprintf('Error running token payment %s. Ex: %s', $paymentRef, $e));
 
             throw $e;
         }
+
+        return $tokenPaymentDetails;
+    }
+
+    protected function tokenPay(Policy $policy)
+    {
+        $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+        $user = $policy->getUser();
+
+        $payment = new JudoPayment();
+        $payment->setAmount($amount);
+        $policy->addPayment($payment);
+        $this->dm->persist($payment);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        $tokenPaymentDetails = $this->runTokenPayment($user, $amount, $payment->getId(), $policy->getId());
 
         $payment->setReference($tokenPaymentDetails["yourPaymentReference"]);
         $payment->setReceipt($tokenPaymentDetails["receiptId"]);

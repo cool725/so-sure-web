@@ -13,12 +13,12 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\User;
 
-class PolicyCommand extends ContainerAwareCommand
+class SalvaManualPolicyCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('sosure:salva-phone-policy')
+            ->setName('sosure:salva:manual:policy')
             ->setDescription('Manually create a policy')
             ->addArgument(
                 'email',
