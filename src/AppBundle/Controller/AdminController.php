@@ -242,6 +242,37 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/phone/{id}/active", name="admin_phone_active")
+     * @Method({"POST"})
+     */
+    public function phoneActiveAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        if ($phone) {
+            if ($phone->getActive()) {
+                $phone->setActive(false);
+                $message = 'Phone is no longer active';
+            } else {
+                $phone->setActive(true);
+                $message = 'Phone is now active';
+            }
+            $dm->flush();
+            $this->addFlash(
+                'notice',
+                $message
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
      * @Route("/phone/{id}", name="admin_phone_delete")
      * @Method({"DELETE"})
      */

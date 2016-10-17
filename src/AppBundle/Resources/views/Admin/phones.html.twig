@@ -1,19 +1,19 @@
 {% extends 'base.html.twig' %}
 
 {% macro display_actions(phone, token) %}
-  <button type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
+  <button title="Alternatives" type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
       data-query="{{ path('claims_phone_alternatives', {'id': phone.id}) }}"
       data-phone="{{ phone.toAlternativeArray()|json_encode }}"
       {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
       ><i class="fa fa-book"></i></button>
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
+  <button title="Add Pricing" type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
       data-update="{{ path('admin_phone_price', {'id': phone.id}) }}"
       data-ipt-rate="{{ phone.currentIptRate }}"
       data-salva-standard="{{ phone.getSalvaBinderMonthlyPremium }}"
       data-salva-min="{{ phone.getSalvaMiniumumBinderMonthlyPremium }}"
-      data-phone="{{ phone.toPriceArray()|json_encode }}"><i class="fa fa-edit"></i></button>
-  <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
-          data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}"><i class="fa fa-trash"></i></button>
+      data-phone="{{ phone.toPriceArray()|json_encode }}"><i class="fa fa-gbp"></i></button>
+  <button title="Deactive Phone" type="button" class="btn btn-warning phone-active" data-token="{{ token }}"
+          data-active="{{ path('admin_phone_active', {'id': phone.id}) }}"><i class="fa fa-power-off"></i></button>
 {% endmacro display_actions %}
 
 {% block stylesheets %}

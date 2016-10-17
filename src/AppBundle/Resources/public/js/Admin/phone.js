@@ -54,13 +54,13 @@ $('#phoneModal').on('show.bs.modal', function (event) {
 });
 
 
-$('.phone-delete').click(function() {
-    if (confirm('Are you sure you want to delete this phone?')) {
-        var url = $(this).data('delete');
+$('.phone-active').click(function() {
+    if (confirm('Are you sure you want to make this phone active/inactive?')) {
+        var url = $(this).data('active');
         var token = $(this).data('token');
         $.ajax({
             url: url,
-            type: 'DELETE',
+            type: 'POST',
             data: { token: token },
             success: function(result) {
                 window.location = window.location;
