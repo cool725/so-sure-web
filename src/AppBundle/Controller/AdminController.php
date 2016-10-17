@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -171,10 +172,10 @@ class AdminController extends BaseController
     }
     
     /**
-     * @Route("/phone/{id}", name="admin_phone_edit")
+     * @Route("/phone/{id}/price", name="admin_phone_price")
      * @Method({"POST"})
      */
-    public function phoneEditAction(Request $request, $id)
+    public function phonePriceAction(Request $request, $id)
     {
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
@@ -184,15 +185,52 @@ class AdminController extends BaseController
         $repo = $dm->getRepository(Phone::class);
         $phone = $repo->find($id);
         if ($phone) {
-            $devices = explode("|", $request->get('devices'));
-            $devices = array_filter(array_map('trim', $devices));
-            $phone->setMake($request->get('make'));
-            $phone->setModel($request->get('model'));
-            $phone->setDevices($devices);
-            $phone->setMemory($request->get('memory'));
-            $active = filter_var($request->get('active'), FILTER_VALIDATE_BOOLEAN);
-            $phone->setActive($active);
-            $phone->getCurrentPhonePrice()->setGwp($request->get('gwp'));
+            $gwp = $request->get('gwp');
+            $from = new \DateTime($request->get('from'));
+            $to = null;
+            if ($request->get('to')) {
+                $to = new \DateTime($request->get('to'));
+            }
+
+            if ($gwp < $phone->getSalvaMiniumumBinderMonthlyPremium()) {
+                $this->addFlash('error', sprintf(
+                    '£%.2f is less than allowed min binder £%.2f',
+                    $gwp,
+                    $phone->getSalvaMiniumumBinderMonthlyPremium()
+                ));
+
+                return new RedirectResponse($this->generateUrl('admin_phones'));
+            }
+            if ($to && $to < $from) {
+                $this->addFlash('error', sprintf(
+                    '%s must be after %s',
+                    $from->format(\DateTime::ATOM),
+                    $to->format(\DateTime::ATOM)
+                ));
+
+                return new RedirectResponse($this->generateUrl('admin_phones'));
+            }
+
+            if (!$phone->getCurrentPhonePrice()->getValidTo()) {
+                if ($phone->getCurrentPhonePrice()->getValidFrom() > $from) {
+                    $this->addFlash('error', sprintf(
+                        '%s must be after current pricing start date %s',
+                        $from->format(\DateTime::ATOM),
+                        $phone->getCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
+                    ));
+
+                    return new RedirectResponse($this->generateUrl('admin_phones'));
+                }
+                $phone->getCurrentPhonePrice()->setValidTo($from);
+            }
+            $price = new PhonePrice();
+            $price->setGwp($request->get('gwp'));
+            $price->setValidFrom($from);
+            if ($request->get('to')) {
+                $price->setValidTo($to);
+            }
+            $phone->addPhonePrice($price);
+
             $dm->flush();
             $this->addFlash(
                 'notice',

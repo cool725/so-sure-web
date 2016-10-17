@@ -7,8 +7,10 @@
       {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
       ><i class="fa fa-book"></i></button>
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-      data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}"
+      data-update="{{ path('admin_phone_price', {'id': phone.id}) }}"
       data-ipt-rate="{{ phone.currentIptRate }}"
+      data-salva-standard="{{ phone.getSalvaBinderMonthlyPremium }}"
+      data-salva-min="{{ phone.getSalvaMiniumumBinderMonthlyPremium }}"
       data-phone="{{ phone.toPriceArray()|json_encode }}"><i class="fa fa-edit"></i></button>
   <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
           data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}"><i class="fa fa-trash"></i></button>
@@ -237,54 +239,73 @@
             <h4 class="modal-title" id="exampleModalLabel">New phone</h4>
           </div>
           <div class="modal-body">
-              <table id="prices" width="100%" cellspacing="0" class="table-striped"></table>
-              <hr style="width: 100%; color: black; height: 1px; background-color:black;" />
-              <h4>Add new price</h4>
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="phone-gwp" class="control-label col-sm-2">From:</label>
-                    <div class="col-sm-10">
-                      <div class='input-group date' id='phone-from-group'>
-                        <input type="text" class="form-control" id="phone-from" name="from">
-                        <span class="input-group-addon">
-                          <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
-                      </div>
+            <table id="prices" width="100%" cellspacing="0" class="table-striped"></table>
+            <hr style="width: 100%; color: black; height: 1px; background-color:black;" />
+            <h4>Add new price</h4>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="phone-gwp" class="control-label col-sm-2">From:</label>
+                  <div class="col-sm-10">
+                    <div class='input-group date' id='phone-from-group'>
+                      <input type="text" class="form-control" id="phone-from" name="from" required="required">
+                      <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
                     </div>
-                  </div>                  
-                </div>
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="phone-gwp" class="control-label col-sm-2">To:</label>
-                    <div class="col-sm-10">
-                      <div class='input-group date' id='phone-to-group'>
-                        <input type="text" class="form-control" id="phone-to" name="to">
-                        <span class="input-group-addon">
-                          <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
-                      </div>
+                  </div>
+                </div>                  
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="phone-gwp" class="control-label col-sm-2">To:</label>
+                  <div class="col-sm-10">
+                    <div class='input-group date' id='phone-to-group'>
+                      <input type="text" class="form-control" id="phone-to" name="to">
+                      <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="phone-gwp" class="control-label col-sm-2">GWP:</label>
-                    <div class="col-sm-10">
-                    <input type="text" class="form-control" id="phone-gwp" name="gwp">
+            </div>
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="phone-gwp" class="control-label col-sm-2">GWP:</label>
+                  <div class="col-sm-10">
+                    <div class="input-group">
+                      <span class="input-group-addon">
+                        <span>£</span>
+                      </span>
+                      <input type="text" class="form-control" id="phone-gwp" name="gwp">
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="phone-premium" class="control-label col-sm-2">Monthly Premium Price:</label>
-                    <div class="col-sm-10">
-                    <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
+              </div>
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="phone-premium" class="control-label col-sm-6">Premium:</label>
+                  <div class="col-sm-6">
+                    <div class="input-group">
+                      <span class="input-group-addon">
+                        <span>£</span>
+                      </span>
+                      <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
                     </div>
                   </div>
+                </div>
               </div>
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="phone-premium" class="control-label col-sm-6">Salva Std/Min:</label>
+                  <div class="col-sm-6">
+                    <label class="control-label" id="phone-salva" name="salva"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <input type="hidden" name="token" value="{{ token }}" />

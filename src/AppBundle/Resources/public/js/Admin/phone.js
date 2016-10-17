@@ -24,6 +24,8 @@ $('#phoneModal').on('show.bs.modal', function (event) {
   var update = button.data('update');
   var phone = button.data('phone');
   var ipt_rate = 1 + button.data('ipt-rate');
+  var salva_standard = button.data('salva-standard');
+  var salva_min = button.data('salva-min');
   var modal = $(this);
   modal.find('#phone-update-form').attr("action", update);
   if (phone) {
@@ -41,6 +43,7 @@ $('#phoneModal').on('show.bs.modal', function (event) {
     });
     modal.find('.modal-title').text(phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
     modal.find('#phone-gwp').val(phone.gwp);
+    modal.find('#phone-salva').html('£' + salva_standard + ' / £' + salva_min);
 
     modal.find('#phone-gwp').keyup(function() {
       monthly = (modal.find('#phone-gwp').val() * ipt_rate).toFixed(2);
