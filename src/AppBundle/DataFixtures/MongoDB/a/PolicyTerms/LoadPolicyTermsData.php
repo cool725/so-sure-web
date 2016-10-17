@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\DataFixtures\MongoDB\_PolicyTerms;
+namespace AppBundle\DataFixtures\MongoDB\a\PolicyTerms;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
