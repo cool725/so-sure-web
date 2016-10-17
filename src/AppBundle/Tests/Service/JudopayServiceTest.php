@@ -288,7 +288,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals($calculator['received'], 0 - $calculator['refunded']);
     }
 
-    /** @expectedException \Judopay\Exception\BadRequest */
+    /** @expectedException \Judopay\Exception\ApiException */
     public function testJudoRefundExceeded()
     {
         $user = $this->createValidUser(static::generateEmail('judo-refund-exceeded', $this));
