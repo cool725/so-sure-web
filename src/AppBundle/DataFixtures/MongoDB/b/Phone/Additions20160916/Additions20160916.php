@@ -1,11 +1,11 @@
 <?php
 
-namespace AppBundle\DataFixtures\MongoDB\Phone\Additions20160101;
+namespace AppBundle\DataFixtures\MongoDB\b\Phone\Additions20160101;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\Phone;
-use AppBundle\DataFixtures\MongoDB\Phone\LoadPhoneData;
+use AppBundle\DataFixtures\MongoDB\b\Phone\LoadPhoneData;
 
 class Additions20160916 extends LoadPhoneData implements FixtureInterface
 {
