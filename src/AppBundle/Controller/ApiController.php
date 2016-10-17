@@ -160,7 +160,10 @@ class ApiController extends BaseController
             // User has successfully logged in, so clear the rate limit
             $rateLimit->clearByUser($user);
 
-            return new JsonResponse($user->toApiArray($identityId, $token));
+            $response = $user->toApiArray($identityId, $token);
+            $this->get('logger')->info(sprintf('loginAction Resp %s', json_encode($response)));
+
+            return new JsonResponse($response);
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
