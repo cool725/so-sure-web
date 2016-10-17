@@ -881,7 +881,10 @@ class ApiAuthController extends BaseController
 
             $this->get('statsd')->endTiming("api.getCurrentUser");
 
-            return new JsonResponse($user->toApiArray());
+            $response = $user->toApiArray();
+            $this->get('logger')->info(sprintf('getCurrentUserAction Resp %s', json_encode($response)));
+
+            return new JsonResponse($response);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
@@ -911,7 +914,10 @@ class ApiAuthController extends BaseController
                 $debug = true;
             }
 
-            return new JsonResponse($user->toApiArray(null, null, $debug));
+            $response = $user->toApiArray(null, null, $debug);
+            $this->get('logger')->info(sprintf('getUserAction Resp %s', json_encode($response)));
+
+            return new JsonResponse($response);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Exception $e) {
