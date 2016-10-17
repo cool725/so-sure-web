@@ -1,38 +1,66 @@
+$(function () {
+    $('#phone-from-group').datetimepicker({
+        format: "DD-MM-YYYY HH:mm",
+        allowInputToggle: true,
+        showTodayButton: true,
+        useCurrent: false 
+    });
+    $('#phone-to-group').datetimepicker({
+        format: "DD-MM-YYYY HH:mm",
+        allowInputToggle: true,
+        showTodayButton: true,
+        useCurrent: false //Important! See issue #1075
+    });
+    $("#phone-from-group").on("dp.change", function (e) {
+        $('#phone-to-group').data("DateTimePicker").minDate(e.date);
+    });
+    $("#phone-to-group").on("dp.change", function (e) {
+        $('#phone-from-group').data("DateTimePicker").maxDate(e.date);
+    });
+});
+
 $('#phoneModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   var update = button.data('update');
   var phone = button.data('phone');
   var ipt_rate = 1 + button.data('ipt-rate');
+  var salva_standard = button.data('salva-standard');
+  var salva_min = button.data('salva-min');
   var modal = $(this);
   modal.find('#phone-update-form').attr("action", update);
   if (phone) {
-    modal.find('.modal-title').text('Edit Phone');
-    modal.find('#phone-make').val(phone.make);
-    modal.find('#phone-model').val(phone.model);
-    modal.find('#phone-devices').val(phone.devices.join('|'));
-    modal.find('#phone-memory').val(phone.memory);
+    modal.find('#prices').DataTable({
+      destroy: true,
+      paging: false,
+      searching: false,
+      data: phone.prices,
+      columns: [
+        { title: 'Valid From', data: 'valid_from' },
+        { title: 'Valid To', data: 'valid_to' },
+        { title: 'GWP', data: 'gwp' },
+        { title: 'Premium', data: 'premium' }
+      ]
+    });
+    modal.find('.modal-title').text(phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
     modal.find('#phone-gwp').val(phone.gwp);
-    if (phone.active) {
-      modal.find('#phone-active-yes').prop('checked',true);
-    } else {
-      modal.find('#phone-active-no').prop('checked',true);
-    }
+    modal.find('#phone-salva').html('£' + salva_standard + ' / £' + salva_min);
 
     modal.find('#phone-gwp').keyup(function() {
-      monthly = modal.find('#phone-gwp').val() * ipt_rate;
+      monthly = (modal.find('#phone-gwp').val() * ipt_rate).toFixed(2);
       modal.find('#phone-premium').val(monthly);
     });
     modal.find('#phone-gwp').keyup();
   }
 });
 
-$('.phone-delete').click(function() {
-    if (confirm('Are you sure you want to delete this phone?')) {
-        var url = $(this).data('delete');
+
+$('.phone-active').click(function() {
+    if (confirm('Are you sure you want to make this phone active/inactive?')) {
+        var url = $(this).data('active');
         var token = $(this).data('token');
         $.ajax({
             url: url,
-            type: 'DELETE',
+            type: 'POST',
             data: { token: token },
             success: function(result) {
                 window.location = window.location;

@@ -1,22 +1,37 @@
 {% extends 'base.html.twig' %}
 
 {% macro display_actions(phone, token) %}
-  <button type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
+  <button title="Alternatives" type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
       data-query="{{ path('claims_phone_alternatives', {'id': phone.id}) }}"
       data-phone="{{ phone.toAlternativeArray()|json_encode }}"
       {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
       ><i class="fa fa-book"></i></button>
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-      data-update="{{ path('admin_phone_edit', {'id': phone.id}) }}"
+  <button title="Add Pricing" type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
+      data-update="{{ path('admin_phone_price', {'id': phone.id}) }}"
       data-ipt-rate="{{ phone.currentIptRate }}"
-      data-phone="{{ phone.toEditArray()|json_encode }}"><i class="fa fa-edit"></i></button>
-  <button type="button" class="btn btn-danger phone-delete" data-token="{{ token }}"
-          data-delete="{{ path('admin_phone_delete', {'id': phone.id}) }}"><i class="fa fa-trash"></i></button>
+      data-salva-standard="{{ phone.getSalvaBinderMonthlyPremium }}"
+      data-salva-min="{{ phone.getSalvaMiniumumBinderMonthlyPremium }}"
+      data-phone="{{ phone.toPriceArray()|json_encode }}"><i class="fa fa-gbp"></i></button>
+  <button title="Deactive Phone" type="button" class="btn btn-warning phone-active" data-token="{{ token }}"
+          data-active="{{ path('admin_phone_active', {'id': phone.id}) }}"><i class="fa fa-power-off"></i></button>
 {% endmacro display_actions %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+    'components/datatables.net-bs/dataTables.bootstrap.min.css'
+    '@AppBundle/Resources/public/css/Admin/phones.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+        'components/moment/moment.min.js'
+        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        'components/datatables.net/jquery.dataTables.min.js'
+        'components/datatables.net-bs/dataTables.bootstrap.min.js'
         '@AppBundle/Resources/public/js/tabs.js'
         '@AppBundle/Resources/public/js/Admin/phone.js'
         '@AppBundle/Resources/public/js/Claims/phoneAlternativesModal.js'
@@ -32,23 +47,23 @@
     <h4 class="text-center"><strong>Phones</strong></h4>
     <div class="row">
     {{ form_start(form) }}
-        <div class="form-group">
-            {{ form_label(form.os, 'Os', {'label_attr': {'class': 'col-sm-3'}}) }}
+        <div class="form-group col-sm-8">
+            {{ form_label(form.os, 'Os', {'label_attr': {'class': 'col-sm-2'}}) }}
             {{ form_errors(form.os) }}
-            {{ form_widget(form.os, {'attr': {'class': 'col-sm-6'}}) }}
+            {{ form_widget(form.os, {'attr': {'class': 'col-sm-10 os'}}) }}
         </div>
-        <div class="form-group">
-            {{ form_label(form.active, 'Active', {'label_attr': {'class': 'col-sm-1'}}) }}
+        <div class="form-group col-sm-4">
+            {{ form_label(form.active, 'Active', {'label_attr': {'class': 'col-sm-4'}}) }}
             {{ form_errors(form.active) }}
-            {{ form_widget(form.active, {'attr': {'class': 'col-sm-2'}}) }}
+            {{ form_widget(form.active, {'attr': {'class': 'col-sm-6'}}) }}
         </div>
-        <div class="form-group">
-            {{ form_label(form.rules, 'Business rules', {'label_attr': {'class': 'col-sm-3'}}) }}
+        <div class="form-group col-sm-4">
+            {{ form_label(form.rules, 'Business rules', {'label_attr': {'class': 'col-sm-6'}}) }}
             {{ form_errors(form.rules) }}
-            {{ form_widget(form.rules, {'attr': {'class': 'col-sm-2'}}) }}
+            {{ form_widget(form.rules, {'attr': {'class': 'col-sm-6'}}) }}
         </div>
         <div class="form-group">
-          <div class="col-sm-2 col-sm-offset-2 text-center">
+          <div class="col-sm-2 col-sm-offset-3 text-center">
             {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success'}}) }}
           </div>
         </div>
@@ -61,11 +76,6 @@
       <li role="presentation" class="active"><a href="#financial">Financial</a></li>
       <li role="presentation"><a href="#device">Device</a></li>
       <li role="presentation"><a href="#replacement">Replacement</a></li>
-      <li role="presentation">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-                data-update="{{ path('admin_phone_add') }}">Add new phone</button>
-        
-      </li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="financial">
@@ -221,7 +231,7 @@
     {% include 'AppBundle::Claims/phoneAlternativesModal.html.twig' %}
 
     <div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
         <form id="phone-update-form" class="form-horizontal" method="post">
           <div class="modal-header">
@@ -229,58 +239,78 @@
             <h4 class="modal-title" id="exampleModalLabel">New phone</h4>
           </div>
           <div class="modal-body">
-              <div class="form-group">
-                <label for="phone-make" class="control-label col-sm-2">Make:</label>
-                <div class="col-sm-10">
-                <input type="text" class="form-control" id="phone-make" name="make">
+            <table id="prices" width="100%" cellspacing="0" class="table-striped"></table>
+            <hr style="width: 100%; color: black; height: 1px; background-color:black;" />
+            <h4>Add new price</h4>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="phone-gwp" class="control-label col-sm-2">From:</label>
+                  <div class="col-sm-10">
+                    <div class='input-group date' id='phone-from-group'>
+                      <input type="text" class="form-control" id="phone-from" name="from" required="required">
+                      <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
+                    </div>
+                  </div>
+                </div>                  
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="phone-gwp" class="control-label col-sm-2">To:</label>
+                  <div class="col-sm-10">
+                    <div class='input-group date' id='phone-to-group'>
+                      <input type="text" class="form-control" id="phone-to" name="to">
+                      <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="form-group">
-                <label for="phone-model" class="control-label col-sm-2">Model:</label>
-                <div class="col-sm-10">
-                <input type="text" class="form-control" id="phone-model" name="model">
+            </div>
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="phone-gwp" class="control-label col-sm-2">GWP:</label>
+                  <div class="col-sm-10">
+                    <div class="input-group">
+                      <span class="input-group-addon">
+                        <span>£</span>
+                      </span>
+                      <input type="text" class="form-control" id="phone-gwp" name="gwp">
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="form-group">
-                <label for="phone-devices" class="control-label col-sm-2">Devices:</label>
-                <div class="col-sm-10">
-                <input type="text" class="form-control" id="phone-devices" name="devices">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="phone-premium" class="control-label col-sm-6">Premium:</label>
+                  <div class="col-sm-6">
+                    <div class="input-group">
+                      <span class="input-group-addon">
+                        <span>£</span>
+                      </span>
+                      <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="form-group">
-                <label for="phone-memory" class="control-label col-sm-2">Memory:</label>
-                <div class="col-sm-10">
-                <input type="text" class="form-control" id="phone-memory" name="memory">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="phone-premium" class="control-label col-sm-6">Salva Std/Min:</label>
+                  <div class="col-sm-6">
+                    <label class="control-label" id="phone-salva" name="salva"></label>
+                  </div>
                 </div>
               </div>
-              <div class="form-group">
-                <label for="phone-gwp" class="control-label col-sm-2">GWP:</label>
-                <div class="col-sm-10">
-                <input type="text" class="form-control" id="phone-gwp" name="gwp" readonly="true" disabled="disabled">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="phone-premium" class="control-label col-sm-2">Monthly Premium Price:</label>
-                <div class="col-sm-10">
-                <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="phone-active" class="control-label col-sm-2">Active:</label>
-                <div class="col-sm-10">
-                <label class="radio-inline">
-                  <input type="radio" id="phone-active-yes" value="true" name="active">Yes
-                </label>
-                <label class="radio-inline">
-                  <input type="radio" id="phone-active-no" value="false" name="active">No
-                </label>
-                </div>
-              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <input type="hidden" name="token" value="{{ token }}" />
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-primary">Add</button>
           </div>
         </form>
         </div>

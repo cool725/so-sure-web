@@ -101,4 +101,14 @@ abstract class Price
         $premium->setIpt($this->getIpt($date));
         $premium->setIptRate($this->getCurrentIptRate($date));
     }
+
+    public function toApiArray(\DateTime $date = null)
+    {
+        return [
+            'valid_from' => $this->getValidFrom()->format(\DateTime::ATOM),
+            'valid_to' => $this->getValidTo() ? $this->getValidTo()->format(\DateTime::ATOM) : null,
+            'gwp' => $this->getGwp(),
+            'premium' => $this->getMonthlyPremiumPrice($date),
+        ];
+    }
 }

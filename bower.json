@@ -19,7 +19,9 @@
     "seiyria-bootstrap-slider": "~6.1",
     "Chart.js": "^1.1.0",
     "eonasdan-bootstrap-datetimepicker": "^4.17.42",
-    "ouibounce": "^0.0.12"
+    "ouibounce": "^0.0.12",
+    "datatables.net": "^1.10.12",
+    "datatables.net-bs": "^1.10.12"
   },
   "install": {
     "path": "web/components",
@@ -43,6 +45,13 @@
       ],
       "ouibounce": [
         "bower_components/ouibounce/build/ouibounce.min.js"
+      ],
+      "datatables.net": [
+        "bower_components/datatables.net/js/jquery.dataTables.min.js"
+      ],
+      "datatables.net-bs": [
+        "bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js",
+        "bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css"
       ]
     }
   }
