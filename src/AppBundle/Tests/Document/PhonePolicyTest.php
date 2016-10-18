@@ -858,7 +858,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, $policyA->getCancelledReason());
         $now = new \DateTime();
         $this->assertEquals($now->format('y-M-d'), $policyA->getEnd()->format('y-M-d'));
-        $this->assertTrue($policyA->getUser()->isLocked());
+        $this->assertFalse($policyA->getUser()->isLocked());
 
         $this->assertEquals(0, $policyA->getPotValue());
         $this->assertEquals(10, $policyB->getPotValue());

@@ -2150,6 +2150,79 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(self::$testUser->getEmailCanonical(), $data['email']);
     }
 
+    public function testGetCurrentUserWithCancelledUserDeclinedPolicy()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('get-user-declined', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(1, count($data['policies']));
+        $this->assertFalse($data['has_cancelled_policy']);
+        $this->assertTrue($data['has_valid_policy']);
+
+        $policyService = static::$container->get('app.policy');
+        $repo = static::$dm->getRepository(SalvaPhonePolicy::class);
+        $policy = $repo->find($policyData['id']);
+        $policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
+
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(403);
+
+        $user->setLocked(false);
+        static::$dm->flush();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(1, count($data['policies']));
+        $this->assertTrue($data['has_cancelled_policy']);
+        $this->assertFalse($data['has_valid_policy']);
+    }
+
+    public function testGetCurrentUserWithCancelledUserOkPolicy()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('get-user-ok', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(1, count($data['policies']));
+        $this->assertFalse($data['has_cancelled_policy']);
+        $this->assertTrue($data['has_valid_policy']);
+
+        $policyService = static::$container->get('app.policy');
+        $policyService->setDispatcher(null);
+        $repo = static::$dm->getRepository(SalvaPhonePolicy::class);
+        $policy = $repo->find($policyData['id']);
+        $policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_COOLOFF);
+
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(0, count($data['policies']));
+        $this->assertFalse($data['has_cancelled_policy']);
+        $this->assertFalse($data['has_valid_policy']);
+    }
+
     // user/{id}
 
     /**

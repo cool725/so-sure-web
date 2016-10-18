@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\ReceperioService;
 use GeoJson\Geometry\Point;
 
@@ -75,5 +76,64 @@ class BaseImeiServiceTest extends WebTestCase
         // 356938035643809 is valid 356938035643808 changes check digit should invalidate luhn check
         $this->assertFalse(self::$imei->isImei(356938035643808));
         $this->assertFalse(self::$imei->isImei('356938035643808'));
+    }
+
+    public function testIsDuplicatePolicyImeiExpired()
+    {
+        $imeiNumber = rand(1, 999999);
+
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
+
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $policy->setImei($imeiNumber);
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        $this->assertTrue(self::$imei->isDuplicatePolicyImei($imeiNumber));
+
+        $policy->setStatus(PhonePolicy::STATUS_EXPIRED);
+        static::$dm->flush();
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
+    }
+
+    public function testIsDuplicatePolicyImeiCancelledUserOk()
+    {
+        $imeiNumber = rand(1, 999999);
+
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
+
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $policy->setImei($imeiNumber);
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        $this->assertTrue(self::$imei->isDuplicatePolicyImei($imeiNumber));
+
+        $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
+        static::$dm->flush();
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
+    }
+
+    public function testIsDuplicatePolicyImeiCancelledUserDeclined()
+    {
+        $imeiNumber = rand(1, 999999);
+
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
+
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $policy->setImei($imeiNumber);
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        $this->assertTrue(self::$imei->isDuplicatePolicyImei($imeiNumber));
+
+        $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(PhonePolicy::CANCELLED_ACTUAL_FRAUD);
+        static::$dm->flush();
+        $this->assertTrue(self::$imei->isDuplicatePolicyImei($imeiNumber));
     }
 }

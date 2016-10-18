@@ -11,19 +11,13 @@ class PhonePolicyRepository extends PolicyRepository
 {
     use DateTrait;
 
-    public function isMissingOrExpiredOnlyPolicy($imei)
+    public function findDuplicateImei($imei)
     {
-        // if there's an imei in the db, only allow insurance for an expired policy
-        // TODO: may want to allow a new policy if within 1 month of expiration and same user
-        // TODO: consider if we want to allow an unpaid or cancelled policy on a different user?
         return $this->createQueryBuilder()
-            ->field('imei')->equals($imei)
-            ->field('status')->notEqual('expired')
+            ->field('imei')->equals((string) $imei)
             ->getQuery()
-            ->execute()
-            ->count() == 0;
+            ->execute();
     }
-
 
     /**
      * All policies that are active (excluding so-sure test ones)

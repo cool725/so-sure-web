@@ -69,14 +69,40 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($user->hasValidBillingDetails());
     }
 
-    public function testHasCancelledPolicy()
+    public function testHasCancelledPolicyWithUserDeclined()
     {
         $user = new User();
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
         $user->addPolicy($policy);
-        $this->assertTrue($user->hasCancelledPolicy());
+        $this->assertTrue($user->hasCancelledPolicyWithUserDeclined());
+    }
+
+    public function testGetPoliciesUserDeclined()
+    {
+        $user = new User();
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
+        $this->assertEquals(0, count($user->getPolicies()));
+        $user->addPolicy($policy);
+        $this->assertEquals(1, count($user->getPolicies()));
+    }
+
+    public function testGetPoliciesUserOk()
+    {
+        $user = new User();
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_COOLOFF);
+        $this->assertEquals(0, count($user->getPolicies()));
+        $user->addPolicy($policy);
+        $this->assertEquals(0, count($user->getPolicies()));
+        $this->assertEquals(1, count($user->getAllPolicies()));
     }
 
     public function testHasUnpaidPolicy()

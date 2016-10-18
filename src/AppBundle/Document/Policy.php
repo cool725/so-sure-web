@@ -1174,9 +1174,24 @@ abstract class Policy
         return false;
     }
 
+    public function isExpired()
+    {
+        return $this->getStatus() == self::STATUS_EXPIRED;
+    }
+
     public function isCancelled()
     {
         return $this->getStatus() == self::STATUS_CANCELLED;
+    }
+
+    public function isCancelledWithUserDeclined()
+    {
+        return $this->getStatus() == self::STATUS_CANCELLED && in_array($this->getCancelledReason(), [
+            self::CANCELLED_ACTUAL_FRAUD,
+            self::CANCELLED_SUSPECTED_FRAUD,
+            self::CANCELLED_UNPAID,
+            self::CANCELLED_BADRISK
+        ]);
     }
 
     public function isCooloffCancelled()
@@ -1448,9 +1463,11 @@ abstract class Policy
         $this->setCancelledReason($reason);
         $this->setEnd($date);
 
-        // For now, just lock the user.  May want to allow the user to login in the future though...
+        // User declined cancellations should lock the user record
         $user = $this->getUser();
-        $user->setLocked(true);
+        if ($this->isCancelledWithUserDeclined()) {
+            $user->setLocked(true);
+        }
 
         // zero out the connection value for connections bound to this policy
         foreach ($this->getConnections() as $networkConnection) {
