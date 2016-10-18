@@ -756,7 +756,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
           'user_token' => ['token' => $this->getToken()],
           'addresses' => $addresses,
           'mobile_number' => $this->getMobileNumber(),
-          'policies' => $this->eachApiArray($this->policies),
+          'policies' => $this->eachApiArray($this->getPolicies()),
           'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), true, $debug),
           'has_cancelled_policy' => $this->hasCancelledPolicy(),
           'has_unpaid_policy' => $this->hasUnpaidPolicy(),
