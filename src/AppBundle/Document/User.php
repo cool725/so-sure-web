@@ -333,12 +333,37 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function getPolicies()
     {
+        $policies = [];
+        foreach ($this->policies as $policy) {
+            // If the user is declined we want to have the policy in the list
+            // Previously ok cancelled policies can be ignored and hidden in most cases
+            if (!$policy->isCancelled() || $policy->isCancelledWithUserDeclined()) {
+                $policies[] = $policy;
+            }
+        }
+
+        return $policies;
+    }
+
+    public function getAllPolicies()
+    {
         return $this->policies;
     }
 
-    public function hasCancelledPolicyWithUserUserDeclined()
+    public function hasCancelledPolicy()
     {
         foreach ($this->getPolicies() as $policy) {
+            if ($policy->isCancelled()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasCancelledPolicyWithUserDeclined()
+    {
+        foreach ($this->getAllPolicies() as $policy) {
             if ($policy->isCancelledWithUserDeclined()) {
                 return true;
             }
@@ -733,7 +758,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
           'mobile_number' => $this->getMobileNumber(),
           'policies' => $this->eachApiArray($this->policies),
           'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), true, $debug),
-          'has_cancelled_policy' => $this->hasCancelledPolicyWithUserUserDeclined(),
+          'has_cancelled_policy' => $this->hasCancelledPolicy(),
           'has_unpaid_policy' => $this->hasUnpaidPolicy(),
           'has_valid_policy' => $this->hasValidPolicy(),
           'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
