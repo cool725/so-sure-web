@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bb8c60b98f24f94fa71fda24ff128708",
-    "content-hash": "f3e929805d1d3c7f3d27e02babde8414",
+    "hash": "04e412badbf165a1663324c58cfcc6fa",
+    "content-hash": "b73c28841b922504869c99d96a7a5c96",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -3010,16 +3010,16 @@
         },
         {
             "name": "judopay/judopay-sdk",
-            "version": "1.0.3.1",
+            "version": "2.0.1.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/so-sure/PhpSdk.git",
-                "reference": "dbbd59bb184b4a316b4d4efa570d720b2196bfc3"
+                "url": "https://github.com/so-sure/Judo-PHP.git",
+                "reference": "ef7769e4295eb62e0ac3abafaa85f558e0186ac6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/PhpSdk/zipball/dbbd59bb184b4a316b4d4efa570d720b2196bfc3",
-                "reference": "dbbd59bb184b4a316b4d4efa570d720b2196bfc3",
+                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/ef7769e4295eb62e0ac3abafaa85f558e0186ac6",
+                "reference": "ef7769e4295eb62e0ac3abafaa85f558e0186ac6",
                 "shasum": ""
             },
             "require": {
@@ -3030,8 +3030,14 @@
             },
             "require-dev": {
                 "bossa/phpspec2-expect": "~1.0",
-                "phpspec/phpspec": "~2.0",
-                "squizlabs/php_codesniffer": "~1.5"
+                "phpdocumentor/reflection-docblock": "^2.0",
+                "phpspec/phpspec": "^2.0",
+                "phpunit/phpunit": "4.8",
+                "squizlabs/php_codesniffer": "^2.0",
+                "symfony/console": "~2.3",
+                "symfony/finder": "~2.1",
+                "symfony/process": "^2.6",
+                "symfony/yaml": "~2.1"
             },
             "type": "library",
             "autoload": {
@@ -3041,6 +3047,12 @@
                 "files": [
                     "src/Judopay.php"
                 ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/",
+                    "spec\\": "spec/"
+                }
             },
             "license": [
                 "MIT"
@@ -3057,9 +3069,9 @@
                 "payment"
             ],
             "support": {
-                "source": "https://github.com/so-sure/PhpSdk/tree/1.0.3.1"
+                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.2"
             },
-            "time": "2016-06-23 10:22:45"
+            "time": "2016-10-17 16:39:52"
         },
         {
             "name": "knplabs/knp-snappy",
