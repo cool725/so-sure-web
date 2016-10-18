@@ -51,11 +51,11 @@
                 <tr>
                     <td>Policies</td>
                     <td>
-                        {% for policy in user.policies %}
+                        {% for policy in user.allPolicies %}
                             {% if policy.policyNumber|length > 0 %}
                                 <a href="{{ path('admin_policy', {'id': policy.id }) }}">
                                     {{ policy.policyNumber }}
-                                </a>
+                                </a> ({{ policy.status }})
                             {% else %}
                                 {{ policy.id }} (In progress)
                             {% endif %}

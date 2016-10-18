@@ -22,7 +22,7 @@
 
 {% block body %}
 <div class="container">
-    <h2>so-sure Claims - {{policy.user.name }}</h2>
+    <h2>so-sure Admin - <a href="{{ path('admin_user', {'id': policy.user.id}) }}">{{policy.user.name }}</a></h2>
     <div class="bg-danger text-right" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <div class="row">
             <div class="col-md-6">
