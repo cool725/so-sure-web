@@ -14,7 +14,7 @@ class PhonePolicyRepository extends PolicyRepository
     public function findDuplicateImei($imei)
     {
         return $this->createQueryBuilder()
-            ->field('imei')->equals($imei)
+            ->field('imei')->equals((string) $imei)
             ->getQuery()
             ->execute();
     }

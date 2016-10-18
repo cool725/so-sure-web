@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use AppBundle\Document\Phone;
 use AppBundle\Document\LostPhone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -63,9 +64,10 @@ class BaseImeiService
      */
     public function isDuplicatePolicyImei($imei)
     {
-        $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $repo->findDuplicateImei($imei);
 
-        foreach ($repo->findDuplicateImei($imei) as $policy) {
+        foreach ($policies as $policy) {
             // Expired policies can be paid for again
             if ($policy->isExpired()) {
                 continue;
