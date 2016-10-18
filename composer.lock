@@ -1017,16 +1017,16 @@
         },
         {
             "name": "doctrine/mongodb-odm",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/mongodb-odm.git",
-                "reference": "9eedb38286805f8f084c9a530ef89379ed9bf4b5"
+                "reference": "e839648ef7649757aae3b9818236a6fa47c016cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/mongodb-odm/zipball/9eedb38286805f8f084c9a530ef89379ed9bf4b5",
-                "reference": "9eedb38286805f8f084c9a530ef89379ed9bf4b5",
+                "url": "https://api.github.com/repos/doctrine/mongodb-odm/zipball/e839648ef7649757aae3b9818236a6fa47c016cd",
+                "reference": "e839648ef7649757aae3b9818236a6fa47c016cd",
                 "shasum": ""
             },
             "require": {
@@ -1097,7 +1097,7 @@
                 "odm",
                 "persistence"
             ],
-            "time": "2016-07-27 13:16:06"
+            "time": "2016-10-07 09:18:05"
         },
         {
             "name": "doctrine/mongodb-odm-bundle",
@@ -1173,16 +1173,16 @@
         },
         {
             "name": "doctrine/orm",
-            "version": "v2.5.4",
+            "version": "v2.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "bc4ddbfb0114cb33438cc811c9a740d8aa304aab"
+                "reference": "73e4be7c7b3ba26f96b781a40b33feba4dfa6d45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/bc4ddbfb0114cb33438cc811c9a740d8aa304aab",
-                "reference": "bc4ddbfb0114cb33438cc811c9a740d8aa304aab",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/73e4be7c7b3ba26f96b781a40b33feba4dfa6d45",
+                "reference": "73e4be7c7b3ba26f96b781a40b33feba4dfa6d45",
                 "shasum": ""
             },
             "require": {
@@ -1245,7 +1245,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2016-01-05 21:34:58"
+            "time": "2016-09-10 18:51:13"
         },
         {
             "name": "domnikl/statsd",
