@@ -1174,6 +1174,11 @@ abstract class Policy
         return false;
     }
 
+    public function isExpired()
+    {
+        return $this->getStatus() == self::STATUS_EXPIRED;
+    }
+
     public function isCancelled()
     {
         return $this->getStatus() == self::STATUS_CANCELLED;

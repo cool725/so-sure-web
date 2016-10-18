@@ -65,7 +65,22 @@ class BaseImeiService
     {
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
 
-        return !$repo->isMissingOrExpiredOnlyPolicy($imei);
+        foreach ($repo->findDuplicateImei($imei) as $policy) {
+            // Expired policies can be paid for again
+            if ($policy->isExpired()) {
+                continue;
+            }
+            // Cancelled policies that are not user declined can be paid for again
+            if ($policy->isCancelled() && !$policy->isCancelledWithUserDeclined()) {
+                continue;
+            }
+
+            // TODO: may want to allow a new policy if within 1 month of expiration and same user
+            // TODO: consider if we want to allow an unpaid policy on a different user?
+            return true;
+        }
+
+        return false;
     }
 
     /**
