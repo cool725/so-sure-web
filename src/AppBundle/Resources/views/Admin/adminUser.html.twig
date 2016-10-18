@@ -60,7 +60,7 @@
                                 {{ policy.id }} (In progress)
                             {% endif %}
                         {% endfor %}
-                        {% if user.policies|length == 0 %}
+                        {% if user.allPolicies|length == 0 %}
                             No policies
                         {% endif %}
                     </td>
