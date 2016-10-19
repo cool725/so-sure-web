@@ -16,12 +16,15 @@
             <div id="navchange"></div>
             <div class="row" id="welcome">
                 <div class="col-md-12">
-                        <h1 class="text-center">Insure your phone with {{invitation.inviter.name}}.<br> Get up to 80% of your money back.</h1>
-                    </div>
-                            <p class="lead text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
-                        </div>
-                    </div>
+                    <h1 class="text-center">
+                        {% if invitation.inviter is defined %}
+                            Insure your phone with {{invitation.inviter.name}}.
+                        {% else %}
+                            Insure your phone.
+                        {% endif %}
+                        <br>Get up to 80% of your money back.</h1>
                 </div>
+                    <p class="lead text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
             </div>
         </div>
         <div id="select-phone">
@@ -46,17 +49,19 @@
         </div>
         </div>
 
-        <div class="text-break">
-            <div class="line"></div>
-            OR
-            <div class="line"></div>
-        </div>
+        {% if invitation %}
+            <div class="text-break">
+                <div class="line"></div>
+                OR
+                <div class="line"></div>
+            </div>
 
             <div class="row">
                 {{ form_start(form) }}
                 {{ form_widget(form) }}
                 {{ form_end(form) }}
             </div>
+        {% endif %}
         </section>
 
         {% include 'AppBundle::Default/howItWorks.html.twig' %}
