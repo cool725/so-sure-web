@@ -386,6 +386,84 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
     }
 
+    public function testEmailInvitationReinviteOptOut()
+    {
+        $this->removeAllEmailInvitations();
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('EmailInvitationReinviteOptOut-user', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('EmailInvitationReinviteOptOut-invite', $this),
+            'bar'
+        );
+        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('EmailInvitationReinviteOptOut-invite', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
+        $count = count($emailInvitationRepo->findSystemReinvitations());
+        $future = new \DateTime();
+        $future->add(new \DateInterval('P3D'));
+        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
+
+        $optOut = new EmailOptOut();
+        $optOut->setEmail(static::generateEmail('EmailInvitationReinviteOptOut-invite', $this));
+        $optOut->setCategory(SmsOptOut::OPTOUT_CAT_INVITATIONS);
+        static::$dm->persist($optOut);
+        static::$dm->flush();
+
+        // allow reinvitation
+        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
+        self::$invitationService->reinvite($invitation);
+
+        $this->assertEquals(EmailInvitation::STATUS_SKIPPED, $invitation->getStatus());
+        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
+    }
+
+    /*
+     * @expectedException \Exception
+     */
+    public function testSmsInvitationReinviteOptOut()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSmsInvitationReinviteOptOut-user', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSmsInvitationReinviteOptOut-invite', $this),
+            'bar'
+        );
+        $mobile = static::generateRandomMobile();
+        $userInvitee->setMobileNumber($mobile);
+        $invitation = self::$invitationService->inviteBySms($policy, $mobile);
+        $this->assertTrue($invitation instanceof SmsInvitation);
+
+        $optOut = new SmsOptOut();
+        $optOut->setMobile($mobile);
+        $optOut->setCategory(SmsOptOut::OPTOUT_CAT_INVITATIONS);
+        static::$dm->persist($optOut);
+        static::$dm->flush();
+
+        // allow reinvitation
+        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
+
+        // annotation not working for some reason :()
+        $this->setExpectedException(\Exception::class);
+
+        // sms reinvites are currently not allowed - exception thrown
+        self::$invitationService->reinvite($invitation);
+
+        $this->assertEquals(SmsInvitation::STATUS_SKIPPED, $invitation->getStatus());
+    }
+
     private function removeAllEmailInvitations()
     {
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
