@@ -29,10 +29,7 @@ class InvitationController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
         $deviceAtlas = $this->get('app.deviceatlas');
 
-        // TODO: Change to more friendly templates
-        if (!$invitation) {
-            throw $this->createNotFoundException('Unable to find invitation');
-        } elseif ($invitation->isSingleUse() && $invitation->isProcessed()) {
+        if ($invitation && $invitation->isSingleUse() && $invitation->isProcessed()) {
             return $this->render('AppBundle:Invitation:processed.html.twig', [
                 'invitation' => $invitation,
             ]);
