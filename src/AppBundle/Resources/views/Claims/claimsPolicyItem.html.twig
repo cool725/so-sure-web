@@ -19,79 +19,111 @@
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="policy">
-                <table class="table table-striped">
-                    <tr>
-                        <td>Policy Number</td>
-                        <td>
-                            {% if policy.policyNumber|length %}
-                                {{ policy.policyNumber }}
-                            {% else %}
-                                N/A 
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Policy Status</td>
-                        <td>
-                          {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
-                          {% if policy.cancelledReason %}
-                            / {{ policy.cancelledReason }}
-                          {% endif %}
-                        </td>
-                    </tr>
-                    {% if policy.isPolicy %}
-                    <tr>
-                        <td>Policy Dates</td>
-                        <td>{{ policy.start | date('d M Y H:i', 'Europe/London') }} - {{ policy.end | date('d M Y H:i', 'Europe/London') }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if policy.isPolicy %}
-                    <tr>
-                        <td>Policy Payments</td>
-                        <td>Paid £{{ policy.premiumPaid }} of £{{ policy.premium.yearlyPremiumPrice }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if policy.isPolicy %}
-                    <tr>
-                        <td>Policy Installments</td>
-                        <td>{{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if policy.phone %}
-                    <tr>
-                        <td>Phone</td>
-                        <td>{{ policy.phone }}
-                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
-                                    data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
-                                    data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
-                                    >Show Alternatives</button>
-
-                        </td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                      <td>ClaimsCheck Cert Id</td>
-                      <td>
-                        {% for key, data in policy.checkmendCertsAsArray if data['certId'] is defined %}
-                            {% if data['certId'] == 'serial' %}
-                                <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId'] }}</span>
-                            {% else %}
-                              <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
-                            {% endif %}
-                            ({{ key|date("F j, Y H:i", "Europe/London") }})<br />
-                        {% endfor %}
-                        {% if policy.checkmendCerts|length == 0 %}
-                          Certs not present
+            <div class="row">
+                <div class="col-md-7">
+                    <h2>Policy</h2>
+                    <table class="table table-striped">
+                        <tr>
+                            <td>Policy Number</td>
+                            <td>
+                                {% if policy.policyNumber|length %}
+                                    {{ policy.policyNumber }}
+                                {% else %}
+                                    N/A 
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Policy Status</td>
+                            <td>
+                              {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
+                              {% if policy.cancelledReason %}
+                                / {{ policy.cancelledReason }}
+                              {% endif %}
+                            </td>
+                        </tr>
+                        {% if policy.isPolicy %}
+                        <tr>
+                            <td>Policy Dates</td>
+                            <td>{{ policy.start | date('d M Y H:i', 'Europe/London') }} - {{ policy.end | date('d M Y H:i', 'Europe/London') }}</td>
+                        </tr>
                         {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                            {{ form_start(receperio_form, {'attr': {'class': 'form-inline'}}) }}
-                            {{ form_widget(receperio_form.rerun, {'label': 'Re-run check', 'attr': {'class': 'btn btn-danger confirm-imei-rerun'}}) }}
-                            {{ form_end(receperio_form) }}
+                        {% if policy.isPolicy %}
+                        <tr>
+                            <td>Policy Payments</td>
+                            <td>Paid £{{ policy.premiumPaid }} of £{{ policy.premium.yearlyPremiumPrice }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if policy.isPolicy %}
+                        <tr>
+                            <td>Policy Installments</td>
+                            <td>{{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if policy.phone %}
+                        <tr>
+                            <td>Phone</td>
+                            <td>{{ policy.phone }}
+                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
+                                        data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
+                                        data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
+                                        >Show Alternatives</button>
+    
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                          <td>ClaimsCheck Cert Id</td>
+                          <td>
+                            {% for key, data in policy.checkmendCertsAsArray if data['certId'] is defined %}
+                                {% if data['certId'] == 'serial' %}
+                                    <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId'] }}</span>
+                                {% else %}
+                                  <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
+                                {% endif %}
+                                ({{ key|date("F j, Y H:i", "Europe/London") }})<br />
+                            {% endfor %}
+                            {% if policy.checkmendCerts|length == 0 %}
+                              Certs not present
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                {{ form_start(receperio_form, {'attr': {'class': 'form-inline'}}) }}
+                                {{ form_widget(receperio_form.rerun, {'label': 'Re-run check', 'attr': {'class': 'btn btn-danger confirm-imei-rerun'}}) }}
+                                {{ form_end(receperio_form) }}
+                              </td>
+                            {% endif %}
                           </td>
-                        {% endif %}
-                      </td>
-                    </tr>
-                </table>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-5">
+                    <h2>Notes</h2>
+                    {% for time,note in policy.notes %}
+                        {% set note_decoded = note|json_decode() %}
+                      <div class="row">
+                        <b>{{ time|date }} by {{ note_decoded.name }}</b>
+                      </div>
+                      <div class="row">
+                        {{ note_decoded.notes }}
+                      </div>
+                    {% endfor %}
+                    <hr class="strong">
+                    <div class="row">
+                    {{ form_start(note_form)}}
+                    {{ form_label(note_form.notes) }}
+                    </div>
+                    <div class="row">
+                      <div class="form-group">
+                        {{ form_widget(note_form.notes, {'attr': {'class': 'col-sm-12'}}) }}
+                      </div>
+                    </div>
+                    <div class="row">
+                        {{ form_widget(note_form.add, {'label': 'Add Note', 'attr': {'class': 'btn btn-success'}}) }}
+                        {{ form_end(note_form) }}
+                    </div>
+                </div>
+            </div>
+                
                 {% if policy.isPolicy %}
                 <h3>Pot</h3>
                 <table class="table table-striped">

@@ -13,6 +13,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Form\Type\PhoneType;
+use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\ClaimsCheckType;
 use AppBundle\Form\Type\UserSearchType;
@@ -144,6 +145,9 @@ class ClaimsController extends BaseController
         $formClaimsCheck = $this->get('form.factory')
             ->createNamedBuilder('claimscheck', ClaimsCheckType::class)
             ->getForm();
+        $noteForm = $this->get('form.factory')
+            ->createNamedBuilder('note_form', NoteType::class)
+            ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('claim')) {
                 $formClaim->handleRequest($request);
@@ -183,6 +187,22 @@ class ClaimsController extends BaseController
 
                     return $this->redirectToRoute('claims_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('note_form')) {
+                $noteForm->handleRequest($request);
+                if ($noteForm->isValid()) {
+                    $policy->addNote(json_encode([
+                        'user_id' => $this->getUser()->getId(),
+                        'name' => $this->getUser()->getName(),
+                        'notes' => $noteForm->getData()['notes']
+                    ]));
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Added note to Policy %s.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('claims_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -191,6 +211,7 @@ class ClaimsController extends BaseController
             'policy' => $policy,
             'formClaim' => $formClaim->createView(),
             'formClaimsCheck' => $formClaimsCheck->createView(),
+            'note_form' => $noteForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'claims_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

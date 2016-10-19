@@ -267,6 +267,11 @@ abstract class Policy
      */
     protected $leadSource;
 
+    /**
+     * @MongoDB\Field(type="hash")
+     */
+    protected $notes = array();
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -668,6 +673,17 @@ abstract class Policy
     public function getLeadSource()
     {
         return $this->leadSource;
+    }
+
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    public function addNote($note)
+    {
+        $now = new \DateTime();
+        $this->notes[$now->getTimestamp()] = $note;
     }
 
     public function setId($id)
