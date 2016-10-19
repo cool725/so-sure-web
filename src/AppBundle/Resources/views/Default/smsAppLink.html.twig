@@ -20,25 +20,26 @@
           <p style="margin-top: 10px"><i>One text per phone number. UK Numbers only.</i></p>
         {{ form_end(form) }}
         </div>
-    <div id="app-store">
-        <div class="row download-app">
-            <div class="text-break-dark">
-                <div class="line-dark"></div>
-                or
-                <div class="line-dark"></div>
+
+        <section class="download-now" id="download-now">
+            <div class="container">
+                <h2>The next bit is via the app</h2>
+                  <p class="lead text-center" id="hero-description">It makes sense, we are a mobile insurance provider after all!</p>
+                <div class="row download-app">
+                    <div class="col-md-6 text-right">
+                        <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+                        </a>
+                    </div>
+                    <div class="col-md-6 text-left">
+                        <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6 text-right">
-                <a class="ga-outbound-click" href="{{ apple_download('text-me-the-app') }}">
-                    <img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
-                </a>
-            </div>
-            <div class="col-md-6 text-left">
-                <a class="ga-outbound-click" href="{{ google_download('text-me-the-app') }}">
-                    <img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
-                </a>
-            </div>
-        </div>
-    </div>
+        </section>
+
     </div>
   </div>
 </div>

@@ -11,19 +11,20 @@
 {% endblock %}
 
 {% block body %}
-    <section class="hero">
+    <section class="popular-devices">
         <div class="container">
             <div id="navchange"></div>
             <div class="row" id="welcome">
                 <div class="col-md-12">
                         <h1 class="text-center">Insure your phone with {{invitation.inviter.name}}.<br> Get up to 80% of your money back.</h1>
                     </div>
-                            <p class="text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
+                            <p class="lead text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div id="select-phone">
         <div class="container" id="get-quote">
             <div class="row">
                 <div class="col-sm-12">
@@ -43,44 +44,41 @@
                 <a href="mailto:hello@wearesosure.com">Don't see your device. Let us know.</a>
             </p>
         </div>
+        </div>
 
-        <div class="container" id="app-store">
-            <div class="row download-app">
-                <div class="text-break">
-                    <div class="line"></div>
-                    or
-                    <div class="line"></div>
-                </div>
-            </div>
+        <div class="text-break">
+            <div class="line"></div>
+            OR
+            <div class="line"></div>
+        </div>
+
             <div class="row">
                 {{ form_start(form) }}
                 {{ form_widget(form) }}
                 {{ form_end(form) }}
-
-                <p class="select-device text-center"><small>Not sure why you've received this?
-                    <a href="mailto:support@wearesosure.com" style="color: #fff;">Let us know</a>.</small></p>
             </div>
         </section>
 
         {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
-        <div class="download-now" id="download-now">
+        <section class="download-now" id="download-now">
             <div class="container">
-                <h3 class="text-center">Ready for better? Download our app now.</h3>
+                <h2>The next bit is via the app</h2>
+                  <p class="lead text-center" id="hero-description">It makes sense, we are a mobile insurance provider after all!</p>
                 <div class="row download-app">
                     <div class="col-md-6 text-right">
-                        <a class="ga-outbound-click" href="{{ apple_download('invitation') }}">
-                            <img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
+                        <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
                         </a>
                     </div>
                     <div class="col-md-6 text-left">
-                        <a class="ga-outbound-click" href="{{ google_download('invitation') }}">
-                            <img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
+                        <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
+        </section>
 
     {% endblock %}

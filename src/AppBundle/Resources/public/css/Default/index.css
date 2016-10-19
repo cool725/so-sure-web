@@ -275,10 +275,12 @@
     vertical-align: middle;
     height: 100%;
 }
-
-.popular-devices .row {
-    text-align: left;
-    margin-top: 40px;
+.popular-devices .btn-danger {
+    padding: 12px 30px;
+    border-radius: 30px;
+    -moz-border-radius: 30px;
+    -webkit-border-radius: 30px;
+    width: 155px;
 }
 
 #memory-select {
