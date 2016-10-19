@@ -100,6 +100,6 @@ class BranchTwigExtension extends \Twig_Extension
 
     public function getName()
     {
-        return 'app_extension';
+        return 'app_twig_branch';
     }
 }

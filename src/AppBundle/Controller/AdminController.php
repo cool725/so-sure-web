@@ -33,6 +33,7 @@ use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
+use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\EmailOptOutType;
 use AppBundle\Form\Type\SmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
@@ -619,6 +620,9 @@ class AdminController extends BaseController
         $pendingCancelForm = $this->get('form.factory')
             ->createNamedBuilder('pending_cancel_form', PendingPolicyCancellationType::class, $policy)
             ->getForm();
+        $noteForm = $this->get('form.factory')
+            ->createNamedBuilder('note_form', NoteType::class)
+            ->getForm();
         $imeiForm = $this->get('form.factory')
             ->createNamedBuilder('imei_form', ImeiType::class, $policy)
             ->getForm();
@@ -671,6 +675,22 @@ class AdminController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('note_form')) {
+                $noteForm->handleRequest($request);
+                if ($noteForm->isValid()) {
+                    $policy->addNote(json_encode([
+                        'user_id' => $this->getUser()->getId(),
+                        'name' => $this->getUser()->getName(),
+                        'notes' => $noteForm->getData()['notes']
+                    ]));
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Added note to Policy %s.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             } elseif ($request->request->has('facebook_form')) {
                 $facebookForm->handleRequest($request);
                 if ($facebookForm->isValid()) {
@@ -718,6 +738,7 @@ class AdminController extends BaseController
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
             'pending_cancel_form' => $pendingCancelForm->createView(),
+            'note_form' => $noteForm->createView(),
             'imei_form' => $imeiForm->createView(),
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),

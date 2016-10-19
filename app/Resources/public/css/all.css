@@ -405,3 +405,10 @@ width: 60% !important;
 div.col-sm-5.five-two {
   width: 40% !important;
 }
+
+hr.strong {
+    width: 100%;
+    color: black;
+    height: 1px;
+    background-color:black;
+}
