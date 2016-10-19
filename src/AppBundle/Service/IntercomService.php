@@ -40,43 +40,82 @@ class IntercomService
         $this->redis = $redis;
     }
 
-    public function update(User $user)
+    public function update(User $user, $allowSoSure = false, $undelete = false)
     {
-        if ($user->hasSoSureEmail()) {
-            return;
+        if ($user->hasSoSureEmail() && !$allowSoSure) {
+            return ['skipped' => true];
         }
 
-        if ($user->hasValidPolicy()) {
-            $resp = $this->updateConvert($user);
-        } else {
-            $resp = $this->updateLead($user);
+        if (!$undelete && $this->isDeleted($user)) {
+            return ['deleted' => true];
         }
+
+        $converted = false;
+        if ($this->leadExists($user)) {
+            $this->convertLead($user);
+            $converted = true;
+        }
+        $resp = $this->updateUser($user, $converted);
 
         return $resp;
     }
 
-    public function updateConvert(User $user, $allowSoSure = false)
+    private function isDeleted(User $user)
     {
-        if ($user->hasSoSureEmail() && !$allowSoSure) {
-            return;
+        // Record must exist before it can be considered deleted
+        if (!$user->getIntercomId()) {
+            return false;
+        }
+
+        if ($this->userExists($user) || $this->leadExists($user)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function leadExists(User $user)
+    {
+        if (!$user->getIntercomId()) {
+            return false;
         }
 
         try {
-            $resp = $this->updateUser($user);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            // For leads, there should be an intercom id on the so-sure user record (set on creation)
-            // However, as the record is not marked as a user, it will trigger a 404
-            // So, first convert the lead, then update the user
-            if ($e->getResponse()->getStatusCode() == "404") {
-                $resp = $this->convertLead($user);
-                $resp = $this->updateUser($user, true);
-            }
-        }
+            $resp = $this->client->leads->getLead($user->getIntercomId());
+            $this->logger->info(sprintf('getLead %s %s', $user->getEmail(), json_encode($resp)));
 
-        return $resp;
+            return true;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            if ($e->getResponse()->getStatusCode() == "404") {
+                return false;
+            }
+            // print_r($e->getResponse()->getBody()->getContents());
+
+            throw $e;
+        }
     }
 
-    private function convertLead(User $user)
+    private function userExists(User $user)
+    {
+        if (!$user->getIntercomId()) {
+            return false;
+        }
+
+        try {
+            $resp = $this->client->users->getUser($user->getIntercomId());
+            $this->logger->info(sprintf('getUser %s %s', $user->getEmail(), json_encode($resp)));
+
+            return true;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            if ($e->getResponse()->getStatusCode() == "404") {
+                return false;
+            }
+
+            throw $e;
+        }
+    }
+
+    public function convertLead(User $user)
     {
         $data = [
           "contact" => array("id" => $user->getIntercomId()),
@@ -95,11 +134,10 @@ class IntercomService
             'email' => $user->getEmail(),
             'name' => $user->getName(),
             'signed_up_at' => $user->getCreated()->getTimestamp(),
+            'user_id' => $user->getId(),
         );
         if ($user->getIntercomId()) {
             $data['id'] = $user->getIntercomId();
-            // user_id can only be set if the user already exists
-            $data['user_id'] = $user->getId();
         }
 
         $policyValue = 0;
