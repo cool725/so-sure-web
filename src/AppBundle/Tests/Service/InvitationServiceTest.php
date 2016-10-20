@@ -98,7 +98,10 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
-        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('testDuplicateEmail-invite', $this));
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('testDuplicateEmail-invite', $this)
+        );
         $this->assertTrue($invitation instanceof EmailInvitation);
         static::$dm->flush();
 
