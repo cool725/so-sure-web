@@ -228,6 +228,13 @@ class InvitationTest extends WebTestCase
         self::$dm->persist($policyB);
         self::$dm->persist($invitationB);
         self::$dm->flush();
+
+        $invitationC = new EmailInvitation();
+        $invitationC->setName('Foo Bar');
+        $invitationC->setEmail('testNonDuplicateEmail-different@bar.com');
+        $invitationC->setPolicy($policyB);
+        self::$dm->persist($invitationC);
+        self::$dm->flush();
     }
 
     public function testDuplicateSms()
@@ -289,6 +296,13 @@ class InvitationTest extends WebTestCase
         self::$dm->persist($userB);
         self::$dm->persist($policyB);
         self::$dm->persist($invitationB);
+        self::$dm->flush();
+
+        $invitationC = new SmsInvitation();
+        $invitationC->setName('Foo Bar');
+        $invitationC->setMobile('+447775740403');
+        $invitationC->setPolicy($policyB);
+        self::$dm->persist($invitationC);
         self::$dm->flush();
     }
 }
