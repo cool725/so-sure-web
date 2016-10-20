@@ -548,13 +548,16 @@ class InvitationService
         $invitation->setCancelled(new \DateTime());
         $this->dm->flush();
 
-        // Notify invitee of cancellation
+        // Given that we can now display the invitation page even if there isn't a valid invite,
+        // we shouldn't send a cancellation email - we still want them to signup
+        /*
         if ($invitation instanceof EmailInvitation) {
             $this->sendEmail($invitation, self::TYPE_EMAIL_CANCEL);
         } else {
             // TODO: SMS Cancellation
             \AppBundle\Classes\NoOp::noOp([null]);
         }
+        */
     }
 
     public function reinvite(Invitation $invitation)
