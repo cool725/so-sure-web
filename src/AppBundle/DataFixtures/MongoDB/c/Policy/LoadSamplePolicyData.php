@@ -123,7 +123,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $phone = null;
         while ($phone == null) {
             $phone = $phones[rand(0, count($phones) - 1)];
-            if (!$phone->getCurrentPhonePrice() || $phone->getMake() == "ALL") {
+            if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
                 $phone = null;
             }
         }

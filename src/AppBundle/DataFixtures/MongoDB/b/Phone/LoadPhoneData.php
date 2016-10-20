@@ -21,8 +21,11 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         $this->container = $container;
     }
 
-    protected function loadCsv(ObjectManager $manager, $filename)
+    protected function loadCsv(ObjectManager $manager, $filename, $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime('2016-01-01');
+        }
         $file = sprintf(
             "%s/../src/AppBundle/DataFixtures/%s",
             $this->container->getParameter('kernel.root_dir'),
@@ -32,7 +35,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         if (($handle = fopen($file, "r")) !== FALSE) {
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                 if ($row > 0) {
-                    $this->newPhoneFromRow($manager, $data);
+                    $this->newPhoneFromRow($manager, $data, $date);
                 }
                 if ($row % 1000 == 0) {
                     $manager->flush();
@@ -81,7 +84,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         }
     }
 
-    protected function newPhoneFromRow($manager, $data)
+    protected function newPhoneFromRow($manager, $data, $date)
     {
         try {
             // price
@@ -112,7 +115,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
                 str_replace('£', '', $data[7]), // $initialPrice
                 str_replace('£', '', $data[6]), // $replacementPrice
                 $data[8], // $initialPriceUrl
-                new \DateTime('2016-01-01')
+                $date
             );
 
             $resolution = explode('x', str_replace(' ', '', $data[17]));
