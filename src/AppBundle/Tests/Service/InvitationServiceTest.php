@@ -90,6 +90,24 @@ class InvitationServiceTest extends WebTestCase
     /**
      * @expectedException AppBundle\Exception\DuplicateInvitationException
      */
+    public function testDuplicateEmail()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testDuplicateEmail-user', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('testDuplicateEmail-invite', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
+        static::$dm->flush();
+
+        self::$invitationService->inviteByEmail($policy, static::generateEmail('testDuplicateEmail-invite', $this));
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\DuplicateInvitationException
+     */
     public function testDuplicateEmailInvitationRejected()
     {
         $user = static::createUser(
