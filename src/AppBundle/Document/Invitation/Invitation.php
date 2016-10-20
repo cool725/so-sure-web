@@ -13,6 +13,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("invitation_type")
  * @MongoDB\DiscriminatorMap({"email"="EmailInvitation", "sms"="SmsInvitation"})
+ * @MongoDB\Index(keys={"email"="asc", "mobile"="asc", "policy.id"="asc"}, sparse="true", unique="true")
  */
 abstract class Invitation
 {
