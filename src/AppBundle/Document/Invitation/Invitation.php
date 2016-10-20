@@ -20,6 +20,7 @@ abstract class Invitation
 
     const STATUS_SENT = 'sent';
     const STATUS_FAILED = 'failed';
+    const STATUS_SKIPPED = 'skipped';
 
     /**
      * @MongoDB\Id
@@ -69,7 +70,7 @@ abstract class Invitation
     protected $reinvitedCount;
 
     /**
-     * @Assert\Choice({"sent", "failed"})
+     * @Assert\Choice({"sent", "failed", "skipped"})
      * @MongoDB\Field(type="string")
      */
     protected $status;

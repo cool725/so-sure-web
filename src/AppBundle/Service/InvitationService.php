@@ -321,10 +321,6 @@ class InvitationService
      */
     protected function sendEmail(Invitation $invitation, $type)
     {
-        if ($this->debug) {
-            return;
-        }
-
         $to = null;
         $subject = null;
         $htmlTemplate = sprintf('AppBundle:Email:invitation/%s.html.twig', $type);
@@ -370,6 +366,18 @@ class InvitationService
             throw new \InvalidArgumentException(sprintf('Unknown type %s', $type));
         }
 
+        $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
+        $optouts = $optOutRepo->findOptOut($to, EmailOptOut::OPTOUT_CAT_INVITATIONS);
+        if (count($optouts) > 0) {
+            $invitation->setStatus(EmailInvitation::STATUS_SKIPPED);
+
+            return;
+        }
+
+        if ($this->debug) {
+            return;
+        }
+
         try {
             $this->mailer->sendTemplate(
                 $subject,
@@ -397,6 +405,13 @@ class InvitationService
      */
     protected function sendSms(SmsInvitation $invitation, $type)
     {
+        $optOutRepo = $this->dm->getRepository(SmsOptOut::class);
+        $optouts = $optOutRepo->findOptOut($invitation->getMobile(), SmsOptOut::OPTOUT_CAT_INVITATIONS);
+        if (count($optouts) > 0) {
+            $invitation->setStatus(SmsInvitation::STATUS_SKIPPED);
+            return;
+        }
+
         if ($this->debug) {
             // Useful for testing
             $this->addSmsCharge($invitation);
@@ -562,10 +577,13 @@ class InvitationService
             $this->dm->flush();
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
         } elseif ($invitation instanceof SmsInvitation) {
-            $this->sendSms($invitation);
+            throw new \Exception('SMS Reinvitations are not currently supported');
+            /*
+            $this->sendSms($invitation, self::TYPE_SMS_REINVITE);
             $invitation->reinvite();
             $this->dm->flush();
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+            */
         } else {
             throw new \Exception('Unknown invitation type. Unable to reinvite.');
         }
