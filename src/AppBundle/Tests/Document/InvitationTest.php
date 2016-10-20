@@ -6,6 +6,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\PhonePolicy;
 
 /**
  * @group functional-nonet
@@ -164,5 +165,130 @@ class InvitationTest extends WebTestCase
         $invitation->setName('Foo Bar');
         $api = $invitation->toApiArray();
         $this->assertNull($api['image_url']);
+    }
+
+    public function testDuplicateEmail()
+    {
+        $userA = new User();
+        $userA->setEmail('testDuplicateEmailA@InvitationTest.com');
+        $policyA = new PhonePolicy();
+        $userA->addPolicy($policyA);
+
+        $invitationA = new EmailInvitation();
+        $invitationA->setName('Foo Bar');
+        $invitationA->setEmail('testDuplicateEmail@bar.com');
+        $invitationA->setPolicy($policyA);
+        self::$dm->persist($userA);
+        self::$dm->persist($policyA);
+        self::$dm->persist($invitationA);
+        self::$dm->flush();
+
+        $invitationB = new EmailInvitation();
+        $invitationB->setName('Foo Bar');
+        $invitationB->setEmail('testDuplicateEmail@bar.com');
+        $invitationB->setPolicy($policyA);
+        self::$dm->persist($invitationB);
+        try {
+            self::$dm->flush();
+
+            // expect exception to occur
+            $this->assertTrue(false);
+        } catch (\MongoDuplicateKeyException $e) {
+            // expected exeption - ignore
+            \AppBundle\Classes\NoOp::noOp([$e]);
+        }
+    }
+
+    public function testNonDuplicateEmail()
+    {
+        $userA = new User();
+        $userA->setEmail('testNonDuplicateEmailA@InvitationTest.com');
+        $policyA = new PhonePolicy();
+        $userA->addPolicy($policyA);
+
+        $invitationA = new EmailInvitation();
+        $invitationA->setName('Foo Bar');
+        $invitationA->setEmail('testNonDuplicateEmail@bar.com');
+        $invitationA->setPolicy($policyA);
+        self::$dm->persist($userA);
+        self::$dm->persist($policyA);
+        self::$dm->persist($invitationA);
+        self::$dm->flush();
+
+        $userB = new User();
+        $userB->setEmail('testNonDuplicateEmailB@InvitationTest.com');
+        $policyB = new PhonePolicy();
+        $userB->addPolicy($policyB);
+
+        $invitationB = new EmailInvitation();
+        $invitationB->setName('Foo Bar');
+        $invitationB->setEmail('testNonDuplicateEmail@bar.com');
+        $invitationB->setPolicy($policyB);
+        self::$dm->persist($userB);
+        self::$dm->persist($policyB);
+        self::$dm->persist($invitationB);
+        self::$dm->flush();
+    }
+
+    public function testDuplicateSms()
+    {
+        $userA = new User();
+        $userA->setEmail('testDuplicateSmsA@InvitationTest.com');
+        $policyA = new PhonePolicy();
+        $userA->addPolicy($policyA);
+
+        $invitationA = new SmsInvitation();
+        $invitationA->setName('Foo Bar');
+        $invitationA->setMobile('+447775740400');
+        $invitationA->setPolicy($policyA);
+        self::$dm->persist($userA);
+        self::$dm->persist($policyA);
+        self::$dm->persist($invitationA);
+        self::$dm->flush();
+
+        $invitationB = new SmsInvitation();
+        $invitationB->setName('Foo Bar');
+        $invitationB->setMobile('+447775740400');
+        $invitationB->setPolicy($policyA);
+        self::$dm->persist($invitationB);
+        try {
+            self::$dm->flush();
+
+            // expect exception to occur
+            $this->assertTrue(false);
+        } catch (\MongoDuplicateKeyException $e) {
+            // expected exeption - ignore
+            \AppBundle\Classes\NoOp::noOp([$e]);
+        }
+    }
+
+    public function testNonDuplicateSms()
+    {
+        $userA = new User();
+        $userA->setEmail('testNonDuplicateSmsA@InvitationTest.com');
+        $policyA = new PhonePolicy();
+        $userA->addPolicy($policyA);
+
+        $invitationA = new SmsInvitation();
+        $invitationA->setName('Foo Bar');
+        $invitationA->setMobile('+447775740401');
+        self::$dm->persist($userA);
+        self::$dm->persist($policyA);
+        self::$dm->persist($invitationA);
+        self::$dm->flush();
+
+        $userB = new User();
+        $userB->setEmail('testNonDuplicateSmsB@InvitationTest.com');
+        $policyB = new PhonePolicy();
+        $userB->addPolicy($policyB);
+
+        $invitationB = new SmsInvitation();
+        $invitationB->setName('Foo Bar');
+        $invitationB->setMobile('+447775740402');
+        $invitationB->setPolicy($policyB);
+        self::$dm->persist($userB);
+        self::$dm->persist($policyB);
+        self::$dm->persist($invitationB);
+        self::$dm->flush();
     }
 }
