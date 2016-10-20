@@ -298,6 +298,11 @@ abstract class Invitation
         return $this->isAccepted() || $this->isRejected() || $this->isCancelled();
     }
 
+    public function isInviteeProcessed()
+    {
+        return $this->isAccepted() || $this->isRejected();
+    }
+
     public function getInviteeName()
     {
         if ($this->getInvitee()) {
