@@ -177,6 +177,8 @@ class InvitationService
                 $invitation = $prevInvitation;
                 $invitation->setCancelled(null);
                 $this->dm->flush();
+            } else {
+                throw new DuplicateInvitationException('Email was already invited to this policy');
             }
         }
 

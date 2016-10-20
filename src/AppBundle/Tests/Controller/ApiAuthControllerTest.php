@@ -1580,6 +1580,43 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
     }
 
+    public function testDuplicateEmailInvitation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('DuplicateEmailInvitation-user', $this),
+            'foo'
+        );
+        $userInvitee = self::createUser(
+            self::$userManager,
+            self::generateEmail('DuplicateEmailInvitation-invitee', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('DuplicateEmailInvitation-invitee', $this),
+            'name' => 'functional test',
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(
+            strtolower(self::generateEmail('DuplicateEmailInvitation-invitee', $this)),
+            $data['invitation_detail']
+        );
+        $this->assertEquals('functional test', $data['name']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => self::generateEmail('DuplicateEmailInvitation-invitee', $this),
+            'name' => 'functional test',
+        ]);
+        $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_DUPLICATE);
+    }
+
     public function testEmailValidationInvitation()
     {
         $user = self::createUser(
