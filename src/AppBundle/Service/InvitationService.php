@@ -415,6 +415,8 @@ class InvitationService
         if ($this->debug) {
             // Useful for testing
             $this->addSmsCharge($invitation);
+
+            return;
         }
 
         $smsTemplate = sprintf('AppBundle:Sms:%s.txt.twig', $type);

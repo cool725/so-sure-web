@@ -401,7 +401,10 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('EmailInvitationReinviteOptOut-invite', $this),
             'bar'
         );
-        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('EmailInvitationReinviteOptOut-invite', $this));
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('EmailInvitationReinviteOptOut-invite', $this)
+        );
         $this->assertTrue($invitation instanceof EmailInvitation);
 
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
@@ -424,7 +427,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
     }
 
-    /*
+    /**
      * @expectedException \Exception
      */
     public function testSmsInvitationReinviteOptOut()
@@ -454,9 +457,6 @@ class InvitationServiceTest extends WebTestCase
 
         // allow reinvitation
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
-
-        // annotation not working for some reason :()
-        $this->setExpectedException(\Exception::class);
 
         // sms reinvites are currently not allowed - exception thrown
         self::$invitationService->reinvite($invitation);
