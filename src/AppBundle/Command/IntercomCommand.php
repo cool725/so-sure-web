@@ -54,6 +54,12 @@ class IntercomCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'Force a lead to user conversion (email address)'
             )
+            ->addOption(
+                'undelete',
+                null,
+                InputOption::VALUE_NONE,
+                'Resync regardless of deletion (will undelete if deleted) - requires email'
+            )
         ;
     }
 
@@ -65,6 +71,7 @@ class IntercomCommand extends ContainerAwareCommand
         $email = $input->getOption('email');
         $requeue = $input->getOption('requeue');
         $convertLead = $input->getOption('convert-lead');
+        $undelete = true === $input->getOption('undelete');
 
         $intercom = $this->getContainer()->get('app.intercom');
 
@@ -75,12 +82,12 @@ class IntercomCommand extends ContainerAwareCommand
                 $resp = $intercom->queue($user);
                 $output->writeln(sprintf('User %s was requeued', $user->getId()));
             } else {
-                $resp = $intercom->update($user);
+                $resp = $intercom->update($user, true, $undelete);
                 $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
             }
         } elseif ($convertLead) {
             $user = $this->getUser($convertLead);
-            $resp = $intercom->updateConvert($user, true);
+            $resp = $intercom->convertLead($user);
             $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
         } elseif ($clear) {
             $intercom->clearQueue();
