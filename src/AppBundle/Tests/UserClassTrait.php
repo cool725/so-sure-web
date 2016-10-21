@@ -93,7 +93,8 @@ trait UserClassTrait
         $phone = null;
         while ($phone == null) {
             $phone = $phones[rand(0, count($phones) - 1)];
-            if (!$phone->getCurrentPhonePrice() || $phone->getMake() == "ALL") {
+            // Many tests rely on past dates, so ensure the date is ok for the past
+            if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
                 $phone = null;
             }
         }

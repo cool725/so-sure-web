@@ -101,7 +101,7 @@ class ApiController extends BaseController
              * so may want to re-enable for releases
             if ($user->getEmailCanonical() == "apple@so-sure.com") {
                 list($identityId, $token) = $this->getCognitoIdToken($user, $request);
-                $intercomHash = $this->get('app.intercom')->getApiUserHash($this->getUser());
+                $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
                 return new JsonResponse($user->toApiArray($intercomHash, $identityId, $token));
             }
@@ -683,7 +683,7 @@ class ApiController extends BaseController
                 $this->snsSubscribe('registered', $user->getSnsEndpoint());
                 $this->snsUnsubscribe('unregistered', $user->getSnsEndpoint());
             }
-            $intercomHash = $this->get('app.intercom')->getApiUserHash($this->getUser());
+            $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
             return new JsonResponse($user->toApiArray($intercomHash, $identityId, $token));
         } catch (ValidationException $ex) {

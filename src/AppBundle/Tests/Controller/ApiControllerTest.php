@@ -858,7 +858,7 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals($birthday->format(\DateTime::ATOM), $user->getBirthday()->format(\DateTime::ATOM));
         $this->assertEquals('Foo', $user->getFirstName());
         $this->assertEquals('Bar', $user->getLastName());
-        $this->assertTrue(strlen($data['intercom_token']['android_hash']) > 10);
+        $this->assertTrue(strlen($data['intercom_token']['android_hash']) > 10, json_encode($data));
         $this->assertTrue(strlen($data['intercom_token']['ios_hash']) > 10);
     }
 
