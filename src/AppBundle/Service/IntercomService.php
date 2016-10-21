@@ -156,7 +156,7 @@ class IntercomService
         ];
     }
 
-    public function getUserHash(User $user = null, $secureType)
+    public function getUserHash(User $user = null, $secureType = null)
     {
         $secure = null;
         if ($secureType == self::SECURE_WEB) {
