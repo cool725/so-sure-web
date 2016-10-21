@@ -342,6 +342,21 @@ class Phone
         return $this->model;
     }
 
+    public function getEncodedModel()
+    {
+        $model = str_replace('+', '++', $this->getModel());
+
+        return str_replace(' ', '+', $model);
+    }
+
+    public static function decodeModel($encodedModel)
+    {
+        $decodedModel = str_replace('++', '^', $encodedModel);
+        $decodedModel = str_replace('+', ' ', $decodedModel);
+
+        return str_replace('^', '+', $decodedModel);
+    }
+
     public function setModel($model)
     {
         $this->model = $model;
