@@ -102,13 +102,13 @@ class DefaultController extends BaseController
                     if ($policy->getPhone()->getMemory()) {
                         return $this->redirectToRoute('quote_make_model_memory', [
                             'make' => $policy->getPhone()->getMake(),
-                            'model' => $policy->getPhone()->getModel(),
+                            'model' => $policy->getPhone()->getEncodedModel(),
                             'memory' => $policy->getPhone()->getMemory(),
                         ]);
                     } else {
                         return $this->redirectToRoute('quote_make_model', [
                             'make' => $policy->getPhone()->getMake(),
-                            'model' => $policy->getPhone()->getModel(),
+                            'model' => $policy->getPhone()->getEncodedModel(),
                         ]);
                     }
                 }
@@ -329,12 +329,21 @@ class DefaultController extends BaseController
         $repo = $dm->getRepository(Phone::class);
         $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
         $phone = null;
+        $decodedModel = Phone::decodeModel($model);
         if ($id) {
             $phone = $repo->find($id);
         } elseif ($memory) {
-            $phone = $repo->findOneBy(['make' => $make, 'model' => $model, 'memory' => (int) $memory]);
+            $phone = $repo->findOneBy(['make' => $make, 'model' => $decodedModel, 'memory' => (int) $memory]);
+            // check for historical urls
+            if (!$phone) {
+                $phone = $repo->findOneBy(['make' => $make, 'model' => $model, 'memory' => (int) $memory]);
+            }
         } else {
-            $phone = $repo->findOneBy(['make' => $make, 'model' => $model]);
+            $phone = $repo->findOneBy(['make' => $make, 'model' => $decodedModel]);
+            // check for historical urls
+            if (!$phone) {
+                $phone = $repo->findOneBy(['make' => $make, 'model' => $model]);
+            }
         }
         if (!$phone) {
             return new RedirectResponse($this->generateUrl('homepage'));

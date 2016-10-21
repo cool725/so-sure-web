@@ -42,13 +42,13 @@ class PhoneSitemapGenerator implements GeneratorInterface
             if ($phone->getMemory()) {
                 $url = $this->router->generate('quote_make_model_memory', [
                     'make' => $phone->getMake(),
-                    'model' => $phone->getModel(),
+                    'model' => $phone->getEncodedModel(),
                     'memory' => $phone->getMemory(),
                 ], true);
             } else {
                 $url = $this->router->generate('quote_make_model', [
                     'make' => $phone->getMake(),
-                    'model' => $phone->getModel(),
+                    'model' => $phone->getEncodedModel(),
                 ], true);
             }
             $entries[] = new Entry($url, null, 'weekly', '0.7');
