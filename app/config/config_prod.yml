@@ -59,7 +59,7 @@ monolog:
             channels: ["receperio"]            
         main:
             type:         fingers_crossed
-            action_level: warning
+            action_level: info
             handler:      nested
         nested:
             formatter: "app.logger.lineformatter"
