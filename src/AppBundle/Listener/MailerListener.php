@@ -35,7 +35,8 @@ class MailerListener implements Swift_Events_SendListener
         } elseif ($evt->getResult() == Swift_Events_SendEvent::RESULT_FAILED) {
             $result = 'Failed';
         }
-        $this->logger->info(sprintf('Email %s %s [%s]',
+        $this->logger->info(sprintf(
+            'Email %s %s [%s]',
             $result,
             json_encode($evt->getMessage()->getTo()),
             $evt->getMessage()->getSubject()
