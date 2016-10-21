@@ -101,8 +101,9 @@ class ApiController extends BaseController
              * so may want to re-enable for releases
             if ($user->getEmailCanonical() == "apple@so-sure.com") {
                 list($identityId, $token) = $this->getCognitoIdToken($user, $request);
+                $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
-                return new JsonResponse($user->toApiArray($identityId, $token));
+                return new JsonResponse($user->toApiArray($intercomHash, $identityId, $token));
             }
             */
 
@@ -159,8 +160,9 @@ class ApiController extends BaseController
 
             // User has successfully logged in, so clear the rate limit
             $rateLimit->clearByUser($user);
+            $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
-            $response = $user->toApiArray($identityId, $token);
+            $response = $user->toApiArray($intercomHash, $identityId, $token);
             $this->get('logger')->info(sprintf('loginAction Resp %s', json_encode($response)));
 
             return new JsonResponse($response);
@@ -681,8 +683,9 @@ class ApiController extends BaseController
                 $this->snsSubscribe('registered', $user->getSnsEndpoint());
                 $this->snsUnsubscribe('unregistered', $user->getSnsEndpoint());
             }
+            $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
-            return new JsonResponse($user->toApiArray($identityId, $token));
+            return new JsonResponse($user->toApiArray($intercomHash, $identityId, $token));
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 

@@ -2668,6 +2668,10 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals($data['line1'], $result['addresses'][0]['line1']);
         $this->assertEquals($data['city'], $result['addresses'][0]['city']);
         $this->assertEquals($data['postcode'], $result['addresses'][0]['postcode']);
+
+        $this->assertFalse(isset($data['intercom_token']));
+        $this->assertFalse(isset($data['cognito_token']));
+        $this->assertFalse(isset($data['user_token']));
     }
 
     public function testUserAddAddressBadLines()
