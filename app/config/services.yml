@@ -144,6 +144,8 @@ services:
             intercom_token: "%intercom_token%"
             redis:          "@snc_redis.default"
             secure:         "%intercom_secure%"
+            android:        "%intercom_secure_android%"
+            ios:            "%intercom_secure_ios%"
 
     app.address:
         class: AppBundle\Service\PCAService

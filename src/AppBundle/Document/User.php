@@ -764,7 +764,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
           'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
           'image_url' => $this->getImageUrl(),
           'sns_endpoint' => $this->getSnsEndpoint() ? $this->getSnsEndpoint() : null,
-          'intercom_user_hash' => $intercomHash,
+          'intercom_token' => $intercomHash,
         ];
     }
 }

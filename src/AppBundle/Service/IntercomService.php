@@ -10,6 +10,9 @@ use Intercom\IntercomClient;
 class IntercomService
 {
     const KEY_INTERCOM_QUEUE = 'queue:intercom';
+    const SECURE_WEB = 'web';
+    const SECURE_ANDROID = 'android';
+    const SECURE_IOS = 'ios';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -22,25 +25,35 @@ class IntercomService
 
     protected $redis;
 
+    protected $secure;
+    protected $secureAndroid;
+    protected $secureIOS;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $token
      * @param                 $redis
      * @param string          $secure
+     * @param string          $secureAndroid
+     * @param string          $secureIOS
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         $token,
         $redis,
-        $secure
+        $secure,
+        $secureAndroid,
+        $secureIOS
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->client = new IntercomClient($token, null);
         $this->redis = $redis;
         $this->secure = $secure;
+        $this->secureAndroid = $secureAndroid;
+        $this->secureIOS = $secureIOS;
     }
 
     public function update(User $user, $allowSoSure = false, $undelete = false)
@@ -131,10 +144,33 @@ class IntercomService
         return $resp;
     }
 
-    public function getUserHash(User $user = null)
+    public function getApiUserHash(User $user = null)
     {
+        if (!$user || !$user->getId()) {
+            return null;
+        }
+
+        return [
+            'android_hash' => $this->getUserHash($user, self::SECURE_ANDROID),
+            'ios_hash' => $this->getUserHash($user, self::SECURE_IOS),
+        ];
+    }
+
+    public function getUserHash(User $user = null, $secureType)
+    {
+        $secure = null;
+        if ($secureType == self::SECURE_WEB) {
+            $secure = $this->secure;
+        } elseif ($secureType == self::SECURE_ANDROID) {
+            $secure = $this->secureAndroid;
+        } elseif ($secureType == self::SECURE_IOS) {
+            $secure = $this->secureIOS;
+        } else {
+            throw new \Exception('Unknown secure type');
+        }
+
         if ($user && $user->getId()) {
-            return hash_hmac('sha256', $user->getId(), $this->secure);
+            return hash_hmac('sha256', $user->getId(), $secure);
         }
 
         return null;
