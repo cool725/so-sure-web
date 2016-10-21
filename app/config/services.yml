@@ -480,6 +480,13 @@ services:
         tags:
             -  { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
+    app.listener.mailer:
+        class:  AppBundle\Listener\MailerListener
+        arguments: ["@logger"]
+        tags:
+          - { name: monolog.logger, channel: mailer }
+          - { name: "swiftmailer.default.plugin" }
+
     app.form.type.usersearch:
         class: AppBundle\Form\Type\UserSearchType
         arguments: ["@request_stack"]
