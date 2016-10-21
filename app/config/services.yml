@@ -143,6 +143,7 @@ services:
             logger:         "@logger"
             intercom_token: "%intercom_token%"
             redis:          "@snc_redis.default"
+            secure:         "%intercom_secure%"
 
     app.address:
         class: AppBundle\Service\PCAService

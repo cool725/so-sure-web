@@ -737,7 +737,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return true;
     }
 
-    public function toApiArray($identityId = null, $token = null, $debug = false)
+    public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)
     {
         $addresses = [];
         if ($this->getBillingAddress()) {
@@ -764,6 +764,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
           'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
           'image_url' => $this->getImageUrl(),
           'sns_endpoint' => $this->getSnsEndpoint() ? $this->getSnsEndpoint() : null,
+          'intercom_user_hash' => $intercomHash,
         ];
     }
 }

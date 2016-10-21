@@ -98,3 +98,4 @@ parameters:
 
     intercom_token: ''
     intercom_webhook_key: ''
+    intercom_secure: ''

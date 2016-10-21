@@ -27,17 +27,20 @@ class IntercomService
      * @param LoggerInterface $logger
      * @param string          $token
      * @param                 $redis
+     * @param string          $secure
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         $token,
-        $redis
+        $redis,
+        $secure
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->client = new IntercomClient($token, null);
         $this->redis = $redis;
+        $this->secure = $secure;
     }
 
     public function update(User $user, $allowSoSure = false, $undelete = false)
@@ -119,13 +122,22 @@ class IntercomService
     {
         $data = [
           "contact" => array("id" => $user->getIntercomId()),
-          "user" => array("user_id" => $user->getId())
+          "user" => array("user_id" => $user->getId()),
         ];
 
         $resp = $this->client->leads->convertLead($data);
         $this->logger->debug(sprintf('Intercom convert lead (userid %s) %s', $user->getId(), json_encode($resp)));
 
         return $resp;
+    }
+
+    public function getUserHash(User $user = null)
+    {
+        if ($user && $user->getId()) {
+            return hash_hmac('sha256', $user->getId(), $this->secure);
+        }
+
+        return null;
     }
 
     private function updateUser(User $user, $isConverted = false)

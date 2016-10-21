@@ -155,8 +155,9 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
+            $intercomHash = $this->get('app.intercom')->getUserHash($this->getUser());
 
-            return new JsonResponse($this->getUser()->toApiArray());
+            return new JsonResponse($this->getUser()->toApiArray($intercomHash));
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (RateLimitException $e) {
@@ -880,8 +881,9 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('view', $user);
 
             $this->get('statsd')->endTiming("api.getCurrentUser");
+            $intercomHash = $this->get('app.intercom')->getUserHash($this->getUser());
 
-            $response = $user->toApiArray();
+            $response = $user->toApiArray($intercomHash);
             $this->get('logger')->info(sprintf('getCurrentUserAction Resp %s', json_encode($response)));
 
             return new JsonResponse($response);
@@ -913,8 +915,9 @@ class ApiAuthController extends BaseController
             if ($this->getRequestBool($request, 'debug')) {
                 $debug = true;
             }
+            $intercomHash = $this->get('app.intercom')->getUserHash($this->getUser());
 
-            $response = $user->toApiArray(null, null, $debug);
+            $response = $user->toApiArray($intercomHash, null, null, $debug);
             $this->get('logger')->info(sprintf('getUserAction Resp %s', json_encode($response)));
 
             return new JsonResponse($response);
@@ -1048,8 +1051,9 @@ class ApiAuthController extends BaseController
             if ($userChanged) {
                 $dm->flush();
             }
+            $intercomHash = $this->get('app.intercom')->getUserHash($this->getUser());
 
-            return new JsonResponse($user->toApiArray());
+            return new JsonResponse($user->toApiArray($intercomHash));
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
@@ -1103,8 +1107,9 @@ class ApiAuthController extends BaseController
 
             $dm->persist($address);
             $dm->flush();
+            $intercomHash = $this->get('app.intercom')->getUserHash($this->getUser());
 
-            return new JsonResponse($user->toApiArray());
+            return new JsonResponse($user->toApiArray($intercomHash));
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
