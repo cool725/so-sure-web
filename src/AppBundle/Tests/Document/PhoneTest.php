@@ -102,6 +102,15 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $phone->setMake('Apple');
         $this->assertFalse($phone->isSameMake('Google'));
     }
+    
+    /**
+     * @expectedException \Exception
+     */
+    public function testPlusEncoding()
+    {
+        $phone = new Phone();
+        $phone->setModel('A-Plus');
+    }
 
     private function getSamplePhoneA()
     {

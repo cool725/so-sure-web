@@ -344,21 +344,25 @@ class Phone
 
     public function getEncodedModel()
     {
-        $model = str_replace('+', '++', $this->getModel());
+        $model = str_replace('+', '-Plus', $this->getModel());
 
         return str_replace(' ', '+', $model);
     }
 
     public static function decodeModel($encodedModel)
     {
-        $decodedModel = str_replace('++', '^', $encodedModel);
-        $decodedModel = str_replace('+', ' ', $decodedModel);
+        $decodedModel = str_replace('+', ' ', $encodedModel);
+        $decodedModel = str_replace('-Plus', '+', $decodedModel);
 
-        return str_replace('^', '+', $decodedModel);
+        return $decodedModel;
     }
 
     public function setModel($model)
     {
+        if (stripos($model, '-Plus') !== false) {
+            throw new \Exception(sprintf('%s contains -Plus which will break encoding rules', $model));
+        }
+
         $this->model = $model;
     }
 
