@@ -456,12 +456,16 @@ class SalvaExportServiceTest extends WebTestCase
     {
         $policyCooloff = $this->createPolicy('connected-export-cooloff', new \DateTime('2016-01-01'));
         $policy = $this->createPolicy('connected-export', new \DateTime('2016-01-01'));
+        $invitation = self::$container->get('app.invitation');
+        $invitation->setEnvironment('prod');
+        $invitation->setDebug(true);
         static::connectPolicies(
-            self::$container->get('app.invitation'),
+            $invitation,
             $policy,
             $policyCooloff,
             new \DateTime('2016-01-02')
         );
+        $invitation->setEnvironment('test');
         $this->assertGreaterThan(0, count($policyCooloff->getConnections()));
         $this->assertGreaterThan(0, $policyCooloff->getPotValue());
 

@@ -1511,11 +1511,11 @@ class ApiAuthControllerTest extends BaseControllerTest
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'email' => 'patrick@so-sure.com',
+            'email' => 'patrick@so-sure.net',
             'name' => 'functional test',
         ]);
         $data = $this->verifyResponse(200);
-        $this->assertEquals('patrick@so-sure.com', $data['invitation_detail']);
+        $this->assertEquals('patrick@so-sure.net', $data['invitation_detail']);
         $this->assertEquals('functional test', $data['name']);
 
         $cancelUrl = sprintf("/api/v1/auth/invitation/%s", $data['id']);
@@ -1526,12 +1526,38 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'email' => 'patrick@so-sure.com',
+            'email' => 'patrick@so-sure.net',
             'name' => 'functional test',
         ]);
         $this->verifyResponse(200);
     }
 
+    /*
+     * Test would only work against a prod env server
+    public function testSoSureEmailInvitation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('sosure-email', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'email' => 'patrick@so-sure.com',
+            'name' => 'functional test',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_OPTOUT);
+    }
+    */
+
+    /**
+     */
     public function testNewEmailAndRejectedDupInvitation()
     {
         $user = self::createUser(

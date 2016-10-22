@@ -6,6 +6,7 @@ namespace AppBundle\Document;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use GeoJson\Geometry\Point;
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Invitation\Invitation;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
@@ -700,7 +701,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function hasSoSureEmail()
     {
-        return stripos($this->getEmailCanonical(), '@so-sure.com') !== false;
+        return SoSure::hasSoSureEmail($this->getEmailCanonical());
     }
 
     public function getImageUrl($size = 100)

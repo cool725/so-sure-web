@@ -105,6 +105,7 @@ services:
             sms:                  "@app.sms"
             rateLimit:            "@app.ratelimit"
             push:                 "@app.push"
+            environment:          "%kernel.environment%"
 
     app.digits:
         class: AppBundle\Service\DigitsService

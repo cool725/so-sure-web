@@ -189,6 +189,14 @@ class ApiAuthController extends BaseController
                 'User has previously claimed',
                 422
             );
+        } catch (OptOutException $e) {
+            // OptOut is a failsafe on so-sure invitations
+            // Should never occur, but if it does, the maxpot response should be appropiate to display
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_MAXPOT,
+                'User has a full pot',
+                422
+            );
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
