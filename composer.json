@@ -24,7 +24,6 @@
         "google/apiclient": "^2.0.0@RC",
         "staffim/rollbar-bundle": "*",
         "judopay/judopay-sdk": "2.0.1.2",
-        "facebook/php-sdk-v4": "^5.1",
         "aws/aws-sdk-php": "^3.15",
         "jms/security-extra-bundle": "^1.6",
         "white-october/pagerfanta-bundle": "^1.0",
@@ -53,7 +52,8 @@
         "nexylan/slack-bundle": "^1.0",
         "rollerworks/password-strength-bundle": "^1.5",
         "nelmio/security-bundle": "^2.0",
-        "intercom/intercom-php": "^3.0"
+        "intercom/intercom-php": "^3.0",
+        "facebook/graph-sdk": "^5.4"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
