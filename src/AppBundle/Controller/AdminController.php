@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
@@ -187,10 +188,18 @@ class AdminController extends BaseController
         $phone = $repo->find($id);
         if ($phone) {
             $gwp = $request->get('gwp');
-            $from = new \DateTime($request->get('from'));
+            $from = new \DateTime($request->get('from'), new \DateTimeZone(SoSure::TIMEZONE));
             $to = null;
             if ($request->get('to')) {
-                $to = new \DateTime($request->get('to'));
+                $to = new \DateTime($request->get('to'), new \DateTimeZone(SoSure::TIMEZONE));
+                $now = new \DateTime();
+                if ($to < $now) {
+                    $this->addFlash('error', sprintf(
+                        'New Price To Date must be in the future'
+                    ));
+
+                    return new RedirectResponse($this->generateUrl('admin_phones'));
+                }
             }
 
             if ($gwp < $phone->getSalvaMiniumumBinderMonthlyPremium()) {
@@ -448,12 +457,12 @@ class AdminController extends BaseController
             $start = new \DateTime();
             $start->sub(new \DateInterval('P7D'));
         } else {
-            $start = new \DateTime($start);
+            $start = new \DateTime($start, new \DateTimeZone(SoSure::TIMEZONE));
         }
         if (!$end) {
             $end = new \DateTime();
         } else {
-            $end = new \DateTime($end);
+            $end = new \DateTime($end, new \DateTimeZone(SoSure::TIMEZONE));
         }
 
         $dm = $this->getManager();
