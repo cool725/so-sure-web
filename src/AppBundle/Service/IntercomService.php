@@ -319,4 +319,48 @@ class IntercomService
     {
         return $this->redis->lrange(self::KEY_INTERCOM_QUEUE, 0, $max);
     }
+    
+    public function unsubscribes()
+    {
+        $this->unsubscribeLeads();
+        $this->unsubscribeUsers();
+    }
+
+    private function unsubscribeLeads()
+    {
+        $page = 1;
+        $pages = 1;
+        while ($page <= $pages) {
+            print sprintf('page %d%s', $page, PHP_EOL);
+            $resp = $this->client->leads->getLeads(['page' => $page]);
+            $page++;
+            $pages = $resp->pages->total_pages;
+            
+            foreach ($resp->contacts as $lead) {
+                if ($lead->unsubscribed_from_emails) {
+                    print $lead->email;
+                    print PHP_EOL;
+                }
+            }
+        }
+    }
+
+    private function unsubscribeUsers()
+    {
+        $page = 1;
+        $pages = 1;
+        while ($page <= $pages) {
+            print sprintf('page %d%s', $page, PHP_EOL);
+            $resp = $this->client->users->getUsers(['page' => $page]);
+            $page++;
+            $pages = $resp->pages->total_pages;
+            
+            foreach ($resp->users as $user) {
+                if ($user->unsubscribed_from_emails) {
+                    print $user->email;
+                    print PHP_EOL;
+                }
+            }
+        }
+    }
 }
