@@ -32,7 +32,7 @@
     <div class='col-md-4'>
         <div class="form-group">
             <div class='input-group date' id='report-start'>
-                <input name="start" type='text' class="form-control" value="{{ start |date('d-m-Y H:i')}}" />
+                <input name="start" type='text' class="form-control" value="{{ start |date('d-m-Y H:i', 'Europe/London')}}" />
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar"></span>
                 </span>
@@ -42,7 +42,7 @@
     <div class='col-md-4'>
         <div class="form-group">
             <div class='input-group date' id='report-end'>
-                <input name="end" type='text' class="form-control" value="{{ end |date('d-m-Y H:i')}}" />
+                <input name="end" type='text' class="form-control" value="{{ end |date('d-m-Y H:i', 'Europe/London')}}" />
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar"></span>
                 </span>
