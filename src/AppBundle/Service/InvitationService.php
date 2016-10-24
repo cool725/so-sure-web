@@ -350,7 +350,7 @@ class InvitationService
                 return;
             }
             $to = $invitation->getEmail();
-            $subject = sprintf('%s wants to connect with your on so-sure', $invitation->getInviterName());
+            $subject = sprintf('%s wants to connect with you on so-sure', $invitation->getInviterName());
         } elseif ($type == self::TYPE_EMAIL_REINVITE) {
             // Only able to do for EmailInvitations
             if (!$invitation instanceof EmailInvitation) {
