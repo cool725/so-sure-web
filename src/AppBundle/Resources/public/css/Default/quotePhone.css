@@ -56,9 +56,13 @@
   }
   .quote-panel-left {
       border-bottom: 2px solid #efefef;
+      padding: 15px 5px 15px 5px;
+  }
+  .quote-panel-right {
+    padding: 15px 5px 15px 5px;
   }
   .view-quote .btn-primary {
-    width: 250px;
+    width: 150px;
   }
 }
 
@@ -95,10 +99,24 @@
     font-family: "Avenir LT Std 35 Light", "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
     color: #626B78;
 }
+.reward-pot {
+  padding-top: 35px;
+}
 @media (max-width:767px) {
   .connections .explainer p {
       text-align: center;
     }
+    .reward-pot {
+      padding-top: 10px;
+    }
+    .slider-container {
+  		padding-top: 10px;
+  	}
+}
+@media (min-width: 767px) {
+	.pot-text-container {
+		padding-top: 30px;
+	}
 }
 
 /* Page Scroll Indictor */
@@ -118,7 +136,7 @@
 }
 @media (max-width: 992px) {
 #money_back {
-  margin-top: 20px;
+  margin-top: 10px;
   }
 }
 .circle {
@@ -140,47 +158,10 @@
   background: linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
 }
-
-.support-chat {
-  padding: 60px 50px 0 50px;
-}
-
-#sk-container.sk-embedded {
-	font-family: inherit !important;
-	border-radius: 4px !important;
-	border: 2px solid #efefef;
-  position: relative !important;
-  height: 500px !important;
-}
-
-#sk-container.sk-embedded #sk-header {
-	background-color: #efefef !important;
-}
-#sk-container.sk-embedded #sk-header .unread-badge {
-  display: none !important;
-}
-#sk-container.sk-embedded #sk-conversation .sk-intro-section {
-	background-color: #efefef;
-	border-radius: 4px !important;
-}
-#sk-container.sk-embedded #sk-conversation .sk-intro-section {
-	display: none;
-}
-#sk-container.sk-embedded #sk-conversation {
-	padding-top: 10px;
-}
-#sk-container.sk-embedded #sk-footer {
-  height: 40px !important;
-}
-.sk-logo {
-	display: none !important;
-}
-
 /* Frequently Asked Questions */
 
 .faqs {
-  padding-top: 30px;
-  padding-bottom: 60px;
+  padding: 30px 15px 120px 15px;
 }
 @media (min-width: 992px) {
   .faqs {
