@@ -3,20 +3,21 @@
 .hero {
   height: 80%;
 }
+.hero-cta {
+  padding-right: 50px;
+  padding-top: 20px;
+}
 
 @media (max-width: 992px) {
     .hero {
         padding-top: 50px;
         padding-bottom: 50px;
-        height: 800px;
+        height: 920px;
+    }
+    .hero-cta {
+      padding-right: 15px;
     }
 }
-@media (max-width: 767px) {
-  .hero {
-    height: 1000px;
-  }
-}
-
 
 #welcome {
     padding-bottom: 15px;
@@ -114,7 +115,7 @@
     padding-top: 50px;
   }
   .press img {
-    width: 280px;
+    width: 220px;
   }
   div.col-sm-2:nth-child(6) > a:nth-child(1) > img:nth-child(1) {
     padding-top: 20px;
@@ -468,7 +469,7 @@
 
 .explainer-video {
     cursor: pointer;
-    margin-top: 50px;
+    margin-top: 70px;
     margin-bottom: 20px;
 }
 .explainer-video-view {
@@ -505,6 +506,7 @@
 @media (max-width: 543px) {
   .explainer-video-frame {
     width: 90%;
+    height: 170px;
   }
 }
 .explainer-video-overlay {
