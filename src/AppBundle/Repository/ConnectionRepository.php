@@ -63,6 +63,7 @@ class ConnectionRepository extends BaseDocumentRepository
     public function count(\DateTime $start = null, \DateTime $end = null)
     {
         $qb = $this->createQueryBuilder();
+        $qb->field('excludeReporting')->notEqual(true);
 
         if ($start) {
             $qb->field('date')->gte($start);
@@ -85,7 +86,8 @@ class ConnectionRepository extends BaseDocumentRepository
         $collection = $this->dm->getDocumentCollection($this->documentName)->getMongoCollection();
         $ops = [
             ['$match' => [
-                'sourcePolicy.$id' => [ '$nin' => $this->excludedPolicyIds]
+                'sourcePolicy.$id' => [ '$nin' => $this->excludedPolicyIds],
+                'excludeReporting' => [ '$ne' => true]
             ]],
             ['$group' => [
                 '_id' => ['policy' => '$sourcePolicy'],

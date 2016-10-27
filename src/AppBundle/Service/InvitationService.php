@@ -571,6 +571,7 @@ class InvitationService
         $connection->setPromoValue($promoConnectionValue);
         $connection->setInvitation($invitation);
         $connection->setInitialInvitationDate($invitation->getCreated());
+        $connection->setExcludeReporting(!$policy->isValidPolicy());
         $policy->addConnection($connection);
         $policy->updatePotValue();
     }

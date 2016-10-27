@@ -79,6 +79,7 @@ class InvitationServiceTest extends WebTestCase
     {
         // reset environment
         self::$invitationService->setEnvironment('test');
+        self::$policyService->setEnvironment('test');
     }
 
     public function tearDown()
@@ -921,7 +922,9 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('user-accept', $this),
             'bar'
         );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, new \DateTime('2016-01-01'), false, true);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, new \DateTime('2016-01-01'), true, false);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'));
         $this->assertTrue($policy->isPolicy());
 
         $userInvitee = static::createUser(
@@ -934,10 +937,12 @@ class InvitationServiceTest extends WebTestCase
             static::$dm,
             static::$phone,
             new \DateTime('2016-04-01'),
-            false,
-            true
+            true,
+            false
         );
+        static::$policyService->create($policyInvitee, new \DateTime('2016-04-01'));
 
+        self::$invitationService->setEnvironment('prod');
         $invitation = self::$invitationService->inviteByEmail(
             $policy,
             static::generateEmail('invite-accept', $this)
@@ -955,6 +960,7 @@ class InvitationServiceTest extends WebTestCase
                 $this->assertEquals(2, $connection->getTotalValue());
                 $this->assertEquals($invitation->getId(), $connection->getInvitation()->getId());
                 $this->assertEquals($invitation->getCreated(), $connection->getInitialInvitationDate());
+                $this->assertFalse($connection->getExcludeReporting());
             }
         }
         $this->assertTrue($connectionFound);
@@ -966,9 +972,10 @@ class InvitationServiceTest extends WebTestCase
         foreach ($inviteePolicy->getConnections() as $connection) {
             if ($connection->getLinkedPolicy()->getId() == $inviterPolicy->getId()) {
                 $connectionFound = true;
-                $this->assertEquals(10, $connection->getTotalValue());
+                $this->assertEquals(15, $connection->getTotalValue());
                 $this->assertEquals($invitation->getId(), $connection->getInvitation()->getId());
                 $this->assertEquals($invitation->getCreated(), $connection->getInitialInvitationDate());
+                $this->assertFalse($connection->getExcludeReporting());
             }
         }
         $this->assertTrue($connectionFound);
@@ -1064,6 +1071,8 @@ class InvitationServiceTest extends WebTestCase
             if ($connection->getLinkedPolicy()->getId() == $policyInviteeAfter->getId()) {
                 $connectionFound = true;
                 $this->assertEquals(10, $connection->getTotalValue());
+                // non prod acceptence without prefix
+                $this->assertTrue($connection->getExcludeReporting());
             }
         }
         $this->assertTrue($connectionFound);
