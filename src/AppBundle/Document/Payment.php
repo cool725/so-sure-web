@@ -116,6 +116,15 @@ abstract class Payment
      */
     protected $scheduledPayments;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     * @MongoDB\Index(sparse=true)
+     * @Gedmo\Versioned
+     */
+    protected $notes;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -168,6 +177,16 @@ abstract class Payment
     public function getIpt()
     {
         return $this->ipt;
+    }
+
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
+    }
+
+    public function getNotes()
+    {
+        return $this->notes;
     }
 
     public function calculateSplit()

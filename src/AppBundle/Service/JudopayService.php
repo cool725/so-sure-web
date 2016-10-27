@@ -393,8 +393,8 @@ class JudopayService
             ));
         }
         try {
-            $payment = $this->tokenPay($policy);
-            $this->processTokenPayResult($scheduledPayment, $payment);
+            $payment = $this->tokenPay($policy, $scheduledPayment->getType());
+            $this->processScheduledPaymentResult($scheduledPayment, $payment);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
@@ -411,7 +411,7 @@ class JudopayService
         return $scheduledPayment;
     }
 
-    public function processTokenPayResult($scheduledPayment, $payment, \DateTime $date = null)
+    public function processScheduledPaymentResult($scheduledPayment, $payment, \DateTime $date = null)
     {
         $policy = $scheduledPayment->getPolicy();
         $scheduledPayment->setPayment($payment);
@@ -505,13 +505,14 @@ class JudopayService
         return $tokenPaymentDetails;
     }
 
-    protected function tokenPay(Policy $policy)
+    protected function tokenPay(Policy $policy, $notes = null)
     {
         $amount = $policy->getPremium()->getMonthlyPremiumPrice();
         $user = $policy->getUser();
 
         $payment = new JudoPayment();
         $payment->setAmount($amount);
+        $payment->setNotes($notes);
         $policy->addPayment($payment);
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
@@ -618,10 +619,11 @@ class JudopayService
      * @param JudoPayment $payment
      * @param float       $amount         Amount to refund (or null for entire initial amount)
      * @param float       $totalCommision Total commission amount to refund (or null for entire amount from payment)
+     * @param string      $notes
      *
      * @return JudoPayment
      */
-    public function refund(JudoPayment $payment, $amount = null, $totalCommision = null)
+    public function refund(JudoPayment $payment, $amount = null, $totalCommision = null, $notes = null)
     {
         if (!$amount) {
             $amount = $payment->getAmount();
@@ -633,6 +635,7 @@ class JudopayService
         // Refund is a negative payment
         $refund = new JudoPayment();
         $refund->setAmount(0 - $amount);
+        $refund->setNotes($notes);
         $payment->getPolicy()->addPayment($refund);
         $this->dm->persist($refund);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));

@@ -344,12 +344,14 @@ class SalvaExportService
                 $policy->getSalvaPolicyNumberByDate($payment->getDate()),
                 $this->adjustDate($payment->getDate()),
                 $this->toTwoDp($payment->getAmount()),
+                $payment->getNotes() ? $payment->getNotes() : '',
             ];
         } else {
             $data = [
                 'PolicyNumber',
                 'PaymentDate',
                 'PaymentAmount',
+                'Notes',
             ];
         }
 
