@@ -432,7 +432,7 @@ class JudopayServiceTest extends WebTestCase
         $payment = new JudoPayment();
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
 
-        self::$judopay->processTokenPayResult($scheduledPayment, $payment);
+        self::$judopay->processScheduledPaymentResult($scheduledPayment, $payment);
         $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertEquals(11, count($policy->getScheduledPayments()));
@@ -451,7 +451,7 @@ class JudopayServiceTest extends WebTestCase
             $payment = new JudoPayment();
             $payment->setResult(JudoPayment::RESULT_DECLINED);
 
-            self::$judopay->processTokenPayResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
+            self::$judopay->processScheduledPaymentResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
             $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
             $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
             $this->assertEquals(11 + $i, count($policy->getScheduledPayments()));
@@ -462,7 +462,7 @@ class JudopayServiceTest extends WebTestCase
         $payment = new JudoPayment();
         $payment->setResult(JudoPayment::RESULT_DECLINED);
 
-        self::$judopay->processTokenPayResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
+        self::$judopay->processScheduledPaymentResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
         // 11 + 4
@@ -511,7 +511,7 @@ class JudopayServiceTest extends WebTestCase
             $payment->setAmount($scheduledPayment->getAmount());
             self::$judopay->setCommission($policy, $payment);
 
-            self::$judopay->processTokenPayResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
+            self::$judopay->processScheduledPaymentResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
             $policy->addPayment($payment);
             $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
             $this->assertEquals(
@@ -527,7 +527,7 @@ class JudopayServiceTest extends WebTestCase
         $payment->setAmount($scheduledPayment->getAmount());
         self::$judopay->setCommission($policy, $payment);
 
-        self::$judopay->processTokenPayResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
+        self::$judopay->processScheduledPaymentResult($scheduledPayment, $payment, clone $scheduledPayment->getScheduled());
         $policy->addPayment($payment);
         self::$dm->flush();
         $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());

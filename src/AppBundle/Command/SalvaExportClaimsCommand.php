@@ -47,5 +47,6 @@ class SalvaExportClaimsCommand extends ContainerAwareCommand
         $salva = $this->getContainer()->get('app.salva');
         $data = $salva->exportClaims($s3, $date, $days);
         $output->write(implode(PHP_EOL, $data));
+        $output->writeln('');
     }
 }

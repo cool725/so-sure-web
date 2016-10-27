@@ -52,7 +52,10 @@ class RefundListener
 
                 return;
             }
-            $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount);
+            $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, sprintf(
+                'cancelled %s',
+                $policy->getCancelledReason()
+            ));
         }
 
         if ($policy instanceof SalvaPhonePolicy) {

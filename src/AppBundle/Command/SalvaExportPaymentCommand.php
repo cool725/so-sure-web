@@ -48,5 +48,6 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
         $salva = $this->getContainer()->get('app.salva');
         $data = $salva->exportPayments($s3, $date);
         $output->write(implode(PHP_EOL, $data));
+        $output->writeln('');
     }
 }
