@@ -2055,4 +2055,33 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(new \DateTime('2017-02-15'), $policy->getNextBillingDate(new \DateTime('2017-02-14')));
         $this->assertEquals(new \DateTime('2018-02-15'), $policy->getNextBillingDate(new \DateTime('2017-02-16')));
     }
+
+    public function testGetPolicyPrefix()
+    {
+        $sosureUser = new User();
+        $sosureUser->setEmailCanonical('testgetpolicyprefix@so-sure.com');
+        $sosurePolicy = new SalvaPhonePolicy();
+        $sosurePolicy->setUser($sosureUser);
+
+        $user = new User();
+        $user->setEmailCanonical('foo@bar.com');
+        $policy = new SalvaPhonePolicy();
+        $policy->setUser($user);
+
+        $this->assertEquals('INVALID', $sosurePolicy->getPolicyPrefix('prod'));
+        $this->assertNull($policy->getPolicyPrefix('prod'));
+
+        $this->assertEquals('TEST', $sosurePolicy->getPolicyPrefix('test'));
+        $this->assertEquals('TEST', $policy->getPolicyPrefix('test'));
+    }
+
+    public function testHasPolicyPrefix()
+    {
+        $sosurePolicy = new SalvaPhonePolicy();
+        $sosurePolicy->setPolicyNumber('FOO/123');
+        $this->assertTrue($sosurePolicy->hasPolicyPrefix('FOO'));
+        $this->assertFalse($sosurePolicy->hasPolicyPrefix('foo'));
+        // TODO: Should this be up to /
+        $this->assertTrue($sosurePolicy->hasPolicyPrefix('F'));
+    }
 }

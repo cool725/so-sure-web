@@ -161,14 +161,7 @@ class PolicyService
         $this->statsd->startTiming("policy.create");
         $user = $policy->getUser();
 
-        $prefix = null;
-        if ($this->environment != 'prod') {
-            $prefix = strtoupper($this->environment);
-        } elseif ($user->hasSoSureEmail()) {
-            // any emails with @so-sure.com will generate an invalid policy
-            $prefix = 'INVALID';
-        }
-
+        $prefix = $policy->getPolicyPrefix($this->environment);
         if ($policy->isValidPolicy($prefix)) {
             return false;
         }

@@ -2,6 +2,9 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
+
+use AppBundle\Classes\SoSure;
+
 use AppBundle\Document\Connection;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
@@ -68,6 +71,8 @@ class InvitationService
     /** @var boolean */
     protected $debug;
 
+    protected $environment;
+
     /**
      * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
@@ -78,6 +83,7 @@ class InvitationService
      * @param SmsService       $sms
      * @param RateLimitService $rateLimit
      * @param PushService      $push
+     * @param string           $environment
      */
     public function __construct(
         DocumentManager $dm,
@@ -88,7 +94,8 @@ class InvitationService
         ShortLinkService $shortLink,
         SmsService $sms,
         RateLimitService $rateLimit,
-        PushService $push
+        PushService $push,
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -99,11 +106,22 @@ class InvitationService
         $this->sms = $sms;
         $this->rateLimit = $rateLimit;
         $this->push = $push;
+        $this->environment = $environment;
     }
 
     public function setDebug($debug)
     {
         $this->debug = $debug;
+    }
+
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
+    }
+
+    public function setMailer($mailer)
+    {
+        $this->mailer = $mailer;
     }
 
     /**
@@ -147,9 +165,31 @@ class InvitationService
         }
     }
 
+    /**
+     * Ensure that we don't invite/accept between invalid and valid policies
+     *
+     * @param Policy $policy Policy to check if its valid/invalid
+     * @param string $email  Email to check if its so-sure / non so-sure
+     */
+    public function validateSoSurePolicyEmail(Policy $policy, $email)
+    {
+        // For Prod, Invitations to @so-sure.com emails can only come from INVALID prod policies
+        if ($this->environment == 'prod') {
+            if (SoSure::hasSoSureEmail($email) && !$policy->hasPolicyPrefix(Policy::PREFIX_INVALID)) {
+                throw new OptOutException(sprintf('Email %s has opted out', $email));
+            }
+        }
+
+        // INVALID prod policies can only invite @so-sure.com emails
+        if ($policy->hasPolicyPrefix(Policy::PREFIX_INVALID) && !SoSure::hasSoSureEmail($email)) {
+            throw new FullPotException('Invalid policies can not invite');
+        }
+    }
+
     public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
     {
         $this->validatePolicy($policy);
+        $this->validateSoSurePolicyEmail($policy, $email);
 
         $connectionRepo = $this->dm->getRepository(Connection::class);
         if ($connectionRepo->isConnectedByEmail($policy, $email)) {
@@ -445,8 +485,12 @@ class InvitationService
 
     protected function validatePolicy(Policy $policy)
     {
-        if (!$policy->isPolicy()) {
-            throw new InvalidPolicyException('Policy must be pending/active before inviting/connecting');
+        $prefix = $policy->getPolicyPrefix($this->environment);
+        if (!$policy->isValidPolicy($prefix)) {
+            throw new InvalidPolicyException(sprintf(
+                'Policy must be pending/active before inviting/connecting (%s)',
+                $policy->getPolicyNumber()
+            ));
         }
         if ($policy->isPotCompletelyFilled()) {
             throw new FullPotException('Pot is full and no longer able to invite/connect');
@@ -467,6 +511,9 @@ class InvitationService
         }
 
         $inviterPolicy = $invitation->getPolicy();
+
+        $this->validateSoSurePolicyEmail($inviterPolicy, $inviteePolicy->getUser()->getEmail());
+        $this->validateSoSurePolicyEmail($inviteePolicy, $inviterPolicy->getUser()->getEmail());
 
         $this->validatePolicy($inviterPolicy);
         $this->validatePolicy($inviteePolicy);

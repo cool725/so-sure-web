@@ -53,6 +53,8 @@ abstract class Policy
     const PLAN_MONTHLY = 'monthly';
     const PLAN_YEARLY = 'yearly';
 
+    const PREFIX_INVALID = 'INVALID';
+
     // First 1000 policies
     const PROMO_LAUNCH = 'launch';
 
@@ -1419,16 +1421,36 @@ abstract class Policy
         return $this->getStatus() !== null && $this->getPremium() !== null;
     }
 
+    public function getPolicyPrefix($environment)
+    {
+        $prefix = null;
+        if ($environment != 'prod') {
+            $prefix = strtoupper($environment);
+        } elseif ($this->getUser()->hasSoSureEmail()) {
+            // any emails with @so-sure.com will generate an invalid policy
+            $prefix = self::PREFIX_INVALID;
+        }
+
+        return $prefix;
+    }
+
+    public function hasPolicyPrefix($prefix)
+    {
+        if (!$prefix) {
+            $prefix = $this->getPolicyNumberPrefix();
+        }
+
+        // TODO: Should this be up to / ?
+        return strpos($this->getPolicyNumber(), $prefix) === 0;
+    }
+
     public function isValidPolicy($prefix = null)
     {
         if (!$this->isPolicy()) {
             return false;
         }
-        if (!$prefix) {
-            $prefix = $this->getPolicyNumberPrefix();
-        }
 
-        return strpos($this->getPolicyNumber(), $prefix) === 0;
+        return $this->hasPolicyPrefix($prefix);
     }
 
     public function isBillablePolicy()

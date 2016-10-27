@@ -64,23 +64,21 @@ class InvitationServiceTest extends WebTestCase
             'foo@foo.com',
             'bar'
         );
-        self::$invitationService = new InvitationService(
-            self::$dm,
-            self::$container->get('logger'),
-            $mailer,
-            self::$container->get('templating'),
-            self::$container->get('api.router'),
-            self::$container->get('app.shortlink'),
-            self::$container->get('app.sms'),
-            self::$container->get('app.ratelimit'),
-            self::$container->get('app.push')
-        );
+        self::$invitationService = self::$container->get('app.invitation');
+        self::$invitationService->setMailer($mailer);
+        self::$invitationService->setDebug(true);
+
         self::$policyService = self::$container->get('app.policy');
 
-        self::$invitationService->setDebug(true);
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phone2 = $phoneRepo->findOneBy(['devices' => 'iPhone8,1', 'memory' => 64]);
+    }
+
+    public function setUp()
+    {
+        // reset environment
+        self::$invitationService->setEnvironment('test');
     }
 
     public function tearDown()
@@ -106,6 +104,110 @@ class InvitationServiceTest extends WebTestCase
         static::$dm->flush();
 
         self::$invitationService->inviteByEmail($policy, static::generateEmail('testDuplicateEmail-invite', $this));
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\OptOutException
+     */
+    public function testSoSureEmailInvitation()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSoSureEmailInvitation-user', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true, false);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+
+        self::$invitationService->setEnvironment('prod');
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            'foo@so-sure.com'
+        );
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\FullPotException
+     */
+    public function testProdSoSurePolicyOtherEmailInvitation()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'testSoSurePolicyOtherEmailInvitation-user@so-sure.com',
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true, false);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+
+        self::$invitationService->setEnvironment('prod');
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            'foo@so-sure.net'
+        );
+    }
+
+    public function testProdSoSurePolicyEmailInvitation()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'testSoSurePolicyEmailInvitation-user@so-sure.com',
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true, false);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+
+        self::$invitationService->setEnvironment('prod');
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            'foo@so-sure.com'
+        );
+        self::$invitationService->setEnvironment('test');
+        $this->assertTrue($invitation instanceof EmailInvitation);
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\FullPotException
+     */
+    public function testAcceptSoSureEmail()
+    {
+        $inviter = static::createUser(
+            static::$userManager,
+            'testAcceptSoSureEmail-inviter@so-sure.com',
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviter, static::$dm, static::$phone, null, true, false);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($inviterPolicy);
+        static::$policyService->setEnvironment('test');
+
+        $invitee = static::createUser(
+            static::$userManager,
+            'testAcceptSoSureEmail-invitee@so-sure.com',
+            'bar'
+        );
+        $inviteePolicy = static::initPolicy($invitee, static::$dm, static::$phone, null, true, false);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($inviteePolicy);
+        static::$policyService->setEnvironment('test');
+
+        self::$invitationService->setEnvironment('prod');
+        $invitation = self::$invitationService->inviteByEmail(
+            $inviterPolicy,
+            'testAcceptSoSureEmail-invitee@so-sure.com'
+        );
+        self::$invitationService->setEnvironment('test');
+
+        $invitee->setEmail('testAcceptSoSureEmail-invitee@so-sure.net');
+        static::$dm->flush();
+
+        self::$invitationService->setEnvironment('prod');
+        self::$invitationService->accept($invitation, $inviteePolicy);
     }
 
     /**
