@@ -677,7 +677,7 @@
     <p>
         If one of your Group’s mobile phone is no longer insured by so-sure part way through your annual policy, we will allow you to replace that connection at the same value within the 30 days following your connection leaving the service. 
     </p>
-    {% if policy.promoCode == 'launch' %}
+    {% if policy.promoCode == 'launch' or policy.promoCode == 'launch-free-nov' %}
         <p>
             As your policy has a promotion code "{{ policy.promoCode|upper }}", so-sure is offering you in the first year of you being insured by so-sure:
         </p>
@@ -687,6 +687,22 @@
             </li>
             <li>
                 the maximum value of your Reward Pot is 100% of the value of the price of your mobile phone insurance with so-sure. 
+            </li>
+        </ol>
+        <p>
+            All other terms and conditions apply.
+        </p>
+    {% endif %}
+    {% if policy.promoCode == 'free-nov' or policy.promoCode == 'launch-free-nov' %}
+        <p>
+            As your policy has a promotion code "{{ promo_code|upper }}", so-sure is offering you a free month of coverage:
+        </p>
+        <ol type="i">
+            <li>
+                In the case of monthly payments, so-sure will refund your first month's payment back to your card within 45 days.
+            </li>
+            <li>
+                In the case of annual payment, so-sure will refund an amount equal to 1/12 of your annual policy price back to your card within 45 days.
             </li>
         </ol>
         <p>
