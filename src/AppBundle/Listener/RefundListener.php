@@ -96,7 +96,7 @@ class RefundListener
 
         if ($refundAmount > $payment->getAmount()) {
             $this->logger->error(sprintf(
-                'For policy %s, Free Nov Promo refund owed %f is greater than last payment received. Manual processing required.',
+                'Manual processing required (policy %s), Free Nov Promo refund %f is more than last payment.',
                 $policy->getId(),
                 $refundAmount
             ));
