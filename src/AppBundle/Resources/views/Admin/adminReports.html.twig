@@ -172,6 +172,18 @@
                             <td></td>
                             <td></td>
                         </tr>
+                        <tr>
+                            <td>Policies with X Connection</td>
+                            <td></td>
+                            <td>{{ data.totalPolicies }}</td>
+                        </tr>
+                        {% for i in 0..9 %}
+                            <tr>
+                                <td style="padding-left: 30px">Policies with {{ i }} Connection(s)</td>
+                                <td></td>
+                                <td>{{ data.policyConnections[i] }}</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>        
