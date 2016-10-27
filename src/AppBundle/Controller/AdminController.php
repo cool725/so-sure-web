@@ -917,7 +917,7 @@ class AdminController extends BaseController
         ];
     }
 
-    private function getPayments($date, $class = null)
+    private function getPayments($date)
     {
         $dm = $this->getManager();
         $paymentRepo = $dm->getRepository(Payment::class);
