@@ -315,7 +315,7 @@ abstract class Payment
         $this->scheduledPayments[] = $scheduledPayment;
     }
 
-    public static function sumPayments($payments, $requireValidPolicy)
+    public static function sumPayments($payments, $requireValidPolicy, $class = null)
     {
         $data = [
             'total' => 0,
@@ -335,6 +335,9 @@ abstract class Payment
         foreach ($payments as $payment) {
             // For prod, skip invalid policies
             if ($requireValidPolicy && !$payment->getPolicy()->isValidPolicy()) {
+                continue;
+            }
+            if ($class && !$payment instanceof $class) {
                 continue;
             }
 
