@@ -106,6 +106,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $user->setPreLaunch(true);
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setDispatcher(null);
         static::$policyService->create($policy, new \DateTime('2016-11-01'));
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
@@ -122,6 +123,7 @@ class PolicyServiceTest extends WebTestCase
             static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setDispatcher(null);
         static::$policyService->create($policy, new \DateTime('2016-11-01'));
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
