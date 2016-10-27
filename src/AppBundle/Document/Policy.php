@@ -57,6 +57,10 @@ abstract class Policy
 
     // First 1000 policies
     const PROMO_LAUNCH = 'launch';
+    // Free month (refund) for Nov 2016
+    const PROMO_FREE_NOV = 'free-nov';
+    // Launch promo + Free month (refund) for Nov 2016
+    const PROMO_LAUNCH_FREE_NOV = 'launch+free-nov';
 
     public static $riskLevels = [
         self::RISK_CONNECTED_POT_ZERO => self::RISK_LEVEL_HIGH,

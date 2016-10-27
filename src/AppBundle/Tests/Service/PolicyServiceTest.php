@@ -89,7 +89,7 @@ class PolicyServiceTest extends WebTestCase
             static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->create($policy);
+        static::$policyService->create($policy, new \DateTime('2016-10-01'));
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::PROMO_LAUNCH, $policy->getPromoCode());

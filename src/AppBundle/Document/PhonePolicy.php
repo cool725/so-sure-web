@@ -196,7 +196,8 @@ class PhonePolicy extends Policy
 
         // Extra Case for Salva's 10 minute buffer
         if ($this->isPolicyWithin60Days($date) || $this->isBeforePolicyStarted($date)) {
-            if ($this->getUser()->isPreLaunch() || $this->getPromoCode() == self::PROMO_LAUNCH) {
+            if ($this->getUser()->isPreLaunch() ||
+                in_array($this->getPromoCode(), [self::PROMO_LAUNCH, self::PROMO_LAUNCH_FREE_NOV])) {
                 return self::PROMO_LAUNCH_VALUE;
             }
         }
@@ -285,7 +286,8 @@ class PhonePolicy extends Policy
             throw new \Exception('Policy is missing a user');
         }
 
-        if ($this->getUser()->isPreLaunch() || $this->getPromoCode() == self::PROMO_LAUNCH) {
+        if ($this->getUser()->isPreLaunch() ||
+            in_array($this->getPromoCode(), [self::PROMO_LAUNCH, self::PROMO_LAUNCH_FREE_NOV])) {
             // 100% of policy
             return $this->getPremium()->getYearlyPremiumPrice();
         } else {
