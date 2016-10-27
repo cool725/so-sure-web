@@ -79,11 +79,11 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_CANCELLED, $updatedPolicy->getStatus());
     }
 
-    public function testCreatePolicyHasPromoCode()
+    public function testCreatePolicyHasLaunchPromoCode()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('create', $this),
+            static::generateEmail('testCreatePolicyHasLaunchPromoCode', $this),
             'bar',
             null,
             static::$dm
@@ -93,6 +93,56 @@ class PolicyServiceTest extends WebTestCase
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::PROMO_LAUNCH, $policy->getPromoCode());
+    }
+
+    public function testCreatePolicyHasLaunchNovPromoCode()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePolicyHasLaunchNovPromoCode', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $user->setPreLaunch(true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(Policy::PROMO_LAUNCH_FREE_NOV, $policy->getPromoCode());
+    }
+
+    public function testCreatePolicyHasNovPromoCode()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePolicyHasNovPromoCode', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(Policy::PROMO_FREE_NOV, $policy->getPromoCode());
+    }
+
+    public function testCreatePolicyHasNoPromoCode()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePolicyHasNoPromoCode', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $user->setPreLaunch(true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->create($policy, new \DateTime('2016-12-01'));
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertNull($policy->getPromoCode());
     }
 
     public function testCreatePolicyPolicyNumber()

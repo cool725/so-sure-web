@@ -202,7 +202,7 @@ class PolicyService
         return true;
     }
 
-    public function setPromoCode($policy)
+    protected function setPromoCode($policy)
     {
         $promoCode = null;
         $isPreLaunchUser = $policy->getUser()->isPreLaunch();
