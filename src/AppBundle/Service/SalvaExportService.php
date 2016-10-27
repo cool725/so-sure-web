@@ -10,6 +10,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\User;
@@ -248,7 +249,7 @@ class SalvaExportService
         $lines = [];
         $total = 0;
         $numPayments = 0;
-        $repo = $this->dm->getRepository(JudoPayment::class);
+        $repo = $this->dm->getRepository(Payment::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null)));
         foreach ($repo->getAllPaymentsForExport($date) as $payment) {
             // For prod, skip invalid policies
@@ -333,7 +334,7 @@ class SalvaExportService
         return $s3Key;
     }
 
-    public function transformPayment(JudoPayment $payment = null)
+    public function transformPayment(Payment $payment = null)
     {
         if ($payment) {
             if (!$payment->isSuccess()) {

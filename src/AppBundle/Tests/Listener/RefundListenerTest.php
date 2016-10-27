@@ -10,6 +10,7 @@ use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Event\UserEvent;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Listener\RefundListener;
 use AppBundle\Event\PolicyEvent;
@@ -72,5 +73,27 @@ class RefundListenerTest extends WebTestCase
         
         $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger);
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
+    }
+
+    public function testRefundFreeNovPromo()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundFreeNovPromo', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
+        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-11-01'));
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+        $this->assertEquals(Policy::PROMO_FREE_NOV, $policy->getPromoCode());
+
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger);
+        $listener->refundFreeNovPromo(new PolicyEvent($policy));
     }
 }

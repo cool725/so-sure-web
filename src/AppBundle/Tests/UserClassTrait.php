@@ -164,13 +164,39 @@ trait UserClassTrait
         return $policy;
     }
 
-    public static function addPayment($policy, $amount, $commission)
+    public static function addJudoPayPayment($judopay, $policy, $date = null, $monthly = true)
     {
+        if ($monthly) {
+            $policy->setPremiumInstallments(12);
+            $premium = $policy->getPremium()->getMonthlyPremiumPrice($date);
+            $commission = Salva::MONTHLY_TOTAL_COMMISSION;
+        } else {
+            $policy->setPremiumInstallments(1);
+            $premium = $policy->getPremium()->getYearlyPremiumPrice($date);
+            $commission = Salva::YEARLY_TOTAL_COMMISSION;
+        }
+
+        $receiptId = $judopay->testPay(
+            $policy->getUser(),
+            $policy->getId(),
+            $premium,
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        self::addPayment($policy, $premium, $commission, $receiptId);
+    }
+
+    public static function addPayment($policy, $amount, $commission, $receiptId = null)
+    {
+        if (!$receiptId) {
+            $receiptId = rand(1, 999999);
+        }
         $payment = new JudoPayment();
         $payment->setAmount($amount);
         $payment->setTotalCommission($commission);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
+        $payment->setReceipt($receiptId);
         $policy->addPayment($payment);
     }
 

@@ -403,20 +403,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $phone = $this->getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, new \DateTime('2016-01-01'));
-        $receiptId = self::$judopay->testPay(
-            $user,
-            $policy->getId(),
-            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(new \DateTime('2016-01-01')),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
-        );
-        $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice(new \DateTime('2016-01-01')));
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt($receiptId);
-        $policy->addPayment($payment);
+        static::addJudoPayPayment(self::$judopay, $policy, new \DateTime('2016-01-01'));
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');

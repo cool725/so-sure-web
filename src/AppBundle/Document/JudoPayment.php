@@ -56,6 +56,11 @@ class JudoPayment extends Payment
     public function setResult($result)
     {
         $this->result = $result;
+        if ($result == self::RESULT_SUCCESS) {
+            $this->setSuccess(true);
+        } else {
+            $this->setSuccess(false);
+        }
     }
 
     public function getMessage()
@@ -90,6 +95,10 @@ class JudoPayment extends Payment
 
     public function isSuccess()
     {
+        if ($this->success !== null) {
+            return $this->success;
+        }
+
         return $this->getResult() == self::RESULT_SUCCESS;
     }
 }
