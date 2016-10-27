@@ -545,8 +545,14 @@ class AdminController extends BaseController
             $data['totalSCodeInvitations'] / $data['totalSCodePolicies'] :
             'n/a';
 
-        for ($i = 0; $i <= 9; $i++) {
+        $data['policyConnections'][0] = $data['totalPolicies'];
+        $data['policyConnections']['10+'] = 0;
+        for ($i = 1; $i <= 30; $i++) {
             $data['policyConnections'][$i] = $connectionRepo->countByConnection($i, $start, $end);
+            $data['policyConnections'][0] -= $data['policyConnections'][$i];
+            if ($i >= 10) {
+                $data['policyConnections']['10+'] += $data['policyConnections'][$i];
+            }
         }
 
         return [
