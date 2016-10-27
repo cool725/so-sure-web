@@ -97,6 +97,13 @@ class Connection
      */
     protected $replacementUser;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $excludeReporting;
+
     public function __construct()
     {
         $this->date = new \DateTime();
@@ -219,6 +226,16 @@ class Connection
     public function getTotalValue()
     {
         return $this->getValue() + $this->getPromoValue();
+    }
+
+    public function setExcludeReporting($excludeReporting)
+    {
+        $this->excludeReporting = $excludeReporting;
+    }
+
+    public function getExcludeReporting()
+    {
+        return $this->excludeReporting;
     }
 
     public function clearValue()
