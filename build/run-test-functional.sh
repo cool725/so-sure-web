@@ -11,11 +11,15 @@ else
 fi
 
 SKIP_POLICY=0
+SKIP_DB=0
 FUNCTIONAL_TEST="test:functional"
-while getopts ":snph" opt; do
+while getopts ":snpdh" opt; do
   case $opt in
     s)
       SKIP_POLICY=1
+      ;;
+    d)
+      SKIP_DB=1
       ;;
     n)
       FUNCTIONAL_TEST="test:functional:nonet"
@@ -24,7 +28,7 @@ while getopts ":snph" opt; do
       FUNCTIONAL_TEST="test:functional:paid"
       ;;
     h)
-      echo "Usage: $0 [-s skip policy] [-n no network test | -p run paid test] [filter e.g. (::Method or namespace - use \\)"
+      echo "Usage: $0 [-d skip db refresh] [-s skip policy] [-n no network test | -p run paid test] [filter e.g. (::Method or namespace - use \\)"
       ;;
   esac
 done
@@ -42,8 +46,10 @@ if [ -d /dev/shm/cache/test ]; then
   sudo rm -rf /dev/shm/cache/test/
 fi
 
+if [ "$SKIP_DB" == "0" ]; then
 app/console --env=test redis:flushdb --client=default -n
 app/console --env=test doctrine:mongodb:schema:drop
+
 if [ "$SKIP_POLICY" == "0" ]; then
   app/console --env=test doctrine:mongodb:fixtures:load --no-interaction
 else
@@ -52,6 +58,7 @@ else
   app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/PlayDevice --append
   app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/User --append
   app/console --env=test sosure:doctrine:index
+fi
 fi
 
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
