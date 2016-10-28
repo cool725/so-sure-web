@@ -6,22 +6,9 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\DateTrait;
 
-class JudoPaymentRepository extends DocumentRepository
+class JudoPaymentRepository extends PaymentRepository
 {
     use DateTrait;
-
-    public function getAllPaymentsForExport(\DateTime $date)
-    {
-        $startMonth = $this->startOfMonth($date);
-        $nextMonth = $this->endOfMonth($date);
-
-        return $this->createQueryBuilder()
-            ->field('result')->equals(JudoPayment::RESULT_SUCCESS)
-            ->field('date')->gte($startMonth)
-            ->field('date')->lt($nextMonth)
-            ->getQuery()
-            ->execute();
-    }
 
     public function findTransaction($date, $amount, $cardLastFour)
     {
@@ -29,7 +16,7 @@ class JudoPaymentRepository extends DocumentRepository
         $nextDay = $this->endOfDay($date);
 
         return $this->createQueryBuilder()
-            ->field('result')->equals(JudoPayment::RESULT_SUCCESS)
+            ->field('success')->equals(true)
             ->field('amount')->equals((double) $amount)
             ->field('date')->gte($startDay)
             ->field('date')->lt($nextDay)

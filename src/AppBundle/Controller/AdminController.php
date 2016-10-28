@@ -18,6 +18,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\SoSurePayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Connection;
@@ -883,13 +884,6 @@ class AdminController extends BaseController
     {
         $date = new \DateTime(sprintf('%d-%d-01', $year, $month));
 
-        $dm = $this->getManager();
-        $paymentRepo = $dm->getRepository(JudoPayment::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-
-        $payments = $paymentRepo->getAllPaymentsForExport($date);
-        $paymentTotals = Payment::sumPayments($payments, $this->getParameter('kernel.environment') == 'prod');
-
         $templating = $this->get('templating');
         $snappyPdf = $this->get('knp_snappy.pdf');
         $snappyPdf->setOption('orientation', 'Landscape');
@@ -897,8 +891,8 @@ class AdminController extends BaseController
         $html = $templating->render('AppBundle:Pdf:adminAccounts.html.twig', [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $paymentTotals,
-            'activePolicies' => $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date),
+            'paymentTotals' => $this->getAllPaymentTotals($date),
+            'activePolicies' => $this->getActivePolicies($date),
         ]);
 
         return new Response(
@@ -909,6 +903,35 @@ class AdminController extends BaseController
                 'Content-Disposition'   => sprintf('attachment; filename="so-sure-%d-%d.pdf"', $year, $month)
             )
         );
+    }
+
+    private function getAllPaymentTotals($date)
+    {
+        $isProd = $this->getParameter('kernel.environment') == 'prod';
+        $payments = $this->getPayments($date);
+
+        return [
+            'all' => Payment::sumPayments($payments, $isProd),
+            'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
+        ];
+    }
+
+    private function getPayments($date)
+    {
+        $dm = $this->getManager();
+        $paymentRepo = $dm->getRepository(Payment::class);
+        $payments = $paymentRepo->getAllPaymentsForExport($date);
+
+        return $payments;
+    }
+
+    private function getActivePolicies($date)
+    {
+        $dm = $this->getManager();
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+
+        return $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date);
     }
 
     /**
@@ -928,13 +951,7 @@ class AdminController extends BaseController
         $date = new \DateTime(sprintf('%d-%d-01', $year, $month));
 
         $dm = $this->getManager();
-        $paymentRepo = $dm->getRepository(JudoPayment::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
         $s3FileRepo = $dm->getRepository(S3File::class);
-
-        $payments = $paymentRepo->getAllPaymentsForExport($date);
-        $paymentTotals = Payment::sumPayments($payments, $this->getParameter('kernel.environment') == 'prod');
-
         $judoFile = new JudoFile();
         $judoForm = $this->get('form.factory')
             ->createNamedBuilder('judo', JudoFileType::class, $judoFile)
@@ -978,9 +995,9 @@ class AdminController extends BaseController
             'judoForm' => $judoForm->createView(),
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $paymentTotals,
+            'paymentTotals' => $this->getAllPaymentTotals($date),
             // TODO: query will eve
-            'activePolicies' => $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date),
+            'activePolicies' => $this->getActivePolicies($date),
             'files' => $s3FileRepo->getAllFiles($date),
         ];
     }
@@ -1002,7 +1019,7 @@ class AdminController extends BaseController
         $date = new \DateTime(sprintf('%d-%d-01', $year, $month));
 
         $dm = $this->getManager();
-        $paymentRepo = $dm->getRepository(JudoPayment::class);
+        $paymentRepo = $dm->getRepository(Payment::class);
         $barclaysFileRepo = $dm->getRepository(BarclaysFile::class);
         $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
 

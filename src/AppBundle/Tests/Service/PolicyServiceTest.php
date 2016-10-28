@@ -79,22 +79,84 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_CANCELLED, $updatedPolicy->getStatus());
     }
 
-    public function testCreatePolicyHasPromoCode()
+    public function testCreatePolicyHasLaunchPromoCode()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('create', $this),
+            static::generateEmail('testCreatePolicyHasLaunchPromoCode', $this),
             'bar',
             null,
             static::$dm
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->create($policy);
+        static::$policyService->create($policy, new \DateTime('2016-10-01'));
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(Policy::PROMO_LAUNCH, $policy->getPromoCode());
     }
 
+    /**
+     * Not applicable now
+    public function testCreatePolicyHasLaunchNovPromoCode()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePolicyHasLaunchNovPromoCode', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $user->setPreLaunch(true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setDispatcher(null);
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(Policy::PROMO_LAUNCH_FREE_NOV, $policy->getPromoCode());
+    }
+    */
+
+    /**
+     */
+    public function testCreatePolicyHasNovPromoCode()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePolicyHasNovPromoCode', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setDispatcher(null);
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(Policy::PROMO_FREE_NOV, $policy->getPromoCode());
+    }
+
+    /**
+     * TODO - generate 1000 policies or adjust query somehow
+    public function testCreatePolicyHasNoPromoCode()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePolicyHasNoPromoCode', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $user->setPreLaunch(true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->create($policy, new \DateTime('2016-12-01'));
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertNull($policy->getPromoCode());
+    }
+    */
+
+    /**
+     */
     public function testCreatePolicyPolicyNumber()
     {
         $user = static::createUser(
@@ -353,20 +415,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $phone = $this->getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, new \DateTime('2016-01-01'));
-        $receiptId = self::$judopay->testPay(
-            $user,
-            $policy->getId(),
-            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(new \DateTime('2016-01-01')),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
-        );
-        $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice(new \DateTime('2016-01-01')));
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt($receiptId);
-        $policy->addPayment($payment);
+        static::addJudoPayPayment(self::$judopay, $policy, new \DateTime('2016-01-01'));
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');

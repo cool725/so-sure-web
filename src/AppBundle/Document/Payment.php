@@ -10,10 +10,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\PaymentRepository")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
- * @MongoDB\DiscriminatorMap({"judo"="JudoPayment","gocardless"="GocardlessPayment"})
+ * @MongoDB\DiscriminatorMap({"judo"="JudoPayment","gocardless"="GocardlessPayment","sosure"="SoSurePayment"})
  * @Gedmo\Loggable
  */
 abstract class Payment
@@ -125,14 +125,19 @@ abstract class Payment
      */
     protected $notes;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $success;
+
     public function __construct()
     {
         $this->created = new \DateTime();
         $this->date = new \DateTime();
         $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
     }
-
-    abstract public function isSuccess();
 
     public function getId()
     {
@@ -187,6 +192,16 @@ abstract class Payment
     public function getNotes()
     {
         return $this->notes;
+    }
+
+    public function setSuccess($success)
+    {
+        $this->success = $success;
+    }
+
+    public function isSuccess()
+    {
+        return $this->success;
     }
 
     public function calculateSplit()
@@ -300,7 +315,7 @@ abstract class Payment
         $this->scheduledPayments[] = $scheduledPayment;
     }
 
-    public static function sumPayments($payments, $requireValidPolicy)
+    public static function sumPayments($payments, $requireValidPolicy, $class = null)
     {
         $data = [
             'total' => 0,
@@ -320,6 +335,9 @@ abstract class Payment
         foreach ($payments as $payment) {
             // For prod, skip invalid policies
             if ($requireValidPolicy && !$payment->getPolicy()->isValidPolicy()) {
+                continue;
+            }
+            if ($class && !$payment instanceof $class) {
                 continue;
             }
 

@@ -650,10 +650,6 @@
     <p>
         Lump sum payments are made within 45 days of your policy ending as long as none of your Group has submitted a claim for an event that took place before the end of your policy term. For example, if your policy ends on 3rd March and your Reward Pot was worth £48 and none of your Group submits a claim by 31st March, we will payout £48 to you by the 17th April.
     </p>
-
-  </div>
-  <div style="{{ column_two_margins }}">
-
     <p>
         Circumstances in which your Reward Pot will not be paid out to you:
     </p>
@@ -671,13 +667,17 @@
             if we have paid out a claim for you.
         </li>
     </ul>
+
+  </div>
+  <div style="{{ column_two_margins }}">
+
     <p>
         If you upgrade your mobile phone to a more expensive mobile phone mid-way through the Period of Insurance, we will amend your premium to reflect the mobile phone insured and adjust your Reward Pot and Reward Pot Limit accordingly. The first new Member admitted to your Group after the upgrade will be rewarded to you as if they had joined in the first 60 days of the Period of Insurance.
     </p>
     <p>
         If one of your Group’s mobile phone is no longer insured by so-sure part way through your annual policy, we will allow you to replace that connection at the same value within the 30 days following your connection leaving the service. 
     </p>
-    {% if policy.promoCode == 'launch' %}
+    {% if policy.promoCode == 'launch' or policy.promoCode == 'launch-free-nov' %}
         <p>
             As your policy has a promotion code "{{ policy.promoCode|upper }}", so-sure is offering you in the first year of you being insured by so-sure:
         </p>
@@ -689,10 +689,26 @@
                 the maximum value of your Reward Pot is 100% of the value of the price of your mobile phone insurance with so-sure. 
             </li>
         </ol>
+    {% endif %}
+    {% if policy.promoCode == 'free-nov' or policy.promoCode == 'launch-free-nov' %}
         <p>
-            All other terms and conditions apply.
+            As your policy has a promotion code "{{ policy.promoCode|upper }}", so-sure is offering you a free month of coverage:
+        </p>
+        <ol type="i">
+            <li>
+                 In the case of monthly payments, so-sure will refund your first month's payment back to your card within 45 days of purchase.
+            </li>
+            <li>
+                In the case of an annual (12 months) payment, so-sure will refund your first month (1/12th of annual payment) to the nearest penny, back to your card within 45 days of purchase.
+            </li>
+        </ol>
+    {% endif %}
+    {% if policy.promoCode|length > 0 %}
+        <p>
+            This offer cannot be used if another offer applies. All other terms and conditions apply.
         </p>
     {% endif %}
+    
     <p>
         All payments assume that no deduction is required by way of taxation. If we are obliged by law to make such deduction, then the Reward Pot payments shall be reduced accordingly.    
     </p>

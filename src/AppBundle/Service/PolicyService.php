@@ -177,12 +177,8 @@ class PolicyService
         } else {
             $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE), null, $date);
         }
-        if ($policy instanceof PhonePolicy) {
-            $repo = $this->dm->getRepository(PhonePolicy::class);
-            if ($repo->isPromoLaunch($policy->getPolicyNumberPrefix())) {
-                $policy->setPromoCode(Policy::PROMO_LAUNCH);
-            }
-        }
+
+        $this->setPromoCode($policy);
 
         $scode = $this->uniqueSCode($policy);
         $shortLink = $this->branch->generateSCode($scode->getCode());
@@ -204,6 +200,33 @@ class PolicyService
         $this->statsd->endTiming("policy.create");
 
         return true;
+    }
+
+    protected function setPromoCode($policy)
+    {
+        $promoCode = null;
+        $isPreLaunchUser = $policy->getUser()->isPreLaunch();
+        $isOct2016 = $policy->getStart()->format('Y-m') == '2016-10';
+        $isNov2016 = $policy->getStart()->format('Y-m') == '2016-11';
+
+        // Prelaunch Policy is being discontinued as of end Oct 2016
+        // This was only advertised after policy purchase, so can be discontinued for future policies
+        // And manually added on request
+        $isPreLaunchPolicy = false;
+        if ($policy instanceof PhonePolicy) {
+            $repo = $this->dm->getRepository(PhonePolicy::class);
+            $isPreLaunchPolicy = $repo->isPromoLaunch($policy->getPolicyNumberPrefix());
+        }
+
+        if ($isOct2016 && ($isPreLaunchPolicy || $isPreLaunchUser)) {
+            $promoCode = Policy::PROMO_LAUNCH;
+        } elseif ($isNov2016) {
+            $promoCode = Policy::PROMO_FREE_NOV;
+        } elseif ($isPreLaunchPolicy || $isPreLaunchUser) {
+            $promoCode = Policy::PROMO_LAUNCH;
+        }
+
+        $policy->setPromoCode($promoCode);
     }
 
     private function queueMessage($policy)
