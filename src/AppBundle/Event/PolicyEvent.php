@@ -17,14 +17,24 @@ class PolicyEvent extends Event
 
     /** @var PhonePolicy */
     protected $policy;
+    protected $date;
 
-    public function __construct(Policy $policy)
+    public function __construct(Policy $policy, \DateTime $date = null)
     {
         $this->policy = $policy;
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $this->date = $date;
     }
 
     public function getPolicy()
     {
         return $this->policy;
+    }
+
+    public function getDate()
+    {
+        return $this->date;
     }
 }

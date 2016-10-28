@@ -340,8 +340,8 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->validatePolicyData($data2, $updatedPolicy, 2, Policy::STATUS_ACTIVE, 0);
         $this->validatePolicyPayments($data2, $updatedPolicy, 0);
-        // TODO: Not sure on this one - 366 - 31 = 335
-        $this->validateProratedPolicyAmounts($data2, $updatedPolicy, 334);
+        // 366 - 31 = 335
+        $this->validateProratedPolicyAmounts($data2, $updatedPolicy, 335);
         //$this->validateRemainingYearPolicyAmounts($data2, $updatedPolicy, 11);
         $this->validateStaticPolicyData($data2, $updatedPolicy);
     }
@@ -552,7 +552,7 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
         $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
-        // 6.38 gwp / 76.60 yearly gpw  * (153 - 32) / 366 = 25.32
-        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.32</n1:usedFinalPremium>', $xml);
+        // 6.38 gwp / 76.60 yearly gpw  * (153 - 31) / 366 = 25.53
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.53</n1:usedFinalPremium>', $xml);
     }
 }

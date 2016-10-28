@@ -6,10 +6,12 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Event\PolicyEvent;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Tests\UserClassTrait;
 use AppBundle\Classes\Salva;
@@ -25,6 +27,10 @@ class SalvaPhonePolicyTest extends WebTestCase
     protected static $container;
     protected static $dm;
     protected static $phone;
+    protected static $phone6;
+    protected static $policyService;
+    protected static $userManager;
+    protected static $judopay;
 
     public static function setUpBeforeClass()
     {
@@ -38,8 +44,12 @@ class SalvaPhonePolicyTest extends WebTestCase
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$userManager = self::$container->get('fos_user.user_manager');
+        self::$policyService = self::$container->get('app.policy');
+        self::$judopay = self::$container->get('app.judopay');
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+        self::$phone6 = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
     }
 
     public function tearDown()
@@ -368,19 +378,77 @@ class SalvaPhonePolicyTest extends WebTestCase
         $tz = new \DateTimeZone(Salva::SALVA_TIMEZONE);
         $policy = static::createUserPolicy(true, new \DateTime('2016-10-01', $tz));
         $this->assertEquals(365, $policy->getSalvaDaysInPolicy(null));
+        $this->assertEquals(365, $policy->getDaysInPolicy(new \DateTime('2017-09-30 23:59', $tz)));
 
         $version = $policy->incrementSalvaPolicyNumber(new \DateTime('2016-10-03', $tz));
         $this->assertEquals(3, $policy->getSalvaDaysInPolicy($version));
-        // 84.26 totol premium * 3/365 = 0.69
+        $this->assertEquals(3, $policy->getDaysInPolicy(new \DateTime('2016-10-03', $tz)));
+        // 84.26 total premium * 3/365 = 0.69
         $this->assertEquals(0.69, $policy->getTotalPremiumPrice($version));
         // 10.72 * 2/365 = 0.09
         $this->assertEquals(0.09, $policy->getTotalBrokerFee($version));
 
         $version = $policy->incrementSalvaPolicyNumber(new \DateTime('2016-10-05 17:00', $tz));
         $this->assertEquals(2, $policy->getSalvaDaysInPolicy($version));
+        $this->assertEquals(5, $policy->getDaysInPolicy(new \DateTime('2016-10-05 17:00', $tz)));
         // 84.26 totol premium * 2/365 = 0.46
         $this->assertEquals(0.46, $policy->getTotalPremiumPrice($version));
         // 10.72 * 2/365 = 0.06
         $this->assertEquals(0.06, $policy->getTotalBrokerFee($version));
+    }
+
+    public function testBugInRefund()
+    {
+        $tz = new \DateTimeZone(Salva::SALVA_TIMEZONE);
+        // initial policy creation
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testBugInRefund', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, self::$phone6, new \DateTime('2016-09-21 17:12', $tz));
+        static::addJudoPayPayment(self::$judopay, $policy, new \DateTime('2016-09-21 17:12', $tz));
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-09-21 17:12', $tz));
+        self::$dm->flush();
+
+        //\Doctrine\Common\Util\Debug::dump($policy);
+
+        // ss_tariff
+        $this->assertEquals(365, $policy->getDaysInPolicyYear());
+        $this->assertEquals(365, $policy->getSalvaDaysInPolicy(null));
+        $this->assertEquals(1, $policy->getSalvaProrataMultiplier(null));
+        // 103.68 / 1.095 = 94.68
+        $this->assertEquals(94.68, $policy->getTotalGwp());
+
+        static::$policyService->cancel(
+            $policy,
+            SalvaPhonePolicy::CANCELLED_USER_REQUESTED,
+            new \DateTime('2016-10-19 12:10', $tz)
+        );
+        $dispatcher = static::$container->get('event_dispatcher');
+        $dispatcher->dispatch(
+            PolicyEvent::EVENT_CANCELLED,
+            new PolicyEvent($policy, new \DateTime('2016-10-19 12:10', $tz))
+        );
+
+        // Invalid values that we originally present
+        /*
+        $this->assertEquals(8.24, $policy->getTotalPremiumPrice());
+        $this->assertEquals(7.95, $policy->getRemainingPremiumPaid([]));
+        $this->assertEquals(0.85, $policy->getTotalBrokerFee());
+        $this->assertEquals(0.82, $policy->getRemainingTotalCommissionPaid([]));
+        */
+
+        // Expected
+        // 103.68 * 29 / 365 = 8.24
+        $this->assertEquals(8.24, $policy->getTotalPremiumPrice());
+        $this->assertEquals(8.24, $policy->getRemainingPremiumPaid([]));
+
+        // 10.72 * 29 / 365 = 0.85
+        $this->assertEquals(0.85, $policy->getTotalBrokerFee());
+        $this->assertEquals(0.85, $policy->getRemainingTotalCommissionPaid([]));
     }
 }

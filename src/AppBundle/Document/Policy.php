@@ -956,12 +956,9 @@ abstract class Policy
         }
         $date = $this->endOfDay($date);
 
-        $diff = $this->getStart()->diff($date);
+        $start = $this->startOfDay($this->getStart());
+        $diff = $start->diff($date);
         $days = $diff->days;
-        // Partial days count as a full day
-        if ($diff->h > 0 || $diff->i > 0 || $diff->s > 0) {
-            $days++;
-        }
 
         return $days;
     }
