@@ -241,6 +241,7 @@ class SalvaPhonePolicy extends PhonePolicy
         }
 
         $startDate = $this->getSalvaStartDate($version);
+        $startDate = $this->startOfDay($startDate);
         $endDate = null;
         if ($version) {
             // if we're versioned, the previous period was already billed for the start date
