@@ -956,20 +956,9 @@ class AdminController extends BaseController
         $judoForm = $this->get('form.factory')
             ->createNamedBuilder('judo', JudoFileType::class, $judoFile)
             ->getForm();
-        $yearMonthForm = $this->get('form.factory')
-            ->createNamedBuilder('yearMonth', YearMonthType::class)
-            ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('yearMonth')) {
-                $yearMonthForm->handleRequest($request);
-                if ($yearMonthForm->isSubmitted() && $yearMonthForm->isValid()) {
-                    return $this->redirectToRoute('admin_accounts_date', [
-                        'year' => $yearMonthForm->get('year')->getData(),
-                        'month' => $yearMonthForm->get('month')->getData()
-                    ]);
-                }
-            } elseif ($request->request->has('judo')) {
+            if ($request->request->has('judo')) {
                 $judoForm->handleRequest($request);
                 if ($judoForm->isSubmitted() && $judoForm->isValid()) {
                     $dm = $this->getManager();
@@ -991,7 +980,6 @@ class AdminController extends BaseController
         }
 
         return [
-            'yearMonthForm' => $yearMonthForm->createView(),
             'judoForm' => $judoForm->createView(),
             'year' => $year,
             'month' => $month,
@@ -1035,20 +1023,9 @@ class AdminController extends BaseController
         $barclaysForm = $this->get('form.factory')
             ->createNamedBuilder('barclays', BarclaysFileType::class, $barclaysFile)
             ->getForm();
-        $yearMonthForm = $this->get('form.factory')
-            ->createNamedBuilder('yearMonth', YearMonthType::class)
-            ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('yearMonth')) {
-                $yearMonthForm->handleRequest($request);
-                if ($yearMonthForm->isSubmitted() && $yearMonthForm->isValid()) {
-                    return $this->redirectToRoute('admin_banking_date', [
-                        'year' => $yearMonthForm->get('year')->getData(),
-                        'month' => $yearMonthForm->get('month')->getData()
-                    ]);
-                }
-            } elseif ($request->request->has('lloyds')) {
+            if ($request->request->has('lloyds')) {
                 $lloydsForm->handleRequest($request);
                 if ($lloydsForm->isSubmitted() && $lloydsForm->isValid()) {
                     $dm = $this->getManager();
@@ -1120,7 +1097,6 @@ class AdminController extends BaseController
         }
 
         return [
-            'yearMonthForm' => $yearMonthForm->createView(),
             'lloydsForm' => $lloydsForm->createView(),
             'barclaysForm' => $barclaysForm->createView(),
             'year' => $year,

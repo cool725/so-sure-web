@@ -12,6 +12,7 @@
     {% javascripts
         'components/moment/moment.min.js'
         'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        '@AppBundle/Resources/public/js/Admin/banking.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -20,32 +21,28 @@
 {% block body %}
 <div class="container" style="margin-bottom: 50px">
 
-{{ form_start(yearMonthForm) }}
 <div class="row">
     <div class="col-md-7">
         <h1>so-sure Banking for {{ month }} / {{ year }}</h1>
     </div>
+    <form id='banking-form' method="POST">
     <div class="col-md-2">
-        <div class="form-group">
-            {{ form_label(yearMonthForm.month, 'Month') }}
-            {{ form_errors(yearMonthForm.month) }}
-            {{ form_widget(yearMonthForm.month) }}
-        </div>                
+        <div class="form-group" style="padding-top: 15px;">
+            <div class='input-group date' id='banking'>
+                <input name="banking" type='text' class="form-control" value="{{month}}-{{year}}" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
     </div>
     <div class="col-md-2">
-        <div class="form-group">
-            {{ form_label(yearMonthForm.year, 'Year') }}
-            {{ form_errors(yearMonthForm.year) }}
-            {{ form_widget(yearMonthForm.year) }}
+        <div class="form-group" style="padding-top: 15px;">
+            <button class="btn btn-primary">View Banking</button>
         </div>                
     </div>
-    <div class="col-md-1">
-        <div class="form-group">
-            {{ form_widget(yearMonthForm.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}
-        </div>                
-    </div>
+    </form>
 </div>
-{{ form_end(yearMonthForm) }}
 
 <div class="row">
     <div class="col-md-8">
