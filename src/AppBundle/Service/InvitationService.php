@@ -644,6 +644,17 @@ class InvitationService
         return true;
     }
 
+    public function isOptedOut($email, $category = null)
+    {
+        if (!$category) {
+            $category = EmailOptOut::OPTOUT_CAT_ALL;
+        }
+
+        $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
+        $optouts = $optOutRepo->findOptOut($email, $category);
+        return count($optouts) > 0;
+    }
+
     public function optout($email, $category = null)
     {
         if (!$category) {
@@ -651,13 +662,27 @@ class InvitationService
         }
 
         $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
-        $optOut = $optoutRepo->findOneBy(['email' => strtolower($email), 'category' => $category]);
-        if (!$optOut) {
+        $optOuts = $optoutRepo->findOptOut($email, $category);
+        if (count($optOuts) == 0) {
             $optout = new EmailOptOut();
             $optout->setCategory($category);
             $optout->setEmail($email);
 
             $this->dm->persist($optout);
+        }
+        $this->dm->flush();
+    }
+
+    public function optin($email, $category = null)
+    {
+        if (!$category) {
+            $category = EmailOptOut::OPTOUT_CAT_ALL;
+        }
+
+        $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
+        $optOuts = $optoutRepo->findOptOut($email, $category);
+        foreach ($optOuts as $optOut) {
+            $this->dm->remove($optOut);
         }
         $this->dm->flush();
     }

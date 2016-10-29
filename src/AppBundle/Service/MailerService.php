@@ -49,7 +49,11 @@ class MailerService
         $attachmentFiles = null,
         $bcc = null
     ) {
+        $this->addUnsubsribeHash($to, $htmlData);
+
         if ($textTemplate && $textData) {
+            $this->addUnsubsribeHash($to, $textData);
+
             return $this->send(
                 $subject,
                 $to,
@@ -67,6 +71,22 @@ class MailerService
                 $attachmentFiles,
                 $bcc
             );
+        }
+    }
+
+    private function addUnsubsribeHash($to, &$array)
+    {
+        $hash = null;
+        // TODO: Add swiftmailer header check
+        if (is_string($to)) {
+            $hash = urlencode(base64_encode($to));
+        } elseif (is_array($to)) {
+            $hash = urlencode(base64_encode(array_keys($to)[0]));
+        }
+        if ($hash) {
+            $array['unsubscribe_url'] = $this->router->generate('optout_hash', ['hash' => $hash], true);
+        } else {
+            $array['unsubscribe_url'] = "mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!";
         }
     }
 
