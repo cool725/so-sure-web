@@ -1,34 +1,49 @@
 {% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/moment/moment.min.js'
+        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        '@AppBundle/Resources/public/js/Admin/accounts.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
 {% block body %}
 <div class="container" style="margin-bottom: 50px">
 
-{{ form_start(yearMonthForm) }}
 <div class="row">
     <div class="col-md-6">
         <h1>so-sure Accounts for {{ month }} / {{ year }}</h1>
     </div>
+    <form id='accounts-form' method="POST">
     <div class="col-md-2">
-        <div class="form-group" style="padding-top: 25px;">
-            {{ form_label(yearMonthForm.month, 'Month') }}
-            {{ form_errors(yearMonthForm.month) }}
-            {{ form_widget(yearMonthForm.month) }}
-        </div>                
-    </div>
-    <div class="col-md-2">
-        <div class="form-group" style="padding-top: 25px;">
-            {{ form_label(yearMonthForm.year, 'Year') }}
-            {{ form_errors(yearMonthForm.year) }}
-            {{ form_widget(yearMonthForm.year) }}
-        </div>                
+        <div class="form-group" style="padding-top: 15px;">
+            <div class='input-group date' id='accounts'>
+                <input name="accounts" type='text' class="form-control" value="{{month}}-{{year}}" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
     </div>
     <div class="col-md-2">
         <div class="form-group" style="padding-top: 15px;">
-            {{ form_widget(yearMonthForm.submit, {'label': 'View Accounts', 'attr': {'class': 'btn btn-success'}}) }}&nbsp;
+            <button class="btn btn-primary">View Accounts</button>
+            &nbsp;
             <a target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}"><i class="fa fa-print"></i></a>
         </div>                
     </div>
+    </form>
 </div>
-{{ form_end(yearMonthForm) }}
 <h4>Note that # of policies may not be accurate when viewed historically until <a href="https://app.clubhouse.io/sosure/story/787/past-reporting">ch787</a> is complete.</h4>
 
 {% include 'AppBundle:Admin:adminAccountsData.html.twig' %}
