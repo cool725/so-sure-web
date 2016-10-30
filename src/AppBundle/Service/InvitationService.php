@@ -207,6 +207,7 @@ class InvitationService
         }
 
         $invitation = null;
+        $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(EmailInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $email);
         foreach ($prevInvitations as $prevInvitation) {
@@ -217,6 +218,11 @@ class InvitationService
                 $invitation = $prevInvitation;
                 $invitation->setCancelled(null);
                 $this->dm->flush();
+                $isReinvite = true;
+            } elseif ($prevInvitation->canReinvite()) {
+                // A duplicate invitation can be considered a reinvitation
+                $invitation = $prevInvitation;
+                $isReinvite = true;
             } else {
                 throw new DuplicateInvitationException('Email was already invited to this policy');
             }
@@ -239,9 +245,14 @@ class InvitationService
 
         if (!$skipSend) {
             if ($invitation->getInvitee()) {
+                // User invite is the same for reinvite
                 $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE_USER);
             } else {
-                $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+                if ($isReinvite) {
+                    $this->sendEmail($invitation, self::TYPE_EMAIL_REINVITE);
+                } else {
+                    $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+                }
             }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
         }
