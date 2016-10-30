@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/moment/moment.min.js'
+        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        '@AppBundle/Resources/public/js/Admin/scheduledPayments.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>Scheduled Payments {{ month }} / {{ year }}</h1>
+    </div>
+    <form id='scheduled-payments-form' method="POST">
+    <div class="col-md-2">
+        <div class="form-group" style="padding-top: 15px;">
+            <div class='input-group date' id='scheduled-payments'>
+                <input name="scheduled-payments" type='text' class="form-control" value="{{month}}-{{year}}" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group" style="padding-top: 15px;">
+            <button class="btn btn-primary">View Scheduled Payments</button>
+        </div>                
+    </div>
+    </form>
+</div>
+
+{% for scheduledPayment in scheduledPayments %}
+    <div class="row">
+        <div class="col-md-2">
+            <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
+                {{ scheduledPayment.policy.policyNumber }}
+            </a>
+        </div>
+        <div class="col-md-3">
+            {{ scheduledPayment.scheduled|date }}
+        </div>
+        <div class="col-md-2">
+            £{{ scheduledPayment.amount }}
+        </div>
+        <div class="col-md-2">
+            {{ scheduledPayment.status }}
+        </div>
+    </div>
+{% endfor %}
+    
+</div>
+{% endblock %}

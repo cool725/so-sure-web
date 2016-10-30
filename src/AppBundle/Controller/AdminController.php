@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
@@ -17,6 +18,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\SoSurePayment;
 use AppBundle\Document\PolicyTerms;
@@ -60,6 +62,8 @@ use MongoRegex;
  */
 class AdminController extends BaseController
 {
+    use DateTrait;
+
     /**
      * @Route("/", name="admin_home")
      * @Template
@@ -987,6 +991,33 @@ class AdminController extends BaseController
             // TODO: query will eve
             'activePolicies' => $this->getActivePolicies($date),
             'files' => $s3FileRepo->getAllFiles($date),
+        ];
+    }
+
+    /**
+     * @Route("/scheduled-payments", name="admin_scheduled_payments")
+     * @Route("/scheduled-payments/{year}/{month}", name="admin_scheduled_payments_date")
+     * @Template
+     */
+    public function adminScheduledPaymentsAction(Request $request, $year = null, $month = null)
+    {
+        $now = new \DateTime();
+        if (!$year) {
+            $year = $now->format('Y');
+        }
+        if (!$month) {
+            $month = $now->format('m');
+        }
+        $date = new \DateTime(sprintf('%d-%d-01', $year, $month));
+
+        $dm = $this->getManager();
+        $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
+        $scheduledPayments = $scheduledPaymentRepo->findMonthlyScheduled($date);
+
+        return [
+            'year' => $year,
+            'month' => $month,
+            'scheduledPayments' => $scheduledPayments,
         ];
     }
 
