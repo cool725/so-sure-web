@@ -836,7 +836,14 @@
                                                                               <em>Copyright &copy; 2016 so-sure, All rights reserved.</em>
                                                                               <br>
                                                                               <br>Want to change how you receive these emails?
-                                                                              <br>You can <a href="mailto:hello@wearesosure.com?Subject=I want update my contact details">update your preferences</a> or <a href="mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!">unsubscribe from this list</a><br>
+                                                                              <br>You can
+                                                                                 <a href="mailto:hello@wearesosure.com?Subject=I want update my contact details">update your preferences</a> or
+                                                                                 {% if unsubscribe_url is defined %}
+                                                                                    <a href="{{ unsubscribe_url }}">unsubscribe from this list</a>
+                                                                                 {% else %}
+                                                                                    <a href="mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!">unsubscribe from this list</a>
+                                                                                 {% endif %}
+                                                                              <br>
                                                                               <br>
                                                                            </td>
                                                                         </tr>

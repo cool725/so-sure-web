@@ -448,22 +448,53 @@ class DefaultController extends BaseController
             ->getForm();
 
         $email = null;
-        $hash = $request->get('hash');
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $hash = urlencode(base64_encode($form->getData()['email']));
+
+            return new RedirectResponse($this->generateUrl('optout_hash', ['hash' => $hash]));
         }
 
-        if ($hash) {
-            $email = base64_decode(urldecode($hash));
-            $invitationService = $this->get('app.invitation');
-            $invitationService->optout($email, EmailOptOut::OPTOUT_CAT_ALL);
+        return array(
+            'form_optout' => $form->createView(),
+        );
+    }
+
+    /**
+     * @Route("/optout/{hash}", name="optout_hash")
+     * @Template()
+     */
+    public function optOutHashAction(Request $request, $hash)
+    {
+        $form = $this->createFormBuilder()
+            ->add('add', SubmitType::class)
+            ->getForm();
+
+
+        if (!$hash) {
+            return new RedirectResponse($this->generateUrl('optout'));
+        }
+
+        $email = base64_decode(urldecode($hash));
+        $invitationService = $this->get('app.invitation');
+
+        $cat = $request->get('cat');
+        if (!$cat) {
+            $cat = EmailOptOut::OPTOUT_CAT_ALL;
+        }
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $invitationService->optin($email, $cat);
+        } else {
+            $invitationService->optout($email, $cat);
             $invitationService->rejectAllInvitations($email);
         }
 
         return array(
+            'category' => $cat,
             'email' => $email,
-            'form_optout' => $form->createView(),
+            'form_optin' => $form->createView(),
+            'is_opted_out' => $invitationService->isOptedOut($email, $cat),
         );
     }
 }
