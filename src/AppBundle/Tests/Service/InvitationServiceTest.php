@@ -212,6 +212,39 @@ class InvitationServiceTest extends WebTestCase
     }
 
     /**
+     * @expectedException \MongoDuplicateKeyException
+     */
+    public function testConcurrentAccept()
+    {
+        $inviter = static::createUser(
+            static::$userManager,
+            static::generateEmail('testConcurrentAccept-user', $this),
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviter, static::$dm, static::$phone, null, true, false);
+        static::$policyService->create($inviterPolicy);
+
+        $invitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testConcurrentAccept-invitee', $this),
+            'bar'
+        );
+        $inviteePolicy = static::initPolicy($invitee, static::$dm, static::$phone, null, true, false);
+        static::$policyService->create($inviteePolicy);
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $inviterPolicy,
+            static::generateEmail('testConcurrentAccept-invitee', $this)
+        );
+
+        self::$invitationService->accept($invitation, $inviteePolicy);
+        $invitation->setAccepted(null);
+        $invitation->setEmail(static::generateEmail('testConcurrentAccept-invitee2', $this));
+        static::$dm->flush();
+        self::$invitationService->accept($invitation, $inviteePolicy);
+    }
+
+    /**
      * @expectedException AppBundle\Exception\DuplicateInvitationException
      */
     public function testDuplicateEmailInvitationRejected()

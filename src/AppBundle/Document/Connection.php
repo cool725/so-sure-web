@@ -11,6 +11,7 @@ use AppBundle\Document\Invitation\Invitation;
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
  * @Gedmo\Loggable
+ * @MongoDB\Index(keys={"sourcePolicy.id"="asc","linkedPolicy.id"="asc"}, sparse="true", unique="true")
  */
 class Connection
 {
