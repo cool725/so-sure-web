@@ -107,6 +107,32 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->inviteByEmail($policy, static::generateEmail('testDuplicateEmail-invite', $this));
     }
 
+    public function testDuplicateEmailReInvites()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testDuplicateEmailReInvites-user', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('testDuplicateEmailReInvites-invite', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        // allow reinvites
+        $before = new \DateTime();
+        $before = $before->sub(new \DateInterval('PT1S'));
+        $invitation->setNextReinvited($before);
+        static::$dm->flush();
+
+        self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('testDuplicateEmailReInvites-invite', $this)
+        );
+    }
+
     /**
      * @expectedException AppBundle\Exception\OptOutException
      */
