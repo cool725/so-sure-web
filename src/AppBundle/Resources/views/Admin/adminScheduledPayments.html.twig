@@ -45,7 +45,7 @@
 
 {% for scheduledPayment in scheduledPayments %}
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
                 {{ scheduledPayment.policy.policyNumber }}
             </a>
