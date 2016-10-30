@@ -999,7 +999,7 @@ class AdminController extends BaseController
      * @Route("/scheduled-payments/{year}/{month}", name="admin_scheduled_payments_date")
      * @Template
      */
-    public function adminScheduledPaymentsAction(Request $request, $year = null, $month = null)
+    public function adminScheduledPaymentsAction($year = null, $month = null)
     {
         $now = new \DateTime();
         if (!$year) {
