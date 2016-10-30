@@ -39,7 +39,7 @@ class WeeklyEmailCommand extends ContainerAwareCommand
         $count = 0;
         foreach ($policies as $policy) {
             try {
-                if ($count > $limit) {
+                if ($count >= $limit) {
                     continue;
                 }
                 // $inviteService = $this->getContainer()->get('app.invitation');

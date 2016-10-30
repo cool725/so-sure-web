@@ -1,8 +1,12 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\OptOut\OptOut;
+
 class MailerService
 {
+    const EMAIL_WEEKLY = 'weekly';
+
     /** @var \Swift_Mailer */
     protected $mailer;
     protected $smtp;
@@ -47,9 +51,10 @@ class MailerService
         $textTemplate = null,
         $textData = null,
         $attachmentFiles = null,
-        $bcc = null
+        $bcc = null,
+        $emailType = null
     ) {
-        $this->addUnsubsribeHash($to, $htmlData);
+        $this->addUnsubsribeHash($to, $htmlData, $emailType);
 
         if ($textTemplate && $textData) {
             $this->addUnsubsribeHash($to, $textData);
@@ -74,7 +79,7 @@ class MailerService
         }
     }
 
-    private function addUnsubsribeHash($to, &$array)
+    private function addUnsubsribeHash($to, &$array, $emailType = null)
     {
         $hash = null;
         // TODO: Add swiftmailer header check
@@ -84,9 +89,20 @@ class MailerService
             $hash = urlencode(base64_encode(array_keys($to)[0]));
         }
         if ($hash) {
-            $array['unsubscribe_url'] = $this->router->generate('optout_hash', ['hash' => $hash], true);
+            $data = ['hash' => $hash];
+            if ($emailType) {
+                $data['cat'] = $this->emailTypeToOptOut($emailType);
+            }
+            $array['unsubscribe_url'] = $this->router->generate('optout_hash', $data, true);
         } else {
             $array['unsubscribe_url'] = "mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!";
+        }
+    }
+
+    private function emailTypeToOptOut($emailType)
+    {
+        if ($emailType == self::EMAIL_WEEKLY) {
+            return OptOut::OPTOUT_CAT_WEEKLY;
         }
     }
 

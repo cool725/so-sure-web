@@ -534,7 +534,10 @@ class PolicyService
                 'AppBundle:Email:policy/weekly.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:policy/weekly.txt.twig',
-                ['policy' => $policy]
+                ['policy' => $policy],
+                null,
+                null,
+                MailerService::EMAIL_WEEKLY
             );
             $policy->setLastEmailed(new \DateTime());
 

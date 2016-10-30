@@ -478,18 +478,23 @@ class DefaultController extends BaseController
         $email = base64_decode(urldecode($hash));
         $invitationService = $this->get('app.invitation');
 
+        $cat = $request->get('cat');
+        if (!$cat) {
+            $cat = EmailOptOut::OPTOUT_CAT_ALL;
+        }
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $invitationService->optin($email, EmailOptOut::OPTOUT_CAT_ALL);
+            $invitationService->optin($email, $cat);
         } else {
-            $invitationService->optout($email, EmailOptOut::OPTOUT_CAT_ALL);
+            $invitationService->optout($email, $cat);
             $invitationService->rejectAllInvitations($email);
         }
 
         return array(
+            'category' => $cat,
             'email' => $email,
             'form_optin' => $form->createView(),
-            'is_opted_out' => $invitationService->isOptedOut($email),
+            'is_opted_out' => $invitationService->isOptedOut($email, $cat),
         );
     }
 }
