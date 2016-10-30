@@ -367,16 +367,8 @@ class DefaultController extends BaseController
             }
         }
 
-        $tmpPolicy = new PhonePolicy();
-        $prefix = $tmpPolicy->getPolicyNumberPrefix();
-        $isPromo = $phonePolicyRepo->isPromoLaunch($prefix);
-
-        $maxPot = $phone->getCurrentPhonePrice()->getMaxPot($isPromo);
-        $additionalValue = 0;
-        if ($isPromo) {
-            $additionalValue = PhonePolicy::PROMO_LAUNCH_VALUE;
-        }
-        $maxConnections = $phone->getCurrentPhonePrice()->getMaxConnections($additionalValue, $isPromo);
+        $maxPot = $phone->getCurrentPhonePrice()->getMaxPot();
+        $maxConnections = $phone->getCurrentPhonePrice()->getMaxConnections();
 
         return array(
             'phone' => $phone,
@@ -384,7 +376,6 @@ class DefaultController extends BaseController
             'connection_value' => PhonePolicy::STANDARD_VALUE,
             'max_connections' => $maxConnections,
             'max_pot' => $maxPot,
-            'is_promo' => $isPromo,
             'form' => $form->createView()
         );
     }
