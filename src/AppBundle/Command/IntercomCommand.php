@@ -113,7 +113,7 @@ class IntercomCommand extends ContainerAwareCommand
             }
             $output->writeln(sprintf("Queued %d Users", $count));
         } elseif ($unsubscribes) {
-            $intercom->unsubscribes();
+            $output->writeln(implode(PHP_EOL, $intercom->unsubscribes()));
             $output->writeln(sprintf("Rechecked unsubscribes"));
         } else {
             $count = $intercom->process($process);
