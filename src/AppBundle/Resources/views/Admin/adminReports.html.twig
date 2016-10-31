@@ -137,32 +137,32 @@
                         </tr>
                         <tr>
                             <td>Avg # of Invitations per policy</td>
-                            <td>{{ data.newAvgInvitations }}</td>
-                            <td>{{ data.totalAvgInvitations }}</td>
+                            <td>{% if data.newAvgInvitations != 'n/a' %}{{ data.newAvgInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                            <td>{% if data.totalAvgInvitations != 'n/a' %}{{ data.totalAvgInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                         </tr>
                         <tr>
                             <td style="padding-left: 30px">Avg # of Invitations per policy (Direct)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
            title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
                             </td>
-                            <td>{{ data.newAvgDirectInvitations }}</td>
-                            <td>{{ data.totalAvgDirectInvitations }}</td>
+                            <td>{% if data.newAvgDirectInvitations != 'n/a' %}{{ data.newAvgDirectInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                            <td>{% if data.totalAvgDirectInvitations != 'n/a' %}{{ data.totalAvgDirectInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                         </tr>
                         <tr>
                             <td style="padding-left: 30px">Avg # of Invitations per policy (Invitation)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
            title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
                             </td>
-                            <td>{{ data.newAvgInvitationInvitations }}</td>
-                            <td>{{ data.totalAvgInvitationInvitations }}</td>
+                            <td>{% if data.newAvgInvitationInvitations != 'n/a' %}{{ data.newAvgInvitationInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                            <td>{% if data.totalAvgInvitationInvitations != 'n/a' %}{{ data.totalAvgInvitationInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                         </tr>
                         <tr>
                             <td style="padding-left: 30px">Avg # of Invitations per policy (SCode)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
            title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
                             </td>
-                            <td>{{ data.newAvgSCodeInvitations }}</td>
-                            <td>{{ data.totalAvgSCodeInvitations }}</td>
+                            <td>{% if data.newAvgSCodeInvitations != 'n/a' %}{{ data.newAvgSCodeInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                            <td>{% if data.totalAvgSCodeInvitations != 'n/a' %}{{ data.totalAvgSCodeInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                         </tr>
                         <tr>
                             <td><del>Avg hours to connect</del>
@@ -188,6 +188,16 @@
                             <td style="padding-left: 30px">Policies with 10+ Connection(s)</td>
                             <td></td>
                             <td>{{ data.policyConnections['10+'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Avg Connections / Policy</td>
+                            <td></td>
+                            <td>{{ data.totalAvgConnections|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Weighted Avg Connections / Policy</td>
+                            <td></td>
+                            <td>{{ data.totalWeightedAvgConnections|number_format(2, '.', ',') }}</td>
                         </tr>
                     </tbody>
                 </table>
