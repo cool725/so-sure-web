@@ -102,5 +102,4 @@ class Lead
     {
         $this->intercomId = $intercomId;
     }
-
 }
