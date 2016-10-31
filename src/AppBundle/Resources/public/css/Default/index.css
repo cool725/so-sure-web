@@ -42,6 +42,11 @@
     width: 155px;
 }
 
+.hero .btn-primary-large {
+    width: 200px;
+    margin-left: 20px;
+}
+
 .hero .btn-info {
     padding: 12px 30px;
     border: 2px solid #202532;
@@ -590,4 +595,12 @@
   .modal-fullscreen .modal-dialog {
      width: 1170px;
    }
+}
+
+.modal-switching ol {
+  font-size: larger;
+}
+.modal-switching {
+  background: rgba(0, 0, 0, 0.6);
+  padding-top: 10%;
 }
