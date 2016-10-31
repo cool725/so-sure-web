@@ -60,6 +60,12 @@ class IntercomCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Resync regardless of deletion (will undelete if deleted) - requires email'
             )
+            ->addOption(
+                'unsubscribes',
+                null,
+                InputOption::VALUE_NONE,
+                'Check for unsubscriptions'
+            )
         ;
     }
 
@@ -72,6 +78,7 @@ class IntercomCommand extends ContainerAwareCommand
         $requeue = $input->getOption('requeue');
         $convertLead = $input->getOption('convert-lead');
         $undelete = true === $input->getOption('undelete');
+        $unsubscribes = true === $input->getOption('unsubscribes');
 
         $intercom = $this->getContainer()->get('app.intercom');
 
@@ -105,6 +112,9 @@ class IntercomCommand extends ContainerAwareCommand
                 $count++;
             }
             $output->writeln(sprintf("Queued %d Users", $count));
+        } elseif ($unsubscribes) {
+            $output->writeln(implode(PHP_EOL, $intercom->unsubscribes()));
+            $output->writeln(sprintf("Rechecked unsubscribes"));
         } else {
             $count = $intercom->process($process);
             $output->writeln(sprintf("Sent %s user updates", $count));
