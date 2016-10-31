@@ -182,3 +182,8 @@
 .download-now p {
     color: #626B78;
 }
+
+.modal-buy {
+  background: rgba(0, 0, 0, 0.6);
+  padding-top: 10%;
+}

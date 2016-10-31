@@ -15,6 +15,7 @@ class Lead
 
     const SOURCE_TEXT_ME = 'text-me';
     const SOURCE_LAUNCH_USA = 'launch-usa';
+    const SOURCE_BUY = 'buy';
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -40,10 +41,17 @@ class Lead
     protected $email;
 
     /**
-     * @Assert\Choice({"text-me", "launch-usa"})
+     * @Assert\Choice({"text-me", "launch-usa", "buy"})
      * @MongoDB\Field(type="string")
      */
     protected $source;
+
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     */
+    protected $intercomId;
 
     public function __construct()
     {
@@ -84,4 +92,15 @@ class Lead
     {
         $this->source = $source;
     }
+
+    public function getIntercomId()
+    {
+        return $this->intercomId;
+    }
+
+    public function setIntercomId($intercomId)
+    {
+        $this->intercomId = $intercomId;
+    }
+
 }

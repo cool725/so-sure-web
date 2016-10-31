@@ -11,7 +11,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use AppBundle\Form\Type\LaunchType;
+use AppBundle\Form\Type\LeadEmailType;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
@@ -20,9 +22,7 @@ use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\SmsAppLinkType;
-use AppBundle\Form\Type\LeadEmailType;
 use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\Lead;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -197,6 +197,15 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/download-app", name="download_app", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Template
+     */
+    public function downloadAppAction(Request $request)
+    {
+        return [];
+    }
+
+    /**
      * @Route("/text-me-the-app", name="sms_app_link", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      * @Template
      */
@@ -355,15 +364,46 @@ class DefaultController extends BaseController
             ->createNamedBuilder('launch', LaunchType::class, $user)
             ->getForm();
 
-        if ('POST' === $request->getMethod()) {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $launchUser = $this->get('app.user.launch');
-                $existingUser = $launchUser->addUser($user)['user'];
-            }
+        $lead = new Lead();
+        $lead->setSource(Lead::SOURCE_BUY);
+        $leadForm = $this->get('form.factory')
+            ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
+            ->getForm();
 
-            if ($existingUser) {
-                return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('launch')) {
+                $form->handleRequest($request);
+                if ($form->isValid()) {
+                    $launchUser = $this->get('app.user.launch');
+                    $existingUser = $launchUser->addUser($user)['user'];
+                }
+
+                if ($existingUser) {
+                    return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
+                }
+            } elseif ($request->request->has('lead_form')) {
+                $leadForm->handleRequest($request);
+                if ($leadForm->isValid()) {
+                    $leadRepo = $dm->getRepository(Lead::class);
+                    if (!$leadRepo->findOneBy(['email' => $lead->getEmail()])) {
+                        $dm->persist($lead);
+                        $dm->flush();
+                    }
+
+                    // TODO: Move to queue
+                    $intercom = $this->get('app.intercom');
+                    $intercom->updateLead($lead);
+
+                    $this->addFlash('success', sprintf(
+                        'Thanks!  Please download the app to continue with your so-sure purchase.'
+                    ));
+
+                    return $this->redirectToRoute('download_app');
+                } else {
+                    $this->addFlash('error', sprintf(
+                        "Sorry, didn't quite catch that email.  Please try again."
+                    ));
+                }
             }
         }
 
@@ -376,7 +416,8 @@ class DefaultController extends BaseController
             'connection_value' => PhonePolicy::STANDARD_VALUE,
             'max_connections' => $maxConnections,
             'max_pot' => $maxPot,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'lead_form' => $leadForm->createView(),
         );
     }
 
