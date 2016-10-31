@@ -200,7 +200,7 @@ class DefaultController extends BaseController
      * @Route("/download-app", name="download_app", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      * @Template
      */
-    public function downloadAppAction(Request $request)
+    public function downloadAppAction()
     {
         return [];
     }
