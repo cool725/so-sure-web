@@ -139,6 +139,9 @@ class AdminController extends BaseController
         } elseif ($rules == 'replacement') {
             $phones = $phones->field('suggestedReplacement')->exists(true);
         }
+        $phones = $phones->sort('make', 'asc');
+        $phones = $phones->sort('model', 'asc');
+        $phones = $phones->sort('memory', 'asc');
         $pager = $this->pager($request, $phones);
 
         return [
