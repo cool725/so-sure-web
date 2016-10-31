@@ -212,9 +212,10 @@ class IntercomService
         }
 
         // optout
-        $repo = $this->dm->getRepository(EmailOptOut::class);
-        $optout = $repo->findOneBy(['email' => $user->getEmailCanonical()]);
-        if ($optout) {
+        $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
+        $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
+            $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+        if ($optedOut) {
             $data['unsubscribed_from_emails'] = true;
         }
 
@@ -328,20 +329,25 @@ class IntercomService
 
     private function unsubscribeLeads()
     {
+        $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $page = 1;
         $pages = 1;
         while ($page <= $pages) {
-            print sprintf('page %d%s', $page, PHP_EOL);
+            print sprintf('Checking Leads - page %d%s', $page, PHP_EOL);
             $resp = $this->client->leads->getLeads(['page' => $page]);
             $page++;
             $pages = $resp->pages->total_pages;
             
             foreach ($resp->contacts as $lead) {
-                if ($lead->unsubscribed_from_emails) {
-                    print $lead->email;
-                    print PHP_EOL;
+                $optedOut = $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
+                    $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                if ($lead->unsubscribed_from_emails && !$optedOut) {
+                    $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE);
+                    $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                    print sprintf("Added optout for %s\n", $lead->email);
                 }
             }
+            $this->dm->flush();
         }
     }
 
@@ -351,17 +357,34 @@ class IntercomService
         $page = 1;
         $pages = 1;
         while ($page <= $pages) {
-            print sprintf('page %d%s', $page, PHP_EOL);
+            print sprintf('Checking Users - page %d%s', $page, PHP_EOL);
             $resp = $this->client->users->getUsers(['page' => $page]);
             $page++;
             $pages = $resp->pages->total_pages;
-            
             foreach ($resp->users as $user) {
-                if ($user->unsubscribed_from_emails) {
-                    print $user->email;
-                    print PHP_EOL;
+                $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
+                    $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                if ($user->unsubscribed_from_emails && !$optedOut) {
+                    // Webhook callback from intercom issue
+                    $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE);
+                    $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                    print sprintf("Added optout for %s\n", $user->email);
+                } elseif (!$user->unsubscribed_from_emails && $optedOut) {
+                    // sosure user listener -> queue -> intercom update issue
+                    $sosureUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->email)]);
+                    $this->updateUser($sosureUser);
+                    print sprintf("Resync intercom user for %s\n", $user->email);
                 }
             }
+            $this->dm->flush();
         }
+    }
+
+    private function addEmailOptOut($email, $category)
+    {
+        $optout = new EmailOptOut();
+        $optout->setCategory($category);
+        $optout->setEmail($email);
+        $this->dm->persist($optout);
     }
 }

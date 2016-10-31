@@ -522,8 +522,7 @@ class PolicyService
         }
 
         $repo = $this->dm->getRepository(EmailOptOut::class);
-        $optOut = $repo->findOptOut($policy->getUser()->getEmail(), EmailOptOut::OPTOUT_CAT_WEEKLY)->count();
-        if ($optOut > 0) {
+        if ($repo->isOptedOut($policy->getUser()->getEmail(), EmailOptOut::OPTOUT_CAT_WEEKLY)) {
             return;
         }
 

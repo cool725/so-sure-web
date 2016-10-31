@@ -197,8 +197,7 @@ class InvitationService
         }
 
         $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
-        $optouts = $optOutRepo->findOptOut($email, EmailOptOut::OPTOUT_CAT_INVITATIONS);
-        if (count($optouts) > 0) {
+        if ($optOutRepo->isOptedOut($email, EmailOptOut::OPTOUT_CAT_INVITATIONS)) {
             throw new OptOutException(sprintf('Email %s has opted out', $email));
         }
 
@@ -271,8 +270,7 @@ class InvitationService
         }
 
         $optOutRepo = $this->dm->getRepository(SmsOptOut::class);
-        $optouts = $optOutRepo->findOptOut($mobile, SmsOptOut::OPTOUT_CAT_INVITATIONS);
-        if (count($optouts) > 0) {
+        if ($optOutRepo->isOptedOut($mobile, SmsOptOut::OPTOUT_CAT_INVITATIONS)) {
             return null;
         }
 
@@ -420,8 +418,7 @@ class InvitationService
         }
 
         $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
-        $optouts = $optOutRepo->findOptOut($to, EmailOptOut::OPTOUT_CAT_INVITATIONS);
-        if (count($optouts) > 0) {
+        if ($optOutRepo->isOptedOut($to, EmailOptOut::OPTOUT_CAT_INVITATIONS)) {
             $invitation->setStatus(EmailInvitation::STATUS_SKIPPED);
 
             return;
@@ -673,8 +670,7 @@ class InvitationService
         }
 
         $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
-        $optOuts = $optoutRepo->findOptOut($email, $category);
-        if (count($optOuts) == 0) {
+        if (!$optoutRepo->isOptedOut($email, $category)) {
             $optout = new EmailOptOut();
             $optout->setCategory($category);
             $optout->setEmail($email);
