@@ -559,6 +559,13 @@ class AdminController extends BaseController
                 $data['policyConnections']['10+'] += $data['policyConnections'][$i];
             }
         }
+        $data['totalAvgConnections'] = $totalConnections / $data['totalPolicies'];
+
+        $weighted = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $weighted += $i * $data['policyConnections'][$i];
+        }
+        $data['totalWeightedAvgConnections'] = $weighted / $data['totalPolicies'];
 
         return [
             'start' => $start,
