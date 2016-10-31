@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\OptOut\EmailOptOut;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Intercom\IntercomClient;
@@ -227,20 +228,19 @@ class IntercomService
 
         return $resp;
     }
-    
-    private function updateLead(User $user)
+
+    public function updateLead(Lead $lead)
     {
         $data = array(
-            'email' => $user->getEmail(),
-            'name' => $user->getName(),
+            'email' => $lead->getEmail(),
         );
-        if ($user->getIntercomId()) {
-            $data['id'] = $user->getIntercomId();
+        if ($lead->getIntercomId()) {
+            $data['id'] = $lead->getIntercomId();
         }
         $resp = $this->client->leads->create($data);
-        $this->logger->debug(sprintf('Intercom create lead (userid %s) %s', $user->getId(), json_encode($resp)));
+        $this->logger->debug(sprintf('Intercom create lead (userid %s) %s', $lead->getId(), json_encode($resp)));
 
-        $user->setIntercomId($resp->id);
+        $lead->setIntercomId($resp->id);
         $this->dm->flush();
 
         return $resp;

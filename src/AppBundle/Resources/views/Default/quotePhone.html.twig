@@ -13,7 +13,6 @@
     {% javascripts
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
     'bundles/app/js/Default/slider.js'
-    '@AppBundle/Resources/public/js/Default/quote.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -117,7 +116,7 @@
                 <div class="row" style="padding-top: 30px; padding-bottom: 10px;">
                 <div class="col-sm-12">
                   <p class="text-center">
-                    <a class="btn btn-primary" id="get-started">Buy now</a>
+                    <a class="btn btn-primary" id="get-started" data-toggle="modal" data-target="#buyModal">Buy now</a>
                   </p>
                 </div>
               </div>
@@ -226,4 +225,33 @@
     </div>
 </div>
 </div>
+
+<div class="modal modal-buy fade" id="buyModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      {{ form_start(lead_form) }}
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title text-center">Welcome to the social insurance revolution!</h3>
+      </div>
+      <div class="modal-body text-center">
+        <h4>Let's start you on your way</h4>
+        <div class="row">
+            <div class="form-group col-sm-12">
+                {{ form_errors(lead_form.email) }}
+                {{ form_widget(lead_form.email, {'attr': {'placeholder': 'Email address'}}) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group text-center col-sm-12" style="padding-top: 10px;">
+                {{ form_widget(lead_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-primary'}}) }}
+                {{ form_rest(lead_form) }}
+            </div>
+        </div>
+        {{ form_end(lead_form) }}
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
