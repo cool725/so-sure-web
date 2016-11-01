@@ -385,7 +385,8 @@ class DefaultController extends BaseController
                 $leadForm->handleRequest($request);
                 if ($leadForm->isValid()) {
                     $leadRepo = $dm->getRepository(Lead::class);
-                    if (!$leadRepo->findOneBy(['email' => $lead->getEmail()])) {
+                    if (!$leadRepo->findOneBy(['email' => strtolower($lead->getEmail())])) {
+                        $lead->setEmail(strtolower($lead->getEmail()));
                         $dm->persist($lead);
                         $dm->flush();
                     }
