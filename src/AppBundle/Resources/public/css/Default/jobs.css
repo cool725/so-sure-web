@@ -7,7 +7,7 @@ ul.jobs {
 }
 .jobs li.dev:before {
   font-family: 'FontAwesome';
-  content: '\f179';
+  content: '\f0ac';
   margin: 0 5px 0 -15px;
 }
 .jobs li.growth:before {
