@@ -18,7 +18,8 @@ class RateLimitService
     const USER_KEY_FORMAT = 'rate:%s:%s:%s';
 
     const DEVICE_TYPE_ADDRESS = 'address'; // 5p / query
-    const DEVICE_TYPE_IMEI = 'imei'; // 10p / query
+    const DEVICE_TYPE_IMEI = 'imei'; // 2p / query
+    const DEVICE_TYPE_SERIAL = 'serial'; // 5p / query
     const DEVICE_TYPE_LOGIN = 'login';
     const DEVICE_TYPE_POLICY = 'policy';
     const DEVICE_TYPE_RESET = 'reset';
@@ -27,6 +28,7 @@ class RateLimitService
 
     public static $cacheTimes = [
         self::DEVICE_TYPE_IMEI => 86400, // 1 day
+        self::DEVICE_TYPE_SERIAL => 86400, // 1 day
         self::DEVICE_TYPE_ADDRESS => 86400, // 1 day
         self::DEVICE_TYPE_LOGIN => 3600, // 1 hour
         self::DEVICE_TYPE_POLICY => 604800, // 7 days
@@ -37,6 +39,7 @@ class RateLimitService
 
     public static $maxRequests = [
         self::DEVICE_TYPE_IMEI => 2,
+        self::DEVICE_TYPE_SERIAL => 2,
         self::DEVICE_TYPE_ADDRESS => 3,
         self::DEVICE_TYPE_LOGIN => 10,
         self::DEVICE_TYPE_POLICY => 1,
@@ -47,6 +50,7 @@ class RateLimitService
 
     public static $maxIpRequests = [
         self::DEVICE_TYPE_IMEI => 14,
+        self::DEVICE_TYPE_SERIAL => 14,
         self::DEVICE_TYPE_ADDRESS => 21,
         self::DEVICE_TYPE_LOGIN => 21,
         self::DEVICE_TYPE_POLICY => 50,
@@ -118,18 +122,24 @@ class RateLimitService
      *
      * @return boolean
      */
-    public function allowedByDevice($type, $ip, $cognitoId)
+    public function allowedByDevice($type, $ip, $cognitoId = null)
     {
+        $maxIpRequests = self::$maxIpRequests[$type];
+        $maxCognitoRequests = self::$maxRequests[$type];
+
         $ipKey = sprintf(self::KEY_FORMAT, $type, $ip);
         $cognitoIdKey = sprintf(self::KEY_FORMAT, $type, $cognitoId);
 
         $ipRequests = $this->redis->incr($ipKey);
-        $maxIpRequests = self::$maxIpRequests[$type];
-        $cognitoRequests = $this->redis->incr($cognitoIdKey);
-        $maxCognitoRequests = self::$maxRequests[$type];
-
         $this->redis->expire($ipKey, self::$cacheTimes[$type]);
-        $this->redis->expire($cognitoIdKey, self::$cacheTimes[$type]);
+
+        if ($cognitoId) {
+            $cognitoRequests = $this->redis->incr($cognitoIdKey);
+            $this->redis->expire($cognitoIdKey, self::$cacheTimes[$type]);
+        } else {
+            // ignore cognito if not set
+            $cognitoRequests = 0;
+        }
 
         // ignore rate limiting for some ips
         if (in_array($ip, self::$excludedIps)) {

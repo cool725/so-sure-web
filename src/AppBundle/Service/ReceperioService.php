@@ -8,6 +8,8 @@ use AppBundle\Document\Charge;
 use AppBundle\Document\Claim;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\IdentityLog;
+use AppBundle\Exception\RateLimitException;
 
 class ReceperioService extends BaseImeiService
 {
@@ -45,6 +47,9 @@ class ReceperioService extends BaseImeiService
 
     /** @var string */
     protected $responseData;
+
+    /** @var RateLimitService */
+    protected $rateLimit;
 
     /**
      * @param string $environment
@@ -92,6 +97,11 @@ class ReceperioService extends BaseImeiService
     public function getResponseData()
     {
         return $this->responseData;
+    }
+
+    public function setRateLimit($rateLimit)
+    {
+        $this->rateLimit = $rateLimit;
     }
 
     private function queueMessage(
@@ -278,18 +288,29 @@ class ReceperioService extends BaseImeiService
     /**
      * Checks imei against a blacklist
      *
-     * @param Phone  $phone
-     * @param string $imei
-     * @param User   $user
+     * @param Phone       $phone
+     * @param string      $imei
+     * @param User        $user
+     * @param IdentityLog $identityLog
      *
      * @return boolean True if imei is ok
      */
-    public function checkImei(Phone $phone, $imei, User $user = null)
+    public function checkImei(Phone $phone, $imei, User $user = null, IdentityLog $identityLog = null)
     {
         \AppBundle\Classes\NoOp::noOp([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == self::TEST_INVALID_IMEI) {
             return false;
+        }
+
+        if ($identityLog && $identityLog->isSessionDataPresent()) {
+            if (!$this->rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_IMEI,
+                $identityLog->getIp(),
+                $identityLog->getCognitoId()
+            )) {
+                throw new RateLimitException();
+            }
         }
 
         if ($this->getEnvironment() != 'prod') {
@@ -445,17 +466,28 @@ class ReceperioService extends BaseImeiService
     /**
      * Validate that the serial number matches the expected phone details
      *
-     * @param Phone  $phone
-     * @param string $serialNumber
-     * @param User   $user
+     * @param Phone       $phone
+     * @param string      $serialNumber
+     * @param User        $user
+     * @param IdentityLog $identityLog
      *
      * @return boolean True if imei is ok
      */
-    public function checkSerial(Phone $phone, $serialNumber, User $user = null)
+    public function checkSerial(Phone $phone, $serialNumber, User $user = null, IdentityLog $identityLog = null)
     {
         \AppBundle\Classes\NoOp::noOp([$phone]);
         if ($serialNumber == self::TEST_INVALID_SERIAL) {
             return false;
+        }
+
+        if ($identityLog && $identityLog->isSessionDataPresent()) {
+            if (!$this->rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_SERIAL,
+                $identityLog->getIp(),
+                $identityLog->getCognitoId()
+            )) {
+                throw new RateLimitException();
+            }
         }
 
         if ($this->getEnvironment() != 'prod') {

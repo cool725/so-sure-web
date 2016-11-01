@@ -314,6 +314,14 @@ abstract class BaseController extends Controller
         return $geoip->getIdentityLog($clientIp, $this->getCognitoIdentityId($request));
     }
 
+    protected function getIdentityLogWeb(Request $request)
+    {
+        $identityLog = new IdentityLog();
+        $identityLog->setIp($request->getClientIp());
+
+        return $identityLog;
+    }
+
     protected function getUserHistory($userId)
     {
         $dm = $this->getManager();

@@ -28,7 +28,10 @@ class JudopayService
     protected $logger;
 
     /** @var JudoPay */
-    protected $client;
+    protected $apiClient;
+
+    /** @var JudoPay */
+    protected $webClient;
 
     /** @var string */
     protected $judoId;
@@ -57,6 +60,8 @@ class JudopayService
      * @param string          $judoId
      * @param string          $environment
      * @param                 $statsd
+     * @param string          $webToken
+     * @param string          $webSecret
      */
     public function __construct(
         DocumentManager $dm,
@@ -67,14 +72,16 @@ class JudopayService
         $apiSecret,
         $judoId,
         $environment,
-        $statsd
+        $statsd,
+        $webToken,
+        $webSecret
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->policyService = $policyService;
         $this->judoId = $judoId;
         $this->mailer = $mailer;
-        $data = array(
+        $apiData = array(
            'apiToken' => $apiToken,
            'apiSecret' => $apiSecret,
            'judoId' => $judoId,
@@ -82,7 +89,16 @@ class JudopayService
            // endpointUrl is overwriten in Judopay Configuration Constructor
            // 'endpointUrl' => ''
         );
-        $this->client = new Judopay($data);
+        $this->apiClient = new Judopay($apiData);
+        $webData = array(
+           'apiToken' => $webToken,
+           'apiSecret' => $webSecret,
+           'judoId' => $judoId,
+           'useProduction' => $environment == 'prod',
+           // endpointUrl is overwriten in Judopay Configuration Constructor
+           // 'endpointUrl' => ''
+        );
+        $this->webClient = new Judopay($webData);
         $this->statsd = $statsd;
         $this->environment = $environment;
     }
@@ -90,7 +106,7 @@ class JudopayService
     public function getTransactions($pageSize)
     {
         $repo = $this->dm->getRepository(JudoPayment::class);
-        $transactions = $this->client->getModel('Transaction');
+        $transactions = $this->apiClient->getModel('Transaction');
         $data = array(
             'judoId' => $this->judoId,
         );
@@ -217,7 +233,7 @@ class JudopayService
 
     public function testPayDetails(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
     {
-        $payment = $this->client->getModel('CardPayment');
+        $payment = $this->apiClient->getModel('CardPayment');
         $data = array(
             'judoId' => $this->judoId,
             'yourConsumerReference' => $user->getId(),
@@ -241,7 +257,7 @@ class JudopayService
 
     public function getReceipt($receiptId)
     {
-        $transaction = $this->client->getModel('Transaction');
+        $transaction = $this->apiClient->getModel('Transaction');
 
         try {
             $transactionDetails = $transaction->find($receiptId);
@@ -507,7 +523,7 @@ class JudopayService
         }
 
         // add payment
-        $tokenPayment = $this->client->getModel('TokenPayment');
+        $tokenPayment = $this->apiClient->getModel('TokenPayment');
 
         $data = array(
                 'judoId' => $this->judoId,
@@ -586,21 +602,22 @@ class JudopayService
     /**
      *
      */
-    public function webpay(User $user, Phone $phone, $amount, $ipAddress, $userAgent)
+    public function webpay(Policy $policy, $amount, $ipAddress, $userAgent)
     {
-        $payment = new Payment();
+        $payment = new JudoPayment();
         $payment->setAmount($amount);
+        $payment->setUser($policy->getUser());
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         // add payment
-        $webPayment = $this->client->getModel('WebPayments\Payment');
+        $webPayment = $this->webClient->getModel('WebPayments\Payment');
 
         // populate the required data fields.
         $webPayment->setAttributeValues(
             array(
                 'judoId' => $this->judoId,
-                'yourConsumerReference' => $user->getId(),
+                'yourConsumerReference' => $policy->getUser()->getId(),
                 'yourPaymentReference' => $payment->getId(),
                 'amount' => $amount,
                 'currency' => 'GBP',
@@ -610,50 +627,15 @@ class JudopayService
         );
 
         $webpaymentDetails = $webPayment->create();
+        $this->logger->info(sprintf('Judo Webpayment %s', json_encode($webpaymentDetails)));
         $payment->setReference($webpaymentDetails["reference"]);
 
-        $policy = new SalvaPhonePolicy();
-        $policy->setUser($user);
-        $policy->setPhone($phone);
         $policy->addPayment($payment);
-        $this->dm->persist($policy);
-
-        $payment->setPolicy($policy);
-
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         return array('post_url' => $webpaymentDetails["postUrl"], 'payment' => $payment);
     }
     
-    /**
-     * Record a successful payment
-     *
-     * @param string $reference
-     * @param string $receipt
-     * @param string $token
-     *
-     * @return Policy
-     */
-    public function paymentSuccess($reference, $receipt, $token)
-    {
-        $repo = $this->dm->getRepository(Payment::class);
-        $payment = $repo->findOneBy(['reference' => $reference]);
-        if (!$payment) {
-            throw new \Exception('Unable to locate payment');
-        }
-
-        // TODO: Encrypt
-        $payment->setToken($token);
-        $payment->setReceipt($receipt);
-        $payment->getPolicy()->create();
-
-        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-        // TODO: Email receipt?
-
-        return $payment->getPolicy();
-    }
-
     /**
      * Refund a payment
      *
@@ -682,7 +664,7 @@ class JudopayService
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         // add refund
-        $refundModel = $this->client->getModel('Refund');
+        $refundModel = $this->apiClient->getModel('Refund');
 
         $data = array(
                 'judoId' => $this->judoId,

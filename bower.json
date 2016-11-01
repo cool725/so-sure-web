@@ -21,7 +21,8 @@
     "eonasdan-bootstrap-datetimepicker": "^4.17.42",
     "ouibounce": "^0.0.12",
     "datatables.net": "^1.10.12",
-    "datatables.net-bs": "^1.10.12"
+    "datatables.net-bs": "^1.10.12",
+    "typeahead.js": "^0.11.1"
   },
   "install": {
     "path": "web/components",
@@ -52,6 +53,9 @@
       "datatables.net-bs": [
         "bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js",
         "bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css"
+      ],
+      "typeahead.js": [
+        "bower_components/typeahead.js/dist/typeahead.bundle.min.js"
       ]
     }
   }

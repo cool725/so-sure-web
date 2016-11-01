@@ -722,12 +722,13 @@ class ApiAuthControllerTest extends BaseControllerTest
     public function testNewPolicyInvalidUser()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser2);
+        $this->clearRateLimit();
         $imei = self::generateRandomImei();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'OnePlus',
             'device' => 'A0001',
-            'memory' => 65,
+            'memory' => 63,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
@@ -777,7 +778,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'imei' => self::INVALID_IMEI,
             'make' => 'OnePlus',
             'device' => 'A0001',
-            'memory' => 65,
+            'memory' => 63,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => self::INVALID_IMEI]),
         ]]);

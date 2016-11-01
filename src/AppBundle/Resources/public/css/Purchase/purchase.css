@@ -1,0 +1,69 @@
+.modal-confirm {
+  background: rgba(0, 0, 0, 0.6);
+  padding-top: 10%;
+}
+
+.modal-confirm-wrapper {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.modal-summary {
+  background: rgba(0, 0, 0, 0.6);
+  padding-top: 10%;
+}
+
+.modal-summary ul {
+    list-style: none;
+}
+
+.modal-summary ul li {
+    font-weight: 900;
+}
+
+.modal-policy {
+  background: rgba(0, 0, 0, 0.6);
+  padding-top: 2%;
+  max-height: 90%;
+  overflow-y: scroll;
+}
+
+.modal-policy .modal-dialog {
+    width: 70% !important;
+}
+
+.has-error ul {
+  list-style: none;
+}
+
+.has-error li {
+  margin-left: -40px;
+  color: red;
+}
+
+.has-error .form-control {
+  border-width: 2px;
+}
+
+.tt-menu {
+  background-color: white;
+  border: 1px solid;
+  width:150%;
+  overflow-y: scroll;
+  border-radius: 5px;
+  max-height: 150px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.tt-suggestion {
+  padding-bottom: 2px;
+}
+
+.tt-suggestion:hover {
+  background-color: #F5F5F5;
+}
+
+.address-manual {
+  padding-left: 0px;
+}

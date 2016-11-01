@@ -69,6 +69,8 @@ services:
             judoId:               "%judopay_id%"
             environment:          "%kernel.environment%"
             statsd:               "@statsd"
+            webToken:             "%judopay_webtoken%"
+            webSecret:            "%judopay_websecret%"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
@@ -188,6 +190,7 @@ services:
             - [setSecretKey, ['%receperio_secretkey%']]
             - [setStoreId, ['%receperio_storeid%']]
             - [setEnvironment, ['%kernel.environment%']]
+            - [setRateLimit, ['@app.ratelimit']]
 
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService
@@ -298,6 +301,9 @@ services:
             statsd:               "@statsd"
             redis:                "@snc_redis.default"
             branch:               "@app.branch"
+            address:              "@app.address"
+            imeiValidator:        "@app.imei"
+            rateLimit:            "@app.ratelimit"
 
     app.mailer:
         class: AppBundle\Service\MailerService
@@ -505,11 +511,22 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.purchase:
+        class: AppBundle\Form\Type\PurchaseType
+        arguments: ["@request_stack"]
+        tags:
+            - { name: form.type }
+
     app.form.type.claim:
         class: AppBundle\Form\Type\ClaimType
         arguments: ["@app.imei"]
         tags:
             - { name: form.type }
+
+    app.validator.age:
+        class: AppBundle\Validator\Constraints\AgeValidator
+        tags:
+            - { name: validator.constraint_validator }
 
     app.validator.alphanumeric:
         class: AppBundle\Validator\Constraints\AlphanumericValidator
@@ -528,6 +545,18 @@ services:
 
     app.validator.mobile:
         class: AppBundle\Validator\Constraints\MobileValidator
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.imei:
+        class: AppBundle\Validator\Constraints\ImeiValidator
+        arguments: ["@app.imei"]
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.postcode:
+        class: AppBundle\Validator\Constraints\PostcodeValidator
+        arguments: ["@app.address"]
         tags:
             - { name: validator.constraint_validator }
 

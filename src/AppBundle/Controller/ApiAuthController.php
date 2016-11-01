@@ -36,6 +36,13 @@ use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Exception\InvalidUserDetailsException;
+use AppBundle\Exception\GeoRestrictedException;
+use AppBundle\Exception\DuplicateImeiException;
+use AppBundle\Exception\LostStolenImeiException;
+use AppBundle\Exception\InvalidImeiException;
+use AppBundle\Exception\ImeiBlacklistedException;
+use AppBundle\Exception\ImeiPhoneMismatchException;
 
 use AppBundle\Service\RateLimitService;
 use AppBundle\Security\UserVoter;
@@ -257,78 +264,14 @@ class ApiAuthController extends BaseController
 
             $imeiValidator = $this->get('app.imei');
             $jwtValidator = $this->get('app.jwt');
-            $addressValidator = $this->get('app.address');
             $user = $this->getUser();
             $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
-
-            if (!$user->hasValidDetails()) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
-                    'User needs first/last name, email, birthday & mobile number before policy can be created',
-                    422
-                );
-            }
 
             // We'll probably want to change this in the future, but for now, a user can only create 1 policy
             if ($user->hasPolicy()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_POLICY_LIMIT,
                     'User can only have 1 policy',
-                    422
-                );
-            }
-
-            if (!$user->hasValidBillingDetails()) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
-                    'User must have billing address set before policy can be created',
-                    422
-                );
-            }
-
-            if (!$addressValidator->validatePostcode($user->getBillingAddress()->getPostCode())) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_GEO_RESTRICTED,
-                    "User's billing address must be valid and in GB",
-                    422
-                );
-            }
-
-            $rateLimit = $this->get('app.ratelimit');
-            if (!$rateLimit->allowedByDevice(
-                RateLimitService::DEVICE_TYPE_IMEI,
-                $this->getCognitoIdentityIp($request),
-                $this->getCognitoIdentityId($request)
-            )) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
-            }
-            if (!$rateLimit->allowedByDevice(
-                RateLimitService::DEVICE_TYPE_POLICY,
-                $this->getCognitoIdentityIp($request),
-                $this->getCognitoIdentityId($request)
-            )) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
-            }
-
-            $imei = str_replace(' ', '', $this->getDataString($phonePolicyData, 'imei'));
-            if (!$imeiValidator->isImei($imei)) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_IMEI_INVALID,
-                    'Imei fails validation checks',
-                    422
-                );
-            }
-            if ($imeiValidator->isLostImei($imei)) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_IMEI_LOSTSTOLEN,
-                    'Imei was reported as lost/stolen',
-                    422
-                );
-            }
-            if ($imeiValidator->isDuplicatePolicyImei($imei)) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI,
-                    'Imei is already registered for a policy',
                     422
                 );
             }
@@ -346,6 +289,13 @@ class ApiAuthController extends BaseController
                 );
             }
 
+            $imei = str_replace(' ', '', $this->getDataString($phonePolicyData, 'imei'));
+            $serialNumber = $this->getDataString($phonePolicyData, 'serial_number');
+            // For phones without a serial number, run check on imei
+            if (!$serialNumber) {
+                $serialNumber = $imei;
+            }
+
             try {
                 $jwtValidator->validate(
                     $this->getCognitoIdentityId($request),
@@ -360,34 +310,6 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $dm = $this->getManager();
-
-            $serialNumber = $this->getDataString($phonePolicyData, 'serial_number');
-            // For phones without a serial number, run check on imei
-            if (!$serialNumber) {
-                $serialNumber = $imei;
-            }
-
-            // Checking against blacklist should be last check to possible avoid costs
-            if (!$imeiValidator->checkImei($phone, $imei, $this->getUser())) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED,
-                    'Imei is blacklisted',
-                    422
-                );
-            }
-            $imeiCertId = $imeiValidator->getCertId();
-            $imeiResponse = $imeiValidator->getResponseData();
-
-            if (!$imeiValidator->checkSerial($phone, $serialNumber, $this->getUser())) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_POLICY_IMEI_PHONE_MISMATCH,
-                    'Imei/Phone mismatch',
-                    422
-                );
-            }
-            $serialResponse = $imeiValidator->getResponseData();
-
             $policyService = $this->get('app.policy');
             $policy = $policyService->init(
                 $user,
@@ -401,12 +323,11 @@ class ApiAuthController extends BaseController
                     'memory' => $this->getDataString($phonePolicyData, 'memory'),
                 ])
             );
-            $policy->addCheckmendCertData($imeiCertId, $imeiResponse);
-            $policy->addCheckmendSerialData($serialResponse);
             $policy->setName($this->getDataString($phonePolicyData, 'name'));
 
             $this->validateObject($policy);
 
+            $dm = $this->getManager();
             $dm->persist($policy);
             $dm->flush();
 
@@ -415,6 +336,50 @@ class ApiAuthController extends BaseController
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (InvalidUserDetailsException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS,
+                'User needs first/last name, email, birthday & mobile number before policy can be created',
+                422
+            );
+        } catch (RateLimitException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+        } catch (GeoRestrictedException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_GEO_RESTRICTED,
+                "User's billing address must be valid and in GB",
+                422
+            );
+        } catch (InvalidImeiException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_IMEI_INVALID,
+                'Imei fails validation checks',
+                422
+            );
+        } catch (LostStolenImeiException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_IMEI_LOSTSTOLEN,
+                'Imei was reported as lost/stolen',
+                422
+            );
+        } catch (DuplicateImeiException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI,
+                'Imei is already registered for a policy',
+                422
+            );
+        } catch (ImeiBlacklistedException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED,
+                'Imei is blacklisted',
+                422
+            );
+        } catch (ImeiPhoneMismatchException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_IMEI_PHONE_MISMATCH,
+                'Imei/Phone mismatch',
+                422
+            );
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
