@@ -22,7 +22,7 @@
 <div class="container" style="margin-bottom: 50px">
 
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-md-6">
         <h1>so-sure Banking for {{ month }} / {{ year }}</h1>
     </div>
     <form id='banking-form' method="POST">
@@ -36,16 +36,20 @@
             </div>
         </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4">
         <div class="form-group" style="padding-top: 15px;">
             <button class="btn btn-primary">View Banking</button>
-        </div>                
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysModal"
+                ><i class="fa fa-plus"></i> Barclays</button>
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#lloydsModal"
+                ><i class="fa fa-plus"></i> Lloyds</button>
+        </div>
     </div>
     </form>
 </div>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-4">
         <h3>Transaction Date</h3>
         <table class="table table-striped">
             <tr>
@@ -57,6 +61,8 @@
                 <td>£{{ totalTransaction|number_format(2, '.', ',') }}</td>
             </tr>
         </table>
+    </div>
+    <div class="col-md-4">
         <h3>Processing Date</h3>
         <table class="table table-striped">
             <tr>
@@ -68,6 +74,8 @@
                 <td>£{{ totalLloydsProcessing|number_format(2, '.', ',') }}</td>
             </tr>
         </table>
+    </div>
+    <div class="col-md-4">
         <h3>Received Date</h3>
         <table class="table table-striped">
             <tr>
@@ -75,40 +83,6 @@
                 <td>£{{ totalReceived|number_format(2, '.', ',') }}</td>
             </tr>
         </table>        
-    </div>
-    <div class="col-md-4">
-        <div style="border-radius: 5px; border: solid 1px; padding: 10px;">
-                <h3>Barclays</h3>
-                {% for barclaysFile in barclaysFiles %}
-                    <p>{{ barclaysFile.fileName }}</p>
-                {% endfor %}
-            {{ form_start(barclaysForm) }}
-                <div class="form-group">
-                    {{ form_label(barclaysForm.file, 'File') }}
-                    {{ form_errors(barclaysForm.file) }}
-                    {{ form_widget(barclaysForm.file) }}
-                </div>                
-                <div class="form-group">
-                    {{ form_widget(barclaysForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
-                </div>
-            {{ form_end(barclaysForm) }}
-        </div>
-        <div style="border-radius: 5px; border: solid 1px; padding: 10px;">
-            <h3>Lloyds</h3>
-                {% for lloydsFile in lloydsFiles %}
-                    <p>{{ lloydsFile.fileName }}</p>
-                {% endfor %}
-            {{ form_start(lloydsForm) }}
-                <div class="form-group">
-                    {{ form_label(lloydsForm.file, 'File') }}
-                    {{ form_errors(lloydsForm.file) }}
-                    {{ form_widget(lloydsForm.file) }}
-                </div>                
-                <div class="form-group">
-                    {{ form_widget(lloydsForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
-                </div>
-            {{ form_end(lloydsForm) }}
-        </div>
     </div>
 </div>
 <div class="row">
@@ -233,7 +207,56 @@
     </div>
 </div>
 
+    <div class="modal fade" id="barclaysModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Barclays Upload</h4>
+          </div>
+          <div class="modal-body">
+                {% for barclaysFile in barclaysFiles %}
+                    <p>{{ barclaysFile.fileName }}</p>
+                {% endfor %}
+            {{ form_start(barclaysForm) }}
+                <div class="form-group">
+                    {{ form_label(barclaysForm.file, 'File') }}
+                    {{ form_errors(barclaysForm.file) }}
+                    {{ form_widget(barclaysForm.file) }}
+                </div>                
+                <div class="form-group">
+                    {{ form_widget(barclaysForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>
+            {{ form_end(barclaysForm) }}
+          </div>
+        </div>
+      </div>
+    </div>
 
-    
+    <div class="modal fade" id="lloydsModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Lloyds Upload</h4>
+          </div>
+          <div class="modal-body">
+                {% for lloydsFile in lloydsFiles %}
+                    <p>{{ lloydsFile.fileName }}</p>
+                {% endfor %}
+            {{ form_start(lloydsForm) }}
+                <div class="form-group">
+                    {{ form_label(lloydsForm.file, 'File') }}
+                    {{ form_errors(lloydsForm.file) }}
+                    {{ form_widget(lloydsForm.file) }}
+                </div>                
+                <div class="form-group">
+                    {{ form_widget(lloydsForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>
+            {{ form_end(lloydsForm) }}    
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
 {% endblock %}

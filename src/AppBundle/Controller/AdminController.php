@@ -1080,8 +1080,8 @@ class AdminController extends BaseController
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_banking_date', [
-                        'year' => $yearMonthForm->get('year')->getData(),
-                        'month' => $yearMonthForm->get('month')->getData()
+                        'year' => $date->format('Y'),
+                        'month' => $date->format('m'),
                     ]);
                 }
             } elseif ($request->request->has('barclays')) {
@@ -1098,8 +1098,8 @@ class AdminController extends BaseController
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_banking_date', [
-                        'year' => $yearMonthForm->get('year')->getData(),
-                        'month' => $yearMonthForm->get('month')->getData()
+                        'year' => $date->format('Y'),
+                        'month' => $date->format('m'),
                     ]);
                 }
             }
