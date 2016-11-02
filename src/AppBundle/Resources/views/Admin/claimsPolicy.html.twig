@@ -39,25 +39,46 @@
             </div>
             <div class="col-md-6">
                 {{ form_start(cancel_form, {'attr': {'class': 'form-inline'}}) }}
-                <div class="form-group">
-                    {{ form_label(cancel_form.cancellationReason, 'Reason') }}
-                    {{ form_errors(cancel_form.cancellationReason) }}
-                    {{ form_widget(cancel_form.cancellationReason, { 'separator': '---Unlikely Reasons---' }) }}
-                <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true" title="Cancellation Reasons" data-content="
-        <b>Cooloff</b>: only visible if within 14 days and no pending claims<br />
-        <b>User Request</b>: any other user requested reason beyond cooloff<br />
-        <b>Unpaid</b>: only visible if status is unpaid, but should only be cancelled after 30 days<br />
-        <b>Fraud (actual)</b>: should only be used in cases where it can be proven<br />
-        <b>Fraud (suspected)</b>: use with caution as likely to cause lawsuits<br />
-        <b>Dispossession</b>: only for cases where a phone has been lost but claim not approved<br />
-        <b>Wreckage</b>: only for cases where a phone is damaged beyond use but claim not approved
-        "></i>
+                <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(cancel_form.cancellationReason, 'Reason') }}
+                        {{ form_errors(cancel_form.cancellationReason) }}
+                        {{ form_widget(cancel_form.cancellationReason, { 'separator': '---Unlikely Reasons---' }) }}
+                    <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true" title="Cancellation Reasons" data-content="
+            <b>Cooloff</b>: only visible if within 14 days and no pending claims<br />
+            <b>User Request</b>: any other user requested reason beyond cooloff<br />
+            <b>Unpaid</b>: only visible if status is unpaid, but should only be cancelled after 30 days<br />
+            <b>Fraud (actual)</b>: should only be used in cases where it can be proven<br />
+            <b>Fraud (suspected)</b>: use with caution as likely to cause lawsuits<br />
+            <b>Dispossession</b>: only for cases where a phone has been lost but claim not approved<br />
+            <b>Wreckage</b>: only for cases where a phone is damaged beyond use but claim not approved
+            "></i>
+                    </div>
                 </div>
-                {{ form_widget(cancel_form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
-                {{ form_end(cancel_form) }}
-                <br />
-                <i>If cancellation list is empty, then most likely this is an open claim that must be resolved first.</i>
-                
+                </div>
+                <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(cancel_form.skipNetworkEmail, 'Skip network cancellation email') }}
+                        {{ form_errors(cancel_form.skipNetworkEmail) }}
+                        {{ form_widget(cancel_form.skipNetworkEmail) }}
+                        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true" title="Cancellation Reasons" data-content="
+                        Only do this if manually transferring policy"></i>
+                    </div>
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-md-12">
+                    {{ form_widget(cancel_form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
+                    {{ form_end(cancel_form) }}
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-md-12">
+                    <i>If cancellation list is empty, then most likely this is an open claim that must be resolved first.</i>                
+                </div>
+                </div>
             </div>
         </div>
     </div>

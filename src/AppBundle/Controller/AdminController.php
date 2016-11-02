@@ -672,7 +672,11 @@ class AdminController extends BaseController
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
                     if ($policy->canCancel($cancel->getCancellationReason())) {
-                        $policyService->cancel($policy, $cancel->getCancellationReason());
+                        $policyService->cancel(
+                            $policy,
+                            $cancel->getCancellationReason(),
+                            $cancel->getSkipNetworkEmail()
+                        );
                         $this->addFlash(
                             'success',
                             sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())

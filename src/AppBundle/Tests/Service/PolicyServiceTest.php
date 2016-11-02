@@ -393,7 +393,7 @@ class PolicyServiceTest extends WebTestCase
         static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice(), Salva::MONTHLY_TOTAL_COMMISSION);
 
         // 61 days (366/12 * 2)
-        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_ACTUAL_FRAUD, new \DateTime('2016-02-02'));
+        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_ACTUAL_FRAUD, false, new \DateTime('2016-02-02'));
         // 6.99 / month
         $this->assertEquals(13.98, $policy->getTotalPremiumPrice());
         // 6.38 / month rough - (6.99 * 12 / (1.095)) * 61 / 366  = 12.77
@@ -422,7 +422,7 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         static::$policyService->setEnvironment('test');
 
-        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_COOLOFF, new \DateTime('2016-01-10'));
+        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_COOLOFF, false, new \DateTime('2016-01-10'));
         $this->assertEquals(0, $policy->getTotalPremiumPrice());
         $this->assertEquals(0, $policy->getTotalGwp());
         $this->assertEquals(0, $policy->getUsedGwp());

@@ -43,6 +43,7 @@ class CancelPolicyType extends AbstractType
                 'preferred_choices' => $preferred,
                 'placeholder' => 'Cancellation reason'
             ])
+            ->add('skipNetworkEmail', CheckboxType::class, ['required' => false])
             ->add('cancel', SubmitType::class)
         ;
     }

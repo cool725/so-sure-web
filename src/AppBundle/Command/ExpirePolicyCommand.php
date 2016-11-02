@@ -33,7 +33,7 @@ class ExpirePolicyCommand extends ContainerAwareCommand
         $count = 0;
         foreach ($policies as $policy) {
             if ($policy->shouldExpirePolicy()) {
-                $policyService->cancel($policy);
+                $policyService->cancel($policy, Policy::CANCELLED_UNPAID);
                 $output->writeln(sprintf('Cancelled Policy %s / %s', $policy->getPolicyNumber(), $policy->getId()));
                 $count++;
             }
