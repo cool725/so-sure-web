@@ -84,18 +84,23 @@ class ConnectionRepository extends BaseDocumentRepository
     public function countByConnection($connections)
     {
         $collection = $this->dm->getDocumentCollection($this->documentName)->getMongoCollection();
+        $match = ['excludeReporting' => [ '$ne' => true]];
+        if ($this->excludedPolicyIds) {
+            $match['sourcePolicy.$id'] = [ '$nin' => $this->excludedPolicyIds];
+            $match['linkedPolicy.$id'] = [ '$nin' => $this->excludedPolicyIds];
+        }
         $ops = [
-            ['$match' => [
-                'sourcePolicy.$id' => [ '$nin' => $this->excludedPolicyIds],
-                'linkedPolicy.$id' => [ '$nin' => $this->excludedPolicyIds],
-                'excludeReporting' => [ '$ne' => true]
+            [
+                '$match' => $match
+            ],
+            [
+                '$group' => [
+                   '_id' => ['policy' => '$sourcePolicy'],
+                   'count' => ['$sum' => 1]
             ]],
-            ['$group' => [
-                '_id' => ['policy' => '$sourcePolicy'],
-                'count' => ['$sum' => 1]
-            ]],
-            ['$match' => [
-                'count' => [ '$eq' => $connections]
+            [
+                '$match' => [
+                   'count' => [ '$eq' => $connections]
             ]],
         ];
 

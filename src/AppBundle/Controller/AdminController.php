@@ -489,8 +489,9 @@ class AdminController extends BaseController
         }
 
         $policyRepo->setExcludedPolicyIds($excludedPolicyIds);
-        $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
         $invitationRepo->setExcludedPolicyIds($excludedPolicyIds);
+        // Doesn't make sense to exclude as will skew all figures
+        // $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
 
         $data['newPolicies'] = $policyRepo->countAllActivePolicies($end, $start);
         $data['totalPolicies'] = $policyRepo->countAllActivePolicies();
