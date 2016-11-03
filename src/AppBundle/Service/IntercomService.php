@@ -214,8 +214,8 @@ class IntercomService
 
         // optout
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
-        $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
-            $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+        $optedOut = $emailOptOutRepo->isOptedOut($user->getEmail(), EmailOptOut::OPTOUT_CAT_AQUIRE) ||
+            $emailOptOutRepo->isOptedOut($user->getEmail(), EmailOptOut::OPTOUT_CAT_RETAIN);
         if ($optedOut) {
             $data['unsubscribed_from_emails'] = true;
         }
