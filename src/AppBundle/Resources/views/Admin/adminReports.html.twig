@@ -97,7 +97,10 @@
                             <td>{{ data.totalSCodePolicies }}</td>
                         </tr>
                         <tr>
-                            <td>Connections</td>
+                            <td>Connections
+        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
+                            </td>
                             <td>{{ new_connections }}
         <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
            title="Details" data-content="New connections made across all policies during period"></i>                            
