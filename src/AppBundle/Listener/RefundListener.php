@@ -31,8 +31,12 @@ class RefundListener
      * @param LoggerInterface $logger
      * @param string          $environment
      */
-    public function __construct(DocumentManager $dm, JudopayService $judopayService, LoggerInterface $logger, $environment)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        JudopayService $judopayService,
+        LoggerInterface $logger,
+        $environment
+    ) {
         $this->dm = $dm;
         $this->judopayService = $judopayService;
         $this->logger = $logger;
