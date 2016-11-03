@@ -12,6 +12,9 @@ class Cancel
     /** @var string */
     protected $cancellationReason;
 
+    /** @var boolean */
+    protected $skipNetworkEmail;
+
     public function getPolicy()
     {
         return $this->policy;
@@ -30,5 +33,15 @@ class Cancel
     public function setCancellationReason($cancellationReason)
     {
         $this->cancellationReason = $cancellationReason;
+    }
+
+    public function getSkipNetworkEmail()
+    {
+        return $this->skipNetworkEmail;
+    }
+
+    public function setSkipNetworkEmail($skipNetworkEmail)
+    {
+        $this->skipNetworkEmail = $skipNetworkEmail;
     }
 }

@@ -476,13 +476,15 @@ class PolicyService
         throw new \Exception(sprintf('Missing payment for policy %s', $policy->getId()));
     }
 
-    public function cancel(Policy $policy, $reason, \DateTime $date = null)
+    public function cancel(Policy $policy, $reason, $skipNetworkEmail = false, \DateTime $date = null)
     {
         $policy->cancel($reason, $date);
         $this->dm->flush();
 
         $this->cancelledPolicyEmail($policy);
-        $this->networkCancelledPolicyEmails($policy);
+        if (!$skipNetworkEmail) {
+            $this->networkCancelledPolicyEmails($policy);
+        }
 
         // Primarily used to allow tests to avoid triggering policy events
         if ($this->dispatcher) {

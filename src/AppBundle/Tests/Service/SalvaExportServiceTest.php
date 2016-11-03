@@ -366,7 +366,7 @@ class SalvaExportServiceTest extends WebTestCase
         static::$policyService->setDispatcher(null);
 
         // finally cancel policy
-        static::$policyService->cancel($policy, $reason, $date);
+        static::$policyService->cancel($policy, $reason, false, $date);
 
         // but as not using judopay, need to add a refund
         $refundAmount = $policy->getRefundAmount($date);
