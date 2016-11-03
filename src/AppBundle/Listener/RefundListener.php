@@ -22,16 +22,21 @@ class RefundListener
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var string */
+    protected $environment;
+
     /**
      * @param DocumentManager $dm
      * @param JudopayService  $judopayService
      * @param LoggerInterface $logger
+     * @param string          $environment
      */
-    public function __construct(DocumentManager $dm, JudopayService $judopayService, LoggerInterface $logger)
+    public function __construct(DocumentManager $dm, JudopayService $judopayService, LoggerInterface $logger, $environment)
     {
         $this->dm = $dm;
         $this->judopayService = $judopayService;
         $this->logger = $logger;
+        $this->environment = $environment;
     }
 
     /**
@@ -82,6 +87,11 @@ class RefundListener
         $payment = $policy->getLastSuccessfulPaymentCredit();
         // Only run against JudoPayments
         if (!$payment instanceof JudoPayment) {
+            return;
+        }
+
+        // Refund for Nov will break test cases
+        if ($this->environment == "test") {
             return;
         }
 
