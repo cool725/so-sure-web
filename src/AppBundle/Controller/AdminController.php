@@ -510,8 +510,9 @@ class AdminController extends BaseController
         $totalSCodePolicies = $policyRepo->findAllActivePolicies('scode');
         $data['totalSCodePolicies'] = $totalSCodePolicies->count();
 
-        $newConnections = $connectionRepo->count($start, $end);
-        $totalConnections = $connectionRepo->count();
+        // For reporting, connection numbers should be seen as a 2 way connection
+        $newConnections = $connectionRepo->count($start, $end) / 2;
+        $totalConnections = $connectionRepo->count() / 2;
 
         $data['newInvitations'] = $invitationRepo->count(null, $start, $end);
         $data['totalInvitations'] = $invitationRepo->count();
