@@ -1177,10 +1177,18 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policyData = $this->verifyResponse(200);
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
-        $this->assertEquals('launch', $policyData['promo_code']);
-        $this->assertEquals(6, $policyData['pot']['max_connections']);
+
+        $promoCode = 'launch';
+        $now = new \DateTime();
+        if ($now->format('Y-m') == '2016-11') {
+            $promoCode = 'free-nov';
+        }
+
+        $this->assertEquals($promoCode, $policyData['promo_code']);
+        $this->assertEquals(7, $policyData['pot']['max_connections']);
         // $this->assertEquals(83.88, $policyData['pot']['max_value']);
-        $this->assertEquals(84.24, $policyData['pot']['max_value']);
+        // 6.38 gwp * 1.1 = 7.018 * 12 = 84.24 * .8 = 67.39
+        $this->assertEquals(67.39, $policyData['pot']['max_value']);
         $highConnectionValue = 0;
         $lowConnectionValue = null;
         foreach ($policyData['pot']['connection_values'] as $connectionValue) {
@@ -1191,7 +1199,11 @@ class ApiAuthControllerTest extends BaseControllerTest
                 $lowConnectionValue = $connectionValue['value'];
             }
         }
-        $this->assertEquals(15, $highConnectionValue);
+        if ($promoCode == 'launch') {
+            $this->assertEquals(15, $highConnectionValue);
+        } else {
+            $this->assertEquals(10, $highConnectionValue);
+        }
         $this->assertEquals(2, $lowConnectionValue);
     }
 
