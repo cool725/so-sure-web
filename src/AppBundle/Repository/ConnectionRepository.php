@@ -97,11 +97,13 @@ class ConnectionRepository extends BaseDocumentRepository
                 '$group' => [
                    '_id' => ['policy' => '$sourcePolicy'],
                    'count' => ['$sum' => 1]
-            ]],
+                ]
+            ],
             [
                 '$match' => [
                    'count' => [ '$eq' => $connections]
-            ]],
+                ]
+            ],
         ];
 
         $data = $collection->aggregate($ops);
