@@ -87,6 +87,7 @@ class ConnectionRepository extends BaseDocumentRepository
         $ops = [
             ['$match' => [
                 'sourcePolicy.$id' => [ '$nin' => $this->excludedPolicyIds],
+                'linkedPolicy.$id' => [ '$nin' => $this->excludedPolicyIds],
                 'excludeReporting' => [ '$ne' => true]
             ]],
             ['$group' => [
