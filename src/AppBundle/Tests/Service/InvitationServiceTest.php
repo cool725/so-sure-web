@@ -1099,7 +1099,12 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-02-01'));
 
         // Now Cancel policy
-        self::$policyService->cancel($policyInvitee, Policy::CANCELLED_ACTUAL_FRAUD, false, new \DateTime('2016-04-03'));
+        self::$policyService->cancel(
+            $policyInvitee,
+            Policy::CANCELLED_ACTUAL_FRAUD,
+            false,
+            new \DateTime('2016-04-03')
+        );
 
         $userInvitee = static::createUser(
             static::$userManager,
