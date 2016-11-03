@@ -469,6 +469,7 @@ services:
             dm:      "@doctrine_mongodb.odm.default_document_manager"
             judopay: "@app.judopay"
             logger:  "@logger"
+            environment: "%kernel.environment%"
         tags:
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: refundFreeNovPromo }

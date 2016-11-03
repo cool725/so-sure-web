@@ -71,7 +71,7 @@ class RefundListenerTest extends WebTestCase
 
         $this->assertTrue($policy->isValidPolicy());
         
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger);
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
     }
 
@@ -93,7 +93,7 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
         $this->assertEquals(Policy::PROMO_FREE_NOV, $policy->getPromoCode());
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger);
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
         $listener->refundFreeNovPromo(new PolicyEvent($policy));
     }
 }
