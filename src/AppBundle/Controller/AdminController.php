@@ -555,7 +555,8 @@ class AdminController extends BaseController
             $data['totalSCodeInvitations'] / $data['totalSCodePolicies'] :
             'n/a';
 
-        $data['policyConnections'][0] = $data['totalPolicies'];
+        $totalPolicies = $data['totalPolicies'] + count($excludedPolicyIds);
+        $data['policyConnections'][0] = $totalPolicies;
         $data['policyConnections']['10+'] = 0;
         for ($i = 1; $i <= 30; $i++) {
             $data['policyConnections'][$i] = $connectionRepo->countByConnection($i, $start, $end);
@@ -564,13 +565,13 @@ class AdminController extends BaseController
                 $data['policyConnections']['10+'] += $data['policyConnections'][$i];
             }
         }
-        $data['totalAvgConnections'] = $totalConnections / $data['totalPolicies'];
+        $data['totalAvgConnections'] = $totalConnections / $totalPolicies;
 
         $weighted = 0;
         for ($i = 0; $i < 10; $i++) {
             $weighted += $i * $data['policyConnections'][$i];
         }
-        $data['totalWeightedAvgConnections'] = $weighted / $data['totalPolicies'];
+        $data['totalWeightedAvgConnections'] = $weighted / $totalPolicies;
 
         return [
             'start' => $start,
