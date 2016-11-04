@@ -808,6 +808,11 @@ abstract class Policy
         }
     }
 
+    public function getTotalPremiumPrice()
+    {
+        return $this->getPremiumInstallmentCount() * $this->getPremiumInstallmentPrice();
+    }
+
     public function getPremiumPlan()
     {
         if ($this->getPremiumInstallments() == 1) {
@@ -1637,5 +1642,17 @@ abstract class Policy
             'premium_plan' => $this->getPremiumPlan(),
             'scodes' => $this->eachApiArray($this->getActiveSCodes()),
         ];
+    }
+
+    public static function sumTotalPremiumPrice($policies, $prefix = null)
+    {
+        $total = 0;
+        foreach ($policies as $policy) {
+            if ($policy->isValidPolicy($prefix)) {
+                $total += $policy->getTotalPremiumPrice();
+            }
+        }
+
+        return $total;
     }
 }

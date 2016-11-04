@@ -96,6 +96,36 @@
                             <td>{{ data.newSCodePolicies }}</td>
                             <td>{{ data.totalSCodePolicies }}</td>
                         </tr>
+
+                        <tr>
+                            <td>Avg Yearly Premium</td>
+                            <td>{% if data.newPoliciesAvgPremium is defined %}<span title="£{{ data.newPoliciesPremium }} total">£{{ data.newPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                            <td>{% if data.totalPoliciesAvgPremium is defined %}<span title="£{{ data.totalPoliciesPremium }} total">£{{ data.totalPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 30px">Avg Yearly Premium (Direct)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{% if data.newDirectPoliciesAvgPremium is defined %}<span title="£{{ data.newDirectPoliciesPremium }} total">£{{ data.newDirectPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                            <td>{% if data.totalDirectPoliciesAvgPremium is defined %}<span title="£{{ data.totalDirectPoliciesPremium }} total">£{{ data.totalDirectPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 30px">Avg Yearly Premium (Invitation)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{% if data.newInvitationPoliciesAvgPremium is defined %}<span title="£{{ data.newInvitationPolicies }} total">£{{ data.newInvitationPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                            <td>{% if data.totalInvitationPoliciesAvgPremium is defined %}<span title="£{{ data.totalInvitationPolicies }} total">£{{ data.totalInvitationPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                        </tr>
+                            <td style="padding-left: 30px">Avg Yearly Premium (SCode)
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+                            </td>
+                            <td>{% if data.newSCodePoliciesAvgPremium is defined %}<span title="£{{ data.newSCodePoliciesPremium }} total">£{{ data.newSCodePoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                            <td>{% if data.totalSCodePoliciesAvgPremium is defined %}<span title="£{{ data.totalSCodePoliciesPremium }} total">£{{ data.totalSCodePoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                        </tr>
+
                         <tr>
                             <td>Connection Links
         <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
