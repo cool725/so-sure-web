@@ -499,52 +499,66 @@ class AdminController extends BaseController
         $data['newDirectPolicies'] = $newDirectPolicies->count();
         $data['newDirectPoliciesPremium'] = Policy::sumTotalPremiumPrice($newDirectPolicies);
         if ($data['newDirectPolicies'] != 0) {
-            $data['newDirectPoliciesAvgPremium'] = $this->toTwoDp($data['newDirectPoliciesPremium'] / $data['newDirectPolicies']);
+            $data['newDirectPoliciesAvgPremium'] = $this->toTwoDp(
+                $data['newDirectPoliciesPremium'] / $data['newDirectPolicies']
+            );
         }
 
         $totalDirectPolicies = $policyRepo->findAllActivePolicies(null);
         $data['totalDirectPolicies'] = $totalDirectPolicies->count();
         $data['totalDirectPoliciesPremium'] = Policy::sumTotalPremiumPrice($totalDirectPolicies);
         if ($data['totalDirectPolicies'] != 0) {
-            $data['totalDirectPoliciesAvgPremium'] = $this->toTwoDp($data['totalDirectPoliciesPremium'] / $data['totalDirectPolicies']);
+            $data['totalDirectPoliciesAvgPremium'] = $this->toTwoDp(
+                $data['totalDirectPoliciesPremium'] / $data['totalDirectPolicies']
+            );
         }
 
         $newInvitationPolicies = $policyRepo->findAllActivePolicies('invitation', $start, $end);
         $data['newInvitationPolicies'] = $newInvitationPolicies->count();
         $data['newInvitationPoliciesPremium'] = Policy::sumTotalPremiumPrice($newInvitationPolicies);
         if ($data['newInvitationPolicies'] != 0) {
-            $data['newInvitationPoliciesAvgPremium'] = $this->toTwoDp($data['newInvitationPoliciesPremium'] / $data['newInvitationPolicies']);
+            $data['newInvitationPoliciesAvgPremium'] = $this->toTwoDp(
+                $data['newInvitationPoliciesPremium'] / $data['newInvitationPolicies']
+            );
         }
 
         $totalInvitationPolicies = $policyRepo->findAllActivePolicies('invitation');
         $data['totalInvitationPolicies'] = $totalInvitationPolicies->count();
         $data['totalInvitationPoliciesPremium'] = Policy::sumTotalPremiumPrice($totalInvitationPolicies);
         if ($data['totalInvitationPolicies'] != 0) {
-            $data['totalInvitationPoliciesAvgPremium'] = $this->toTwoDp($data['totalInvitationPoliciesPremium'] / $data['totalInvitationPolicies']);
+            $data['totalInvitationPoliciesAvgPremium'] = $this->toTwoDp(
+                $data['totalInvitationPoliciesPremium'] / $data['totalInvitationPolicies']
+            );
         }
 
         $newSCodePolicies = $policyRepo->findAllActivePolicies('scode', $start, $end);
         $data['newSCodePolicies'] = $newSCodePolicies->count();
         $data['newSCodePoliciesPremium'] = Policy::sumTotalPremiumPrice($newSCodePolicies);
         if ($data['newSCodePolicies'] != 0) {
-            $data['newSCodePoliciesAvgPremium'] = $this->toTwoDp($data['newSCodePoliciesPremium'] / $data['newSCodePolicies']);
+            $data['newSCodePoliciesAvgPremium'] = $this->toTwoDp(
+                $data['newSCodePoliciesPremium'] / $data['newSCodePolicies']
+            );
         }
 
         $totalSCodePolicies = $policyRepo->findAllActivePolicies('scode');
         $data['totalSCodePolicies'] = $totalSCodePolicies->count();
         $data['totalSCodePoliciesPremium'] = Policy::sumTotalPremiumPrice($totalInvitationPolicies);
         if ($data['totalSCodePolicies'] != 0) {
-            $data['totalSCodePoliciesAvgPremium'] = $this->toTwoDp($data['totalSCodePoliciesPremium'] / $data['totalSCodePolicies']);
+            $data['totalSCodePoliciesAvgPremium'] = $this->toTwoDp(
+                $data['totalSCodePoliciesPremium'] / $data['totalSCodePolicies']
+            );
         }
 
         $data['newPolicies'] = $policyRepo->countAllActivePolicies($end, $start);
-        $data['newPoliciesPremium'] = $data['newDirectPoliciesPremium'] + $data['newInvitationPoliciesPremium'] + $data['newSCodePoliciesPremium'];
+        $data['newPoliciesPremium'] = $data['newDirectPoliciesPremium'] + $data['newInvitationPoliciesPremium'] +
+            $data['newSCodePoliciesPremium'];
         if ($data['newPolicies'] != 0) {
             $data['newPoliciesAvgPremium'] = $this->toTwoDp($data['newPoliciesPremium'] / $data['newPolicies']);
         }
 
         $data['totalPolicies'] = $policyRepo->countAllActivePolicies();
-        $data['totalPoliciesPremium'] = $data['totalDirectPoliciesPremium'] + $data['totalInvitationPoliciesPremium'] + $data['totalSCodePoliciesPremium'];
+        $data['totalPoliciesPremium'] = $data['totalDirectPoliciesPremium'] + $data['totalInvitationPoliciesPremium'] +
+            $data['totalSCodePoliciesPremium'];
         if ($data['totalPolicies'] != 0) {
             $data['totalPoliciesAvgPremium'] = $this->toTwoDp($data['totalPoliciesPremium'] / $data['totalPolicies']);
         }
