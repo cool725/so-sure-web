@@ -993,8 +993,8 @@ class AdminController extends BaseController
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_accounts_date', [
-                        'year' => $yearMonthForm->get('year')->getData(),
-                        'month' => $yearMonthForm->get('month')->getData()
+                        'year' => $date->format('Y'),
+                        'month' => $date->format('m'),
                     ]);
                 }
             }
