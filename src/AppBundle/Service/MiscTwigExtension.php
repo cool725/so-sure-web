@@ -3,9 +3,12 @@ namespace AppBundle\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
+use AppBundle\Document\CurrencyTrait;
 
 class MiscTwigExtension extends \Twig_Extension
 {
+    use CurrencyTrait;
+
     /** @var RequestStack */
     protected $requestStack;
 
@@ -28,6 +31,13 @@ class MiscTwigExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFilter('json_decode', [$this, 'jsonDecode']),
+        );
+    }
+
+    public function getFunctions()
+    {
+        return array(
+            new \Twig_SimpleFunction('equal_to_two_dp', [$this, 'areEqualToTwoDp']),
         );
     }
 
