@@ -386,7 +386,7 @@ abstract class Payment
             if (!isset($data[$day])) {
                 $data[$day] = 0;
             }
-            $data[$day] += $payment->getAmount();
+            $data[$day] += CurrencyTrait::staticToTwoDp($payment->getAmount());
         }
 
         return $data;
