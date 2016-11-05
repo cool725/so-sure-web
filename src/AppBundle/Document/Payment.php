@@ -382,7 +382,8 @@ abstract class Payment
                 throw new \Exception('Payment list contains multiple months');
             }
 
-            $day = $payment->getDate()->format('d');
+            $day = (int) $payment->getDate()->format('d');
+
             if (!isset($data[$day])) {
                 $data[$day] = 0;
             }
