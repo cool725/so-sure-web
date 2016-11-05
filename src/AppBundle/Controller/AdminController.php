@@ -978,7 +978,7 @@ class AdminController extends BaseController
         );
     }
 
-    private function getAllPaymentTotals($date)
+    private function getAllPaymentTotals(\DateTime $date)
     {
         $isProd = $this->getParameter('kernel.environment') == 'prod';
         $payments = $this->getPayments($date);
@@ -990,7 +990,7 @@ class AdminController extends BaseController
         ];
     }
 
-    private function getPayments($date)
+    private function getPayments(\DateTime $date)
     {
         $dm = $this->getManager();
         $paymentRepo = $dm->getRepository(Payment::class);
