@@ -955,7 +955,7 @@ class AdminController extends BaseController
      */
     public function adminAccountsPrintAction($year, $month)
     {
-        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-0%d-01', $year, $month));
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
 
         $templating = $this->get('templating');
         $snappyPdf = $this->get('knp_snappy.pdf');
@@ -978,7 +978,7 @@ class AdminController extends BaseController
         );
     }
 
-    private function getAllPaymentTotals($date)
+    private function getAllPaymentTotals(\DateTime $date)
     {
         $isProd = $this->getParameter('kernel.environment') == 'prod';
         $payments = $this->getPayments($date);
@@ -990,7 +990,7 @@ class AdminController extends BaseController
         ];
     }
 
-    private function getPayments($date)
+    private function getPayments(\DateTime $date)
     {
         $dm = $this->getManager();
         $paymentRepo = $dm->getRepository(Payment::class);
