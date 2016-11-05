@@ -955,7 +955,7 @@ class AdminController extends BaseController
      */
     public function adminAccountsPrintAction($year, $month)
     {
-        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-0%d-01', $year, $month));
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
 
         $templating = $this->get('templating');
         $snappyPdf = $this->get('knp_snappy.pdf');
