@@ -87,6 +87,13 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         } else {
             $policies = $policyRepo->findAll();
             foreach ($policies as $policy) {
+                if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
+                    continue;
+                }
+                // TODO: Run financials for cancelled policies as well
+                if ($policy->isCancelled()) {
+                    continue;
+                }
                 if ($policy->isPolicyPaidToDate($prefix, $validateDate) === false) {
                     $output->writeln(sprintf(
                         'Policy %s is not paid to date',
