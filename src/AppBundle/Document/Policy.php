@@ -1608,6 +1608,62 @@ abstract class Policy
         return $connectionValues;
     }
 
+    public function getTotalSuccessfulPayments($prefix = null, \Datetime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $totalPaid = 0;
+        foreach ($this->getSuccessfulPayments() as $payment) {
+            if ($payment->getDate() <= $date) {
+                $totalPaid += $payment->getAmount();
+            }
+        }
+
+        return $totalPaid;
+    }
+
+    public function getTotalExpectedPaidToDate($prefix = null, \Datetime $date = null)
+    {
+        if (!$this->isValidPolicy($prefix)) {
+            return null;
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $expectedPaid = 0;
+        if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+            $expectedPaid = $this->getPremiumInstallmentPrice();
+        } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+            $diff = $date->diff($this->getStart());
+            $months = $diff->m;
+            if ($diff->d > 0 || $diff->h > 0 || $diff-n > 0) {
+                $months++;
+            }
+            $expectedPaid = $this->getPremiumInstallmentPrice() * $months;
+        } else {
+            throw new \Exception('Unknown premium plan');
+        }
+
+        return $expectedPaid;
+    }
+
+    public function isPolicyPaidToDate($prefix = null, \Datetime $date = null)
+    {
+        $totalPaid = $this->getTotalSuccessfulPayments($prefix, $date);
+        $expectedPaid = $this->getTotalExpectedPaidToDate($prefix, $date);
+
+        return $expectedPaid == $totalPaid;
+    }
+
+    public function isPotValueCorrect()
+    {
+        return $this->getPotValue() == $this->calculatePotValue() &&
+            $this->getPromoPotValue() == $this->calculatePotValue(true);
+    }
+
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms()) {
