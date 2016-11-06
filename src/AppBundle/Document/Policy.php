@@ -1440,7 +1440,7 @@ abstract class Policy
         return $prefix;
     }
 
-    public function hasPolicyPrefix($prefix)
+    public function hasPolicyPrefix($prefix = null)
     {
         if (!$prefix) {
             $prefix = $this->getPolicyNumberPrefix();
@@ -1655,7 +1655,7 @@ abstract class Policy
         $totalPaid = $this->getTotalSuccessfulPayments($date);
         $expectedPaid = $this->getTotalExpectedPaidToDate($prefix, $date);
 
-        return $expectedPaid == $totalPaid;
+        return $this->areEqualToTwoDp($expectedPaid, $totalPaid);
     }
 
     public function isPotValueCorrect()
