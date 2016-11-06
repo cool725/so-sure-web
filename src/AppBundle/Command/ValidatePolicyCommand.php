@@ -105,7 +105,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
     private function failurePaymentMessage($policy, $prefix, $date)
     {
-        $totalPaid = $policy->getTotalSuccessfulPayments($prefix, $date);
+        $totalPaid = $policy->getTotalSuccessfulPayments($date);
         $expectedPaid = $policy->getTotalExpectedPaidToDate($prefix, $date);
         return sprintf(
             'Policy %s Paid £%0.2f Expected £%0.2f',
