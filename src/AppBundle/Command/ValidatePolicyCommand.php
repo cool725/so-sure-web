@@ -88,7 +88,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $policies = $policyRepo->findAll();
             foreach ($policies as $policy) {
                 if ($policy->isPolicyPaidToDate($prefix, $validateDate) === false) {
-                    $output->writeln(sprintf('Policy %s is not paid to date', $policy->getPolicyNumber()));
+                    $output->writeln(sprintf(
+                        'Policy %s is not paid to date',
+                        $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId()
+                    ));
                     $output->writeln($this->failurePaymentMessage($policy, $prefix, $validateDate));
                 }
                 if ($policy->isPotValueCorrect() === false) {
@@ -106,7 +109,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $expectedPaid = $policy->getTotalExpectedPaidToDate($prefix, $date);
         return sprintf(
             'Policy %s Paid £%0.2f Expected £%0.2f',
-            $policy->getPolicyNumber(),
+            $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
             $totalPaid,
             $expectedPaid
         );

@@ -1605,10 +1605,6 @@ abstract class Policy
 
     public function getTotalSuccessfulPayments($prefix = null, \Datetime $date = null)
     {
-        if (!$this->isValidPolicy($prefix)) {
-            return null;
-        }
-
         if (!$date) {
             $date = new \DateTime();
         }
