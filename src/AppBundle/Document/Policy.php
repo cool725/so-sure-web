@@ -1657,6 +1657,12 @@ abstract class Policy
         return $expectedPaid == $totalPaid;
     }
 
+    public function isPotValueCorrect()
+    {
+        return $this->getPotValue() == $this->calculatePotValue() &&
+            $this->getPromoPotValue() == $this->calculatePotValue(true);
+    }
+
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms()) {
