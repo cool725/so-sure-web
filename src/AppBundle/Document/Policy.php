@@ -1603,7 +1603,7 @@ abstract class Policy
         return $connectionValues;
     }
 
-    public function getTotalSuccessfulPayments($prefix = null, \Datetime $date = null)
+    public function getTotalSuccessfulPayments(\Datetime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -1647,7 +1647,7 @@ abstract class Policy
 
     public function isPolicyPaidToDate($prefix = null, \Datetime $date = null)
     {
-        $totalPaid = $this->getTotalSuccessfulPayments($prefix, $date);
+        $totalPaid = $this->getTotalSuccessfulPayments($date);
         $expectedPaid = $this->getTotalExpectedPaidToDate($prefix, $date);
 
         return $expectedPaid == $totalPaid;
