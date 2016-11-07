@@ -91,7 +91,7 @@ class DigitsService
             strlen($data['access_token']['token']) < 10) {
             throw new \Exception(sprintf('Access token is not set %s', json_encode($data)));
         }
-        if (!in_array($verificationType, ['sms', 'voicecall']) {
+        if (!in_array($verificationType, ['sms', 'voicecall'])) {
             throw new \Exception(sprintf('Unknown digits verification type %s', $verificationType));
         }
         // TODO: Store digits id against user record??
