@@ -97,7 +97,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
 
             $valid = $policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate);
-            $lines[] = sprintf('Policy %s %s correct scheduled payments', $policyNumber, $valid ? 'has' : 'does NOT have');
+            $lines[] = sprintf(
+                'Policy %s %s correct scheduled payments',
+                $policyNumber,
+                $valid ? 'has' : 'does NOT have'
+            );
             if (!$valid) {
                 $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
             }
