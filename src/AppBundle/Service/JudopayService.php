@@ -141,10 +141,38 @@ class JudopayService
             return true;
         }
 
-        // Mark policy as pending for monitoring purposes
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
-        $this->dm->flush();
+        if (!$policy->getStatus() || $policy->getStatus() == PhonePolicy::STATUS_PENDING) {
+            // New policy
 
+            // Mark policy as pending for monitoring purposes
+            $policy->setStatus(PhonePolicy::STATUS_PENDING);
+            $this->dm->flush();
+
+            $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $deviceDna, $date);
+
+            $this->policyService->create($policy, $date);
+            $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+            $this->dm->flush();
+        } else {
+            // Existing policy - add payment + prevent duplicate billing
+            $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $deviceDna, $date);
+            $this->policyService->adjustScheduledPayments($policy);
+            $this->dm->flush();
+        }
+
+        $this->statsd->endTiming("judopay.add");
+
+        return true;
+    }
+
+    protected function createPayment(
+        Policy $policy,
+        $receiptId,
+        $consumerToken,
+        $cardToken,
+        $deviceDna = null,
+        \DateTime $date = null
+    ) {
         $user = $policy->getUser();
 
         $judo = new JudoPaymentMethod();
@@ -159,14 +187,7 @@ class JudopayService
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $date);
 
-        $this->validateUser($policy->getUser());
-        $this->policyService->create($policy, $date);
-        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-        $this->dm->flush();
-
-        $this->statsd->endTiming("judopay.add");
-
-        return true;
+        $this->validateUser($user);
     }
 
     public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)

@@ -144,6 +144,11 @@ class ScheduledPayment
         return $this->policy;
     }
 
+    public function cancel()
+    {
+        $this->setStatus(self::STATUS_CANCELLED);
+    }
+
     public function reschedule($date = null)
     {
         if (!$date) {
@@ -177,5 +182,17 @@ class ScheduledPayment
         }
 
         return $this->getScheduled() <= $date;
+    }
+
+    public static function sumScheduledPaymentAmounts($scheduledPayments, $prefix = null)
+    {
+        $total = 0;
+        foreach ($scheduledPayments as $scheduledPayment) {
+            if ($scheduledPayment->isBillable($prefix)) {
+                $total += $scheduledPayment->getAmount();
+            }
+        }
+
+        return $total;
     }
 }

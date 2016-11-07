@@ -10,6 +10,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
 use AppBundle\Document\SCode;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -408,6 +409,71 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(1.21, $policy->getTotalIpt());
         // 0.89 / month rough - 10.72 * 61/366 = 1.78
         $this->assertEquals(1.79, $policy->getTotalBrokerFee());
+    }
+
+    public function testAdjustScheduledPaymentsOk()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testAdjustScheduledPayments', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-10-01'));
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        //static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice(), Salva::MONTHLY_TOTAL_COMMISSION);
+
+        // Initial payment applied - nothing to adjust
+        $this->assertNull(self::$policyService->adjustScheduledPayments($policy));
+        $this->assertEquals(0, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
+    }
+
+    public function testAdjustScheduledPaymentsAdditionalPayment()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testAdjustScheduledPaymentsAdditionalPayment', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-10-01'));
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        // additional payment should require an adjustment a scheduledpayment cancellation
+        static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice(), Salva::MONTHLY_TOTAL_COMMISSION);
+
+        // 1 scheduled payment should be cancelled to offset the additional payment received
+        $this->assertTrue(self::$policyService->adjustScheduledPayments($policy));
+        $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
+    }
+
+    public function testUnableToAdjustScheduledPayments()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testUnableToAdjustScheduledPayments', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-10-01'));
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        // additional payment with a 1p diff should result in unable to find a scheduled payment to cancel
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice()  + 0.01,
+            Salva::MONTHLY_TOTAL_COMMISSION
+        );
+
+        $this->assertFalse(self::$policyService->adjustScheduledPayments($policy));
+        $this->assertEquals(0, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
     }
 
     public function testSalvaCooloff()

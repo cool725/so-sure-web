@@ -303,6 +303,14 @@ abstract class Policy
     {
         $payment->setPolicy($this);
         $payment->calculateSplit();
+
+        // For some reason, payment was being added twice for ::testNewPolicyJudopayUnpaidRepayOk
+        // perhaps an issue with cascade persist
+        // seems to have no ill effects and resolves the issue
+        if ($this->payments->contains($payment)) {
+            throw new \Exception('duplicate payment');
+        }
+
         $this->payments->add($payment);
     }
 
@@ -604,6 +612,18 @@ abstract class Policy
         }
 
         return $next;
+    }
+
+    public function getAllScheduledPayments($status)
+    {
+        $scheduledPayments = [];
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == $status) {
+                $scheduledPayments[] = $scheduledPayment;
+            }
+        }
+
+        return $scheduledPayments;
     }
 
     public function getLastEmailed()
@@ -1656,6 +1676,17 @@ abstract class Policy
         $expectedPaid = $this->getTotalExpectedPaidToDate($prefix, $date);
 
         return $this->areEqualToTwoDp($expectedPaid, $totalPaid);
+    }
+
+    public function arePolicyScheduledPaymentsCorrect($prefix = null, \Datetime $date = null)
+    {
+        $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
+        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
+
+        $outstanding = $this->getTotalPremiumPrice() - $this->getTotalSuccessfulPayments($date);
+        //print sprintf("%f ?= %f\n", $outstanding, $totalScheduledPayments);
+
+        return $this->areEqualToTwoDp($outstanding, $totalScheduledPayments);
     }
 
     public function isPotValueCorrect()
