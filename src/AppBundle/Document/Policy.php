@@ -1659,7 +1659,7 @@ abstract class Policy
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
             $diff = $date->diff($this->getStart());
             $months = $diff->m;
-            if ($diff->d > 0 || $diff->h > 0 || $diff-n > 0) {
+            if ($diff->d > 0 || $diff->h > 0 || $diff->i > 0 || $diff->s > 0) {
                 $months++;
             }
             $expectedPaid = $this->getPremiumInstallmentPrice() * $months;
@@ -1670,12 +1670,17 @@ abstract class Policy
         return $expectedPaid;
     }
 
-    public function isPolicyPaidToDate($prefix = null, \Datetime $date = null)
+    public function isPolicyPaidToDate($exact = true, $prefix = null, \Datetime $date = null)
     {
         $totalPaid = $this->getTotalSuccessfulPayments($date);
         $expectedPaid = $this->getTotalExpectedPaidToDate($prefix, $date);
 
-        return $this->areEqualToTwoDp($expectedPaid, $totalPaid);
+        if ($exact) {
+            return $this->areEqualToTwoDp($expectedPaid, $totalPaid);
+        } else {
+            // >= doesn't quite allow for minor float differences
+            return $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
+        }
     }
 
     public function arePolicyScheduledPaymentsCorrect($prefix = null, \Datetime $date = null)

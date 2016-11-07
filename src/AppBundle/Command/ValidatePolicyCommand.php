@@ -72,7 +72,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
-            $valid = $policy->isPolicyPaidToDate($prefix, $validateDate);
+            $valid = $policy->isPolicyPaidToDate(true, $prefix, $validateDate);
             $lines[] = sprintf('Policy %s %s paid to date', $policyNumber, $valid ? 'is' : 'is NOT');
             if (!$valid) {
                 $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
@@ -102,7 +102,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($policy->isCancelled()) {
                     continue;
                 }
-                if ($policy->isPolicyPaidToDate($prefix, $validateDate) === false) {
+                if ($policy->isPolicyPaidToDate(true, $prefix, $validateDate) === false) {
                     $lines[] = sprintf(
                         'Policy %s is not paid to date',
                         $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId()

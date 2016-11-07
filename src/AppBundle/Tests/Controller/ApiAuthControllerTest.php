@@ -1466,14 +1466,14 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => $receiptId,
         ]]);
         $policyData = $this->verifyResponse(200);
-        //$this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $repo->find($policyData['id']);
         $this->assertEquals(11, count($policy->getScheduledPayments()));
-        //$this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertEquals(7.02 * 2, $policy->getTotalSuccessfulPayments());
 
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
