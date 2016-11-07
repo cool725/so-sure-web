@@ -42,15 +42,23 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'If policy number is present, update pot value if required'
             )
+            ->addOption(
+                'skip-email',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not send email report if present'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $lines = [];
         $date = $input->getOption('date');
         $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
         $updatePotValue = $input->getOption('update-pot-value');
+        $skipEmail = $input->getOption('skip-email');
         $validateDate = null;
         if ($date) {
             $validateDate = new \DateTime($date);
@@ -65,23 +73,23 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
             $valid = $policy->isPolicyPaidToDate($prefix, $validateDate);
-            $output->writeln(sprintf('Policy %s %s paid to date', $policyNumber, $valid ? 'is' : 'is NOT'));
+            $lines[] = sprintf('Policy %s %s paid to date', $policyNumber, $valid ? 'is' : 'is NOT');
             if (!$valid) {
-                $output->writeln($this->failureMessage($policy, $prefix, $validateDate));
+                $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
             }
             $valid = $policy->isPotValueCorrect();
-            $output->writeln(sprintf(
+            $lines[] = sprintf(
                 'Policy %s %s the correct pot value',
                 $policyNumber,
                 $valid ? 'has' : 'does NOT have'
-            ));
+            );
             if (!$valid) {
-                $output->writeln($this->failurePotValueMessage($policy));
+                $lines[] = $this->failurePotValueMessage($policy);
                 if ($updatePotValue) {
                     $policy->updatePotValue();
                     $dm->flush();
-                    $output->writeln('Updated pot value');
-                    $output->writeln($this->failurePotValueMessage($policy));
+                    $lines[] = 'Updated pot value';
+                    $lines[] = $this->failurePotValueMessage($policy);
                 }
             }
         } else {
@@ -95,18 +103,25 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     continue;
                 }
                 if ($policy->isPolicyPaidToDate($prefix, $validateDate) === false) {
-                    $output->writeln(sprintf(
+                    $lines[] = sprintf(
                         'Policy %s is not paid to date',
                         $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId()
-                    ));
-                    $output->writeln($this->failurePaymentMessage($policy, $prefix, $validateDate));
+                    );
+                    $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
                 }
                 if ($policy->isPotValueCorrect() === false) {
-                    $output->writeln(sprintf('Policy %s has incorrect pot value', $policy->getPolicyNumber()));
-                    $output->writeln($this->failurePotValueMessage($policy));
+                    $lines[] = sprintf('Policy %s has incorrect pot value', $policy->getPolicyNumber());
+                    $lines[] = $this->failurePotValueMessage($policy);
                 }
             }
         }
+
+        if (!$skipEmail) {
+            $mailer = $this->getContainer()->get('app.mailer');
+            $mailer->send('Policy Validation', 'tech@so-sure.com', implode('<br />', $lines));
+        }
+
+        $output->writeln(implode(PHP_EOL, $lines));
         $output->writeln('Finished');
     }
 
