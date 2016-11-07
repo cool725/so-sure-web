@@ -10,6 +10,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SCode;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -1442,7 +1443,11 @@ class ApiAuthControllerTest extends BaseControllerTest
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $repo->find($policyData['id']);
+        //\Doctrine\Common\Util\Debug::dump($policy->getSuccessfulPayments());
         $this->assertEquals(11, count($policy->getScheduledPayments()));
+        $this->assertEquals(7.02, $policy->getTotalSuccessfulPayments());
+
+        // Now assume an unpaid payment
         $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
         $dm->flush();
 
@@ -1469,9 +1474,14 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policy = $repo->find($policyData['id']);
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertEquals(7.02 * 2, $policy->getTotalSuccessfulPayments());
 
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
         $this->assertEquals('monthly', $policyData['premium_plan']);
+        $environment = self::$client->getContainer()->getParameter('kernel.environment');
+        $prefix = $policy->getPolicyPrefix($environment);
+        $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect($prefix));
+        $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
     }
 
     // policy/{id}/terms

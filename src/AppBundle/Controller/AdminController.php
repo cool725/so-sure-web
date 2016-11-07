@@ -497,7 +497,7 @@ class AdminController extends BaseController
 
         $newDirectPolicies = $policyRepo->findAllActivePolicies(null, $start, $end);
         $data['newDirectPolicies'] = $newDirectPolicies->count();
-        $data['newDirectPoliciesPremium'] = Policy::sumTotalPremiumPrice($newDirectPolicies);
+        $data['newDirectPoliciesPremium'] = Policy::sumYearlyPremiumPrice($newDirectPolicies);
         if ($data['newDirectPolicies'] != 0) {
             $data['newDirectPoliciesAvgPremium'] = $this->toTwoDp(
                 $data['newDirectPoliciesPremium'] / $data['newDirectPolicies']
@@ -506,7 +506,7 @@ class AdminController extends BaseController
 
         $totalDirectPolicies = $policyRepo->findAllActivePolicies(null);
         $data['totalDirectPolicies'] = $totalDirectPolicies->count();
-        $data['totalDirectPoliciesPremium'] = Policy::sumTotalPremiumPrice($totalDirectPolicies);
+        $data['totalDirectPoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalDirectPolicies);
         if ($data['totalDirectPolicies'] != 0) {
             $data['totalDirectPoliciesAvgPremium'] = $this->toTwoDp(
                 $data['totalDirectPoliciesPremium'] / $data['totalDirectPolicies']
@@ -515,7 +515,7 @@ class AdminController extends BaseController
 
         $newInvitationPolicies = $policyRepo->findAllActivePolicies('invitation', $start, $end);
         $data['newInvitationPolicies'] = $newInvitationPolicies->count();
-        $data['newInvitationPoliciesPremium'] = Policy::sumTotalPremiumPrice($newInvitationPolicies);
+        $data['newInvitationPoliciesPremium'] = Policy::sumYearlyPremiumPrice($newInvitationPolicies);
         if ($data['newInvitationPolicies'] != 0) {
             $data['newInvitationPoliciesAvgPremium'] = $this->toTwoDp(
                 $data['newInvitationPoliciesPremium'] / $data['newInvitationPolicies']
@@ -524,7 +524,7 @@ class AdminController extends BaseController
 
         $totalInvitationPolicies = $policyRepo->findAllActivePolicies('invitation');
         $data['totalInvitationPolicies'] = $totalInvitationPolicies->count();
-        $data['totalInvitationPoliciesPremium'] = Policy::sumTotalPremiumPrice($totalInvitationPolicies);
+        $data['totalInvitationPoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalInvitationPolicies);
         if ($data['totalInvitationPolicies'] != 0) {
             $data['totalInvitationPoliciesAvgPremium'] = $this->toTwoDp(
                 $data['totalInvitationPoliciesPremium'] / $data['totalInvitationPolicies']
@@ -533,7 +533,7 @@ class AdminController extends BaseController
 
         $newSCodePolicies = $policyRepo->findAllActivePolicies('scode', $start, $end);
         $data['newSCodePolicies'] = $newSCodePolicies->count();
-        $data['newSCodePoliciesPremium'] = Policy::sumTotalPremiumPrice($newSCodePolicies);
+        $data['newSCodePoliciesPremium'] = Policy::sumYearlyPremiumPrice($newSCodePolicies);
         if ($data['newSCodePolicies'] != 0) {
             $data['newSCodePoliciesAvgPremium'] = $this->toTwoDp(
                 $data['newSCodePoliciesPremium'] / $data['newSCodePolicies']
@@ -542,7 +542,7 @@ class AdminController extends BaseController
 
         $totalSCodePolicies = $policyRepo->findAllActivePolicies('scode');
         $data['totalSCodePolicies'] = $totalSCodePolicies->count();
-        $data['totalSCodePoliciesPremium'] = Policy::sumTotalPremiumPrice($totalInvitationPolicies);
+        $data['totalSCodePoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalInvitationPolicies);
         if ($data['totalSCodePolicies'] != 0) {
             $data['totalSCodePoliciesAvgPremium'] = $this->toTwoDp(
                 $data['totalSCodePoliciesPremium'] / $data['totalSCodePolicies']

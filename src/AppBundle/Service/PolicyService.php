@@ -424,6 +424,57 @@ class PolicyService
         ));
     }
 
+    public function adjustScheduledPayments(Policy $policy, \DateTime $date = null)
+    {
+        $log = [];
+        $prefix = $policy->getPolicyPrefix($this->environment);
+        if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
+            return null;
+        }
+
+        // Flush the manager, so we only will have the scheduled payments in the changeset in case we need to clear it
+        $this->dm->flush();
+        $scheduledPayments = [];
+        // Try cancellating scheduled payments until amount matches
+        while (!$policy->arePolicyScheduledPaymentsCorrect($prefix, $date) &&
+                ($scheduledPayment = $policy->getNextScheduledPayment()) !== null) {
+            $scheduledPayments[] = $scheduledPayment;
+            $scheduledPayment->cancel();
+            $log[] = sprintf(
+                'For Policy %s, cancelled scheduled payment %s on %s for £%0.2f',
+                $policy->getPolicyNumber(),
+                $scheduledPayment->getId(),
+                $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
+                $scheduledPayment->getAmount()
+            );
+        }
+
+        if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
+            $this->dm->flush();
+            $this->logger->warning(implode(PHP_EOL, $log));
+
+            return true;
+        } else {
+            // Amount doesn't match - don't cancel scheduled payments
+
+            // Merge entity doesn't seem to be resetting the count of scheduled payments,
+            // so undue the cancelled
+            foreach ($scheduledPayments as $scheduledPayment) {
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            }
+            // Avoid persisting any changes (shouldn't be as we just reset the cancellation)
+            $this->dm->clear();
+            // Reload object from db
+            $policy = $this->dm->merge($policy);
+            $this->logger->error(sprintf(
+                'For Policy %s, unable to adjust scheduled payments to meet expected payment amount',
+                $policy->getPolicyNumber()
+            ));
+
+            return false;
+        }
+    }
+
     public function generateScheduledPayments(Policy $policy, \DateTime $date = null)
     {
         if (!$date) {

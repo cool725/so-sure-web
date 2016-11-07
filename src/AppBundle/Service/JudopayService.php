@@ -44,6 +44,9 @@ class JudopayService
 
     protected $statsd;
 
+    /** @var string */
+    protected $environment;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -81,6 +84,7 @@ class JudopayService
         );
         $this->client = new Judopay($data);
         $this->statsd = $statsd;
+        $this->environment = $environment;
     }
 
     public function getTransactions($pageSize)
@@ -121,11 +125,12 @@ class JudopayService
     }
 
     /**
-     * @param Policy $policy
-     * @param string $receiptId
-     * @param string $consumerToken
-     * @param string $cardToken     Can be null if card is declined
-     * @param string $deviceDna     Optional device dna data (json encoded) for judoshield
+     * @param Policy    $policy
+     * @param string    $receiptId
+     * @param string    $consumerToken
+     * @param string    $cardToken     Can be null if card is declined
+     * @param string    $deviceDna     Optional device dna data (json encoded) for judoshield
+     * @param \DateTime $date
      */
     public function add(
         Policy $policy,
@@ -136,15 +141,58 @@ class JudopayService
         \DateTime $date = null
     ) {
         $this->statsd->startTiming("judopay.add");
-        // if already active, don't re-run
+        // doesn't make sense to add payments for cancelled or expired policies
+        if (in_array($policy->getStatus(), [PhonePolicy::STATUS_CANCELLED, PhonePolicy::STATUS_EXPIRED])) {
+            throw new \Exception('Unable to apply payment to cancelled/expired policy');
+        }
+
+        // TODO: Perhaps this should be allowed - just in case there were multiple payments?
         if ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {
             return true;
         }
 
-        // Mark policy as pending for monitoring purposes
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
-        $this->dm->flush();
+        if (!$policy->getStatus() || $policy->getStatus() == PhonePolicy::STATUS_PENDING) {
+            // New policy
 
+            // Mark policy as pending for monitoring purposes
+            $policy->setStatus(PhonePolicy::STATUS_PENDING);
+            $this->dm->flush();
+
+            $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $deviceDna, $date);
+
+            $this->policyService->create($policy, $date);
+            $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+            $this->dm->flush();
+        } else {
+            // Existing policy - add payment + prevent duplicate billing
+            $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $deviceDna, $date);
+            $this->policyService->adjustScheduledPayments($policy, $date);
+
+            $isPaidToDate = $policy->isPolicyPaidToDate(false, $policy->getPolicyPrefix($this->environment), $date);
+            // update status if it makes sense to
+            if ($isPaidToDate &&
+                in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])
+            ) {
+                $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+            } elseif (!$isPaidToDate) {
+                $this->logger->error(sprintf('Policy %s is not paid to date', $policy->getPolicyNumber()));
+            }
+            $this->dm->flush();
+        }
+
+        $this->statsd->endTiming("judopay.add");
+
+        return true;
+    }
+
+    protected function createPayment(
+        Policy $policy,
+        $receiptId,
+        $consumerToken,
+        $cardToken,
+        $deviceDna = null,
+        \DateTime $date = null
+    ) {
         $user = $policy->getUser();
 
         $judo = new JudoPaymentMethod();
@@ -159,14 +207,7 @@ class JudopayService
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $date);
 
-        $this->validateUser($policy->getUser());
-        $this->policyService->create($policy, $date);
-        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-        $this->dm->flush();
-
-        $this->statsd->endTiming("judopay.add");
-
-        return true;
+        $this->validateUser($user);
     }
 
     public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
