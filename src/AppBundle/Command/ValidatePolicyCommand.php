@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\ScheduledPayment;
 
 class ValidatePolicyCommand extends ContainerAwareCommand
 {
@@ -72,11 +73,13 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
+
             $valid = $policy->isPolicyPaidToDate(true, $prefix, $validateDate);
             $lines[] = sprintf('Policy %s %s paid to date', $policyNumber, $valid ? 'is' : 'is NOT');
             if (!$valid) {
                 $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
             }
+
             $valid = $policy->isPotValueCorrect();
             $lines[] = sprintf(
                 'Policy %s %s the correct pot value',
@@ -91,6 +94,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = 'Updated pot value';
                     $lines[] = $this->failurePotValueMessage($policy);
                 }
+            }
+
+            $valid = $policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate);
+            $lines[] = sprintf('Policy %s %s correct scheduled payments', $policyNumber, $valid ? 'has' : 'does NOT have');
+            if (!$valid) {
+                $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
             }
         } else {
             $policies = $policyRepo->findAll();
@@ -112,6 +121,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($policy->isPotValueCorrect() === false) {
                     $lines[] = sprintf('Policy %s has incorrect pot value', $policy->getPolicyNumber());
                     $lines[] = $this->failurePotValueMessage($policy);
+                }
+                if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate) === false) {
+                    $lines[] = sprintf('Policy %s has incorrect scheduled payments', $policy->getPolicyNumber());
+                    $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
                 }
             }
         }
@@ -146,6 +159,20 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $policy->calculatePotValue(),
             $policy->getPromoPotValue(),
             $policy->calculatePotValue(true)
+        );
+    }
+
+    private function failureScheduledPaymentsMessage($policy, $prefix, $date)
+    {
+        $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
+        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
+
+        return sprintf(
+            'Policy %s Total Premium £%0.2f Payments Made £%0.2f Scheduled Payments £%0.2f',
+            $policy->getPolicyNumber(),
+            $policy->getYearlyPremiumPrice(),
+            $policy->getTotalSuccessfulPayments($date),
+            $totalScheduledPayments
         );
     }
 }

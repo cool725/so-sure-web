@@ -828,7 +828,7 @@ abstract class Policy
         }
     }
 
-    public function getTotalPremiumPrice()
+    public function getYearlyPremiumPrice()
     {
         return $this->getPremiumInstallmentCount() * $this->getPremiumInstallmentPrice();
     }
@@ -1688,7 +1688,7 @@ abstract class Policy
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
 
-        $outstanding = $this->getTotalPremiumPrice() - $this->getTotalSuccessfulPayments($date);
+        $outstanding = $this->getYearlyPremiumPrice() - $this->getTotalSuccessfulPayments($date);
         //print sprintf("%f ?= %f\n", $outstanding, $totalScheduledPayments);
 
         return $this->areEqualToTwoDp($outstanding, $totalScheduledPayments);
@@ -1736,12 +1736,12 @@ abstract class Policy
         ];
     }
 
-    public static function sumTotalPremiumPrice($policies, $prefix = null)
+    public static function sumYearlyPremiumPrice($policies, $prefix = null)
     {
         $total = 0;
         foreach ($policies as $policy) {
             if ($policy->isValidPolicy($prefix)) {
-                $total += $policy->getTotalPremiumPrice();
+                $total += $policy->getYearlyPremiumPrice();
             }
         }
 
