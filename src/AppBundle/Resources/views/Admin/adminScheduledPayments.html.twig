@@ -42,25 +42,35 @@
     </div>
     </form>
 </div>
-
-{% for scheduledPayment in scheduledPayments %}
-    <div class="row">
-        <div class="col-md-3">
+<div class="row">
+  <table class="table table-striped">
+    <tbody>
+        <tr>
+            <th>Policy</th>
+            <th>Scheduled Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+        </tr>
+{% for scheduledPayment in scheduledPayments if scheduledPayment.policy.validPolicy %}
+    <tr class="{% if scheduledPayment.status == 'failed' %}danger{% elseif scheduledPayment.status == 'cancelled' %}warning{% endif %}">
+        <td>
             <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
                 {{ scheduledPayment.policy.policyNumber }}
             </a>
-        </div>
-        <div class="col-md-3">
+        </td>
+        <td>
             {{ scheduledPayment.scheduled|date }}
-        </div>
-        <div class="col-md-2">
+        </td>
+        <td>
             £{{ scheduledPayment.amount }}
-        </div>
-        <div class="col-md-2">
-            {{ scheduledPayment.status }}
-        </div>
-    </div>
+        </td>
+        <td>
+            {{ scheduledPayment.status }}            
+        </td>
+    </tr>
 {% endfor %}
+    </tbody>
+  </table>
     
 </div>
 {% endblock %}
