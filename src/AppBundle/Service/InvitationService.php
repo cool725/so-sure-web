@@ -342,6 +342,7 @@ class InvitationService
     {
         $user = null;
         $badge = null;
+        $messageData = null;
         if ($type == PushService::MESSAGE_CONNECTED) {
             $user = $invitation->getInviter();
             $message = sprintf(
@@ -354,6 +355,7 @@ class InvitationService
                 '%s wants to connect with you!',
                 $invitation->getInviterName()
             );
+            $messageData = ['id' => $invitation->getId()];
             // TODO: Enable this when iOS app is ready to handle
             // $badge = count($user->getUnprocessedReceivedInvitations());
         }
@@ -362,7 +364,7 @@ class InvitationService
             return null;
         }
 
-        $this->push->sendToUser($type, $user, $message, $badge);
+        $this->push->sendToUser($type, $user, $message, $badge, $messageData);
     }
 
     /**
