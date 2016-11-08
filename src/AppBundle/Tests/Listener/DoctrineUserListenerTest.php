@@ -97,6 +97,26 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->preUpdate($events);
     }
 
+    public function testPreUpdateUserEmailSame()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testPreUpdateUserEmailSame', $this));
+        static::$dm->persist($user);
+        $listener = $this->createUserEmailEventListener(
+            $user,
+            static::generateEmail('testPreUpdateUserEmailSame', $this),
+            $this->never(),
+            UserEmailEvent::EVENT_CHANGED
+        );
+
+        $changeSet = ['email' => [
+            static::generateEmail('testPreUpdateUserEmailSame', $this),
+            static::generateEmail('testPreUpdateUserEmailSame', $this)
+        ]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
     private function createUserEventListener($user, $count, $eventType)
     {
         $event = new UserEvent($user);
