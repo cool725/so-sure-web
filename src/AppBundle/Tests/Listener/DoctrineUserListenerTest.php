@@ -148,4 +148,45 @@ class DoctrineUserListenerTest extends WebTestCase
 
         return $listener;
     }
+
+    public function testUpdateUserEmailChanged()
+    {
+        $listener = $this->getMockBuilder('UserListener')
+                         ->setMethods(array('onUserEmailChangedEvent'))
+                         ->getMock();
+        $listener->expects($this->once())
+                     ->method('onUserEmailChangedEvent');
+
+        $dispatcher = static::$container->get('event_dispatcher');
+        $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, 'onUserEmailChangedEvent'));
+
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('testUpdateUserEmailChanged-init', $this),
+            'foo'
+        );
+        $user->setEmail(static::generateEmail('testUpdateUserEmailChanged', $this));
+        static::$dm->flush();
+    }
+
+    public function testUpdateUserEmailChangedButSame()
+    {
+        $listener = $this->getMockBuilder('UserListener')
+                         ->setMethods(array('onUserEmailChangedEvent'))
+                         ->getMock();
+        $listener->expects($this->never())
+                     ->method('onUserEmailChangedEvent');
+
+        $dispatcher = static::$container->get('event_dispatcher');
+        $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, 'onUserEmailChangedEvent'));
+
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('testUpdateUserEmailChangedButSame', $this),
+            'foo'
+        );
+        // same but different
+        $user->setEmail(strtolower(static::generateEmail('testUpdateUserEmailChangedButSame', $this)));
+        static::$dm->flush();
+    }
 }
