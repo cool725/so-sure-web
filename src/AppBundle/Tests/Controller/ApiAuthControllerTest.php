@@ -2820,7 +2820,9 @@ class ApiAuthControllerTest extends BaseControllerTest
             $phonePolicy['name'] = $name;
         }
 
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => $phonePolicy]);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
+            'phone_policy' => $phonePolicy
+        ]);
         $this->verifyResponse(200);
 
         return $crawler;
