@@ -349,15 +349,13 @@ class JudopayService
                 $this->toTwoDp($premium->getYearlyPremiumPrice()),
             ])) {
             $errMsg = sprintf(
-                'REFUNDED NEEDED!! Expected %f or %f, not %f for payment id: %s',
+                'ADJUSTMENT NEEDED!! Expected %f or %f, not %f for payment id: %s',
                 $premium->getMonthlyPremiumPrice(),
                 $premium->getYearlyPremiumPrice(),
                 $payment->getAmount(),
                 $payment->getId()
             );
             $this->logger->error($errMsg);
-
-            throw new InvalidPremiumException($errMsg);
         }
 
         /* TODO: May want to validate this data??
@@ -434,7 +432,7 @@ class JudopayService
             ));
         }
         try {
-            $payment = $this->tokenPay($policy, $scheduledPayment->getType());
+            $payment = $this->tokenPay($policy, $scheduledPayment->getAmount(), $scheduledPayment->getType());
             $this->processScheduledPaymentResult($scheduledPayment, $payment);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         } catch (\Exception $e) {
@@ -546,9 +544,11 @@ class JudopayService
         return $tokenPaymentDetails;
     }
 
-    protected function tokenPay(Policy $policy, $notes = null)
+    protected function tokenPay(Policy $policy, $amount = null, $notes = null)
     {
-        $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+        if (!$amount) {
+            $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+        }
         $user = $policy->getUser();
 
         $payment = new JudoPayment();

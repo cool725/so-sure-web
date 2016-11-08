@@ -130,10 +130,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals('Success', $payment->getResult());
     }
 
-    /**
-     * @expectedException AppBundle\Exception\InvalidPremiumException
-     */
-    public function testJudoReceiptPaymentDiffException()
+    public function testJudoReceiptPaymentDiff()
     {
         $user = $this->createValidUser(static::generateEmail('judo-receipt-exception', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -154,6 +151,7 @@ class JudopayServiceTest extends WebTestCase
             '452'
         );
         $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        // should be allowed
     }
 
     public function testJudoExceptionStatusPending()
@@ -387,11 +385,14 @@ class JudopayServiceTest extends WebTestCase
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
 
         $this->assertEquals(11, count($policy->getScheduledPayments()));
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getPremiumPaid());
         $scheduledPayment = $policy->getScheduledPayments()[0];
+        $scheduledPayment->setAmount($scheduledPayment->getAmount() + 1);
         $nextMonth = new \DateTime();
         $nextMonth->add(new \DateInterval('P1M'));
 
         self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
     }
 
     public function testProcessTokenPayResult()
