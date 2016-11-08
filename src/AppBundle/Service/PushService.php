@@ -56,13 +56,15 @@ class PushService
     {
         $this->logger->debug(sprintf('Push triggered to %s %s', $arn, $message));
         try {
+            $apns = $this->generateAPNSMessage($messageType, $message, $badge, $messageData);
+            $gcm = $this->generateGCMMessage($messageType, $message, $messageData);
             $this->sns->publish([
                'TargetArn' => $arn,
                'MessageStructure' => 'json',
                 'Message' => json_encode([
-                    'APNS' => json_encode($this->generateAPNSMessage($messageType, $message, $badge, $messageData)),
-                    'APNS_SANDBOX' => json_encode($this->generateAPNSMessage($messageType, $message, $badge, $messageData)),
-                    'GCM' => json_encode($this->generateGCMMessage($messageType, $message, $messageData)),
+                    'APNS' => json_encode($apns),
+                    'APNS_SANDBOX' => json_encode($apns),
+                    'GCM' => json_encode($gcm),
                 ])
             ]);
         } catch (\Exception $e) {
