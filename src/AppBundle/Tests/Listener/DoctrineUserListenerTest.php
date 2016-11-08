@@ -97,6 +97,26 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->preUpdate($events);
     }
 
+    public function testPreUpdateUserEmailSame()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testPreUpdateUserEmailSame', $this));
+        static::$dm->persist($user);
+        $listener = $this->createUserEmailEventListener(
+            $user,
+            static::generateEmail('testPreUpdateUserEmailSame', $this),
+            $this->never(),
+            UserEmailEvent::EVENT_CHANGED
+        );
+
+        $changeSet = ['email' => [
+            static::generateEmail('testPreUpdateUserEmailSame', $this),
+            static::generateEmail('testPreUpdateUserEmailSame', $this)
+        ]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
     private function createUserEventListener($user, $count, $eventType)
     {
         $event = new UserEvent($user);
@@ -127,5 +147,46 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener = new DoctrineUserListener($dispatcher);
 
         return $listener;
+    }
+
+    public function testUpdateUserEmailChanged()
+    {
+        $listener = $this->getMockBuilder('UserListener')
+                         ->setMethods(array('onUserEmailChangedEvent'))
+                         ->getMock();
+        $listener->expects($this->once())
+                     ->method('onUserEmailChangedEvent');
+
+        $dispatcher = static::$container->get('event_dispatcher');
+        $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, 'onUserEmailChangedEvent'));
+
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('testUpdateUserEmailChanged-init', $this),
+            'foo'
+        );
+        $user->setEmail(static::generateEmail('testUpdateUserEmailChanged', $this));
+        static::$dm->flush();
+    }
+
+    public function testUpdateUserEmailChangedButSame()
+    {
+        $listener = $this->getMockBuilder('UserListener')
+                         ->setMethods(array('onUserEmailChangedEvent'))
+                         ->getMock();
+        $listener->expects($this->never())
+                     ->method('onUserEmailChangedEvent');
+
+        $dispatcher = static::$container->get('event_dispatcher');
+        $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, 'onUserEmailChangedEvent'));
+
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('testUpdateUserEmailChangedButSame', $this),
+            'foo'
+        );
+        // same but different
+        $user->setEmail(strtolower(static::generateEmail('testUpdateUserEmailChangedButSame', $this)));
+        static::$dm->flush();
     }
 }

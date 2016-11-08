@@ -13,6 +13,8 @@ use AppBundle\Document\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SCode;
 use AppBundle\Classes\ApiErrorCode;
+use AppBundle\Event\UserEmailEvent;
+use AppBundle\Listener\UserListener;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Document\Invitation\EmailInvitation;
 

@@ -31,7 +31,8 @@ class DoctrineUserListener
     {
         $document = $eventArgs->getDocument();
         if ($document instanceof User) {
-            if ($eventArgs->hasChangedField('email')) {
+            if ($eventArgs->hasChangedField('email') &&
+                strtolower($eventArgs->getOldValue('email')) != strtolower($eventArgs->getNewValue('email'))) {
                 $event = new UserEmailEvent($document, $eventArgs->getOldValue('email'));
                 $this->dispatcher->dispatch(UserEmailEvent::EVENT_CHANGED, $event);
             }
