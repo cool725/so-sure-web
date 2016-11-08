@@ -403,6 +403,7 @@ class ApiAuthController extends BaseController
             );
             $policy->addCheckmendCertData($imeiCertId, $imeiResponse);
             $policy->addCheckmendSerialData($serialResponse);
+            $policy->setName($this->getDataString($phonePolicyData, 'name'));
 
             $this->validateObject($policy);
 

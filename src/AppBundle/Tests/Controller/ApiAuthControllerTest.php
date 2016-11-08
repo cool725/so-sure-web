@@ -552,6 +552,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+            'name' => 'foo',
         ]]);
 
         $data = $this->verifyResponse(200);
@@ -560,6 +561,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
+        $this->assertEquals('foo', $data['phone_policy']['name']);
 
         // Now make sure that the policy shows up against the user
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
@@ -864,6 +866,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'serial_number' => "23423423342",
         ]]);
         $data = $this->verifyResponse(200);
+        $this->assertNull($data['phone_policy']['name']);
     }
 
     public function testNewPolicyInvactivePhone()
@@ -2794,7 +2797,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     /**
      *
      */
-    protected function generatePolicy($cognitoIdentityId, $user, $clearRateLimit = true)
+    protected function generatePolicy($cognitoIdentityId, $user, $clearRateLimit = true, $name = null)
     {
         if ($user) {
             $this->updateUserDetails($cognitoIdentityId, $user);
@@ -2804,7 +2807,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             $this->clearRateLimit();
         }
         $imei = self::generateRandomImei();
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+        $phonePolicy = [
             'imei' => $imei,
             'make' => 'OnePlus',
             'device' => 'A0001',
@@ -2812,7 +2815,14 @@ class ApiAuthControllerTest extends BaseControllerTest
             'memory' => 63,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
-        ]]);
+        ];
+        if ($name) {
+            $phonePolicy['name'] = $name;
+        }
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
+            'phone_policy' => $phonePolicy
+        ]);
         $this->verifyResponse(200);
 
         return $crawler;

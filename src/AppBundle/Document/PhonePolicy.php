@@ -57,6 +57,14 @@ class PhonePolicy extends Policy
      */
     protected $checkmendCerts = array();
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $name;
+
     public function getPhone()
     {
         return $this->phone;
@@ -100,6 +108,16 @@ class PhonePolicy extends Policy
     public function setPhoneData($phoneData)
     {
         $this->phoneData = $phoneData;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     public function getCheckmendCerts()
@@ -331,6 +349,7 @@ class PhonePolicy extends Policy
             'phone_policy' => [
                 'imei' => $this->getImei(),
                 'phone' => $this->getPhone() ? $this->getPhone()->toApiArray() : null,
+                'name' => $this->getName() ? $this->getName() : null,
             ]
         ]);
     }
