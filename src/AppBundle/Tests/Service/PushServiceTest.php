@@ -36,7 +36,7 @@ class PushServiceTest extends WebTestCase
     public function testCustomDataMessageGeneral()
     {
         $data = self::$push->getCustomData(PushService::MESSAGE_GENERAL);
-        $this->assertEquals(['ss' => ['display' => 'popup'], 'type' => 'alert'], $data);
+        $this->assertEquals(['ss' => ['display' => 'popup', 'message_type' => 'general'], 'type' => 'alert'], $data);
     }
 
     public function testCustomDataMessageConnected()
@@ -46,6 +46,7 @@ class PushServiceTest extends WebTestCase
                 'uri' => 'sosure://open/pot',
                 'display' => 'popup',
                 'refresh' => true,
+                'message_type' => 'connected'
             ],
             'type' => 'alert'
         ], $data);
@@ -58,6 +59,18 @@ class PushServiceTest extends WebTestCase
                 'uri' => 'sosure://open/pot',
                 'display' => 'popup',
                 'refresh' => true,
+                'message_type' => 'invitation'
+            ],
+            'type' => 'alert'
+        ], $data);
+
+        $data = self::$push->getCustomData(PushService::MESSAGE_INVITATION, ['id' => '1']);
+        $this->assertEquals(['ss' => [
+                'uri' => 'sosure://open/pot',
+                'display' => 'popup',
+                'refresh' => true,
+                'message_type' => 'invitation',
+                'data' => ['invitation' => ['id' => '1']],
             ],
             'type' => 'alert'
         ], $data);
@@ -68,7 +81,7 @@ class PushServiceTest extends WebTestCase
         $data = self::$push->generateGCMMessage(PushService::MESSAGE_GENERAL, 'foo');
         $this->assertEquals(['data' => [
             'message' => 'foo',
-            'ss' => ['display' => 'popup'],
+            'ss' => ['display' => 'popup', 'message_type' => 'general'],
             'type' => 'alert'
         ]], $data);
     }
@@ -77,8 +90,8 @@ class PushServiceTest extends WebTestCase
     {
         $data = self::$push->generateAPNSMessage(PushService::MESSAGE_GENERAL, 'foo');
         $this->assertEquals([
-            'aps' => ['alert' => 'foo'],
-            'ss' => ['display' => 'popup'],
+            'aps' => ['alert' => 'foo', 'category' => 'general'],
+            'ss' => ['display' => 'popup', 'message_type' => 'general'],
             'type' => 'alert'
         ], $data);
     }
