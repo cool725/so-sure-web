@@ -36,7 +36,7 @@ class PurchaseType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', EmailType::class, ['read_only' => true, 'disabled' => true])
+            ->add('email', EmailType::class, ['attr' => ['readonly' => true], 'disabled' => true])
             ->add('firstName', TextType::class)
             ->add('lastName', TextType::class)
             ->add('mobileNumber', TextType::class)

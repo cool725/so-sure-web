@@ -691,6 +691,7 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testNewPolicyRateLimited()
     {
+        $this->clearRateLimit();
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $limit = RateLimitService::$maxIpRequests[RateLimitService::DEVICE_TYPE_POLICY];
         for ($i = 1; $i <= $limit + 1; $i++) {
@@ -710,7 +711,7 @@ class ApiAuthControllerTest extends BaseControllerTest
                     'imei' => $imei,
                     'make' => 'OnePlus',
                     'device' => 'A0001',
-                    'memory' => 65,
+                    'memory' => 63,
                     'rooted' => false,
                     'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
                 ]]

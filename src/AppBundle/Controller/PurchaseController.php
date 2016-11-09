@@ -32,6 +32,7 @@ use AppBundle\Exception\LostStolenImeiException;
 use AppBundle\Exception\InvalidImeiException;
 use AppBundle\Exception\ImeiBlacklistedException;
 use AppBundle\Exception\ImeiPhoneMismatchException;
+use AppBundle\Exception\RateLimitException;
 
 /**
  * @Route("/purchase")
@@ -135,7 +136,6 @@ class PurchaseController extends BaseController
                         ));
                     }
 
-                    // TODO: Rate limiting
                     if ($policy) {
                         // If any policy data has changed, delete/re-create
                         if ($policy->getImei() != $purchase->getImei() ||
@@ -199,6 +199,12 @@ class PurchaseController extends BaseController
                             );
                             $allowPayment = false;
                         } catch (ImeiPhoneMismatchException $e) {
+                            $this->addFlash(
+                                'error',
+                                "Sorry, we are unable to insure you."
+                            );
+                            $allowPayment = false;
+                        } catch (RateLimitException $e) {
                             $this->addFlash(
                                 'error',
                                 "Sorry, we are unable to insure you."
