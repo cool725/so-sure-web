@@ -19,10 +19,10 @@
     var iframe = document.querySelector('#exp-vid');
     var player = new Vimeo.Player(iframe);
 
-    $('.modal').on('hidden.bs.modal', function() {
+    $('.modal-video').on('hidden.bs.modal', function() {
         player.pause();
     })
 
-    $('.modal').on('shown.bs.modal', function() {
+    $('.modal-video').on('shown.bs.modal', function() {
         player.play();
     })

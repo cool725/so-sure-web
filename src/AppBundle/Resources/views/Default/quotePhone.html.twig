@@ -13,6 +13,7 @@
     {% javascripts
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
     'bundles/app/js/Default/slider.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -46,9 +47,9 @@
                                     <h4>£{{ phone_price.monthlyPremiumPrice }}</h4>
                                     <br>
                                     <p>Covered for</p>
-                                    <h4>Theft, Loss &amp; Accidental Damage</h4>
+                                    <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
                                     <p>
-                                        <a href="#" data-toggle="modal" data-target="#more-info">More information</a>
+                                        <a href="#" data-toggle="modal" data-target="#more-info">More details (incl. excess)</a>
                                     </p>
                                 </span>
                             </div>
@@ -137,7 +138,7 @@
 
     <section class="download-now" id="download-now">
         <div class="container">
-            <h2>Get covered in seconds using our app</h2>
+            <h2>Download our app now to pay</h2>
               <p class="lead text-center">Our app makes it easier for you to cover your phone and connect with your friends.</p>
             <div class="row download-app">
                 <div class="col-md-6 text-right">
@@ -155,10 +156,30 @@
     </div>
     </section>
 
+    <section class="learn-video">
+      <div class="container">
+        <h2 class="text-center">Learn how it works</h2>
+        <p class="lead text-center">
+          Watch the video &amp; learn how you can get up to 80% money back, every year.
+        </p>
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <div class="explainer-video">
+                <a class="explainer-video-view" data-toggle="modal" data-target="#modal-fullscreen">
+                    <div class="explainer-video-frame">
+                        <div class="explainer-video-overlay"></div>
+                    </div>
+                </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section>
         <div class="container support-chat">
             <h2 class="text-center">
-                Frequently Asked Questions
+                Frequently asked questions
             </h2>
             <p class="lead text-center" id="hero-description">
               Can't find the answer you're looking for? Check out our <a href="https://help.wearesosure.com">Help Centre</a>.
@@ -232,10 +253,10 @@
       {{ form_start(lead_form) }}
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h3 class="modal-title text-center">Welcome to the social insurance revolution!</h3>
+        <h2 class="modal-title text-center">Ready to join the Social Insurance revolution?</h2>
       </div>
       <div class="modal-body text-center">
-        <h4>Let's start you on your way</h4>
+        <p class="lead">Just enter your email below to get started!</p>
         <div class="row">
             <div class="form-group col-sm-12">
                 {{ form_errors(lead_form.email) }}
@@ -253,5 +274,26 @@
     </div>
   </div>
 </div>
+
+<div class="modal-video modal-fullscreen fade" id="modal-fullscreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="responsive-container">
+                <iframe id="exp-vid" src="https://player.vimeo.com/video/185840373??api=1&player_id=vimeoplayer&title=0&byline=0&portrait=0" width="1280" height="720" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Pulling in Vimeo API - Froogaloop -->
+<script src="https://player.vimeo.com/api/player.js"></script>
 
 {% endblock %}
