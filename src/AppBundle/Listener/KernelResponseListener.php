@@ -61,7 +61,7 @@ class KernelResponseListener
         // create/update cookie
         $cookie = new Cookie(
             self::SOSURE_EMPLOYEE_COOKIE_NAME,
-            $this->adminCookieValue,
+            urlencode($this->adminCookieValue),
             time() + self::SOSURE_EMPLOYEE_COOKIE_LENGTH,
             '/',
             $this->domain,
