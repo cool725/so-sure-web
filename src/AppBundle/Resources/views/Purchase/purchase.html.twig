@@ -9,10 +9,6 @@
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
-{% block remotestylesheets %}
- <link rel="stylesheet" type="text/css" href="https://services.postcodeanywhere.co.uk/css/captureplus-2.20.min.css?key=NU19-FM29-AF33-GM59" />
-{% endblock %}
-
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
@@ -239,9 +235,7 @@
         </div>
     </div>
     {{ form_end(purchase_form) }}
-    <script type="text/javascript" src="https://services.postcodeanywhere.co.uk/js/captureplus-2.20.min.js?key=NU19-FM29-AF33-GM59"></script>
 
-    
     {% if webpay_action is defined and webpay_reference is defined %}
     <div class="modal-confirm-wrapper">
     <div class="modal modal-confirm" id="purchaseModal" tabindex="-1" role="dialog" style="display: block;">
