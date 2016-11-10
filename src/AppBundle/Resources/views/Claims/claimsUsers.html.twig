@@ -104,7 +104,7 @@
                     </thead>
                     <tbody>
                     {% for user in users %}
-                        {% for policy in user.policies %}
+                        {% for policy in user.allPolicies %}
                         <tr>
                             <td><a href="{{ path(policy_route, {id: policy.id}) }}">
                                 {% if policy.policyNumber|length %}
@@ -127,7 +127,7 @@
                             <td>{% if user.locked %}locked{% elseif user.enabled %}enabled{% else %}disabled{%endif %}</td>
                         </tr>
                         {% endfor %}
-                        {% if user.policies|length == 0 %}
+                        {% if user.allPolicies|length == 0 %}
                         <tr>
                             <td>N/A</td>
                             <td>N/A</td>
