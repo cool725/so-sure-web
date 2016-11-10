@@ -2,7 +2,8 @@
 {% block fos_user_content %}
 <div class="container">
     <h1>Welcome back!</h1>
-    <div class="login-digits" data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
+    <div class="login-digits" style="{% if error %}display: none;{% endif %}"
+         data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
       <p class="text-centre" style="padding-bottom: 20px;">
         Just enter your mobile number below, we'll then text you a code. Enter that code and, hey presto, you'll be logged in!
       </p>
@@ -23,7 +24,7 @@
         <p class="swap-login-wrapper"><a href="#" class="swap-login btn-info">Prefer email login?</a></p>
     </div>
 
-    <div class="login-email">
+    <div class="login-email" style="{% if not error %}display: none;{% endif %}">
         <p>
             Please login below.
         </p>
