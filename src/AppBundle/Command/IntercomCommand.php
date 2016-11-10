@@ -117,7 +117,7 @@ class IntercomCommand extends ContainerAwareCommand
             $output->writeln(sprintf("Rechecked unsubscribes"));
         } else {
             $count = $intercom->process($process);
-            $output->writeln(sprintf("Sent %s user updates", $count));
+            $output->writeln(sprintf("Sent %s updates", $count));
         }
     }
 
