@@ -30,7 +30,7 @@ class IntercomListener
     public function onPolicyCreatedEvent(PolicyEvent $event)
     {
         $this->intercom->queue($event->getPolicy()->getUser());
-        // TODO: Trigger intercom event
+        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_CREATED);
     }
 
     public function onPolicyPotEvent(PolicyEvent $event)
@@ -42,6 +42,6 @@ class IntercomListener
     public function onPolicyCancelledEvent(PolicyEvent $event)
     {
         $this->intercom->queue($event->getPolicy()->getUser());
-        // TODO: Trigger intercom event
+        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_CANCELLED);
     }
 }

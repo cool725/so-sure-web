@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Policy;
 use AppBundle\Document\OptOut\EmailOptOut;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Intercom\IntercomClient;
@@ -11,9 +12,14 @@ use Intercom\IntercomClient;
 class IntercomService
 {
     const KEY_INTERCOM_QUEUE = 'queue:intercom';
+
     const SECURE_WEB = 'web';
     const SECURE_ANDROID = 'android';
     const SECURE_IOS = 'ios';
+
+    const QUEUE_USER = 'user';
+    const QUEUE_EVENT_POLICY_CREATED = 'policy-created';
+    const QUEUE_EVENT_POLICY_CANCELLED = 'policy-cancelled';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -249,11 +255,28 @@ class IntercomService
         return $resp;
     }
 
+    public function sendPolicyEvent(Policy $policy, $event)
+    {
+        $now = new \DateTime();
+        $data = [
+            'event_name' => $event,
+            'created_at' => $now->getTimestamp(),
+            'id' => $policy->getUser()->getIntercomId(),
+            'user_id' => $policy->getUser()->getId(),
+        ];
+        if ($event == self::QUEUE_EVENT_POLICY_CANCELLED) {
+            $data['metadata']['Cancelled Reason'] = $policy->getCancelledReason();
+        }
+        $resp = $this->client->events->create($data);
+        $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
+    }
+
     public function process($max)
     {
         $count = 0;
         while ($count < $max) {
             $user = null;
+            $data = null;
             try {
                 $queueItem = $this->redis->lpop(self::KEY_INTERCOM_QUEUE);
                 if (!$queueItem) {
@@ -261,47 +284,55 @@ class IntercomService
                 }
                 $data = unserialize($queueItem);
 
-                if (!isset($data['userId']) || !$data['userId']) {
-                    throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
-                }
-                $repo = $this->dm->getRepository(User::class);
-                $user = $repo->find($data['userId']);
-                if (!$user) {
-                    throw new \Exception(sprintf('Unable to find userId: %s', $data['userId']));
+                if (isset($data['action'])) {
+                    $action = $data['action'];
+                } else {
+                    // legacy before action was used.  can be removed soon after
+                    $action = self::QUEUE_USER;
                 }
 
-                $this->update($user);
-
-                $count = $count + 1;
-            } catch (\Exception $e) {
-                if ($user) {
-                    $queued = false;
-                    if (isset($data['retryAttempts']) && $data['retryAttempts'] >= 0) {
-                        if ($data['retryAttempts'] < 2) {
-                            $this->queue(
-                                $user,
-                                $data['retryAttempts'] + 1
-                            );
-                            $queued = true;
-                        }
-                    } else {
-                        $this->queue($user);
-                        $queued = true;
+                if ($action == self::QUEUE_USER) {
+                    if (!isset($data['userId']) || !$data['userId']) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
-                    $this->logger->error(sprintf(
-                        'Error sending user %s to intercom (requeued: %s). Ex: %s',
-                        $user->getId(),
-                        $queued ? 'Yes' : 'No',
-                        $e->getMessage()
-                    ));
+                    $repo = $this->dm->getRepository(User::class);
+                    $user = $repo->find($data['userId']);
+                    if (!$user) {
+                        throw new \InvalidArgumentException(sprintf('Unable to find userId: %s', $data['userId']));
+                    }
+
+                    $this->update($user);
+                } elseif ($action == self::QUEUE_EVENT_POLICY_CREATED ||
+                          $action == self::QUEUE_EVENT_POLICY_CANCELLED) {
+                    if (!isset($data['policyId']) || !$data['policyId']) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+                    $repo = $this->dm->getRepository(Policy::class);
+                    $policy = $repo->find($data['policyId']);
+                    if (!$policy) {
+                        throw new \InvalidArgumentException(sprintf('Unable to find policyId: %s', $data['policyId']));
+                    }
+
+                    $this->sendPolicyEvent($policy, $action);
+                }
+                $count = $count + 1;
+            } catch (\InvalidArgumentException $e) {
+                $this->logger->error(sprintf(
+                    'Error processing Intercom queue message %s. Ex: %s',
+                    json_encode($data),
+                    $e->getMessage()
+                ));
+            } catch (\Exception $e) {
+                if (isset($data['retryAttempts']) && $data['retryAttempts'] < 2) {
+                    $data['retryAttempts'] += 1;
+                    $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
                 } else {
                     $this->logger->error(sprintf(
-                        'Error sending user (Unknown) to intercom (requeued). Ex: %s',
+                        'Error (retry exceeded) sending message to Intercom %s. Ex: %s',
+                        json_encode($data),
                         $e->getMessage()
                     ));
                 }
-
-                throw $e;
             }
         }
 
@@ -310,7 +341,21 @@ class IntercomService
 
     public function queue(User $user, $retryAttempts = 0)
     {
-        $data = ['userId' => $user->getId(), 'retryAttempts' => $retryAttempts];
+        $data = [
+            'action' => self::QUEUE_USER,
+            'userId' => $user->getId(),
+            'retryAttempts' => $retryAttempts
+        ];
+        $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
+    }
+
+    public function queuePolicy(Policy $policy, $event, $retryAttempts = 0)
+    {
+        $data = [
+            'action' => $event,
+            'policyId' => $policy->getId(),
+            'retryAttempts' => $retryAttempts
+        ];
         $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
     }
 
