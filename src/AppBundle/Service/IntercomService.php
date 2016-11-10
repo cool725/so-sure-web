@@ -206,6 +206,7 @@ class IntercomService
         $data['custom_attributes']['Promo Code'] = $user->getCurrentPolicy() ?
             $user->getCurrentPolicy()->getPromoCode() :
             '';
+        $data['custom_attributes']['Pending Invites'] = count($user->getUnprocessedReceivedInvitations());
 
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
