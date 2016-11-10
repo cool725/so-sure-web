@@ -3,8 +3,12 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
 ENV=""
-while getopts "e:h" opt; do
+USER="wwww-data"
+while getopts "e:u:h" opt; do
   case $opt in
+    u)
+      USER=$OPTARG
+      ;;
     e)
       ENV=$OPTARG
       ;;
@@ -21,5 +25,5 @@ if [ "$ENV" == "" ]; then
 fi
 
 # /c/ version of PlayDevice Fixtures will run upset on existing data, so safe to rerun
-echo "sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --append --fixtures src/AppBundle/DataFixtures/MongoDB/c/PlayDevice"
-sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --append --fixtures src/AppBundle/DataFixtures/MongoDB/c/PlayDevice
+echo "sudo -u $USER app/console --env=$ENV doctrine:mongodb:fixtures:load --append --fixtures src/AppBundle/DataFixtures/MongoDB/c/PlayDevice"
+sudo -u $USER app/console --env=$ENV doctrine:mongodb:fixtures:load --append --fixtures src/AppBundle/DataFixtures/MongoDB/c/PlayDevice
