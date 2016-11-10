@@ -13,7 +13,7 @@
     {% javascripts
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
     'bundles/app/js/Default/slider.js'
-    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -275,25 +275,6 @@
   </div>
 </div>
 
-<div class="modal-video modal-fullscreen fade" id="modal-fullscreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-<div class="modal-dialog">
-    <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">
-                <span aria-hidden="true">&times;</span>
-                <span class="sr-only">Close</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="responsive-container">
-                <iframe id="exp-vid" src="https://player.vimeo.com/video/185840373??api=1&player_id=vimeoplayer&title=0&byline=0&portrait=0" width="1280" height="720" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-
-<!-- Pulling in Vimeo API - Froogaloop -->
-<script src="https://player.vimeo.com/api/player.js"></script>
+{% include 'AppBundle::Default/modalVideo.html.twig' %}
 
 {% endblock %}
