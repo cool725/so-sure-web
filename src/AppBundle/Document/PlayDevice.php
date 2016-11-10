@@ -8,6 +8,8 @@ use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document
+ * @MongoDB\Index(keys={"retailBranding"="asc", "marketingName"="asc", "model"="asc", "device"="asc"},
+ *  sparse="true", unique="true")
  */
 class PlayDevice
 {
@@ -34,6 +36,7 @@ class PlayDevice
      * @AppAssert\Token()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
+     * @MongoDB\Index(unique=false, sparse=true)
      */
     protected $device;
 
