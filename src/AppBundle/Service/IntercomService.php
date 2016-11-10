@@ -203,7 +203,9 @@ class IntercomService
         $data['custom_attributes']['Premium'] = $policyValue;
         $data['custom_attributes']['Pot'] = $pot;
         $data['custom_attributes']['Connections'] = $connections;
-        $data['custom_attributes']['Promo Code'] = $user->getCurrentPolicy() ? $user->getCurrentPolicy()->getPromoCode() : '';
+        $data['custom_attributes']['Promo Code'] = $user->getCurrentPolicy() ?
+            $user->getCurrentPolicy()->getPromoCode() :
+            '';
 
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
