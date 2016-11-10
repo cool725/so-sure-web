@@ -739,8 +739,17 @@ class ApiAuthController extends BaseController
                 // TODO: Change to while loop
                 throw new \Exception('duplicate code');
             }
+            $shortLink = $this->get('app.branch')->generateSCode($scode->getCode());
+            // branch is preferred, but can fallback to old website version if branch is down
+            if (!$shortLink) {
+                $link = $this->generateUrl('scode', ['code' => $scode->getCode()], true);
+                $shortLink = $this->get('app.shortlink')->addShortLink($link);
+            }
+            $scode->setShareLink($shortLink);
             $policy->addSCode($scode);
             $this->validateObject($scode);
+
+            $dm->flush();
 
             return new JsonResponse($scode->toApiArray());
         } catch (AccessDeniedException $ade) {

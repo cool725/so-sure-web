@@ -2074,8 +2074,13 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $getData = $this->verifyResponse(200);
         $this->assertEquals(8, strlen($getData['code']));
+        $this->assertGreaterThan(8, strlen($getData['share_link']));
         $this->assertEquals(SCode::TYPE_STANDARD, $getData['type']);
         $this->assertNotEquals($oldCode, $getData['code']);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $scodeRepo = $dm->getRepository(SCode::class);
+        $this->assertNotNull($scodeRepo->findOneBy(['code' => $getData['code']]));
     }
 
     public function testCreatePolicySCodeMissingParams()
