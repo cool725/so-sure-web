@@ -4,16 +4,22 @@ namespace AppBundle\Tests\Listener;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use AppBundle\Listener\UserListener;
 use AppBundle\Listener\DoctrineUserListener;
-use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
+use AppBundle\Listener\IntercomListener;
+
 use AppBundle\Event\UserEvent;
+use AppBundle\Event\PolicyEvent;
+use AppBundle\Event\InvitationEvent;
+
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Invitation\EmailInvitation;
+
 use AppBundle\Service\IntercomService;
-use AppBundle\Listener\IntercomListener;
-use AppBundle\Event\PolicyEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @group functional-net
@@ -79,7 +85,8 @@ class IntercomListenerTest extends WebTestCase
 
         $this->assertTrue($policy->isValidPolicy());
 
-        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        // Expect a user update + a policy create event
+        $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
     }
@@ -123,7 +130,8 @@ class IntercomListenerTest extends WebTestCase
         $listener = new IntercomListener(static::$intercomService);
         $listener->onPolicyCreatedEvent(new PolicyEvent($policy));
 
-        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        // Expect a user update + a policy create event
+        $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
     }
@@ -145,7 +153,8 @@ class IntercomListenerTest extends WebTestCase
         $listener = new IntercomListener(static::$intercomService);
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
-        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        // Expect a user update + a policy cancel event
+        $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
     }
@@ -167,5 +176,52 @@ class IntercomListenerTest extends WebTestCase
         $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
+    }
+
+    public function testIntercomInvitations()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomInvitationReceived-A', $this),
+            'bar'
+        );
+        $policyA = new PhonePolicy();
+        $policyA->setUser($userA);
+        $policyA->setId(rand(1, 99999));
+
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomInvitationReceived-B', $this),
+            'bar'
+        );
+        $policyB = new PhonePolicy();
+        $policyB->setUser($userB);
+        $policyB->setId(rand(1, 99999));
+
+        $invitation = new EmailInvitation();
+        $invitation->setInviter($userA);
+        $invitation->setInvitee($userB);
+        $invitation->setEmail($userB->getEmailCanonical());
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $event = new InvitationEvent($invitation);
+        $data = [
+            'onInvitationReceivedEvent',
+            'onInvitationAcceptedEvent',
+            'onInvitationRejectedEvent',
+            'onInvitationCancelledEvent',
+            'onInvitationInvitedEvent',
+            'onInvitationReinvitedEvent',
+        ];
+        foreach ($data as $method) {
+            call_user_func([$listener, $method], $event);
+
+            $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+            $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+            $this->assertEquals($invitation->getId(), $data['invitationId']);
+        }
     }
 }
