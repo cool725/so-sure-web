@@ -160,11 +160,6 @@ class Purchase
         return $this->mobileNumber;
     }
 
-    public function getFormattedMobileNumber()
-    {
-        return sprintf('+44%s', $this->mobileNumber);
-    }
-
     public function setMobileNumber($mobileNumber)
     {
         $this->mobileNumber = $mobileNumber;
@@ -245,7 +240,7 @@ class Purchase
         $this->setEmail($user->getEmail());
         $this->setFirstName($user->getFirstName());
         $this->setLastName($user->getLastName());
-        $this->setMobileNumber(str_replace('+44', '', $user->getMobileNumber()));
+        $this->setMobileNumber($user->getMobileNumber());
         $this->setBirthday($user->getBirthday());
         $this->setAddress($user->getBillingAddress());
     }
@@ -266,7 +261,7 @@ class Purchase
         $user->setEmail($this->getEmail());
         $user->setFirstName($this->getFirstName());
         $user->setLastName($this->getLastName());
-        $user->setMobileNumber($this->getFormattedMobileNumber());
+        $user->setMobileNumber($this->getMobileNumber());
         $user->setBirthday($this->getBirthday());
         $user->setBillingAddress($this->getAddress());
     }

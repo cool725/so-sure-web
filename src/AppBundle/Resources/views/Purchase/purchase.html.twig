@@ -62,12 +62,7 @@
                             {{ form_label(purchase_form.mobileNumber, 'Mobile Number') }}
                         </div>
                         <div class="form-group col-sm-6 {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
-                            <div class='input-group'>
-                                <span class="input-group-addon">
-                                    +44
-                                </span>
-                                {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'7[1-9][0-9]{8,8}', 'data-error': 'Please enter a valid UK Mobile Number. Did you leave off the beginning 0?'}}) }}
-                            </div>
+                            {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'00447[1-9][0-9]{8,8}|[+]447[1-9][0-9]{8,8}|07[1-9][0-9]{8,8}', 'data-error': 'Please enter a valid UK Mobile Number.'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
                         </div>
                     </div>
