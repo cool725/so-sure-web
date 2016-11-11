@@ -67,3 +67,5 @@
 .address-manual {
   padding-left: 0px;
 }
+
+.twitter-typeahead, .tt-hint, .tt-input, .tt-menu { width: 100%; }
