@@ -3,6 +3,8 @@
 namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Doctrine\ODM\MongoDB\DocumentManager;
+
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Policy;
@@ -14,9 +16,12 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
+
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MailerService;
-use Doctrine\ODM\MongoDB\DocumentManager;
+
+use AppBundle\Event\InvitationEvent;
+
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\FullPotException;
@@ -115,11 +120,13 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+
         $invitation = self::$invitationService->inviteByEmail(
             $policy,
             static::generateEmail('testDuplicateEmailReInvites-invite', $this)
         );
         $this->assertTrue($invitation instanceof EmailInvitation);
+
 
         // allow reinvites
         $before = new \DateTime();
@@ -189,12 +196,41 @@ class InvitationServiceTest extends WebTestCase
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
 
+        $this->expectInvitationEvent(InvitationEvent::EVENT_INVITED, 'onInvitationInvitedEvent');
+
         self::$invitationService->setEnvironment('prod');
         $invitation = self::$invitationService->inviteByEmail(
             $policy,
             'foo@so-sure.com'
         );
         self::$invitationService->setEnvironment('test');
+        $this->assertTrue($invitation instanceof EmailInvitation);
+    }
+
+    public function testEmailInvitationExistingUser()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testEmailInvitationExistingUser', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true, false);
+        static::$policyService->create($policy);
+
+        $invitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testEmailInvitationExistingUser-invitee', $this),
+            'bar'
+        );
+        $policyInvitee = static::initPolicy($invitee, static::$dm, static::$phone, null, true, false);
+        static::$policyService->create($policyInvitee);
+
+        $this->expectInvitationEvent(InvitationEvent::EVENT_RECEIVED, 'onInvitationReceivedEvent');
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('testEmailInvitationExistingUser-invitee', $this)
+        );
         $this->assertTrue($invitation instanceof EmailInvitation);
     }
 
@@ -562,6 +598,8 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
 
         // allow reinvitation
+        $this->expectInvitationEvent(InvitationEvent::EVENT_REINVITED, 'onInvitationReinvitedEvent');
+
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
         self::$invitationService->reinvite($invitation);
 
@@ -765,6 +803,8 @@ class InvitationServiceTest extends WebTestCase
         $future->add(new \DateInterval('P3D'));
         $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
 
+        $this->expectInvitationEvent(InvitationEvent::EVENT_REJECTED, 'onInvitationRejectedEvent');
+
         self::$invitationService->reject($invitation);
 
         $this->assertTrue($invitation->isRejected());
@@ -789,6 +829,9 @@ class InvitationServiceTest extends WebTestCase
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite8', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
+
+        $this->expectInvitationEvent(InvitationEvent::EVENT_ACCEPTED, 'onInvitationAcceptedEvent');
+
         self::$invitationService->accept($invitation, $policyInvitee);
 
         $this->assertTrue($invitation->isAccepted());
@@ -1395,6 +1438,9 @@ class InvitationServiceTest extends WebTestCase
             $email
         );
         $this->assertTrue($cancelledInvitation instanceof EmailInvitation);
+
+        $this->expectInvitationEvent(InvitationEvent::EVENT_CANCELLED, 'onInvitationCancelledEvent');
+
         self::$invitationService->cancel($cancelledInvitation);
 
         $openInvitation = self::$invitationService->inviteByEmail(
@@ -1438,5 +1484,17 @@ class InvitationServiceTest extends WebTestCase
         }
 
         return $newPolicy;
+    }
+
+    private function expectInvitationEvent($eventType, $method)
+    {
+        $listener = $this->getMockBuilder('IntercomListener')
+                         ->setMethods(array($method))
+                         ->getMock();
+        $listener->expects($this->once())
+                     ->method($method);
+
+        $dispatcher = static::$container->get('event_dispatcher');
+        $dispatcher->addListener($eventType, array($listener, $method));
     }
 }

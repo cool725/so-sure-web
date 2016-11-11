@@ -14,7 +14,7 @@ class InvitationEvent extends Event
     const EVENT_REJECTED = 'event.invitation.rejected';
     const EVENT_CANCELLED = 'event.invitation.cancelled';
     const EVENT_INVITED = 'event.invitation.invited';
-    const EVENT_RENVITED = 'event.invitation.reinvited';
+    const EVENT_REINVITED = 'event.invitation.reinvited';
 
     /** @var Invitation */
     protected $invitation;
