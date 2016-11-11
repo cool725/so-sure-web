@@ -6,6 +6,10 @@ use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
 use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Document\Invitation\SmsInvitation;
+
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Intercom\IntercomClient;
 
@@ -18,8 +22,17 @@ class IntercomService
     const SECURE_IOS = 'ios';
 
     const QUEUE_USER = 'user';
+
     const QUEUE_EVENT_POLICY_CREATED = 'policy-created';
     const QUEUE_EVENT_POLICY_CANCELLED = 'policy-cancelled';
+
+    const QUEUE_EVENT_INVITATION_ACCEPTED = 'invitation-accepted';
+    const QUEUE_EVENT_INVITATION_CANCELLED = 'invitation-cancelled';
+    const QUEUE_EVENT_INVITATION_INVITED = 'invitation-invited';
+    const QUEUE_EVENT_INVITATION_PENDING = 'invitation-pending';
+    const QUEUE_EVENT_INVITATION_RECEIVED = 'invitation-received';
+    const QUEUE_EVENT_INVITATION_REINVITED = 'invitation-reinvited';
+    const QUEUE_EVENT_INVITATION_REJECTED = 'invitation-rejected';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -271,6 +284,32 @@ class IntercomService
         $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
     }
 
+    public function sendInvitationEvent(Invitation $invitation, $event)
+    {
+        $now = new \DateTime();
+        $data = [
+            'event_name' => $event,
+            'created_at' => $now->getTimestamp(),
+        ];
+        if ($event == self::QUEUE_EVENT_INVITATION_INVITED ||
+            $event == self::QUEUE_EVENT_INVITATION_REINVITED ||
+            $event == self::QUEUE_EVENT_INVITATION_CANCELLED) {
+            $data['id'] = $invitation->getInviter()->getIntercomId();
+            $data['user_id'] = $invitation->getInviter()->getId();
+            $data['metadata']['Invitee Name'] = $invitation->getInvitee()->getName();
+        } elseif ($event == self::QUEUE_EVENT_INVITATION_RECEIVED ||
+            $event == self::QUEUE_EVENT_INVITATION_PENDING ||
+            $event == self::QUEUE_EVENT_INVITATION_ACCEPTED ||
+            $event == self::QUEUE_EVENT_INVITATION_REJECTED) {
+            $data['id'] = $invitation->getInvitee()->getIntercomId();
+            $data['user_id'] = $invitation->getInvitee()->getId();
+            $data['metadata']['Inviter Name'] = $invitation->getInviter()->getName();
+        }
+
+        $resp = $this->client->events->create($data);
+        $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
+    }
+
     public function process($max)
     {
         $count = 0;
@@ -292,28 +331,32 @@ class IntercomService
                 }
 
                 if ($action == self::QUEUE_USER) {
-                    if (!isset($data['userId']) || !$data['userId']) {
+                    if (!isset($data['userId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
-                    $repo = $this->dm->getRepository(User::class);
-                    $user = $repo->find($data['userId']);
-                    if (!$user) {
-                        throw new \InvalidArgumentException(sprintf('Unable to find userId: %s', $data['userId']));
-                    }
 
-                    $this->update($user);
+                    $this->update($this->getUser($data['userId']));
                 } elseif ($action == self::QUEUE_EVENT_POLICY_CREATED ||
                           $action == self::QUEUE_EVENT_POLICY_CANCELLED) {
-                    if (!isset($data['policyId']) || !$data['policyId']) {
+                    if (!isset($data['policyId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
-                    $repo = $this->dm->getRepository(Policy::class);
-                    $policy = $repo->find($data['policyId']);
-                    if (!$policy) {
-                        throw new \InvalidArgumentException(sprintf('Unable to find policyId: %s', $data['policyId']));
+
+                    $this->sendPolicyEvent($this->getPolicy($data['policyId']), $action);
+                } elseif ($action == self::QUEUE_EVENT_INVITATION_ACCEPTED ||
+                          $action == self::QUEUE_EVENT_INVITATION_CANCELLED ||
+                          $action == self::QUEUE_EVENT_INVITATION_INVITED ||
+                          $action == self::QUEUE_EVENT_INVITATION_PENDING ||
+                          $action == self::QUEUE_EVENT_INVITATION_RECEIVED ||
+                          $action == self::QUEUE_EVENT_INVITATION_REINVITED ||
+                          $action == self::QUEUE_EVENT_INVITATION_REJECTED) {
+                    if (!isset($data['invitationId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
 
-                    $this->sendPolicyEvent($policy, $action);
+                    $this->sendInvitationEvent($this->getInvitation($data['invitationId']), $action);
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
                 $count = $count + 1;
             } catch (\InvalidArgumentException $e) {
@@ -339,6 +382,48 @@ class IntercomService
         return $count;
     }
 
+    private function getUser($id)
+    {
+        if (!$id) {
+            throw new \InvalidArgumentException('Missing userId');
+        }
+        $repo = $this->dm->getRepository(User::class);
+        $user = $repo->find($id);
+        if (!$user) {
+            throw new \InvalidArgumentException(sprintf('Unable to find userId: %s', $id));
+        }
+
+        return $user;
+    }
+
+    private function getPolicy($id)
+    {
+        if (!$id) {
+            throw new \InvalidArgumentException('Missing policyId');
+        }
+        $repo = $this->dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw new \InvalidArgumentException(sprintf('Unable to find policyId: %s', $id));
+        }
+
+        return $policy;
+    }
+
+    private function getInvitation($id)
+    {
+        if (!$id) {
+            throw new \InvalidArgumentException('Missing invitationId');
+        }
+        $repo = $this->dm->getRepository(Invitation::class);
+        $invitation = $repo->find($id);
+        if (!$invitation) {
+            throw new \InvalidArgumentException(sprintf('Unable to find invitationId: %s', $id));
+        }
+
+        return $invitation;
+    }
+
     public function queue(User $user, $retryAttempts = 0)
     {
         $data = [
@@ -354,6 +439,16 @@ class IntercomService
         $data = [
             'action' => $event,
             'policyId' => $policy->getId(),
+            'retryAttempts' => $retryAttempts
+        ];
+        $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
+    }
+
+    public function queueInvitation(Invitation $invitation, $event, $retryAttempts = 0)
+    {
+        $data = [
+            'action' => $event,
+            'invitationId' => $invitation->getId(),
             'retryAttempts' => $retryAttempts
         ];
         $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));

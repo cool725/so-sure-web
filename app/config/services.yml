@@ -108,6 +108,7 @@ services:
             rateLimit:            "@app.ratelimit"
             push:                 "@app.push"
             environment:          "%kernel.environment%"
+            dispatcher:           "@event_dispatcher"
 
     app.digits:
         class: AppBundle\Service\DigitsService
@@ -459,6 +460,12 @@ services:
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+            -  { name: kernel.event_listener, event: event.invitation.received, method: onInvitationReceivedEvent }
+            -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
+            -  { name: kernel.event_listener, event: event.invitation.rejected, method: onInvitationRejectedEvent }
+            -  { name: kernel.event_listener, event: event.invitation.cancelled, method: onInvitationCancelledEvent }
+            -  { name: kernel.event_listener, event: event.invitation.invited, method: onInvitationInvitedEvent }
+            -  { name: kernel.event_listener, event: event.invitation.reinvited, method: onInvitationReinvitedEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener
