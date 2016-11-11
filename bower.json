@@ -22,7 +22,8 @@
     "ouibounce": "^0.0.12",
     "datatables.net": "^1.10.12",
     "datatables.net-bs": "^1.10.12",
-    "typeahead.js": "^0.11.1"
+    "typeahead.js": "^0.11.1",
+    "bootstrap-validator": "^0.11.5"
   },
   "install": {
     "path": "web/components",
@@ -56,6 +57,9 @@
       ],
       "typeahead.js": [
         "bower_components/typeahead.js/dist/typeahead.bundle.min.js"
+      ],
+      "bootstrap-validator": [
+        "bower_components/bootstrap-validator/js/validator.js"
       ]
     }
   }

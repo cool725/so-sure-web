@@ -115,7 +115,7 @@ class PurchaseController extends BaseController
                         $user,
                         $purchase->getEmail(),
                         null,
-                        $purchase->getMobileNumber()
+                        $purchase->getFormattedMobileNumber()
                     );
                     if ($userExists) {
                         // @codingStandardsIgnoreStart

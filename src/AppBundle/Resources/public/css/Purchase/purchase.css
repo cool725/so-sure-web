@@ -32,13 +32,17 @@
     width: 70% !important;
 }
 
-.has-error ul {
+.help-block ul {
   list-style: none;
 }
 
-.has-error li {
+.help-block li {
   margin-left: -40px;
   color: red;
+}
+
+.help-block .list-unstyled li {
+  margin-left: 0px;
 }
 
 .has-error .form-control {

@@ -15,13 +15,14 @@
         'components/moment/moment.min.js'
         'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
         'components/typeahead.js/typeahead.bundle.min.js'
+        'components/bootstrap-validator/validator.js'
         '@AppBundle/Resources/public/js/Purchase/purchase.js' %}
     %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block body %}
 <div class="container">
-    {{ form_start(purchase_form) }}
+    {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator'}}) }}
     <div class="row">
         <div class="col-md-6">
             <div class="panel panel-default">
@@ -35,7 +36,7 @@
                         </div>
                         <div class="form-group col-sm-6 {% if form_errors(purchase_form.email) %}has-error{% endif %}">
                             {{ form_widget(purchase_form.email, {'attr':{'class':'form-control'}}) }}
-                            {{ form_errors(purchase_form.email) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.email) }}</div>
                         </div>
                     </div>
                     <div class="row">
@@ -44,7 +45,7 @@
                         </div>
                         <div class="form-group col-sm-6 {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
                             {{ form_widget(purchase_form.firstName, {'attr':{'class':'form-control'}}) }}
-                            {{ form_errors(purchase_form.firstName) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.firstName) }}</div>
                         </div>
                     </div>
                     <div class="row">
@@ -53,7 +54,7 @@
                         </div>
                         <div class="form-group col-sm-6 {% if form_errors(purchase_form.lastName) %}has-error{% endif %}">
                             {{ form_widget(purchase_form.lastName, {'attr':{'class':'form-control'}}) }}
-                            {{ form_errors(purchase_form.lastName) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.lastName) }}</div>
                         </div>
                     </div>
                     <div class="row">
@@ -65,9 +66,9 @@
                                 <span class="input-group-addon">
                                     +44
                                 </span>
-                                {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control'}}) }}
+                                {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'7[1-9][0-9]{8,8}', 'data-error': 'Please enter a valid UK Mobile Number. Did you leave off the beginning 0?'}}) }}
                             </div>
-                            {{ form_errors(purchase_form.mobileNumber) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
                         </div>
                     </div>
                     <div class="row">
@@ -81,7 +82,7 @@
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
                             </div>
-                            {{ form_errors(purchase_form.birthday) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
                         </div>
                     </div>
                 </div>
@@ -117,7 +118,7 @@
                         </div>
                         <div class="form-group col-sm-6 {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                             {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control'}}) }}
-                            {{ form_errors(purchase_form.imei) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                         </div>
                     </div>
                     {% if purchase_form.serialNumber is defined %}
@@ -129,7 +130,7 @@
                         </div>
                         <div class="form-group col-sm-6 {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
                             {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control'}}) }}
-                            {{ form_errors(purchase_form.serialNumber) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
                         </div>
                     </div>
                     {% endif %}
@@ -169,7 +170,7 @@
                             </div>
                             <div class="form-group col-sm-6 {% if form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1'}}) }}
-                                {{ form_errors(purchase_form.addressLine1) }}
+                                <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
                             </div>
                         </div>
                         <div class="row">
@@ -178,7 +179,7 @@
                             </div>
                             <div class="form-group col-sm-6 {% if form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2'}}) }}
-                                {{ form_errors(purchase_form.addressLine2) }}
+                                <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
                             </div>
                         </div>
                         <div class="row">
@@ -187,7 +188,7 @@
                             </div>
                             <div class="form-group col-sm-6 {% if form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3'}}) }}
-                                {{ form_errors(purchase_form.addressLine3) }}
+                                <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
                             </div>
                         </div>
                         <div class="row">
@@ -196,7 +197,7 @@
                             </div>
                             <div class="form-group col-sm-6 {% if form_errors(purchase_form.city) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.city, {'attr':{'class':'form-control city'}}) }}
-                                {{ form_errors(purchase_form.city) }}
+                                <div class="help-block with-errors">{{ form_errors(purchase_form.city) }}</div>
                             </div>
                         </div>
                         <div class="row">
@@ -205,7 +206,7 @@
                             </div>
                             <div class="form-group col-sm-6 {% if form_errors(purchase_form.postcode) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode'}}) }}
-                                {{ form_errors(purchase_form.postcode) }}
+                                <div class="help-block with-errors">{{ form_errors(purchase_form.postcode) }}</div>
                             </div>
                         </div>
                     </div>
