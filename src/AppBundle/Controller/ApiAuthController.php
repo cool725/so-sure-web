@@ -12,6 +12,7 @@ use AppBundle\Form\Type\LaunchType;
 use AppBundle\Form\Type\PhoneType;
 
 use AppBundle\Document\Address;
+use AppBundle\Document\Payment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -606,6 +607,7 @@ class ApiAuthController extends BaseController
                     $this->getDataString($judoData, 'receipt_id'),
                     $this->getDataString($judoData, 'consumer_token'),
                     $this->getDataString($judoData, 'card_token'),
+                    Payment::SOURCE_MOBILE,
                     $this->getDataString($judoData, 'device_dna')
                 );
             }

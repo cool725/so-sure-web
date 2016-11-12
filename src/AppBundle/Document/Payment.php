@@ -20,6 +20,11 @@ abstract class Payment
 {
     use CurrencyTrait;
 
+    const SOURCE_TOKEN = 'token';
+    const SOURCE_WEB = 'web';
+    const SOURCE_WEB_API = 'web-qpi';
+    const SOURCE_MOBILE = 'mobile';
+
     /**
      * @MongoDB\Id
      */
@@ -126,6 +131,13 @@ abstract class Payment
     protected $notes;
 
     /**
+     * @Assert\Choice({"mobile", "web", "web-api", "token"})
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $source;
+
+    /**
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
@@ -162,6 +174,16 @@ abstract class Payment
     public function getAmount()
     {
         return $this->amount;
+    }
+
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    public function setSource($source)
+    {
+        $this->source = $source;
     }
 
     public function setGwp($gwp)

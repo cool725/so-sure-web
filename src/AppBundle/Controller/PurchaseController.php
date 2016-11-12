@@ -262,7 +262,8 @@ class PurchaseController extends BaseController
             $payment->getPolicy(),
             $request->get('ReceiptId'),
             null,
-            $request->get('CardToken')
+            $request->get('CardToken'),
+            Payment::SOURCE_WEB
         );
         $this->addFlash(
             'success',
