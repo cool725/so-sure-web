@@ -257,7 +257,7 @@
       {{ form_start(lead_form) }}
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title text-center">Ready to join the Social Insurance revolution?</h2>
+        <h3 class="modal-title text-center">Ready to join the Social Insurance revolution?</h3>
       </div>
       <div class="modal-body text-center">
         <p class="lead">Just enter your email below to get started!</p>
@@ -265,19 +265,35 @@
             <div class="form-group col-sm-12">
                 {{ form_errors(lead_form.email) }}
                 {{ form_widget(lead_form.email, {'attr': {'placeholder': 'Email address'}}) }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="form-group text-center col-sm-12" style="padding-top: 10px;">
                 {{ form_widget(lead_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-primary'}}) }}
                 {{ form_rest(lead_form) }}
             </div>
         </div>
         {{ form_end(lead_form) }}
+        <div class="download-app-modal">
+        <div class="text-break">
+            <div class="line"></div>
+            OR
+            <div class="line"></div>
+        </div>
+        <div class="row" style="padding-bottom: 30px;">
+          <p class="lead">Download our app - it's a little bit easier.</p>
+        <div class="col-md-6 text-right">
+            <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+            </a>
+        </div>
+        <div class="col-md-6 text-left">
+            <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+            </a>
+        </div>
+      </div>
+      </div>
+      </div>
+      </div>
       </div>
     </div>
-  </div>
-</div>
 
 {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
