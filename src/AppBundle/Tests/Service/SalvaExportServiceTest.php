@@ -134,6 +134,27 @@ class SalvaExportServiceTest extends WebTestCase
         );
     }
 
+    public function testProdInvalidSkippedStatus()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            'testProdInvalidSkippedStatus@so-sure.com',
+            'bar'
+        );
+        static::$salva->setEnvironment('prod');
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertTrue($updatedPolicy->isPrefixInvalidPolicy());
+        $this->assertEquals(
+            SalvaPhonePolicy::SALVA_STATUS_SKIPPED,
+            $updatedPolicy->getSalvaStatus()
+        );
+    }
+
     /**
      * @expectedException \UnexpectedValueException
      */

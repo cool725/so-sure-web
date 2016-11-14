@@ -14,6 +14,9 @@ use AppBundle\Classes\Salva;
  */
 class SalvaPhonePolicy extends PhonePolicy
 {
+    // Policy shouldn't be set to salva
+    const SALVA_STATUS_SKIPPED = 'skipped';
+
     // Policy needs to be sent to salva
     const SALVA_STATUS_PENDING = 'pending';
 
@@ -37,7 +40,7 @@ class SalvaPhonePolicy extends PhonePolicy
 
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "wait-cancelled", "pending-cancelled",
-     *      "replacement-cancel", "replacement-create"})
+     *      "replacement-cancel", "replacement-create", "skipped"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -189,7 +192,11 @@ class SalvaPhonePolicy extends PhonePolicy
     public function create($seq, $prefix = null, \DateTime $startDate = null)
     {
         parent::create($seq, $prefix, $startDate);
-        $this->setSalvaStatus(self::SALVA_STATUS_PENDING);
+        if ($this->isPrefixInvalidPolicy()) {
+            $this->setSalvaStatus(self::SALVA_STATUS_SKIPPED);
+        } else {
+            $this->setSalvaStatus(self::SALVA_STATUS_PENDING);
+        }
     }
 
     public function cancel($reason, \DateTime $date = null)

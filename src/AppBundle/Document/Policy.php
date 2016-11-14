@@ -1470,6 +1470,11 @@ abstract class Policy
         return strpos($this->getPolicyNumber(), $prefix) === 0;
     }
 
+    public function isPrefixInvalidPolicy()
+    {
+        return $this->hasPolicyPrefix(self::PREFIX_INVALID);
+    }
+
     public function isValidPolicy($prefix = null)
     {
         if (!$this->isPolicy()) {
