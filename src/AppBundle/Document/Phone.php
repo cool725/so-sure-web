@@ -177,6 +177,12 @@ class Phone
      */
     protected $suggestedReplacement;
 
+    /**
+     * @Assert\Url(protocols = {"http", "https"})
+     * @MongoDB\Field(type="string")
+     */
+    protected $imageUrl;
+
     public function __construct()
     {
     }
@@ -438,6 +444,16 @@ class Phone
         $this->active = $active;
     }
 
+    public function getImageUrl()
+    {
+        return $this->imageUrl;
+    }
+
+    public function setImageUrl($imageUrl)
+    {
+        $this->imageUrl = $imageUrl;
+    }
+
     public function getMonthAge()
     {
         if (!$this->getReleaseDate()) {
@@ -611,6 +627,7 @@ class Phone
             'model' => $this->getModel(),
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
+            'image_url' => $this->getImageUrl() ? $this->getImageUrl() : null,
         ];
     }
 
