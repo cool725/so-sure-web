@@ -7,11 +7,32 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use AppBundle\Document\Phone;
+use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Payment;
+use AppBundle\Document\User;
+use AppBundle\Document\Form\Purchase;
+
 use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
-use Symfony\Component\HttpFoundation\Session\Session;
+use AppBundle\Form\Type\PurchaseType;
+
+use AppBundle\Security\UserVoter;
+
+use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Exception\InvalidUserDetailsException;
+use AppBundle\Exception\GeoRestrictedException;
+use AppBundle\Exception\DuplicateImeiException;
+use AppBundle\Exception\LostStolenImeiException;
+use AppBundle\Exception\InvalidImeiException;
+use AppBundle\Exception\ImeiBlacklistedException;
+use AppBundle\Exception\ImeiPhoneMismatchException;
+use AppBundle\Exception\RateLimitException;
 
 /**
  * @Route("/purchase")
@@ -19,177 +40,268 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class PurchaseController extends BaseController
 {
     /**
-     * @Route("/", name="purchase")
+     * @Route("/phone/{phoneId}", name="purchase_phone", requirements={"phoneId":"[0-9a-f]{24,24}"})
+     * @Route("/{policyId}", name="purchase_policy", requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
-     */
-    public function indexAction()
+    */
+    public function purchaseAction(Request $request, $phoneId = null, $policyId = null)
     {
-        throw $this->createAccessDeniedException('Coming soon');
-
-        $phone = $this->getSessionPhone();
-        if (!$phone) {
-            return $this->redirectToRoute('quote');
-        }
-
-        return array(
-            'phone' => $phone
-        );
-    }
-
-    private function getSessionPhone()
-    {
-        $session = new Session();
-        $phoneId = $session->get('quote');
-
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phone = $repo->find($phoneId);
-
-        return $phone;
-    }
-
-    /**
-     * @Route("/dd/", name="purchase_item_debit")
-     * @Template
-     */
-    public function purchaseDdItemAction(Request $request)
-    {
-        throw $this->createAccessDeniedException('Coming soon');
-
-        $phone = $this->getSessionPhone();
-        if (!$phone) {
-            return $this->redirectToRoute('quote');
-        }
-
         $user = $this->getUser();
-        $form = $this->createForm(BasicUserType::class, $user);
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $dm = $this->getManager();
-            $dm->flush();
+        if ($user->hasValidPolicy()) {
+            $this->addFlash(
+                'warning',
+                'Sorry, we currently only support 1 policy per user.  Multiple policies are coming soon!'
+            );
 
-            $this->redirectToRoute('purchase_item_debit_address');
+            return $this->redirectToRoute('user_home');
         }
 
-        return array(
-            'phone' => $phone,
-            'form' => $form->createView(),
-        );
-    }
+        $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
 
-    /**
-     * @Route("/dd/address", name="purchase_item_debit_address")
-     * @Template
-     */
-    public function purchaseDdItemAddressAction(Request $request)
-    {
-        throw $this->createAccessDeniedException('Coming soon');
-
-        $phone = $this->getSessionPhone();
-        if (!$phone) {
-            return $this->redirectToRoute('quote');
-        }
-
+        $webpay = null;
         $dm = $this->getManager();
-        $user = $this->getUser();
-        if (!$address = $user->getBillingAddress()) {
-            $address = new Address();
-            $address->setType(Address::Billing);
-            $address->setUser($user);
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = null;
+        $phone = null;
+        if ($phoneId) {
+            $phone = $phoneRepo->find($phoneId);
+        } elseif ($policyId) {
+            $policy = $policyRepo->find($policyId);
+            if (!$policy) {
+                throw $this->createNotFoundException('Policy not found');
+            }
+
+            if ($policy->isValidPolicy()) {
+                $this->addFlash('warning', 'This policy was already purchased.');
+                return $this->redirectToRoute('user_home');
+            }
+            $phone = $policy->getPhone();
+        } else {
+            throw $this->createNotFoundException('Missing argument');
+        }
+        if (!$phone) {
+            throw $this->createNotFoundException('Phone not found');
         }
 
-        $form = $this->createForm(AddressType::class, $address);
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $dm->persist($address);
-            $dm->flush();
-
-            //$this->redirectToRoute('purchase_item_debit_address');
+        // If there are any policies in progress, redirect to the purchase route
+        if (!$policy) {
+            $initPolicies = $user->getInitPolicies();
+            if (count($initPolicies) > 0) {
+                return $this->redirectToRoute('purchase_policy', ['policyId' => $initPolicies[0]->getId()]);
+            }
         }
 
-        return array(
+        $purchase = new Purchase();
+        $purchase->populateFromUser($user);
+        $purchase->setPhone($phone);
+        if ($policy) {
+            $purchase->setImei($policy->getImei());
+            $purchase->setSerialNumber($policy->getSerialNumber());
+        }
+        if ($request->get('email')) {
+            $purchase->setEmail($request->get('email'));
+        }
+        $purchaseForm = $this->get('form.factory')
+            ->createNamedBuilder('purchase_form', PurchaseType::class, $purchase)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('purchase_form')) {
+                $purchaseForm->handleRequest($request);
+                if ($purchaseForm->isValid()) {
+                    $userRepo = $dm->getRepository(User::class);
+                    $userExists = $userRepo->existsAnotherUser(
+                        $user,
+                        $purchase->getEmail(),
+                        null,
+                        $purchase->getMobileNumber()
+                    );
+                    if ($userExists) {
+                        // @codingStandardsIgnoreStart
+                        $err = 'It looks like you already have an account.  Please logout and try logging in with a different email/mobile number';
+                        // @codingStandardsIgnoreEnd
+                        $this->addFlash('error', $err);
+
+                        // TODO: would be good to auto logout.  redirecting to /logout doesn't work well
+                        throw new \Exception($err);
+                    }
+
+                    $purchase->populateUser($user);
+
+                    if (!$user->hasValidDetails() || !$user->hasValidBillingDetails()) {
+                        throw new \InvalidArgumentException(sprintf(
+                            'User is missing details such as name, email address, or billing details (User: %s)',
+                            $user->getId()
+                        ));
+                    }
+
+                    if ($policy) {
+                        // If any policy data has changed, delete/re-create
+                        if ($policy->getImei() != $purchase->getImei() ||
+                            $policy->getSerialNumber() != $purchase->getSerialNumber() ||
+                            $policy->getPhone()->getId() != $purchase->getPhone()->getId()) {
+                            $dm->remove($policy);
+                            $dm->flush();
+                            $policy = null;
+                        }
+                    }
+
+                    $allowPayment = true;
+                    if (!$policy) {
+                        try {
+                            $policyService = $this->get('app.policy');
+                            $policy = $policyService->init(
+                                $user,
+                                $phone,
+                                $purchase->getImei(),
+                                $purchase->getSerialNumber(),
+                                $this->getIdentityLogWeb($request)
+                            );
+                            $dm->persist($policy);
+                        } catch (InvalidPremiumException $e) {
+                            // Nothing the user can do, so rethow
+                            throw $e;
+                        } catch (InvalidUserDetailsException $e) {
+                            $this->addFlash(
+                                'error',
+                                "Please check all your details.  It looks like we're missing something."
+                            );
+                            $allowPayment = false;
+                        } catch (GeoRestrictedException $e) {
+                            $this->addFlash(
+                                'error',
+                                "Sorry, we are unable to insure you. It looks like you're outside the UK."
+                            );
+                            throw $this->createNotFoundException('Unable to see policy');
+                        } catch (DuplicateImeiException $e) {
+                            $this->addFlash(
+                                'error',
+                                "Sorry, it looks this phone is already insured"
+                            );
+                            $allowPayment = false;
+                        } catch (LostStolenImeiException $e) {
+                            $this->addFlash(
+                                'error',
+                                "Sorry, it looks this phone is already insured"
+                            );
+                            $allowPayment = false;
+                        } catch (ImeiBlacklistedException $e) {
+                            $this->addFlash(
+                                'error',
+                                "Sorry, we are unable to insure you."
+                            );
+                            $allowPayment = false;
+                        } catch (InvalidImeiException $e) {
+                            $this->addFlash(
+                                'error',
+                                "Looks like the IMEI you provided isn't quite right.  Please check the number again."
+                            );
+                            $allowPayment = false;
+                        } catch (ImeiPhoneMismatchException $e) {
+                            $this->addFlash(
+                                'error',
+                                "Sorry, we are unable to insure you."
+                            );
+                            $allowPayment = false;
+                        } catch (RateLimitException $e) {
+                            $this->addFlash(
+                                'error',
+                                "Sorry, we are unable to insure you."
+                            );
+                            $allowPayment = false;
+                        }
+                    }
+                    $dm->flush();
+
+                    if ($allowPayment) {
+                        $webpay = $this->get('app.judopay')->webpay(
+                            $policy,
+                            $policy->getPremium()->getMonthlyPremiumPrice(),
+                            $request->getClientIp(),
+                            $request->headers->get('User-Agent')
+                        );
+                    }
+                }
+            }
+        }
+
+        $data = array(
             'phone' => $phone,
-            'form' => $form->createView(),
+            'purchase_form' => $purchaseForm->createView(),
+            'policy_key' => $this->getParameter('policy_key'),
         );
+
+        if (isset($webpay['post_url']) && isset($webpay['payment'])) {
+            $data['webpay_action'] = $webpay['post_url'];
+            $data['webpay_reference'] = $webpay['payment']->getReference();
+        }
+        
+        return $data;
     }
 
     /**
-     * @Route("/cc/success/", name="purchase_judopay_receive_success")
-     * @Template
+     * @Route("/cc/success", name="purchase_judopay_receive_success")
+     * @Route("/cc/success/", name="purchase_judopay_receive_success_slash")
      * @Method({"POST"})
      */
     public function purchaseJudoPayReceiveSuccessAction(Request $request)
     {
-        throw $this->createAccessDeniedException('Coming soon');
-
-        $policy = $this->get('app.judopay')->paymentSuccess(
-            $request->get('Reference'),
-            $request->get('ReceiptId'),
-            $request->get('CardToken')
-        );
-
-        return $this->redirectToRoute('purchase_judopay_success', ['id' => $policy->getId()]);
-    }
-
-    /**
-     * @Route("/cc/success/{id}", name="purchase_judopay_success")
-     * @Template
-     * @Method({"GET"})
-     */
-    public function purchaseJudoPaySuccessAction($id)
-    {
-        throw $this->createAccessDeniedException('Coming soon');
-
         $dm = $this->getManager();
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($id);
-        if (!$policy) {
-            throw new \Exception('Unable to locate policy');
-        }
-        if ($policy->getUser()->getId() != $this->getUser()->getId()) {
-            throw new \Exception('Invalid policy');
+        $repo = $dm->getRepository(Payment::class);
+        $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
+        if (!$payment) {
+            throw new \Exception('Unable to locate payment');
         }
 
-        return array('policy' => $policy);
-    }
-    
-    /**
-     * @Route("/cc/fail/", name="purchase_judopay_receive_fail")
-     * @Template
-     */
-    public function purchaseJudoPayFailAction()
-    {
-        throw $this->createAccessDeniedException('Coming soon');
-
-        return array();
-    }
-
-    /**
-     * @Route("/cc/", name="purchase_judopay")
-     * @Template
-     */
-    public function purchaseJudoPayAction(Request $request)
-    {
-        throw $this->createAccessDeniedException('Coming soon');
-
-        $phone = $this->getSessionPhone();
-        if (!$phone) {
-            return $this->redirectToRoute('quote');
+        if ($payment->getUser()->getId() != $this->getUser()->getId()) {
+            throw new AccessDeniedException('Unknown user');
         }
 
-        // TODO: Lost addition?
-        $webpay = $this->get('app.judopay')->webpay(
-            $this->getUser(),
-            $phone,
-            $phone->getCurrentPhonePrice(),
-            $request->getClientIp(),
-            $request->headers->get('User-Agent')
+        $policy = $this->get('app.judopay')->add(
+            $payment->getPolicy(),
+            $request->get('ReceiptId'),
+            null,
+            $request->get('CardToken'),
+            Payment::SOURCE_WEB
+        );
+        $this->addFlash(
+            'success',
+            'Welcome to so-sure!'
         );
 
-        return array(
-            'form_action' => $webpay['post_url'],
-            'reference' => $webpay['payment']->getReference(),
-            'phone' => $phone,
-        );
+        return $this->redirectToRoute('user_home');
+    }
+    /**
+     * @Route("/cc/fail", name="purchase_judopay_receive_fail")
+     * @Route("/cc/fail/", name="purchase_judopay_receive_fail_slash")
+     */
+    public function purchaseJudoPayFailAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Payment::class);
+        $reference = $request->get('Reference');
+        if (!$reference) {
+            $initPolicies = $this->getUser()->getInitPolicies();
+            if (count($initPolicies) > 0) {
+                $this->addFlash('warning', 'You seem to have a policy that you started creating, but is unpaid.');
+                return $this->redirectToRoute('purchase_policy', ['policyId' => $initPolicies[0]->getId()]);
+            }
+
+            throw new \Exception('Unable to locate reference');
+        }
+
+        $payment = $repo->findOneBy(['reference' => $reference]);
+        if (!$payment) {
+            throw new \Exception('Unable to locate payment');
+        }
+
+        if ($payment->getUser()->getId() != $this->getUser()->getId()) {
+            throw new AccessDeniedException('Unknown user');
+        }
+
+        $this->addFlash('error', 'There was a problem processing your payment. You can try again.');
+
+        return $this->redirectToRoute('purchase_policy', ['policyId' => $payment->getPolicy()->getId()]);
     }
 }

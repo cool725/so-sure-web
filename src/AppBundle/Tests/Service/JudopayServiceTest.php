@@ -10,6 +10,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Classes\Salva;
 
@@ -89,7 +90,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         $this->assertEquals($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(), $payment->getAmount());
         $this->assertEquals($payment->getAmount() / (1 + $policy->getPremium()->getIptRate()), $payment->getGwp());
         $this->assertEquals($receiptId, $payment->getReceipt());
@@ -123,7 +124,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         $this->assertEquals($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(), $payment->getAmount());
         $this->assertEquals($receiptId, $payment->getReceipt());
         $this->assertEquals($policy->getId(), $payment->getReference());
@@ -150,7 +151,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         // should be allowed
     }
 
@@ -207,7 +208,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '125'
         );
-        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
     }
 
     public function testJudoAdd()
@@ -224,7 +225,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        self::$judopay->add($policy, $receiptId, 'ctoken', 'token');
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
@@ -244,7 +245,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        self::$judopay->add($policy, $receiptId, 'ctoken', 'token');
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
@@ -264,7 +265,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        self::$judopay->add($policy, $receiptId, 'ctoken', 'token');
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
@@ -301,7 +302,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        self::$judopay->add($policy, $receiptId, 'ctoken', 'token');
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
@@ -339,6 +340,7 @@ class JudopayServiceTest extends WebTestCase
             $details['receiptId'],
             $details['consumer']['consumerToken'],
             $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
             "{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}"
         );
         // @codingStandardsIgnoreEnd
@@ -377,6 +379,7 @@ class JudopayServiceTest extends WebTestCase
             $details['receiptId'],
             $details['consumer']['consumerToken'],
             $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
             "{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}"
         );
         // @codingStandardsIgnoreEnd
@@ -420,6 +423,7 @@ class JudopayServiceTest extends WebTestCase
             $details['receiptId'],
             $details['consumer']['consumerToken'],
             $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
             "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
         );
         // @codingStandardsIgnoreEnd
@@ -503,6 +507,7 @@ class JudopayServiceTest extends WebTestCase
             $details['receiptId'],
             $details['consumer']['consumerToken'],
             $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
             "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
         );
         // @codingStandardsIgnoreEnd

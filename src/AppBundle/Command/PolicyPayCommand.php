@@ -11,6 +11,7 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment;
 use AppBundle\Document\User;
 
 class PolicyPayCommand extends ContainerAwareCommand
@@ -89,6 +90,7 @@ class PolicyPayCommand extends ContainerAwareCommand
             $details['receiptId'],
             $details['consumer']['consumerToken'],
             $details['cardDetails']['cardToken'],
+            Payment::SOURCE_TOKEN,
             $user->getPaymentMethod()->getDeviceDna(),
             $date
         );

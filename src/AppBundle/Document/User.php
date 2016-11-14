@@ -346,6 +346,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
+    public function getInitPolicies()
+    {
+        $policies = [];
+        foreach ($this->policies as $policy) {
+            if (!$policy->getStatus()) {
+                $policies[] = $policy;
+            }
+        }
+
+        return $policies;
+    }
+
     public function getAllPolicies()
     {
         return $this->policies;

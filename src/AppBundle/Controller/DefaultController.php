@@ -384,22 +384,29 @@ class DefaultController extends BaseController
             } elseif ($request->request->has('lead_form')) {
                 $leadForm->handleRequest($request);
                 if ($leadForm->isValid()) {
-                    $leadRepo = $dm->getRepository(Lead::class);
-                    if (!$leadRepo->findOneBy(['email' => strtolower($lead->getEmail())])) {
-                        $lead->setEmail(strtolower($lead->getEmail()));
-                        $dm->persist($lead);
+                    $userRepo = $dm->getRepository(User::class);
+                    $user = $userRepo->findOneBy(['emailCanonical' => strtolower($lead->getEmail())]);
+                    if (!$user) {
+                        $userManager = $this->get('fos_user.user_manager');
+                        $user = $userManager->createUser();
+                        $user->setEnabled(true);
+                        $user->setEmail($lead->getEmail());
+                        $dm->persist($user);
                         $dm->flush();
+
+                        $this->get('fos_user.security.login_manager')->loginUser(
+                            $this->getParameter('fos_user.firewall_name'),
+                            $user
+                        );
+                    } elseif (!$this->getUser()) {
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash('warning', sprintf(
+                            "Looks like you already have an account. Please login below to continue with your purchase.  You may need to use the email login and forgot password link."
+                        ));
+                        // @codingStandardsIgnoreEnd
                     }
 
-                    // TODO: Move to queue
-                    $intercom = $this->get('app.intercom');
-                    $intercom->updateLead($lead);
-
-                    $this->addFlash('success', sprintf(
-                        'Thanks!  Please download the app to continue with your so-sure purchase.'
-                    ));
-
-                    return $this->redirectToRoute('download_app');
+                    return $this->redirectToRoute('purchase_phone', ['phoneId' => $phone->getId()]);
                 } else {
                     $this->addFlash('error', sprintf(
                         "Sorry, didn't quite catch that email.  Please try again."

@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -63,9 +64,45 @@ class UserController extends BaseController
      * @Route("/invalid", name="user_invalid_policy")
      * @Template
      */
-    public function invalidPolicyAction()
+    public function invalidPolicyAction(Request $request)
     {
+        $user = $this->getUser();
+
+        // If there are any policies in progress, redirect to the purchase
+        $initPolicies = $user->getInitPolicies();
+        if (count($initPolicies) > 0) {
+            return $this->redirectToRoute('purchase_policy', ['policyId' => $initPolicies[0]->getId()]);
+        }
+
+        $deviceAtlas = $this->get('app.deviceatlas');
+        $policy = new PhonePolicy();
+        if ($request->getMethod() == "GET") {
+            $phone = $deviceAtlas->getPhone($request);
+            /*
+            if (!$phone) {
+                $phone = $this->getDefaultPhone();
+            }
+            */
+            if ($phone instanceof Phone) {
+                $policy->setPhone($phone);
+            }
+        }
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneType::class, $policy)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('launch_phone')) {
+                $formPhone->handleRequest($request);
+                if ($formPhone->isValid() && $policy->getPhone()) {
+                    return $this->redirectToRoute('purchase_phone', [
+                        'phoneId' => $policy->getPhone()->getId(),
+                    ]);
+                }
+            }
+        }
+
         return array(
+            'form_phone' => $formPhone->createView(),
         );
     }
 

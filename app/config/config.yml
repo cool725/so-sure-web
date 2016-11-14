@@ -54,6 +54,7 @@ twig:
         heap_id: %heap_id%
         google_analytics: %google_analytics%
         ga_tag_manager_env: %ga_tag_manager_env%
+        pca_webkey: %pca_webkey%
         branch_key: %branch_key%
         drift_key: %drift_key%
         use_cdn: true

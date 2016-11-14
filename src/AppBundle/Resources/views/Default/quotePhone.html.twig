@@ -117,7 +117,11 @@
                 <div class="row" style="padding-top: 30px; padding-bottom: 10px;">
                 <div class="col-sm-12">
                   <p class="text-center">
-                    <a class="btn btn-primary" id="get-started" data-toggle="modal" data-target="#buyModal">Buy now</a>
+                    {% if app.user is not null and app.user %}
+                      <a class="btn btn-primary" id="get-started" href="{{ path('purchase_phone', {'phoneId': phone.id }) }}">Buy now</a>
+                    {% else %}
+                      <a class="btn btn-primary" id="get-started" data-toggle="modal" data-target="#buyModal">Buy now</a>
+                    {% endif %}
                   </p>
                 </div>
               </div>

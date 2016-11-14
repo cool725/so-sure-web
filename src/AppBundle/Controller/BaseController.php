@@ -16,6 +16,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhoneTrait;
+use AppBundle\Document\IdentityLog;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Exception\ValidationException;
 
@@ -312,6 +313,14 @@ abstract class BaseController extends Controller
         $geoip = $this->get('app.geoip');
 
         return $geoip->getIdentityLog($clientIp, $this->getCognitoIdentityId($request));
+    }
+
+    protected function getIdentityLogWeb(Request $request)
+    {
+        $identityLog = new IdentityLog();
+        $identityLog->setIp($request->getClientIp());
+
+        return $identityLog;
     }
 
     protected function getUserHistory($userId)

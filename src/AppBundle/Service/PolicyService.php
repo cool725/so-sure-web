@@ -2,6 +2,10 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -9,6 +13,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
+use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -17,11 +22,19 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\PolicyTermsFile;
 use AppBundle\Document\File\PolicyScheduleFile;
+
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Event\PolicyEvent;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Doctrine\ODM\MongoDB\DocumentManager;
+
 use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Exception\InvalidUserDetailsException;
+use AppBundle\Exception\GeoRestrictedException;
+use AppBundle\Exception\DuplicateImeiException;
+use AppBundle\Exception\LostStolenImeiException;
+use AppBundle\Exception\InvalidImeiException;
+use AppBundle\Exception\ImeiBlacklistedException;
+use AppBundle\Exception\ImeiPhoneMismatchException;
+use AppBundle\Exception\RateLimitException;
 
 class PolicyService
 {
@@ -66,6 +79,12 @@ class PolicyService
 
     protected $branch;
 
+    protected $address;
+
+    protected $imeiValidator;
+
+    protected $rateLimit;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -104,6 +123,9 @@ class PolicyService
      * @param                  $statsd
      * @param                  $redis
      * @param                  $branch
+     * @param                  $address
+     * @param                  $imeiValidator
+     * @param                  $rateLimit
      */
     public function __construct(
         DocumentManager $dm,
@@ -120,7 +142,10 @@ class PolicyService
         ShortLinkService $shortLink,
         $statsd,
         $redis,
-        $branch
+        $branch,
+        $address,
+        $imeiValidator,
+        $rateLimit
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -137,10 +162,75 @@ class PolicyService
         $this->statsd = $statsd;
         $this->redis = $redis;
         $this->branch = $branch;
+        $this->address = $address;
+        $this->imeiValidator = $imeiValidator;
+        $this->rateLimit = $rateLimit;
     }
 
-    public function init(User $user, $phone, $imei, $serialNumber, $identityLog = null, $phoneData = null)
+    private function validateUser($user)
     {
+        if (!$user->hasValidDetails() || !$user->hasValidBillingDetails()) {
+            throw new InvalidUserDetailsException();
+        }
+        if (!$this->address->validatePostcode($user->getBillingAddress()->getPostCode())) {
+            throw new GeoRestrictedException();
+        }
+    }
+
+    private function validateImei($imei)
+    {
+        if (!$this->imeiValidator->isImei($imei)) {
+            throw new InvalidImeiException();
+        }
+        if ($this->imeiValidator->isLostImei($imei)) {
+            throw new LostStolenImeiException();
+        }
+        if ($this->imeiValidator->isDuplicatePolicyImei($imei)) {
+            throw new DuplicateImeiException();
+        }
+    }
+
+    private function checkImeiSerial(User $user, Phone $phone, $imei, $serialNumber, IdentityLog $identityLog = null)
+    {
+        $checkmend = [];
+        // Checking against blacklist should be last check to possible avoid costs
+        if (!$this->imeiValidator->checkImei($phone, $imei, $user, $identityLog)) {
+            throw new ImeiBlacklistedException();
+        }
+        $checkmend['imeiCertId'] = $this->imeiValidator->getCertId();
+        $checkmend['imeiResponse'] = $this->imeiValidator->getResponseData();
+
+        if (!$this->imeiValidator->checkSerial($phone, $serialNumber, $user, $identityLog)) {
+            throw new ImeiPhoneMismatchException();
+        }
+        $checkmend['serialResponse'] = $this->imeiValidator->getResponseData();
+
+        return $checkmend;
+    }
+
+    public function init(
+        User $user,
+        Phone $phone,
+        $imei,
+        $serialNumber,
+        IdentityLog $identityLog = null,
+        $phoneData = null
+    ) {
+        $this->validateUser($user);
+        $this->validateImei($imei);
+
+        if ($identityLog && $identityLog->isSessionDataPresent()) {
+            if (!$this->rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_POLICY,
+                $identityLog->getIp(),
+                $identityLog->getCognitoId()
+            )) {
+                throw new RateLimitException();
+            }
+        }
+
+        $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
+
         // TODO: items in POST /policy should be moved to service and service called here
         $policy = new SalvaPhonePolicy();
         $policy->setPhone($phone);
@@ -152,6 +242,9 @@ class PolicyService
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
         $policy->init($user, $latestTerms);
+
+        $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
+        $policy->addCheckmendSerialData($checkmend['serialResponse']);
 
         return $policy;
     }

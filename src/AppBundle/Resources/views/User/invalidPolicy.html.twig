@@ -7,7 +7,25 @@
             <div class="col-md-8 col-md-offset-2">
                 <h1>Oops</h1>
                 <h2>Looks like you don't have an active policy yet</h2>
-                <h2>Download our app :)</h2>
+        <h2>Buy a policy now!</h2>
+        <div class="row" id="select-phone">
+            <div class="col-sm-12 text-center">
+                <div class="device-select">
+                    {{ form_start(form_phone) }}
+                    <div class="input-group">
+                        {{ form_widget(form_phone.phone, { 'attr': {'class': 'form-control'}}) }}
+                        <span class="input-group-btn text-center">
+                            {{ form_widget(form_phone.next, {'label': 'Buy now', 'attr': {'class': 'btn btn-primary'}}) }}
+                        </span>
+                    </div>
+                    {{ form_end(form_phone) }}
+                </div>
+            </div>
+            <p class="text-center">
+                <a href="mailto:hello@wearesosure.com">Don't see your device? Let us know.</a>
+            </p>
+        </div>
+    </div>
             </div>
         </div>
     </div>

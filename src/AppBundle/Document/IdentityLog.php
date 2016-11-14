@@ -84,4 +84,9 @@ class IdentityLog
     {
         $this->loc = $loc;
     }
+
+    public function isSessionDataPresent()
+    {
+        return $this->getCognitoId() !== null || $this->getIp() !== null;
+    }
 }
