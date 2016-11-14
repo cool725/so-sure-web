@@ -628,6 +628,9 @@ class JudopayService
                 'judoId' => $this->judoId,
                 'yourConsumerReference' => $policy->getUser()->getId(),
                 'yourPaymentReference' => $payment->getId(),
+                'yourPaymentMetaData' => [
+                    'policy_id' => $policy->getId(),
+                ],
                 'amount' => $amount,
                 'currency' => 'GBP',
                 'clientIpAddress' => $ipAddress,
