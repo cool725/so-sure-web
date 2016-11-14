@@ -22,7 +22,7 @@ abstract class Payment
 
     const SOURCE_TOKEN = 'token';
     const SOURCE_WEB = 'web';
-    const SOURCE_WEB_API = 'web-qpi';
+    const SOURCE_WEB_API = 'web-api';
     const SOURCE_MOBILE = 'mobile';
 
     /**
@@ -183,6 +183,9 @@ abstract class Payment
 
     public function setSource($source)
     {
+        if (!in_array($source, ["mobile", "web", "web-api", "token"])) {
+            throw new \Exception(sprintf('Unknown source %s', $source));
+        }
         $this->source = $source;
     }
 

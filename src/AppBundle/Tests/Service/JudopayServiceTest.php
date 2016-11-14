@@ -90,7 +90,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         $this->assertEquals($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(), $payment->getAmount());
         $this->assertEquals($payment->getAmount() / (1 + $policy->getPremium()->getIptRate()), $payment->getGwp());
         $this->assertEquals($receiptId, $payment->getReceipt());
@@ -124,7 +124,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         $this->assertEquals($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(), $payment->getAmount());
         $this->assertEquals($receiptId, $payment->getReceipt());
         $this->assertEquals($policy->getId(), $payment->getReference());
@@ -151,7 +151,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
-        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         // should be allowed
     }
 
@@ -208,7 +208,7 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '125'
         );
-        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
     }
 
     public function testJudoAdd()

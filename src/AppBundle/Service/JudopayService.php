@@ -306,6 +306,7 @@ class JudopayService
         if ($date) {
             $payment->setDate($date);
         }
+        //\Doctrine\Common\Util\Debug::dump($payment);
         $policy->addPayment($payment);
 
         $judoPaymentMethod = $policy->getUser()->getPaymentMethod();
