@@ -5,7 +5,15 @@ $(function(){
     var maxConnections = $('.doughnut-outer').data('max-connections');
     var connections = $('.doughnut-outer').data('connections');
     var invites = $('.doughnut-outer').data('invites');
-    var data = [ Math.min(connections + invites, maxConnections) / maxConnections, Math.min(invites, maxConnections) / maxConnections];
+
+    // a complete 0 value for data total will result in display not show
+    var data = [1, 1];
+    if (connections + invites > 0) {
+        data = [
+            Math.min(connections + invites, maxConnections) / maxConnections,
+            Math.min(invites, maxConnections) / maxConnections
+        ];
+    }
     var myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
