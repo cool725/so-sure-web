@@ -12,6 +12,7 @@ use AppBundle\Document\LostPhone;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SCode;
+use AppBundle\Document\MultiPay;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Event\UserEmailEvent;
 use AppBundle\Listener\UserListener;
@@ -512,6 +513,96 @@ class ApiAuthControllerTest extends BaseControllerTest
             'policy_id' => $inviteePolicyData['id']
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_MAXPOT);
+    }
+
+    // PUT multipay/{id}
+
+    /**
+     *
+     */
+    public function testPutMultiPay()
+    {
+        $multiPay = $this->createMultiPayRequest(
+            self::generateEmail('testPutMultiPay-payer', $this),
+            self::generateEmail('testPutMultiPay-payee', $this),
+            true
+        );
+        $payerPolicy = $multiPay->getPayer()->getCurrentPolicy();
+
+        $payerCognitoIdentityId = $this->getAuthUser($multiPay->getPayer());
+        $url = sprintf('/api/v1/auth/multipay/%s?_method=PUT', $multiPay->getId());
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
+            'action' => 'accept',
+            'amount' => $multiPay->getPolicy()->getPremium()->getMonthlyPremiumPrice(),
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(MultiPay::class);
+        $updatedMulitPay = $repo->find($multiPay->getId());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $updatedMulitPay->getPolicy()->getStatus());
+    }
+
+    public function testPutMultiPayMissingAction()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutMultiPayMissingAction', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf('/api/v1/auth/multipay/%s?_method=PUT', 'foo');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['amount' => 'foo']);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testPutMultiPayMissingAmount()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutMultiPayMissingAmount', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf('/api/v1/auth/multipay/%s?_method=PUT', 'foo');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'accept']);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testPutMultiPayInvalidAction()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutMultiPayInvalidAction', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf('/api/v1/auth/multipay/%s?_method=PUT', 'foo');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'action' => 'foo',
+            'amount' => '0.01'
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testPutMultiPayUnknownMultiPay()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutMultiPayUnknownMultiPay', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf('/api/v1/auth/multipay/%s?_method=PUT', 'foo');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'action' => 'accept',
+            'amount' => '0.01'
+        ]);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
     // ping / auth
@@ -2218,6 +2309,214 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
+    // PUT scode/{id}
+
+    /**
+     *
+     */
+    public function testPutPolicySCode()
+    {
+        $multiPay = $this->createMultiPayRequest(
+            self::generateEmail('testPutPolicySCode-payer', $this),
+            self::generateEmail('testPutPolicySCode-payee', $this)
+        );
+
+        // Rerunning should not be allowed
+        $payeeCognitoIdentityId = $this->getAuthUser($multiPay->getPayee());
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $multiPay->getSCode()->getCode());
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
+            'action' => 'request',
+            'policy_id' => $multiPay->getPolicy()->getId(),
+        ]);
+        $getData = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+    
+    public function testPutPolicySCodeCancel()
+    {
+        $multiPay = $this->createMultiPayRequest(
+            self::generateEmail('testPutPolicySCodeCancel-payer', $this),
+            self::generateEmail('testPutPolicySCodeCancel-payee', $this)
+        );
+
+        // Cancellation (done here as all above would just need duplication if different method)
+        $payeeCognitoIdentityId = $this->getAuthUser($multiPay->getPayee());
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $multiPay->getSCode()->getCode());
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
+            'action' => 'cancel',
+            'policy_id' => $multiPay->getPolicy()->getId(),
+        ]);
+        $getData = $this->verifyResponse(200);
+
+        // Verify cancellation
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        $payeePolicy = $policyRepo->find($multiPay->getPolicy()->getId());
+        $this->assertNull($payeePolicy->getStatus());
+        $userRepo = $dm->getRepository(User::class);
+        $updatedPayerUser = $userRepo->find($multiPay->getPayer()->getId());
+        $this->assertEquals(1, count($updatedPayerUser->getMultiPays()));
+        $updatedMultipay = $updatedPayerUser->getMultiPays()[0];
+        $this->assertEquals(MultiPay::STATUS_CANCELLED, $updatedMultipay->getStatus());
+        $this->assertEquals($multiPay->getPayer()->getId(), $updatedMultipay->getPayer()->getId());
+        $this->assertEquals($multiPay->getPayee()->getId(), $updatedMultipay->getPayee()->getId());
+
+        // Rerunning should not be allowed
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $multiPay->getSCode()->getCode());
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
+            'action' => 'cancel',
+            'policy_id' => $multiPay->getPolicy()->getId(),
+        ]);
+        $getData = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testPutSCodeInactiveSCode()
+    {
+        // Payer
+        $payerUser = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutSCodeInactiveSCode-payer', $this),
+            'foo'
+        );
+        $payerCognitoIdentityId = $this->getAuthUser($payerUser);
+        $crawler = $this->generatePolicy($payerCognitoIdentityId, $payerUser);
+        $createData = $this->verifyResponse(200);
+        $payerPolicyId = $createData['id'];
+
+        $this->payPolicy($payerUser, $payerPolicyId);
+
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(0, count($data['multipay_policies']));
+
+        $url = sprintf('/api/v1/auth/scode');
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
+            'type' => SCode::TYPE_MULTIPAY,
+            'policy_id' => $payerPolicyId,
+        ]);
+        $getData = $this->verifyResponse(200);
+        $sCode = $getData['code'];
+        $this->assertEquals(8, strlen($sCode));
+
+        // Payee
+        $payeeUser = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutSCodeInactiveSCode-payee', $this),
+            'foo'
+        );
+        $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
+        $crawler = $this->generatePolicy($payeeCognitoIdentityId, $payeeUser);
+        $createData = $this->verifyResponse(200);
+        $payeePolicyId = $createData['id'];
+
+        // DELETE SCode
+        $url = sprintf('/api/v1/auth/scode/%s?_method=DELETE', $sCode);
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
+            'action' => 'request',
+            'policy_id' => $payeePolicyId,
+        ]);
+        $getData = $this->verifyResponse(200);
+
+        // Finally scode request
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $sCode);
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
+            'action' => 'request',
+            'policy_id' => $payeePolicyId,
+        ]);
+        $getData = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testPutSCodeMissingAction()
+    {
+        $payeeUser = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutSCodeMissingAction', $this),
+            'foo'
+        );
+        $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
+
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', 'foo');
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, ['policy_id' => 'foo']);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testPutSCodeMissingPolicyId()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutSCodeMissingPolicyId', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', 'foo');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'request']);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testPutSCodeInvalidAction()
+    {
+        $payeeUser = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutSCodeInvalidAction', $this),
+            'foo'
+        );
+        $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
+
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', 'foo');
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
+            'action' => 'foo',
+            'policy_id' => 'foo'
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testPutSCodeUnknownSCode()
+    {
+        $payeeUser = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutSCodeUnknownSCode', $this),
+            'foo'
+        );
+        $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
+
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', 'foo');
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
+            'action' => 'request',
+            'policy_id' => 'foo'
+        ]);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testPutSCodeUnknownPolicyId()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPutSCodeUnknownPolicyId', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $url = sprintf('/api/v1/auth/scode');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'type' => SCode::TYPE_MULTIPAY,
+            'policy_id' => $policyId,
+        ]);
+        $getData = $this->verifyResponse(200);
+        $sCode = $getData['code'];
+        $this->assertEquals(8, strlen($sCode));
+
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $sCode);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'action' => 'request',
+            'policy_id' => 'foo'
+        ]);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
     // policy/{id}/terms
 
     /**
@@ -2884,7 +3183,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->verifyResponse(200);
     }
 
-    protected function payPolicy($user, $policyId)
+    protected function payPolicy($user, $policyId, $amount = null)
     {
         // Reload user to get address
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
@@ -2894,19 +3193,40 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
         $policy = $policyRepo->find($policyId);
 
-        $payment = new JudoPayment();
-        $dm->persist($payment);
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $policy->addPayment($payment);
-        $user->addPolicy($policy);
+        if ($amount) {
+            $judopay = self::$client->getContainer()->get('app.judopay');
+            $payDetails = $judopay->testPayDetails(
+                $user,
+                $policyId,
+                $amount,
+                '4976 0000 0000 3436',
+                '12/20',
+                '452'
+            );
 
-        static::$policyService->create($policy);
-        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
-        $dm->flush();
-        $this->assertNotNull($payment->getId());
-        $this->assertNotNull($policy->getUser());
+            $cognitoIdentityId = $this->getAuthUser($user);
+            $url = sprintf("/api/v1/auth/policy/%s/pay", $policyId);
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+                'consumer_token' => $payDetails['consumer']['consumerToken'],
+                'card_token' => $payDetails['cardDetails']['cardToken'],
+                'receipt_id' => $payDetails['receiptId'],
+            ]]);
+            $this->verifyResponse(200);
+        } else {
+            $payment = new JudoPayment();
+            $dm->persist($payment);
+            $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+            $payment->setResult(JudoPayment::RESULT_SUCCESS);
+            $payment->setReceipt(rand(1, 999999));
+            $policy->addPayment($payment);
+            $user->addPolicy($policy);
+
+            static::$policyService->create($policy);
+            $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+            $dm->flush();
+            $this->assertNotNull($payment->getId());
+        }
+        
         $this->assertNotNull($policy->getUser());
         $this->assertNotNull($policy->getUser()->getBillingAddress());
         $this->assertNotNull($policy->getUser()->getBillingAddress()->getLine1());
@@ -2922,5 +3242,89 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(SalvaPhonePolicy::STATUS_PENDING, $policyData['status']);
         $this->assertEquals($policyId, $policyData['id']);
         */
+    }
+
+    private function createMultiPayRequest($payerEmail, $payeeEmail, $real = false)
+    {
+        // Payer
+        $payerUser = self::createUser(
+            self::$userManager,
+            $payerEmail,
+            'foo'
+        );
+        $payerCognitoIdentityId = $this->getAuthUser($payerUser);
+        $crawler = $this->generatePolicy($payerCognitoIdentityId, $payerUser);
+        $createData = $this->verifyResponse(200);
+        $payerPolicyId = $createData['id'];
+
+        $amount = null;
+        if ($real) {
+            $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+            $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+            $payerPolicy = $policyRepo->find($payerPolicyId);
+            $amount = $payerPolicy->getPremium()->getMonthlyPremiumPrice();
+        }
+        $this->payPolicy($payerUser, $payerPolicyId, $amount);
+
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(0, count($data['multipay_policies']));
+
+        $url = sprintf('/api/v1/auth/scode');
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
+            'type' => SCode::TYPE_MULTIPAY,
+            'policy_id' => $payerPolicyId,
+        ]);
+        $getData = $this->verifyResponse(200);
+        $sCode = $getData['code'];
+        $this->assertEquals(8, strlen($sCode));
+
+        // Payee
+        $payeeUser = self::createUser(
+            self::$userManager,
+            $payeeEmail,
+            'foo'
+        );
+        $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
+        $crawler = $this->generatePolicy($payeeCognitoIdentityId, $payeeUser);
+        $createData = $this->verifyResponse(200);
+        $payeePolicyId = $createData['id'];
+
+        // Finally scode request
+        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $sCode);
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
+            'action' => 'request',
+            'policy_id' => $payeePolicyId,
+        ]);
+        $getData = $this->verifyResponse(200);
+
+        // Verify payee data
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        $payeePolicy = $policyRepo->find($payeePolicyId);
+        $this->assertEquals(Policy::STATUS_MULTIPAY_REQUESTED, $payeePolicy->getStatus());
+        $userRepo = $dm->getRepository(User::class);
+        $updatedPayerUser = $userRepo->find($payerUser->getId());
+        $this->assertEquals(1, count($updatedPayerUser->getMultiPays()));
+        $multipay = $updatedPayerUser->getMultiPays()[0];
+        $this->assertEquals(MultiPay::STATUS_REQUESTED, $multipay->getStatus());
+        $this->assertEquals($payerUser->getId(), $multipay->getPayer()->getId());
+        $this->assertEquals($payeeUser->getId(), $multipay->getPayee()->getId());
+
+        // Verify payer data
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(1, count($data['multipay_policies']));
+        $foundPolicy = false;
+        foreach ($data['multipay_policies'] as $policy) {
+            if ($policy['policy_id'] == $payeePolicyId) {
+                $foundPolicy = true;
+            }
+        }
+        $this->assertTrue($foundPolicy);
+
+        return $multipay;
     }
 }

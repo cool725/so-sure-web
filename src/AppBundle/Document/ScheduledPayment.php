@@ -13,6 +13,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class ScheduledPayment
 {
+    use CurrencyTrait;
+
     const STATUS_SCHEDULED = 'scheduled';
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILED = 'failed';
@@ -182,6 +184,14 @@ class ScheduledPayment
         }
 
         return $this->getScheduled() <= $date;
+    }
+
+    public function toApiArray()
+    {
+        return [
+            'date' => $this->getScheduled() ? $this->getScheduled()->format(\DateTime::ATOM) : null,
+            'amount' => $this->getAmount() ? $this->toTwoDp($this->getAmount()) : null,
+        ];
     }
 
     public static function sumScheduledPaymentAmounts($scheduledPayments, $prefix = null)

@@ -40,6 +40,8 @@ abstract class Policy
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_EXPIRED = 'expired';
     const STATUS_UNPAID = 'unpaid';
+    const STATUS_MULTIPAY_REQUESTED = 'multipay-requested';
+    const STATUS_MULTIPAY_REJECTED = 'multipay-rejected';
 
     const CANCELLED_UNPAID = 'unpaid';
     const CANCELLED_ACTUAL_FRAUD = 'actual-fraud';
@@ -89,7 +91,14 @@ abstract class Policy
     protected $user;
 
     /**
-     * @Assert\Choice({"pending", "active", "cancelled", "expired", "unpaid"})
+     * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="payerPolicies")
+     * @Gedmo\Versioned
+     */
+    protected $payer;
+
+    /**
+     * @Assert\Choice({"pending", "active", "cancelled", "expired", "unpaid",
+     *                  "multipay-requested", "multipay-rejected"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -376,6 +385,16 @@ abstract class Policy
     public function setUser(User $user)
     {
         $this->user = $user;
+    }
+
+    public function getPayer()
+    {
+        return $this->payer;
+    }
+
+    public function setPayer(User $user)
+    {
+        $this->payer = $user;
     }
 
     public function getStart()
@@ -1717,6 +1736,13 @@ abstract class Policy
             $this->getPromoPotValue() == $this->calculatePotValue(true);
     }
 
+    public function getPremiumPayments()
+    {
+        return [
+            'paid' => $this->eachApiArray($this->getPayments()),
+            'scheduled' => $this->eachApiArray($this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED)),
+        ];
+    }
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms()) {
@@ -1750,6 +1776,7 @@ abstract class Policy
             'premium' => $this->getPremiumInstallmentPrice(),
             'premium_plan' => $this->getPremiumPlan(),
             'scodes' => $this->eachApiArray($this->getActiveSCodes()),
+            'premium_payments' => $this->getPremiumPayments(),
         ];
     }
 

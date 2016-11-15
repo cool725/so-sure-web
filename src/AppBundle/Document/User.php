@@ -184,6 +184,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $policies;
 
     /**
+     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="payer")
+     */
+    protected $payerPolicies;
+
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="MultiPay", mappedBy="payer", cascade={"persist"})
+     */
+    protected $multipays;
+
+    /**
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
@@ -358,9 +368,49 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
+    public function getUnInitPolicy()
+    {
+        foreach ($this->getAllPolicies() as $policy) {
+            if (!$policy->getStatus()) {
+                return $policy;
+            }
+        }
+
+        return null;
+    }
+
     public function getAllPolicies()
     {
         return $this->policies;
+    }
+
+    public function getPayerPolicies()
+    {
+        return $this->payerPolicies;
+    }
+
+    public function addPayerPolicy(Policy $policy)
+    {
+        $policy->setPayer($this);
+        $this->payerPolicies[] = $policy;
+    }
+
+    public function getMultiPays()
+    {
+        return $this->multipays;
+    }
+
+    public function addMultiPay(MultiPay $multipay)
+    {
+        // For some reason, multipay was being added twice for ::testPutPolicySCode
+        // perhaps an issue with cascade persist
+        // seems to have no ill effects and resolves the issue
+        if ($this->multipays->contains($multipay)) {
+            throw new \Exception('duplicate multipay');
+        }
+
+        $multipay->setPayer($this);
+        $this->multipays[] = $multipay;
     }
 
     public function hasCancelledPolicy()
@@ -778,6 +828,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
           'image_url' => $this->getImageUrl(),
           'sns_endpoint' => $this->getSnsEndpoint() ? $this->getSnsEndpoint() : null,
           'intercom_token' => $intercomHash,
+          'multipay_policies' => $this->eachApiArray($this->getMultiPays()),
         ];
     }
 }

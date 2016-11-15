@@ -263,6 +263,11 @@ class PolicyService
             throw new \Exception(sprintf('Policy %s is not valid, yet has scheduled payments', $policy->getId()));
         }
 
+        // If policy hasn't yet been assigned a payer, default to the policy user
+        if (!$policy->getPayer()) {
+            $user->addPayerPolicy($policy);
+        }
+
         $this->generateScheduledPayments($policy, $date);
 
         if ($prefix) {

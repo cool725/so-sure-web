@@ -340,6 +340,14 @@ abstract class Payment
         $this->scheduledPayments[] = $scheduledPayment;
     }
 
+    public function toApiArray()
+    {
+        return [
+            'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ATOM) : null,
+            'amount' => $this->getAmount() ? $this->toTwoDp($this->getAmount()) : null,
+        ];
+    }
+
     public static function sumPayments($payments, $requireValidPolicy, $class = null)
     {
         $data = [
