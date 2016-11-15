@@ -1,13 +1,15 @@
 $(function(){
     Chart.defaults.global.defaultFontFamily = '"Avenir LT Std 45 Book","Helvetica Neue",Helvetica,Arial,sans-serif';
+    Chart.defaults.global.tooltips.enabled = false;
     var ctx = document.getElementById("myChart");
+    var maxConnections = $('.doughnut-outer').data('max-connections');
     var connections = $('.doughnut-outer').data('connections');
     var invites = $('.doughnut-outer').data('invites');
-    var data = [connections, invites];
+    var data = [ Math.min(connections + invites, maxConnections) / maxConnections, Math.min(invites, maxConnections) / maxConnections];
     var myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ["Connections", "Invites"],
+            labels: ["Connections [" + connections + "]", "Invites [" + invites + "]"],
             datasets: [{
                 data: data,
                 backgroundColor: [
