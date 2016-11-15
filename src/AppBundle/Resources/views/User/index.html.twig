@@ -26,7 +26,7 @@
                             </p>
                             <div class="align-center">
                             <div class="doughnut-outer center-block text-center" data-max-connections="{{ policy.maxConnections }}"
-                                 data-connections="{{ policy.connections|length }}" data-invites="{{ policy.invitations|length }}">
+                                 data-connections="{{ policy.connections|length }}" data-invites="{{ policy.sentInvitations|length }}">
                                 <canvas id="myChart"></canvas>
                                 <div class="doughnut-inner">
                                     <h3>£{{ policy.potValue }}</h3>
