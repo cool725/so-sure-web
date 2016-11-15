@@ -25,7 +25,8 @@
                                 Here is your Reward Pot, you can also see who you're connected with in our the app.
                             </p>
                             <div class="align-center">
-                            <div class="doughnut-outer center-block text-center" data-connections="{{ policy.connections|length }}" data-invites="{{ policy.invitations|length }}">
+                            <div class="doughnut-outer center-block text-center" data-max-connections="{{ policy.maxConnections }}"
+                                 data-connections="{{ policy.connections|length }}" data-invites="{{ policy.sentInvitations|length }}">
                                 <canvas id="myChart"></canvas>
                                 <div class="doughnut-inner">
                                     <h3>£{{ policy.potValue }}</h3>
