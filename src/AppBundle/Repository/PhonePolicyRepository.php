@@ -42,7 +42,7 @@ class PhonePolicyRepository extends PolicyRepository
 
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
-                Policy::STATUS_ACTIVE,
+                Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
