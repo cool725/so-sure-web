@@ -541,11 +541,14 @@ class JudopayService
                 ],
                 'amount' => $amount,
                 'currency' => 'GBP',
-                'consumerToken' => $paymentMethod->getCustomerToken(),
                 'cardToken' => $paymentMethod->getCardToken(),
                 'emailAddress' => $user->getEmail(),
                 'mobileNumber' => $user->getMobileNumber(),
         );
+        // For webpayments, we won't have the customer token, but its optoinal anyway
+        if ($paymentMethod->getCustomerToken()) {
+            $data['consumerToken'] = $paymentMethod->getCustomerToken();
+        }
         if ($paymentMethod->getDecodedDeviceDna() && is_array($paymentMethod->getDecodedDeviceDna())) {
             $data['clientDetails'] = $paymentMethod->getDecodedDeviceDna();
         } else {
