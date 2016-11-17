@@ -18,7 +18,7 @@
             <div class="col-md-12">
                 <h1 class="text-center">
                     {% if invitation.inviter is defined %}
-                        Insure your phone with {{invitation.inviter.name}}.
+                        Insure your phone with {{scode.policy.user.name}}.
                     {% else %}
                         Insure your phone.
                     {% endif %}
@@ -85,5 +85,4 @@
         </div>
     </div>
     </section>
-
-    {% endblock %}
+        {% endblock %}
