@@ -324,7 +324,7 @@ class ApiAuthController extends BaseController
                     'memory' => $this->getDataString($phonePolicyData, 'memory'),
                 ])
             );
-            $policy->setName($this->getDataString($phonePolicyData, 'name'));
+            $policy->setName($this->conformAlphanumericSpaceDot($this->getDataString($phonePolicyData, 'name'), 100));
 
             $this->validateObject($policy);
 
