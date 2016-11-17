@@ -400,6 +400,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->multipays;
     }
 
+    public function getActiveMultiPays()
+    {
+        $multiPays = [];
+        foreach ($this->getMultiPays() as $multiPay) {
+            if (!in_array($multiPay->getStatus(), [MultiPay::STATUS_CANCELLED, MultiPay::STATUS_REJECTED])) {
+                $multiPays[] = $multiPay;
+            }
+        }
+
+        return $multiPays;
+    }
+
     public function addMultiPay(MultiPay $multipay)
     {
         // For some reason, multipay was being added twice for ::testPutPolicySCode
@@ -828,7 +840,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
           'image_url' => $this->getImageUrl(),
           'sns_endpoint' => $this->getSnsEndpoint() ? $this->getSnsEndpoint() : null,
           'intercom_token' => $intercomHash,
-          'multipay_policies' => $this->eachApiArray($this->getMultiPays()),
+          'multipay_policies' => $this->eachApiArray($this->getActiveMultiPays()),
         ];
     }
 }

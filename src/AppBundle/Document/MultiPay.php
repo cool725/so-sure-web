@@ -152,6 +152,7 @@ class MultiPay
         return [
             'id' => $this->getId(),
             'date' => $this->getCreatedDate() ? $this->getCreatedDate()->format(\DateTime::ATOM) : null,
+            'status' => $this->getStatus(),
             'policy_id' => $this->getPolicy()->getId(),
             'policy_number' => $this->getPolicy()->getPolicyNumber() ? $this->getPolicy()->getPolicyNumber() : null,
             'policy_user_name' => $this->getPayee()->getName(),
