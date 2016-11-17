@@ -319,7 +319,8 @@ class IntercomService
             $data['user_id'] = $invitation->getInvitee()->getId();
             $data['metadata']['Inviter Name'] = $invitation->getInviter()->getName();
         } else {
-            $this->logger->debug(sprintf('Skipping Intercom create event (%s) as user deleted'));
+            $this->logger->debug(sprintf('Skipping Intercom create event (%s) as user deleted', $event));
+            return;
         }
 
         $resp = $this->client->events->create($data);
