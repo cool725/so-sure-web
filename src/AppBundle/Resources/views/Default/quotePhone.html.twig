@@ -14,6 +14,7 @@
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
     'bundles/app/js/Default/slider.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -117,12 +118,8 @@
                 <div class="row" style="padding-top: 30px; padding-bottom: 10px;">
                 <div class="col-sm-12">
                   <p class="text-center">
-                    {% if app.user is not null and app.user %}
-                      <a class="btn btn-primary" id="get-started" href="{{ path('purchase_phone', {'phoneId': phone.id }) }}">Buy now</a>
-                    {% else %}
-                      <a class="btn btn-primary" id="get-started" data-toggle="modal" data-target="#buyModal">Buy now</a>
-                    {% endif %}
-                  </p>
+                      <a class="btn btn-primary" id="get-started">Buy now</a>
+                    </p>
                 </div>
               </div>
                 <div class="row" style="border-top: 2px solid #efefef; font-size: 14px; padding-top: 10px;">
@@ -141,23 +138,36 @@
     </section>
 
     <section class="download-now" id="download-now">
-        <div class="container">
-            <h2>Download our app now to pay</h2>
-              <p class="lead text-center">Our app makes it easier for you to cover your phone and connect with your friends.</p>
-            <div class="row download-app">
-                <div class="col-md-6 text-right">
-                    <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
-                        <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-                    </a>
-                </div>
-                <div class="col-md-6 text-left">
-                    <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
-                        <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-                    </a>
+      {{ form_start(lead_form) }}
+        <div class="container" id="buyModal">
+            <h2>Ready to join the Social Insurance revolution?</h2>
+            <p class="lead">Just enter your email below to get started.</p>
+            <div class="row">
+                <div class="form-group col-sm-12">
+                    {{ form_errors(lead_form.email) }}
+                    {{ form_widget(lead_form.email, {'attr': {'placeholder': 'Email address'}}) }}
+                    {{ form_widget(lead_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-primary'}}) }}
+                    {{ form_rest(lead_form) }}
                 </div>
             </div>
-        </div>
-    </div>
+            {{ form_end(lead_form) }}
+            <div class="text-break">
+                <div class="line"></div>
+                OR
+                <div class="line"></div>
+            </div>
+            <div class="row" style="padding-bottom: 30px;">
+              <p class="lead">Download our app - it's a little bit easier.</p>
+            <div class="col-md-6 text-right">
+                <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+                </a>
+            </div>
+            <div class="col-md-6 text-left">
+                <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+                </a>
+            </div>
     </section>
 
     <section class="learn-video">

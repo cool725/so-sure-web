@@ -38,7 +38,8 @@
 
 .help-block li {
   margin-left: -40px;
-  color: red;
+  color: #FF6666;
+  font-size: 14px;
 }
 
 .help-block .list-unstyled li {
@@ -73,3 +74,7 @@
 }
 
 .twitter-typeahead, .tt-hint, .tt-input, .tt-menu { width: 100%; }
+
+label {
+  font-weight: normal !important;
+}
