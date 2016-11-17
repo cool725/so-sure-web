@@ -24,6 +24,7 @@ class SCodeController extends BaseController
      */
     public function scodeAction(Request $request, $code)
     {
+        $scode = null;
         try {
             $deviceAtlas = $this->get('app.deviceatlas');
             $dm = $this->getManager();
@@ -36,8 +37,7 @@ class SCodeController extends BaseController
                 throw new \Exception('Unknown scode');
             }
         } catch (\Exception $e) {
-            // TODO: Change to more friendly templates
-            throw $this->createNotFoundException('Unable to find link');
+            $scode = null;
         }
 
         $policy = new PhonePolicy();
