@@ -54,6 +54,7 @@ class EmailInvitationRepository extends DocumentRepository
             ->field('accepted')->equals(null)
             ->field('cancelled')->equals(null)
             ->field('rejected')->equals(null)
+            ->field('invitee.$id')->notEqual(null)
             ->getQuery()
             ->execute();
     }
