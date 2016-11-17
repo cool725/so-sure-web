@@ -11,18 +11,23 @@
 {% endblock %}
 
 {% block body %}
-<section class="hero">
+<section class="popular-devices">
     <div class="container">
         <div id="navchange"></div>
         <div class="row" id="welcome">
             <div class="col-md-12">
-                <div class="text-center">
-                  <h4>Your friend, {{scode.policy.user.name}}, just joined the Social Insurance revolution &amp; they'd like you to join them!</h4>
-                  <p><br>We offer better &amp; up to 80% cheaper phone insurance when you connect with friends and none of you claim. <br><br> Find out how much you could save by getting a quote below.</p>
-                </div>
+                <h1 class="text-center">
+                    {% if invitation.inviter is defined %}
+                        Insure your phone with {{invitation.inviter.name}}.
+                    {% else %}
+                        Insure your phone.
+                    {% endif %}
+                    <br>Get up to 80% of your money back.</h1>
             </div>
+                <p class="lead text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
         </div>
     </div>
+    <div id="select-phone">
     <div class="container" id="get-quote">
         <div class="row">
             <div class="col-sm-12">
@@ -42,29 +47,43 @@
             <a href="mailto:hello@wearesosure.com">Don't see your device. Let us know.</a>
         </p>
     </div>
-    <div class="container" id="app-store">
-        <div class="row download-app">
-            <div class="text-break">
-                <div class="line"></div>
-                or
-                <div class="line"></div>
-            </div>
-            <div class="col-md-6 text-right">
-                <a class="ga-outbound-click" href="{{ apple_download('homepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/download-badge-app-store.svg" alt="Download so-sure on the App Store"></img>
-                </a>
-            </div>
-            <div class="col-md-6 text-left">
-                <a class="ga-outbound-click" href="{{ google_download('homepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/download-badge-google-play.svg" alt="Get so-sure on Google Play"></img>
-                </a>
-            </div>
-        </div>
     </div>
 
-</section>
+    {% if invitation %}
+        <div class="text-break">
+            <div class="line"></div>
+            OR
+            <div class="line"></div>
+        </div>
+
+        <div class="row">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
+        </div>
+    {% endif %}
+    </section>
 
     {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
+    <section class="download-now" id="download-now">
+        <div class="container">
+            <h2>The next bit is via the app</h2>
+              <p class="lead text-center" id="hero-description">It makes sense, we are a mobile insurance provider after all!</p>
+            <div class="row download-app">
+                <div class="col-md-6 text-right">
+                    <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                        <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+                    </a>
+                </div>
+                <div class="col-md-6 text-left">
+                    <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                        <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
 
     {% endblock %}
