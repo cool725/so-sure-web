@@ -241,6 +241,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->sentInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->receivedInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->policies = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->multipays = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = new \DateTime();
         $this->resetToken();
     }
