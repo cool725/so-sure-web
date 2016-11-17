@@ -1215,6 +1215,30 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(2, $lowConnectionValue);
     }
 
+    public function testNewPolicyJudopayExceptionPartialPolicy()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyJudopayExceptionPartialPolicy', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        // Simulate an exception occuring - policy status will be pending, but nothing else occurred
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($data['id']);
+        $updatedPolicy->setStatus(Policy::STATUS_PENDING);
+        $dm->flush();
+
+        $url = sprintf("/api/v1/auth/user?_method=GET");
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $policyData = $this->verifyResponse(200);
+        // print_r($policyData);
+    }
+
     public function testNewPolicyJudopayInvalidUserDetails()
     {
         $user = self::createUser(
