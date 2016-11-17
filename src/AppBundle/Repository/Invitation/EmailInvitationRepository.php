@@ -38,4 +38,23 @@ class EmailInvitationRepository extends DocumentRepository
             ->getQuery()
             ->execute();
     }
+
+    public function findPendingInvitations(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $oneDay = clone $date;
+        $oneDay->sub(new \DateInterval('P1D'));
+
+        // at least 1 day needs to have pasted since the original invite
+        return $this->createQueryBuilder()
+            ->field('created')->lte($oneDay)
+            ->field('accepted')->equals(null)
+            ->field('cancelled')->equals(null)
+            ->field('rejected')->equals(null)
+            ->getQuery()
+            ->execute();
+    }
 }

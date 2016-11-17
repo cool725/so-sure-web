@@ -33,8 +33,9 @@ class IntercomService
     const QUEUE_EVENT_INVITATION_PENDING = 'invitation-pending';
     const QUEUE_EVENT_INVITATION_RECEIVED = 'invitation-received';
     const QUEUE_EVENT_INVITATION_REJECTED = 'invitation-rejected';
-    */
     const QUEUE_EVENT_INVITATION_REINVITED = 'invitation-reinvited';
+    */
+    const QUEUE_EVENT_INVITATION_PENDING = 'invitation-pending';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -293,21 +294,31 @@ class IntercomService
             'event_name' => $event,
             'created_at' => $now->getTimestamp(),
         ];
-        if ($event == self::QUEUE_EVENT_INVITATION_REINVITED) {
-            $data['id'] = $invitation->getInviter()->getIntercomId();
-            $data['user_id'] = $invitation->getInviter()->getId();
-            $data['metadata']['Invitee Name'] = $invitation->getInvitee()->getName();
-        }
+
+        // QUEUE_EVENT_INVITATION_PENDING
+        $useInviter = false;
         /*
-        elseif ($event == self::QUEUE_EVENT_INVITATION_RECEIVED ||
+        if ($event == self::QUEUE_EVENT_INVITATION_CANCELLED ||
+            $event == self::QUEUE_EVENT_INVITATION_INVITED ||
+            $event == self::QUEUE_EVENT_INVITATION_REINVITED) {
+            $useInviter = true;
+        } elseif ($event == self::QUEUE_EVENT_INVITATION_RECEIVED ||
             $event == self::QUEUE_EVENT_INVITATION_PENDING ||
             $event == self::QUEUE_EVENT_INVITATION_ACCEPTED ||
             $event == self::QUEUE_EVENT_INVITATION_REJECTED) {
+            $useInviter = false;
+        }
+        */
+
+        if ($useInviter) {
+            $data['id'] = $invitation->getInviter()->getIntercomId();
+            $data['user_id'] = $invitation->getInviter()->getId();
+            $data['metadata']['Invitee Name'] = $invitation->getInvitee()->getName();
+        } else {
             $data['id'] = $invitation->getInvitee()->getIntercomId();
             $data['user_id'] = $invitation->getInvitee()->getId();
             $data['metadata']['Inviter Name'] = $invitation->getInviter()->getName();
         }
-        */
 
         $resp = $this->client->events->create($data);
         $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
@@ -346,7 +357,7 @@ class IntercomService
                     }
 
                     $this->sendPolicyEvent($this->getPolicy($data['policyId']), $action);
-                } elseif ($action == self::QUEUE_EVENT_INVITATION_REINVITED) {
+                } elseif ($action == self::QUEUE_EVENT_INVITATION_PENDING) {
                     /*
                           $action == self::QUEUE_EVENT_INVITATION_ACCEPTED ||
                           $action == self::QUEUE_EVENT_INVITATION_CANCELLED ||
