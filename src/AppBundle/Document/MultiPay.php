@@ -151,12 +151,14 @@ class MultiPay
     {
         return [
             'id' => $this->getId(),
+            'date' => $this->getCreatedDate() ? $this->getCreatedDate()->format(\DateTime::Atom) : null,
             'policy_id' => $this->getPolicy()->getId(),
-            'policy_number' => $this->getPolicy()->getPolicyNumber(),
+            'policy_number' => $this->getPolicy()->getPolicyNumber() ? $this->getPolicy()->getPolicyNumber() : null,
             'policy_user_name' => $this->getPayee()->getName(),
             'policy_status' => $this->getPolicy()->getStatus(),
-            'policy_premium' => $this->getPolicy()->getPremiumInstallmentPrice(),
-            'premium_payments' => null,
+            'policy_premium' => $this->getPolicy()->getPremium()->getMonthlyPremiumPrice(),
+            'policy_premium_plan' => $this->getPolicy()->getPremiumPlan() ? $this->getPolicy()->getPremiumPlan() : null,
+            'premium_payments' => $this->getPolicy()->getPremiumPayments(),
         ];
     }
 }
