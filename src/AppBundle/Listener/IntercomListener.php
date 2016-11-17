@@ -52,9 +52,4 @@ class IntercomListener
         $this->intercom->queue($event->getInvitation()->getInviter());
         $this->intercom->queue($event->getInvitation()->getInvitee());
     }
-
-    public function onInvitationReinvitedEvent(InvitationEvent $event)
-    {
-        $this->intercom->queueInvitation($event->getInvitation(), IntercomService::QUEUE_EVENT_INVITATION_REINVITED);
-    }
 }
