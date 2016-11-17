@@ -310,14 +310,16 @@ class IntercomService
         }
         */
 
-        if ($useInviter) {
+        if ($useInviter && !$this->isDeleted($invitation->getInviter())) {
             $data['id'] = $invitation->getInviter()->getIntercomId();
             $data['user_id'] = $invitation->getInviter()->getId();
             $data['metadata']['Invitee Name'] = $invitation->getInvitee()->getName();
-        } else {
+        } elseif (!$useInviter && !$this->isDeleted($invitation->getInvitee())) {
             $data['id'] = $invitation->getInvitee()->getIntercomId();
             $data['user_id'] = $invitation->getInvitee()->getId();
             $data['metadata']['Inviter Name'] = $invitation->getInviter()->getName();
+        } else {
+            $this->logger->debug(sprintf('Skipping Intercom create event (%s) as user deleted'));
         }
 
         $resp = $this->client->events->create($data);
