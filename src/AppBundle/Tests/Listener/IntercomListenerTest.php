@@ -209,19 +209,21 @@ class IntercomListenerTest extends WebTestCase
         $listener = new IntercomListener(static::$intercomService);
         $event = new InvitationEvent($invitation);
         $data = [
-            'onInvitationReceivedEvent',
-            'onInvitationAcceptedEvent',
-            'onInvitationRejectedEvent',
-            'onInvitationCancelledEvent',
-            'onInvitationInvitedEvent',
-            'onInvitationReinvitedEvent',
+            'onInvitationAcceptedEvent' => 2,
+            'onInvitationReinvitedEvent' => 1,
         ];
-        foreach ($data as $method) {
+        foreach ($data as $method => $count) {
             call_user_func([$listener, $method], $event);
 
-            $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
-            $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
-            $this->assertEquals($invitation->getId(), $data['invitationId']);
+            $this->assertEquals($count, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+            for ($i = 0; $i < $count; $i++) {
+                $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+                if ($method == 'onInvitationAcceptedEvent') {
+                    $this->assertTrue(isset($data['userId']));
+                } else {
+                    $this->assertEquals($invitation->getId(), $data['invitationId']);
+                }
+            }
         }
     }
 }
