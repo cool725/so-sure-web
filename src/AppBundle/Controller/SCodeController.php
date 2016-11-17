@@ -24,14 +24,19 @@ class SCodeController extends BaseController
      */
     public function scodeAction(Request $request, $code)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(SCode::class);
-        $scode = $repo->findOneBy(['code' => $code]);
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $deviceAtlas = $this->get('app.deviceatlas');
+        try {
+            $deviceAtlas = $this->get('app.deviceatlas');
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(SCode::class);
+            $scode = $repo->findOneBy(['code' => $code]);
+            $phoneRepo = $dm->getRepository(Phone::class);
 
-        // TODO: Change to more friendly templates
-        if (!$scode) {
+            // make sure to get policy user in code first rather than in twig in case policy/user was deleted
+            if (!$scode || !$scode->getPolicy()->getUser()) {
+                throw new \Exception('Unknown scode');
+            }
+        } catch (\Exception $e) {
+            // TODO: Change to more friendly templates
             throw $this->createNotFoundException('Unable to find link');
         }
 
