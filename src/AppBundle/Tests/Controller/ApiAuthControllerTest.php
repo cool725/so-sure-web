@@ -537,6 +537,17 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $data = $this->verifyResponse(200);
 
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        //print_r($data);
+
+        $payeeCognitoIdentityId = $this->getAuthUser($multiPay->getPayee());
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        //print_r($data);
+
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(MultiPay::class);
         $updatedMulitPay = $repo->find($multiPay->getId());
