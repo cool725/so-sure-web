@@ -210,7 +210,6 @@ class IntercomListenerTest extends WebTestCase
         $event = new InvitationEvent($invitation);
         $data = [
             'onInvitationAcceptedEvent' => 2,
-            'onInvitationReinvitedEvent' => 1,
         ];
         foreach ($data as $method => $count) {
             call_user_func([$listener, $method], $event);

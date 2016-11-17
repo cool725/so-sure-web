@@ -461,7 +461,6 @@ services:
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
-            -  { name: kernel.event_listener, event: event.invitation.reinvited, method: onInvitationReinvitedEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener
