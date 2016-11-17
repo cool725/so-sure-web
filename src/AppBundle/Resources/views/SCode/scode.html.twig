@@ -17,7 +17,7 @@
         <div class="row" id="welcome">
             <div class="col-md-12">
                 <h1 class="text-center">
-                    {% if invitation.inviter is defined %}
+                    {% if scode is defined and scode %}
                         Insure your phone with {{scode.policy.user.name}}.
                     {% else %}
                         Insure your phone.
@@ -49,19 +49,6 @@
     </div>
     </div>
 
-    {% if invitation %}
-        <div class="text-break">
-            <div class="line"></div>
-            OR
-            <div class="line"></div>
-        </div>
-
-        <div class="row">
-            {{ form_start(form) }}
-            {{ form_widget(form) }}
-            {{ form_end(form) }}
-        </div>
-    {% endif %}
     </section>
 
     {% include 'AppBundle::Default/howItWorks.html.twig' %}
