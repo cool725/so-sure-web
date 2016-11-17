@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
+use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Service\IntercomService;
 
 class IntercomCommand extends ContainerAwareCommand
 {
@@ -66,6 +68,12 @@ class IntercomCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Check for unsubscriptions'
             )
+            ->addOption(
+                'pending-invites',
+                null,
+                InputOption::VALUE_NONE,
+                'Send events for outstanding pending inbound invitations'
+            )
         ;
     }
 
@@ -79,6 +87,7 @@ class IntercomCommand extends ContainerAwareCommand
         $convertLead = $input->getOption('convert-lead');
         $undelete = true === $input->getOption('undelete');
         $unsubscribes = true === $input->getOption('unsubscribes');
+        $pendingInvites = true === $input->getOption('pending-invites');
 
         $intercom = $this->getContainer()->get('app.intercom');
 
@@ -115,6 +124,13 @@ class IntercomCommand extends ContainerAwareCommand
         } elseif ($unsubscribes) {
             $output->writeln(implode(PHP_EOL, $intercom->unsubscribes()));
             $output->writeln(sprintf("Rechecked unsubscribes"));
+        } elseif ($pendingInvites) {
+            $count = 0;
+            foreach ($this->getPendingInvites() as $invitation) {
+                $intercom->queueInvitation($invitation, IntercomService::QUEUE_EVENT_INVITATION_PENDING);
+                $count++;
+            }
+            $output->writeln(sprintf("Queued %d Pending Invitations", $count));
         } else {
             $count = $intercom->process($process);
             $output->writeln(sprintf("Sent %s updates", $count));
@@ -126,6 +142,13 @@ class IntercomCommand extends ContainerAwareCommand
         $repo = $this->getUserRepository();
 
         return $repo->findAll();
+    }
+
+    private function getPendingInvites()
+    {
+        $repo = $this->getEmailInvitationRepository();
+
+        return $repo->findPendingInvitations();
     }
 
     private function getUser($email)
@@ -143,6 +166,14 @@ class IntercomCommand extends ContainerAwareCommand
     {
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $repo = $dm->getRepository(User::class);
+
+        return $repo;
+    }
+
+    private function getEmailInvitationRepository()
+    {
+        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $repo = $dm->getRepository(EmailInvitation::class);
 
         return $repo;
     }
