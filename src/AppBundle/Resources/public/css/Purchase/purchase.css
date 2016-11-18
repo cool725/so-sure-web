@@ -70,11 +70,37 @@
 }
 
 .address-manual {
-  padding-left: 0px;
+  padding: 12px 30px;
+  border: 2px solid #202532;
+  background: none !important;
+  border-radius: 30px;
+  -moz-border-radius: 30px;
+  -webkit-border-radius: 30px;
+  background: none;
+  color: #202532;
+}
+.address-manual:hover {
+  color: #202352;
 }
 
 .twitter-typeahead, .tt-hint, .tt-input, .tt-menu { width: 100%; }
 
 label {
   font-weight: normal !important;
+}
+
+.text-break {
+  padding: 20px !important;
+}
+
+.btn-primary {
+  padding: 12px 30px;
+  border-radius: 30px;
+  -moz-border-radius: 30px;
+  -webkit-border-radius: 30px;
+}
+
+.btn-primary.disabled {
+  background-color: #ccc;
+  border-color: #ccc;
 }

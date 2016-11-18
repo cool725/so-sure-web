@@ -94,7 +94,7 @@
                             Device
                         </div>
                         <div class="form-group col-sm-8">
-                            {{ phone.make }} {{ phone.model }} {% if phone.memory %}{{ phone.memory }}GB{% endif %}
+                            <h4>{{ phone.make }} {{ phone.model }} {% if phone.memory %}{{ phone.memory }}GB{% endif %}</h4>
                         </div>
                     </div>
                     <div class="row">
@@ -102,7 +102,7 @@
                             Monthly Price
                         </div>
                         <div class="form-group col-sm-6">
-                            £{{ phone.currentPhonePrice.monthlyPremiumPrice }}
+                            <h4>£{{ phone.currentPhonePrice.monthlyPremiumPrice }}</h4>
                         </div>
                     </div>
                     <div class="row">
@@ -143,13 +143,25 @@
                     {% set showAddress = purchase_form.addressLine1.vars.data|length > 0 or purchase_form.postcode.vars.data|length > 0 %}
                     <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
                         <div class="row">
-                            <div class="form-group col-sm-6 col-sm-offset-3">
-                                <input class="typeahead" type="text" placeholder="Address or Postcode">
+                          <div class="form-group col-sm-4">
+                            {{ form_label(purchase_form.serialNumber, 'Find Address') }}
+                          </div>
+                            <div class="form-group col-sm-6">
+                                <input class="typeahead form-control" type="text" placeholder="Enter Postcode">
                             </div>
                         </div>
                         <div class="row">
-                            <div class="form-group col-sm-6 col-sm-offset-3">
-                                <button class="btn btn-link address-manual">Manually type address</button>
+                          <div class="col-sm-12 text-center">
+                            <div class="text-break">
+                                <div class="line"></div>
+                                OR
+                                <div class="line"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-12 text-center">
+                                <button class="btn btn-info address-manual">Manually input address</button>
                             </div>
                         </div>
                     </div>
@@ -211,19 +223,19 @@
         <div class="col-md-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h4>Purchase</h4>
+                    <h4>Policy Documents &amp; Purchase</h4>
                 </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="form-group col-sm-12 text-center">
                             <button type="button" class="btn btn-link" data-toggle="modal" data-target="#summaryModal"
-                                            ><i class="fa fa-file-o"></i> Policy Summary</button>
+                                            ><i class="fa fa-file-o"></i> View Policy Summary</button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-sm-12 text-center">
                             <button type="button" class="btn btn-link" data-toggle="modal" data-target="#policyModal"
-                                            ><i class="fa fa-file-text-o"></i> Policy Document</button>
+                                            ><i class="fa fa-file-text-o"></i> View Policy Document</button>
                         </div>
                     </div>
                     <div class="row">
