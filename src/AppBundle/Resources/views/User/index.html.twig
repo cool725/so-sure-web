@@ -4,6 +4,7 @@
     {{ parent() }}
     {% javascripts
     'components/clipboard/clipboard.min.js'
+    'components/jssocials/jssocials.min.js'    
     'bundles/app/js/User/index.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -60,9 +61,11 @@
                   <div class="row" style="margin-top: 20px">
                     <h4>Share your invite code</h4>
                     <input id="scode" readonly="readonly" type="text" value="{{ policy.standardSCode.code }}">
-                    <button class="btn btn-clipboard" data-clipboard-text="{{ policy.standardSCode.shareLink }}" data-toggle="tooltip" data-placement="right">
+                    <button class="btn btn-clipboard" data-clipboard-text="{{ policy.standardSCode.shareLink }}" data-toggle="tooltip" data-placement="right"
+                            data-share-text="Hey, I've just joined so-sure – better insurance that is up to 80% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: {{ policy.standardSCode.shareLink }}. Add my code after you pay: {{ policy.standardSCode.code }}">
                         <i class="fa fa-clipboard"></i>
                     </button>
+                    <div id="share"></div>
                   </div>
                   {% endif %}
                 </div>
@@ -76,6 +79,8 @@
 {% block stylesheets %}
 {{ parent() }}
 {% stylesheets
+'components/jssocials/jssocials.css'
+'components/jssocials/jssocials-theme-flat.css'
 '@AppBundle/Resources/public/css/User/index.css'
 '@AppBundle/Resources/public/css/User/trust.css'
  %}

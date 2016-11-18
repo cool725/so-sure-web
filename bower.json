@@ -24,7 +24,8 @@
     "datatables.net-bs": "^1.10.12",
     "typeahead.js": "^0.11.1",
     "bootstrap-validator": "^0.11.5",
-    "clipboard": "^1.5.15"
+    "clipboard": "^1.5.15",
+    "jssocials": "^1.4.0"
   },
   "install": {
     "path": "web/components",
@@ -64,6 +65,11 @@
       ],
       "clipboard": [
         "bower_components/clipboard/dist/clipboard.min.js"
+      ],
+      "jssocials": [
+        "bower_components/jssocials/dist/jssocials.min.js",
+        "bower_components/jssocials/dist/jssocials.css",
+        "bower_components/jssocials/dist/jssocials-theme-flat.css"
       ]
     }
   }

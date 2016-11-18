@@ -38,4 +38,10 @@ $(function(){
         $('.btn-clipboard').tooltip('show');
         setTimeout(function() { $('.btn-clipboard').tooltip('hide'); }, 1500);
     });
+    $("#share").jsSocials({
+        shares: ["twitter", "facebook"],
+        url: $('.btn-clipboard').data('clipboard-text'),
+        text: $('.btn-clipboard').data('share-text'),
+        shareIn: 'popup'
+    })
 });
