@@ -146,7 +146,7 @@
                             <label>Find Address</label>
                           </div>
                             <div class="form-group col-sm-6">
-                                <input class="typeahead form-control" type="text" placeholder="Enter Postcode" required="required">
+                                <input class="typeahead form-control" type="text" placeholder="Enter Postcode" {% if not showAddress %}required="required"{% endif %}>
                             </div>
                         </div>
                         <div class="row">

@@ -14,7 +14,7 @@ $(function(){
 
     var showAddress = function(err) {
         $('.address-search').hide();
-        $('.address-search').val('n/a');
+        $('.typeahead').removeAttr('required');
         $('.address-show').show();
         if (err) {
             $('.address-show-error').show();
