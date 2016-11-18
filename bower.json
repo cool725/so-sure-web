@@ -23,7 +23,8 @@
     "datatables.net": "^1.10.12",
     "datatables.net-bs": "^1.10.12",
     "typeahead.js": "^0.11.1",
-    "bootstrap-validator": "^0.11.5"
+    "bootstrap-validator": "^0.11.5",
+    "clipboard": "^1.5.15"
   },
   "install": {
     "path": "web/components",
@@ -60,6 +61,9 @@
       ],
       "bootstrap-validator": [
         "bower_components/bootstrap-validator/js/validator.js"
+      ],
+      "clipboard": [
+        "bower_components/clipboard/dist/clipboard.min.js"
       ]
     }
   }

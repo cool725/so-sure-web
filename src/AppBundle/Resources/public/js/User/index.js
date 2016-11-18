@@ -30,4 +30,12 @@ $(function(){
           cutoutPercentage: 85
         }
     });
+
+    $('.btn-clipboard').tooltip({'title':'Copied', 'trigger': 'manual'});
+    var clipboard = new Clipboard('.btn-clipboard');
+
+    clipboard.on('success', function(e) {
+        $('.btn-clipboard').tooltip('show');
+        setTimeout(function() { $('.btn-clipboard').tooltip('hide'); }, 1500);
+    });
 });

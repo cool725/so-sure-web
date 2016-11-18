@@ -3,6 +3,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    'components/clipboard/clipboard.min.js'
     'bundles/app/js/User/index.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -20,11 +21,11 @@
                     <h4>Reward Pot</h4>
                 </div>
                 <div class="panel-body">
-                        <div class="row">
-                            <p class="text-center" style="padding: 20px;">
-                                Here is your Reward Pot, you can also see who you're connected with in our the app.
-                            </p>
-                            <div class="align-center">
+                    <div class="row">
+                        <p class="text-center" style="padding: 20px;">
+                            Here is your Reward Pot, you can also see who you're connected with in our the app.
+                        </p>
+                        <div class="align-center">
                             <div class="doughnut-outer center-block text-center" data-max-connections="{{ policy.maxConnections }}"
                                  data-connections="{{ policy.connections|length }}" data-invites="{{ policy.sentInvitations|length }}">
                                 <canvas id="myChart"></canvas>
@@ -34,11 +35,11 @@
                                     <span>of a maxium of £{{ policy.maxPot }}</span>
                                 </div>
                             </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         <div class="col-md-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -54,11 +55,20 @@
                     </div>
                     {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-primary'}}) }}&nbsp;
                     {{ form_end(email_form) }}
+                  </div>
+                  {% if policy.standardSCode.shareLink %}
+                  <div class="row" style="margin-top: 20px">
+                    <h4>Share your invite code</h4>
+                    <input id="scode" readonly="readonly" type="text" value="{{ policy.standardSCode.code }}">
+                    <button class="btn btn-clipboard" data-clipboard-text="{{ policy.standardSCode.shareLink }}" data-toggle="tooltip" data-placement="right">
+                        <i class="fa fa-clipboard"></i>
+                    </button>
+                  </div>
+                  {% endif %}
                 </div>
             </div>
         </div>
     </div>
-  </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js" type="text/javascript"></script>
 
 {% endblock %}
