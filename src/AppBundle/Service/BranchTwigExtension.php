@@ -39,12 +39,39 @@ class BranchTwigExtension extends \Twig_Extension
         );
     }
 
+    private function getAppleCampaign()
+    {
+        $utm = $this->getUtm();
+        if ($utm) {
+            $appleCampaign = sprintf('%s-%s-%s', $utm['source'], $utm['campaign'], $utm['medium']);
+
+            return $appleCampaign;
+        }
+
+        return null;
+    }
+
+    private function getUtm()
+    {
+        $utm = $this->getSession('utm');
+        if ($utm) {
+            return unserialize($utm);
+        }
+
+        return null;
+    }
+
     private function getSCode()
+    {
+        return $this->getSession('scode');
+    }
+
+    private function getSession($var)
     {
         $request = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
         if ($session->isStarted()) {
-            return $session->get('scode');
+            return $session->get($var);
         }
 
         return null;
@@ -69,20 +96,25 @@ class BranchTwigExtension extends \Twig_Extension
 
     public function branch($source)
     {
-        return $this->branch->link($this->getData(), [], $source);
+        return $this->branch->link($this->getData(), [], $source, $this->getAppleCampaign());
     }
 
     public function apple($source)
     {
         if ($this->getSCode()) {
             try {
-                return $this->branch->appleLink($this->getData(), $this->getMarketing(), $source);
+                return $this->branch->appleLink(
+                    $this->getData(),
+                    $this->getMarketing(),
+                    $source,
+                    $this->getAppleCampaign()
+                );
             } catch (\Exception $e) {
                 $this->logger->error('Failed generating apple scode link', ['exception' => $e]);
             }
         }
 
-        return $this->branch->downloadAppleLink($source);
+        return $this->branch->downloadAppleLink($source, $this->getAppleCampaign());
     }
 
     public function google($source)
