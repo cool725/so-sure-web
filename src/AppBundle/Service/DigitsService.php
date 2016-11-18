@@ -109,7 +109,11 @@ class DigitsService
         $user = $repo->findOneBy(['digitsId' => $id]);
         if ($user->getMobileNumber() != $mobileNumber) {
             // Digits user exists, but has different registered mobile number to policy
-            $this->logger->warning(sprintf('User %s has a different digits mobile number %s', $user->getId(), $mobileNumber));
+            $this->logger->warning(sprintf(
+                'User %s has a different digits mobile number %s',
+                $user->getId(),
+                $mobileNumber
+            ));
         } elseif (!$user) {
             $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
 
@@ -118,7 +122,12 @@ class DigitsService
                 $user->setDigitsIds($id);
                 $this->dm->flush();
             } elseif ($user->getDigitsId() != $id) {
-                throw new \Exception(sprintf('User %s has a different digits id [%s/%s]', $user->getId(), $id, $mobileNumber));
+                throw new \Exception(sprintf(
+                    'User %s has a different digits id [%s/%s]',
+                    $user->getId(),
+                    $id,
+                    $mobileNumber
+                ));
             }
         }
 
