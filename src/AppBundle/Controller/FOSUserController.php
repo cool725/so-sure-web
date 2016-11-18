@@ -18,6 +18,7 @@ class FOSUserController extends ResettingController
      */
     public function resetAction($token)
     {
+        // @codingStandardsIgnoreStart
         $user = $this->container->get('fos_user.user_manager')->findUserByConfirmationToken($token);
 
         if (null === $user) {
@@ -42,5 +43,6 @@ class FOSUserController extends ResettingController
             'token' => $token,
             'form' => $form->createView(),
         ));
+        // @codingStandardsIgnoreEnd
     }
 }
