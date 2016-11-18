@@ -25,7 +25,7 @@ class JudoPayment extends Payment
     protected $result;
 
     /**
-     * @AppAssert\Token()
+     * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="0", max="100")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned

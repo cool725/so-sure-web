@@ -554,7 +554,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
-            'name' => 'foo',
+            'name' => "Kelvin’s iPhone5",
         ]]);
 
         $data = $this->verifyResponse(200);
@@ -563,7 +563,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
-        $this->assertEquals('foo', $data['phone_policy']['name']);
+        $this->assertEquals("Kelvins iPhone5", $data['phone_policy']['name']);
 
         // Now make sure that the policy shows up against the user
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
@@ -1213,6 +1213,30 @@ class ApiAuthControllerTest extends BaseControllerTest
             $this->assertEquals(10, $highConnectionValue);
         }
         $this->assertEquals(2, $lowConnectionValue);
+    }
+
+    public function testNewPolicyJudopayExceptionPartialPolicy()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyJudopayExceptionPartialPolicy', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        // Simulate an exception occuring - policy status will be pending, but nothing else occurred
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($data['id']);
+        $updatedPolicy->setStatus(Policy::STATUS_PENDING);
+        $dm->flush();
+
+        $url = sprintf("/api/v1/auth/user?_method=GET");
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $policyData = $this->verifyResponse(200);
+        // print_r($policyData);
     }
 
     public function testNewPolicyJudopayInvalidUserDetails()

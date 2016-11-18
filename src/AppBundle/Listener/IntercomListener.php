@@ -5,6 +5,7 @@ namespace AppBundle\Listener;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\PolicyEvent;
+use AppBundle\Event\InvitationEvent;
 use AppBundle\Service\IntercomService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
@@ -43,5 +44,12 @@ class IntercomListener
     {
         $this->intercom->queue($event->getPolicy()->getUser());
         $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_CANCELLED);
+    }
+
+    public function onInvitationAcceptedEvent(InvitationEvent $event)
+    {
+        // Invitation accepted is a connection, so update both inviter & invitee
+        $this->intercom->queue($event->getInvitation()->getInviter());
+        $this->intercom->queue($event->getInvitation()->getInvitee());
     }
 }

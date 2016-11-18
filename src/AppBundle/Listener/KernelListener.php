@@ -7,8 +7,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-class KernelResponseListener
+class KernelListener
 {
     const SOSURE_EMPLOYEE_COOKIE_NAME = 'sosure-employee';
     const SOSURE_EMPLOYEE_COOKIE_LENGTH = 604800; // 7 days
@@ -27,6 +28,22 @@ class KernelResponseListener
         $this->logger = $logger;
         $this->environment = $environment;
         $this->domain = $domain;
+    }
+
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+        
+        $request  = $event->getRequest();
+        $source = $request->query->get('utm_source');
+        $medium = $request->query->get('utm_medium');
+        $campaign = $request->query->get('utm_campaign');
+        if ($source || $medium || $campaign) {
+            $session = $request->getSession();
+            $session->set('utm', serialize(['source' => $source, 'medium' => $medium, 'campaign' => $campaign]));
+        }
     }
 
     public function onKernelResponse(FilterResponseEvent $event)

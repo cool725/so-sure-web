@@ -15,6 +15,9 @@ use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\PhoneTrait;
+
+use AppBundle\Event\InvitationEvent;
 
 use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\RateLimitException;
@@ -25,7 +28,6 @@ use AppBundle\Exception\OptOutException;
 use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\SelfInviteException;
 use AppBundle\Exception\ConnectedInvitationException;
-use AppBundle\Document\PhoneTrait;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -72,6 +74,12 @@ class InvitationService
     protected $debug;
 
     protected $environment;
+    protected $dispatcher;
+
+    public function setDispatcher($dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
 
     /**
      * @param DocumentManager  $dm
@@ -84,6 +92,7 @@ class InvitationService
      * @param RateLimitService $rateLimit
      * @param PushService      $push
      * @param string           $environment
+     * @param                  $dispatcher
      */
     public function __construct(
         DocumentManager $dm,
@@ -95,7 +104,8 @@ class InvitationService
         SmsService $sms,
         RateLimitService $rateLimit,
         PushService $push,
-        $environment
+        $environment,
+        $dispatcher
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -107,6 +117,7 @@ class InvitationService
         $this->rateLimit = $rateLimit;
         $this->push = $push;
         $this->environment = $environment;
+        $this->dispatcher = $dispatcher;
     }
 
     public function setDebug($debug)
@@ -156,11 +167,13 @@ class InvitationService
             $user = $userRepo->findOneBy(['emailCanonical' => $invitation->getEmail()]);
             if ($user && $invitation->getInviter()->getId() != $user->getId()) {
                 $invitation->setInvitee($user);
+                $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
             }
         } elseif ($invitation instanceof SmsInvitation) {
             $user = $userRepo->findOneBy(['mobileNumber' => $invitation->getMobile()]);
             if ($user && $invitation->getInviter()->getId() != $user->getId()) {
                 $invitation->setInvitee($user);
+                $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
             }
         }
     }
@@ -254,6 +267,7 @@ class InvitationService
                 }
             }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+            $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
         }
 
         return $invitation;
@@ -314,6 +328,7 @@ class InvitationService
                 $this->sendSms($invitation, self::TYPE_SMS_INVITE);
             }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+            $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
         }
 
         return $invitation;
@@ -365,6 +380,14 @@ class InvitationService
         }
 
         $this->push->sendToUser($type, $user, $message, $badge, $messageData);
+    }
+
+    protected function sendEvent(Invitation $invitation, $eventType)
+    {
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            $this->dispatcher->dispatch($eventType, new InvitationEvent($invitation));
+        }
     }
 
     /**
@@ -553,6 +576,7 @@ class InvitationService
         // Notify inviter of acceptance
         $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
         $this->sendPush($invitation, PushService::MESSAGE_CONNECTED);
+        $this->sendEvent($invitation, InvitationEvent::EVENT_ACCEPTED);
     }
 
     protected function addConnection(
@@ -597,6 +621,7 @@ class InvitationService
 
         // Notify inviter of rejection
         $this->sendEmail($invitation, self::TYPE_EMAIL_REJECT);
+        $this->sendEvent($invitation, InvitationEvent::EVENT_REJECTED);
     }
 
     public function cancel(Invitation $invitation)
@@ -608,6 +633,7 @@ class InvitationService
         $invitation->setCancelled(new \DateTime());
         $this->dm->flush();
 
+        $this->sendEvent($invitation, InvitationEvent::EVENT_CANCELLED);
         // Given that we can now display the invitation page even if there isn't a valid invite,
         // we shouldn't send a cancellation email - we still want them to signup
         /*
@@ -639,6 +665,7 @@ class InvitationService
             $invitation->reinvite();
             $this->dm->flush();
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+            $this->sendEvent($invitation, InvitationEvent::EVENT_REINVITED);
         } elseif ($invitation instanceof SmsInvitation) {
             throw new \Exception('SMS Reinvitations are not currently supported');
             /*

@@ -1145,6 +1145,10 @@ abstract class Policy
 
     public function isPolicyWithin30Days($date = null)
     {
+        if (!$this->getStart()) {
+            return null;
+        }
+
         if ($date == null) {
             $date = new \DateTime();
         }
@@ -1154,6 +1158,10 @@ abstract class Policy
 
     public function isPolicyWithin60Days($date = null)
     {
+        if (!$this->getStart()) {
+            return null;
+        }
+
         if ($date == null) {
             $date = new \DateTime();
         }
@@ -1163,6 +1171,10 @@ abstract class Policy
 
     public function isBeforePolicyStarted($date = null)
     {
+        if (!$this->getStart()) {
+            return null;
+        }
+
         if ($date == null) {
             $date = new \DateTime();
         }
@@ -1575,7 +1587,7 @@ abstract class Policy
     public function getConnectionValues()
     {
         $connectionValues = [];
-        if (!$this->isPolicy()) {
+        if (!$this->isPolicy() || !$this->getStart()) {
             return $connectionValues;
         }
         $now = new \DateTime();

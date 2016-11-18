@@ -15,7 +15,6 @@
         'components/moment/moment.min.js'
         'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
         'components/typeahead.js/typeahead.bundle.min.js'
-        'components/bootstrap-validator/validator.js'
         '@AppBundle/Resources/public/js/Purchase/purchase.js' %}
     %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -62,7 +61,7 @@
                             {{ form_label(purchase_form.mobileNumber, 'Mobile Number') }}
                         </div>
                         <div class="form-group col-sm-6 {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
-                            {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'00447[1-9][0-9]{8,8}|[+]447[1-9][0-9]{8,8}|07[1-9][0-9]{8,8}', 'data-error': 'Please enter a valid UK Mobile Number.'}}) }}
+                            {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'00447[1-9][0-9]{8,8}|[+]447[1-9][0-9]{8,8}|07[1-9][0-9]{8,8}', 'title': 'Enter a valid UK Mobile Number.'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
                         </div>
                     </div>
