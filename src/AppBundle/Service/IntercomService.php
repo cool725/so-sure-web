@@ -115,15 +115,22 @@ class IntercomService
 
     private function leadExists(User $user)
     {
-        if (!$user->getIntercomId()) {
-            return false;
-        }
-
         try {
-            $resp = $this->client->leads->getLead($user->getIntercomId());
+            $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
+            return count($resp->contacts) > 0;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            throw $e;
+        }
+    }
+
+    /*
+    public function getLeadByEmail(User $user)
+    {
+        try {
+            $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
             $this->logger->info(sprintf('getLead %s %s', $user->getEmail(), json_encode($resp)));
 
-            return true;
+            return $resp;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             if ($e->getResponse()->getStatusCode() == "404") {
                 return false;
@@ -133,6 +140,7 @@ class IntercomService
             throw $e;
         }
     }
+    */
 
     private function userExists(User $user)
     {
@@ -156,15 +164,21 @@ class IntercomService
 
     public function convertLead(User $user)
     {
-        $data = [
-          "contact" => array("id" => $user->getIntercomId()),
-          "user" => array("user_id" => $user->getId()),
-        ];
+        $results = [];
+        $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
+        $results[] = $resp;
+        foreach ($resp->contacts as $lead) {
+            $data = [
+              "contact" => array("id" => $lead->id),
+              "user" => array("user_id" => $user->getId()),
+            ];
 
-        $resp = $this->client->leads->convertLead($data);
-        $this->logger->debug(sprintf('Intercom convert lead (userid %s) %s', $user->getId(), json_encode($resp)));
+            $resp = $this->client->leads->convertLead($data);
+            $this->logger->debug(sprintf('Intercom convert lead (userid %s) %s', $user->getId(), json_encode($resp)));
+            $results[] = $resp;
+        }
 
-        return $resp;
+        return $results;
     }
 
     public function getApiUserHash(User $user = null)
