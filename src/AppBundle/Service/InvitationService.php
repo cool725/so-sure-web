@@ -10,6 +10,7 @@ use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -334,7 +335,7 @@ class InvitationService
         return $invitation;
     }
 
-    public function inviteBySCode(Policy $policy, $scode)
+    public function inviteBySCode(Policy $policy, $scode, \DateTime $date = null)
     {
         $this->validatePolicy($policy);
 
@@ -344,6 +345,21 @@ class InvitationService
             throw new NotFoundHttpException();
         }
         $user = $scodeObj->getPolicy()->getUser();
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $date->sub(new \DateInterval('P1D'));
+
+        // if there isn't a lead source and its been less than a day, assume that
+        // the lead source was due to the scode
+        if (!$policy->getLeadSource() && $policy->getStart() > $date) {
+            $policy->setLeadSource(Lead::LEAD_SOURCE_SCODE);
+            // if policy is being set, user probably needs setting as well
+            if (!$user->getLeadSource()) {
+                $user->setLeadSource(Lead::LEAD_SOURCE_SCODE);
+            }
+        }
 
         return $this->inviteByEmail($policy, $user->getEmail(), $user->getName());
     }

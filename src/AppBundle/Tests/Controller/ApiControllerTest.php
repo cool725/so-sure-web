@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Sns;
 use AppBundle\Classes\ApiErrorCode;
@@ -1173,7 +1174,7 @@ class ApiControllerTest extends BaseControllerTest
         $user = $userRepo->findOneBy(['email' => 'api-new-user-scode@api.bar.com']);
         $this->assertTrue($user !== null);
         $this->assertEquals($scode->getId(), $user->getAcceptedSCode()->getId());
-        $this->assertEquals('scode', $user->getLeadSource());
+        $this->assertEquals(Lead::LEAD_SOURCE_SCODE, $user->getLeadSource());
     }
 
     public function testUserCreateInactiveSCode()

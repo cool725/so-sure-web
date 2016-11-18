@@ -7,6 +7,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\JudoPayment;
@@ -1998,7 +1999,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         $user->setEmail(static::generateEmail('lead-source', $this));
         self::$dm->persist($user);
-        $user->setLeadSource('scode');
+        $user->setLeadSource(Lead::LEAD_SOURCE_SCODE);
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         // Most tests should be against non-prelaunch users
@@ -2007,7 +2008,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999));
-        $this->assertEquals('scode', $policy->getLeadSource());
+        $this->assertEquals(Lead::LEAD_SOURCE_SCODE, $policy->getLeadSource());
     }
 
     public function testGetDaysInPolicyYearPreFebLeapYear()

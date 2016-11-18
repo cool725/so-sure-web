@@ -24,6 +24,7 @@ use AppBundle\Document\JudoPayment;
 use AppBundle\Document\SoSurePayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\Connection;
 use AppBundle\Document\OptOut\OptOut;
 use AppBundle\Document\OptOut\EmailOptOut;
@@ -513,7 +514,7 @@ class AdminController extends BaseController
             );
         }
 
-        $newInvitationPolicies = $policyRepo->findAllActivePolicies('invitation', $start, $end);
+        $newInvitationPolicies = $policyRepo->findAllActivePolicies(Lead::LEAD_SOURCE_INVITATION, $start, $end);
         $data['newInvitationPolicies'] = $newInvitationPolicies->count();
         $data['newInvitationPoliciesPremium'] = Policy::sumYearlyPremiumPrice($newInvitationPolicies);
         if ($data['newInvitationPolicies'] != 0) {
@@ -522,7 +523,7 @@ class AdminController extends BaseController
             );
         }
 
-        $totalInvitationPolicies = $policyRepo->findAllActivePolicies('invitation');
+        $totalInvitationPolicies = $policyRepo->findAllActivePolicies(Lead::LEAD_SOURCE_INVITATION);
         $data['totalInvitationPolicies'] = $totalInvitationPolicies->count();
         $data['totalInvitationPoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalInvitationPolicies);
         if ($data['totalInvitationPolicies'] != 0) {
@@ -531,7 +532,7 @@ class AdminController extends BaseController
             );
         }
 
-        $newSCodePolicies = $policyRepo->findAllActivePolicies('scode', $start, $end);
+        $newSCodePolicies = $policyRepo->findAllActivePolicies(Lead::LEAD_SOURCE_SCODE, $start, $end);
         $data['newSCodePolicies'] = $newSCodePolicies->count();
         $data['newSCodePoliciesPremium'] = Policy::sumYearlyPremiumPrice($newSCodePolicies);
         if ($data['newSCodePolicies'] != 0) {
@@ -540,7 +541,7 @@ class AdminController extends BaseController
             );
         }
 
-        $totalSCodePolicies = $policyRepo->findAllActivePolicies('scode');
+        $totalSCodePolicies = $policyRepo->findAllActivePolicies(Lead::LEAD_SOURCE_SCODE);
         $data['totalSCodePolicies'] = $totalSCodePolicies->count();
         $data['totalSCodePoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalInvitationPolicies);
         if ($data['totalSCodePolicies'] != 0) {

@@ -466,7 +466,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->receivedInvitations[] = $invitation;
 
         if (!$this->getLeadSource() && $invitation->getCreated() < $this->getCreated()) {
-            $this->setLeadSource('invitation');
+            $this->setLeadSource(Lead::LEAD_SOURCE_INVITATION);
         }
     }
 
@@ -689,7 +689,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $this->acceptedSCode = $scode;
         if (!$this->getLeadSource()) {
-            $this->setLeadSource('scode');
+            $this->setLeadSource(Lead::LEAD_SOURCE_SCODE);
         }
     }
 

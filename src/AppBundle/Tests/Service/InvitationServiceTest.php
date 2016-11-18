@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\Address;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
@@ -950,6 +951,81 @@ class InvitationServiceTest extends WebTestCase
             $inviterPolicy->getStandardSCode()->getCode()
         );
         $this->assertTrue($invitation instanceof EmailInvitation);
+    }
+
+    public function testSCodeInvitationSetsLeadSource()
+    {
+        $inviterUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationSetsLeadSource-inviter', $this),
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
+
+        $inviteeUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationSetsLeadSource-invitee', $this),
+            'bar'
+        );
+        $inviteePolicy = static::initPolicy($inviteeUser, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteBySCode(
+            $inviteePolicy,
+            $inviterPolicy->getStandardSCode()->getCode()
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+        $this->assertEquals(Lead::LEAD_SOURCE_SCODE, $inviteePolicy->getLeadSource());
+    }
+
+    public function testSCodeInvitationWithLeadSourceDoesNotChangeLeadSource()
+    {
+        $inviterUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationWithLeadSourceDoesNotChangeLeadSource-inviter', $this),
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
+
+        $inviteeUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationWithLeadSourceDoesNotChangeLeadSource-invitee', $this),
+            'bar'
+        );
+        $inviteePolicy = static::initPolicy($inviteeUser, static::$dm, static::$phone, null, false, true);
+        $inviteePolicy->setLeadSource(Lead::LEAD_SOURCE_INVITATION);
+        $this->assertEquals(Lead::LEAD_SOURCE_INVITATION, $inviteePolicy->getLeadSource());
+
+        $invitation = self::$invitationService->inviteBySCode(
+            $inviteePolicy,
+            $inviterPolicy->getStandardSCode()->getCode()
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+        $this->assertEquals(Lead::LEAD_SOURCE_INVITATION, $inviteePolicy->getLeadSource());
+    }
+
+    public function testOldSCodeInvitationDoesNotSetLeadSource()
+    {
+        $inviterUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testOldSCodeInvitationDoesNotSetLeadSource-inviter', $this),
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
+
+        $inviteeUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testOldSCodeInvitationDoesNotSetLeadSource-invitee', $this),
+            'bar'
+        );
+        $inviteePolicy = static::initPolicy($inviteeUser, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteBySCode(
+            $inviteePolicy,
+            $inviterPolicy->getStandardSCode()->getCode(),
+            new \DateTime('2 days')
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+        $this->assertNotEquals(Lead::LEAD_SOURCE_SCODE, $inviteePolicy->getLeadSource());
     }
 
     /**
