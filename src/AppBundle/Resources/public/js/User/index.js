@@ -8,10 +8,10 @@ $(function(){
 
     // a complete 0 value for data total will result in display not show
     var data = [1, 1];
-    if (connections + invites > 0) {
+    if (connections + invites > 0 && maxConnections != 0) {
         data = [
-            Math.min(connections + invites, maxConnections) / maxConnections,
-            Math.min(invites, maxConnections) / maxConnections
+            Math.min(connections, maxConnections) / maxConnections,
+            Math.min(connections + invites, maxConnections) / maxConnections
         ];
     }
     var myChart = new Chart(ctx, {
