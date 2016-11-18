@@ -4,10 +4,13 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\User;
+use AppBundle\Document\PhoneTrait;
 use GuzzleHttp\Client;
 
 class DigitsService
 {
+    use PhoneTrait;
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -39,10 +42,11 @@ class DigitsService
 
     public function validateUser($provider, $credentials, $cognitoId = null)
     {
-        // @codingStandardsIgnoreStart
         // https://docs.fabric.io/apple/digits/advanced-setup.html#oauth-echo
 
+        // @codingStandardsIgnoreStart
         // Validate that the oauth_consumer_key header value in the X-Verify-Credentials-Authorization matches your oauth consumer key, to ensure the user is logging into your site. You can use an oauth library to parse the header and explicitly match the key value, e.g. parse(params['X-Verify-Credentials-Authorization']).oauth_consumer_key=<your oauth consumer key>.
+        // @codingStandardsIgnoreEnd
         $foundConsumerKey = false;
         if (preg_match("/oauth_consumer_key=\"([^\"]*)\"/", $credentials, $matches) && isset($matches[1])) {
             $foundConsumerKey = in_array($matches[1], $this->allowedDigitsConsumerKeys);
@@ -58,7 +62,9 @@ class DigitsService
             throw new \Exception($message);
         }
 
+        // @codingStandardsIgnoreStart
         // Verify the X-Auth-Service-Provider header, by parsing the uri and asserting the domain is api.digits.com, to ensure you are calling Digits.
+        // @codingStandardsIgnoreEnd
         if (parse_url($provider, PHP_URL_HOST) != 'api.digits.com') {
             throw new \Exception(sprintf('Invalid digits api host %s', $provider));
         }
@@ -66,7 +72,9 @@ class DigitsService
         $queryData = [];
         $querystring = parse_str(parse_url($provider, PHP_URL_QUERY), $queryData);
 
+        // @codingStandardsIgnoreStart
         // Consider adding additional parameters to the signature to tie your app’s own session to the Digits session. Use the alternate form OAuthEchoHeadersToVerifyCredentialsWithParams: to provide additional parameters to include in the OAuth service URL. Verify these parameters are present in the service URL and that the API request succeeds.
+        // @codingStandardsIgnoreEnd
         if ($cognitoId) {
             if (!isset($queryData['identity_id']) || $cognitoId != $queryData['identity_id']) {
                 throw new \Exception(sprintf('Cognito Id %s does not match session url %s', $cognitoId, $provider));
@@ -76,12 +84,14 @@ class DigitsService
         $client = new Client();
         $res = $client->request('GET', $provider, ['headers' => ['Authorization' => $credentials]]);
 
+        // @codingStandardsIgnoreStart
         // {"phone_number":"+447775740466","access_token":{"token":"719464658130857984-eBlXwMizxBkZ6QomhL5EOgChkuAlGZo","secret":"zSYBM5yYADHFPEzqO80ee9ZlHlFTbz21uJ6sNXTCqHO6F"},"id_str":"719464658130857984","verification_type":"sms","id":719464658130857984,"created_at":"Mon Apr 11 09:58:36 +0000 2016"} [] []
+        // @codingStandardsIgnoreEnd
         $body = (string) $res->getBody();
         $this->logger->info(sprintf('Digits response: %s', $body));
 
         $data = json_decode($body, true);
-        $mobileNumber = $data['phone_number'];
+        $mobileNumber = $this->normalizeUkMobile($data['phone_number']);
         $id = $data['id_str'];
         $verificationType = $data['verification_type'];
 
@@ -94,12 +104,23 @@ class DigitsService
         if (!in_array($verificationType, ['sms', 'voicecall'])) {
             throw new \Exception(sprintf('Unknown digits verification type %s', $verificationType));
         }
-        // TODO: Store digits id against user record??
-
-        // @codingStandardsIgnoreEnd
 
         $repo = $this->dm->getRepository(User::class);
-        $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
+        $user = $repo->findOneBy(['digitsId' => $id]);
+        if ($user->getMobileNumber() != $mobileNumber) {
+            // Digits user exists, but has different registered mobile number to policy
+            $this->logger->warning(sprintf('User %s has a different digits mobile number %s', $user->getId(), $mobileNumber));
+        } elseif (!$user) {
+            $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
+
+            // First time login, so we should store the digits id against the user record
+            if (!$user->getDigitsId()) {
+                $user->setDigitsIds($id);
+                $this->dm->flush();
+            } elseif ($user->getDigitsId() != $id) {
+                throw new \Exception(sprintf('User %s has a different digits id [%s/%s]', $user->getId(), $id, $mobileNumber));
+            }
+        }
 
         return $user;
     }
