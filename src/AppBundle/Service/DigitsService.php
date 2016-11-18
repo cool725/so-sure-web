@@ -112,7 +112,7 @@ class DigitsService
 
             // First time login, so we should store the digits id against the user record
             if (!$user->getDigitsId()) {
-                $user->setDigitsIds($id);
+                $user->setDigitsId($id);
                 $this->dm->flush();
             } elseif ($user->getDigitsId() != $id) {
                 throw new \Exception(sprintf(
