@@ -47,7 +47,7 @@
 }
 @media (min-width: 992px) {
   .view-quote .panel-primary {
-    height: 420px;
+    height: 365px;
   }
 }
 @media (max-width: 992px) {
@@ -205,47 +205,44 @@
   padding-top: 10%;
 }
 
-#buyModal #lead_form_email {
+#download-now #lead_form_email {
   padding: 10px 15px 10px 15px;
-  width: 300px;
+  width: 400px;
   margin-bottom: 0;
   margin-top: 15px;
   border-radius: 25px;
   border: 2px solid #efefef;
 }
 
-#buyModal #lead_form_save {
+#download-now #lead_form_save {
   padding: 12px 30px;
   border-radius: 30px;
   -moz-border-radius: 30px;
   -webkit-border-radius: 30px;
-  width: 155px;
+}
+@media (min-width: 992px) {
+  #download-now img {
+    width: 30%;
+  }
 }
 @media (max-width: 543px) {
-    #buyModal #lead_form_save {
+    #download-now #lead_form_save {
       margin-top: 15px;
       margin-left: 0px;
       width: 250px;
     }
-    #buyModal #lead_form_email {
+    #download-now #lead_form_email {
       width: 250px;
     }
 }
 @media (max-width: 992px) {
-  .download-app-modal .text-left {
+  #download-now .text-left {
     text-align: center !important
   }
-  .download-app-modal .text-right {
+  #download-now .text-right {
     text-align: center !important
   }
-  .download-app-modal img {
+  #download-now img {
     padding-top: 10px;
   }
-}
-
-#buyModal > div > div > form > div.modal-body.text-center > div.text-break {
-  padding-top: 20px;
-  padding-bottom: 40px;
-  padding-left: 0;
-  padding-right: 0;
 }
