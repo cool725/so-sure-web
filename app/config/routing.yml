@@ -39,7 +39,8 @@ fos_user_resetting_check_email:
 fos_user_resetting_reset:
     path: /resetting/reset/{token}
     defaults:
-        _controller: AppBundle:FOSUser:reset        
+        _controller: AppBundle:FOSUser:reset
+#        _controller: FOSUserBundle:Resetting:reset
         method: GET|POST
 
 fos_user_change_password:

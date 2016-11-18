@@ -34,7 +34,9 @@ class FOSUserController extends ResettingController
         $process = $formHandler->process($user);
 
         if ($process) {
-            $this->setFlash('fos_user_success', 'resetting.flash.success');
+            // $this->setFlash('fos_user_success', 'resetting.flash.success');
+            $this->setFlash('success', 'Your password has been reset.  Please login using your new credentials.');
+            $this->container->get('doctrine_mongodb.odm.default_document_manager')->flush();
 
             return new RedirectResponse($this->container->get('router')->generate('fos_user_security_login'));
         }
