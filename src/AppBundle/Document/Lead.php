@@ -17,6 +17,10 @@ class Lead
     const SOURCE_LAUNCH_USA = 'launch-usa';
     const SOURCE_BUY = 'buy';
 
+    // Lead Source is used in User & Policy
+    const LEAD_SOURCE_INVITATION = 'invitation';
+    const LEAD_SOURCE_SCODE = 'scode';
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
