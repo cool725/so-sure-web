@@ -55,13 +55,19 @@ class BranchService
         $this->appleAppDownload = $appleAppDownload;
     }
 
-    public function downloadAppleLink($source)
+    public function downloadAppleLink($source, $appleCampaign = null)
     {
-        if ($source && $this->environment == 'prod') {
-            return sprintf("%s&cs=%s", $this->appleAppDownload, $source);
-        } else {
-            return $this->appleAppDownload;
+        $downloadLink = $this->appleAppDownload;
+        if ($this->environment == 'prod') {
+            if ($source) {
+                $downloadLink = sprintf("%s&cs=%s", $downloadLink, $source);
+            }
+            if ($appleCampaign) {
+                $downloadLink = sprintf("%s&ct=%s", $downloadLink, $appleCampaign);
+            }
         }
+
+        return $downloadLink;
     }
 
     public function downloadGoogleLink($source)
@@ -83,21 +89,21 @@ class BranchService
         return $this->send($data, $this->marketing($marketing));
     }
 
-    public function appleLink($data, $marketing, $source)
+    public function appleLink($data, $marketing, $source, $appleCampaign = null)
     {
         $data = array_merge($data, [
-            '$desktop_url' => $this->downloadAppleLink($source),
+            '$desktop_url' => $this->downloadAppleLink($source, $appleCampaign),
             '$ios_url' => $this->downloadAppleLink($source),
         ]);
 
         return $this->send($data, $this->marketing($marketing));
     }
 
-    public function link($data, $marketing, $source)
+    public function link($data, $marketing, $source, $appleCampaign = null)
     {
         $data = array_merge($data, [
             //'$desktop_url' => $this->router->generate('', true),
-            '$ios_url' => $this->downloadAppleLink($source),
+            '$ios_url' => $this->downloadAppleLink($source, $appleCampaign),
             '$android_url' => $this->downloadGoogleLink($source),
         ]);
 
@@ -116,7 +122,7 @@ class BranchService
             'scode' => $code,
             '$deeplink_path' => sprintf('invite/scode/%s', $code),
             '$desktop_url' => $this->router->generate('scode', ['code' => $code], true),
-            '$ios_url' => $this->downloadAppleLink('app'),
+            '$ios_url' => $this->downloadAppleLink('app', 'scode'),
             '$android_url' => $this->downloadGoogleLink('app'),
         ];
 

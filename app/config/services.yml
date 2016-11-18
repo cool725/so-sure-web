@@ -483,7 +483,7 @@ services:
             -  { name: kernel.event_listener, event: event.policy.created, method: refundFreeNovPromo }
 
     app.listener.response:
-        class:   AppBundle\Listener\KernelResponseListener
+        class:   AppBundle\Listener\KernelListener
         arguments:
             tokenStorage:     "@security.token_storage"
             authChecker:      "@security.authorization_checker"
@@ -492,6 +492,7 @@ services:
             environment:      "%kernel.environment%"
             domain:           "%sosure_employee_cookie_domain%"
         tags:
+            -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
             -  { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
     app.listener.mailer:
