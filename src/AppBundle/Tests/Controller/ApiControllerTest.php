@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Sns;
 use AppBundle\Classes\ApiErrorCode;
