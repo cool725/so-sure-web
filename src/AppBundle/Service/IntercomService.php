@@ -123,25 +123,6 @@ class IntercomService
         }
     }
 
-    /*
-    public function getLeadByEmail(User $user)
-    {
-        try {
-            $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
-            $this->logger->info(sprintf('getLead %s %s', $user->getEmail(), json_encode($resp)));
-
-            return $resp;
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            if ($e->getResponse()->getStatusCode() == "404") {
-                return false;
-            }
-            // print_r($e->getResponse()->getBody()->getContents());
-
-            throw $e;
-        }
-    }
-    */
-
     private function userExists(User $user)
     {
         if (!$user->getIntercomId()) {
