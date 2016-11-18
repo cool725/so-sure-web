@@ -1173,7 +1173,7 @@ class ApiControllerTest extends BaseControllerTest
         $user = $userRepo->findOneBy(['email' => 'api-new-user-scode@api.bar.com']);
         $this->assertTrue($user !== null);
         $this->assertEquals($scode->getId(), $user->getAcceptedSCode()->getId());
-        $this->assertEquals('scode', $user->getLeadSource());
+        $this->assertEquals(Lead::LEAD_SOURCE_SCODE, $user->getLeadSource());
     }
 
     public function testUserCreateInactiveSCode()

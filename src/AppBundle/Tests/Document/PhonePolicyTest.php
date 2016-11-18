@@ -2008,7 +2008,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999));
-        $this->assertEquals('scode', $policy->getLeadSource());
+        $this->assertEquals(Lead::LEAD_SOURCE_SCODE, $policy->getLeadSource());
     }
 
     public function testGetDaysInPolicyYearPreFebLeapYear()

@@ -25,7 +25,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     use ArrayToApiArrayTrait;
     use PhoneTrait;
     use GravatarTrait;
-    
+
     /**
      * @MongoDB\Id
      */

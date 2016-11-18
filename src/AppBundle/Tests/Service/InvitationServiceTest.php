@@ -981,14 +981,14 @@ class InvitationServiceTest extends WebTestCase
     {
         $inviterUser = static::createUser(
             static::$userManager,
-            static::generateEmail('testSCodeInvitationSetsLeadSource-inviter', $this),
+            static::generateEmail('testSCodeInvitationWithLeadSourceDoesNotChangeLeadSource-inviter', $this),
             'bar'
         );
         $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
 
         $inviteeUser = static::createUser(
             static::$userManager,
-            static::generateEmail('testSCodeInvitationSetsLeadSource-invitee', $this),
+            static::generateEmail('testSCodeInvitationWithLeadSourceDoesNotChangeLeadSource-invitee', $this),
             'bar'
         );
         $inviteePolicy = static::initPolicy($inviteeUser, static::$dm, static::$phone, null, false, true);
