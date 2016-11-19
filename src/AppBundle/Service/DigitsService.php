@@ -110,8 +110,10 @@ class DigitsService
         if (!$user) {
             $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
 
-            // First time login, so we should store the digits id against the user record
-            if (!$user->getDigitsId()) {
+            if (!$user) {
+                return null;
+            } elseif (!$user->getDigitsId()) {
+                // First time login, so we should store the digits id against the user record
                 $user->setDigitsId($id);
                 $this->dm->flush();
             } elseif ($user->getDigitsId() != $id) {
