@@ -130,6 +130,10 @@ class PurchaseController extends BaseController
                     $purchase->populateUser($user);
 
                     if (!$user->hasValidDetails() || !$user->hasValidBillingDetails()) {
+                        $this->get('logger')->error(sprintf(
+                            'Invalid purchase user details %s',
+                            json_encode($purchase->toApiArray())
+                        ));
                         throw new \InvalidArgumentException(sprintf(
                             'User is missing details such as name, email address, or billing details (User: %s)',
                             $user->getId()
@@ -230,6 +234,7 @@ class PurchaseController extends BaseController
             'phone' => $phone,
             'purchase_form' => $purchaseForm->createView(),
             'policy_key' => $this->getParameter('policy_key'),
+            'is_postback' => 'POST' === $request->getMethod(),
         );
 
         if (isset($webpay['post_url']) && isset($webpay['payment'])) {

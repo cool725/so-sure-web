@@ -145,8 +145,9 @@
                           <div class="form-group col-sm-4">
                             <label>Find Address</label>
                           </div>
-                            <div class="form-group col-sm-6">
+                            <div class="form-group col-sm-6 {% if is_postback %}has-error{% endif %}">
                                 <input class="typeahead form-control" type="text" placeholder="Enter Postcode" {% if not showAddress %}required="required"{% endif %}>
+                                {% if is_postback %}<div class="help-block with-errors">Your address is required</div>{% endif %}
                             </div>
                         </div>
                         <div class="row">

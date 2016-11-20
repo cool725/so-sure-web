@@ -235,6 +235,20 @@ class Purchase
         return $this->postcode;
     }
 
+    public function toApiArray()
+    {
+        return [
+            'email' => $this->getEmail(),
+            'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
+            'mobileNumber' => $this->getMobileNumber(),
+            'phone_id' => $this->getPhone()->getId(),
+            'phone' => $this->getPhone()->__toString(),
+            'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
+            'address' => $this->getAddress()->__toString(),
+        ];
+    }
+
     public function populateFromUser($user)
     {
         $this->setEmail($user->getEmail());
