@@ -29,7 +29,7 @@ class AgeValidator extends ConstraintValidator
 
         if (!$diff || $diff->y < 18) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('%string%', $birthday->format(\DateTime::ATOM))
+                ->setParameter('%string%', $birthday ? $birthday->format(\DateTime::ATOM) : 'not present')
                 ->addViolation();
         }
     }
