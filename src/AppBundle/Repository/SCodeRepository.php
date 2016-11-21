@@ -14,4 +14,12 @@ class SCodeRepository extends DocumentRepository
             ->execute()
             ->count();
     }
+
+    public function getLinkPrefix($prefix)
+    {
+        return $this->createQueryBuilder()
+            ->field('shareLink')->equals(new \MongoRegex(sprintf('/%s.*/i', $prefix)))
+            ->getQuery()
+            ->execute();
+    }
 }
