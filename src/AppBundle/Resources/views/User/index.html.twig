@@ -16,6 +16,31 @@
             This account page is still a work in progress, so it's a bit limited at the moment. However, if you have any ideas of what might be useful to you, we'd love to
             <a href="mailto:hello@wearesosure.com">hear them</a>.
         </p>
+        {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
+        <div class="col-md-12">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h4>Invitations</h4>
+                </div>
+                <div class="panel-body">
+                    {{ form_start(invitation_form, {'attr': { 'class': 'form-inline'}}) }}
+                    <div class="row">
+                        {% for invitation in policy.user.unprocessedReceivedInvitations %}
+                        <div class="col-md-6">
+                             <div class="form-group">
+                            <label style="margin-right: 20px">{{ invitation.inviter.name }}</label>
+                            {{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-primary'}}) }}
+                            {{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-danger'}}) }}
+                             </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {{ form_errors(invitation_form) }}
+                    {{ form_end(invitation_form) }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="col-md-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
