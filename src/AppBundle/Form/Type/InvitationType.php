@@ -27,8 +27,16 @@ class InvitationType extends AbstractType
             $user = $event->getData();
             $form = $event->getForm();
             foreach ($user->getUnprocessedReceivedInvitations() as $invitation) {
-                $form->add(sprintf('accept_%s', $invitation->getId()), SubmitType::class, ['label' => 'Accept', 'attr' => ['class' => 'btn btn-primary']]);
-                $form->add(sprintf('reject_%s', $invitation->getId()), SubmitType::class, ['label' => 'Decline', 'attr' => ['class' => 'btn btn-danger']]);
+                $form->add(
+                    sprintf('accept_%s', $invitation->getId()),
+                    SubmitType::class,
+                    ['label' => 'Accept', 'attr' => ['class' => 'btn btn-primary']]
+                );
+                $form->add(
+                    sprintf('reject_%s', $invitation->getId()),
+                    SubmitType::class,
+                    ['label' => 'Decline', 'attr' => ['class' => 'btn btn-danger']]
+                );
             }
         });
     }
