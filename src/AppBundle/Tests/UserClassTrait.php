@@ -22,6 +22,8 @@ trait UserClassTrait
     public static function createUserPolicy($init = false, $date = null)
     {
         $user = new User();
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
         self::addAddress($user);
 
         $policy = new SalvaPhonePolicy();
@@ -30,7 +32,7 @@ trait UserClassTrait
         if ($init) {
             $policy->init($user, self::getLatestPolicyTerms(static::$dm));
             $policy->setPhone(self::$phone, $date);
-            $policy->create(rand(1, 999999), 'TEST', $date);
+            $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
         }
 
         return $policy;
@@ -155,7 +157,7 @@ trait UserClassTrait
                 throw new \Exception('Attempted to create policy without setting a phone');
             }
 
-            $policy->create(rand(1, 999999), 'TEST', $date);
+            $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
         }
 
         $dm->persist($policy);

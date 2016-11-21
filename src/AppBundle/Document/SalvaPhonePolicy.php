@@ -189,9 +189,9 @@ class SalvaPhonePolicy extends PhonePolicy
         }
     }
 
-    public function create($seq, $prefix = null, \DateTime $startDate = null)
+    public function create($seq, $prefix = null, \DateTime $startDate = null, $scodeCount = 1)
     {
-        parent::create($seq, $prefix, $startDate);
+        parent::create($seq, $prefix, $startDate, $scodeCount);
         if ($this->isPrefixInvalidPolicy()) {
             $this->setSalvaStatus(self::SALVA_STATUS_SKIPPED);
         } else {

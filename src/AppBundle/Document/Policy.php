@@ -663,6 +663,13 @@ abstract class Policy
         return $scodes;
     }
 
+    public function createAddSCode($scodeCount)
+    {
+        $scode = new SCode();
+        $scode->generateNamedCode($this->getUser(), $scodeCount);
+        $this->addSCode($scode);
+    }
+
     public function addSCode(SCode $scode)
     {
         $scode->setPolicy($this);
@@ -746,7 +753,7 @@ abstract class Policy
         $this->setPolicyTerms($terms);
     }
 
-    public function create($seq, $prefix = null, \DateTime $startDate = null)
+    public function create($seq, $prefix = null, \DateTime $startDate = null, $scodeCount = 1)
     {
         if (!$this->getUser()) {
             throw new \Exception('Missing user for policy');
@@ -794,7 +801,7 @@ abstract class Policy
         ));
         $this->setStatus(self::STATUS_PENDING);
         if (count($this->getSCodes()) == 0) {
-            $this->addSCode(new SCode());
+            $this->createAddSCode($scodeCount);
         }
 
         $this->setLeadSource($this->getUser()->getLeadSource());
