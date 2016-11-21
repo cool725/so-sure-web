@@ -70,6 +70,6 @@ class SCodeCommand extends ContainerAwareCommand
             $scode->getPolicy()->getPolicyNumber(),
             $scode->getCode(),
             $scode->getShareLink()
-        ));        
+        ));
     }
 }
