@@ -195,7 +195,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new SalvaPhonePolicy();
         $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
         $policyA->setPhone(self::$phone);
-        $policyA->create(rand(1, 999999));
+        $policyA->create(rand(1, 999999), null, null, rand(1, 9999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_HIGH, $policyA->getRisk(new \DateTime("2016-01-10")));
     }
@@ -209,7 +209,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new SalvaPhonePolicy();
         $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
         $policyA->setPhone(self::$phone);
-        $policyA->create(rand(1, 999999));
+        $policyA->create(rand(1, 999999), null, null, rand(1, 9999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_MEDIUM, $policyA->getRisk(new \DateTime("2016-02-10")));
     }
@@ -223,7 +223,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new SalvaPhonePolicy();
         $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
         $policyA->setPhone(self::$phone);
-        $policyA->create(rand(1, 999999));
+        $policyA->create(rand(1, 999999), null, null, rand(1, 9999));
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(0);
 
@@ -323,14 +323,14 @@ class PhonePolicyTest extends WebTestCase
         $policyA = new SalvaPhonePolicy();
         $policyA->init($userA, self::getLatestPolicyTerms(static::$dm));
         $policyA->setPhone(static::$phone);
-        $policyA->create($policyNumber);
+        $policyA->create($policyNumber, null, null, rand(1, 9999));
         self::$dm->persist($policyA);
         self::$dm->flush();
 
         $policyB = new SalvaPhonePolicy();
         $policyB->init($userB, self::getLatestPolicyTerms(static::$dm));
         $policyB->setPhone(static::$phone);
-        $policyB->create($policyNumber);
+        $policyB->create($policyNumber, null, null, rand(1, 9999));
         self::$dm->persist($policyB);
         self::$dm->flush();
     }
@@ -624,7 +624,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($user->isPreLaunch());
         $policy->setPhone(static::$phone);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
 
         $this->assertFalse(
             $policy->isPotCompletelyFilled(),
@@ -677,7 +677,7 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPotValue(80);
     }
@@ -697,7 +697,7 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPotValue(120);
     }
@@ -714,7 +714,7 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPotValue(80);
     }
@@ -726,7 +726,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999), null, new \DateTime('2016-01-01 16:00'));
+        $policy->create(rand(1, 999999), null, new \DateTime('2016-01-01 16:00'), rand(1, 9999));
         $this->assertEquals(
             new \DateTime('2016-12-31 23:59:59', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
             $policy->getEnd()
@@ -740,7 +740,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999), null, new \DateTime('2016-07-01 16:00'));
+        $policy->create(rand(1, 999999), null, new \DateTime('2016-07-01 16:00'), rand(1, 9999));
         $this->assertEquals(
             new \DateTime('2017-06-30 23:59:59', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
             $policy->getEnd()
@@ -754,7 +754,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999), null, new \DateTime('2016-04-19 16:00'));
+        $policy->create(rand(1, 999999), null, new \DateTime('2016-04-19 16:00'), rand(1, 9999));
         $this->assertEquals(new \DateTime('2016-06-18 16:00'), $policy->getConnectionCliffDate());
     }
 
@@ -787,7 +787,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $policy->setPotValue(20);
@@ -890,7 +890,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -938,7 +938,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -959,7 +959,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -995,7 +995,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $this->assertNull($policy->getPremiumInstallmentCount());
@@ -1009,7 +1009,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -1032,7 +1032,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -1059,7 +1059,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -1089,7 +1089,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -1119,7 +1119,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('installment-yearly', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -1161,7 +1161,7 @@ class PhonePolicyTest extends WebTestCase
         $user = new User();
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -1183,7 +1183,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('broker-fee-paid', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         for ($i = 0; $i <= 1; $i++) {
@@ -1207,7 +1207,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('savla-policynumber', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(sprintf('%s/1', $policy->getPolicyNumber()), $policy->getSalvaPolicyNumber());
 
@@ -1224,7 +1224,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('salva-version', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertNull($policy->getSalvaVersion(new \DateTime("2016-01-01")));
 
@@ -1245,7 +1245,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('remianing-broker-fee-paid', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -1279,7 +1279,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('total-broker-fee', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"));
+        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
 
         $payment = new JudoPayment();
         $payment->setAmount(
@@ -1308,7 +1308,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('last-successful-payment-credit', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $this->assertNull($policy->getLastSuccessfulPaymentCredit());
@@ -1370,7 +1370,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('expire-policy-missing-payment', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         // Policy doesn't have a payment, so should be expired
@@ -1386,7 +1386,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('expire-policy', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $payment = new JudoPayment();
@@ -1432,7 +1432,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('can-cancel-policy', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertTrue($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-01")));
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-15")));
@@ -1459,7 +1459,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('cancel-policy-disallowed', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-15")));
         $policy->cancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-15"));
@@ -1477,7 +1477,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('cancel-policy-open-claim', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
         $this->assertTrue($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-05")));
@@ -1499,7 +1499,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('can-cancel-policy-unpaid', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_UNPAID));
 
@@ -1516,7 +1516,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail($this->generateEmail('cancel-already-cancelled', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         static::$dm->persist($policy);
         static::$dm->persist($user);
@@ -1535,7 +1535,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('can-cancel-policy-expired', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setEnd(new \DateTime("2016-12-31 23:59"));
         $policy->setStatus(Policy::STATUS_EXPIRED);
@@ -1551,7 +1551,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('is-within-cooloff', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertTrue($policy->isWithinCooloffPeriod(new \DateTime("2016-01-01")));
         $this->assertTrue($policy->isWithinCooloffPeriod(new \DateTime("2016-01-14 23:59:59")));
@@ -1889,7 +1889,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"));
+        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
         $policy->setPremiumInstallments($installments);
 
         $this->addPayment($policy, $amount, $commission);
@@ -2007,7 +2007,7 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $this->assertEquals(Lead::LEAD_SOURCE_SCODE, $policy->getLeadSource());
     }
 
@@ -2020,7 +2020,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('days-policy-year-pre-feb', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, new \DateTime('2016-02-01'));
+        $policy->create(rand(1, 999999), null, new \DateTime('2016-02-01'), rand(1, 9999));
 
         $this->assertEquals(366, $policy->getDaysInPolicyYear());
     }
@@ -2034,7 +2034,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('days-policy-year-post-feb', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, new \DateTime('2016-03-01'));
+        $policy->create(rand(1, 999999), null, new \DateTime('2016-03-01'), rand(1, 9999));
 
         $this->assertEquals(365, $policy->getDaysInPolicyYear());
     }

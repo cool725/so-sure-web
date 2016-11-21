@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document()
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\SCodeRepository")
  * @Gedmo\Loggable
  */
 class SCode
@@ -76,10 +76,32 @@ class SCode
         $this->generateRandomCode();
     }
 
+    public static function getNameForCode(User $user)
+    {
+        $firstName = str_pad($user->getFirstName(), 1, "0");
+        $lastName = str_pad($user->getLastName(), 4, "0");
+        $name = sprintf("%s%s", substr($firstName, 0, 1), substr($lastName, 0, 3));
+
+        return $name;
+    }
+
+    public function generateNamedCode(User $user, $count)
+    {
+        $code = sprintf("%s%04d", self::getNameForCode($user), $count);
+        if (strlen($code) > 8) {
+            $code = substr($code, 0, 8);
+        }
+        if (strlen($code) != 8) {
+            throw new \Exception(sprintf('SCode %s is not 8 character', $code));
+        }
+
+        $this->setCode(strtolower($code));
+    }
+
     public function generateRandomCode()
     {
         $randBase64 = $this->removeDisallowedBase64Chars(base64_encode(random_bytes(12)));
-        $this->setCode(substr($randBase64, 0, 8));
+        $this->setCode(strtolower(substr($randBase64, 0, 8)));
     }
 
     public function removeDisallowedBase64Chars($string)
@@ -93,6 +115,8 @@ class SCode
 
     public static function isValidSCode($scode)
     {
+        // TODO: Consider adding additional scodes to users and gradually phase out old ones
+        // should be able one day to remove the lowercase a-z validation here
         return preg_match("/^[a-zA-Z0-9\/+]{8,8}/", $scode) === 1;
     }
 
