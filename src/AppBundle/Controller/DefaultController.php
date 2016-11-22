@@ -42,7 +42,12 @@ class DefaultController extends BaseController
         //$ip = "72.229.28.185";
         $ip = $request->getClientIp();
         $site = $request->get('site');
-        if ($geoip->findCountry($ip) == "US" && $site != 'uk') {
+        $userAgent = $request->headers->get('User-Agent');
+        // make sure to exclude us based bots that import content - eg. facebook/twitter
+        // https://developers.facebook.com/docs/sharing/webmasters/crawler
+        // https://dev.twitter.com/cards/getting-started#crawling
+        if ($geoip->findCountry($ip) == "US" && $site != 'uk' &&
+            !preg_match("/Twitterbot|facebookexternalhit|Facebot/i", $userAgent)) {
             return $this->redirectToRoute('launch_usa');
         }
         $dm = $this->getManager();

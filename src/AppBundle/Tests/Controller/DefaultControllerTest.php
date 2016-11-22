@@ -33,6 +33,30 @@ class DefaultControllerTest extends BaseControllerTest
         $this->assertGreaterThan(10, count($values));
     }
 
+    public function testIndexRedirect()
+    {
+        $crawler = self::$client->request('GET', '/', [], [], ['REMOTE_ADDR' => '70.248.28.23']);
+        self::verifyResponse(302);
+    }
+
+    public function testIndexFacebookNoRedirect()
+    {
+        $crawler = self::$client->request('GET', '/', [], [], [
+            'REMOTE_ADDR' => '70.248.28.23',
+            'HTTP_User-Agent' => "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)"
+        ]);
+        self::verifyResponse(200);
+    }
+
+    public function testIndexTwitterNoRedirect()
+    {
+        $crawler = self::$client->request('GET', '/', [], [], [
+            'REMOTE_ADDR' => '70.248.28.23',
+            'HTTP_User-Agent' => "twitterbot"
+        ]);
+        self::verifyResponse(200);
+    }
+
     public function testIndexInvalid()
     {
         $crawler = self::$client->request('GET', '/');
