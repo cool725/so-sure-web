@@ -64,6 +64,8 @@ security:
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ %davies_ip% ] }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ %sosure_rwe_ip% ] }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ %sosure_patrick_ip% ] }
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/purchase/, role: ROLE_USER }

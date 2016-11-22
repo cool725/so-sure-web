@@ -269,6 +269,7 @@ services:
             excel:          "@app.excel"
             s3:             "@aws.s3"
             claims:         "@app.claims"
+            environment:    "%kernel.environment%"
         tags:
             - { name: monolog.logger, channel: davies }
 
