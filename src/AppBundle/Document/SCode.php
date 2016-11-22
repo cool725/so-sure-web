@@ -14,7 +14,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 class SCode
 {
     const TYPE_STANDARD = 'standard';
-    const TYPE_PAYGROUP = 'paygroup';
+    const TYPE_MULTIPAY = 'multipay';
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -38,7 +38,7 @@ class SCode
     protected $code;
 
     /**
-     * @Assert\Choice({"standard", "paygroup"})
+     * @Assert\Choice({"standard", "multipay"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -169,7 +169,7 @@ class SCode
 
     public function setType($type)
     {
-        if (!in_array($type, [self::TYPE_STANDARD, self::TYPE_PAYGROUP])) {
+        if (!in_array($type, [self::TYPE_STANDARD, self::TYPE_MULTIPAY])) {
             throw new \InvalidArgumentException(sprintf('%s is not a valid type'));
         }
 

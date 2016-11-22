@@ -6,6 +6,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Address;
+use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
 use AppBundle\Document\JudoPayment;
@@ -178,15 +179,21 @@ trait UserClassTrait
             $commission = Salva::YEARLY_TOTAL_COMMISSION;
         }
 
-        $receiptId = $judopay->testPay(
-            $policy->getUser(),
+        $details = self::runJudoPayPayment($judopay, $policy->getUser(), $policy, $premium);
+        $receiptId = $details['receiptId'];
+        self::addPayment($policy, $premium, $commission, $receiptId);
+    }
+
+    public static function runJudoPayPayment($judopay, User $user, Policy $policy, $amount)
+    {
+        return $judopay->testPayDetails(
+            $user,
             $policy->getId(),
-            $premium,
+            $amount,
             '4976 0000 0000 3436',
             '12/20',
             '452'
         );
-        self::addPayment($policy, $premium, $commission, $receiptId);
     }
 
     public static function addPayment($policy, $amount, $commission, $receiptId = null)

@@ -1,0 +1,12 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Policy Payment Request from {{ multiPay.payee.name }}
+
+**
+------------------------------------------------------------
+{{ multiPay.payee.name }} has requested you to pay for their policy.
+
+The premium is £{{ multiPay.policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} / month or £{{ multiPay.policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }} for the year.
+
+You can open your so-sure App to Accept or Reject the request.
+{% endblock body %}

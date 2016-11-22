@@ -2,9 +2,12 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
-use GoCardlessPro\Client;
-use \GoCardlessPro\Environment;
+use Doctrine\ODM\MongoDB\DocumentManager;
+
 use JudoPay;
+
+use AppBundle\Classes\Salva;
+
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
@@ -14,11 +17,11 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
-use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Document\MultiPay;
 use AppBundle\Document\CurrencyTrait;
+
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\PaymentDeclinedException;
-use AppBundle\Classes\Salva;
 
 class JudopayService
 {
@@ -525,6 +528,9 @@ class JudopayService
     public function runTokenPayment(User $user, $amount, $paymentRef, $policyId, $customerRef = null)
     {
         $paymentMethod = $user->getPaymentMethod();
+        if (!$paymentMethod) {
+            throw new \Exception(sprintf('Unknown payment method for user %s', $user->getId()));
+        }
         if (!$customerRef) {
             $customerRef = $user->getId();
         }
@@ -575,7 +581,7 @@ class JudopayService
         if (!$amount) {
             $amount = $policy->getPremium()->getMonthlyPremiumPrice();
         }
-        $user = $policy->getUser();
+        $user = $policy->getPayer();
 
         $payment = new JudoPayment();
         $payment->setAmount($amount);
@@ -771,5 +777,35 @@ class JudopayService
         $judoFile->setDate($data['date']);
 
         return $data;
+    }
+
+    /**
+     * @param MultiPay  $multiPay
+     * @param           $amount
+     * @param \DateTime $date
+     */
+    public function multiPay(MultiPay $multiPay, $amount, \DateTime $date = null)
+    {
+        $this->statsd->startTiming("judopay.multipay");
+
+        $policy = $multiPay->getPolicy();
+        if ($policy->getStatus() != PhonePolicy::STATUS_MULTIPAY_REQUESTED) {
+            throw new ProcessedException();
+        }
+
+        // Mark policy as pending for monitoring purposes
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $multiPay->getPayer()->addPayerPolicy($policy);
+        $this->dm->flush();
+
+        $this->tokenPay($policy, $amount);
+
+        $this->policyService->create($policy, $date);
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $this->dm->flush();
+
+        $this->statsd->endTiming("judopay.multipay");
+
+        return true;
     }
 }

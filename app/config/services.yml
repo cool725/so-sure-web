@@ -393,6 +393,11 @@ services:
         tags:
             - { name: security.voter }
 
+    app.voter.multiPay:
+        class: AppBundle\Security\MultiPayVoter
+        tags:
+            - { name: security.voter }
+
     doctrine.listener.invitation:
         class:   AppBundle\Listener\DoctrineInvitationListener
         arguments:

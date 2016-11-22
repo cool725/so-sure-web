@@ -22,6 +22,7 @@ class PushService
     // these are currently mixpanel events
     const MESSAGE_RATEMYAPP = 'ratemyapp';
     const MESSAGE_PROMO = 'promo';
+    const MESSAGE_MULTIPAY = 'multipay';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -95,6 +96,8 @@ class PushService
             return self::DISPLAY_POPUP;
         } elseif ($messageType == self::MESSAGE_INVITATION) {
             return self::DISPLAY_POPUP;
+        } elseif ($messageType == self::MESSAGE_MULTIPAY) {
+            return self::DISPLAY_POPUP;
         } else {
             return null;
         }
@@ -107,6 +110,8 @@ class PushService
         } elseif ($messageType == self::MESSAGE_CONNECTED) {
             return true;
         } elseif ($messageType == self::MESSAGE_INVITATION) {
+            return true;
+        } elseif ($messageType == self::MESSAGE_MULTIPAY) {
             return true;
         } else {
             return null;
