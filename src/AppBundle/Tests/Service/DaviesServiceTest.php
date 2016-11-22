@@ -90,53 +90,6 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
     }
 
-    /**
-     * @expectedException \Exception
-     */
-    public function testValidateClaimDetailsUserName()
-    {
-        $user = new User();
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
-        $claim = new Claim();
-        $policy->addClaim($claim);
-        $policy->setPolicyNumber(1);
-
-        $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = 1;
-        $daviesClaim->insuredName = 'bar foo';
-
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-    }
-
-    /**
-     * @expectedException \Exception
-     */
-    public function testValidateClaimDetailsPostcode()
-    {
-        $address = new Address();
-        $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('AAA');
-        $user = new User();
-        $user->setBillingAddress($address);
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
-        $claim = new Claim();
-        $policy->addClaim($claim);
-        $policy->setPolicyNumber(1);
-
-        $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = 1;
-        $daviesClaim->insuredName = 'foo bar';
-        $daviesClaim->riskPostCode = 'BAA';
-
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-    }
-
     public function testValidateClaimDetails()
     {
         $address = new Address();
