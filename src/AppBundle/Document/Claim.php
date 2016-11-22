@@ -174,56 +174,48 @@ class Claim
     protected $processed;
 
     /**
-     * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $excess;
 
     /**
-     * @Assert\Range(min=0,max=1000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
-    protected $unauthorizedCalls = 0;
+    protected $unauthorizedCalls;
 
     /**
-     * @Assert\Range(min=0,max=500)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
-    protected $accessories = 0;
+    protected $accessories;
 
     /**
-     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $phoneReplacementCost;
 
     /**
-     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $transactionFees;
 
     /**
-     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
-    protected $claimHandlingFees = 0;
+    protected $claimHandlingFees;
 
     /**
-     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $reservedValue;
 
     /**
-     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
@@ -250,6 +242,14 @@ class Claim
      * @Gedmo\Versioned
      */
     protected $validCrimeRef;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $shippingAddress;
 
     public function __construct()
     {
@@ -612,6 +612,16 @@ class Claim
     public function setValidCrimeRef($validCrimeRef)
     {
         $this->validCrimeRef = $validCrimeRef;
+    }
+
+    public function getShippingAddress()
+    {
+        return $this->shippingAddress;
+    }
+
+    public function setShippingAddress($shippingAddress)
+    {
+        $this->shippingAddress = $shippingAddress;
     }
 
     public function isMonetaryClaim($includeOpen = false)

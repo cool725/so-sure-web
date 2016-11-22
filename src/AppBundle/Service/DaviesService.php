@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
 use AppBundle\Classes\DaviesClaim;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Phone;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class DaviesService
@@ -40,27 +41,31 @@ class DaviesService
      * @param ExcelService    $excel
      * @param S3Client        $s3
      * @param ClaimsService   $claimsService
+     * @param                 $environment
      */
     public function __construct(
         DocumentManager  $dm,
         LoggerInterface $logger,
         ExcelService $excel,
         S3Client $s3,
-        ClaimsService $claimsService
+        ClaimsService $claimsService,
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->excel = $excel;
         $this->s3 = $s3;
         $this->bucket = 'ops.so-sure.com';
-        $this->path = 'claims-report/prod';
+        $this->path = sprintf('claims-report/%s', $environment);
         $this->claimsService = $claimsService;
     }
 
     public function import()
     {
+        $lines = [];
         $keys = $this->listS3();
         foreach ($keys as $key) {
+            $lines[] = sprintf('Processing %s/%s', $this->path, $key);
             $processed = false;
             try {
                 $emailFile = $this->downloadEmail($key);
@@ -75,8 +80,10 @@ class DaviesService
 
             if ($processed) {
                 $this->moveS3($key, self::PROCESSED_FOLDER);
+                $lines[] = sprintf('Successfully imported %s/%s and moved to processed folder', $this->path, $key);
             } else {
                 $this->moveS3($key, self::FAILED_FOLDER);
+                $lines[] = sprintf('Failed to import %s/%s and moved to failed folder', $this->path, $key);
             }
 
             if (file_exists($excelFile)) {
@@ -86,6 +93,8 @@ class DaviesService
                 unlink($emailFile);
             }
         }
+
+        return $lines;
     }
 
     /**
@@ -100,7 +109,8 @@ class DaviesService
 
         $keys = [];
         foreach ($iterator as $object) {
-            if ($object['Size'] > 0) {
+            if ($object['Size'] > 0 &&
+                stripos($object['Key'], 'AMAZON_SES_SETUP_NOTIFICATION') === false) {
                 $keys[] = $object['Key'];
             }
         }
@@ -214,7 +224,7 @@ class DaviesService
         $success = true;
         foreach ($daviesClaims as $daviesClaim) {
             try {
-                $repo = $this->dm->getRepository(Claims::class);
+                $repo = $this->dm->getRepository(Claim::class);
                 $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
                 if (!$claim) {
                     throw new \Exception(sprintf('Unable to locate claim %s', $daviesClaim->claimNumber));
@@ -227,8 +237,8 @@ class DaviesService
                     $claim->setStatus($daviesClaim->getClaimStatus());
                 }
 
-                $claim->setExcess($this->excess);
-                $claim->setIncurred($this->incurred);
+                $claim->setExcess($daviesClaim->excess);
+                $claim->setIncurred($daviesClaim->incurred);
                 $claim->setClaimHandlingFees($daviesClaim->claimHandlingFees);
 
                 $claim->setReplacementPhone($this->getReplacementPhone($daviesClaim));
@@ -250,7 +260,7 @@ class DaviesService
                 $this->claimsService->processClaim($claim);
             } catch (\Exception $e) {
                 $success = false;
-                $this->logger->error('Error processing file %s', $key, $e->getMessage());
+                $this->logger->error(sprintf('Error processing file %s', $key), ['exception' => $e]);
             }
         }
 
@@ -268,20 +278,30 @@ class DaviesService
         }
 
         if ($claim->getPolicy()->getUser()->getName() != $daviesClaim->insuredName) {
-            throw new \Exception(sprintf(
-                'Claim %s does not match insuredName %s',
+            $this->logger->warning(sprintf(
+                'Claim %s: %s does not match expected insuredName %s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->insuredName
+                $daviesClaim->insuredName,
+                $claim->getPolicy()->getUser()->getName()
             ));
         }
 
-        if ($claim->getPolicy()->getUser()->getBillingAddress()->getPostCode() != $daviesClaim->riskPostCode) {
-            throw new \Exception(sprintf(
-                'Claim %s does not match postcode %s',
+        if (!$this->postcodeCompare(
+            $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode(),
+            $daviesClaim->riskPostCode
+        )) {
+            $this->logger->warning(sprintf(
+                'Claim %s: %s does not match expected postcode %s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->riskPostCode
+                $daviesClaim->riskPostCode,
+                $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode()
             ));
         }
+    }
+
+    private function postcodeCompare($postcodeA, $postcodeB)
+    {
+        return strtolower(str_replace(' ', '', $postcodeA)) == strtolower(str_replace(' ', '', $postcodeB));
     }
 
     public function getReplacementPhone(DaviesClaim $daviesClaim)

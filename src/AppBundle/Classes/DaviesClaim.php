@@ -63,56 +63,60 @@ class DaviesClaim
     public function getClaimStatus()
     {
         // open status should not update
-        if ($this->status == "Open") {
+        if (strtolower($this->status) == "open") {
             return null;
-        } elseif ($this->status == "Closed" && $this->miStatus == "settled") {
+        } elseif (strtolower($this->status) == "closed" && strtolower($this->miStatus) == "settled") {
             return Claim::STATUS_SETTLED;
-        } elseif ($this->status == "Closed" && $this->miStatus == "repudiated") {
+        } elseif (strtolower($this->status) == "closed" && strtolower($this->miStatus) == "repudiated") {
             return Claim::STATUS_DECLINED;
-        } elseif ($this->status == "Closed" && $this->miStatus == "withdrawn") {
+        } elseif (strtolower($this->status) == "closed" && strtolower($this->miStatus) == "withdrawn") {
             return Claim::STATUS_WITHDRAWN;
         }
     }
 
     public function fromArray($data)
     {
-        // TODO: Improve validation - should should exceptions in the setters
-        $this->client = $data[0];
-        if ($this->client == "") {
-            return;
-        } elseif ($this->client != "So-Sure") {
-            throw new \Exception('Incorrect client');
-        }
+        try {
+            // TODO: Improve validation - should should exceptions in the setters
+            $this->client = $data[0];
+            if ($this->client == "") {
+                return;
+            } elseif ($this->client != "So-Sure") {
+                throw new \Exception('Incorrect client');
+            }
 
-        $this->claimNumber = $data[1];
-        $this->insuredName = $data[2];
-        $this->riskPostCode = $data[3];
-        $this->lossDate = $this->excelDate($data[4]);
-        $this->startDate = $this->excelDate($data[5]);
-        $this->endDate = $this->excelDate($data[6]);
-        $this->lossType = $data[7];
-        $this->lossDescription = $data[8];
-        $this->location = $data[9];
-        $this->status = $data[10];
-        $this->miStatus = $data[11];
-        $this->brightstarProductNumber = $data[12];
-        $this->replacementMake = $data[13];
-        $this->replacementModel = $data[14];
-        $this->replacementImei = $data[15];
-        $this->replacementReceivedDate = $this->excelDate($data[16]);
-        $this->incurred = $data[17];
-        $this->unauthorizedCalls = $data[18];
-        $this->accessories = $data[19];
-        $this->phoneReplacementCost = $data[20];
-        $this->transactionFees = $data[21];
-        $this->claimHandlingFees = $data[22];
-        $this->excess = $data[23];
-        $this->reserved = $data[24];
-        $this->policyNumber = $data[25];
-        $this->notificationDate = $this->excelDate($data[26]);
-        $this->dateCreated = $this->excelDate($data[27]);
-        $this->dateClosed = $this->excelDate($data[28]);
-        $this->shippingAddress = $data[29];
+            $this->claimNumber = $data[1];
+            $this->insuredName = $data[2];
+            $this->riskPostCode = $data[3];
+            $this->lossDate = $this->excelDate($data[4]);
+            $this->startDate = $this->excelDate($data[5]);
+            $this->endDate = $this->excelDate($data[6]);
+            $this->lossType = $data[7];
+            $this->lossDescription = $data[8];
+            $this->location = $data[9];
+            $this->status = $data[10];
+            $this->miStatus = $data[11];
+            $this->brightstarProductNumber = $data[12];
+            $this->replacementMake = $data[13];
+            $this->replacementModel = $data[14];
+            $this->replacementImei = $data[15];
+            $this->replacementReceivedDate = $this->excelDate($data[16]);
+            $this->incurred = $this->nullIfBlank($data[17]);
+            $this->unauthorizedCalls = $this->nullIfBlank($data[18]);
+            $this->accessories = $this->nullIfBlank($data[19]);
+            $this->phoneReplacementCost = $this->nullIfBlank($data[20]);
+            $this->transactionFees = $this->nullIfBlank($data[21]);
+            $this->claimHandlingFees = $this->nullIfBlank($data[22]);
+            $this->excess = $this->nullIfBlank($data[23]);
+            $this->reserved = $this->nullIfBlank($data[24]);
+            $this->policyNumber = $data[25];
+            $this->notificationDate = $this->excelDate($data[26]);
+            $this->dateCreated = $this->excelDate($data[27]);
+            $this->dateClosed = $this->excelDate($data[28]);
+            $this->shippingAddress = $data[29];
+        } catch (\Exception $e) {
+            throw new \Exception(sprintf('%s claim: %s', $e->getMessage(), json_encode($this)));
+        }
     }
 
     public static function create($data)
@@ -127,11 +131,28 @@ class DaviesClaim
         return $claim;
     }
 
+    private function nullIfBlank($field)
+    {
+        if (!$field || strlen(trim($field)) == 0) {
+            return null;
+        }
+
+        return trim($field);
+    }
+
     private function excelDate($days)
     {
-        $origin = new \DateTime("1900-01-01");
-        $origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
+        try {
+            if (!$days) {
+                return null;
+            }
 
-        return $origin;
+            $origin = new \DateTime("1900-01-01");
+            $origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
+
+            return $origin;
+        } catch (\Exception $e) {
+            throw new \Exception(sprintf('Error creating date (days: %s), %s', $days, $e->getMessage()));
+        }
     }
 }

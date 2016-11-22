@@ -23,6 +23,8 @@ class DaviesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $davies = $this->getContainer()->get('app.davies');
-        $davies->import();
+        $lines = $davies->import();
+        $output->writeln(implode(PHP_EOL, $lines));
+        $output->writeln('Finished');
     }
 }
