@@ -1,0 +1,40 @@
+.register {
+    margin-top: 5%;
+    margin-bottom: 5%;
+    text-align: center;
+}
+
+.register .row {
+    margin-bottom: 20px;
+}
+
+.register .section-title {
+    margin-bottom: 20px;
+}
+
+.register .section-description {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.register .form-control {
+    margin-left: 20px;
+}
+
+.help-block ul {
+  list-style: none;
+}
+
+.help-block li {
+  margin-left: -40px;
+  color: #FF6666;
+  font-size: 14px;
+}
+
+.help-block .list-unstyled li {
+  margin-left: 0px;
+}
+
+.has-error .form-control {
+  border-width: 2px;
+}

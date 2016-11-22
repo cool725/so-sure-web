@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}so-sure - Register{% endblock %}
+{% block meta %}
+  <meta name="description" content="Welcome to the Social Insurance Revolution."/>
+  <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance" />
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    '@AppBundle/Resources/public/css/Default/register.css'
+    %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+  <section class="register">
+      <h1 class="section-title">Create your account</h1>
+      <p class="section-description">Just enter your details below to setup your account</p>
+      {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
+        <div class="row">
+            <div class="form-group col-sm-offset-3 col-sm-6 {% if form_errors(form.email) %}has-error{% endif %}">
+                {{ form_label(form.email, 'Email') }}
+                {{ form_widget(form.email, {'attr':{'class':'form-control'}}) }}
+                <div class="help-block with-errors">{{ form_errors(form.email) }}</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-sm-offset-3 col-sm-6 {% if form_errors(form.mobileNumber) %}has-error{% endif %}">
+                {{ form_label(form.mobileNumber, 'Mobile No.') }}
+                {{ form_widget(form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'00447[1-9][0-9]{8,8}|[+]447[1-9][0-9]{8,8}|07[1-9][0-9]{8,8}', 'title': 'Enter a valid UK Mobile Number.'}}) }}
+                <div class="help-block with-errors">{{ form_errors(form.mobileNumber) }}</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-sm-12 text-center">
+                {{ form_widget(form.register, {'label': 'Create Account', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
+            </div>
+        </div>
+    {{ form_end(form) }}
+  </section>
+{% endblock %}
