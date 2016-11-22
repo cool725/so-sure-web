@@ -11,8 +11,10 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
+use AppBundle\Form\Type\InvitationType;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\FacebookService;
+use AppBundle\Security\InvitationVoter;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -35,15 +37,18 @@ class UserController extends BaseController
         }
         $policy = $user->getCurrentPolicy();
 
+        $invitationService = $this->get('app.invitation');
         $emailInvitiation = new EmailInvitation();
         $emailInvitationForm = $this->get('form.factory')
             ->createNamedBuilder('email', EmailInvitationType::class, $emailInvitiation)
+            ->getForm();
+        $invitationForm = $this->get('form.factory')
+            ->createNamedBuilder('invitation', InvitationType::class, $user)
             ->getForm();
 
         if ($request->request->has('email')) {
             $emailInvitationForm->handleRequest($request);
             if ($emailInvitationForm->isSubmitted() && $emailInvitationForm->isValid()) {
-                $invitationService = $this->get('app.invitation');
                 $invitationService->inviteByEmail($policy, $emailInvitiation->getEmail());
                 $this->addFlash(
                     'success',
@@ -52,11 +57,37 @@ class UserController extends BaseController
 
                 return new RedirectResponse($this->generateUrl('user_home'));
             }
+        } elseif ($request->request->has('invitation')) {
+            $invitationForm->handleRequest($request);
+            if ($invitationForm->isSubmitted() && $invitationForm->isValid()) {
+                foreach ($user->getUnprocessedReceivedInvitations() as $invitation) {
+                    if ($invitationForm->get(sprintf('accept_%s', $invitation->getId()))->isClicked()) {
+                        $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
+                        $invitationService->accept($invitation, $policy);
+                        $this->addFlash(
+                            'success',
+                            sprintf("You're now connected with %s", $invitation->getInviter()->getName())
+                        );
+
+                        return new RedirectResponse($this->generateUrl('user_home'));
+                    } elseif ($invitationForm->get(sprintf('reject_%s', $invitation->getId()))->isClicked()) {
+                        $this->denyAccessUnlessGranted(InvitationVoter::REJECT, $invitation);
+                        $invitationService->reject($invitation);
+                        $this->addFlash(
+                            'warning',
+                            sprintf("You've declined the invitation from %s", $invitation->getInviter()->getName())
+                        );
+
+                        return new RedirectResponse($this->generateUrl('user_home'));
+                    }
+                }
+            }
         }
 
         return array(
             'policy' => $user->getCurrentPolicy(),
             'email_form' => $emailInvitationForm->createView(),
+            'invitation_form' => $invitationForm->createView(),
         );
     }
 
