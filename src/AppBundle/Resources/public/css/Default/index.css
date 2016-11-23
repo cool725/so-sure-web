@@ -2,6 +2,7 @@
 
 .hero {
   height: 80%;
+  padding-bottom: 50px;
 }
 .hero-cta {
   padding-right: 50px;
@@ -25,8 +26,6 @@
 
 @media (max-width: 992px) {
     .hero {
-        padding-top: 50px;
-        padding-bottom: 50px;
         height: 1000px;
     }
     .hero-cta {
@@ -59,11 +58,6 @@
 #switch-btn {
     padding-top: 20px;
     font-size: 14px;
-}
-@media(min-width: 672px) {
-  #switch-btn {
-    padding-left: 20px;
-  }
 }
 
 #learn-more-btn {

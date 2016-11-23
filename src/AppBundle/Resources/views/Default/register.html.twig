@@ -14,29 +14,35 @@
 {% endblock %}
 
 {% block body %}
-  <section class="register">
+  <section class="register vertical-align-wrap">
+    <div class="vertical-align-middle">
       <h1 class="section-title">Create your account</h1>
-      <p class="section-description">Just enter your details below to setup your account</p>
-      {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
-        <div class="row">
-            <div class="form-group col-sm-offset-3 col-sm-6 {% if form_errors(form.email) %}has-error{% endif %}">
+      <p class="section-description">Just enter your details below to setup your account.</p>
+      <div class="checkout-step">
+      {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+            <div class="form-group{% if form_errors(form.email) %}has-error{% endif %}">
+                <div class="col-sm-2">
                 {{ form_label(form.email, 'Email') }}
-                {{ form_widget(form.email, {'attr':{'class':'form-control'}}) }}
+                </div>
+                <div class="col-sm-10">
+                {{ form_widget(form.email, {'attr':{'class':'form-control', 'placeholder':'jane.smith@gmail.com'}}) }}
                 <div class="help-block with-errors">{{ form_errors(form.email) }}</div>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="form-group col-sm-offset-3 col-sm-6 {% if form_errors(form.mobileNumber) %}has-error{% endif %}">
-                {{ form_label(form.mobileNumber, 'Mobile No.') }}
-                {{ form_widget(form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'00447[1-9][0-9]{8,8}|[+]447[1-9][0-9]{8,8}|07[1-9][0-9]{8,8}', 'title': 'Enter a valid UK Mobile Number.'}}) }}
+            <div class="form-group{% if form_errors(form.mobileNumber) %}has-error{% endif %}">
+              <div class="col-sm-2">
+                {{ form_label(form.mobileNumber, 'Mobile') }}
+              </div>
+                <div class="col-sm-10">
+                {{ form_widget(form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'00447[1-9][0-9]{8,8}|[+]447[1-9][0-9]{8,8}|07[1-9][0-9]{8,8}', 'title': 'Enter a valid UK Mobile Number', 'placeholder':'+447700 111 222'}}) }}
                 <div class="help-block with-errors">{{ form_errors(form.mobileNumber) }}</div>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="form-group col-sm-12 text-center">
-                {{ form_widget(form.register, {'label': 'Create Account', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
+            <div class="form-group">
+                {{ form_widget(form.register, {'label': 'Create account', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
             </div>
-        </div>
-    {{ form_end(form) }}
+          {{ form_end(form) }}
+      </div>
+    </div>
   </section>
 {% endblock %}
