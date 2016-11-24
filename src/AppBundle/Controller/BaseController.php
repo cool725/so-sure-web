@@ -112,8 +112,7 @@ abstract class BaseController extends Controller
         }
 
         return $phones;
-        //['makes' => $makes, 'phones' => $phones];
-    }        
+    }
 
     protected function getQuotes($make, $device, $returnAllIfNone = true)
     {
