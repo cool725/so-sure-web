@@ -62,7 +62,6 @@ class DefaultController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
         $logger = $this->get('logger');
         $launchUser = $this->get('app.user.launch');
-        $deviceAtlas = $this->get('app.deviceatlas');
 
         $userTop = new User();
         $referral = $request->get('referral');
@@ -73,27 +72,11 @@ class DefaultController extends BaseController
             $logger->debug(sprintf('Referral %s', $referral));
         }
         $userBottom = clone $userTop;
-        $phoneMake = new PhoneMake();
-        if ($request->getMethod() == "GET") {
-            $phone = $deviceAtlas->getPhone($request);
-            /*
-            if (!$phone) {
-                $phone = $this->getDefaultPhone();
-            }
-            */
-            if ($phone instanceof Phone) {
-                $phoneMake->setMake($phone->getMake());
-            }
-        }
-
         $formTop = $this->get('form.factory')
             ->createNamedBuilder('launch_top', LaunchType::class, $userTop)
             ->getForm();
         $formBottom = $this->get('form.factory')
             ->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)
-            ->getForm();
-        $formPhone = $this->get('form.factory')
-            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -108,7 +91,48 @@ class DefaultController extends BaseController
                 if ($formBottom->isValid()) {
                     $existingUser = $launchUser->addUser($userBottom)['user'];
                 }
-            } elseif ($request->request->has('launch_phone')) {
+            }
+
+            if ($existingUser) {
+                return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
+            }
+        }
+
+        return array(
+            'form_top' => $formTop->createView(),
+            'form_bottom' => $formBottom->createView(),
+            'referral' => $referral,
+        );
+    }
+
+    /**
+     * @Route("/select-phone", name="select_phone_make")
+     * @Template()
+     */
+    public function selectPhoneMakeAction(Request $request)
+    {
+        $deviceAtlas = $this->get('app.deviceatlas');
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phoneMake = new PhoneMake();
+        if ($request->getMethod() == "GET") {
+            $phone = $deviceAtlas->getPhone($request);
+            /*
+            if (!$phone) {
+                $phone = $this->getDefaultPhone();
+            }
+            */
+            if ($phone instanceof Phone) {
+                $phoneMake->setMake($phone->getMake());
+            }
+        }
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
+                'action' => $this->generateUrl('select_phone_make'),
+            ])
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('launch_phone')) {
                 // handle request / isvalid doesn't really work well with jquery form adjustment
                 // $formPhone->handleRequest($request);
                 $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
@@ -131,19 +155,12 @@ class DefaultController extends BaseController
                     }
                 }
             }
-
-            if ($existingUser) {
-                return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
-            }
         }
 
-        return array(
-            'form_top' => $formTop->createView(),
-            'form_bottom' => $formBottom->createView(),
-            'referral' => $referral,
+        return [
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
-        );
+        ];
     }
 
     /**

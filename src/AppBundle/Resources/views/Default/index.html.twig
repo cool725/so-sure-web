@@ -146,7 +146,7 @@
 {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
 <section class="popular-devices" id="get-quote">
-    {% include 'AppBundle::Default/selectPhoneMake.html.twig' %}
+    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
 
     <div class="text-break">
         <div class="line"></div>

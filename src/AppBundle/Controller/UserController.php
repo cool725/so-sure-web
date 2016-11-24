@@ -105,35 +105,7 @@ class UserController extends BaseController
             return $this->redirectToRoute('purchase_policy', ['policyId' => $initPolicies[0]->getId()]);
         }
 
-        $deviceAtlas = $this->get('app.deviceatlas');
-        $policy = new PhonePolicy();
-        if ($request->getMethod() == "GET") {
-            $phone = $deviceAtlas->getPhone($request);
-            /*
-            if (!$phone) {
-                $phone = $this->getDefaultPhone();
-            }
-            */
-            if ($phone instanceof Phone) {
-                $policy->setPhone($phone);
-            }
-        }
-        $formPhone = $this->get('form.factory')
-            ->createNamedBuilder('launch_phone', PhoneType::class, $policy)
-            ->getForm();
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('launch_phone')) {
-                $formPhone->handleRequest($request);
-                if ($formPhone->isValid() && $policy->getPhone()) {
-                    return $this->redirectToRoute('purchase_phone', [
-                        'phoneId' => $policy->getPhone()->getId(),
-                    ]);
-                }
-            }
-        }
-
         return array(
-            'form_phone' => $formPhone->createView(),
         );
     }
 

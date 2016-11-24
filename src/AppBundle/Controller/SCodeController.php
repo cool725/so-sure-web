@@ -26,7 +26,6 @@ class SCodeController extends BaseController
     {
         $scode = null;
         try {
-            $deviceAtlas = $this->get('app.deviceatlas');
             $dm = $this->getManager();
             $repo = $dm->getRepository(SCode::class);
             $scode = $repo->findOneBy(['code' => $code]);
@@ -40,47 +39,11 @@ class SCodeController extends BaseController
             $scode = null;
         }
 
-        $policy = new PhonePolicy();
-        if ($request->getMethod() == "GET") {
-            $phone = $deviceAtlas->getPhone($request);
-            /*
-            if (!$phone) {
-                $phone = $this->getDefaultPhone();
-            }
-            */
-            if ($phone instanceof Phone) {
-                $policy->setPhone($phone);
-            }
-        }
-
-        $formPhone = $this->get('form.factory')
-            ->createNamedBuilder('launch_phone', PhoneType::class, $policy)
-            ->getForm();
-
-        if ($request->request->has('launch_phone')) {
-            $formPhone->handleRequest($request);
-            if ($formPhone->isValid()) {
-                if ($policy->getPhone()->getMemory()) {
-                    return $this->redirectToRoute('quote_make_model_memory', [
-                        'make' => $policy->getPhone()->getMake(),
-                        'model' => $policy->getPhone()->getModel(),
-                        'memory' => $policy->getPhone()->getMemory(),
-                    ]);
-                } else {
-                    return $this->redirectToRoute('quote_make_model', [
-                        'make' => $policy->getPhone()->getMake(),
-                        'model' => $policy->getPhone()->getModel(),
-                    ]);
-                }
-            }
-        } else {
-            $session = $this->get('session');
-            $session->set('scode', $code);
-        }
+        $session = $this->get('session');
+        $session->set('scode', $code);
 
         return array(
             'scode' => $scode,
-            'form_phone' => $formPhone->createView(),
         );
     }
 }
