@@ -4,16 +4,27 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Form\Type\LeadEmailType;
 use AppBundle\Form\Type\RegisterUserType;
+use AppBundle\Form\Type\PhoneMakeType;
+use AppBundle\Form\Type\PhoneType;
+use AppBundle\Form\Type\SmsAppLinkType;
+
 use AppBundle\Document\Form\Register;
+use AppBundle\Document\Form\PhoneMake;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Phone;
@@ -22,13 +33,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
-use AppBundle\Form\Type\PhoneType;
-use AppBundle\Form\Type\SmsAppLinkType;
 use AppBundle\Document\PolicyTerms;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends BaseController
 {
@@ -68,7 +73,7 @@ class DefaultController extends BaseController
             $logger->debug(sprintf('Referral %s', $referral));
         }
         $userBottom = clone $userTop;
-        $policy = new PhonePolicy();
+        $phoneMake = new PhoneMake();
         if ($request->getMethod() == "GET") {
             $phone = $deviceAtlas->getPhone($request);
             /*
@@ -77,7 +82,7 @@ class DefaultController extends BaseController
             }
             */
             if ($phone instanceof Phone) {
-                $policy->setPhone($phone);
+                $phoneMake->setMake($phone->getMake());
             }
         }
 
@@ -88,7 +93,7 @@ class DefaultController extends BaseController
             ->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)
             ->getForm();
         $formPhone = $this->get('form.factory')
-            ->createNamedBuilder('launch_phone', PhoneType::class, $policy)
+            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -104,18 +109,24 @@ class DefaultController extends BaseController
                     $existingUser = $launchUser->addUser($userBottom)['user'];
                 }
             } elseif ($request->request->has('launch_phone')) {
-                $formPhone->handleRequest($request);
-                if ($formPhone->isValid() && $policy->getPhone()) {
-                    if ($policy->getPhone()->getMemory()) {
+                // handle request / isvalid doesn't really work well with jquery form adjustment
+                // $formPhone->handleRequest($request);
+                $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
+                if ($phoneMake->getPhoneId()) {
+                    $phone = $phoneRepo->find($phoneMake->getPhoneId());
+                    if (!$phone) {
+                        throw new \Exception('unknown phone');
+                    }
+                    if ($phone->getMemory()) {
                         return $this->redirectToRoute('quote_make_model_memory', [
-                            'make' => $policy->getPhone()->getMake(),
-                            'model' => $policy->getPhone()->getEncodedModel(),
-                            'memory' => $policy->getPhone()->getMemory(),
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
+                            'memory' => $phone->getMemory(),
                         ]);
                     } else {
                         return $this->redirectToRoute('quote_make_model', [
-                            'make' => $policy->getPhone()->getMake(),
-                            'model' => $policy->getPhone()->getEncodedModel(),
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
                         ]);
                     }
                 }
@@ -131,6 +142,7 @@ class DefaultController extends BaseController
             'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
             'form_phone' => $formPhone->createView(),
+            'phones' => $this->getPhonesArray(),
         );
     }
 

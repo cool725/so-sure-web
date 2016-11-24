@@ -625,6 +625,16 @@ class Phone
         return $name;
     }
 
+    public function getModelMemory()
+    {
+        $name = sprintf("%s", $this->model);
+        if ($this->memory) {
+            $name = sprintf("%s (%s GB)", $name, $this->memory);
+        }
+
+        return $name;
+    }
+
     public function toApiArray()
     {
         return [

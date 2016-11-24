@@ -1,0 +1,22 @@
+    <div class="container" id="select-phone-data" data-phones='{{ phones|json_encode|raw }}'>
+        <h2>Get a quote</h2>
+        <p class="lead text-center" id="hero-description">Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
+        <div class="row" id="select-phone">
+            <div class="col-sm-12 text-center">
+                <div class="device-select">
+                    {{ form_start(form_phone) }}
+                    <div class="input-group">
+                        {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }}
+                        {{ form_widget(form_phone.phoneId, { 'attr': {'class': 'select-phone-dropdown select-phones'}}) }}
+                        <span class="input-group-btn text-center">
+                            {{ form_widget(form_phone.next, {'label': 'Quote me', 'attr': {'class': 'btn btn-primary'}}) }}
+                        </span>
+                    </div>
+                    {{ form_end(form_phone) }}
+                </div>
+            </div>
+            <p class="text-center">
+                <a href="mailto:hello@wearesosure.com">Don't see your device? Let us know.</a>
+            </p>
+        </div>
+    </div>

@@ -22,6 +22,38 @@ class PhoneRepository extends DocumentRepository
 
         return $qb;
     }
+
+    public function findActiveMakes()
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->addAnd($qb->expr()->field('os')->in([Phone::OS_CYANOGEN, Phone::OS_ANDROID, Phone::OS_IOS]));
+        $qb->addAnd($qb->expr()->field('make')->notEqual("ALL"));
+        $qb->addAnd($qb->expr()->field('active')->equals(true));
+        $qb->distinct('make');
+        $qb->sort('make', 'asc');
+
+        $makes = [];
+        $items = $qb->getQuery()->execute();
+        foreach($items as $make) {
+            $makes[$make] = $make;
+        }
+
+        return $makes;
+    }
+
+    public function findActiveModels($make)
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->addAnd($qb->expr()->field('os')->in([Phone::OS_CYANOGEN, Phone::OS_ANDROID, Phone::OS_IOS]));
+        $qb->addAnd($qb->expr()->field('make')->notEqual("ALL"));
+        $qb->addAnd($qb->expr()->field('make')->equals($make));
+        $qb->addAnd($qb->expr()->field('active')->equals(true));
+        $qb->sort('make', 'asc')
+            ->sort('model', 'asc')
+            ->sort('memory', 'asc');
+
+        return $qb->getQuery()->execute();
+    }
     
     public function alternatives(Phone $phone)
     {

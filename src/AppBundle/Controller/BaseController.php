@@ -96,6 +96,24 @@ abstract class BaseController extends Controller
 
         return $cognitoIdentity->getCognitoIdToken($user, $this->getCognitoIdentityId($request));
     }
+    
+    protected function getPhonesArray()
+    {
+        $makes = [];
+        $phones = [];
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $items = $repo->findActive()->getQuery()->execute();
+        foreach ($items as $phone) {
+            if (!in_array($phone->getMake(), $makes)) {
+                $makes[] = $phone->getMake();
+            }
+            $phones[$phone->getMake()][$phone->getId()] = $phone->getModelMemory();
+        }
+
+        return $phones;
+        //['makes' => $makes, 'phones' => $phones];
+    }        
 
     protected function getQuotes($make, $device, $returnAllIfNone = true)
     {

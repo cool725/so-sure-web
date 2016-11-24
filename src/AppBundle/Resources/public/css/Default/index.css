@@ -180,24 +180,6 @@
     width: 75%;
 }
 
-#launch_phone_phone {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAAJ1BMVEVmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmaP/QSjAAAADHRSTlMAAgMJC0uWpKa6wMxMdjkoAAAANUlEQVR4AeXJyQEAERAAsNl7Hf3X6xt0QL6JpZWq30pdvdadme+0PMdzvHm8YThHcT1H7K0BtOMDniZhWOgAAAAASUVORK5CYII=);
-    -webkit-background-size: 13px 13px;
-    background-size: 15px;
-    background-repeat: no-repeat;
-    background-position: 98%;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border-radius: 30px;
-    -moz-border-radius: 30px;
-    -webkit-border-radius: 30px;
-    padding: 12px 30px;
-    border: 2px solid #efefef;
-    color: #202532;
-    box-shadow: none;
-}
-
 .form-control {
     border-width: 0px;
     height: 45px;
