@@ -22,7 +22,7 @@ class SCodeController extends BaseController
      * @Route("/scode/{code}", name="scode")
      * @Template
      */
-    public function scodeAction(Request $request, $code)
+    public function scodeAction($code)
     {
         $scode = null;
         try {

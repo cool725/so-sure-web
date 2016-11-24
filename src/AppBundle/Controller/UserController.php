@@ -95,7 +95,7 @@ class UserController extends BaseController
      * @Route("/invalid", name="user_invalid_policy")
      * @Template
      */
-    public function invalidPolicyAction(Request $request)
+    public function invalidPolicyAction()
     {
         $user = $this->getUser();
 
