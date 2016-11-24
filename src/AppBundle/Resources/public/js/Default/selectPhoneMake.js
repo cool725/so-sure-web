@@ -1,9 +1,7 @@
 $(function(){
     var phones = $('#select-phone-data').data('phones');
-    $('.select-phone-make').on('change', function(e) {
+    var updatePhones = function() {
         var make = $('.select-phone-make').val();
-        console.log(make);
-        console.log(phones[make]);
         var options = $(".select-phones");
         options.empty();
         if (make) {
@@ -14,5 +12,9 @@ $(function(){
         $.each(phones[make], function(key, value) {
             options.append($("<option />").val(key).text(value));
         });
+    }
+    $('.select-phone-make').on('change', function(e) {
+        updatePhones();
     });
+    updatePhones();
 });
