@@ -46,7 +46,7 @@ class PhoneRepository extends DocumentRepository
         $qb = $this->createQueryBuilder();
         $qb->addAnd($qb->expr()->field('os')->in([Phone::OS_CYANOGEN, Phone::OS_ANDROID, Phone::OS_IOS]));
         $qb->addAnd($qb->expr()->field('make')->notEqual("ALL"));
-        $qb->addAnd($qb->expr()->field('make')->equals  ($make));
+        $qb->addAnd($qb->expr()->field('make')->equals($make));
         $qb->addAnd($qb->expr()->field('active')->equals(true));
         $qb->sort('make', 'asc')
             ->sort('model', 'asc')
