@@ -387,7 +387,7 @@ class DefaultController extends BaseController
             return new RedirectResponse($this->generateUrl('homepage'));
         }
 
-        $session = new Session();
+        $session = $request->getSession();
         $session->set('quote', $phone->getId());
 
         $user = new User();

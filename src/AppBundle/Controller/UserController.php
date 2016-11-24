@@ -155,7 +155,7 @@ class UserController extends BaseController
             return $redirect;
         }
 
-        $session = new Session();
+        $session = $request->getSession();
         if (!$friends = $session->get('friends')) {
             $friends = $facebook->getAllFriends();
             $session->set('friends', $friends);
