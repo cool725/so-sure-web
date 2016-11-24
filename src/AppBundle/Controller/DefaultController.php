@@ -12,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Form\Type\LeadEmailType;
+use AppBundle\Form\Type\RegisterUserType;
+use AppBundle\Document\Form\Register;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Phone;
@@ -172,33 +174,55 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/register", name="register")
+     * @Template
+     */
+    public function registerAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $registerUser = new Register();
+        $session = $request->getSession();
+
+        $form = $this->get('form.factory')
+            ->createNamedBuilder('launch', RegisterUserType::class, $registerUser)
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $userRepo = $dm->getRepository(User::class);
+            if ($userRepo->existsUser($registerUser->getEmail(), null, $registerUser->getMobileNumber())) {
+                $this->addFlash('warning', 'Looks like you already have an account.');
+                return $this->redirectToRoute('user_home');
+            }
+
+            $userManager = $this->get('fos_user.user_manager');
+            $user = $userManager->createUser();
+            $user->setEnabled(true);
+            $registerUser->populateUser($user);
+
+            $dm->persist($user);
+            $dm->flush();
+
+            $this->get('fos_user.security.login_manager')->loginUser(
+                $this->getParameter('fos_user.firewall_name'),
+                $user
+            );
+
+            return $this->redirectToRoute('purchase');
+        }
+
+        return [
+            'form' => $form->createView(),
+            'quote' => $session->get('quote'),
+        ];
+    }
+
+    /**
      * @Route("/alpha", name="alpha")
      * @Template
      */
     public function alphaAction()
     {
         return array();
-    }
-
-    /**
-     * @Route("/quote", name="quote")
-     * @Template
-     */
-    public function quoteAction(Request $request)
-    {
-        $policy = new PhonePolicy();
-        $form = $this->createForm(PhoneType::class, $policy);
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $session = new Session();
-            $session->set('quote', $policy->getPhone()->getId());
-
-            return $this->redirectToRoute('purchase');
-        }
-
-        return array(
-            'form' => $form->createView(),
-        );
     }
 
     /**
@@ -362,6 +386,9 @@ class DefaultController extends BaseController
         if (!$phone) {
             return new RedirectResponse($this->generateUrl('homepage'));
         }
+
+        $session = new Session();
+        $session->set('quote', $phone->getId());
 
         $user = new User();
 

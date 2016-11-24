@@ -138,26 +138,22 @@
     </section>
 
     <section class="download-now" id="download-now">
-      {{ form_start(lead_form) }}
         <div class="container" id="buyModal">
             <h2>Ready to pay?</h2>
-            <p class="lead">Just enter your email below to get started.</p>
+            <p class="lead">You can either purchase your insurance online</p>
             <div class="row">
                 <div class="form-group col-sm-12">
-                    {{ form_errors(lead_form.email) }}
-                    {{ form_widget(lead_form.email, {'attr': {'placeholder': 'Email address'}}) }}
-                    {{ form_widget(lead_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-primary'}}) }}
-                    {{ form_rest(lead_form) }}
+                  <a class="btn btn-primary btn-rounded" href="{{ path('register') }}">Get started</a>
                 </div>
             </div>
-            {{ form_end(lead_form) }}
+            {% if phone.appAvailable %}
             <div class="text-break">
                 <div class="line"></div>
                 OR
                 <div class="line"></div>
             </div>
             <div class="row" style="padding-bottom: 30px;">
-              <p class="lead">Download our app - it's a little bit easier.</p>
+              <p class="lead">Download our app - it's a lot easier.</p>
             <div class="col-md-6 text-right">
                 <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
                     <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
@@ -168,6 +164,7 @@
                     <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
                 </a>
             </div>
+            {% endif %}
     </section>
 
     <section class="learn-video">

@@ -42,6 +42,7 @@ class PurchaseController extends BaseController
     /**
      * @Route("/phone/{phoneId}", name="purchase_phone", requirements={"phoneId":"[0-9a-f]{24,24}"})
      * @Route("/{policyId}", name="purchase_policy", requirements={"policyId":"[0-9a-f]{24,24}"})
+     * @Route("/", name="purchase")
      * @Template
     */
     public function purchaseAction(Request $request, $phoneId = null, $policyId = null)
@@ -59,6 +60,7 @@ class PurchaseController extends BaseController
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
 
         $webpay = null;
+        $session = $request->getSession();
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $policyRepo = $dm->getRepository(PhonePolicy::class);
@@ -77,6 +79,8 @@ class PurchaseController extends BaseController
                 return $this->redirectToRoute('user_home');
             }
             $phone = $policy->getPhone();
+        } elseif ($session->get('quote')) {
+            $phone = $phoneRepo->find($session->get('quote'));
         } else {
             throw $this->createNotFoundException('Missing argument');
         }

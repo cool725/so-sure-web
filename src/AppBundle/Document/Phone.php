@@ -610,6 +610,11 @@ class Phone
         return strtolower($this->getMake()) == $make;
     }
 
+    public function isAppAvailable()
+    {
+        return in_array($this->getOs(), [self::OS_ANDROID, self::OS_CYANOGEN, self::OS_IOS]);
+    }
+
     public function __toString()
     {
         $name = sprintf("%s %s", $this->make, $this->model);

@@ -409,3 +409,8 @@ hr.strong {
     height: 1px;
     background-color:black;
 }
+
+.btn-rounded {
+    border-radius: 30px;
+    padding: 10px 30px;
+}
