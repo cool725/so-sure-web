@@ -236,7 +236,7 @@ class DefaultController extends BaseController
                 $user
             );
 
-            return $this->redirectToRoute('purchase');
+            return $this->redirectToRoute('purchase_step_1');
         }
 
         return [

@@ -17,10 +17,12 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Payment;
 use AppBundle\Document\User;
 use AppBundle\Document\Form\Purchase;
+use AppBundle\Document\Form\PurchaseStep1;
 
 use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\PurchaseType;
+use AppBundle\Form\Type\PurchaseStep1Type;
 
 use AppBundle\Security\UserVoter;
 
@@ -251,6 +253,71 @@ class PurchaseController extends BaseController
         return $data;
     }
 
+    /**
+     * @Route("/step-1", name="purchase_step_1")
+     * @Template
+    */
+    public function purchaseStep1Action(Request $request)
+    {
+        $user = $this->getUser();
+        if ($user->getFirstName() && $user->getLastName() && $user->getMobileNumber() && $user->getBirthday()) {
+            // redirect to step 2
+        }
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+
+        $dm = $this->getManager();
+
+        $purchase = new PurchaseStep1();
+        $purchase->populateFromUser($user);
+        $purchaseForm = $this->get('form.factory')
+            ->createNamedBuilder('purchase_form', PurchaseStep1Type::class, $purchase)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('purchase_form')) {
+                $purchaseForm->handleRequest($request);
+                if ($purchaseForm->isValid()) {
+                    $userRepo = $dm->getRepository(User::class);
+                    $userExists = $userRepo->existsAnotherUser(
+                        $user,
+                        $purchase->getEmail(),
+                        null,
+                        $purchase->getMobileNumber()
+                    );
+                    if ($userExists) {
+                        // @codingStandardsIgnoreStart
+                        $err = 'It looks like you already have an account.  Please logout and try logging in with a different email/mobile number';
+                        // @codingStandardsIgnoreEnd
+                        $this->addFlash('error', $err);
+
+                        // TODO: would be good to auto logout.  redirecting to /logout doesn't work well
+                        throw new \Exception($err);
+                    }
+
+                    $purchase->populateUser($user);
+
+                    if (!$user->hasValidDetails()) {
+                        $this->get('logger')->error(sprintf(
+                            'Invalid purchase user details %s',
+                            json_encode($purchase->toApiArray())
+                        ));
+                        throw new \InvalidArgumentException(sprintf(
+                            'User is missing details such as name, email address, or birthday (User: %s)',
+                            $user->getId()
+                        ));
+                    }
+                    $dm->flush();
+                }
+            }
+        }
+
+        $data = array(
+            'purchase_form' => $purchaseForm->createView(),
+        );
+
+        return $data;
+    }
+    
     /**
      * @Route("/cc/success", name="purchase_judopay_receive_success")
      * @Route("/cc/success/", name="purchase_judopay_receive_success_slash")
