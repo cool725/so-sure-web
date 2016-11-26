@@ -57,7 +57,7 @@ twig:
         pca_webkey: %pca_webkey%
         branch_key: %branch_key%
         drift_key: %drift_key%
-        use_cdn: false
+        use_cdn: true
         branch_pot_url: %branch_pot_url%
         branch_share_url: %branch_share_url%
         branch_policy_url: %branch_policy_url%
