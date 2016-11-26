@@ -18,52 +18,37 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class PurchaseType extends AbstractType
+class PurchaseStepAddressType extends AbstractType
 {
     /**
-     * @var RequestStack
+     * @var boolean
      */
-    private $requestStack;
+    private $required;
 
     /**
-     * @param RequestStack $requestStack
+     * @param boolean $required
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct($required)
     {
-        $this->requestStack = $requestStack;
+        $this->required = $required;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', EmailType::class, ['attr' => ['readonly' => true], 'disabled' => true])
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('mobileNumber', TextType::class)
-            ->add('birthday', DateType::class, ['widget' => 'single_text', 'html5' => false, 'format' => 'dd/MM/yyyy'])
-            ->add('imei', TextType::class)
-            ->add('addressLine1', TextType::class)
+            ->add('addressLine1', TextType::class, ['required' => $this->required])
             ->add('addressLine2', TextType::class, ['required' => false])
             ->add('addressLine3', TextType::class, ['required' => false])
-            ->add('city', TextType::class)
-            ->add('postcode', TextType::class)
-            ->add('submit', SubmitType::class)
+            ->add('city', TextType::class, ['required' => $this->required])
+            ->add('postcode', TextType::class, ['required' => $this->required])
+            ->add('next', SubmitType::class)
         ;
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            $purchase = $event->getData();
-            $form = $event->getForm();
-
-            if ($purchase->getPhone()->getMake() == "Apple") {
-                $form->add('serialNumber', TextType::class);
-            }
-        });
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\Form\Purchase',
+            'data_class' => 'AppBundle\Document\Form\PurchaseStepAddress',
         ));
     }
 }

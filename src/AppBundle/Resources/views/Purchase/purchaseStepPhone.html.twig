@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    '@AppBundle/Resources/public/css/Purchase/purchase.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+     %}
+    %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
+    {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator'}}) }}
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+                    <div class="row">
+                        <div class="form-group col-sm-4">
+                            Device
+                        </div>
+                        <div class="form-group col-sm-8">
+                            <h4>{{ phone.make }} {{ phone.model }} {% if phone.memory %}{{ phone.memory }}GB{% endif %}</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-4">
+                            Monthly Price
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <h4>£{{ phone.currentPhonePrice.monthlyPremiumPrice }}</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-4">
+                            {{ form_label(purchase_form.imei, 'IMEI') }}
+                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
+                                            ><i class="fa fa-question"></i></button>
+                        </div>
+                        <div class="form-group col-sm-6 {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
+                            {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control'}}) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
+                        </div>
+                    </div>
+                    {% if purchase_form.serialNumber is defined %}
+                    <div class="row">
+                        <div class="form-group col-sm-4">
+                            {{ form_label(purchase_form.serialNumber, 'Serial Number') }}
+                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
+                                            ><i class="fa fa-question"></i></button>
+                        </div>
+                        <div class="form-group col-sm-6 {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
+                            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control'}}) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="form-group col-sm-12 text-center">
+                            {{ form_widget(purchase_form.next, {'label': 'Continue to Purchase', 'attr': {'class': 'btn btn-primary'}}) }}
+                        </div>
+                    </div>
+                </div>
+    </div>
+    {{ form_end(purchase_form) }}
+</div>
+
+    <div class="modal fade" id="nonAppleModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">IMEI</h4>
+          </div>
+          <div class="modal-body">
+            It's easy to find your IMEI.  Just dial <a href="tel:*#06#">*#06#</a> on your mobile and your IMEI will immediately be displayed.  There is no cost to dial this number.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="appleModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">IMEI & Serial Number</h4>
+          </div>
+          <div class="modal-body">
+            It's easy to find your IMEI & Serial Number.  Open the Settings App, and navigate to General / About.  The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

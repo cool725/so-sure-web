@@ -109,7 +109,23 @@ label {
    display: block;
    margin-bottom: 10px;
 }
-
 .purchase-amount input {
   margin-left: 0px !important;
 }
+
+.purchase-nav {
+  text-align: center;
+}
+
+.purchase-nav ul {
+  list-style: none;
+}
+
+.purchase-nav li {
+  display: inline-block;
+  margin-right: 30px;
+  padding-right: 30px;
+  margin-bottom: 30px;
+  border-right: 1px solid;
+}
+

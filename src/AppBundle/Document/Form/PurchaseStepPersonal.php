@@ -7,7 +7,7 @@ use AppBundle\Document\Address;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
-class PurchaseStep1
+class PurchaseStepPersonal
 {
     /**
      * @var string

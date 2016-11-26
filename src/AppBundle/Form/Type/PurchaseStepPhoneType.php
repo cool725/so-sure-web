@@ -18,24 +18,49 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class PurchaseStep1Type extends AbstractType
+class PurchaseStepPhoneType extends AbstractType
 {
+    /**
+     * @var boolean
+     */
+    private $required;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @param RequestStack $requestStack
+     * @param boolean      $request
+     */
+    public function __construct(RequestStack $requestStack, $required)
+    {
+        $this->requestStack = $requestStack;
+        $this->required = $required;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', EmailType::class, ['attr' => ['readonly' => true], 'disabled' => true])
-            ->add('mobileNumber', TextType::class, ['attr' => ['readonly' => true], 'disabled' => true])
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('birthday', DateType::class, ['widget' => 'single_text', 'html5' => false, 'format' => 'dd/MM/yyyy'])
+            ->add('imei', TextType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $purchase = $event->getData();
+            $form = $event->getForm();
+
+            if ($purchase->getPhone()->getMake() == "Apple") {
+                $form->add('serialNumber', TextType::class, ['required' => $this->required]);
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\Form\PurchaseStep1',
+            'data_class' => 'AppBundle\Document\Form\PurchaseStepPhone',
         ));
     }
 }
