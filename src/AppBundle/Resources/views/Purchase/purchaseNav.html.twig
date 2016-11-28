@@ -1,8 +1,34 @@
 <div class="purchase-nav">
 <ul>
-    <li><a href="{{ path('purchase_step_personal') }}">Step 1 - Personal Details</a></li>
-    <li><a href="{{ path('purchase_step_address') }}">Step 2 - Billing Details</a></li>
-    <li><a href="{{ path('purchase_step_phone') }}">Step 3 - Phone Details</a></li>
-    <li><a href="{{ path('purchase_step_review') }}">Step 4 - Review Terms</a></li>
+    <li>
+        {% if step > 1%}<i class="fa fa-check text-success"></i> {% endif %}
+        {% if step <= 1 %}
+            1. Personal Details
+        {% else %}
+            <a href="{{ path('purchase_step_personal') }}">1. Personal Details</a>
+        {% endif %}
+    </li>
+    <li>{% if step > 2%}<i class="fa fa-check text-success"></i> {% endif %}
+        {% if step <= 2 %}
+            2. Billing Details
+        {% else %}
+            <a href="{{ path('purchase_step_address') }}">2. Billing Details</a>
+        {% endif %}
+    </li>
+    <li>
+        {% if step > 3%}<i class="fa fa-check text-success"></i> {% endif %}
+        {% if step <= 3 %}
+            3. Phone Details
+        {% else %}
+            <a href="{{ path('purchase_step_phone') }}">3. Phone Details</a>
+        {% endif %}
+    </li>
+    <li>
+        {% if step <= 4 %}
+            4. Review Terms
+        {% else %}
+            <a href="{{ path('purchase_step_review') }}">4. Review Terms</a>
+        {% endif %}
+    </li>
 </ul>
 </div>

@@ -321,6 +321,7 @@ class PurchaseController extends BaseController
 
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
+            'step' => 1,
         );
 
         return $data;
@@ -372,6 +373,7 @@ class PurchaseController extends BaseController
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
+            'step' => 2,
         );
 
         return $data;
@@ -503,6 +505,7 @@ class PurchaseController extends BaseController
             'phone' => $phone,
             'purchase_form' => $purchaseForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
+            'step' => 3,
         );
 
         return $data;
@@ -532,6 +535,7 @@ class PurchaseController extends BaseController
             'policy_key' => $this->getParameter('policy_key'),
             'webpay_action' => $webpay['post_url'],
             'webpay_reference' => $webpay['payment']->getReference(),
+            'step' => 4,
         ];
         
         return $data;
