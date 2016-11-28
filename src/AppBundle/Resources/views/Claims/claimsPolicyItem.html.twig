@@ -58,9 +58,9 @@
                                     <i class="fa fa-warning text-danger" title="Policy is NOT paid to date"></i>
                                 {% endif %}
                                 &nbsp;
-                                Paid £{{ policy.premiumPaid }} of £{{ policy.premium.yearlyPremiumPrice }}&nbsp;
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#scheduledPaymentsModal"
-                                            >Scheduled Payments</button>
+                                Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}&nbsp;
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
+                                            >Payments</button>
                             
                             </td>
                         </tr>
@@ -68,7 +68,7 @@
                         {% if policy.isPolicy %}
                         <tr>
                             <td>Policy Installments</td>
-                            <td>{{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice }}</td>
+                            <td>{{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}</td>
                         </tr>
                         {% endif %}
                         {% if policy.isPolicy %}
@@ -84,7 +84,7 @@
                         {% if policy.phone %}
                         <tr>
                             <td>Phone</td>
-                            <td>{{ policy.phone }}
+                            <td>{{ policy.phone }}&nbsp;
                                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
                                         data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
                                         data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
@@ -363,20 +363,60 @@
 
     {% include 'AppBundle::Claims/phoneAlternativesModal.html.twig' %}
 
-    <div class="modal fade" id="scheduledPaymentsModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="paymentsModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Scheduled Payments</h4>
+            <h4 class="modal-title">Payments</h4>
           </div>
           <div class="modal-body">
 
+            <h4>Paid</h4>
             <table class="table table-striped">
               <tbody>
                   <tr>
                       <th>Type</th>
-                      <th>Scheduled Date</th>
+                      <th>Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                  </tr>
+                  {% for payment in policy.payments %}
+                    <tr>
+                        <td>
+                            {% if payment.source == 'web' %}
+                                <i class="fa fa-globe" title="Web Payment"></i>
+                            {% elseif payment.source == 'mobile' %}
+                                <i class="fa fa-phone" title="Mobile Payment"></i>
+                            {% elseif payment.source == 'token' %}
+                                <i class="fa fa-clock-o" title="Token/Scheduled Payment"></i>
+                            {% else %}
+                                {{ payment.source }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ payment.date | date('d M Y H:i', 'Europe/London') }}
+                        </td>
+                        <td>
+                            £{{ payment.amount | number_format(2, '.', ',') }}
+                        </td>
+                        <td>
+                            {% if payment.isSuccess %}
+                                <i class="fa fa-check text-success"></i>
+                            {% else %}
+                                <i class="fa fa-minus text-danger"></i>
+                            {% endif %}
+                        </td>
+                    </tr>                      
+                  {% endfor %}
+              </tbody>
+            </table>
+            <h4>Scheduled</h4>
+            <table class="table table-striped">
+              <tbody>
+                  <tr>
+                      <th>Type</th>
+                      <th>Date</th>
                       <th>Amount</th>
                       <th>Status</th>
                   </tr>
