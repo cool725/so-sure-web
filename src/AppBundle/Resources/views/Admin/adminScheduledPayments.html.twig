@@ -37,7 +37,7 @@
     </div>
     <div class="col-md-2">
         <div class="form-group" style="padding-top: 15px;">
-            <button class="btn btn-primary">View Scheduled Payments</button>
+            <button class="btn btn-default">View Scheduled Payments</button>
         </div>                
     </div>
     </form>
@@ -47,6 +47,7 @@
     <tbody>
         <tr>
             <th>Policy</th>
+            <th>Type</th>
             <th>Scheduled Date</th>
             <th>Amount</th>
             <th>Status</th>
@@ -59,17 +60,30 @@
     {% endif %}
     <tr class="{% if scheduledPayment.status == 'failed' %}danger{% elseif isExpired %}warning{% endif %}">
         <td>
+            {% if scheduledPayment.status == 'cancelled' %}<del>{% endif %}
             <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
                 {{ scheduledPayment.policy.policyNumber }}
             </a>
-        </td>
-        <td>
-            {% if scheduledPayment.status == 'cancelled' %}<del>{% endif %}
-            {{ scheduledPayment.scheduled|date }}
             {% if scheduledPayment.status == 'cancelled' %}</del>{% endif %}
         </td>
         <td>
-            £{{ scheduledPayment.amount }}
+            {% if scheduledPayment.type == 'scheduled' %}
+                <i class="fa fa-clock-o" title="Scheduled Payment"></i>
+            {% elseif scheduledPayment.type == 'rescheduled' %}
+                <i class="fa fa-refresh" title="Re-Scheduled Payment"></i>
+            {% else %}
+                {{ scheduledPayment.type }}
+            {% endif %}
+        </td>
+        <td>
+            {% if scheduledPayment.status == 'cancelled' %}<del>{% endif %}
+            {{ scheduledPayment.scheduled | date('d M Y H:i', 'Europe/London')  }}
+            {% if scheduledPayment.status == 'cancelled' %}</del>{% endif %}
+        </td>
+        <td>
+            {% if scheduledPayment.status == 'cancelled' %}<del>{% endif %}
+            £{{ scheduledPayment.amount |number_format(2, '.', ',') }}
+            {% if scheduledPayment.status == 'cancelled' %}</del>{% endif %}
         </td>
         <td>
             {{ scheduledPayment.status }}            
