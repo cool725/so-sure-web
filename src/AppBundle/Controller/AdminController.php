@@ -1079,6 +1079,7 @@ class AdminController extends BaseController
             $month = $now->format('m');
         }
         $date = new \DateTime(sprintf('%d-%d-01', $year, $month));
+        $end = $this->endOfMonth($date);
 
         $dm = $this->getManager();
         $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
@@ -1087,6 +1088,7 @@ class AdminController extends BaseController
         return [
             'year' => $year,
             'month' => $month,
+            'end' => $end,
             'scheduledPayments' => $scheduledPayments,
         ];
     }

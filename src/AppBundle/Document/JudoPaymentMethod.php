@@ -13,6 +13,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 */
 class JudoPaymentMethod extends PaymentMethod
 {
+    use DateTrait;
+
     /**
      * @AppAssert\Token()
      * @Assert\Length(min="0", max="50")
@@ -150,6 +152,37 @@ class JudoPaymentMethod extends PaymentMethod
     public function getCardEndDate()
     {
         return $this->getCardDetail('endDate');
+    }
+
+    public function getCardEndDateAsDate()
+    {
+        $end = $this->getCardEndDate();
+        if (!$end) {
+            return null;
+        }
+
+        $date = new \DateTime(sprintf('%s-%s-01', substr($end, 2, 2), substr($end, 0, 2)));
+
+        return $this->endOfMonth($date);
+    }
+
+    public function isCardExpired(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $end = $this->getCardEndDateAsDate();
+        if (!$end) {
+            return true;
+        }
+
+        return $date > $end;
+    }
+
+    public function __toString()
+    {
+        return sprintf("%s **** %s (Exp: %s)", $this->getCardType(), $this->getCardLastFour(), $this->getCardEndDate());
     }
 
     public function getCardType($cardType = null)
