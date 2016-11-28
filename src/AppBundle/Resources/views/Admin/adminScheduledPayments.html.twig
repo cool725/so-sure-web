@@ -50,22 +50,33 @@
             <th>Scheduled Date</th>
             <th>Amount</th>
             <th>Status</th>
+            <th>Card</th>
         </tr>
 {% for scheduledPayment in scheduledPayments if scheduledPayment.policy.validPolicy %}
-    <tr class="{% if scheduledPayment.status == 'failed' %}danger{% elseif scheduledPayment.status == 'cancelled' %}warning{% endif %}">
+    {% set isExpired = false %}
+    {% if scheduledPayment.policy.user and scheduledPayment.policy.user.paymentMethod and scheduledPayment.policy.user.paymentMethod.isCardExpired(end) %}
+        {% set isExpired = true %}
+    {% endif %}
+    <tr class="{% if scheduledPayment.status == 'failed' %}danger{% elseif isExpired %}warning{% endif %}">
         <td>
             <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
                 {{ scheduledPayment.policy.policyNumber }}
             </a>
         </td>
         <td>
+            {% if scheduledPayment.status == 'cancelled' %}<del>{% endif %}
             {{ scheduledPayment.scheduled|date }}
+            {% if scheduledPayment.status == 'cancelled' %}</del>{% endif %}
         </td>
         <td>
             £{{ scheduledPayment.amount }}
         </td>
         <td>
             {{ scheduledPayment.status }}            
+        </td>
+        <td>{% if scheduledPayment.policy.user and scheduledPayment.policy.user.paymentMethod %}
+                {{ scheduledPayment.policy.user.paymentMethod }}
+            {% endif %}
         </td>
     </tr>
 {% endfor %}

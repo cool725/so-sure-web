@@ -60,6 +60,16 @@
                             <td>{{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice }}</td>
                         </tr>
                         {% endif %}
+                        {% if policy.isPolicy %}
+                        <tr>
+                            <td>Card</td>
+                            {% if policy.user.paymentMethod %}
+                            <td class="{% if policy.user.paymentMethod.isCardExpired %}danger{% endif %}">{{ policy.user.paymentMethod }}</td>
+                            {% else %}
+                            <td class="danger">Missing payment card</td>
+                            {% endif %}
+                        </tr>
+                        {% endif %}
                         {% if policy.phone %}
                         <tr>
                             <td>Phone</td>
