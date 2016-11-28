@@ -51,7 +51,18 @@
                         {% if policy.isPolicy %}
                         <tr>
                             <td>Policy Payments</td>
-                            <td>Paid £{{ policy.premiumPaid }} of £{{ policy.premium.yearlyPremiumPrice }}</td>
+                            <td>
+                                {% if policy.isPolicyPaidToDate %}
+                                    <i class="fa fa-check text-success" title="Policy is paid to date"></i>
+                                {% else %}
+                                    <i class="fa fa-warning text-danger" title="Policy is NOT paid to date"></i>
+                                {% endif %}
+                                &nbsp;
+                                Paid £{{ policy.premiumPaid }} of £{{ policy.premium.yearlyPremiumPrice }}&nbsp;
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#scheduledPaymentsModal"
+                                            >Scheduled Payments</button>
+                            
+                            </td>
                         </tr>
                         {% endif %}
                         {% if policy.isPolicy %}
@@ -351,4 +362,53 @@
     <div style="padding-bottom: 30px"></div>
 
     {% include 'AppBundle::Claims/phoneAlternativesModal.html.twig' %}
+
+    <div class="modal fade" id="scheduledPaymentsModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Scheduled Payments</h4>
+          </div>
+          <div class="modal-body">
+
+            <table class="table table-striped">
+              <tbody>
+                  <tr>
+                      <th>Type</th>
+                      <th>Scheduled Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                  </tr>
+                  {% for scheduledPayment in policy.scheduledPayments %}
+                    <tr>
+                        <td>
+                            {% if scheduledPayment.type == 'scheduled' %}
+                                <i class="fa fa-clock-o" title="Scheduled Payment"></i>
+                            {% elseif scheduledPayment.type == 'rescheduled' %}
+                                <i class="fa fa-refresh" title="Re-Scheduled Payment"></i>
+                            {% else %}
+                                {{ scheduledPayment.type }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if scheduledPayment.status == 'cancelled' %}<del>{% endif %}
+                            {{ scheduledPayment.scheduled | date('d M Y H:i', 'Europe/London') }}
+                            {% if scheduledPayment.status == 'cancelled' %}</del>{% endif %}
+                        </td>
+                        <td>
+                            £{{ scheduledPayment.amount | number_format(2, '.', ',') }}
+                        </td>
+                        <td>
+                            {{ scheduledPayment.status }}            
+                        </td>
+                    </tr>                      
+                  {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
 </div>
