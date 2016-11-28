@@ -387,9 +387,9 @@
                             {% if payment.source == 'web' %}
                                 <i class="fa fa-globe" title="Web Payment"></i>
                             {% elseif payment.source == 'mobile' %}
-                                <i class="fa fa-phone" title="Mobile Payment"></i>
+                                <i class="fa fa-mobile" title="Mobile Payment"></i>
                             {% elseif payment.source == 'token' %}
-                                <i class="fa fa-clock-o" title="Token/Scheduled Payment"></i>
+                                <i class="fa fa-gears" title="Token Payment"></i>
                             {% else %}
                                 {{ payment.source }}
                             {% endif %}

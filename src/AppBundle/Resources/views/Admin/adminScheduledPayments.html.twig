@@ -60,11 +60,9 @@
     {% endif %}
     <tr class="{% if scheduledPayment.status == 'failed' %}danger{% elseif isExpired %}warning{% endif %}">
         <td>
-            {% if scheduledPayment.status == 'cancelled' %}<del>{% endif %}
             <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
                 {{ scheduledPayment.policy.policyNumber }}
             </a>
-            {% if scheduledPayment.status == 'cancelled' %}</del>{% endif %}
         </td>
         <td>
             {% if scheduledPayment.type == 'scheduled' %}
