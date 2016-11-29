@@ -40,12 +40,9 @@ class DoctrineSalvaListener
                 }
 
                 $fields = [
-                    'phone.make',
-                    'phone.model',
-                    'phone.memory',
+                    'phone',
                     'imei',
-                    'phone.initialPrice',
-                    'premium.gwp',
+                    'premium',
                 ];
                 foreach ($fields as $field) {
                     if ($eventArgs->hasChangedField($field)) {

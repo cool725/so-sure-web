@@ -737,6 +737,9 @@ class AdminController extends BaseController
         $receperioForm = $this->get('form.factory')
             ->createNamedBuilder('receperio_form')->add('rerun', SubmitType::class)
             ->getForm();
+        $phoneForm = $this->get('form.factory')
+            ->createNamedBuilder('phone_form', PhoneType::class, $policy)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -780,6 +783,17 @@ class AdminController extends BaseController
                     $this->addFlash(
                         'success',
                         sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('phone_form')) {
+                $phoneForm->handleRequest($request);
+                if ($phoneForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s phone updated.', $policy->getPolicyNumber())
                     );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
@@ -849,6 +863,7 @@ class AdminController extends BaseController
             'pending_cancel_form' => $pendingCancelForm->createView(),
             'note_form' => $noteForm->createView(),
             'imei_form' => $imeiForm->createView(),
+            'phone_form' => $phoneForm->createView(),
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
             'fraud' => $checks,

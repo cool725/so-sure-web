@@ -54,13 +54,16 @@ class DaviesServiceTest extends WebTestCase
         $imeiNew = self::generateRandomImei();
 
         $policy = new PhonePolicy();
+        $policy->setId('1');
         $policy->setImei($imeiOld);
         $policy->setPhone(self::$phoneA);
 
         $claim = new Claim();
         $policy->addClaim($claim);
         
-        self::$daviesService->updatePolicy($claim);
+        $davies = new DaviesClaim();
+
+        self::$daviesService->updatePolicy($claim, $davies);
         $this->assertEquals($imeiOld, $policy->getImei());
         $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
 
@@ -69,7 +72,11 @@ class DaviesServiceTest extends WebTestCase
         $claimB->setReplacementImei($imeiNew);
         $policy->addClaim($claimB);
 
-        self::$daviesService->updatePolicy($claimB);
+        $daviesB = new DaviesClaim();
+        $daviesB->replacementMake = 'Apple';
+        $daviesB->replacementModel = 'iPhone 4';
+
+        self::$daviesService->updatePolicy($claimB, $daviesB);
         $this->assertEquals($imeiNew, $policy->getImei());
         $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
     }

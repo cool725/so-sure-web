@@ -342,6 +342,18 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Phone</td>
+                    <td>
+                      {{ form_start(phone_form, {'attr': {'class': 'form-inline'}}) }}
+                      <div class="form-group">
+                          {{ form_errors(phone_form.phone) }}
+                          {{ form_widget(phone_form.phone) }}
+                      </div>
+                      {{ form_widget(phone_form.next, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-phone-update'}}) }}
+                      {{ form_end(phone_form) }}
+                    </td>
+                </tr>
+                <tr>
                     <td>Facebook</td>
                     <td>
                       {% if policy.user.facebookId | length > 0 %}
