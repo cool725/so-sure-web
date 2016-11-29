@@ -64,11 +64,17 @@
                 {{ form_errors(form.sosure) }}
                 {{ form_widget(form.sosure) }}
             </div>
+            <div class="form-group text-center col-sm-4">
+                {{ form_label(form.invalid, 'Include Invalid Policies') }}
+                {{ form_errors(form.invalid) }}
+                {{ form_widget(form.invalid) }}
+            </div>
         </div>
         {% else %}
             {% do form.imei.setRendered %}
             {% do form.facebookId.setRendered %}
             {% do form.sosure.setRendered %}
+            {% do form.invalid.setRendered %}
         {% endif %}
         <div class="row">
             <div class="form-group text-center col-sm-12" style="padding-top: 10px;">
@@ -105,6 +111,12 @@
                     <tbody>
                     {% for user in users %}
                         {% for policy in user.allPolicies %}
+                        {% if not include_invalid_policies and not policy.hasPolicyPrefix %}
+                           {# Hide policies that are invalid unless specifically requested #}
+                           {#
+                           <tr><td>{{ policy.policyNumber }}</td></tr>
+                           #}
+                        {% else %}
                         <tr>
                             <td><a href="{{ path(policy_route, {id: policy.id}) }}">
                                 {% if policy.policyNumber|length %}
@@ -126,6 +138,7 @@
                             <td>{% if user.facebookId | length > 0 %}Yes{% else %}No{% endif %}</td>
                             <td>{% if user.locked %}locked{% elseif user.enabled %}enabled{% else %}disabled{%endif %}</td>
                         </tr>
+                        {% endif %}
                         {% endfor %}
                         {% if user.allPolicies|length == 0 %}
                         <tr>
