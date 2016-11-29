@@ -29,7 +29,7 @@ class PurchaseType extends AbstractType
 
     /**
      * @param RequestStack $requestStack
-     * @param boolean      $required;
+     * @param boolean      $required
      */
     public function __construct(RequestStack $requestStack, $required)
     {
