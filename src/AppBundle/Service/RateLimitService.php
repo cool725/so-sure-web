@@ -113,6 +113,31 @@ class RateLimitService
         $this->redis->del($userKey);
     }
 
+    public function clearByType($type)
+    {
+        if ($type == 'all') {
+            $type = '*';
+        }
+        $search = sprintf(self::KEY_FORMAT, $type, '*');
+        foreach ($this->redis->keys($search) as $key) {
+            $data[$key] = $this->redis->del($key);
+        }
+    }
+
+    public function show($type)
+    {
+        $data = [];
+        if ($type == 'all') {
+            $type = '*';
+        }
+        $search = sprintf(self::KEY_FORMAT, $type, '*');
+        foreach ($this->redis->keys($search) as $key) {
+            $data[$key] = $this->redis->get($key);
+        }
+
+        return $data;
+    }
+
     /**
      * Is the call allowed
      *
