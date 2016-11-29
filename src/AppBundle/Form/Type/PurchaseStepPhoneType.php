@@ -32,7 +32,7 @@ class PurchaseStepPhoneType extends AbstractType
 
     /**
      * @param RequestStack $requestStack
-     * @param boolean      $request
+     * @param boolean      $required
      */
     public function __construct(RequestStack $requestStack, $required)
     {

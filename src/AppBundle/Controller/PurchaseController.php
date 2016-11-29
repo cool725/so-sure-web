@@ -521,7 +521,6 @@ class PurchaseController extends BaseController
         $policy = $user->getUnInitPolicy();
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
-            
         }
 
         $webpay = $this->get('app.judopay')->webpay(
