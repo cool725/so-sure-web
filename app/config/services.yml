@@ -522,7 +522,7 @@ services:
 
     app.form.type.purchase:
         class: AppBundle\Form\Type\PurchaseType
-        arguments: ["@request_stack"]
+        arguments: ["@request_stack", "%form_required%"]
         tags:
             - { name: form.type }
 
