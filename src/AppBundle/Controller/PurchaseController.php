@@ -48,6 +48,9 @@ class PurchaseController extends BaseController
     public function purchaseAction(Request $request, $phoneId = null, $policyId = null)
     {
         $user = $this->getUser();
+        if (!$user) {
+            throw new AccessDeniedException('User must be logged in to purchase a policy');
+        }
         if ($user->hasValidPolicy()) {
             $this->addFlash(
                 'warning',
