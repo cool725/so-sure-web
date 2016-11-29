@@ -305,7 +305,15 @@ class JudopayService
         $payment->setAmount($transactionDetails["amount"]);
         $payment->setResult($transactionDetails["result"]);
         $payment->setMessage($transactionDetails["message"]);
-        $payment->setSource($source);
+        // If wallet field is present, use that
+        if (isset($transactionDetails["wallet"]) && $transactionDetails["wallet"] == 1) {
+            $payment->setSource(Payment::SOURCE_APPLE_PAY);
+        } elseif (isset($transactionDetails["wallet"]) && $transactionDetails["wallet"] == 2) {
+            $payment->setSource(Payment::SOURCE_ANDROID_PAY);
+        } else {
+            $payment->setSource($source);
+        }
+
         if ($date) {
             $payment->setDate($date);
         }

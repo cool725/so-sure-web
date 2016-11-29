@@ -24,6 +24,8 @@ abstract class Payment
     const SOURCE_WEB = 'web';
     const SOURCE_WEB_API = 'web-api';
     const SOURCE_MOBILE = 'mobile';
+    const SOURCE_APPLE_PAY = 'apple-pay';
+    const SOURCE_ANDROID_PAY = 'android-pay';
 
     /**
      * @MongoDB\Id

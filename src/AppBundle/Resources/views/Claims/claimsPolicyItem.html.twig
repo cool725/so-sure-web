@@ -402,6 +402,10 @@
                                 <i class="fa fa-mobile" title="Mobile Payment"></i>
                             {% elseif payment.source == 'token' %}
                                 <i class="fa fa-gears" title="Token Payment"></i>
+                            {% elseif payment.source == 'apple-pay' %}
+                                <i class="fa fa-apple" title="Apple Payment"></i>
+                            {% elseif payment.source == 'android-pay' %}
+                                <i class="fa fa-android" title="Android Payment"></i>
                             {% else %}
                                 {{ payment.source }}
                             {% endif %}
