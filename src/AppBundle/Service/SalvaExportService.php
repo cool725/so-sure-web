@@ -501,6 +501,19 @@ class SalvaExportService
             $this->sendPolicy($policy);
         } elseif ($action == self::QUEUE_CANCELLED) {
             $this->cancelPolicy($policy, $cancelReason);
+        } elseif ($action == self::QUEUE_UPDATED) {
+            // If exception thrown in the middle of an update, log and avoid re-queueing policy actions
+            try {
+                $this->incrementPolicyNumber($policy);
+
+                $this->queueMessage($policy->getId(), self::QUEUE_CANCELLED, 0, self::CANCELLED_REPLACE);
+                $this->queueMessage($policy->getId(), self::QUEUE_CREATED, 0);
+            } catch (\Exception $e) {
+                $this->logger->error(
+                    sprintf('Error running QUEUE_UPDATED for policy %s', $policy->getId()),
+                    ['exception' => $e]
+                );
+            }
         } else {
             throw new \Exception(sprintf(
                 'Unknown action %s for policyId: %s',
@@ -580,7 +593,7 @@ class SalvaExportService
         return $count;
     }
 
-    public function queue(SalvaPhonePolicy $policy, $action, $retryAttempts = 0, \DateTime $date = null)
+    public function queue(SalvaPhonePolicy $policy, $action, $retryAttempts = 0)
     {
         if (!in_array($action, [self::QUEUE_CANCELLED, self::QUEUE_CREATED, self::QUEUE_UPDATED])) {
             throw new \Exception(sprintf('Unknown queue action %s', $action));
@@ -591,15 +604,7 @@ class SalvaExportService
             return false;
         }
 
-        // Increment policy number should be done outside the queue process
-        if ($action == self::QUEUE_UPDATED) {
-            $this->incrementPolicyNumber($policy, $date);
-
-            $this->queueMessage($policy->getId(), self::QUEUE_CANCELLED, $retryAttempts, self::CANCELLED_REPLACE);
-            $this->queueMessage($policy->getId(), self::QUEUE_CREATED, $retryAttempts);
-        } else {
-            $this->queueMessage($policy->getId(), $action, $retryAttempts);
-        }
+        $this->queueMessage($policy->getId(), $action, $retryAttempts);
 
         return true;
     }

@@ -77,15 +77,11 @@ class SalvaListenerTest extends WebTestCase
         $listener = new SalvaListener(static::$salvaService);
         $listener->onPolicySalvaIncrementEvent(new PolicyEvent($policy));
 
-        // one cancel, one create
-        $this->assertEquals(2, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+        // one updated
+        $this->assertEquals(1, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
         $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
         $this->assertEquals($policy->getId(), $data['policyId']);
-        $this->assertEquals(SalvaExportService::QUEUE_CANCELLED, $data['action']);
-
-        $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
-        $this->assertEquals($policy->getId(), $data['policyId']);
-        $this->assertEquals(SalvaExportService::QUEUE_CREATED, $data['action']);
+        $this->assertEquals(SalvaExportService::QUEUE_UPDATED, $data['action']);
     }
 
     public function testSalvaQueueCreated()

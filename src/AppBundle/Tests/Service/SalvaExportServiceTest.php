@@ -128,8 +128,9 @@ class SalvaExportServiceTest extends WebTestCase
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isValidPolicy());
         $this->assertTrue(static::$salva->queue($updatedPolicy, SalvaExportService::QUEUE_UPDATED));
+        // hasn't yet been updated
         $this->assertEquals(
-            SalvaPhonePolicy::SALVA_STATUS_PENDING_REPLACEMENT_CANCEL,
+            SalvaPhonePolicy::SALVA_STATUS_PENDING,
             $updatedPolicy->getSalvaStatus()
         );
     }

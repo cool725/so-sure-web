@@ -17,52 +17,70 @@ class DoctrineSalvaListener
     /** @var string */
     protected $environment;
 
-    public function __construct($dispatcher, $environment)
+    protected $logger;
+
+    public function __construct($dispatcher, $environment, $logger)
     {
         $this->dispatcher = $dispatcher;
         $this->environment = $environment;
+        $this->logger = $logger;
     }
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
-        $document = $eventArgs->getDocument();
-        if ($document instanceof SalvaPhonePolicy) {
-            if (!$document->isValidPolicy()) {
-                return;
-            }
+        try {
+            $dispatched = [];
+            $document = $eventArgs->getDocument();
 
-            $fields = [
-                'phone.make',
-                'phone.model',
-                'phone.memory',
-                'phone.imei',
-                'phone.initialPrice',
-                'premium.gwp',
-            ];
-            foreach ($fields as $field) {
-                if ($eventArgs->hasChangedField($field)) {
-                    return $this->triggerEvent($document, PolicyEvent::EVENT_SALVA_INCREMENT);
+            if ($document instanceof SalvaPhonePolicy) {
+                $policy = $document;
+                if (!$policy->isValidPolicy()) {
+                    $this->logger->debug(sprintf('preUpdateDebug invalid policy'));
+                    return;
                 }
-            }
-        }
 
-        if ($document instanceof User) {
-            if (!$document->hasValidPolicy()) {
-                return;
-            }
-            $fields = [
-                'firstName',
-                'lastName',
-            ];
-            foreach ($fields as $field) {
-                if ($eventArgs->hasChangedField($field)) {
-                    foreach ($document->getPolicies() as $policy) {
-                        if ($policy instanceof SalvaPhonePolicy && $policy->isValidPolicy()) {
-                            return $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
+                $fields = [
+                    'phone.make',
+                    'phone.model',
+                    'phone.memory',
+                    'imei',
+                    'phone.initialPrice',
+                    'premium.gwp',
+                ];
+                foreach ($fields as $field) {
+                    if ($eventArgs->hasChangedField($field)) {
+                        $this->logger->debug(sprintf('preUpdateDebug changedfield : %s', $field));
+                        if (!in_array($policy->getId(), $dispatched)) {
+                            $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
+                            $dispatched[] = $policy->getId();
                         }
                     }
                 }
             }
+
+            if ($document instanceof User) {
+                if (!$document->hasValidPolicy()) {
+                    return;
+                }
+                $fields = [
+                    'firstName',
+                    'lastName',
+                ];
+                foreach ($fields as $field) {
+                    if ($eventArgs->hasChangedField($field)) {
+                        foreach ($document->getPolicies() as $policy) {
+                            if ($policy instanceof SalvaPhonePolicy && $policy->isValidPolicy()) {
+                                if (!in_array($policy->getId(), $dispatched)) {
+                                    $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
+                                    $dispatched[] = $policy->getId();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Error in salva listener', ['exception' => $e]);
         }
     }
 

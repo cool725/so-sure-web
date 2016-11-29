@@ -65,7 +65,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
         $this->runPreUpdate($policy, $this->once(), ['phone.make' => ['Apple', 'Samsung']]);
         $this->runPreUpdate($policy, $this->once(), ['phone.model' => ['iPhone 5', 'iPhone 6']]);
         $this->runPreUpdate($policy, $this->once(), ['phone.memory' => ['16', '32']]);
-        $this->runPreUpdate($policy, $this->once(), ['phone.imei' => ['11', '12']]);
+        $this->runPreUpdate($policy, $this->once(), ['imei' => ['11', '12']]);
         $this->runPreUpdate($policy, $this->once(), ['phone.initialPrice' => [1, 2]]);
         $this->runPreUpdate($policy, $this->once(), ['premium.gwp' => [1, 2]]);
         $this->runPreUpdate($policy, $this->never(), ['premium.ipt' => [1, 2]]);
@@ -104,7 +104,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrineSalvaListener($dispatcher, 'test');
+        $listener = new DoctrineSalvaListener($dispatcher, 'test', static::$container->get('logger'));
 
         return $listener;
     }

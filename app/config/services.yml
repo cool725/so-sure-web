@@ -420,6 +420,7 @@ services:
         arguments:
             dispatcher:  "@event_dispatcher"
             environment: "%kernel.environment%"
+            logger:      "@logger"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
