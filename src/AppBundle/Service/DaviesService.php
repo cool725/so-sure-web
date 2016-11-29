@@ -35,6 +35,8 @@ class DaviesService
     /** @var ClaimsService */
     protected $claimsService;
 
+    protected $mailer;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -42,6 +44,7 @@ class DaviesService
      * @param S3Client        $s3
      * @param ClaimsService   $claimsService
      * @param                 $environment
+     * @param                 $mailer
      */
     public function __construct(
         DocumentManager  $dm,
@@ -49,7 +52,8 @@ class DaviesService
         ExcelService $excel,
         S3Client $s3,
         ClaimsService $claimsService,
-        $environment
+        $environment,
+        $mailer
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -58,6 +62,7 @@ class DaviesService
         $this->bucket = 'ops.so-sure.com';
         $this->path = sprintf('claims-report/%s', $environment);
         $this->claimsService = $claimsService;
+        $this->mailer = $mailer;
     }
 
     public function import()
@@ -254,7 +259,7 @@ class DaviesService
 
                 $claim->setShippingAddress($daviesClaim->shippingAddress);
 
-                $this->updatePolicy($claim);
+                $this->updatePolicy($claim, $daviesClaim);
                 $this->dm->flush();
 
                 $this->claimsService->processClaim($claim);
@@ -318,15 +323,24 @@ class DaviesService
         return $phone;
     }
 
-    public function updatePolicy(Claim $claim)
+    public function updatePolicy(Claim $claim, DaviesClaim $daviesClaim)
     {
         $policy = $claim->getPolicy();
         // We've replaced their phone with a new imei number
-        if ($claim->getReplacementImei() && $claim->getReplacementPhone() &&
+        if ($claim->getReplacementImei() &&
             $claim->getReplacementImei() != $policy->getImei()) {
-            // Phone & Imei have changed, but we can't change their policy premium, which is fixed
-            $policy->setPhone($claim->getReplacementPhone());
+            // Imei has changed, but we can't change their policy premium, which is fixed
             $policy->setImei($claim->getReplacementImei());
+            // If phone has been updated (unlikely at the moment)
+            if ($claim->getReplacementPhone()) {
+                $policy->setPhone($claim->getReplacementPhone());
+            }
+            $this->mailer->sendTemplate(
+                sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
+                'tech@so-sure.com',
+                'AppBundle:Email:davies/checkPhone.html.twig',
+                ['policy' => $policy, 'daviesClaim' => $daviesClaim]
+            );
         }
     }
 }

@@ -62,13 +62,10 @@ class DoctrineSalvaListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
 
         // policy updated
-        $this->runPreUpdate($policy, $this->once(), ['phone.make' => ['Apple', 'Samsung']]);
-        $this->runPreUpdate($policy, $this->once(), ['phone.model' => ['iPhone 5', 'iPhone 6']]);
-        $this->runPreUpdate($policy, $this->once(), ['phone.memory' => ['16', '32']]);
+        $this->runPreUpdate($policy, $this->once(), ['phone' => ['Apple', 'Samsung']]);
         $this->runPreUpdate($policy, $this->once(), ['imei' => ['11', '12']]);
-        $this->runPreUpdate($policy, $this->once(), ['phone.initialPrice' => [1, 2]]);
-        $this->runPreUpdate($policy, $this->once(), ['premium.gwp' => [1, 2]]);
-        $this->runPreUpdate($policy, $this->never(), ['premium.ipt' => [1, 2]]);
+        $this->runPreUpdate($policy, $this->once(), ['premium' => [1, 2]]);
+        $this->runPreUpdate($policy, $this->never(), ['potValue' => [1, 2]]);
 
         // user updated
         $this->runPreUpdateUser($user, $policy, $this->once(), ['firstName' => ['foo', 'bar']]);
