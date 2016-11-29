@@ -88,6 +88,7 @@ class ClaimsController extends BaseController
             'pager' => $pager,
             'form' => $form->createView(),
             'policy_route' => 'claims_policy',
+            'include_invalid_policies' => false,
         ];
     }
 

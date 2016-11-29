@@ -340,6 +340,7 @@ class AdminController extends BaseController
                 return new RedirectResponse($this->generateUrl('admin_users', ['facebookId' => $sosure]));
             }
         }
+        $includeInvalidPolicies = $form->get('invalid')->getData();
 
         $this->formToMongoSearch($form, $users, 'email', 'email');
         $this->formToMongoSearch($form, $users, 'lastname', 'lastName');
@@ -379,6 +380,7 @@ class AdminController extends BaseController
             'pager' => $pager,
             'form' => $form->createView(),
             'policy_route' => 'admin_policy',
+            'include_invalid_policies' => $includeInvalidPolicies,
         ];
     }
 
