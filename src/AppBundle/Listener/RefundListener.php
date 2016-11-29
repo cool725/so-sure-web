@@ -81,10 +81,14 @@ class RefundListener
     /**
      * @param PolicyEvent $event
      */
-    public function refundFreeNovPromo(PolicyEvent $event)
+    public function refundFreeMonthPromo(PolicyEvent $event)
     {
         $policy = $event->getPolicy();
-        if (!in_array($policy->getPromoCode(), [Policy::PROMO_FREE_NOV, Policy::PROMO_LAUNCH_FREE_NOV])) {
+        if (!in_array($policy->getPromoCode(), [
+            Policy::PROMO_FREE_NOV,
+            Policy::PROMO_LAUNCH_FREE_NOV,
+            Policy::PROMO_FREE_DEC_2016,
+        ])) {
             return;
         }
 
@@ -111,8 +115,9 @@ class RefundListener
 
         if ($refundAmount > $payment->getAmount()) {
             $this->logger->error(sprintf(
-                'Manual processing required (policy %s), Free Nov Promo refund %f is more than last payment.',
+                'Manual processing required (policy %s), Promo %s refund %f is more than last payment.',
                 $policy->getId(),
+                $policy->getPromoCode(),
                 $refundAmount
             ));
 
@@ -120,7 +125,7 @@ class RefundListener
         }
         $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, 'free nov promo refund');
         $sosurePayment = SoSurePayment::duplicate($payment);
-        $sosurePayment->setNotes('free nov promo paid by so-sure');
+        $sosurePayment->setNotes(sprintf('promo %s paid by so-sure', $policy->getPromoCode()));
         $policy->addPayment($sosurePayment);
         $this->dm->flush();
     }

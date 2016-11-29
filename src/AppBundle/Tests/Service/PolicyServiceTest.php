@@ -137,6 +137,25 @@ class PolicyServiceTest extends WebTestCase
     }
 
     /**
+     */
+    public function testCreatePolicyHasDec2016PromoCode()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePolicyHasDec2016PromoCode', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setDispatcher(null);
+        static::$policyService->create($policy, new \DateTime('2016-12-01'));
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(Policy::PROMO_FREE_DEC_2016, $policy->getPromoCode());
+    }
+
+    /**
      * TODO - generate 1000 policies or adjust query somehow
     public function testCreatePolicyHasNoPromoCode()
     {
