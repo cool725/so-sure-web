@@ -94,6 +94,28 @@ class RefundListenerTest extends WebTestCase
         $this->assertEquals(Policy::PROMO_FREE_NOV, $policy->getPromoCode());
 
         $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
-        $listener->refundFreeNovPromo(new PolicyEvent($policy));
+        $listener->refundFreeMonthPromo(new PolicyEvent($policy));
+    }
+
+    public function testRefundFreeDec2016Promo()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundFreeDec2016Promo', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
+        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-12-01'));
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-12-01'));
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+        $this->assertEquals(Policy::PROMO_FREE_DEC_2016, $policy->getPromoCode());
+
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener->refundFreeMonthPromo(new PolicyEvent($policy));
     }
 }

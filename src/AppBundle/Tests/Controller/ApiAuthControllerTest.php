@@ -1291,7 +1291,9 @@ class ApiAuthControllerTest extends BaseControllerTest
         $promoCode = 'launch';
         $now = new \DateTime();
         if ($now->format('Y-m') == '2016-11') {
-            $promoCode = 'free-nov';
+            $promoCode = Policy::PROMO_FREE_NOV;
+        } elseif ($now->format('Y-m') == '2016-12') {
+            $promoCode = Policy::PROMO_FREE_DEC_2016;
         }
 
         $this->assertEquals($promoCode, $policyData['promo_code']);

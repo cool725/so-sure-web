@@ -306,6 +306,7 @@ class PolicyService
         $isPreLaunchUser = $policy->getUser()->isPreLaunch();
         $isOct2016 = $policy->getStart()->format('Y-m') == '2016-10';
         $isNov2016 = $policy->getStart()->format('Y-m') == '2016-11';
+        $isDec2016 = $policy->getStart()->format('Y-m') == '2016-12';
 
         // Prelaunch Policy is being discontinued as of end Oct 2016
         // This was only advertised after policy purchase, so can be discontinued for future policies
@@ -320,6 +321,8 @@ class PolicyService
             $promoCode = Policy::PROMO_LAUNCH;
         } elseif ($isNov2016) {
             $promoCode = Policy::PROMO_FREE_NOV;
+        } elseif ($isDec2016) {
+            $promoCode = Policy::PROMO_FREE_DEC_2016;
         } elseif ($isPreLaunchPolicy || $isPreLaunchUser) {
             $promoCode = Policy::PROMO_LAUNCH;
         }

@@ -81,10 +81,14 @@ class RefundListener
     /**
      * @param PolicyEvent $event
      */
-    public function refundFreeNovPromo(PolicyEvent $event)
+    public function refundFreeMonthPromo(PolicyEvent $event)
     {
         $policy = $event->getPolicy();
-        if (!in_array($policy->getPromoCode(), [Policy::PROMO_FREE_NOV, Policy::PROMO_LAUNCH_FREE_NOV])) {
+        if (!in_array($policy->getPromoCode(), [
+            Policy::PROMO_FREE_NOV,
+            Policy::PROMO_LAUNCH_FREE_NOV,
+            Policy::PROMO_FREE_DEC_2016,
+        ])) {
             return;
         }
 
