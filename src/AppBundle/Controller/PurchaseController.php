@@ -258,7 +258,7 @@ class PurchaseController extends BaseController
     }
 
     /**
-     * @Route("/step-1-personal", name="purchase_step_personal")
+     * @Route("/step-personal", name="purchase_step_personal")
      * @Template
     */
     public function purchaseStepPersonalAction(Request $request)
@@ -328,7 +328,7 @@ class PurchaseController extends BaseController
     }
     
     /**
-     * @Route("/step-2-address", name="purchase_step_address")
+     * @Route("/step-address", name="purchase_step_address")
      * @Template
     */
     public function purchaseStepAddressAction(Request $request)
@@ -380,7 +380,7 @@ class PurchaseController extends BaseController
     }
 
     /**
-     * @Route("/step-3-phone", name="purchase_step_phone")
+     * @Route("/step-phone", name="purchase_step_phone")
      * @Template
     */
     public function purchaseStepPhoneAction(Request $request)
@@ -512,7 +512,7 @@ class PurchaseController extends BaseController
     }
 
     /**
-     * @Route("/step-4-review", name="purchase_step_review")
+     * @Route("/step-review", name="purchase_step_review")
      * @Template
     */
     public function purchaseStepReviewAction(Request $request)
@@ -530,12 +530,14 @@ class PurchaseController extends BaseController
             $request->getClientIp(),
             $request->headers->get('User-Agent')
         );
+
         $data = [
             'phone' => $policy->getPhone(),
             'policy_key' => $this->getParameter('policy_key'),
             'webpay_action' => $webpay['post_url'],
             'webpay_reference' => $webpay['payment']->getReference(),
             'step' => 4,
+            'is_postback' => 'POST' === $request->getMethod(),
         ];
         
         return $data;

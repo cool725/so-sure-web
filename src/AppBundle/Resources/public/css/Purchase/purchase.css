@@ -129,3 +129,6 @@ label {
   border-right: 1px solid;
 }
 
+.purchase-nav .step-active {
+  font-weight: bold;
+}
