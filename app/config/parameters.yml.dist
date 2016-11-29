@@ -21,6 +21,7 @@ parameters:
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
     api_secret:        ThisTokenIsNotSoSecretChangeIt
+    form_required:     true
 
     fb_appid: changeme
     fb_secret: changeme

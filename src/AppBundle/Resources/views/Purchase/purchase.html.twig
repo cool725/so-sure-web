@@ -175,45 +175,45 @@
                             <div class="form-group col-sm-4">
                                 {{ form_label(purchase_form.addressLine1, 'Address Line 1') }}
                             </div>
-                            <div class="form-group col-sm-6 {% if form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
+                            <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
+                                {% if showAddress %}<div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>{% endif %}
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-sm-4">
                                 {{ form_label(purchase_form.addressLine2, 'Address Line 2') }}
                             </div>
-                            <div class="form-group col-sm-6 {% if form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
+                            <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
+                                {% if showAddress %}<div class="help-block with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>{% endif %}
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-sm-4">
                                 {{ form_label(purchase_form.addressLine3, 'Address Line 3') }}
                             </div>
-                            <div class="form-group col-sm-6 {% if form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
+                            <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
+                                {% if showAddress %}<div class="help-block with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>{% endif %}
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-sm-4">
                                 {{ form_label(purchase_form.city, 'City') }}
                             </div>
-                            <div class="form-group col-sm-6 {% if form_errors(purchase_form.city) %}has-error{% endif %}">
+                            <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.city, {'attr':{'class':'form-control city'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.city) }}</div>
+                                {% if showAddress %}<div class="help-block with-errors">{{ form_errors(purchase_form.city) }}</div>{% endif %}
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-sm-4">
                                 {{ form_label(purchase_form.postcode, 'Postcode') }}
                             </div>
-                            <div class="form-group col-sm-6 {% if form_errors(purchase_form.postcode) %}has-error{% endif %}">
+                            <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
                                 {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.postcode) }}</div>
+                                {% if showAddress %}<div class="help-block with-errors">{{ form_errors(purchase_form.postcode) }}</div>{% endif %}
                             </div>
                         </div>
                     </div>
