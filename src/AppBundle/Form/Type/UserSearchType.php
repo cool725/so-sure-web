@@ -23,12 +23,15 @@ class UserSearchType extends AbstractType
      */
     private $requestStack;
 
+    private $environment;
+
     /**
      * @param RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, $environment)
     {
         $this->requestStack = $requestStack;
+        $this->environment = $environment;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -68,7 +71,7 @@ class UserSearchType extends AbstractType
                     ]
                 ]
             ])
-            ->add('invalid', CheckboxType::class, ['required' => false])
+            ->add('invalid', CheckboxType::class, ['required' => false, 'data' => $this->environment != 'prod'])
             ->add('search', SubmitType::class)
         ;
 
@@ -81,6 +84,7 @@ class UserSearchType extends AbstractType
             $form->get('lastname')->setData($currentRequest->query->get('lastname'));
             $form->get('policy')->setData($currentRequest->query->get('policy'));
             $form->get('status')->setData($currentRequest->query->get('status'));
+            $form->get('invalid')->setData($currentRequest->query->get('invalid'));
         });
     }
 

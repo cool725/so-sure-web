@@ -512,7 +512,7 @@ services:
 
     app.form.type.usersearch:
         class: AppBundle\Form\Type\UserSearchType
-        arguments: ["@request_stack"]
+        arguments: ["@request_stack", "%kernel.environment%"]
         tags:
             - { name: form.type }
 
