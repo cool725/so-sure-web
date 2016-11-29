@@ -456,6 +456,19 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/admin-rate-limits", name="admin_rate_limits")
+     * @Template
+     */
+    public function adminRateLimitsAction()
+    {
+        $rateLimit = $this->get('app.ratelimit');
+
+        return [
+            'rateLimits' => $rateLimit->show('all')
+        ];
+    }
+
+    /**
      * @Route("/reports", name="admin_reports")
      * @Template
      */
