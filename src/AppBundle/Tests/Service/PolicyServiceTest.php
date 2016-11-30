@@ -431,7 +431,7 @@ class PolicyServiceTest extends WebTestCase
         $policy = static::initPolicy(
             $user,
             static::$dm,
-            $this->getRandomPhone(static::$dm),
+            static::$phone,
             new \DateTime('2016-01-01'),
             true
         );
