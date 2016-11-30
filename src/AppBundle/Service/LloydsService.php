@@ -47,6 +47,17 @@ class LloydsService
                     $header = $row;
                 } else {
                     $line = array_combine($header, $row);
+                    // Exclude lines like this:
+                    // 10/10/2016,,'XX-XX-XX,XXXXXXXX,INTEREST (GROSS) ,,0.03,609.61
+                    // 11/10/2016,PAY,'XX-XX-XX,XXXXXXXX,OUR CHARGE FT176053329271 FP29348357778898 ,15.00,,445.51
+                    // 11/10/2016,TFR,'XX-XX-XX,XXXXXXXX,FORGN PYT293483577 ,164.10,,460.51
+                    if (in_array($line['Transaction Type'], ['TFR', 'PAY', ''])) {
+                        $this->logger->info(sprintf(
+                            'Skipping line as transfer/payment/interest. %s',
+                            implode($line)
+                        ));
+                        continue;
+                    }
 
                     $processedDates = explode('8008566', $line['Transaction Description']);
                     // Expected something like MDIR  8008566SEP21 8008566
@@ -58,6 +69,8 @@ class LloydsService
                         ));
                         continue;
                     }
+
+                    $this->logger->info(sprintf('Processing line. %s', implode($line)));
                     $processedDate = new \DateTime($processedDates[1]);
 
                     if (is_numeric($line['Credit Amount'])) {
