@@ -160,6 +160,7 @@ class ApiController extends BaseController
 
             // User has successfully logged in, so clear the rate limit
             $rateLimit->clearByUser($user);
+
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
             $response = $user->toApiArray($intercomHash, $identityId, $token);

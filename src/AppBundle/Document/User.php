@@ -152,6 +152,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $identityLog;
 
     /**
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
+     */
+    protected $latestMobileIdentityLog;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
+     */
+    protected $latestWebIdentityLog;
+
+    /**
      * @MongoDB\EmbedOne(targetDocument="PaymentMethod")
      * @Gedmo\Versioned
      */
@@ -676,6 +686,26 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setIdentityLog($identityLog)
     {
         $this->identityLog = $identityLog;
+    }
+
+    public function getLatestWebIdentityLog()
+    {
+        return $this->latestWebIdentityLog;
+    }
+
+    public function setLatestWebIdentityLog($identityLog)
+    {
+        $this->latestWebIdentityLog = $identityLog;
+    }
+
+    public function getLatestMobileIdentityLog()
+    {
+        return $this->latestMobileIdentityLog;
+    }
+
+    public function setLatestMobileIdentityLog($identityLog)
+    {
+        $this->latestMobileIdentityLog = $identityLog;
     }
 
     public function getPaymentMethod()
