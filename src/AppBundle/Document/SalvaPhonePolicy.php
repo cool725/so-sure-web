@@ -361,7 +361,6 @@ class SalvaPhonePolicy extends PhonePolicy
 
     private function getTotalGwpActual($version = null)
     {
-        // print sprintf('%f %f', $this->getPremium()->getYearlyGwpActual(), $this->getSalvaProrataMultiplier($version));
         $totalGwp = $this->toTwoDp(
             $this->getPremium()->getYearlyGwpActual() * $this->getSalvaProrataMultiplier($version)
         );
