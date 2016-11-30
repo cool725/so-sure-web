@@ -261,6 +261,26 @@ class JudopayService
         return $details;
     }
 
+    public function testRegisterDetails(User $user, $ref, $cardNumber, $expiryDate, $cv2)
+    {
+        $register = $this->apiClient->getModel('RegisterCard');
+        $data = array(
+            'judoId' => $this->judoId,
+            'yourConsumerReference' => $user->getId(),
+            'yourPaymentReference' => $ref,
+            'amount' => 1.01,
+            'currency' => 'GBP',
+            'cardNumber' => $cardNumber,
+            'expiryDate' => $expiryDate,
+            'cv2' => $cv2,
+        );
+
+        $register->setAttributeValues($data);
+        $details = $register->create();
+
+        return $details;
+    }
+
     public function getReceipt($receiptId)
     {
         $transaction = $this->apiClient->getModel('Transaction');
@@ -278,6 +298,40 @@ class JudopayService
         }
 
         return $transactionDetails;
+    }
+
+    /**
+     * @param User   $user
+     * @param string $receiptId
+     * @param string $consumerToken
+     * @param string $cardToken     Can be null if card is declined
+     * @param string $deviceDna     Optional device dna data (json encoded) for judoshield
+     */
+    public function updatePaymentMethod(
+        User $user,
+        $receiptId,
+        $consumerToken,
+        $cardToken,
+        $deviceDna = null
+    ) {
+        $transactionDetails = $this->getReceipt($receiptId);
+        if ($transactionDetails["result"] != JudoPayment::RESULT_SUCCESS) {
+            throw new PaymentDeclinedException();
+        }
+
+        $judo = $user->getPaymentMethod();
+        if (!$judo) {
+            $judo = new JudoPaymentMethod();
+            $user->setPaymentMethod($judo);
+        }
+        $judo->setCustomerToken($consumerToken);
+        if ($cardToken) {
+            $judo->addCardToken($cardToken, json_encode($transactionDetails['cardDetails']));
+        }
+        if ($deviceDna) {
+            $judo->setDeviceDna($deviceDna);
+        }
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
     }
 
     /**
