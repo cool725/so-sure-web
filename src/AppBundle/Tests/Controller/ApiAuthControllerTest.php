@@ -3137,6 +3137,156 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_INVALID_ADDRESS);
     }
 
+    // user/{id}/payment
+
+    /**
+     *
+     */
+    public function testUpdateUserPaymentJudopayOk()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdateUserPaymentJudopayOk', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $details = $judopay->testRegisterDetails(
+            $user,
+            rand(1, 999999),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+
+        $url = sprintf("/api/v1/auth/user/%s/payment", $user->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => $details['consumer']['consumerToken'],
+            'card_token' => $details['cardDetails']['cardToken'],
+            'receipt_id' => $details['receiptId'],
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $this->assertEquals('3436', $updatedUser->getPaymentMethod()->getCardLastFour());
+
+        $details = $judopay->testRegisterDetails(
+            $user,
+            rand(1, 999999),
+            '4921 8100 0000 5462',
+            '12/20',
+            '441'
+        );
+
+        $url = sprintf("/api/v1/auth/user/%s/payment", $user->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => $details['consumer']['consumerToken'],
+            'card_token' => $details['cardDetails']['cardToken'],
+            'receipt_id' => $details['receiptId'],
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $this->assertEquals('5462', $updatedUser->getPaymentMethod()->getCardLastFour());
+    }
+
+    public function testUpdateUserPaymentJudopayFail()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdateUserPaymentJudopayFail', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $details = $judopay->testRegisterDetails(
+            $user,
+            rand(1, 999999),
+            '4221 6900 0000 4963',
+            '12/20',
+            '125'
+        );
+
+        $url = sprintf("/api/v1/auth/user/%s/payment", $user->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => $details['consumer']['consumerToken'],
+            'card_token' => 'unknown',
+            'receipt_id' => $details['receiptId'],
+        ]]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
+    }
+
+    public function testUpdateUserPaymentJudopayNoData()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdateUserPaymentJudopayNoData', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf("/api/v1/auth/user/%s/payment", $user->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+        ]]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testUpdateUserPaymentJudopayDiffUser()
+    {
+        $userA = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdateUserPaymentJudopayDiffUser-A', $this),
+            'foo'
+        );
+        $userB = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdateUserPaymentJudopayDiffUser-B', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($userA);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $details = $judopay->testRegisterDetails(
+            $userA,
+            rand(1, 999999),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+
+        $url = sprintf("/api/v1/auth/user/%s/payment", $userB->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => $details['consumer']['consumerToken'],
+            'card_token' => $details['cardDetails']['cardToken'],
+            'receipt_id' => $details['receiptId'],
+        ]]);
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_ACCESS_DENIED);
+    }
+
+    public function testUpdateUserPaymentJudopayUnknownUser()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdateUserPaymentJudopayUnknownUser', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf("/api/v1/auth/user/%s/payment", 'foo');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => 'foo',
+            'card_token' => 'foo',
+            'receipt_id' => 'foo',
+        ]]);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
     // helpers
 
     /**

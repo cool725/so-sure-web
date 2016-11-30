@@ -713,7 +713,7 @@ class ApiAuthController extends BaseController
             $dm->flush();
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
-        } catch (AccessDeniedException $ade) {
+        } catch (AccessDeniedException $e) {
             $this->get('logger')->warning(sprintf(
                 'Access denied policy %s receipt %s.',
                 $id,
@@ -1280,6 +1280,78 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api addUserAddress.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/user/{id}/payment", name="api_auth_user_payment")
+     * @Method({"POST"})
+     */
+    public function paymentUserAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            $judoData = null;
+            if (isset($data['bank_account'])) {
+                // Not doing anymore, but too many tests currently expect gocardless, so allow for non-prod
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+            } elseif (isset($data['judo'])) {
+                if (!$this->validateFields($data['judo'], ['consumer_token', 'receipt_id'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+                $judoData = $data['judo'];
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($id);
+            if (!$user) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find user',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted('edit', $user);
+
+            if ($judoData) {
+                $judo = $this->get('app.judopay');
+                $judo->updatePaymentMethod(
+                    $user,
+                    $this->getDataString($judoData, 'receipt_id'),
+                    $this->getDataString($judoData, 'consumer_token'),
+                    $this->getDataString($judoData, 'card_token'),
+                    $this->getDataString($judoData, 'device_dna')
+                );
+            }
+
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+        } catch (PaymentDeclinedException $e) {
+            $this->get('logger')->info(sprintf(
+                'Payment declined policy %s receipt %s.',
+                $id,
+                $this->getDataString($judoData, 'receipt_id')
+            ), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
+        } catch (AccessDeniedException $e) {
+            $this->get('logger')->warning(sprintf(
+                'Access denied policy %s receipt %s.',
+                $id,
+                $this->getDataString($judoData, 'receipt_id')
+            ), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api payPolicy.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
