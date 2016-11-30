@@ -125,12 +125,15 @@ class JudopayService
             if ($receipt['type'] == 'Payment') {
                 $payment = $repo->findOneBy(['receipt' => $receipt['receiptId']]);
                 if (!$payment) {
-                    $this->logger->warning(sprintf(
-                        'Missing judo payment item for receipt %s on %s [%s]',
-                        $receipt['receiptId'],
-                        $receipt['createdAt'],
-                        json_encode($receipt)
-                    ));
+                    // Only need to be concerned about successful payments
+                    if ($receipt['result'] == JudoPayment::RESULT_SUCCESS) {
+                        $this->logger->warning(sprintf(
+                            'Missing judo payment item for receipt %s on %s [%s]',
+                            $receipt['receiptId'],
+                            $receipt['createdAt'],
+                            json_encode($receipt)
+                        ));
+                    }
                     $result['missing']++;
                 } else {
                     $result['validated']++;
