@@ -632,7 +632,7 @@ class JudopayService
         $payment = new JudoPayment();
         $payment->setAmount($amount);
         $payment->setUser($policy->getUser());
-        $payment->setSource(Payment::SOURCE_WEB_API);
+        $payment->setSource(Payment::SOURCE_WEB);
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
