@@ -142,21 +142,13 @@
 .circle {
   width: 110px;
   height: 110px;
-  line-height: 110px;
+  line-height: 115px;
   border-radius: 50%;
   font-size: 28px;
   color: #fff;
   text-align: center;
-  background: #3399FF;
-  padding-top: 5px;
-  background: rgba(51,153,255,1);
-  background: -moz-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-  background: -webkit-gradient(left bottom, right top, color-stop(50%, rgba(51,153,255,1)), color-stop(100%, rgba(0,204,255,1)));
-  background: -webkit-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-  background: -o-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-  background: -ms-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-  background: linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
+  background: #202532;
+  margin-top: 10px;
 }
 /* Frequently Asked Questions */
 
@@ -174,7 +166,7 @@
 
 .download-now {
     background-color: #FFF;
-    padding: 120px 20px 60px 20px;
+    padding: 60px 20px 60px 20px;
     text-align: center;
     color: #202532;
 }
