@@ -76,18 +76,46 @@ class SCode
         $this->generateRandomCode();
     }
 
-    public static function getNameForCode(User $user)
+    public static function getNameForCode(User $user, $type)
     {
-        $firstName = str_pad($user->getFirstName(), 1, "0");
-        $lastName = str_pad($user->getLastName(), 4, "0");
-        $name = sprintf("%s%s", substr($firstName, 0, 1), substr($lastName, 0, 3));
+        if (!$type) {
+            $type == self::TYPE_STANDARD;
+        }
 
-        return $name;
+        $prefix = self::getPrefix($type);
+
+        if ($type == self::TYPE_STANDARD) {
+            $length = 4;
+        } elseif ($type == self::TYPE_MULTIPAY) {
+            $length = 2;
+        } else {
+            throw new \Exception(sprintf('Unknown type %s', $type));
+        }
+
+        $firstName = str_pad($user->getFirstName(), 1, "0");
+        $lastName = str_pad($user->getLastName(), $length, "0");
+        $name = sprintf("%s%s%s", $prefix, substr($firstName, 0, 1), substr($lastName, 0, $length - 1));
+
+        return trim($name);
+    }
+
+    public static function getPrefix($type)
+    {
+        if ($type == self::TYPE_STANDARD) {
+            return null;
+        } elseif ($type == self::TYPE_MULTIPAY) {
+            return 'P-';
+        } else {
+            throw new \Exception(sprintf('Unknown type %s', $type));
+        }
     }
 
     public function generateNamedCode(User $user, $count)
     {
-        $code = sprintf("%s%04d", self::getNameForCode($user), $count);
+        // getName should be 4 to 6 chars
+        $name = self::getNameForCode($user, $this->getType());
+        $code = sprintf("%s%s", $name, str_pad($count, 8 - strlen($name), "0"));
+
         if (strlen($code) > 8) {
             $code = substr($code, 0, 8);
         }
@@ -116,8 +144,8 @@ class SCode
     public static function isValidSCode($scode)
     {
         // TODO: Consider adding additional scodes to users and gradually phase out old ones
-        // should be able one day to remove the lowercase a-z validation here
-        return preg_match("/^[a-zA-Z0-9\/+]{8,8}/", $scode) === 1;
+        // should be able one day to remove the uppercase a-z validation here
+        return preg_match("/^[-a-zA-Z0-9\/+]{8,8}/", $scode) === 1;
     }
 
     public function deactivate()

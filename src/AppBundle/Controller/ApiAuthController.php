@@ -777,10 +777,31 @@ class ApiAuthController extends BaseController
 
             $scode = new SCode();
             $scode->setType($this->getDataString($data, 'type'));
+
             $scodeRepo = $dm->getRepository(SCode::class);
-            if ($scodeRepo->findOneBy(['code' => $scode->getCode()])) {
-                // TODO: Change to while loop
-                throw new \Exception('duplicate code');
+            if ($scode->getType() == SCode::TYPE_STANDARD) {
+                $existingCount = $scodeRepo->getCountForName(
+                    SCode::getNameForCode($this->getUser(), $scode->getType())
+                );
+                $scode->generateNamedCode($this->getUser(), $existingCount + 1);
+                $count = 1;
+                while ($scodeRepo->findOneBy(['code' => $scode->getCode()]) !== null) {
+                    $scode->generateNamedCode($this->getUser(), $existingCount + 1 + $count);
+                    $count++;
+                    if ($count > 10) {
+                        throw new \Exception('Unable to generate unique scode');
+                    }
+                }
+            } elseif ($scode->getType() == SCode::TYPE_MULTIPAY) {
+                $scode->generateNamedCode($this->getUser(), rand(1, 9999));
+                $count = 0;
+                while ($scodeRepo->findOneBy(['code' => $scode->getCode()]) !== null) {
+                    $scode->generateNamedCode($this->getUser(), rand(1, 9999));
+                    $count++;
+                    if ($count > 10) {
+                        throw new \Exception('Unable to generate unique scode');
+                    }
+                }
             }
             $shortLink = $this->get('app.branch')->generateSCode($scode->getCode());
             // branch is preferred, but can fallback to old website version if branch is down
