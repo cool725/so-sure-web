@@ -14,6 +14,13 @@ use AppBundle\Validator\Constraints as AppAssert;
 class IdentityLog
 {
     /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $date;
+
+    /**
      * @AppAssert\Token()
      * @Assert\Length(min="0", max="100")
      * @MongoDB\Field(type="string")
@@ -44,6 +51,21 @@ class IdentityLog
 
     /** @MongoDB\Distance */
     public $distance;
+
+    public function __construct()
+    {
+        $this->setDate(new \DateTime());
+    }
+
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTime $date)
+    {
+        $this->date = $date;
+    }
 
     public function getCognitoId()
     {

@@ -79,6 +79,10 @@ class ApiUnauthController extends BaseController
                 $this->getDataString($data, 'cognito_id')
             );
 
+            // Record mobile access
+            $user->setLatestMobileIdentityLog($this->getIdentityLog($request));
+            $this->getManager()->flush();
+
             return new JsonResponse(['id' => $identityId, 'token' => $token]);
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
