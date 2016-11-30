@@ -72,15 +72,6 @@ class DigitsService
         $queryData = [];
         $querystring = parse_str(parse_url($provider, PHP_URL_QUERY), $queryData);
 
-        // @codingStandardsIgnoreStart
-        // Consider adding additional parameters to the signature to tie your app’s own session to the Digits session. Use the alternate form OAuthEchoHeadersToVerifyCredentialsWithParams: to provide additional parameters to include in the OAuth service URL. Verify these parameters are present in the service URL and that the API request succeeds.
-        // @codingStandardsIgnoreEnd
-        if ($cognitoId) {
-            if (!isset($queryData['identity_id']) || $cognitoId != $queryData['identity_id']) {
-                throw new \Exception(sprintf('Cognito Id %s does not match session url %s', $cognitoId, $provider));
-            }
-        }
-
         $client = new Client();
         $res = $client->request('GET', $provider, ['headers' => ['Authorization' => $credentials]]);
 
@@ -131,6 +122,23 @@ class DigitsService
                 $user->getId(),
                 $mobileNumber
             ));
+        }
+
+        // Moved to last to help with debugging - onced resolved, could be place earlier in process
+        // @codingStandardsIgnoreStart
+        // Consider adding additional parameters to the signature to tie your app’s own session to the Digits session. Use the alternate form OAuthEchoHeadersToVerifyCredentialsWithParams: to provide additional parameters to include in the OAuth service URL. Verify these parameters are present in the service URL and that the API request succeeds.
+        // @codingStandardsIgnoreEnd
+        if ($cognitoId) {
+            if (!isset($queryData['identity_id']) || $cognitoId != $queryData['identity_id']) {
+                // TODO: Once we figure out why this is occurring, change back to an exception
+                $this->logger->warning(sprintf(
+                    'Cognito Id %s does not match session url %s. UserId: %s Digits: %s',
+                    $cognitoId,
+                    $provider,
+                    $user ? $user->getId() : 'unknown',
+                    json_encode($data)
+                ));
+            }
         }
 
         return $user;
