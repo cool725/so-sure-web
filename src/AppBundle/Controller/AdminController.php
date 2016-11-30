@@ -199,7 +199,16 @@ class AdminController extends BaseController
         $phone = $repo->find($id);
         if ($phone) {
             $gwp = $request->get('gwp');
+            $now = new \DateTime();
             $from = new \DateTime($request->get('from'), new \DateTimeZone(SoSure::TIMEZONE));
+            if ($from < $now) {
+                $this->addFlash('error', sprintf(
+                    'New Price From Date must be in the future'
+                ));
+
+                return new RedirectResponse($this->generateUrl('admin_phones'));
+            }
+
             $to = null;
             if ($request->get('to')) {
                 $to = new \DateTime($request->get('to'), new \DateTimeZone(SoSure::TIMEZONE));
