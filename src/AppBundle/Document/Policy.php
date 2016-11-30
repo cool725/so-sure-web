@@ -1364,8 +1364,17 @@ abstract class Policy
             $date = new \DateTime();
         }
 
-        // Max month is 31 days + 30 days cancellation
-        return $this->getLastSuccessfulPaymentCredit()->getDate()->diff($date)->days > 61;
+        return $date >= $this->getPolicyExpirationDate();
+    }
+
+    /**
+     * Note that expiration date is for cancellations only and may be after policy end date
+     */
+    public function getPolicyExpirationDate()
+    {
+        $date = clone $this->getLastSuccessfulPaymentCredit()->getDate();
+
+        return $date->add(new \DateInterval('P61D'));
     }
 
     public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)

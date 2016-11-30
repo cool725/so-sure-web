@@ -63,6 +63,10 @@
             <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
                 {{ scheduledPayment.policy.policyNumber }}
             </a>
+            {% if scheduledPayment.policy.status == 'unpaid' %}
+                <i class="fa fa-warning"
+                   title="Policy is unpaid. Unless payment is made, policy will be automatically cancelled on {{ scheduledPayment.policy.getPolicyExpirationDate|date('d M Y H:i', 'Europe/London') }}"></i>
+            {% endif %}
         </td>
         <td>
             {% if scheduledPayment.type == 'scheduled' %}

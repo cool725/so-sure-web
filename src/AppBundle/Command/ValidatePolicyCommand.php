@@ -117,8 +117,14 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
                 if ($policy->isPolicyPaidToDate(true, $prefix, $validateDate) === false) {
                     $lines[] = sprintf(
-                        'Policy %s is not paid to date',
-                        $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId()
+                        'Policy %s is not paid to date. Next attempt on %s. If unpaid, policy will be cancelled on %s',
+                        $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
+                        $policy->getNextScheduledPayment() ?
+                            $policy->getNextScheduledPayment()->getScheduled()->format(\DateTime::ATOM) :
+                            'unknown',
+                        $policy->getPolicyExpirationDate() ?
+                            $policy->getPolicyExpirationDate()->format(\DateTime::ATOM) :
+                            'unknown'
                     );
                     $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
                 }
