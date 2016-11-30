@@ -89,7 +89,13 @@ class PolicyServiceTest extends WebTestCase
             null,
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-10-01'),
+            true
+        );
         static::$policyService->create($policy, new \DateTime('2016-10-01'));
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
@@ -128,7 +134,13 @@ class PolicyServiceTest extends WebTestCase
             null,
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-11-01'),
+            true
+        );
         static::$policyService->setDispatcher(null);
         static::$policyService->create($policy, new \DateTime('2016-11-01'));
 
@@ -147,7 +159,13 @@ class PolicyServiceTest extends WebTestCase
             null,
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-12-01'),
+            true
+        );
         static::$policyService->setDispatcher(null);
         static::$policyService->create($policy, new \DateTime('2016-12-01'));
 
@@ -231,7 +249,13 @@ class PolicyServiceTest extends WebTestCase
             null,
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
@@ -404,7 +428,13 @@ class PolicyServiceTest extends WebTestCase
             'bar',
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            static::$phone,
+            new \DateTime('2016-01-01'),
+            true
+        );
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
@@ -438,7 +468,13 @@ class PolicyServiceTest extends WebTestCase
             'bar',
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-10-01'),
+            true
+        );
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy, new \DateTime('2016-10-01'));
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
@@ -458,7 +494,13 @@ class PolicyServiceTest extends WebTestCase
             'bar',
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-10-01'),
+            true
+        );
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy, new \DateTime('2016-10-01'));
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
@@ -479,7 +521,13 @@ class PolicyServiceTest extends WebTestCase
             'bar',
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-10-01'),
+            true
+        );
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy, new \DateTime('2016-10-01'));
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
@@ -528,7 +576,13 @@ class PolicyServiceTest extends WebTestCase
             'bar',
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
@@ -554,6 +608,43 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee());
     }
 
+    public function testSalvaFullPolicyGwpDiff()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSalvaFullPolicyGwpDiff', $this),
+            'bar',
+            static::$dm
+        );
+        $phoneRepo = static::$dm->getRepository(Phone::class);
+        $phone = $phoneRepo->findOneBy(['devices' => 'D6502']);
+        $policy = static::initPolicy($user, static::$dm, $phone, new \DateTime('2016-01-01'), true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'));
+        static::$policyService->setEnvironment('test');
+
+        for ($i = 1; $i <= 10; $i++) {
+            static::addPayment(
+                $policy,
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION
+            );
+        }
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::FINAL_MONTHLY_TOTAL_COMMISSION
+        );
+        static::$dm->flush();
+
+        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getTotalPremiumPrice());
+        $this->assertEquals($policy->getPremium()->getYearlyGwp(), $policy->getTotalGwp());
+        $this->assertEquals($policy->getPremium()->getYearlyGwp(), $policy->getUsedGwp());
+        $this->assertEquals($policy->getPremium()->getYearlyIpt(), $policy->getTotalIpt());
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $policy->getTotalBrokerFee());
+    }
+
     public function testSalvaPartialPolicy()
     {
         $user = static::createUser(
@@ -562,7 +653,13 @@ class PolicyServiceTest extends WebTestCase
             'bar',
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
@@ -591,7 +688,13 @@ class PolicyServiceTest extends WebTestCase
             'bar',
             static::$dm
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         $dupSCode = new SCode();
         $dupSCode->setCode($scode->getCode());
