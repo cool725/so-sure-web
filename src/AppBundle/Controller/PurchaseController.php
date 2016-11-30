@@ -146,7 +146,6 @@ class PurchaseController extends BaseController
                             $user->getId()
                         ));
                     }
-
                     if ($policy) {
                         // If any policy data has changed, delete/re-create
                         if ($policy->getImei() != $purchase->getImei() ||

@@ -536,7 +536,10 @@ class ReceperioService extends BaseImeiService
             return $this->validateSamePhone($phone, $serialNumber, $data);
         } catch (\Exception $e) {
             // TODO: automate a future retry check
-            $this->logger->error(sprintf("Unable to check serial number %s Ex: %s", $serialNumber, $e->getMessage()));
+            $this->logger->error(
+                sprintf("Unable to check serial number '%s'", $serialNumber),
+                ['exception' => $e]
+            );
 
             // If there are any issues, assume true and manually process queue later
             $this->queueMessage(
