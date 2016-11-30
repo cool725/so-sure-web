@@ -133,24 +133,30 @@ trait UserClassTrait
             if (!$policy->getPhone()) {
                 throw new \Exception('Missing phone for adding payment');
             }
-            $payment = new JudoPayment();
+            $newDate = null;
             if ($date) {
                 $newDate = clone $date;
                 $newDate->add(new \DateInterval('PT1S'));
-                $payment->setDate($newDate);
             }
             if ($monthly) {
                 $policy->setPremiumInstallments(12);
-                $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-                $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+                self::addPayment(
+                    $policy,
+                    $policy->getPremium($date)->getMonthlyPremiumPrice(),
+                    Salva::MONTHLY_TOTAL_COMMISSION,
+                    null,
+                    $newDate
+                );
             } else {
                 $policy->setPremiumInstallments(1);
-                $payment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
-                $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+                self::addPayment(
+                    $policy,
+                    $policy->getPremium($date)->getYearlyPremiumPrice(),
+                    Salva::YEARLY_TOTAL_COMMISSION,
+                    null,
+                    $newDate
+                );
             }
-            $payment->setResult(JudoPayment::RESULT_SUCCESS);
-            $payment->setReceipt(rand(1, 999999));
-            $policy->addPayment($payment);
         }
 
         if ($createPolicy) {
@@ -196,7 +202,7 @@ trait UserClassTrait
         );
     }
 
-    public static function addPayment($policy, $amount, $commission, $receiptId = null)
+    public static function addPayment($policy, $amount, $commission, $receiptId = null, $date = null)
     {
         if (!$receiptId) {
             $receiptId = rand(1, 999999);
@@ -206,6 +212,9 @@ trait UserClassTrait
         $payment->setTotalCommission($commission);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setReceipt($receiptId);
+        if ($date) {
+            $payment->setDate($date);
+        }
         $policy->addPayment($payment);
     }
 
