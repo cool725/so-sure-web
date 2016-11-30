@@ -75,7 +75,7 @@
                                                 Connect with
                                             </p>
                                             <h3 class="text-left">
-                                                <span id="num_friends" style="color: #3399FF">{{ start_friends }}
+                                                <span id="num_friends">{{ start_friends }}
                                                     friends</span>
                                             </h3>
                                         </div>
@@ -107,7 +107,7 @@
                                             </p>
                                         </div>
                                         <div class="col-md-6 col-centered">
-                                            <div id="money_back" class="circle">£{{ start_value }}</div>
+                                            <h3 id="money_back" class="circle">£{{ start_value }}</h3>
                                         </div>
                                     </div>
                                 </span>
@@ -139,10 +139,10 @@
 
     <section class="download-now" id="download-now">
         <div class="container" id="buyModal">
-            <h2>Ready to pay?</h2>
+            <h2>Ready for better?</h2>
             <p class="lead">You can either purchase your insurance online</p>
             <div class="row">
-                <div class="form-group col-sm-12">
+                <div class="form-group col-md-12" style="padding-top: 10px;">
                   <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">Get started</a>
                 </div>
             </div>

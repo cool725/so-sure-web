@@ -1,12 +1,5 @@
 #connection-slider .slider-selection {
-	background: rgba(51,153,255,1);
-	background: -moz-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-	background: -webkit-gradient(left bottom, right top, color-stop(50%, rgba(51,153,255,1)), color-stop(100%, rgba(0,204,255,1)));
-	background: -webkit-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-	background: -o-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-	background: -ms-linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-	background: linear-gradient(45deg, rgba(51,153,255,1) 50%, rgba(0,204,255,1) 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1 );
+	background: #202532;
 }
 #connection-slider {
 	width: 60% !important;
@@ -18,7 +11,7 @@
 	}
 }
 #connection-slider .slider-handle {
-	background: #3399FF;
+	background: #202532;
 }
 #connectionLegend {
 	padding-bottom: 20px;
