@@ -68,6 +68,17 @@ class Purchase
     protected $serialNumber;
 
     /**
+     * @Assert\Range(
+     *      min = 1,
+     *      max = 200,
+     *      minMessage = "You must select monthly or annual policy payments",
+     *      maxMessage = "You must select monthly or annual policy payments"
+     * )
+     * @Assert\NotNull()
+     */
+    protected $amount;
+
+    /**
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="250")
@@ -191,6 +202,20 @@ class Purchase
     public function setSerialNumber($serialNumber)
     {
         $this->serialNumber = $serialNumber;
+    }
+
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    public function setAmount($amount)
+    {
+        $price = $this->getPhone()->getCurrentPhonePrice();
+        if (!in_array($amount, [$price->getMonthlyPremiumPrice(), $price->getYearlyPremiumPrice()])) {
+            throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
+        }
+        $this->amount = $amount;
     }
 
     public function setAddressLine1($line1)
