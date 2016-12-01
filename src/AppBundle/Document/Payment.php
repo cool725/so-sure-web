@@ -196,9 +196,6 @@ abstract class Payment
 
     public function setSource($source)
     {
-        if (!in_array($source, ["mobile", "web", "web-api", "token"])) {
-            throw new \Exception(sprintf('Unknown source %s', $source));
-        }
         $this->source = $source;
     }
 
