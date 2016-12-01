@@ -6,11 +6,19 @@
                 <div class="device-select">
                     {{ form_start(form_phone) }}
                     <div class="input-group">
-                        {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }}
-                        {{ form_widget(form_phone.phoneId, { 'attr': {'class': 'select-phone-dropdown select-phones'}}) }}
-                        <span class="input-group-btn text-center">
-                            {{ form_widget(form_phone.next, {'label': 'Quote me', 'attr': {'class': 'btn btn-primary'}}) }}
-                        </span>
+                      <ul>
+                        <li>
+                          {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }}
+                        </li>
+                        <li>
+                          {{ form_widget(form_phone.phoneId, { 'attr': {'class': 'select-phone-dropdown select-phones'}}) }}
+                        </li>
+                        <li>
+                          <span class="input-group-btn text-center">
+                              {{ form_widget(form_phone.next, {'label': 'Quote me', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
+                          </span>
+                        </li>
+                      </ul>
                     </div>
                     {{ form_end(form_phone) }}
                 </div>

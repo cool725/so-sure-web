@@ -36,7 +36,7 @@ class PhoneMakeType extends AbstractType
         }
         $builder
             ->add('make', ChoiceType::class, [
-                    'placeholder' => 'Select your make',
+                    'placeholder' => 'Select phone make',
                     'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes()
             ])
             ->add('phoneId', ChoiceType::class, [

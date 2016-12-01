@@ -14,6 +14,9 @@
     border: 2px solid #efefef;
     color: #202532;
     box-shadow: none;
+    width: 390px;
+    margin-bottom: 10px;
+    margin-right: 10px;
 }
 
 #select-phone {
@@ -24,19 +27,23 @@
     border-radius: 5px;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 992px) {
     #select-phone {
         padding-top: 5px;
         padding-bottom: 5px;
     }
-    #select-phone .device-select, .device-select .input-group {
+    .select-phone-dropdown {
         display: inline-block !important;
         margin-top: 5px !important;
         width: 100% !important;
+        margin-right: 0px;
     }
     .form-control {
         border-width: 0px;
         height: 45px;
+    }
+    #select-phone .input-group-btn {
+      top: 0px !important;
     }
 }
 
@@ -46,7 +53,6 @@
     vertical-align: middle;
     font-size: 16px;
     line-height: 1.5;
-    width: 75%;
 }
 
 .form-control {
@@ -65,19 +71,23 @@
 }
 
 #select-phone button.btn {
-    padding: 10px 30px;
+    padding: 12px 30px;
     border-radius: 30px;
     -moz-border-radius: 30px;
     -webkit-border-radius: 30px;
-    margin-left: 10px;
 }
 
-@media (max-width: 767px) {
-    #select-phone button.btn {
-        margin-top: 10px;
-        margin-bottom: 10px;
-        width: 100%;
-        margin-left: 0px;
-    }
+#select-phone .device-select ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
+#select-phone .device-select li {
+  display: inline;
+}
+
+#select-phone .input-group-btn {
+  width: 0% !important;
+  top: 16px;
+}
