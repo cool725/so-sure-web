@@ -5,10 +5,12 @@ namespace AppBundle\Listener;
 use AppBundle\Service\JudopayService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
+use AppBundle\Classes\Salva;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\SoSurePayment;
+use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
 
 class RefundListener
@@ -104,14 +106,7 @@ class RefundListener
         }
 
         $refundAmount = $policy->getPremium()->getMonthlyPremiumPrice();
-        $refundCommissionAmount = null;
-        if ($policy->getPremiumPlan() == Policy::PLAN_MONTHLY) {
-            $refundCommissionAmount = $payment->getTotalCommission();
-        } elseif ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
-            $oneMonth = clone $policy->getStart();
-            $oneMonth = $oneMonth->add(new \DateInterval('P1M'));
-            $refundCommissionAmount = $policy->getProratedRefundCommissionAmount($oneMonth);
-        }
+        $refundCommissionAmount = Salva::MONTHLY_TOTAL_COMMISSION;
 
         if ($refundAmount > $payment->getAmount()) {
             $this->logger->error(sprintf(
@@ -123,8 +118,16 @@ class RefundListener
 
             return;
         }
-        $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, 'free nov promo refund');
-        $sosurePayment = SoSurePayment::duplicate($payment);
+        $this->judopayService->refund(
+            $payment,
+            $refundAmount,
+            $refundCommissionAmount,
+            sprintf('promo %s refund', $policy->getPromoCode()),
+            Payment::SOURCE_SOSURE
+        );
+        $sosurePayment = SoSurePayment::init();
+        $sosurePayment->setAmount($refundAmount);
+        $sosurePayment->setTotalCommission($refundCommissionAmount);
         $sosurePayment->setNotes(sprintf('promo %s paid by so-sure', $policy->getPromoCode()));
         $policy->addPayment($sosurePayment);
         $this->dm->flush();
