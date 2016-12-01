@@ -905,6 +905,7 @@ class ApiAuthController extends BaseController
                 $multiPay->setPolicy($multiPayPolicy);
                 $scodePolicy->getUser()->addMultiPay($multiPay);
                 $multiPayPolicy->setStatus(Policy::STATUS_MULTIPAY_REQUESTED);
+                $dm->flush();
 
                 try {
                     $push = $this->get('app.push');
@@ -914,7 +915,7 @@ class ApiAuthController extends BaseController
                         $multiPay->getPayee()->getName(),
                         $multiPayPolicy->getPremium()->getMonthlyPremiumPrice(),
                         $multiPayPolicy->getPremium()->getYearlyPremiumPrice()
-                    ));
+                    ), null, ['multipay' => ['id' => $multiPay->getId()]]);
                     // @codingStandardsIgnoreEnd
                 } catch (\Exception $e) {
                     $this->get('logger')->error(sprintf("Error in multipay push."), ['exception' => $e]);
