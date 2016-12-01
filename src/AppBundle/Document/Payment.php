@@ -158,6 +158,15 @@ abstract class Payment
         return $this->id;
     }
 
+    public function setId($id)
+    {
+        if ($this->id) {
+            throw new \Exception('Can not reasssign id');
+        }
+
+        $this->id = $id;
+    }
+
     public function getDate()
     {
         return $this->date;

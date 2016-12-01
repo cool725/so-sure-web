@@ -71,6 +71,7 @@ services:
             statsd:               "@statsd"
             webToken:             "%judopay_webtoken%"
             webSecret:            "%judopay_websecret%"
+            dispatcher:           "@event_dispatcher"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
@@ -469,6 +470,8 @@ services:
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
+            -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
+            -  { name: kernel.event_listener, event: event.payment.failed, method: onPaymentFailedEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener

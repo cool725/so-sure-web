@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Payment;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -26,6 +27,8 @@ class IntercomService
     const QUEUE_EVENT_POLICY_CREATED = 'policy-created';
     const QUEUE_EVENT_POLICY_CANCELLED = 'policy-cancelled';
 
+    const QUEUE_EVENT_PAYMENT_SUCCESS = 'payment-succeed';
+    const QUEUE_EVENT_PAYMENT_FAILED = 'payment-failed';
     /*
     const QUEUE_EVENT_INVITATION_ACCEPTED = 'invitation-accepted';
     const QUEUE_EVENT_INVITATION_CANCELLED = 'invitation-cancelled';
@@ -268,28 +271,22 @@ class IntercomService
 
     public function sendPolicyEvent(Policy $policy, $event)
     {
-        $now = new \DateTime();
-        $data = [
-            'event_name' => $event,
-            'created_at' => $now->getTimestamp(),
-            'id' => $policy->getUser()->getIntercomId(),
-            'user_id' => $policy->getUser()->getId(),
-        ];
+        $data = [];
         if ($event == self::QUEUE_EVENT_POLICY_CANCELLED) {
             $data['metadata']['Cancelled Reason'] = $policy->getCancelledReason();
         }
-        $resp = $this->client->events->create($data);
-        $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
+        $user = $policy->getUser();
+        $this->sendEvent($user, $event, $data);
+    }
+
+    public function sendPaymentEvent(Payment $payment, $event)
+    {
+        $user = $payment->getPolicy()->getUser();
+        $this->sendEvent($user, $event, []);
     }
 
     public function sendInvitationEvent(Invitation $invitation, $event)
     {
-        $now = new \DateTime();
-        $data = [
-            'event_name' => $event,
-            'created_at' => $now->getTimestamp(),
-        ];
-
         // QUEUE_EVENT_INVITATION_PENDING
         $useInviter = false;
         /*
@@ -305,18 +302,32 @@ class IntercomService
         }
         */
 
+        $user = null;
+        $data = [];
         if ($useInviter && !$this->isDeleted($invitation->getInviter())) {
-            $data['id'] = $invitation->getInviter()->getIntercomId();
-            $data['user_id'] = $invitation->getInviter()->getId();
+            $user = $invitation->getInviter();
             $data['metadata']['Invitee Name'] = $invitation->getInvitee()->getName();
         } elseif (!$useInviter && !$this->isDeleted($invitation->getInvitee())) {
-            $data['id'] = $invitation->getInvitee()->getIntercomId();
-            $data['user_id'] = $invitation->getInvitee()->getId();
+            $user = $invitation->getInvitee();
             $data['metadata']['Inviter Name'] = $invitation->getInviter()->getName();
         } else {
             $this->logger->debug(sprintf('Skipping Intercom create event (%s) as user deleted', $event));
             return;
         }
+
+        $this->sendEvent($user, $event, $data);
+    }
+
+    private function sendEvent(User $user, $event, $data, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $data['event_name'] = $event;
+        $data['created_at'] = $date->getTimestamp();
+        $data['id'] = $user->getIntercomId();
+        $data['user_id'] = $user->getId();
 
         $resp = $this->client->events->create($data);
         $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
@@ -355,6 +366,13 @@ class IntercomService
                     }
 
                     $this->sendPolicyEvent($this->getPolicy($data['policyId']), $action);
+                } elseif ($action == self::QUEUE_EVENT_PAYMENT_SUCCESS ||
+                          $action == self::QUEUE_EVENT_PAYMENT_FAILED) {
+                    if (!isset($data['paymentId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->sendPaymentEvent($this->getPayment($data['paymentId']), $action);
                 } elseif ($action == self::QUEUE_EVENT_INVITATION_PENDING) {
                     /*
                           $action == self::QUEUE_EVENT_INVITATION_ACCEPTED ||
@@ -425,6 +443,20 @@ class IntercomService
         return $policy;
     }
 
+    private function getPayment($id)
+    {
+        if (!$id) {
+            throw new \InvalidArgumentException('Missing paymentId');
+        }
+        $repo = $this->dm->getRepository(Payment::class);
+        $payment = $repo->find($id);
+        if (!$payment) {
+            throw new \InvalidArgumentException(sprintf('Unable to find paymentId: %s', $id));
+        }
+
+        return $payment;
+    }
+
     private function getInvitation($id)
     {
         if (!$id) {
@@ -454,6 +486,16 @@ class IntercomService
         $data = [
             'action' => $event,
             'policyId' => $policy->getId(),
+            'retryAttempts' => $retryAttempts
+        ];
+        $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
+    }
+
+    public function queuePayment(Payment $payment, $event, $retryAttempts = 0)
+    {
+        $data = [
+            'action' => $event,
+            'paymentId' => $payment->getId(),
             'retryAttempts' => $retryAttempts
         ];
         $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));

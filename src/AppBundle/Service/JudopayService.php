@@ -20,6 +20,8 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\CurrencyTrait;
 
+use AppBundle\Event\PaymentEvent;
+
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\PaymentDeclinedException;
 
@@ -53,6 +55,13 @@ class JudopayService
     /** @var string */
     protected $environment;
 
+    protected $dispatcher;
+
+    public function setDispatcher($dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -65,6 +74,7 @@ class JudopayService
      * @param                 $statsd
      * @param string          $webToken
      * @param string          $webSecret
+     * @param                  $dispatcher
      */
     public function __construct(
         DocumentManager $dm,
@@ -77,13 +87,15 @@ class JudopayService
         $environment,
         $statsd,
         $webToken,
-        $webSecret
+        $webSecret,
+        $dispatcher
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->policyService = $policyService;
         $this->judoId = $judoId;
         $this->mailer = $mailer;
+        $this->dispatcher = $dispatcher;
         $apiData = array(
            'apiToken' => $apiToken,
            'apiSecret' => $apiSecret,
@@ -670,6 +682,15 @@ class JudopayService
         $this->validatePaymentAmount($payment);
 
         $this->setCommission($policy, $payment);
+
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            if ($payment->isSuccess()) {
+                $this->dispatcher->dispatch(PaymentEvent::EVENT_SUCCESS, new PaymentEvent($payment));
+            } else {
+                $this->dispatcher->dispatch(PaymentEvent::EVENT_FAILED, new PaymentEvent($payment));
+            }
+        }
 
         return $payment;
     }

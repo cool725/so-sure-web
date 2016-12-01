@@ -14,8 +14,10 @@ use AppBundle\Listener\IntercomListener;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\InvitationEvent;
+use AppBundle\Event\PaymentEvent;
 
 use AppBundle\Document\User;
+use AppBundle\Document\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Invitation\EmailInvitation;
 
@@ -224,5 +226,59 @@ class IntercomListenerTest extends WebTestCase
                 }
             }
         }
+    }
+
+    public function testIntercomQueuePaymentSuccess()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomQueuePaymentSuccess', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+
+        $payment = new JudoPayment();
+        $payment->setId(1);
+        $payment->setAmount(2);
+        $payment->setPolicy($policy);
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onPaymentSuccessEvent(new PaymentEvent($payment));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals(1, $data['paymentId']);
+    }
+
+    public function testIntercomQueuePaymentFailed()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomQueuePaymentFailed', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+
+        $payment = new JudoPayment();
+        $payment->setId(2);
+        $payment->setAmount(2);
+        $payment->setPolicy($policy);
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onPaymentFailedEvent(new PaymentEvent($payment));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals(2, $data['paymentId']);
     }
 }
