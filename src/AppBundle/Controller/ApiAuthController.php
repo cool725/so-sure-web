@@ -366,10 +366,18 @@ class ApiAuthController extends BaseController
             }
 
             try {
-                $jwtValidator->validate(
+                // Device/memory/serial/rooted were not present in initial version of app.
+                // TODO: Add app version to request and if app version > number, then require instead of optional
+                $claims = $jwtValidator->validate(
                     $this->getCognitoIdentityId($request),
                     $this->getDataString($phonePolicyData, 'validation_data'),
-                    ['imei' => $this->getDataString($phonePolicyData, 'imei')]
+                    ['imei' => $this->getDataString($phonePolicyData, 'imei')],
+                    [
+                        'device' => $this->getDataString($phonePolicyData, 'device'),
+                        'memory' => $this->getDataString($phonePolicyData, 'memory'),
+                        'serial_number' => $this->getDataString($phonePolicyData, 'serial_number'),
+                        'rooted' => $this->getDataString($phonePolicyData, 'rooted'),
+                    ]
                 );
             } catch (\InvalidArgumentException $argE) {
                 return $this->getErrorJsonResponse(

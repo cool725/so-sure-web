@@ -44,7 +44,7 @@ class JWTService
         return sha1($secret);
     }
 
-    public function validate($cognitoId, $jwt, $additionalValidations = null)
+    public function validate($cognitoId, $jwt, $additionalValidations = null, $optionalValidations = null)
     {
         $token = (new Parser())->parse((string) $jwt);
         if (!$token->verify($this->signer, $this->secret)) {
@@ -66,6 +66,21 @@ class JWTService
         if ($additionalValidations) {
             foreach ($additionalValidations as $key => $value) {
                 if ($token->getClaim($key) != $value) {
+                    $this->logger->error(sprintf(
+                        'Failed to validate data %s => %s %s',
+                        $key,
+                        $value,
+                        json_encode($token->getClaims())
+                    ));
+
+                    throw new \InvalidArgumentException(sprintf("JWT Token %s does not match", $key));
+                }
+            }
+        }
+
+        if ($optionalValidations) {
+            foreach ($token->getClaims() as $key => $value) {
+                if (isset($optionalValidations[$key]) && $value != $optionalValidations[$key]) {
                     $this->logger->error(sprintf(
                         'Failed to validate data %s => %s %s',
                         $key,
