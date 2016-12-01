@@ -1108,7 +1108,7 @@ abstract class Policy
         if ($risk == self::RISK_LEVEL_LOW) {
             return 'green';
         } elseif ($risk == self::RISK_LEVEL_MEDIUM) {
-            return 'yellow';
+            return '#ff9500';
         } elseif ($risk == self::RISK_LEVEL_HIGH) {
             return 'red';
         }
