@@ -17,6 +17,16 @@ class SoSurePayment extends Payment
         $sosurePayment->setSuccess(true);
         $sosurePayment->setAmount($payment->getAmount());
         $sosurePayment->setTotalCommission($payment->getTotalCommission());
+        $sosurePayment->setSource(Payment::SOURCE_SOSURE);
+
+        return $sosurePayment;
+    }
+
+    public static function init()
+    {
+        $sosurePayment = new SoSurePayment();
+        $sosurePayment->setSuccess(true);
+        $sosurePayment->setSource(Payment::SOURCE_SOSURE);
 
         return $sosurePayment;
     }

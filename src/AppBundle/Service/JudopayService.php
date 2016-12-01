@@ -750,10 +750,11 @@ class JudopayService
      * @param float       $amount         Amount to refund (or null for entire initial amount)
      * @param float       $totalCommision Total commission amount to refund (or null for entire amount from payment)
      * @param string      $notes
+     * @param string      $source
      *
      * @return JudoPayment
      */
-    public function refund(JudoPayment $payment, $amount = null, $totalCommision = null, $notes = null)
+    public function refund(JudoPayment $payment, $amount = null, $totalCommision = null, $notes = null, $source = null)
     {
         if (!$amount) {
             $amount = $payment->getAmount();
@@ -766,6 +767,7 @@ class JudopayService
         $refund = new JudoPayment();
         $refund->setAmount(0 - $amount);
         $refund->setNotes($notes);
+        $refund->setSource($source);
         $payment->getPolicy()->addPayment($refund);
         $this->dm->persist($refund);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));

@@ -27,6 +27,7 @@ abstract class Payment
     const SOURCE_MOBILE = 'mobile';
     const SOURCE_APPLE_PAY = 'apple-pay';
     const SOURCE_ANDROID_PAY = 'android-pay';
+    const SOURCE_SOSURE = 'sosure';
 
     /**
      * @MongoDB\Id
@@ -134,7 +135,7 @@ abstract class Payment
     protected $notes;
 
     /**
-     * @Assert\Choice({"mobile", "web", "web-api", "token", "apple-pay", "android-pay"})
+     * @Assert\Choice({"mobile", "web", "web-api", "token", "apple-pay", "android-pay", "sosure"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
