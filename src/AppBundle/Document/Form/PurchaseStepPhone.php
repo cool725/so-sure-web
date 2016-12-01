@@ -21,6 +21,11 @@ class PurchaseStepPhone
 
     /**
      * @var string
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="5", max="32",
+     *  minMessage="This doesn't appear to be a valid serial number",
+     *  maxMessage="This doesn't appear to be a valid serial number")
+     * @Assert\NotNull()
      */
     protected $serialNumber;
 
@@ -42,6 +47,9 @@ class PurchaseStepPhone
     public function setImei($imei)
     {
         $this->imei = $imei;
+        if ($this->getPhone()->getMake() != "Apple") {
+            $this->setSerialNumber($imei);
+        }
     }
 
     public function getSerialNumber()
