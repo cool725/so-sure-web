@@ -2,6 +2,11 @@ $(function(){
     var maxAddresses = 60;
     var key = $('#ss-root').data('pca-key');
 
+    $('.form-control').on('keyup', function() {
+        $(this).parent().removeClass('has-error');
+        $(this).parent().find('.with-errors').hide();
+    });
+
     var showAddress = function(err) {
         $('.address-search').hide();
         $('.typeahead').removeAttr('required');
