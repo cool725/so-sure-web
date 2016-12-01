@@ -259,7 +259,7 @@ class JudopayService
             'judoId' => $this->judoId,
             'yourConsumerReference' => $user->getId(),
             'yourPaymentReference' => $ref,
-            'amount' => $amount,
+            'amount' => $this->toTwoDp($amount),
             'currency' => 'GBP',
             'cardNumber' => $cardNumber,
             'expiryDate' => $expiryDate,
@@ -622,7 +622,7 @@ class JudopayService
                 'yourPaymentMetaData' => [
                     'policy_id' => $policyId,
                 ],
-                'amount' => $amount,
+                'amount' => $this->toTwoDp($amount),
                 'currency' => 'GBP',
                 'cardToken' => $paymentMethod->getCardToken(),
                 'emailAddress' => $user->getEmail(),
@@ -726,7 +726,7 @@ class JudopayService
                 'yourPaymentMetaData' => [
                     'policy_id' => $policy->getId(),
                 ],
-                'amount' => $amount,
+                'amount' => $this->toTwoDp($amount),
                 'currency' => 'GBP',
                 'clientIpAddress' => $ipAddress,
                 'clientUserAgent' => $userAgent,
@@ -777,7 +777,7 @@ class JudopayService
                 'judoId' => $this->judoId,
                 'receiptId' => $payment->getReceipt(),
                 'yourPaymentReference' => $refund->getId(),
-                'amount' => abs($refund->getAmount()),
+                'amount' => $this->toTwoDp(abs($refund->getAmount())),
         );
 
         // populate the required data fields.
