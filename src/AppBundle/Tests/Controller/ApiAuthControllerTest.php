@@ -714,6 +714,146 @@ class ApiAuthControllerTest extends BaseControllerTest
         $redis->del('ERROR_NOT_YET_REGULATED');
     }
 
+    public function testNewPolicyInvalidValidation()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyInvalidValidation', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => 'not-an-imei']),
+        ]]);
+
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION);
+    }
+
+    public function testNewPolicyInvalidValidationDevice()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyInvalidValidationDevice', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei, 'device' => 'foo']),
+        ]]);
+
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION);
+    }
+
+    public function testNewPolicyInvalidValidationMemory()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyInvalidValidationMemory', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData(
+                $cognitoIdentityId,
+                ['imei' => $imei, 'device' => 'A0001', 'memory' => 1]
+            ),
+        ]]);
+
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION);
+    }
+
+    public function testNewPolicyInvalidValidationRooted()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyInvalidValidationRooted', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData(
+                $cognitoIdentityId,
+                ['imei' => $imei, 'device' => 'A0001', 'memory' => 64, 'rooted' => true]
+            ),
+        ]]);
+
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION);
+    }
+
+    public function testNewPolicyInvalidValidationSerial()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyInvalidValidationSerial', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'serial_number' => 'foo',
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData(
+                $cognitoIdentityId,
+                ['imei' => $imei, 'device' => 'A0001', 'memory' => 64, 'rooted' => false, 'serial_number' => 'bar']
+            ),
+        ]]);
+
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION);
+    }
+
     public function testNewPolicyDisabledUser()
     {
         $this->clearRateLimit();
