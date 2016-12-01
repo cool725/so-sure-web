@@ -48,8 +48,6 @@ class DeviceAtlasService
      */
     public function getPhone(Request $request)
     {
-        return null;
-
         $userAgent = $request->headers->get('User-Agent');
         try {
             $result = DeviceAtlasCloudClient::getDeviceData($userAgent);
@@ -79,8 +77,6 @@ class DeviceAtlasService
      */
     public function isMobile(Request $request)
     {
-        return null;
-
         $userAgent = $request->headers->get('User-Agent');
         try {
             $result = DeviceAtlasCloudClient::getDeviceData($userAgent);
