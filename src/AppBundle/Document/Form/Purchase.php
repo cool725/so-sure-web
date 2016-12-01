@@ -4,11 +4,14 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\Address;
+use AppBundle\Document\CurrencyTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 class Purchase
 {
+    use CurrencyTrait;
+
     /** @var Phone */
     protected $phone;
     
@@ -212,7 +215,8 @@ class Purchase
     public function setAmount($amount)
     {
         $price = $this->getPhone()->getCurrentPhonePrice();
-        if (!in_array($amount, [$price->getMonthlyPremiumPrice(), $price->getYearlyPremiumPrice()])) {
+        if (!$this->areEqualToTwoDp($amount, $price->getMonthlyPremiumPrice()) &&
+            !$this->areEqualToTwoDp($amount, $price->getYearlyPremiumPrice())) {
             throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
         }
         $this->amount = $amount;
