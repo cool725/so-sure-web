@@ -4,11 +4,14 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\Address;
+use AppBundle\Document\CurrencyTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 class Purchase
 {
+    use CurrencyTrait;
+
     /** @var Phone */
     protected $phone;
     
@@ -66,6 +69,17 @@ class Purchase
      * @Assert\NotNull()
      */
     protected $serialNumber;
+
+    /**
+     * @Assert\Range(
+     *      min = 1,
+     *      max = 200,
+     *      minMessage = "You must select monthly or annual policy payments",
+     *      maxMessage = "You must select monthly or annual policy payments"
+     * )
+     * @Assert\NotNull()
+     */
+    protected $amount;
 
     /**
      * @var string
@@ -191,6 +205,21 @@ class Purchase
     public function setSerialNumber($serialNumber)
     {
         $this->serialNumber = $serialNumber;
+    }
+
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    public function setAmount($amount)
+    {
+        $price = $this->getPhone()->getCurrentPhonePrice();
+        if (!$this->areEqualToTwoDp($amount, $price->getMonthlyPremiumPrice()) &&
+            !$this->areEqualToTwoDp($amount, $price->getYearlyPremiumPrice())) {
+            throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
+        }
+        $this->amount = $amount;
     }
 
     public function setAddressLine1($line1)

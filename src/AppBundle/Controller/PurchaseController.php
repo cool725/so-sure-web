@@ -227,7 +227,7 @@ class PurchaseController extends BaseController
                     if ($allowPayment) {
                         $webpay = $this->get('app.judopay')->webpay(
                             $policy,
-                            $policy->getPremium()->getMonthlyPremiumPrice(),
+                            $purchase->getAmount(),
                             $request->getClientIp(),
                             $request->headers->get('User-Agent')
                         );

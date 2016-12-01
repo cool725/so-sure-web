@@ -104,3 +104,12 @@ label {
   background-color: #ccc;
   border-color: #ccc;
 }
+
+.purchase-amount label {
+   display: block;
+   margin-bottom: 10px;
+}
+
+.purchase-amount input {
+  margin-left: 0px !important;
+}
