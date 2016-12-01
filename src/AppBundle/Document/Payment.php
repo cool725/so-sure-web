@@ -20,6 +20,7 @@ abstract class Payment
 {
     use CurrencyTrait;
 
+    // make sure to add to source below for new entries
     const SOURCE_TOKEN = 'token';
     const SOURCE_WEB = 'web';
     const SOURCE_WEB_API = 'web-api';
@@ -133,7 +134,7 @@ abstract class Payment
     protected $notes;
 
     /**
-     * @Assert\Choice({"mobile", "web", "web-api", "token"})
+     * @Assert\Choice({"mobile", "web", "web-api", "token", "apple-pay", "android-pay"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
