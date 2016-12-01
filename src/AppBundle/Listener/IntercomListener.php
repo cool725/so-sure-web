@@ -4,6 +4,7 @@ namespace AppBundle\Listener;
 
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
+use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\InvitationEvent;
 use AppBundle\Service\IntercomService;
@@ -51,5 +52,15 @@ class IntercomListener
         // Invitation accepted is a connection, so update both inviter & invitee
         $this->intercom->queue($event->getInvitation()->getInviter());
         $this->intercom->queue($event->getInvitation()->getInvitee());
+    }
+
+    public function onPaymentSuccessEvent(PaymentEvent $event)
+    {
+        $this->intercom->queuePayment($event->getPayment(), IntercomService::QUEUE_EVENT_PAYMENT_SUCCESS);
+    }
+
+    public function onPaymentFailedEvent(PaymentEvent $event)
+    {
+        $this->intercom->queuePayment($event->getPayment(), IntercomService::QUEUE_EVENT_PAYMENT_FAILED);
     }
 }
