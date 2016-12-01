@@ -66,8 +66,10 @@ class PurchaseType extends AbstractType
             $price = $purchase->getPhone()->getCurrentPhonePrice();
             $form->add('amount', ChoiceType::class, [
                 'choices' => [
-                    sprintf('%.2f', $price->getMonthlyPremiumPrice()) => sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice()),
-                    sprintf('%.2f', $price->getYearlyPremiumPrice()) => sprintf('£%.2f Yearly', $price->getYearlyPremiumPrice()),
+                    sprintf('%.2f', $price->getMonthlyPremiumPrice()) =>
+                        sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice()),
+                    sprintf('%.2f', $price->getYearlyPremiumPrice()) =>
+                        sprintf('£%.2f Yearly', $price->getYearlyPremiumPrice()),
                 ],
                 'placeholder' => false,
                 'expanded' => 'true',
