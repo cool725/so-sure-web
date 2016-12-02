@@ -57,7 +57,7 @@ class InvoiceService
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param SequenceService  $sequence
+     * @param SequenceService $sequence
      * @param MailerService   $mailer
      * @param                 $smtp
      * @param                 $templating
@@ -147,30 +147,30 @@ class InvoiceService
             $tmpFile
         );
 
-        $this->uploadS3($tmpFile, $filename, $invoice);
+        $this->uploadS3($tmpFile, $filename);
 
         $invoiceFile = new InvoiceFile();
         $invoiceFile->setBucket(self::S3_BUCKET);
-        $invoiceFile->setKey($this->getS3Key($invoice, $filename));
+        $invoiceFile->setKey($this->getS3Key($filename));
         $invoice->addInvoiceFile($invoiceFile);
         $this->dm->flush();
 
         return $tmpFile;
     }
 
-    public function getS3Key(Invoice $invoice, $filename)
+    public function getS3Key($filename)
     {
         $date = new \DateTime();
         return sprintf('%s/invoice/%s/%s', $this->environment, $date->format('Y'), $filename);
     }
 
-    public function uploadS3($file, $filename, Invoice $invoice)
+    public function uploadS3($file, $filename)
     {
         if ($this->environment == "test" || $this->skipS3) {
             return;
         }
 
-        $s3Key = $this->getS3Key($invoice, $filename);
+        $s3Key = $this->getS3Key($filename);
 
         $result = $this->s3->putObject(array(
             'Bucket' => self::S3_BUCKET,

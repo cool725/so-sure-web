@@ -152,7 +152,7 @@ class Address
 
     public function __toString()
     {
-        return $this->stringImplode(' ' );
+        return $this->stringImplode(' ');
     }
 
     public function stringImplode($glue)

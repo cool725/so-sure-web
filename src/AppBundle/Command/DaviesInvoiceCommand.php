@@ -22,10 +22,9 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:davies:invoice')
             ->setDescription('Generate a davies invoice for claimscheck')
-            ->addOption(
+            ->addArgument(
                 'date',
-                null,
-                InputOption::VALUE_REQUIRED,
+                InputArgument::REQUIRED,
                 'date'
             )
         ;
@@ -33,14 +32,14 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $date = new \DateTime($input->getOption('date'));
+        $date = new \DateTime($input->getArgument('date'));
 
         $dm = $this->getManager();
         $charges = $this->getCharges($date);
         if (count($charges) > 0) {
             $invoice = Invoice::generateDaviesInvoice();
             $data = [];
-            foreach($charges as $charge) {
+            foreach ($charges as $charge) {
                 // multiply by 100 as float's don't work as array keys
                 $amount = $this->toTwoDp($charge->getAmount()) * 100;
                 if (!isset($data[$amount])) {
@@ -85,5 +84,5 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
         $repo = $dm->getRepository(Charge::class);
 
         return $repo->findMonthly($date, Charge::TYPE_CLAIMSCHECK, true);
-    }    
+    }
 }

@@ -1265,7 +1265,7 @@ class AdminController extends BaseController
      * @Route("/charge/{year}/{month}", name="admin_charge_date")
      * @Template
      */
-    public function chargeAction(Request $request, $year = null, $month = null)
+    public function chargeAction($year = null, $month = null)
     {
         $now = new \DateTime();
         if (!$year) {
