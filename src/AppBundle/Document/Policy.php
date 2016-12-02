@@ -1326,7 +1326,7 @@ abstract class Policy
 
     public function isWithinCooloffPeriod($date = null)
     {
-        if (!$this->isPolicy()) {
+        if (!$this->isPolicy() || !$this->getStart()) {
             return null;
         }
 
@@ -1699,7 +1699,7 @@ abstract class Policy
 
     public function getTotalExpectedPaidToDate($prefix = null, \Datetime $date = null)
     {
-        if (!$this->isValidPolicy($prefix)) {
+        if (!$this->isValidPolicy($prefix) || !$this->getStart()) {
             return null;
         }
 
@@ -1726,6 +1726,10 @@ abstract class Policy
 
     public function isPolicyPaidToDate($exact = true, $prefix = null, \Datetime $date = null)
     {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
         $totalPaid = $this->getTotalSuccessfulPayments($date);
         $expectedPaid = $this->getTotalExpectedPaidToDate($prefix, $date);
 
