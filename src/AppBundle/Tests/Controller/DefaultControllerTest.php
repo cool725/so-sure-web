@@ -26,7 +26,7 @@ class DefaultControllerTest extends BaseControllerTest
         $form = $crawler->selectButton('launch_phone[next]')->form();
         $values = [];
         foreach ($form->all() as $field) {
-            if ($field instanceof ChoiceFormField) {
+            if ($field instanceof ChoiceFormField && $field->getName() == 'launch_phone[make]') {
                 $values = $field->availableOptionValues();
             }
         }
@@ -63,7 +63,8 @@ class DefaultControllerTest extends BaseControllerTest
         self::verifyResponse(200);
 
         $form = $crawler->selectButton('Quote me')->form();
-        $form['launch_phone[phone]'] = '';
+        $form['launch_phone[make]'] = '';
+        $form['launch_phone[phoneId]'] = '';
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
     }
