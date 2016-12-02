@@ -309,6 +309,19 @@ services:
             imeiValidator:        "@app.imei"
             rateLimit:            "@app.ratelimit"
 
+    app.invoice:
+        class: AppBundle\Service\InvoiceService
+        arguments:
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+            sequence:             "@app.sequence"
+            mailer:               "@app.mailer"
+            smtp:                 "@swiftmailer.transport.real"
+            templating:           "@templating"
+            environment:          "%kernel.environment%"
+            snappy_pdf:           "@knp_snappy.pdf"
+            s3:                   "@aws.s3"
+
     app.mailer:
         class: AppBundle\Service\MailerService
         arguments:

@@ -152,13 +152,29 @@ class Address
 
     public function __toString()
     {
-        $lines = $this->getLine1();
-        if (strlen($this->getLine3()) > 0) {
-            $lines = sprintf("%s %s %s", $this->getLine1(), $this->getLine2(), $this->getLine3());
-        } elseif (strlen($this->getLine2()) > 0) {
-            $lines = sprintf("%s %s", $this->getLine1(), $this->getLine2());
+        return $this->stringImplode(' ');
+    }
+
+    public function stringImplode($glue)
+    {
+        $lines = [];
+        if (strlen($this->getLine1()) > 0) {
+            $lines[] = $this->getLine1();
         }
-        return sprintf("%s %s %s", $lines, $this->getCity(), $this->getPostcode());
+        if (strlen($this->getLine2()) > 0) {
+            $lines[] = $this->getLine2();
+        }
+        if (strlen($this->getLine3()) > 0) {
+            $lines[] = $this->getLine3();
+        }
+        if (strlen($this->getCity()) > 0) {
+            $lines[] = $this->getCity();
+        }
+        if (strlen($this->getPostcode()) > 0) {
+            $lines[] = $this->getPostcode();
+        }
+
+        return implode($glue, $lines);
     }
 
     public function toApiArray()

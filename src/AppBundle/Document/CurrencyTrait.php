@@ -4,6 +4,15 @@ namespace AppBundle\Document;
 
 trait CurrencyTrait
 {
+    public function getCurrentVatRate(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        return 0.2;
+    }
+
     public function getCurrentIptRate(\DateTime $date = null)
     {
         if (!$date) {

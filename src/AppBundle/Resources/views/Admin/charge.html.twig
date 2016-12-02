@@ -93,10 +93,10 @@
                             <td>{{ charge.type }}</td>
                             <td>
                                 {% if charge.user %}
-                                    By {{ charge.user.name }}
+                                    By <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
                                 {% endif %}
                                 {% if charge.policy %}
-                                    <a href="{{ path('admin_policy', {'id': charge.policy.id })}}">{{ charge.policy.policyNumber }}</a>
+                                    &nbsp;For <a href="{{ path('admin_policy', {'id': charge.policy.id })}}">{{ charge.policy.policyNumber }}</a>
                                 {% endif %}                                
                             </td>
                         </tr>
