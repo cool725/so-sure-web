@@ -79,6 +79,12 @@ class Charge
      */
     protected $details;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Invoice")
+     * @Gedmo\Versioned
+     */
+    protected $invoice;
+
     public function __construct()
     {
         $this->createdDate = new \DateTime();
@@ -158,5 +164,15 @@ class Charge
     public function setDetails($details)
     {
         $this->details = $details;
+    }
+
+    public function getInvoice()
+    {
+        return $this->invoice;
+    }
+
+    public function setInvoice($invoice)
+    {
+        $this->invoice = $invoice;
     }
 }

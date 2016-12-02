@@ -12,7 +12,7 @@ class ChargeRepository extends DocumentRepository
 {
     use DateTrait;
 
-    public function findMonthly(\DateTime $date = null)
+    public function findMonthly(\DateTime $date = null, $type = null, $excludeInvoiced = false)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -20,9 +20,19 @@ class ChargeRepository extends DocumentRepository
         $start = $this->startOfMonth($date);
         $end = $this->endOfMonth($date);
 
-        return $this->createQueryBuilder()
+        $qb = $this->createQueryBuilder()
             ->field('createdDate')->gte($start)
-            ->field('createdDate')->lt($end)
+            ->field('createdDate')->lt($end);
+
+        if ($type) {
+            $qb->field('type')->equals($type);
+        }
+
+        if ($excludeInvoiced) {
+            $qb->field('invoice')->exists(false);
+        }
+
+        return $qb
             ->sort('scheduled', 'asc')
             ->getQuery()
             ->execute();

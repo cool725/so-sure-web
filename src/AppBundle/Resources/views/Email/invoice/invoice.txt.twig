@@ -1,0 +1,11 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Invoice {{ invoice.invoiceNumber }}
+
+**
+------------------------------------------------------------
+Please find invoice {{ invoice.invoiceNumber }} attached.
+
+If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
+
+{% endblock body %}

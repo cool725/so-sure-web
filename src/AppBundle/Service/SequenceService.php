@@ -11,6 +11,9 @@ class SequenceService
     const SEQUENCE_PHONE = 'phone-policy';
     const SEQUENCE_PHONE_INVALID = 'phone-policy-invalid';
 
+    const SEQUENCE_INVOICE = 'invoice';
+    const SEQUENCE_INVOICE_INVALID = 'invoice-invalid';
+
     /** @var DocumentManager */
     protected $dm;
 
