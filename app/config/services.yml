@@ -519,6 +519,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.phonemake:
+        class: AppBundle\Form\Type\PhoneMakeType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        tags:
+            - { name: form.type }
+
     app.form.type.phonesearch:
         class: AppBundle\Form\Type\PhoneSearchType
         arguments: ["@request_stack"]

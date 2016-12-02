@@ -1,0 +1,93 @@
+.select-phone-dropdown {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAAJ1BMVEVmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmaP/QSjAAAADHRSTlMAAgMJC0uWpKa6wMxMdjkoAAAANUlEQVR4AeXJyQEAERAAsNl7Hf3X6xt0QL6JpZWq30pdvdadme+0PMdzvHm8YThHcT1H7K0BtOMDniZhWOgAAAAASUVORK5CYII=);
+    -webkit-background-size: 13px 13px;
+    background-size: 15px;
+    background-repeat: no-repeat;
+    background-position: 98%;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 30px;
+    -moz-border-radius: 30px;
+    -webkit-border-radius: 30px;
+    padding: 12px 30px;
+    border: 2px solid #efefef;
+    color: #202532;
+    box-shadow: none;
+    width: 390px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+#select-phone {
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+}
+
+@media (max-width: 992px) {
+    #select-phone {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    .select-phone-dropdown {
+        display: inline-block !important;
+        margin-top: 5px !important;
+        width: 100% !important;
+        margin-right: 0px;
+    }
+    .form-control {
+        border-width: 0px;
+        height: 45px;
+    }
+    #select-phone .input-group-btn {
+      top: 0px !important;
+    }
+}
+
+#select-phone .device-select, .device-select .input-group {
+    display: inline-table;
+    color: #202532;
+    vertical-align: middle;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.form-control {
+    border-width: 0px;
+    height: 45px;
+}
+
+#select-phone a {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+#select-phone a:hover, a:focus {
+    text-decoration: none !important;
+    color: #202532;
+}
+
+#select-phone button.btn {
+    padding: 12px 30px;
+    border-radius: 30px;
+    -moz-border-radius: 30px;
+    -webkit-border-radius: 30px;
+}
+
+#select-phone .device-select ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#select-phone .device-select li {
+  display: inline;
+}
+
+#select-phone .input-group-btn {
+  width: 0% !important;
+  top: 16px;
+}

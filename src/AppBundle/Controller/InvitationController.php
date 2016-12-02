@@ -47,46 +47,14 @@ class InvitationController extends BaseController
             $invitation = null;
         }
 
-        $policy = new PhonePolicy();
-        if ($request->getMethod() == "GET") {
-            $phone = $deviceAtlas->getPhone($request);
-            /*
-            if (!$phone) {
-                $phone = $this->getDefaultPhone();
-            }
-            */
-            if ($phone instanceof Phone) {
-                $policy->setPhone($phone);
-            }
-        }
-
         $form = $this->createFormBuilder()
             ->add('decline', SubmitType::class, array(
                 'label' => "No thanks!",
                 'attr' => ['class' => 'btn btn-danger'],
             ))
             ->getForm();
-        $formPhone = $this->get('form.factory')
-            ->createNamedBuilder('launch_phone', PhoneType::class, $policy)
-            ->getForm();
 
-        if ($request->request->has('launch_phone')) {
-            $formPhone->handleRequest($request);
-            if ($formPhone->isValid()) {
-                if ($policy->getPhone()->getMemory()) {
-                    return $this->redirectToRoute('quote_make_model_memory', [
-                        'make' => $policy->getPhone()->getMake(),
-                        'model' => $policy->getPhone()->getModel(),
-                        'memory' => $policy->getPhone()->getMemory(),
-                    ]);
-                } else {
-                    return $this->redirectToRoute('quote_make_model', [
-                        'make' => $policy->getPhone()->getMake(),
-                        'model' => $policy->getPhone()->getModel(),
-                    ]);
-                }
-            }
-        } else {
+        if ($request->request->has('decline')) {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $invitationService = $this->get('app.invitation');
@@ -102,7 +70,6 @@ class InvitationController extends BaseController
         return array(
             'invitation' => $invitation,
             'form' => $form->createView(),
-            'form_phone' => $formPhone->createView(),
         );
     }
 }

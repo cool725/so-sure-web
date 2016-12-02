@@ -14,6 +14,7 @@
     {{ parent() }}
     {% stylesheets
     'bundles/app/css/Default/index.css'
+    'bundles/app/css/Default/selectPhoneMake.css'
     'bundles/app/css/Default/scrollindicator.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -23,6 +24,7 @@
     {% javascripts
     '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -144,27 +146,7 @@
 {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
 <section class="popular-devices" id="get-quote">
-    <div class="container">
-        <h2>Get a quote</h2>
-        <p class="lead text-center" id="hero-description">Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
-        <div class="row" id="select-phone">
-            <div class="col-sm-12 text-center">
-                <div class="device-select">
-                    {{ form_start(form_phone) }}
-                    <div class="input-group">
-                        {{ form_widget(form_phone.phone, { 'attr': {'class': 'form-control'}}) }}
-                        <span class="input-group-btn text-center">
-                            {{ form_widget(form_phone.next, {'label': 'Quote me', 'attr': {'class': 'btn btn-primary'}}) }}
-                        </span>
-                    </div>
-                    {{ form_end(form_phone) }}
-                </div>
-            </div>
-            <p class="text-center">
-                <a href="mailto:hello@wearesosure.com">Don't see your device? Let us know.</a>
-            </p>
-        </div>
-    </div>
+    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
 
     <div class="text-break">
         <div class="line"></div>
