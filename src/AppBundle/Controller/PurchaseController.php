@@ -20,6 +20,7 @@ use AppBundle\Document\Form\Purchase;
 use AppBundle\Document\Form\PurchaseStepPersonal;
 use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
+use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
@@ -45,6 +46,8 @@ use AppBundle\Exception\RateLimitException;
  */
 class PurchaseController extends BaseController
 {
+    use CurrencyTrait;
+
     /**
      * @Route("/phone/{phoneId}", name="purchase_phone", requirements={"phoneId":"[0-9a-f]{24,24}"})
      * @Route("/{policyId}", name="purchase_policy", requirements={"policyId":"[0-9a-f]{24,24}"})
@@ -496,7 +499,16 @@ class PurchaseController extends BaseController
                     }
                     $dm->flush();
 
-                    return $this->redirectToRoute('purchase_step_review');
+                    if ($this->areEqualToTwoDp($purchase->getAmount(), $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice())) {
+                        return $this->redirectToRoute('purchase_step_review_monthly');
+                    } elseif ($this->areEqualToTwoDp($purchase->getAmount(), $purchase->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice())) {
+                        return $this->redirectToRoute('purchase_step_review_yearly');
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            "Please select the monthly or yearly option."
+                        );
+                    }
                 }
             }
         }
@@ -512,7 +524,8 @@ class PurchaseController extends BaseController
     }
 
     /**
-     * @Route("/step-review", name="purchase_step_review")
+     * @Route("/step-review/monthly", name="purchase_step_review_monthly")
+     * @Route("/step-review/yearly", name="purchase_step_review_yearly")
      * @Template
     */
     public function purchaseStepReviewAction(Request $request)
@@ -523,9 +536,16 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('purchase_step_phone');
         }
 
+        $routeName = $request->get('_route');
+        if ($routeName == "purchase_step_review_monthly") {
+            $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+        } elseif ($routeName == "purchase_step_review_yearly") {
+            $amount = $policy->getPremium()->getYearlyPremiumPrice();
+        }
+
         $webpay = $this->get('app.judopay')->webpay(
             $policy,
-            $policy->getPremium()->getMonthlyPremiumPrice(),
+            $amount,
             $request->getClientIp(),
             $request->headers->get('User-Agent')
         );
@@ -587,7 +607,7 @@ class PurchaseController extends BaseController
             $initPolicies = $this->getUser()->getInitPolicies();
             if (count($initPolicies) > 0) {
                 $this->addFlash('warning', 'You seem to have a policy that you started creating, but is unpaid.');
-                return $this->redirectToRoute('purchase_step_review');
+                return $this->redirectToRoute('purchase_step_phone');
             }
 
             throw new \Exception('Unable to locate reference');
@@ -604,6 +624,6 @@ class PurchaseController extends BaseController
 
         $this->addFlash('error', 'There was a problem processing your payment. You can try again.');
 
-        return $this->redirectToRoute('purchase_step_review');
+        return $this->redirectToRoute('purchase_step_phone');
     }
 }

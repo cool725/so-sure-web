@@ -31,10 +31,11 @@
                     </div>
                     <div class="row">
                         <div class="form-group col-sm-4">
-                            Monthly Price
+                            {{ form_label(purchase_form.amount, 'Payment Schedule') }}
                         </div>
-                        <div class="form-group col-sm-6">
-                            <h4>£{{ phone.currentPhonePrice.monthlyPremiumPrice }}</h4>
+                        <div class="form-group col-sm-6 {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+                            {{ form_widget(purchase_form.amount, {'attr':{'class':'radio purchase-amount'}}) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
                         </div>
                     </div>
                     <div class="row">

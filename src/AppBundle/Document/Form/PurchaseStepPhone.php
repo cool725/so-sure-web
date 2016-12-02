@@ -6,11 +6,25 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Address;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use AppBundle\Document\CurrencyTrait;
 
 class PurchaseStepPhone
 {
+    use CurrencyTrait;
+
     /** @var Phone */
     protected $phone;
+
+    /**
+     * @Assert\Range(
+     *      min = 1,
+     *      max = 200,
+     *      minMessage = "You must select monthly or annual policy payments",
+     *      maxMessage = "You must select monthly or annual policy payments"
+     * )
+     * @Assert\NotNull()
+     */
+    protected $amount;
 
     /**
      * @var string
@@ -37,6 +51,21 @@ class PurchaseStepPhone
     public function setPhone(Phone $phone)
     {
         $this->phone = $phone;
+    }
+
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    public function setAmount($amount)
+    {
+        $price = $this->getPhone()->getCurrentPhonePrice();
+        if (!$this->areEqualToTwoDp($amount, $price->getMonthlyPremiumPrice()) &&
+            !$this->areEqualToTwoDp($amount, $price->getYearlyPremiumPrice())) {
+            throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
+        }
+        $this->amount = $amount;
     }
 
     public function getImei()
