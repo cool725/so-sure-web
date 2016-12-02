@@ -92,8 +92,8 @@
                             <td>£{{ charge.amount|number_format(2, '.', ',') }}</td>
                             <td>{{ charge.type }}</td>
                             <td>
-                                {% if charge.handler %}
-                                    By {{ charge.handler.name }}
+                                {% if charge.user %}
+                                    By {{ charge.user.name }}
                                 {% endif %}
                                 {% if charge.policy %}
                                     <a href="{{ path('admin_policy', {'id': charge.policy.id })}}">{{ charge.policy.policyNumber }}</a>
