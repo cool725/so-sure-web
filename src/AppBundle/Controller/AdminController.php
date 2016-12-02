@@ -13,6 +13,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
@@ -1256,6 +1257,41 @@ class AdminController extends BaseController
             'dailyReceived' => $dailyReceived,
             'barclaysFiles' => $barclaysFiles,
             'lloydsFiles' => $lloydsFiles,
+        ];
+    }
+
+    /**
+     * @Route("/charge", name="admin_charge")
+     * @Route("/charge/{year}/{month}", name="admin_charge_date")
+     * @Template
+     */
+    public function chargeAction(Request $request, $year = null, $month = null)
+    {
+        $now = new \DateTime();
+        if (!$year) {
+            $year = $now->format('Y');
+        }
+        if (!$month) {
+            $month = $now->format('m');
+        }
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Charge::class);
+        $charges = $repo->findMonthly($date);
+        $summary = [];
+        foreach ($charges as $charge) {
+            if (!isset($summary[$charge->getType()])) {
+                $summary[$charge->getType()] = 0;
+            }
+            $summary[$charge->getType()] += $charge->getAmount();
+        }
+
+        return [
+            'year' => $year,
+            'month' => $month,
+            'charges' => $charges,
+            'summary' => $summary,
         ];
     }
 }
