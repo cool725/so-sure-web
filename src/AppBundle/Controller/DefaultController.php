@@ -139,7 +139,13 @@ class DefaultController extends BaseController
                 if ($phoneMake->getPhoneId()) {
                     $phone = $phoneRepo->find($phoneMake->getPhoneId());
                     if (!$phone) {
-                        throw new \Exception('unknown phone');
+                        // TODO: Would be better to redirect to a make page instead
+                        $this->addFlash('warning', 'Please ensure you select a model as well');
+                        if ($this->getReferer()) {
+                            return new RedirectResponse($this->getReferer());
+                        } else {
+                            return $this->redirectToRoute('homepage');
+                        }
                     }
                     if ($phone->getMemory()) {
                         return $this->redirectToRoute('quote_make_model_memory', [

@@ -320,6 +320,19 @@ abstract class BaseController extends Controller
         return $birthday;
     }
 
+    protected function getReferer()
+    {
+        $request = $this->getRequest();
+
+        //look for the referer route
+        $referer = $request->headers->get('referer');
+        if (strlen($referer) > 0) {
+            return $referer;
+        }
+
+        return null;
+    }
+
     protected function getIdentityLog(Request $request)
     {
         // NOTE: not completely secure, but as we're only using for an indication, it's good enough

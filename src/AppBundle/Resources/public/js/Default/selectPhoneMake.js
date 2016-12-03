@@ -5,9 +5,9 @@ $(function(){
         var options = $(".select-phones");
         options.empty();
         if (make) {
-            options.append($("<option />").text('Select your ' + make + ' device'));
+            options.append($("<option />").val("").text('Select your ' + make + ' device'));
         } else {
-            options.append($("<option />").text('Select your phone make first'));            
+            options.append($("<option />").val("").text('Select your phone make first'));
         }
         $.each(phones[make], function(key, value) {
             options.append($("<option />").val(key).text(value));
