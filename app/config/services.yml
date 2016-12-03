@@ -233,6 +233,15 @@ services:
         tags:
             - { name: twig.extension }
 
+    app.twig.intercom:
+        class: AppBundle\Service\IntercomTwigExtension
+        arguments:
+            intercom:     "@app.intercom"
+            logger:       "@logger"
+        public: false
+        tags:
+            - { name: twig.extension }
+
     app.twig.misc:
         class: AppBundle\Service\MiscTwigExtension
         arguments:

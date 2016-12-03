@@ -28,6 +28,13 @@
                     'banner': {% if app.user is null or not app.user %}true{% else %}false{% endif %},
                     'referral': '{% if app is not null and app.session.isStarted %}{{ app.session.get('referral') }}{% endif %}',
                     'scode': '{% if app is not null and app.session.isStarted %}{{ app.session.get('scode') }}{% endif %}'
+                },
+                'intercom': {
+                    'user_id': {% if app.user is null or not app.user %}null{% else %}'{{ app.user.id }}'{% endif %},
+                    'user_hash': {% if app.user is null or not app.user %}null{% else %}'{{ intercom(app.user) }}'{% endif %},
+                    'email':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.email }}'{% endif %},
+                    'name':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.name }}'{% endif %},
+                    'created_at':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.created|date }}'{% endif %}
                 }
             }];
         </script>
