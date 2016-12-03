@@ -204,15 +204,7 @@ class JudopayService
             $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $source, $deviceDna, $date);
             $this->policyService->adjustScheduledPayments($policy, $date);
 
-            $isPaidToDate = $policy->isPolicyPaidToDate(false, $policy->getPolicyPrefix($this->environment), $date);
-            // update status if it makes sense to
-            if ($isPaidToDate &&
-                in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])
-            ) {
-                $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-            } elseif (!$isPaidToDate) {
-                $this->logger->error(sprintf('Policy %s is not paid to date', $policy->getPolicyNumber()));
-            }
+            $this->validatePolicyStatus($policy, $date);
             $this->dm->flush();
         }
 
@@ -537,6 +529,7 @@ class JudopayService
         try {
             $payment = $this->tokenPay($policy, $scheduledPayment->getAmount(), $scheduledPayment->getType());
             $this->processScheduledPaymentResult($scheduledPayment, $payment);
+            $this->validatePolicyStatus($policy, $date);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
@@ -551,6 +544,19 @@ class JudopayService
         }
 
         return $scheduledPayment;
+    }
+
+    public function validatePolicyStatus(Policy $policy, \DateTime $date = null)
+    {
+        $isPaidToDate = $policy->isPolicyPaidToDate(false, $policy->getPolicyPrefix($this->environment), $date);
+        // update status if it makes sense to
+        if ($isPaidToDate &&
+            in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])
+        ) {
+            $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        } elseif (!$isPaidToDate) {
+            $this->logger->error(sprintf('Policy %s is not paid to date', $policy->getPolicyNumber()));
+        }
     }
 
     public function processScheduledPaymentResult($scheduledPayment, $payment, \DateTime $date = null)
