@@ -34,7 +34,7 @@
                     'user_hash': {% if app.user is null or not app.user %}null{% else %}'{{ intercom(app.user) }}'{% endif %},
                     'email':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.email }}'{% endif %},
                     'name':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.name }}'{% endif %},
-                    'created_at':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.created|date }}'{% endif %}
+                    'created_at':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.created|date('U') }}'{% endif %}
                 }
             }];
         </script>
