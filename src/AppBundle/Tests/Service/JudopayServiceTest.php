@@ -398,6 +398,59 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
     }
 
+    public function testJudoScheduledPaymentDelayed()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoScheduledPaymentDelayed', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452',
+            $policy->getId()
+        );
+        if (!isset($details['cardDetails']) || $details['result'] != JudoPayment::RESULT_SUCCESS) {
+            throw new \Exception('Payment failed');
+        }
+
+        // @codingStandardsIgnoreStart
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
+            "{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}"
+        );
+        // @codingStandardsIgnoreEnd
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        self::$dm->flush();
+
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getPremiumPaid());
+        $scheduledPayment = $policy->getScheduledPayments()[0];
+        $scheduledPayment->setAmount($scheduledPayment->getAmount() + 1);
+        $nextMonth = new \DateTime();
+        $nextMonth->add(new \DateInterval('P1M'));
+
+        self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy->getStatus());
+    }
+
     public function testProcessTokenPayResult()
     {
         $this->clearEmail(static::$container);
