@@ -887,8 +887,10 @@ class JudopayService
             throw new ProcessedException();
         }
 
-        // Mark policy as pending for monitoring purposes
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        // Policy should NOT change to pending as will affect client
+        // Monitoring should be set on any policies with STATUS_MULTIPAY_REQUESTED
+        // that also have a multi pay set to aceepted
+        // $policy->setStatus(PhonePolicy::STATUS_PENDING);
         $multiPay->getPayer()->addPayerPolicy($policy);
         $this->dm->flush();
 
