@@ -1422,7 +1422,8 @@ class AdminController extends BaseController
             200,
             array(
                 'Content-Type'          => 'application/pdf',
-                'Content-Disposition'   => sprintf('attachment; filename="so-sure-policy-breakdown-%s.pdf"', $now->format('Y-m-d'))
+                'Content-Disposition'   =>
+                    sprintf('attachment; filename="so-sure-policy-breakdown-%s.pdf"', $now->format('Y-m-d'))
             )
         );
         return [
