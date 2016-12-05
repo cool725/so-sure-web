@@ -114,7 +114,7 @@ class SCode
     {
         // getName should be 4 to 6 chars
         $name = self::getNameForCode($user, $this->getType());
-        $code = sprintf("%s%s", $name, str_pad($count, 8 - strlen($name), "0"));
+        $code = sprintf("%s%s", $name, str_pad($count, 8 - strlen($name), "0", STR_PAD_LEFT));
 
         if (strlen($code) > 8) {
             $code = substr($code, 0, 8);
