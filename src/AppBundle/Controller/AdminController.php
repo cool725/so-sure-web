@@ -1156,8 +1156,8 @@ class AdminController extends BaseController
         $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
-        $paymentTotals = Payment::sumPayments($payments, $this->getParameter('kernel.environment') == 'prod');
-        $paymentDailys = Payment::dailyPayments($payments, $this->getParameter('kernel.environment') == 'prod');
+        $paymentTotals = Payment::sumPayments($payments, $this->getParameter('kernel.environment') == 'prod', JudoPayment::class);
+        $paymentDailys = Payment::dailyPayments($payments, $this->getParameter('kernel.environment') == 'prod', JudoPayment::class);
 
         $lloydsFile = new LloydsFile();
         $lloydsForm = $this->get('form.factory')
