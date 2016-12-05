@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+        <style>
+            body: { width: 100%; }
+            thead, tfoot { display: table-row-group }
+            table { width: 100%; border-collapse: separate; border-spacing:1em; }
+            td { width: 50%; }
+            .table-striped > tbody > tr:nth-child(2n+1) {
+                background-color: #f9f9f9;
+            }
+        </style>
+    </head>
+    <body>
+
+        <h1>so-sure Policy Breakdown {{ now | date('d M Y') }}</h1>
+
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Phone</th>
+                        <th>%</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in data.data %}
+                        <tr>
+                            <td>{{ item.phone }}</td>
+                            <td>{{ (100 * item.count / data.total) | number_format(1, '.', ',') }}%</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+    </body>
+</html>
