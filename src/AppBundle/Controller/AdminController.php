@@ -1314,7 +1314,7 @@ class AdminController extends BaseController
     public function connectionsPrintAction(Request $request)
     {
         $response = new StreamedResponse();
-        $response->setCallback(function() {
+        $response->setCallback(function () {
             $handle = fopen('php://output', 'w+');
 
             // Add the header of the CSV file
@@ -1362,15 +1362,19 @@ class AdminController extends BaseController
         foreach ($connections as $connection) {
             if (!isset($data[$connection->getSourcePolicy()->getId()])) {
                 $data[$connection->getSourcePolicy()->getId()] = [
-                    'date' => $connection->getSourcePolicy()->getStart() ? $connection->getSourcePolicy()->getStart()->format('d M Y') : '',
+                    'date' => $connection->getSourcePolicy()->getStart() ?
+                        $connection->getSourcePolicy()->getStart()->format('d M Y') :
+                        '',
                     'number' => $connection->getSourcePolicy()->getPolicyNumber(),
                     'connections' => [],
                 ];
             }
-            $data[$connection->getSourcePolicy()->getId()]['connections'][] = $connection->getDate() ? $connection->getDate()->format('d M Y') : '';
+            $data[$connection->getSourcePolicy()->getId()]['connections'][] = $connection->getDate() ?
+                $connection->getDate()->format('d M Y') :
+                '';
         }
 
-        usort($data, function($a, $b) {
+        usort($data, function ($a, $b) {
             return $a['date'] >= $b['date'];
         });
 
