@@ -16,20 +16,26 @@
 {% endblock %}
 
 {% block body %}
-<div class="container">
+<div class="payment-container vertical-align-wrap">
+  <div class="vertical-align-middle">
+    <div class="desktop-page-title">
+    <h1 class="section-title">Complete your policy</h1>
+    <p class="section-description lead">Just enter the details below to setup your account.</p>
+    </div>
     {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
+    <div class="checkout-step text-left">
     <div class="row">
+      <div class="col-md-6 col-md-offset-3">
         <form data-action="{{ webpay_action }}" method="post" id="webpay-form">
-          <div class="col-md-6 col-md-offset-3">
             <p>
                 Before you pay, please confirm that the following is correct:
             </p>
             <ol>
                 <li>My phone is in full working condition and my screen is not cracked</li>
                 <li>I am a resident of the United Kingdom</li>
-                <li>I have read & understood the so-sure
-                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#policyModal"
-                                            >policy document</button>
+                <li>I have read &amp; understood the so-sure
+                            <a data-toggle="modal" data-target="#policyModal" style="cursor: pointer;"
+                                            >policy document</a>
                 </li>
             </ol>
             <p>
@@ -50,9 +56,11 @@
                 </div>
             </div>
           </div>
+          </div>
         </form>
     </div>
-</div>
+  </div>
+  </div>
 
     <div class="modal modal-summary fade" id="summaryModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
@@ -85,7 +93,7 @@
 
     <div class="modal modal-policy fade" id="policyModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
-        <div class="modal-content"> 
+        <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title">Policy</h4>

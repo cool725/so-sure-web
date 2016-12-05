@@ -19,8 +19,10 @@
 {% block body %}
     <div class="payment-container vertical-align-wrap">
         <div class="vertical-align-middle">
+          <div class="desktop-page-title">
             <h1 class="section-title">Create your account</h1>
             <p class="section-description">Just enter your details below to setup your account.</p>
+          </div>
             {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
             <div class="checkout-step">
                 {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
@@ -59,58 +61,66 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="form-group col-sm-4">
-                            {{ form_label(purchase_form.addressLine1, 'Address Line 1') }}
+                        <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
+                          <div class="col-sm-3">
+                            {{ form_label(purchase_form.addressLine1, 'Address 1') }}
                         </div>
-                        <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
+                          <div class="col-sm-9">
                             {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1'}}) }}
-                            {% if showAddress %}
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
-                            {% endif %}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
+                          </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="form-group col-sm-4">
-                            {{ form_label(purchase_form.addressLine2, 'Address Line 2') }}
+                        <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
+                          <div class="col-sm-3">
+                            {{ form_label(purchase_form.addressLine2, 'Address 2') }}
                         </div>
-                        <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
+                          <div class="col-sm-9">
                             {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2'}}) }}
                             {% if showAddress %}
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
                             {% endif %}
+                          </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="form-group col-sm-4">
-                            {{ form_label(purchase_form.addressLine3, 'Address Line 3') }}
+                        <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
+                          <div class="col-sm-3">
+                            {{ form_label(purchase_form.addressLine3, 'Address 3') }}
                         </div>
-                        <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
+                          <div class="col-sm-9">
                             {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3'}}) }}
                             {% if showAddress %}
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
                             {% endif %}
+                          </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="form-group col-sm-4">
+                        <div class="form-group {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
+                          <div class="col-sm-3">
                             {{ form_label(purchase_form.city, 'City') }}
                         </div>
-                        <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
+                          <div class="col-sm-9">
                             {{ form_widget(purchase_form.city, {'attr':{'class':'form-control city'}}) }}
                             {% if showAddress %}
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.city) }}</div>
                             {% endif %}
+                          </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="form-group col-sm-4">
+                        <div class="form-group {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
+                          <div class="col-sm-3">
                             {{ form_label(purchase_form.postcode, 'Postcode') }}
                         </div>
-                        <div class="form-group col-sm-6 {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
+                          <div class="col-sm-9">
                             {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode'}}) }}
                             {% if showAddress %}
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.postcode) }}</div>
                             {% endif %}
+                          </div>
                         </div>
                     </div>
                     <div class="row">
@@ -119,10 +129,9 @@
                         </div>
                     </div>
                 </div>
+                {{ form_end(purchase_form) }}
             </div>
         </div>
       </div>
-        {{ form_end(purchase_form) }}
-    </div>
-</div>
+
 {% endblock %}

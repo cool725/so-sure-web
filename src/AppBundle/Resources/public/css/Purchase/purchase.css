@@ -115,7 +115,13 @@ label {
 }
 
 .purchase-amount input {
-    margin-left: 0px !important;
+    margin-left: 10px !important;
+    display: inline-block;
+    position: relative;
+}
+
+.payment-container .radio input[type="radio"] {
+    position: relative;
 }
 
 .purchase-nav {
@@ -134,7 +140,7 @@ label {
     margin-right: 30px;
     padding-right: 30px;
     margin-bottom: 30px;
-    border-right: 1px solid;
+    border-right: 2px solid #efefef;
 }
 
 .purchase-nav li:last-child {
@@ -153,12 +159,15 @@ label {
   color: #33CCCC;
 }
 
-@media (max-width: 543px) {
+@media (max-width: 767px) {
     .purchase-nav .step-active {
         background-color: #000;
         color: #fff;
         padding: 10px;
         width: 100%;
+        position: absolute;
+        top: 120px;
+        left: 0;
     }
     .purchase-nav li {
         border-right: none;
@@ -166,15 +175,22 @@ label {
     .purchase-nav .step-inactive {
         display: none;
     }
+    .desktop-page-title {
+      display: none;
+    }
+    .purchase-nav {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
 }
 
 .payment-container {
-    min-height: 750px;
+    min-height: 700px;
 }
 
 .payment-container label {
     font-weight: normal;
-    margin-top: 5px;
+    margin-top: 7px;
     font-size: 14px;
     float: left;
 }
@@ -188,6 +204,8 @@ label {
 .checkout-step {
     display: flex;
     justify-content: center;
+    padding-left: 30px;
+    padding-right: 20px;
 }
 
 .payment-container .form-group {
@@ -196,7 +214,7 @@ label {
 }
 
 .form-horizontal {
-    width: 90%;
+    width: 100%;
 }
 
 @media (min-width: 563px) {
@@ -207,7 +225,7 @@ label {
 
 @media (min-width:992px) {
     .form-horizontal {
-        width: 35%;
+        width: 40%;
     }
 }
 
@@ -221,9 +239,9 @@ label {
 }
 
 .help-block li {
-    margin-left: -40px;
     color: #FF6666;
     font-size: 14px;
+    text-align: left;
 }
 
 .help-block .list-unstyled li {
@@ -243,4 +261,72 @@ label {
 
 .address-show-error {
   color: #FF6666;
+}
+
+.payment-container .input-group-addon {
+  border-top: 2px solid #efefef;
+  border-right: 2px solid #efefef;
+  border-bottom: 2px solid #efefef;
+  border-left: none;
+}
+.payment-container .input-group {
+  display: inline-flex;
+  width: 100%;
+}
+.payment-container .input-group-addon {
+  width: initial;
+}
+
+#purchase_form_amount {
+  display: inline-block;
+}
+
+#purchase_form_amount label {
+  float: none;
+  display: inline;
+  padding: 15px;
+  margin-right: 10px;
+}
+
+.payment-container .btn-link {
+    padding: 7px;
+}
+
+.payment-container .help-block {
+  font-style: italic;
+  text-align: left;
+  font-size: 14px;
+}
+
+@media (max-width: 543px) {
+  #purchase_form_amount label {
+    padding: 10px;
+  }
+  #purchase_form_amount {
+    width: 105%;
+  }
+}
+
+@media (max-width: 767px) {
+  .payment-container .btn-link {
+    padding: 5px;
+    float: right;
+  }
+}
+
+@media (max-width: 320px) {
+  .payment-container h4 {
+    float: left;
+    margin-right: 85px;
+  }
+}
+
+.payment-container .checkbox label {
+  float: none;
+  font-size: 14px;
+  color: #202532;
+}
+
+.payment-container input[type="checkbox"] {
+  margin: 3px -25px 0;
 }

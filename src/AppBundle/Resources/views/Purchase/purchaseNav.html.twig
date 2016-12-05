@@ -3,32 +3,32 @@
     <li class="{% if step == 1 %}step-active{% else %}step-inactive{% endif %}">
         {% if step > 1%}<i class="fa fa-check text-success"></i> {% endif %}
         {% if step <= 1 %}
-            <span>Personal Details</span>
+            <span>Add Personal Information</span>
         {% else %}
-            <a href="{{ path('purchase_step_personal') }}">Personal Details</a>
+            <a href="{{ path('purchase_step_personal') }}">Add Personal Information</a>
         {% endif %}
     </li>
     <li class="{% if step == 2 %}step-active{% else %}step-inactive{% endif %}">
         {% if step > 2%}<i class="fa fa-check text-success"></i> {% endif %}
         {% if step <= 2 %}
-            <span>Billing Details</span>
+            <span>Add Billing Address</span>
         {% else %}
-            <a href="{{ path('purchase_step_address') }}">Billing Details</a>
+            <a href="{{ path('purchase_step_address') }}">Add Billing Address</a>
         {% endif %}
     </li>
     <li class="{% if step == 3 %}step-active{% else %}step-inactive{% endif %}">
         {% if step > 3%}<i class="fa fa-check text-success"></i> {% endif %}
         {% if step <= 3 %}
-            <span>Personal Details</span>
+            <span>Add Phone Details</span>
         {% else %}
-            <a href="{{ path('purchase_step_phone') }}">Phone Details</a>
+            <a href="{{ path('purchase_step_phone') }}">Add Phone Details</a>
         {% endif %}
     </li>
     <li class="{% if step == 4 %}step-active{% else %}step-inactive{% endif %}">
         {% if step <= 4 %}
-            <span>Review Policy Information</span>
+            <span>Review Policy</span>
         {% else %}
-            <a href="{{ path('purchase_step_review') }}">Review Policy Information</a>
+            <a href="{{ path('purchase_step_review') }}">Review Policy</a>
         {% endif %}
     </li>
 </ul>
