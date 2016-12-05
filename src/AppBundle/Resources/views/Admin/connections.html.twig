@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/moment/moment.min.js'
+        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        '@AppBundle/Resources/public/js/Admin/banking.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+<div class="row">
+    <div class="col-md-8">
+        <h2>Connections</h2>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ path('admin_connections_print')}}"><i class="fa fa-print fa-large" style="margin-top: 15px;"></i></a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-striped">
+            <tr>
+                <th style="width: 10%">Policy Number</th>
+                <th>Policy Inception Date</th>
+                <th>Number of Connections</th>
+                <th>Connection Date 1</th>
+                <th>Connection Date 2</th>
+                <th>Connection Date 3</th>
+                <th>Connection Date 4</th>
+                <th>Connection Date 5</th>
+                <th>Connection Date 6</th>
+                <th>Connection Date 7</th>
+                <th>Connection Date 8</th>
+            </tr>
+            {% for policy in data %}
+                <tr>
+                    <td style="width: 10%">{{ policy.number }}</td>
+                    <td>{{ policy.date }}</td>
+                    <td>{{ policy.connection_count }}</td>
+                    {% for connection in policy.connections %}
+                        <td>{{ connection }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

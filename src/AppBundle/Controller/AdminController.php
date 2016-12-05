@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
@@ -1293,5 +1294,91 @@ class AdminController extends BaseController
             'charges' => $charges,
             'summary' => $summary,
         ];
+    }
+
+    /**
+     * @Route("/connections", name="admin_connections")
+     * @Template
+     */
+    public function connectionsAction(Request $request)
+    {
+        return [
+            'data' => $this->getConnectionData(),
+        ];
+    }
+
+    /**
+     * @Route("/connections/print", name="admin_connections_print")
+     * @Template
+     */
+    public function connectionsPrintAction(Request $request)
+    {
+        $response = new StreamedResponse();
+        $response->setCallback(function() {
+            $handle = fopen('php://output', 'w+');
+
+            // Add the header of the CSV file
+            fputcsv($handle, [
+                'Policy Number',
+                'Policy Inception Date',
+                'Number of Connections',
+                'Connection Date 1',
+                'Connection Date 2',
+                'Connection Date 3',
+                'Connection Date 4',
+                'Connection Date 5',
+                'Connection Date 6',
+                'Connection Date 7',
+                'Connection Date 8',
+            ]);
+            foreach ($this->getConnectionData() as $policy) {
+                $line = array_merge([
+                    $policy['number'],
+                    $policy['date'],
+                    $policy['connection_count'],
+                ], $policy['connections']);
+                fputcsv(
+                    $handle, // The file pointer
+                    $line
+                );
+            }
+
+            fclose($handle);
+        });
+
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="so-sure-connections.csv"');
+
+        return $response;
+    }
+
+    private function getConnectionData()
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Connection::class);
+        $connections = $repo->findAll();
+        $data = [];
+        foreach ($connections as $connection) {
+            if (!isset($data[$connection->getSourcePolicy()->getId()])) {
+                $data[$connection->getSourcePolicy()->getId()] = [
+                    'date' => $connection->getSourcePolicy()->getStart() ? $connection->getSourcePolicy()->getStart()->format('d M Y') : '',
+                    'number' => $connection->getSourcePolicy()->getPolicyNumber(),
+                    'connections' => [],
+                ];
+            }
+            $data[$connection->getSourcePolicy()->getId()]['connections'][] = $connection->getDate() ? $connection->getDate()->format('d M Y') : '';
+        }
+
+        usort($data, function($a, $b) {
+            return $a['date'] >= $b['date'];
+        });
+
+        foreach ($data as $key => $policy) {
+            $data[$key]['connection_count'] = count($policy['connections']);
+            $data[$key]['connections'] = array_slice($policy['connections'], 0, 8);
+        }
+
+        return $data;
     }
 }
