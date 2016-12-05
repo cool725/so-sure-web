@@ -296,6 +296,7 @@ label {
   font-style: italic;
   text-align: left;
   font-size: 14px;
+  color: #FF6666;
 }
 
 @media (max-width: 543px) {
