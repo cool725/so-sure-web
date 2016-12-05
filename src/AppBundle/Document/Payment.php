@@ -414,13 +414,16 @@ abstract class Payment
         return $data;
     }
 
-    public static function dailyPayments($payments, $requireValidPolicy)
+    public static function dailyPayments($payments, $requireValidPolicy, $class = null)
     {
         $month = null;
         $data = [];
         foreach ($payments as $payment) {
             // For prod, skip invalid policies
             if ($requireValidPolicy && !$payment->getPolicy()->isValidPolicy()) {
+                continue;
+            }
+            if ($class && !$payment instanceof $class) {
                 continue;
             }
 
