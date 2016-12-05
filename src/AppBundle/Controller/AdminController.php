@@ -1300,7 +1300,7 @@ class AdminController extends BaseController
      * @Route("/connections", name="admin_connections")
      * @Template
      */
-    public function connectionsAction(Request $request)
+    public function connectionsAction()
     {
         return [
             'data' => $this->getConnectionData(),
@@ -1311,7 +1311,7 @@ class AdminController extends BaseController
      * @Route("/connections/print", name="admin_connections_print")
      * @Template
      */
-    public function connectionsPrintAction(Request $request)
+    public function connectionsPrintAction()
     {
         $response = new StreamedResponse();
         $response->setCallback(function () {
