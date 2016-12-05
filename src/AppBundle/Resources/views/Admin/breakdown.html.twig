@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/moment/moment.min.js'
+        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        '@AppBundle/Resources/public/js/Admin/charge.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>Policy Breakdown</h1>
+    </div>
+    <div class='col-md-4' style="margin-top: 15px">
+        <a href="{{ path('admin_policy_breakdown_print') }}"><i class="fa fa-print fa-large"></i></a>
+    </div>
+</div>
+    <div class="row">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Phone</th>
+                        <th>Total</th>
+                        <th>%</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in data.data %}
+                        <tr>
+                            <td>{{ item.phone }}</td>
+                            <td>{{ item.count }}</td>
+                            <td>{{ (100 * item.count / data.total) | number_format(1, '.', ',') }}%</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
