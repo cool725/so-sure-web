@@ -50,8 +50,10 @@ class LloydsService
                     // Exclude lines like this:
                     // 10/10/2016,,'XX-XX-XX,XXXXXXXX,INTEREST (GROSS) ,,0.03,609.61
                     // 11/10/2016,PAY,'XX-XX-XX,XXXXXXXX,OUR CHARGE FT176053329271 FP29348357778898 ,15.00,,445.51
+                    // 29/11/2016,BP,'XX-XX-XX,XXXXXXXX,AFL INSURANCE BROK ,1.32,,168.68
+                    // 09/11/2016,CHG,'XX-XX-XX,XXXXXXXX,RETURNED D/D ,35.00,,39.08
                     // 11/10/2016,TFR,'XX-XX-XX,XXXXXXXX,FORGN PYT293483577 ,164.10,,460.51
-                    if (in_array($line['Transaction Type'], ['TFR', 'PAY', ''])) {
+                    if (in_array($line['Transaction Type'], ['TFR', 'PAY', 'BP', 'CHG', ''])) {
                         $this->logger->info(sprintf(
                             'Skipping line as transfer/payment/interest. %s',
                             implode($line)
