@@ -3,7 +3,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
 ENV=""
-USER="wwww-data"
+USER="www-data"
 while getopts "e:u:h" opt; do
   case $opt in
     u)
