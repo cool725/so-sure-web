@@ -638,4 +638,23 @@ class Claim
     {
         return in_array($this->getType(), [self::TYPE_LOSS, self::TYPE_THEFT]);
     }
+
+    public static function sumClaims($claims)
+    {
+        $data = [
+            'total' => 0,
+            self::STATUS_INREVIEW => 0,
+            self::STATUS_APPROVED => 0,
+            self::STATUS_SETTLED => 0,
+            self::STATUS_DECLINED => 0,
+            self::STATUS_WITHDRAWN => 0,
+        ];
+        foreach ($claims as $claim)
+        {
+            $data[$claim->getStatus()]++;
+            $data['total']++;
+        }
+
+        return $data;
+    }
 }

@@ -506,6 +506,9 @@ class AdminController extends BaseController
         $policyRepo = $dm->getRepository(PhonePolicy::class);
         $connectionRepo = $dm->getRepository(Connection::class);
         $invitationRepo = $dm->getRepository(Invitation::class);
+        $claimsRepo = $dm->getRepository(Claim::class);
+        $claims = $claimsRepo->findFNOLClaims($start, $end);
+        $claimsTotals = Claim::sumClaims($claims);
 
         $excludedPolicyIds = [];
         $excludedPolicies = [];
@@ -659,6 +662,7 @@ class AdminController extends BaseController
             'total_connections' => $totalConnections,
             'new_connections' => $newConnections,
             'excluded_policies' => $excludedPolicies,
+            'claims' => $claimsTotals,
         ];
     }
 

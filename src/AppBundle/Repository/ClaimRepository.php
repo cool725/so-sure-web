@@ -28,4 +28,14 @@ class ClaimRepository extends DocumentRepository
 
         return $qb->getQuery()->execute();
     }
+
+    public function findFNOLClaims($start, $end)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('notificationDate')->gte($start)
+            ->field('notificationDate')->lt($end)
+        ;
+
+        return $qb->getQuery()->execute();
+    }
 }
