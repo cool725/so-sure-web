@@ -67,7 +67,9 @@
                         </div>
                           <div class="col-sm-9">
                             {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1'}}) }}
-                            <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
+                            {% if showAddress %}
+                                <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
+                            {% endif %}
                           </div>
                         </div>
                     </div>

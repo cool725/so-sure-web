@@ -499,9 +499,15 @@ class PurchaseController extends BaseController
                     }
                     $dm->flush();
 
-                    if ($this->areEqualToTwoDp($purchase->getAmount(), $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice())) {
+                    if ($this->areEqualToTwoDp(
+                        $purchase->getAmount(),
+                        $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+                    )) {
                         return $this->redirectToRoute('purchase_step_review_monthly');
-                    } elseif ($this->areEqualToTwoDp($purchase->getAmount(), $purchase->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice())) {
+                    } elseif ($this->areEqualToTwoDp(
+                        $purchase->getAmount(),
+                        $purchase->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
+                    )) {
                         return $this->redirectToRoute('purchase_step_review_yearly');
                     } else {
                         $this->addFlash(
