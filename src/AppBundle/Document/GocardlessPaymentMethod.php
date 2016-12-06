@@ -106,4 +106,9 @@ class GocardlessPaymentMethod extends PaymentMethod
     {
         return count($this->getSubscriptions()) > 0;
     }
+
+    public function isValid()
+    {
+        return $this->hasSubscription();
+    }
 }

@@ -166,6 +166,11 @@ class JudoPaymentMethod extends PaymentMethod
         return $this->endOfMonth($date);
     }
 
+    public function isValid()
+    {
+        return !$this->isCardExpired();
+    }
+
     public function isCardExpired(\DateTime $date = null)
     {
         if (!$date) {

@@ -494,6 +494,14 @@ class JudopayService
 
     public function scheduledPayment(ScheduledPayment $scheduledPayment, $prefix = null, $date = null)
     {
+        if (!$scheduledPayment->getPolicy()->getUser()->hasValidPaymentMethod()) {
+            throw new \Exception(sprintf(
+                'Scheduled payment %s does not have a valid payment method (User %s)',
+                $scheduledPayment->getId(),
+                $scheduledPayment->getPolicy()->getUser()->getId()
+            ));
+        }
+
         if (!$scheduledPayment->isBillable($prefix)) {
             throw new \Exception(sprintf(
                 'Scheduled payment %s is not billable (status: %s)',
