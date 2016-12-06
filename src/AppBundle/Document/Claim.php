@@ -649,8 +649,7 @@ class Claim
             self::STATUS_DECLINED => 0,
             self::STATUS_WITHDRAWN => 0,
         ];
-        foreach ($claims as $claim)
-        {
+        foreach ($claims as $claim) {
             $data[$claim->getStatus()]++;
             $data['total']++;
         }
