@@ -63,7 +63,9 @@ h1, h2, h3, h4, h5, h6 {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #202532;
 }
-
+.text-success {
+  color: #33CCCC !important;
+}
 /* Global Tools */
 
 /* centered columns styles */

@@ -242,7 +242,7 @@ class DefaultController extends BaseController
                 $user
             );
 
-            return $this->redirectToRoute('purchase');
+            return $this->redirectToRoute('purchase_step_personal');
         }
 
         return [
@@ -473,7 +473,7 @@ class DefaultController extends BaseController
                         // @codingStandardsIgnoreEnd
                     }
 
-                    return $this->redirectToRoute('purchase_phone', ['phoneId' => $phone->getId()]);
+                    return $this->redirectToRoute('purchase_step_personal');
                 } else {
                     $this->addFlash('error', sprintf(
                         "Sorry, didn't quite catch that email.  Please try again."

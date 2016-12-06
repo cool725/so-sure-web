@@ -559,6 +559,24 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.purchasesteppersonal:
+        class: AppBundle\Form\Type\PurchaseStepPersonalType
+        arguments: ["%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.purchasestepaddress:
+        class: AppBundle\Form\Type\PurchaseStepAddressType
+        arguments: ["%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.purchasestepphone:
+        class: AppBundle\Form\Type\PurchaseStepPhoneType
+        arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.claim:
         class: AppBundle\Form\Type\ClaimType
         arguments: ["@app.imei"]

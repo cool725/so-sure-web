@@ -375,6 +375,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
+    /**
+     * TODO: Rename to getUnInitPolicies
+     */
     public function getInitPolicies()
     {
         $policies = [];
