@@ -278,7 +278,7 @@ label {
 }
 
 #purchase_form_amount {
-  display: inline-block;
+  text-align: left;
 }
 
 #purchase_form_amount label {
@@ -303,9 +303,10 @@ label {
   #purchase_form_amount label {
     padding: 10px;
   }
-  #purchase_form_amount {
-    width: 105%;
-  }
+}
+
+.payment-container h4 {
+  text-align: left;
 }
 
 @media (max-width: 767px) {
@@ -313,14 +314,23 @@ label {
     padding: 5px;
     float: right;
   }
+  .payment-container h4 {
+    text-align: left;
+    margin-top: 40px;
+  }
+  #purchase_form_amount {
+    margin-top: 25px;
+  }
 }
 
 @media (max-width: 320px) {
   .payment-container h4 {
     float: left;
-    margin-right: 85px;
+    margin-right: 135px;
+    margin-top: 0px;
   }
 }
+
 
 .payment-container .checkbox label {
   float: none;
@@ -330,4 +340,8 @@ label {
 
 .payment-container input[type="checkbox"] {
   margin: 3px -25px 0;
+}
+
+.payment-container .text-danger {
+  color: #ff6666;
 }
