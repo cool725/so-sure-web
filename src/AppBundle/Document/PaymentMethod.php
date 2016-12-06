@@ -15,4 +15,5 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 abstract class PaymentMethod
 {
+    abstract public function isValid();
 }
