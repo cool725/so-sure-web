@@ -29,7 +29,11 @@
                     'referral': '{% if app is not null and app.session.isStarted %}{{ app.session.get('referral') }}{% endif %}',
                     'scode': '{% if app is not null and app.session.isStarted %}{{ app.session.get('scode') }}{% endif %}'
                 },
+                'user': {
+                    'id': {% if app.user is null or not app.user %}undefined{% else %}'{{ app.user.id }}'{% endif %}
+                },
                 'intercom': {
+                    {# TODO: transition from intercom.user_id to user.id #}
                     'user_id': {% if app.user is null or not app.user %}null{% else %}'{{ app.user.id }}'{% endif %},
                     'user_hash': {% if app.user is null or not app.user %}null{% else %}'{{ intercom(app.user) }}'{% endif %},
                     'email':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.email }}'{% endif %},
