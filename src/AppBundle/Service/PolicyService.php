@@ -416,7 +416,7 @@ class PolicyService
         $repo = $this->dm->getRepository(SCode::class);
         $scode = $policy->getStandardSCode();
         if (!$scode) {
-            $existingCount = $repo->getCountForName(SCode::getNameForCode($policy->getUser()));
+            $existingCount = $repo->getCountForName(SCode::getNameForCode($policy->getUser(), SCode::TYPE_STANDARD));
             $policy->createAddSCode($existingCount + 1 + $count);
 
             return $this->uniqueSCode($policy, $count + 1);
@@ -428,7 +428,7 @@ class PolicyService
         if ($exists) {
             // removing scode from policy seems to be problematic, so change code and make inactive
             $scode->deactivate();
-            $existingCount = $repo->getCountForName(SCode::getNameForCode($policy->getUser()));
+            $existingCount = $repo->getCountForName(SCode::getNameForCode($policy->getUser(), SCode::TYPE_STANDARD));
             $policy->createAddSCode($existingCount + 1 + $count);
 
             return $this->uniqueSCode($policy, $count + 1);
