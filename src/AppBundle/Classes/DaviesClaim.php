@@ -96,10 +96,10 @@ class DaviesClaim
             $this->location = $data[9];
             $this->status = $data[10];
             $this->miStatus = $data[11];
-            $this->brightstarProductNumber = $data[12];
-            $this->replacementMake = $data[13];
-            $this->replacementModel = $data[14];
-            $this->replacementImei = $data[15];
+            $this->brightstarProductNumber = $this->nullIfBlank($data[12]);
+            $this->replacementMake = $this->nullIfBlank($data[13]);
+            $this->replacementModel = $this->nullIfBlank($data[14]);
+            $this->replacementImei = $this->nullIfBlank($data[15]);
             $this->replacementReceivedDate = $this->excelDate($data[16]);
             $this->incurred = $this->nullIfBlank($data[17]);
             $this->unauthorizedCalls = $this->nullIfBlank($data[18]);
@@ -113,7 +113,7 @@ class DaviesClaim
             $this->notificationDate = $this->excelDate($data[26]);
             $this->dateCreated = $this->excelDate($data[27]);
             $this->dateClosed = $this->excelDate($data[28]);
-            $this->shippingAddress = $data[29];
+            $this->shippingAddress = $this->nullIfBlank($data[29]);
         } catch (\Exception $e) {
             throw new \Exception(sprintf('%s claim: %s', $e->getMessage(), json_encode($this)));
         }
@@ -133,7 +133,7 @@ class DaviesClaim
 
     private function nullIfBlank($field)
     {
-        if (!$field || strlen(trim($field)) == 0) {
+        if (!$field || strlen(trim($field)) == 0 || $field == 'TBC') {
             return null;
         }
 
@@ -143,7 +143,7 @@ class DaviesClaim
     private function excelDate($days)
     {
         try {
-            if (!$days) {
+            if (!$days || $days == 'TBC') {
                 return null;
             }
 
