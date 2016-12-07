@@ -781,6 +781,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->birthday = $birthday;
     }
 
+    public function getAge()
+    {
+        if (!$this->getBirthday()) {
+            return null;
+        }
+
+        $now = new \DateTime();
+        $diff = $now->diff($this->getBirthday());
+
+        return $diff->y;
+    }
+
     public function getAcceptedSCode()
     {
         return $this->acceptedSCode;
@@ -860,9 +872,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
-        $now = new \DateTime();
-        $diff = $now->diff($this->getBirthday());
-        if ($diff->y > 150 || $diff->y < 18) {
+        if ($this->getAge() > 150 || $this->getAge() < 18) {
             return false;
         }
 
