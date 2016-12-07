@@ -920,11 +920,7 @@ abstract class Policy
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
 
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            // Cooloff should always refund full amount (which should be equal to the last payment)
-            $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
-            $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
-
-            return $paymentToRefund->getAmount();
+            return $this->getCooloffRefundAmount();
         } else {
             return $this->getProratedRefundAmount($date);
         }
@@ -949,22 +945,52 @@ abstract class Policy
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
 
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            // Cooloff should always refund full amount (which should be equal to the last payment)
-            $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
-            $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
-
-            return $paymentToRefund->getTotalCommission();
+            return $this->getCooloffRefundCommissionAmount();
         } else {
             return $this->getProratedRefundCommissionAmount($date);
         }
     }
 
+    public function getCooloffRefundAmount()
+    {
+        $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
+        $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+        $amount = $paymentToRefund->getAmount();
+        $paid = $this->getPremiumPaid();
+
+        // we should never refund more than the user paid
+        // especially relevent for cases with an automatic free month
+        if ($amount > $paid) {
+            return $paid;
+        }
+
+        return $paymentToRefund->getAmount();
+    }
+
     public function getProratedRefundAmount($date = null)
     {
+        // Cooloff should always refund full amount (which should be equal to the last payment)
         $used = $this->getPremium()->getYearlyPremiumPrice() * $this->getProrataMultiplier($date);
         $paid = $this->getPremiumPaid();
 
         return $this->toTwoDp($paid - $used);
+    }
+
+    public function getCooloffRefundCommissionAmount()
+    {
+        // Cooloff should always refund full amount (which should be equal to the last payment)
+        $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
+        $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+        $amount = $paymentToRefund->getAmount();
+        $paid = $this->getPremiumPaid();
+
+        // we should never refund more than the user paid
+        // especially relevent for cases with an automatic free month
+        if ($amount > $paid) {
+            return $this->getTotalCommissionPaid();
+        }
+
+        return $paymentToRefund->getTotalCommission();
     }
 
     public function getProratedRefundCommissionAmount($date = null)
