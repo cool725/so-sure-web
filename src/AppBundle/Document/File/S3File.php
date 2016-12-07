@@ -19,7 +19,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "barclays"="BarclaysFile",
  *      "policySchedule"="PolicyScheduleFile",
  *      "policyTerms"="PolicyTermsFile",
- *      "invoice"="InvoiceFile"
+ *      "invoice"="InvoiceFile",
+ *      "davies"="DaviesFile"
  * })
  * @Gedmo\Loggable
  */

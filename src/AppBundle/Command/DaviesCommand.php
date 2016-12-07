@@ -17,14 +17,27 @@ class DaviesCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:davies')
             ->setDescription('Import davies emails from s3')
+            ->addOption(
+                'daily',
+                null,
+                InputOption::VALUE_NONE,
+                'Run a daily check on outstanding claims'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $isDaily = true === $input->getOption('daily');
+
         $davies = $this->getContainer()->get('app.davies');
-        $lines = $davies->import();
-        $output->writeln(implode(PHP_EOL, $lines));
+        if ($isDaily) {
+            $count = $davies->claimsDailyEmail();
+            $output->writeln(sprintf('%d outstanding claims. Email report sent.', $count));
+        } else {
+            $lines = $davies->import();
+            $output->writeln(implode(PHP_EOL, $lines));
+        }
         $output->writeln('Finished');
     }
 }

@@ -38,4 +38,12 @@ class ClaimRepository extends DocumentRepository
 
         return $qb->getQuery()->execute();
     }
+
+    public function findOutstanding()
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED]);
+
+        return $qb->getQuery()->execute();
+    }
 }
