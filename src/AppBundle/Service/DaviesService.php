@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use AppBundle\Classes\DaviesClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
+use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class DaviesService
@@ -136,6 +137,12 @@ class DaviesService
             'Bucket' => $this->bucket,
             'Key' => $sourceKey,
         ]);
+
+        $file = new DaviesFile();
+        $file->setBucket($this->bucket);
+        $file->setKey($destKey);
+        $this->dm->persist($file);
+        $this->dm->flush();
     }
 
     public function generateTempFile()
@@ -342,5 +349,23 @@ class DaviesService
                 ['policy' => $policy, 'daviesClaim' => $daviesClaim]
             );
         }
+    }
+
+    public function claimsDailyEmail()
+    {
+        $fileRepo = $this->dm->getRepository(DaviesFile::class);
+        $latestFile = $fileRepo->findOneBy([], ['date' => 1]);
+
+        $claimsRepo = $this->dm->getRepository(Claim::class);
+        $claims = $claimsRepo->findOutstanding();
+
+        $this->mailer->sendTemplate(
+            sprintf('Daily Claims'),
+            'tech@so-sure.com',
+            'AppBundle:Email:davies/dailyEmail.html.twig',
+            ['claims' => $claims, 'latestFile' => $latestFile]
+        );
+
+        return count($claims);
     }
 }
