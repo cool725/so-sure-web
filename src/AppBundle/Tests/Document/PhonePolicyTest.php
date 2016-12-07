@@ -1676,6 +1676,55 @@ class PhonePolicyTest extends WebTestCase
         );
     }
 
+    public function testPolicyWithFreeMonthCooloffNoRefund()
+    {
+        $cancelDate = new \DateTime('2016-01-10');
+
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($cancelDate),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        // add refund of the first month
+        $this->addPayment(
+            $monthlyPolicy,
+            0 - static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($cancelDate),
+            0 - Salva::MONTHLY_TOTAL_COMMISSION
+        );
+
+        $monthlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_COOLOFF, $cancelDate);
+        $this->assertEquals(
+            0,
+            $monthlyPolicy->getRefundAmount()
+        );
+        $this->assertEquals(
+            0,
+            $monthlyPolicy->getRefundCommissionAmount(new \DateTime('2016-01-10'))
+        );
+
+        $yearlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice($cancelDate),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1
+        );
+        // add refund of the first month
+        $this->addPayment(
+            $yearlyPolicy,
+            0 - static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($cancelDate),
+            0 - Salva::MONTHLY_TOTAL_COMMISSION
+        );
+        $yearlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_COOLOFF, $cancelDate);
+        $this->assertEquals(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice($cancelDate) -
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($cancelDate),
+            $yearlyPolicy->getRefundAmount()
+        );
+        $this->assertEquals(
+            Salva::YEARLY_TOTAL_COMMISSION - Salva::MONTHLY_TOTAL_COMMISSION,
+            $yearlyPolicy->getRefundCommissionAmount(new \DateTime('2016-01-10'))
+        );
+    }
+
     public function testDaysInPolicy()
     {
         $policy = $this->createPolicyForCancellation(
