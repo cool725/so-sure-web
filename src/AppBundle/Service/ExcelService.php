@@ -29,6 +29,12 @@ class ExcelService
             // $reader->setLoadSheetsOnly('Details');
 
             $excel = $reader->load($inFile);
+            $objWorksheet = $excel->getActiveSheet();
+            foreach ($objWorksheet->getRowIterator() as $row) {
+                foreach ($row->getCellIterator() as $cell) {
+                    $cell->setValue(str_replace(PHP_EOL, ' ', $cell->getValue()));
+                }
+            }
 
             $writer = \PHPExcel_IOFactory::createWriter($excel, 'CSV');
             $writer->save($outFile);
