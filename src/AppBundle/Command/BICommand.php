@@ -32,8 +32,8 @@ class BICommand extends ContainerAwareCommand
         foreach ($users as $user) {
             if ($user->hasValidPolicy()) {
                 $lines[] = implode(',', [
-                   sprintf('"%d"', $user->getAge()), 
-                   sprintf('"%s"', $user->getBillingAddress()->getPostcode()), 
+                   sprintf('"%d"', $user->getAge()),
+                   sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
                 ]);
             }
         }
