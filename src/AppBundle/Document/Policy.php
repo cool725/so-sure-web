@@ -953,6 +953,7 @@ abstract class Policy
 
     public function getCooloffRefundAmount()
     {
+        // Cooloff should refund full amount (which should be equal to the last payment)
         $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
         $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
         $amount = $paymentToRefund->getAmount();
@@ -969,7 +970,6 @@ abstract class Policy
 
     public function getProratedRefundAmount($date = null)
     {
-        // Cooloff should always refund full amount (which should be equal to the last payment)
         $used = $this->getPremium()->getYearlyPremiumPrice() * $this->getProrataMultiplier($date);
         $paid = $this->getPremiumPaid();
 
@@ -978,7 +978,7 @@ abstract class Policy
 
     public function getCooloffRefundCommissionAmount()
     {
-        // Cooloff should always refund full amount (which should be equal to the last payment)
+        // Cooloff should refund full amount (which should be equal to the last payment)
         $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
         $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
         $amount = $paymentToRefund->getAmount();
