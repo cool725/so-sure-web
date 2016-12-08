@@ -34,8 +34,8 @@
                           </div>
                             <div class="col-sm-9">
                               <h4>{% if phone %}{{ phone.make }} {{ phone.model }} {% if phone.memory %}{{ phone.memory }}GB{% endif %}{% endif %}
-                          <button type="button" class="btn btn-link" data-toggle="modal" data-target="#phoneModal">
-                            {% if phone %}Change Phone{% else %}Select Phone{% endif %}</button>
+                          <button type="button" class="select-phone btn btn-link" data-toggle="modal" data-target="#phoneModal">
+                            {% if phone %}Edit{% else %}Select{% endif %}</button>
                               </h4>
                             </div>
                           </div>

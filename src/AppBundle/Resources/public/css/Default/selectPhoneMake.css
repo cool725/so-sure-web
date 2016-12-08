@@ -53,6 +53,18 @@
     vertical-align: middle;
     font-size: 16px;
     line-height: 1.5;
+
+}
+@media (max-width: 992px) {
+  #select-phone .device-select, .device-select .input-group {
+    width: 80%;
+  }
+}
+
+@media (max-width: 767px) {
+  #select-phone .device-select, .device-select .input-group {
+    width: 100%;
+  }
 }
 
 .form-control {
@@ -89,5 +101,5 @@
 
 #select-phone .input-group-btn {
   width: 0% !important;
-  top: 16px;
+  display: initial;
 }

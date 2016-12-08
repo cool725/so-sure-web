@@ -349,4 +349,8 @@ label {
 .device-select-block li {
     display: block !important;
 }
-    
+
+.payment-container .select-phone {
+  padding: 0px;
+  float: right;
+}
