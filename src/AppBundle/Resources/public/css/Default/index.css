@@ -104,20 +104,6 @@
 
 /* PRESS */
 
-.press {
-    padding: 30px 0px 30px 0px;
-    text-align: center;
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -ms-flex-pack: justify;
-    justify-content: space-between;
-    -ms-flex-align: center;
-    align-items: center;
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
-    width: 100%;
-}
 .press img {
     width: 130px;
 }
@@ -129,7 +115,7 @@
     width: 180px;
   }
   .press h5 {
-    padding-top: 12px;
+    padding-top: 11px;
   }
 }
 @media (max-width: 767px) {
@@ -148,7 +134,6 @@
 /* HOW IT WORKS */
 
 #learn-more {
-    background-color: #FFF;
     padding: 80px 20px 150px 20px;
     text-align: center;
 }
@@ -267,19 +252,6 @@
 
 #device-logo:focus #memory-select {
     opacity: 0.96;
-}
-
-/* BENEFITS */
-
-.benefits {
-    padding: 80px 20px 150px 20px;
-    text-align: center;
-}
-
-.benefits img {
-    height: 150px;
-    padding-top: 30px;
-    padding-bottom: 30px;
 }
 
 /* SOCIAL PROOF */
