@@ -10,6 +10,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Exception\RateLimitException;
+use AppBundle\Exception\ImeiPhoneMismatchException;
 
 class ReceperioService extends BaseImeiService
 {
@@ -576,18 +577,20 @@ class ReceperioService extends BaseImeiService
         $modelData = $makeData['models'][0];
         $model = $modelData['name'];
 
-        // Non applce devices rely on on the modelreference special mapping
+        // Non apple devices rely on on the modelreference special mapping
         // we give reciperio and it really just a make/model check
         if ($make != 'apple') {
             if (isset($modelData['modelreference']) && $modelData['modelreference']) {
                 $device = $modelData['modelreference'];
                 if (!in_array(strtolower($device), $phone->getDevices())) {
-                    throw new \Exception(sprintf(
+                    $this->logger->warning(sprintf(
                         "Mismatching make %s for serial number %s. Data: %s",
                         $phone->getMake(),
                         $serialNumber,
                         json_encode($data)
                     ));
+
+                    return false;
                 }
             } else {
                 $this->logger->warning(sprintf('Need to contact reciperio to add modelreference for %s', $phone));
@@ -597,12 +600,14 @@ class ReceperioService extends BaseImeiService
         }
 
         if (strtolower($model) != strtolower($phone->getModel())) {
-            throw new \Exception(sprintf(
+            $this->logger->warning(sprintf(
                 "Mismatching model %s for serial number %s. Data: %s",
                 $phone->getModel(),
                 $serialNumber,
                 json_encode($data)
             ));
+
+            return false;
         }
 
         if (!isset($modelData['storage']) || !$modelData['storage']) {

@@ -278,7 +278,7 @@ class PurchaseController extends BaseController
                         } catch (ImeiPhoneMismatchException $e) {
                             $this->addFlash(
                                 'error',
-                                "Sorry, we are unable to insure you."
+                                "Looks like phone model you selected isn't quite right.  Please check that you selecte the correct model."
                             );
                             $allowPayment = false;
                         } catch (RateLimitException $e) {
