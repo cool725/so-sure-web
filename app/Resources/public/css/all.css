@@ -81,6 +81,38 @@ h1, h2, h3, h4, h5, h6 {
     margin-right:-4px;
 }
 
+.text-block {
+  padding: 60px 20px 60px 20px;
+}
+
+.start-purchase {
+  background-color: #FFF;
+  padding: 10px;
+  text-align: center;
+}
+
+.app-badge img {
+  width: inherit;
+}
+
+@media (min-width: 992px) {
+  .app-badge img {
+    width: 45%;
+  }
+}
+
+@media (max-width: 992px) {
+  .app-badge .text-left {
+    text-align: center !important
+  }
+  .app-badge .text-right {
+    text-align: center !important
+  }
+  .app-badge img {
+    padding-top: 10px;
+  }
+}
+
 /* NAVIGATION */
 
 .navbar-default {
@@ -188,7 +220,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-break {
     color: #202532;
-    padding: 40px;
+    padding: 20px;
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .text-break .line {

@@ -137,39 +137,79 @@
     </div>
     </section>
 
-    <section class="download-now" id="download-now">
-        <div class="container" id="buyModal">
-            <h2>Ready for better?</h2>
-            <p class="lead">You can either purchase your insurance online</p>
-            <div class="row">
-                <div class="form-group col-md-12" style="padding-top: 10px;">
-                  <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">Get started</a>
-                </div>
+    <section class="text-block">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2">
+        <h2 class="text-center">Why so-sure is designed for you</h2>
+        <p class="lead text-center">
+          It's time phone insurance works harder for you. Here's why...
+        </p>
+        <div class="text-block-body">
+          <p>Shockingly, the FCA recently <a href="https://www.fca.org.uk/publication/thematic-reviews/mobile-phone-findings.pd" target="_blank">reported</a>:
+            <ul>
+              <li>
+                More than a quarter of all phone insurance companies investigated paid out less than 60% of claims.
+              </li>
+              <li>
+                They can take an average of 25 days to payout your claim.
+              </li>
+            </ul>
+          </p>
+          <p>
+            So we created so-sure to serve you and not the insurance companies:
+            <ul>
+              <li>
+                T&amp;Cs that are in plain English and aren't designed to trip you up
+              </li>
+              <li>
+                A replacement phone delivered the next working day once your claim is approved
+              </li>
+              <li>
+                Up to 40% cheaper than the networks &amp; you can get up to 80% money back every year if you and your friends don't claim
+              </li>
+            </ul>
+          </p>
+          <h2 class="lead text-center">
+            Join the insurance revolution: so-sure, better and cheaper.
+          </h2>
+        </div>
+        <div class="start-purchase">
+        <div class="row">
+            <div class="form-group col-md-12" style="padding-top: 10px;">
+              <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">Get started</a>
             </div>
-            {% if phone.appAvailable %}
-            <div class="text-break">
-                <div class="line"></div>
-                OR
-                <div class="line"></div>
-            </div>
-            <div class="row" style="padding-bottom: 30px;">
-              <p class="lead">Download our app - it's a lot easier.</p>
+        </div>
+        {% if phone.appAvailable %}
+        <div class="text-break">
+            <div class="line"></div>
+            OR
+            <div class="line"></div>
+        </div>
+        <div class="row" style="padding-bottom: 30px;">
+          <p class="lead text-center">Download our app - it's a lot easier.</p>
+          <div class="app-badge">
             <div class="col-md-6 text-right">
-                <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-                </a>
-            </div>
-            <div class="col-md-6 text-left">
-                <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-                </a>
-            </div>
-            {% endif %}
-    </section>
-
+            <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+            </a>
+        </div>
+        <div class="col-md-6 text-left ">
+            <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+            </a>
+        </div>
+        </div>
+        {% endif %}
+      </div>
+      </div>
+    </div>
+  </div>
+  </section>
+  
     <section class="learn-video">
       <div class="container">
-        <h2 class="text-center">Learn how it works</h2>
+        <h2 class="text-center">Learn how so-sure works</h2>
         <p class="lead text-center">
           Watch the video &amp; learn how you can get up to 80% money back, every year.
         </p>
@@ -187,8 +227,8 @@
       </div>
     </section>
 
-    <section>
-        <div class="container support-chat">
+    <section class="text-block">
+        <div class="container">
             <h2 class="text-center">
                 Frequently asked questions
             </h2>
@@ -196,27 +236,23 @@
               Can't find the answer you're looking for? Check out our <a href="https://help.wearesosure.com">Help Centre</a>.
             </p>
           </div>
-            <div class="container faqs">
+            <div class="container">
                 <div class="row">
-                    <div class="col-md-12 text-left">
+                  <div class="col-md-8 col-md-offset-2 text-left">
                         <h4>How does it actually work?</h4>
                         <p>You still pay £{{ phone_price.monthlyPremiumPrice|number_format(2, '.', ',') }}
                             monthly for a year, but for each friend that also insures with us we’ll
                             <a href="https://help.wearesosure.com/hc/en-us/sections/201888645-Your-Reward-Pot" target="_blank">add up to £10 your Reward Pot</a>.</p>
-                    </div>
-                    <div class="col-md-12 text-left">
                         <h4>How do I get money back?</h4>
                         <p>If at the end of the year neither you nor your friends have made a claim, you'll get whatever is in your Reward Pot back.</p>
-                    </div>
-                    <div class="col-md-12 text-left">
                         <h4>What happens if someone claims?</h4>
                         <p>If someone claims, your
                             <a href="https://help.wearesosure.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">Reward Pot will go towards helping them get their phone back</a>. They’ll do the same if something happens to you.</p>
-                    </div>
-                    <div class="col-md-12 text-left">
                         <h4>Is this a joke?</h4>
                         <p>No. We just like careful people. If you connect with your friends and you all look after your phones we'll reward you! It's that simple.</p>
+                      </div>
                     </div>
+                  </div>
                 </div>
             </div>
         </div>
