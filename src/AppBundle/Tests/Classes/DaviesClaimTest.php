@@ -20,7 +20,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
     public function testFromArray()
     {
         $data = [
-            'So-Sure',
+            'So-Sure -Mobile',
             '320160401000001',
             'Mr John Smith',
             'AB12 3CD',
