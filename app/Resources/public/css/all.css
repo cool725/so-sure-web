@@ -63,8 +63,13 @@ h1, h2, h3, h4, h5, h6 {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #202532;
 }
+
 .text-success {
   color: #33CCCC !important;
+}
+
+.text-white {
+  color: #fff !important
 }
 /* Global Tools */
 
@@ -79,6 +84,51 @@ h1, h2, h3, h4, h5, h6 {
     text-align:left;
     /* inline-block space fix */
     margin-right:-4px;
+}
+
+.text-block {
+  padding: 60px 20px 60px 20px;
+}
+
+/* Below Fold Banner - e.g. Press and Start Purchase */
+
+.banner {
+    padding: 30px 0px 30px 0px;
+    text-align: center;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -ms-flex-align: center;
+    align-items: center;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.25);
+    width: 100%;
+}
+
+/* App Badges classes for stand alone section */
+
+.app-badge img {
+  width: inherit;
+}
+
+@media (min-width: 992px) {
+  .app-badge img {
+    width: 30%;
+  }
+}
+
+@media (max-width: 992px) {
+  .app-badge .text-left {
+    text-align: center !important
+  }
+  .app-badge .text-right {
+    text-align: center !important
+  }
+  .app-badge img {
+    padding-top: 10px;
+  }
 }
 
 /* NAVIGATION */
@@ -188,7 +238,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-break {
     color: #202532;
-    padding: 40px;
+    padding: 20px;
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .text-break .line {
@@ -349,6 +399,20 @@ h1, h2, h3, h4, h5, h6 {
     color: #626B78;
 }
 
+/* Benefits */
+
+.benefits {
+        padding: 60px 20px 60px 20px;
+    text-align: center;
+}
+
+.benefits img {
+    height: 150px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+
 /* Section Tools */
 .section {
   position: relative;
@@ -387,14 +451,16 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(to top, #efefef , #FFFFFF); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 .brand-gradient {
-  background: rgba(51, 153, 255, 1);
-  background: -moz-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
-  background: -webkit-gradient(left bottom, right top, color-stop(50%, rgba(51, 153, 255, 1)), color-stop(100%, rgba(0, 204, 255, 1)));
-  background: -webkit-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
-  background: -o-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
-  background: -ms-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
-  background: linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
-  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1);
+  background: background: #202532;
+  background: -webkit-linear-gradient(to right, #000428 , #004e92);
+  background: linear-gradient(to right, #202532 , #3399ff);
+}
+@media (max-width: 992px) {
+  .brand-gradient {
+    background: background: #202532;
+    background: -webkit-linear-gradient(to bottom, #000428 , #004e92);
+    background: linear-gradient(to bottom, #202532 , #3399ff);
+  }
 }
 
 div.col-sm-7.five-three {
@@ -413,6 +479,6 @@ hr.strong {
 }
 
 .btn-rounded {
-    border-radius: 30px;
-    padding: 10px 30px;
+    border-radius: 100px;
+    padding: 12px 30px;
 }

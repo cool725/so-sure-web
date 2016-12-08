@@ -25,195 +25,202 @@
 {% endblock %}
 
 {% block body %}
-  <section class="view-quote light-gradient">
-    <div class="vertical-align-wrap">
-      <div class="vertical-align-middle">
-        <div class="container">
-            <h1 class="text-center">Your quote</h1>
-            <p class="lead text-center">
-              We've finally made phone insurance worthwhile for careful people.
-            </p>
-            <div class="row">
-              <div class="panel panel-primary">
-                <div class="col-md-12">
-                <div class="col-md-6">
-                    <div class="quote-panel-left">
-                        <div class="row">
+    <section class="view-quote light-gradient">
+        <div class="vertical-align-wrap">
+            <div class="vertical-align-middle">
+                <div class="container">
+                    <h1 class="text-center">Here's your quote</h1>
+                    <p class="lead text-center">
+                        We like to think that we've finally made phone insurance worthwhile for careful people.
+                    </p>
+                    <div class="row">
+                        <div class="panel panel-primary">
                             <div class="col-md-12">
-                                <span>
-                                    <p>Device</p>
-                                    <h4>{{ phone }}</h4>
-                                    <br>
-                                    <p>Monthly Cost</p>
-                                    <h4>£{{ phone_price.monthlyPremiumPrice }}</h4>
-                                    <br>
-                                    <p>Covered for</p>
-                                    <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
-                                    <p>
-                                        <a href="#" data-toggle="modal" data-target="#more-info">More details (incl. excess)</a>
-                                    </p>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="quote-panel-right">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <span>
-                                    {% set start_friends = phone_price.maxConnections - 1 %}
-                                    {% set start_value = start_friends * connection_value %}
-                                    {% if start_value > phone_price.maxPot %}
-                                        {% set start_value = phone_price.maxPot %}
-                                    {% endif %}
+                                <div class="col-md-6">
+                                    <div class="quote-panel-left">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span>
+                                                    <p>Device</p>
+                                                    <h4>{{ phone }}</h4>
+                                                    <br>
+                                                    <p>Monthly Cost</p>
+                                                    <h4>£{{ phone_price.monthlyPremiumPrice }}</h4>
+                                                    <br>
+                                                    <p>Covered for</p>
+                                                    <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
+                                                    <p>
+                                                        <a href="#" data-toggle="modal" data-target="#more-info">More details (including excess)</a>
+                                                    </p>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="quote-panel-right">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span>
+                                                    {% set start_friends = phone_price.maxConnections - 1 %}
+                                                    {% set start_value = start_friends * connection_value %}
+                                                    {% if start_value > phone_price.maxPot %}
+                                                        {% set start_value = phone_price.maxPot %}
+                                                    {% endif %}
 
-                                    <h4>AND HERE'S THE COOL BIT</h4>
-                                    <div class="row reward-pot">
-                                        <div class="col-sm-4">
-                                            <p class="text-left" style="margin-bottom: -10px;">
-                                                Connect with
-                                            </p>
-                                            <h3 class="text-left">
-                                                <span id="num_friends">{{ start_friends }}
-                                                    friends</span>
-                                            </h3>
-                                        </div>
-                                        <div class="col-md-8">
-                                            <p class="text-left slider-container">
-                                            <form>
-                                                <input
-                                                    type="text"
-                                                    class="span2"
-                                                    value=""
-                                                    data-slider-min="0"
-                                                    data-slider-max="{{ phone_price.maxConnections }}"
-                                                    data-slider-maxpot="{{ phone_price.maxPot }}"
-                                                    data-slider-step="1"
-                                                    data-slider-value="{{ start_friends }}"
-                                                    data-slider-id="connection-slider"
-                                                    id="slider-value"
-                                                    data-slider-handle="round"
-                                                    data-slider-connection-value="{{ connection_value }}"/>
-                                                &nbsp;
-                                            </form>
-                                            </p>
+                                                    <h4>AND HERE'S THE COOL BIT</h4>
+                                                    <div class="row reward-pot">
+                                                        <div class="col-sm-4">
+                                                            <p class="text-left" style="margin-bottom: -10px;">
+                                                                Connect with
+                                                            </p>
+                                                            <h3 class="text-left">
+                                                                <span id="num_friends">{{ start_friends }}
+                                                                    friends</span>
+                                                            </h3>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <p class="text-left slider-container">
+                                                                <form>
+                                                                    <input
+                                                                        type="text"
+                                                                        class="span2"
+                                                                        value=""
+                                                                        data-slider-min="0"
+                                                                        data-slider-max="{{ phone_price.maxConnections }}"
+                                                                        data-slider-maxpot="{{ phone_price.maxPot }}"
+                                                                        data-slider-step="1"
+                                                                        data-slider-value="{{ start_friends }}"
+                                                                        data-slider-id="connection-slider"
+                                                                        id="slider-value"
+                                                                        data-slider-handle="round"
+                                                                        data-slider-connection-value="{{ connection_value }}"/>
+                                                                    &nbsp;
+                                                                </form>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row row-centered">
+                                                        <div class="col-md-6">
+                                                            <p class="text-left pot-text-container">
+                                                                At the end of the year, if no one claims, we'll give you back:
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-md-6 col-centered">
+                                                            <h3 id="money_back" class="circle">£{{ start_value }}</h3>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="row row-centered">
-                                        <div class="col-md-6">
-                                            <p class="text-left pot-text-container">
-                                              At the end of the year, if no one claims, we'll give you back:
-                                            </p>
-                                        </div>
-                                        <div class="col-md-6 col-centered">
-                                            <h3 id="money_back" class="circle">£{{ start_value }}</h3>
-                                        </div>
-                                    </div>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" style="padding-top: 30px; padding-bottom: 10px;">
-                <div class="col-sm-12">
-                  <!-- <p class="text-center">
+                                </div>
+                                <div class="row" style="padding-top: 30px; padding-bottom: 10px;">
+                                    <div class="col-sm-12">
+                                        <!-- <p class="text-center">
                       <a class="btn btn-primary" id="get-started">Buy now</a>
                     </p> -->
+                                    </div>
+                                </div>
+                                <div class="row" style="border-top: 2px solid #efefef; font-size: 14px; padding-top: 10px;">
+                                    <div class="col-sm-12">
+                                        <p class="text-center">
+                                            Not your device? Select another phone
+                                            <a href="/#get-quote">here</a>.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-                <div class="row" style="border-top: 2px solid #efefef; font-size: 14px; padding-top: 10px;">
-                <div class="col-sm-12">
-                  <p class="text-center">
-                    Not your device? Select another phone <a href="/#get-quote">here</a>.
-                  </p>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-    </div>
     </section>
 
-    <section class="download-now" id="download-now">
-        <div class="container" id="buyModal">
-            <h2>Ready for better?</h2>
-            <p class="lead">You can either purchase your insurance online</p>
+    <section class="banner brand-gradient start-purchase">
+        <div class="container">
             <div class="row">
-                <div class="form-group col-md-12" style="padding-top: 10px;">
-                  <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">Get started</a>
+                <div class="col-sm-4 text-left">
+                    <h3 class="text-white">
+                        Ready for better phone insurance?
+                    </h3>
+                </div>
+                <div class="col-sm-2">
+                    <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">Get started online</a>
+                </div>
+                <div class="col-sm-2">
+                    <h4 class="text-white text-center">OR</h4>
+                </div>
+                <div class="col-sm-2 app-badge">
+                    <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                        <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+                    </a>
+                </div>
+                <div class="col-sm-2 app-badge">
+                    <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                        <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+                    </a>
                 </div>
             </div>
-            {% if phone.appAvailable %}
-            <div class="text-break">
-                <div class="line"></div>
-                OR
-                <div class="line"></div>
-            </div>
-            <div class="row" style="padding-bottom: 30px;">
-              <p class="lead">Download our app - it's a lot easier.</p>
-            <div class="col-md-6 text-right">
-                <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-                </a>
-            </div>
-            <div class="col-md-6 text-left">
-                <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-                </a>
-            </div>
-            {% endif %}
+        </div>
     </section>
+
+    {% include 'AppBundle::Default/benefits.html.twig' %}
 
     <section class="learn-video">
-      <div class="container">
-        <h2 class="text-center">Learn how it works</h2>
-        <p class="lead text-center">
-          Watch the video &amp; learn how you can get up to 80% money back, every year.
-        </p>
-        <div class="row">
-          <div class="col-md-12 text-center">
-            <div class="explainer-video">
-                <a class="explainer-video-view" data-toggle="modal" data-target="#modal-fullscreen">
-                    <div class="explainer-video-frame">
-                        <div class="explainer-video-overlay"></div>
+        <div class="container">
+            <h2 class="text-center">Learn how so-sure works</h2>
+            <p class="lead text-center">
+                Watch the video &amp; learn how you can get up to 80% money back, every year.
+            </p>
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="explainer-video">
+                        <a class="explainer-video-view" data-toggle="modal" data-target="#modal-fullscreen">
+                            <div class="explainer-video-frame">
+                                <div class="explainer-video-overlay"></div>
+                            </div>
+                        </a>
                     </div>
-                </a>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </section>
 
-    <section>
-        <div class="container support-chat">
+    <section class="text-block">
+        <div class="container">
             <h2 class="text-center">
                 Frequently asked questions
             </h2>
             <p class="lead text-center" id="hero-description">
-              Can't find the answer you're looking for? Check out our <a href="https://help.wearesosure.com">Help Centre</a>.
+                Can't find the answer you're looking for? Check out our
+                <a href="https://help.wearesosure.com">Help Centre</a>.
             </p>
-          </div>
-            <div class="container faqs">
-                <div class="row">
-                    <div class="col-md-12 text-left">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 text-left">
+                    <h4>Why did we decide to start so-sure?</h4>
+                    <p>While we've all disliked phone insurance for a while, what really drove us to do something about it was
+                        <a href="https://www.fca.org.uk/publication/thematic-reviews/mobile-phone-findings.pd" target="_blank">a recent FCA report</a> that discovered:
+                        <ul>
+                            <li>
+                                More than a quarter of all phone insurance companies investigated paid out less than 60% of claims.
+                            </li>
+                            <li>
+                                They can take an average of 25 days to payout your claim.
+                            </li>
+                        </ul>
                         <h4>How does it actually work?</h4>
                         <p>You still pay £{{ phone_price.monthlyPremiumPrice|number_format(2, '.', ',') }}
                             monthly for a year, but for each friend that also insures with us we’ll
                             <a href="https://help.wearesosure.com/hc/en-us/sections/201888645-Your-Reward-Pot" target="_blank">add up to £10 your Reward Pot</a>.</p>
-                    </div>
-                    <div class="col-md-12 text-left">
                         <h4>How do I get money back?</h4>
                         <p>If at the end of the year neither you nor your friends have made a claim, you'll get whatever is in your Reward Pot back.</p>
-                    </div>
-                    <div class="col-md-12 text-left">
                         <h4>What happens if someone claims?</h4>
                         <p>If someone claims, your
                             <a href="https://help.wearesosure.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">Reward Pot will go towards helping them get their phone back</a>. They’ll do the same if something happens to you.</p>
-                    </div>
-                    <div class="col-md-12 text-left">
                         <h4>Is this a joke?</h4>
                         <p>No. We just like careful people. If you connect with your friends and you all look after your phones we'll reward you! It's that simple.</p>
                     </div>
@@ -221,52 +228,56 @@
             </div>
         </div>
     </div>
+</div>
+</div>
 </section>
 
 <div class="modal fade" id="more-info" tabindex="-1" role="dialog">
 <div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title">Coverage Summary</h4>
-        </div>
-        <div class="modal-body">
-            <h4>What you are covered for?</h4>
-            <p>If you take reasonable care of your phone and don't knowingly put it at risk you are covered for:</p>
-            <ul>
-                <li>Theft</li>
-                <li>Accidental Damage</li>
-                <li>Breakdown (including faults)</li>
-                <li>Loss</li>
-            </ul>
-            <br>
-            <p>In the event of theft or loss you are also covered for:</p>
-            <ul>
-                <li>Unauthorised network charges (up to £1,000 including VAT)</li>
-                <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
-            </ul>
-            <br>
-            <h4>What you are NOT covered for?</h4>
-            <ul>
-                <li>Excess – You need to pay each time you make a successful claim. £50 for Damage or Breakdown. £70 for Theft or Loss.</li>
-                <li>More than two theft or loss claims in the same year.</li>
-            </ul>
-        </div>
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Coverage Summary</h4>
     </div>
+    <div class="modal-body">
+        <h4>What you are covered for?</h4>
+        <p>If you take reasonable care of your phone and don't knowingly put it at risk you are covered for:</p>
+        <ul>
+            <li>Theft</li>
+            <li>Accidental Damage</li>
+            <li>Breakdown (including faults)</li>
+            <li>Loss</li>
+        </ul>
+        <br>
+        <p>In the event of theft or loss you are also covered for:</p>
+        <ul>
+            <li>Unauthorised network charges (up to £1,000 including VAT)</li>
+            <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
+        </ul>
+        <br>
+        <h4>What you are NOT covered for?</h4>
+        <ul>
+            <li>Excess – You need to pay each time you make a successful claim. £50 for Damage or Breakdown. £70 for Theft or Loss.</li>
+            <li>More than two theft or loss claims in the same year.</li>
+        </ul>
+    </div>
+</div>
 </div>
 </div>
 
 <div class="modal modal-buy fade" id="buyModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      {{ form_start(lead_form) }}
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+    {{ form_start(lead_form) }}
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
         <h3 class="modal-title text-center">Ready to join the Social Insurance revolution?</h3>
-      </div>
-      <div class="modal-body text-center">
+    </div>
+    <div class="modal-body text-center">
         <p class="lead">Just enter your email below to get started!</p>
         <div class="row">
             <div class="form-group col-sm-12">
@@ -278,29 +289,29 @@
         </div>
         {{ form_end(lead_form) }}
         <div class="download-app-modal">
-        <div class="text-break">
-            <div class="line"></div>
-            OR
-            <div class="line"></div>
+            <div class="text-break">
+                <div class="line"></div>
+                OR
+                <div class="line"></div>
+            </div>
+            <div class="row" style="padding-bottom: 30px;">
+                <p class="lead">Download our app - it's a little bit easier.</p>
+                <div class="col-md-6 text-right">
+                    <a class="ga-outbound-click" href="{{ apple_download('modal') }}">
+                        <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+                    </a>
+                </div>
+                <div class="col-md-6 text-left">
+                    <a class="ga-outbound-click" href="{{ google_download('modal') }}">
+                        <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="row" style="padding-bottom: 30px;">
-          <p class="lead">Download our app - it's a little bit easier.</p>
-        <div class="col-md-6 text-right">
-            <a class="ga-outbound-click" href="{{ apple_download('modal') }}">
-                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-            </a>
-        </div>
-        <div class="col-md-6 text-left">
-            <a class="ga-outbound-click" href="{{ google_download('modal') }}">
-                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-            </a>
-        </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
     </div>
+</div>
+</div>
+</div>
 
 {% include 'AppBundle::Default/modalVideo.html.twig' %}
 

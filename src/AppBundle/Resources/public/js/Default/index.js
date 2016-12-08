@@ -12,7 +12,7 @@
 
     $("#learn-more-btn").click(function() {
         $('html, body').animate({
-            scrollTop: $("#benefits").offset().top
+            scrollTop: $("#learn-more").offset().top
         }, 1500);
     });
 
