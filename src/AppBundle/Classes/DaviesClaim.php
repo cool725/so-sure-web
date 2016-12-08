@@ -133,17 +133,24 @@ class DaviesClaim
 
     private function nullIfBlank($field)
     {
-        if (!$field || strlen(trim($field)) == 0 || $field == 'TBC') {
+        if (!$field || $this->isNullableValue($field)) {
             return null;
         }
 
         return trim($field);
     }
 
+    private function isNullableValue($value)
+    {
+        // possible values that Davies might use as placeholders
+        // when a field is required by their system, but not yet known
+        return in_array(trim($value), ['', 'TBC', 'Tbc', 'tbc', '-', '0', 0, 'N/A', 'n/a']);
+    }
+
     private function excelDate($days)
     {
         try {
-            if (!$days || $days == 'TBC') {
+            if (!$days || $this->isNullableValue($days)) {
                 return null;
             }
 
