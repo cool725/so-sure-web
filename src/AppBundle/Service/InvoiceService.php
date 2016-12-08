@@ -210,7 +210,8 @@ class InvoiceService
             ['invoice' => $invoice],
             'AppBundle:Email:invoice/invoice.txt.twig',
             ['invoice' => $invoice],
-            [$invoicePdf]
+            [$invoicePdf],
+            'tech@so-sure.com'
         );
     }
 }

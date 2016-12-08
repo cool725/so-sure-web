@@ -27,6 +27,7 @@ use AppBundle\Document\SoSurePayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Invoice;
 use AppBundle\Document\Connection;
 use AppBundle\Document\OptOut\OptOut;
 use AppBundle\Document\OptOut\EmailOptOut;
@@ -1461,5 +1462,20 @@ class AdminController extends BaseController
         });
 
         return ['total' => count($policies), 'data' => $data];
+    }
+
+    /**
+     * @Route("/invoices", name="admin_invoices")
+     * @Template
+     */
+    public function invoicesAction()
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Invoice::class);
+        $invoices = $repo->findAll();
+
+        return [
+            'invoices' => $invoices,
+        ];
     }
 }
