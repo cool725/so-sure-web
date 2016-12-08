@@ -69,7 +69,10 @@ class PurchaseStepPhoneType extends AbstractType
                     $form->add('serialNumber', TextType::class, ['required' => $this->required]);
                 }
             } else {
-                $form->add('amount', TextType::class, ['attr' => ['readonly' => true, 'placeholder' => 'Select phone above'], 'disabled' => true]);
+                $form->add('amount', TextType::class, [
+                    'attr' => ['readonly' => true, 'placeholder' => 'Select phone above'],
+                    'disabled' => true
+                ]);
             }
         });
     }
