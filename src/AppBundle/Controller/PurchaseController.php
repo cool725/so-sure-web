@@ -276,10 +276,12 @@ class PurchaseController extends BaseController
                             );
                             $allowPayment = false;
                         } catch (ImeiPhoneMismatchException $e) {
+                            // @codingStandardsIgnoreStart
                             $this->addFlash(
                                 'error',
-                                "Sorry, we are unable to insure you."
+                                "Looks like phone model you selected isn't quite right. Please check that you selected the correct model."
                             );
+                            // @codingStandardsIgnoreEnd
                             $allowPayment = false;
                         } catch (RateLimitException $e) {
                             $this->addFlash(
