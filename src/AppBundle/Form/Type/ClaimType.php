@@ -37,6 +37,8 @@ class ClaimType extends AbstractType
                 Claim::TYPE_LOSS => Claim::TYPE_LOSS,
                 Claim::TYPE_THEFT => Claim::TYPE_THEFT,
                 Claim::TYPE_DAMAGE => Claim::TYPE_DAMAGE,
+                Claim::TYPE_WARRANTY => Claim::TYPE_WARRANTY,
+                Claim::TYPE_EXTENDED_WARRANTY => Claim::TYPE_EXTENDED_WARRANTY,
             ]])
             ->add('status', ChoiceType::class, ['choices' => [
                 Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,

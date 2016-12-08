@@ -327,6 +327,11 @@ class Claim
             throw new \Exception('Status must be defined');
         }
 
+        if (in_array($this->getType(), [self::TYPE_WARRANTY, self::TYPE_EXTENDED_WARRANTY]) &&
+            in_array($status, [self::STATUS_APPROVED, self::STATUS_DECLINED])) {
+            throw new \InvalidArgumentException(sprintf('Unable to use approved/declined with Warranty Types'));
+        }
+
         $this->status = $status;
     }
 
