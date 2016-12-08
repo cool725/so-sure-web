@@ -553,12 +553,6 @@ services:
         tags:
             - { name: form.type }
 
-    app.form.type.purchase:
-        class: AppBundle\Form\Type\PurchaseType
-        arguments: ["@request_stack", "%form_required%"]
-        tags:
-            - { name: form.type }
-
     app.form.type.purchasesteppersonal:
         class: AppBundle\Form\Type\PurchaseStepPersonalType
         arguments: ["%form_required%"]

@@ -345,3 +345,8 @@ label {
 .payment-container .text-danger {
   color: #ff6666;
 }
+
+.device-select-block li {
+    display: block !important;
+}
+    

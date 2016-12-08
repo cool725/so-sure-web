@@ -76,7 +76,7 @@ class PurchaseStepPhone
     public function setImei($imei)
     {
         $this->imei = $imei;
-        if ($this->getPhone()->getMake() != "Apple") {
+        if ($this->getPhone() && $this->getPhone()->getMake() != "Apple") {
             $this->setSerialNumber($imei);
         }
     }

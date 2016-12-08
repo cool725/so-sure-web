@@ -51,21 +51,28 @@ class PurchaseStepPhoneType extends AbstractType
             $purchase = $event->getData();
             $form = $event->getForm();
 
-            $price = $purchase->getPhone()->getCurrentPhonePrice();
-            $form->add('amount', ChoiceType::class, [
-                'choices' => [
-                    sprintf('%.2f', $price->getMonthlyPremiumPrice()) =>
-                        sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice()),
-                    sprintf('%.2f', $price->getYearlyPremiumPrice()) =>
-                        sprintf('£%.2f Yearly', $price->getYearlyPremiumPrice()),
-                ],
-                'placeholder' => false,
-                'expanded' => 'true',
-                'required' => $this->required
-            ]);
+            if ($purchase->getPhone()) {
+                $price = $purchase->getPhone()->getCurrentPhonePrice();
+                $form->add('amount', ChoiceType::class, [
+                    'choices' => [
+                        sprintf('%.2f', $price->getMonthlyPremiumPrice()) =>
+                            sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice()),
+                        sprintf('%.2f', $price->getYearlyPremiumPrice()) =>
+                            sprintf('£%.2f Yearly', $price->getYearlyPremiumPrice()),
+                    ],
+                    'placeholder' => false,
+                    'expanded' => 'true',
+                    'required' => $this->required
+                ]);
 
-            if ($purchase->getPhone()->getMake() == "Apple") {
-                $form->add('serialNumber', TextType::class, ['required' => $this->required]);
+                if ($purchase->getPhone()->getMake() == "Apple") {
+                    $form->add('serialNumber', TextType::class, ['required' => $this->required]);
+                }
+            } else {
+                $form->add('amount', TextType::class, [
+                    'attr' => ['readonly' => true, 'placeholder' => 'Select phone above'],
+                    'disabled' => true
+                ]);
             }
         });
     }

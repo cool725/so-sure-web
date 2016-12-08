@@ -107,9 +107,10 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/select-phone", name="select_phone_make")
+     * @Route("/select-phone/{type}", name="select_phone_make_type")
      * @Template()
      */
-    public function selectPhoneMakeAction(Request $request)
+    public function selectPhoneMakeAction(Request $request, $type = null)
     {
         $deviceAtlas = $this->get('app.deviceatlas');
         $dm = $this->getManager();
@@ -126,9 +127,13 @@ class DefaultController extends BaseController
                 $phoneMake->setMake($phone->getMake());
             }
         }
+        $post = $this->generateUrl('select_phone_make');
+        if ($type) {
+            $post = $this->generateUrl('select_phone_make_type', ['type' => $type]);
+        }
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
-                'action' => $this->generateUrl('select_phone_make'),
+                'action' => $post,
             ])
             ->getForm();
         if ('POST' === $request->getMethod()) {
@@ -138,26 +143,33 @@ class DefaultController extends BaseController
                 $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
                 if ($phoneMake->getPhoneId()) {
                     $phone = $phoneRepo->find($phoneMake->getPhoneId());
-                    if (!$phone) {
-                        // TODO: Would be better to redirect to a make page instead
-                        $this->addFlash('warning', 'Please ensure you select a model as well');
-                        if ($this->getReferer()) {
-                            return new RedirectResponse($this->getReferer());
-                        } else {
-                            return $this->redirectToRoute('homepage');
-                        }
-                    }
-                    if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                            'memory' => $phone->getMemory(),
-                        ]);
+                    if ($type == 'purchase-select' || $type == 'purchase-change') {
+                        $session = $request->getSession();
+                        $session->set('quote', $phone->getId());
+
+                        return $this->redirectToRoute('purchase_step_phone');
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                        ]);
+                        if (!$phone) {
+                            // TODO: Would be better to redirect to a make page instead
+                            $this->addFlash('warning', 'Please ensure you select a model as well');
+                            if ($this->getReferer()) {
+                                return new RedirectResponse($this->getReferer());
+                            } else {
+                                return $this->redirectToRoute('homepage');
+                            }
+                        }
+                        if ($phone->getMemory()) {
+                            return $this->redirectToRoute('quote_make_model_memory', [
+                                'make' => $phone->getMake(),
+                                'model' => $phone->getEncodedModel(),
+                                'memory' => $phone->getMemory(),
+                            ]);
+                        } else {
+                            return $this->redirectToRoute('quote_make_model', [
+                                'make' => $phone->getMake(),
+                                'model' => $phone->getEncodedModel(),
+                            ]);
+                        }
                     }
                 }
             }
@@ -166,6 +178,7 @@ class DefaultController extends BaseController
         return [
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
+            'type' => $type,
         ];
     }
 
@@ -242,7 +255,7 @@ class DefaultController extends BaseController
                 $user
             );
 
-            return $this->redirectToRoute('purchase_step_personal');
+            return $this->redirectToRoute('purchase');
         }
 
         return [
@@ -473,7 +486,7 @@ class DefaultController extends BaseController
                         // @codingStandardsIgnoreEnd
                     }
 
-                    return $this->redirectToRoute('purchase_step_personal');
+                    return $this->redirectToRoute('purchase');
                 } else {
                     $this->addFlash('error', sprintf(
                         "Sorry, didn't quite catch that email.  Please try again."
