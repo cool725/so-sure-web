@@ -102,7 +102,7 @@ class UserController extends BaseController
         // If there are any policies in progress, redirect to the purchase
         $initPolicies = $user->getInitPolicies();
         if (count($initPolicies) > 0) {
-            return $this->redirectToRoute('purchase_policy', ['policyId' => $initPolicies[0]->getId()]);
+            return $this->redirectToRoute('purchase_step_phone');
         }
 
         return array(

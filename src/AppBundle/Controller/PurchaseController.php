@@ -51,7 +51,6 @@ class PurchaseController extends BaseController
     /**
      * @Route("/phone/{phoneId}", name="purchase_phone", requirements={"phoneId":"[0-9a-f]{24,24}"})
      * @Route("/{policyId}", name="purchase_policy", requirements={"policyId":"[0-9a-f]{24,24}"})
-     * @Route("/", name="purchase")
      * @Template
     */
     public function purchaseAction(Request $request, $phoneId = null, $policyId = null)
@@ -262,6 +261,7 @@ class PurchaseController extends BaseController
 
     /**
      * @Route("/step-personal", name="purchase_step_personal")
+     * @Route("/", name="purchase")
      * @Template
     */
     public function purchaseStepPersonalAction(Request $request)
@@ -402,15 +402,14 @@ class PurchaseController extends BaseController
         if ($session->get('quote')) {
             $phone = $phoneRepo->find($session->get('quote'));
         }
-        if (!$phone) {
-            // TODO: display phone selector
-            throw new \Exception('Unknown phone');
-        }
 
         $purchase = new PurchaseStepPhone();
-        $purchase->setPhone($phone);
+        if ($phone) {
+            $purchase->setPhone($phone);
+        }
         $policy = $user->getUnInitPolicy();
         if ($policy) {
+            $purchase->setPhone($policy->getPhone());
             $purchase->setImei($policy->getImei());
             $purchase->setSerialNumber($policy->getSerialNumber());
         }
@@ -423,6 +422,7 @@ class PurchaseController extends BaseController
                 $purchaseForm->handleRequest($request);
                 if ($purchaseForm->isValid()) {
                     if ($policy) {
+                        // TODO: How can we preserve imei & make/model check results across policies
                         // If any policy data has changed, delete/re-create
                         if ($policy->getImei() != $purchase->getImei() ||
                             $policy->getSerialNumber() != $purchase->getSerialNumber() ||
@@ -438,7 +438,7 @@ class PurchaseController extends BaseController
                             $policyService = $this->get('app.policy');
                             $policy = $policyService->init(
                                 $user,
-                                $phone,
+                                $purchase->getPhone(),
                                 $purchase->getImei(),
                                 $purchase->getSerialNumber(),
                                 $this->getIdentityLogWeb($request)

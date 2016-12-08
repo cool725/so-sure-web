@@ -4,6 +4,7 @@
     {{ parent() }}
     {% stylesheets
     '@AppBundle/Resources/public/css/Purchase/purchase.css'
+    'bundles/app/css/Default/selectPhoneMake.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -11,6 +12,7 @@
     {{ parent() }}
     {% javascripts
     '@AppBundle/Resources/public/js/Purchase/purchaseStepPhone.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
      %}
     %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -31,7 +33,10 @@
                               <label>Phone</label>
                           </div>
                             <div class="col-sm-9">
-                              <h4>{{ phone.make }} {{ phone.model }} {% if phone.memory %}{{ phone.memory }}GB{% endif %}</h4>
+                              <h4>{% if phone %}{{ phone.make }} {{ phone.model }} {% if phone.memory %}{{ phone.memory }}GB{% endif %}{% endif %}
+                          <button type="button" class="btn btn-link" data-toggle="modal" data-target="#phoneModal">
+                            {% if phone %}Change Phone{% else %}Select Phone{% endif %}</button>
+                              </h4>
                             </div>
                           </div>
                       </div>
@@ -110,6 +115,23 @@
           </div>
           <div class="modal-body">
             It's easy to find your IMEI & Serial Numbers.  Open the Settings app, and navigate to General > About.  The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Select your phone</h4>
+          </div>
+          <div class="modal-body">
+            {{ render(controller('AppBundle:Default:selectPhoneMake', {
+              'callback':path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params'))|url_encode,
+              'type': 'modal'})) }}
           </div>
         </div>
       </div>

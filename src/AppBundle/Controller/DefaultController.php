@@ -107,9 +107,10 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/select-phone", name="select_phone_make")
+     * @Route("/select-phone/{$type}", name="select_phone_make_type")
      * @Template()
      */
-    public function selectPhoneMakeAction(Request $request)
+    public function selectPhoneMakeAction(Request $request, $type = null)
     {
         $deviceAtlas = $this->get('app.deviceatlas');
         $dm = $this->getManager();
@@ -138,26 +139,30 @@ class DefaultController extends BaseController
                 $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
                 if ($phoneMake->getPhoneId()) {
                     $phone = $phoneRepo->find($phoneMake->getPhoneId());
-                    if (!$phone) {
-                        // TODO: Would be better to redirect to a make page instead
-                        $this->addFlash('warning', 'Please ensure you select a model as well');
-                        if ($this->getReferer()) {
-                            return new RedirectResponse($this->getReferer());
-                        } else {
-                            return $this->redirectToRoute('homepage');
-                        }
-                    }
-                    if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                            'memory' => $phone->getMemory(),
-                        ]);
+                    if ($type == 'modal') {
+                        return new RedirectResponse($request->get('callback'));
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                        ]);
+                        if (!$phone) {
+                            // TODO: Would be better to redirect to a make page instead
+                            $this->addFlash('warning', 'Please ensure you select a model as well');
+                            if ($this->getReferer()) {
+                                return new RedirectResponse($this->getReferer());
+                            } else {
+                                return $this->redirectToRoute('homepage');
+                            }
+                        }
+                        if ($phone->getMemory()) {
+                            return $this->redirectToRoute('quote_make_model_memory', [
+                                'make' => $phone->getMake(),
+                                'model' => $phone->getEncodedModel(),
+                                'memory' => $phone->getMemory(),
+                            ]);
+                        } else {
+                            return $this->redirectToRoute('quote_make_model', [
+                                'make' => $phone->getMake(),
+                                'model' => $phone->getEncodedModel(),
+                            ]);
+                        }
                     }
                 }
             }
@@ -166,6 +171,7 @@ class DefaultController extends BaseController
         return [
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
+            'type' => $type,
         ];
     }
 
