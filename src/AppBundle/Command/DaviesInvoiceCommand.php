@@ -25,7 +25,13 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
             ->addArgument(
                 'date',
                 InputArgument::REQUIRED,
-                'date'
+                'date (you probably want the previous month)'
+            )
+            ->addOption(
+                'email',
+                null,
+                InputOption::VALUE_NONE,
+                'if set, email accounts.payable@davies-group.com'
             )
         ;
     }
@@ -33,6 +39,11 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $date = new \DateTime($input->getArgument('date'));
+        $email = true === $input->getOption('email');
+        $emailAddress = null;
+        if ($email) {
+            $emailAddress = 'accounts.payable@davies-group.com';
+        }
 
         $dm = $this->getManager();
         $charges = $this->getCharges($date);
@@ -60,8 +71,12 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
             $dm->flush();
 
             $invoiceService = $this->getContainer()->get('app.invoice');
-            $invoiceService->generateInvoice($invoice, 'patrick@so-sure.com');
-            $output->writeln(sprintf('Invoice %s generated and emailed', $invoice->getInvoiceNumber()));
+            $invoiceService->generateInvoice($invoice, $emailAddress);
+            if ($email) {
+                $output->writeln(sprintf('Invoice %s generated and emailed', $invoice->getInvoiceNumber()));
+            } else {
+                $output->writeln(sprintf('Invoice %s generated', $invoice->getInvoiceNumber()));
+            }
         } else {
             $output->writeln(sprintf('No charges for %s', $date->format('M Y')));
         }

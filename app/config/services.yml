@@ -233,6 +233,14 @@ services:
         tags:
             - { name: twig.extension }
 
+    app.twig.s3:
+        class: AppBundle\Service\S3TwigExtension
+        arguments:
+            s3: "@aws.s3"
+        public: false
+        tags:
+            - { name: twig.extension }
+
     app.twig.intercom:
         class: AppBundle\Service\IntercomTwigExtension
         arguments:
