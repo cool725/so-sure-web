@@ -143,7 +143,7 @@ class DefaultController extends BaseController
                 $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
                 if ($phoneMake->getPhoneId()) {
                     $phone = $phoneRepo->find($phoneMake->getPhoneId());
-                    if ($type == 'purchase') {
+                    if ($type == 'purchase-select' || $type == 'purchase-change') {
                         $session = $request->getSession();
                         $session->set('quote', $phone->getId());
 

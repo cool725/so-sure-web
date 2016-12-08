@@ -24,7 +24,6 @@ use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
-use AppBundle\Form\Type\PurchaseType;
 use AppBundle\Form\Type\PurchaseStepPersonalType;
 use AppBundle\Form\Type\PurchaseStepAddressType;
 use AppBundle\Form\Type\PurchaseStepPhoneType;
@@ -317,6 +316,7 @@ class PurchaseController extends BaseController
             'purchase_form' => $purchaseForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 3,
+            'modal_type' => $phone ? 'purchase-change' : 'purchase-select',
         );
 
         return $data;

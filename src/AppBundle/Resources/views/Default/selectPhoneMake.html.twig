@@ -1,14 +1,20 @@
     <div id="select-phone-data" data-phones='{{ phones|json_encode|raw }}'>
-        {% if type is defined and type == 'modal' %}
+        {% if type is defined and type == 'purchase-select' %}
             {% set buttonText = 'Select Phone' %}
+            {% set class = "device-select-block" %}
+            <h2>Select your phone</h2>
+        {% elseif type is defined and type == 'purchase-change' %}
+            {% set buttonText = 'Select Phone' %}
+            {% set class = "device-select-block" %}
             <h2>Change your phone</h2>
         {% else %}
             {% set buttonText = 'Quote me' %}
+            {% set class = "text-center" %}
             <h2>Get a quote</h2>
             <p class="lead text-center" id="hero-description">Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
         {% endif %}
         <div class="row" id="select-phone">
-            <div class="col-sm-12 text-center">
+            <div class="col-sm-12 {{ class }}">
                 <div class="device-select">
                     {{ form_start(form_phone) }}
                     <div class="input-group">
@@ -29,7 +35,7 @@
                     {{ form_end(form_phone) }}
                 </div>
             </div>
-            {% if type is not defined or type != 'modal' %}
+            {% if type is not defined or not type  %}
             <p class="text-center">
                 <a href="mailto:hello@wearesosure.com">Don't see your device? Let us know.</a>
             </p>
