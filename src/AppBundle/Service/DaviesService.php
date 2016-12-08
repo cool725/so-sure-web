@@ -244,7 +244,9 @@ class DaviesService
 
                 $this->validateClaimDetails($claim, $daviesClaim);
 
-                $claim->setType($daviesClaim->getClaimType());
+                if ($claim->getType() != $daviesClaim->getClaimType()) {
+                    throw new \Exception(sprintf('Claims type does not match for claim %s', $daviesClaim->claimNumber));
+                }
                 if ($daviesClaim->getClaimStatus()) {
                     $claim->setStatus($daviesClaim->getClaimStatus());
                 }

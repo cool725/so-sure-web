@@ -45,15 +45,15 @@ class DaviesClaim
 
     public function getClaimType()
     {
-        if ($this->lossType == "Loss") {
+        if (stripos($this->lossType, "Loss") !== false) {
             return Claim::TYPE_LOSS;
-        } elseif ($this->lossType == "Theft") {
+        } elseif (stripos($this->lossType, "Theft") !== false) {
             return Claim::TYPE_THEFT;
-        } elseif ($this->lossType == "Damage") {
+        } elseif (stripos($this->lossType, "Damage") !== false) {
             return Claim::TYPE_DAMAGE;
-        } elseif ($this->lossType == "Warranty") {
+        } elseif (stripos($this->lossType, "Warranty") !== false) {
             return Claim::TYPE_WARRANTY;
-        } elseif ($this->lossType == "Extended Warranty") {
+        } elseif (stripos($this->lossType, "Extended Warranty") !== false) {
             return Claim::TYPE_EXTENDED_WARRANTY;
         } else {
             return null;
