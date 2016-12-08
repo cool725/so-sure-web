@@ -289,12 +289,23 @@ class DaviesService
             ));
         }
 
-        if ($claim->getPolicy()->getUser()->getName() != $daviesClaim->insuredName) {
-            $this->logger->warning(sprintf(
-                'Claim %s: %s does not match expected insuredName %s',
+        similar_text($claim->getPolicy()->getUser()->getName(), $daviesClaim->insuredName, $percent);
+
+        if ($percent < 30) {
+            throw new \Exception(sprintf(
+                'Claim %s: %s does not match expected insuredName %s (match %s)',
                 $daviesClaim->claimNumber,
                 $daviesClaim->insuredName,
-                $claim->getPolicy()->getUser()->getName()
+                $claim->getPolicy()->getUser()->getName(),
+                $percent
+            ));
+        } elseif ($percent < 80) {
+            $this->logger->warning(sprintf(
+                'Claim %s: %s does not match expected insuredName %s (match %s)',
+                $daviesClaim->claimNumber,
+                $daviesClaim->insuredName,
+                $claim->getPolicy()->getUser()->getName(),
+                $percent
             ));
         }
 

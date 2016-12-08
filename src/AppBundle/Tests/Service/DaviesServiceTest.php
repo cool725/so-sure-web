@@ -97,6 +97,27 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateClaimDetailsName()
+    {
+        $user = new User();
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+        $policy->setPolicyNumber(3);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = 3;
+        $daviesClaim->insuredName = 'Mr Bar Foo';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+    }
+
     public function testValidateClaimDetails()
     {
         $address = new Address();
@@ -114,7 +135,7 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->policyNumber = 1;
-        $daviesClaim->insuredName = 'foo bar';
+        $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'AAA';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
