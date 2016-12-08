@@ -249,7 +249,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $claim->setNotificationDate(clone $date);
 
         $claim->setType($this->getRandomClaimType());
-        $claim->setStatus($this->getRandomStatus());
+        $claim->setStatus($this->getRandomStatus($claim->getType()));
         if ($claim->isOpen()) {
             $claim->setDaviesStatus('open');
         } else {
@@ -309,8 +309,17 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return sprintf('%s - %s', ucfirst($claim->getType()), $data[rand(0, count($data) - 1)]);
     }
 
-    protected function getRandomStatus()
+    protected function getRandomStatus($type)
     {
+        if (in_array($type, [Claim::TYPE_WARRANTY, Claim::TYPE_EXTENDED_WARRANTY])) {
+            $random = rand(0, 1);
+            if ($random == 0) {
+                return Claim::STATUS_INREVIEW;
+            } elseif ($random == 1) {
+                return Claim::STATUS_WITHDRAWN;
+            }
+        }
+
         $random = rand(0, 4);
         if ($random == 0) {
             return Claim::STATUS_INREVIEW;
@@ -327,13 +336,17 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
     protected function getRandomClaimType()
     {
-        $type = rand(0, 2);
+        $type = rand(0, 4);
         if ($type == 0) {
             return Claim::TYPE_LOSS;
         } elseif ($type == 1) {
             return Claim::TYPE_THEFT;
         } elseif ($type == 2) {
             return Claim::TYPE_DAMAGE;
+        } elseif ($type == 3) {
+            return Claim::TYPE_WARRANTY;
+        } elseif ($type == 4) {
+            return Claim::TYPE_EXTENDED_WARRANTY;
         }
     }
 }

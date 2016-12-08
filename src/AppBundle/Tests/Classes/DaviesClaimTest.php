@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Classes;
 
 use AppBundle\Classes\DaviesClaim;
+use AppBundle\Document\Claim;
 
 /**
  * @group unit
@@ -55,5 +56,21 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $davies->fromArray($data);
         $this->assertEquals(new \DateTime('2017-02-28'), $davies->endDate);
         $this->assertEquals(new \DateTime('2016-03-01'), $davies->startDate);
+    }
+
+    public function testClaimsType()
+    {
+        $davies = new DaviesClaim();
+        $davies->lossType = "Loss - From Pocket";
+        $this->assertEquals(Claim::TYPE_LOSS, $davies->getClaimType());
+
+        $davies->lossType = "Warranty - Audio Fault";
+        $this->assertEquals(Claim::TYPE_WARRANTY, $davies->getClaimType());
+
+        $davies->lossType = "Accidental Damage - Dropped (Away From Home)   ";
+        $this->assertEquals(Claim::TYPE_DAMAGE, $davies->getClaimType());
+
+        $davies->lossType = "Theft - From Pocket";
+        $this->assertEquals(Claim::TYPE_THEFT, $davies->getClaimType());
     }
 }
