@@ -81,7 +81,7 @@ class DaviesClaim
             $this->client = $data[0];
             if ($this->client == "") {
                 return;
-            } elseif ($this->client != "So-Sure") {
+            } elseif ($this->client != "So-Sure -Mobile") {
                 throw new \Exception('Incorrect client');
             }
 
