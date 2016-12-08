@@ -559,7 +559,7 @@ class ReceperioService extends BaseImeiService
     {
         if (!isset($data['makes']) || count($data['makes']) != 1) {
             throw new \Exception(sprintf(
-                "Unable to check serial number (multiple makes) %s. Data: %s",
+                "Unable to check serial number (no/multiple makes) %s. Data: %s",
                 $serialNumber,
                 json_encode($data)
             ));
@@ -567,13 +567,21 @@ class ReceperioService extends BaseImeiService
         $makeData = $data['makes'][0];
         $make = strtolower($makeData['make']);
 
-        if (!isset($makeData['models']) || count($makeData['models']) != 1) {
+        if (!isset($makeData['models']) || count($makeData['models']) == 0) {
+            throw new \Exception(sprintf(
+                "Contact reciperio - Unable to check serial number (no models) %s. Data: %s",
+                $serialNumber,
+                json_encode($data)
+            ));
+        }
+        if (!$this->areSameModelMemory($makeData['models'])) {
             throw new \Exception(sprintf(
                 "Unable to check serial number (multiple models) %s. Data: %s",
                 $serialNumber,
                 json_encode($data)
             ));
         }
+
         $modelData = $makeData['models'][0];
         $model = $modelData['name'];
 
@@ -623,6 +631,26 @@ class ReceperioService extends BaseImeiService
                 $phone->getMemory(),
                 json_encode($data)
             ));
+        }
+
+        return true;
+    }
+
+    public function areSameModelMemory($models)
+    {
+        // If there are multiple models with the same memory, its just differences in colours which can be ignored
+        $model = null;
+        $storage = null;
+        foreach ($models as $modelData) {
+            if (!$model) {
+                $model = $modelData['name'];
+            }
+            if (!$storage) {
+                $storage = $modelData['storage'];
+            }
+            if ($model != $modelData['name'] || $storage != $modelData['storage']) {
+                return false;
+            }
         }
 
         return true;
