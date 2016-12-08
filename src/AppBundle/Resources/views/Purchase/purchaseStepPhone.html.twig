@@ -129,9 +129,7 @@
             <h4 class="modal-title">Select your phone</h4>
           </div>
           <div class="modal-body">
-            {{ render(controller('AppBundle:Default:selectPhoneMake', {
-              'callback':path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params'))|url_encode,
-              'type': 'modal'})) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': 'purchase'})) }}
           </div>
         </div>
       </div>

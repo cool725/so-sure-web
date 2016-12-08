@@ -107,7 +107,7 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/select-phone", name="select_phone_make")
-     * @Route("/select-phone/{$type}", name="select_phone_make_type")
+     * @Route("/select-phone/{type}", name="select_phone_make_type")
      * @Template()
      */
     public function selectPhoneMakeAction(Request $request, $type = null)
@@ -127,9 +127,13 @@ class DefaultController extends BaseController
                 $phoneMake->setMake($phone->getMake());
             }
         }
+        $post = $this->generateUrl('select_phone_make');
+        if ($type) {
+            $post = $this->generateUrl('select_phone_make_type', ['type' => $type]);
+        }
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
-                'action' => $this->generateUrl('select_phone_make'),
+                'action' => $post,
             ])
             ->getForm();
         if ('POST' === $request->getMethod()) {
@@ -139,8 +143,11 @@ class DefaultController extends BaseController
                 $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
                 if ($phoneMake->getPhoneId()) {
                     $phone = $phoneRepo->find($phoneMake->getPhoneId());
-                    if ($type == 'modal') {
-                        return new RedirectResponse($request->get('callback'));
+                    if ($type == 'purchase') {
+                        $session = $request->getSession();
+                        $session->set('quote', $phone->getId());
+
+                        return $this->redirectToRoute('purchase_step_phone');
                     } else {
                         if (!$phone) {
                             // TODO: Would be better to redirect to a make page instead

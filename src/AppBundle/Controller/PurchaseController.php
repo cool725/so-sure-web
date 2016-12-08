@@ -404,15 +404,19 @@ class PurchaseController extends BaseController
         }
 
         $purchase = new PurchaseStepPhone();
-        if ($phone) {
-            $purchase->setPhone($phone);
-        }
         $policy = $user->getUnInitPolicy();
         if ($policy) {
-            $purchase->setPhone($policy->getPhone());
+            if (!$phone && $policy->getPhone()) {
+                $phone = $policy->getPhone();
+            }
             $purchase->setImei($policy->getImei());
             $purchase->setSerialNumber($policy->getSerialNumber());
         }
+
+        if ($phone) {
+            $purchase->setPhone($phone);
+        }
+
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPhoneType::class, $purchase)
             ->getForm();
