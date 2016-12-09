@@ -48,6 +48,12 @@ class JudoPayment extends Payment
      */
     protected $barclaysReference;
 
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $riskScore;
+
     public function getResult()
     {
         return $this->result;
@@ -100,5 +106,15 @@ class JudoPayment extends Payment
         }
 
         return $this->getResult() == self::RESULT_SUCCESS;
+    }
+
+    public function getRiskScore()
+    {
+        return $this->riskScore;
+    }
+
+    public function setRiskScore($riskScore)
+    {
+        $this->riskScore = $riskScore;
     }
 }
