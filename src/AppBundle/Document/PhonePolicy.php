@@ -120,6 +120,17 @@ class PhonePolicy extends Policy
         $this->name = $name;
     }
 
+    public function getDefaultName()
+    {
+        if ($this->getUser() && $this->getPhone()) {
+            return sprintf("%s's %s", ucfirst($this->getUser()->getFirstName()), $this->getPhone()->getModel());
+        } elseif ($this->getPhone()) {
+            return sprintf("%s", $this->getPhone()->getModel());
+        } else {
+            return null;
+        }
+    }
+
     public function getCheckmendCerts()
     {
         return $this->checkmendCerts;
@@ -349,7 +360,9 @@ class PhonePolicy extends Policy
             'phone_policy' => [
                 'imei' => $this->getImei(),
                 'phone' => $this->getPhone() ? $this->getPhone()->toApiArray() : null,
-                'name' => $this->getName() ? $this->getName() : null,
+                'name' => $this->getName() && strlen($this->getName()) > 0 ?
+                    $this->getName() :
+                    $this->getDefaultName(),
             ]
         ]);
     }
