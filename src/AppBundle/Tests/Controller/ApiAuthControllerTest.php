@@ -1139,7 +1139,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'serial_number' => "23423423342",
         ]]);
         $data = $this->verifyResponse(200);
-        $this->assertNull($data['phone_policy']['name']);
+        $this->assertEquals("Foo's One", $data['phone_policy']['name']);
     }
 
     public function testNewPolicyInvactivePhone()
