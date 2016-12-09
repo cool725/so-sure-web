@@ -367,7 +367,8 @@ class DaviesService
     public function claimsDailyEmail()
     {
         $fileRepo = $this->dm->getRepository(DaviesFile::class);
-        $latestFile = $fileRepo->findOneBy([], ['date' => 1]);
+        $latestFiles = $fileRepo->findBy([], ['created' => 'desc']);
+        $latestFile = count($latestFiles) > 0 ? $latestFiles[0] : null;
 
         $claimsRepo = $this->dm->getRepository(Claim::class);
         $claims = $claimsRepo->findOutstanding();
