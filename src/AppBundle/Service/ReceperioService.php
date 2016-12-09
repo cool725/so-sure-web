@@ -574,7 +574,7 @@ class ReceperioService extends BaseImeiService
                 json_encode($data)
             ));
         }
-        if (!$this->areSameModelMemory($makeData['models'])) {
+        if (!$this->areSameModel($makeData['models'], $make == 'apple')) {
             throw new \Exception(sprintf(
                 "Unable to check serial number (multiple models) %s. Data: %s",
                 $serialNumber,
@@ -643,19 +643,23 @@ class ReceperioService extends BaseImeiService
         return true;
     }
 
-    public function areSameModelMemory($models)
+    public function areSameModel($models, $checkMemory)
     {
         // If there are multiple models with the same memory, its just differences in colours which can be ignored
         $model = null;
         $storage = null;
         foreach ($models as $modelData) {
+            $loopStorage = isset($modelData['storage']) ? $modelData['storage'] : null;
             if (!$model) {
                 $model = $modelData['name'];
             }
             if (!$storage) {
-                $storage = $modelData['storage'];
+                $storage = $loopStorage;
             }
-            if ($model != $modelData['name'] || $storage != $modelData['storage']) {
+            if ($model != $modelData['name']) {
+                return false;
+            }
+            if ($checkMemory && $storage != $loopStorage) {
                 return false;
             }
         }
