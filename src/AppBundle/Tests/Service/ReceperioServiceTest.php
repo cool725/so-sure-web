@@ -98,4 +98,70 @@ class ReceperioServiceTest extends WebTestCase
         $data['makes'][] = ['make' => 'A', 'models' => $models];
         $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
     }
+
+    public function testValidateSamePhoneAndroidMultipleMemory()
+    {
+        $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
+        $models[] = ['name' => 'A', 'storage' => '16GB', 'modelreference' => 'A0001'];
+        $data['makes'][] = ['make' => 'A', 'models' => $models];
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateSamePhoneAndroidDifferentModel()
+    {
+        $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
+        $models[] = ['name' => 'B', 'storage' => '64GB', 'modelreference' => 'A0001'];
+        $data['makes'][] = ['make' => 'A', 'models' => $models];
+        self::$imei->validateSamePhone(static::$phoneB, '123', $data);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateSamePhoneAppleMultipleMemory()
+    {
+        $models[] = ['name' => 'A', 'storage' => '64GB'];
+        $models[] = ['name' => 'A', 'storage' => '16GB'];
+        $data['makes'][] = ['make' => 'Apple', 'models' => $models];
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateSamePhoneAppleDifferentModel()
+    {
+        $models[] = ['name' => 'A', 'storage' => '64GB'];
+        $models[] = ['name' => 'A', 'storage' => '16GB'];
+        $data['makes'][] = ['make' => 'Apple', 'models' => $models];
+        self::$imei->validateSamePhone(static::$phoneA, '123', $data);
+    }
+
+    public function testValidateSamePhoneAppleDifferentColours()
+    {
+        $models[] = ['name' => 'iPhone 5', 'storage' => '16GB', 'color' => 'white'];
+        $models[] = ['name' => 'iPhone 5', 'storage' => '16GB', 'color' => 'black'];
+        $data['makes'][] = ['make' => 'Apple', 'models' => $models];
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+    }
+
+    public function testValidateSamePhoneAppleIncorrectModel()
+    {
+        $models[] = ['name' => 'foo', 'storage' => '16GB', 'color' => 'white'];
+        $data['makes'][] = ['make' => 'Apple', 'models' => $models];
+        $this->assertFalse(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateSamePhoneAppleMissingStorage()
+    {
+        $models[] = ['name' => 'iPhone 5', 'color' => 'white'];
+        $data['makes'][] = ['make' => 'Apple', 'models' => $models];
+        $this->assertFalse(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+    }
 }
