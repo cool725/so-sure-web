@@ -366,6 +366,9 @@ class JudopayService
         $payment->setAmount($transactionDetails["amount"]);
         $payment->setResult($transactionDetails["result"]);
         $payment->setMessage($transactionDetails["message"]);
+        if (isset($transactionDetails["riskScore"])) {
+            $payment->setRiskScore($transactionDetails["riskScore"]);
+        }
         // If wallet field is present, use that
         if (isset($transactionDetails["walletType"]) && $transactionDetails["walletType"] == 1) {
             $payment->setSource(Payment::SOURCE_APPLE_PAY);
@@ -689,6 +692,9 @@ class JudopayService
         $payment->setAmount($tokenPaymentDetails["amount"]);
         $payment->setResult($tokenPaymentDetails["result"]);
         $payment->setMessage($tokenPaymentDetails["message"]);
+        if (isset($tokenPaymentDetails["riskScore"])) {
+            $payment->setRiskScore($tokenPaymentDetails["riskScore"]);
+        }
 
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
@@ -813,6 +819,9 @@ class JudopayService
         $refund->setAmount(0 - $refundModelDetails["amount"]);
         $refund->setResult($refundModelDetails["result"]);
         $refund->setMessage($refundModelDetails["message"]);
+        if (isset($refundModelDetails["riskScore"])) {
+            $refund->setRiskScore($refundModelDetails["riskScore"]);
+        }
 
         $refund->setRefundTotalCommission($totalCommision);
 
