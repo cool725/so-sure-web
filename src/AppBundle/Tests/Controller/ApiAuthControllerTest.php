@@ -688,6 +688,33 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
     }
 
+    public function testNewPolicyBlankPhoneName()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(self::$userManager, self::generateEmail('blankphonename', $this), 'foo', true);
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+            'name' => "",
+        ]]);
+
+        $data = $this->verifyResponse(200);
+
+        $this->assertTrue(strlen($data['id']) > 5);
+        $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
+        $this->assertGreaterThan(0, $data['monthly_premium']);
+        $this->assertGreaterThan(0, $data['yearly_premium']);
+        $this->assertEquals("Foo's One", $data['phone_policy']['name']);
+    }
+
     public function testNewPolicyNotRegulated()
     {
         $this->clearRateLimit();
