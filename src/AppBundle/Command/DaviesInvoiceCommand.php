@@ -12,9 +12,11 @@ use AppBundle\Document\Charge;
 use AppBundle\Document\Invoice;
 use AppBundle\Document\InvoiceItem;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\DateTrait;
 
 class DaviesInvoiceCommand extends ContainerAwareCommand
 {
+    use DateTrait;
     use CurrencyTrait;
 
     protected function configure()
@@ -22,13 +24,14 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:davies:invoice')
             ->setDescription('Generate a davies invoice for claimscheck')
-            ->addArgument(
+            ->addOption(
                 'date',
-                InputArgument::REQUIRED,
-                'date (you probably want the previous month)'
+                null,
+                InputOption::VALUE_REQUIRED,
+                'date'
             )
             ->addOption(
-                'email',
+                'skip-email',
                 null,
                 InputOption::VALUE_NONE,
                 'if set, email accounts.payable@davies-group.com'
@@ -38,11 +41,18 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $date = new \DateTime($input->getArgument('date'));
-        $email = true === $input->getOption('email');
-        $emailAddress = null;
-        if ($email) {
-            $emailAddress = 'accounts.payable@davies-group.com';
+        $date = $input->getOption('date');
+        if ($date) {
+            $date = new \DateTime($input->getOption('date'));
+        } else {
+            $date = $this->startOfPreviousMonth();
+            $output->writeln(sprintf('Using last month %s', $date->format('Y-m')));
+        }
+
+        $skipEmail = true === $input->getOption('skip-email');
+        $emailAddress = 'accounts.payable@davies-group.com';
+        if ($skipEmail) {
+            $emailAddress = null;
         }
 
         $dm = $this->getManager();
