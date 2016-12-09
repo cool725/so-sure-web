@@ -490,7 +490,7 @@ class IntercomService
 
     public function queue(User $user, $retryAttempts = 0)
     {
-        $this->queueUser($user, self::QUEUE_USER, $retryAttempts);
+        $this->queueUser($user, self::QUEUE_USER, null, $retryAttempts);
     }
 
     public function queueUser(User $user, $event, $additional = null, $retryAttempts = 0)
