@@ -15,6 +15,7 @@ use AppBundle\Event\UserEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\InvitationEvent;
 use AppBundle\Event\PaymentEvent;
+use AppBundle\Event\UserPaymentEvent;
 
 use AppBundle\Document\User;
 use AppBundle\Document\JudoPayment;
@@ -280,5 +281,23 @@ class IntercomListenerTest extends WebTestCase
         $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals(2, $data['paymentId']);
+    }
+
+    public function testIntercomQueueUserPaymentFailed()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomQueueUserPaymentFailed', $this),
+            'bar'
+        );
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onUserPaymentFailedEvent(new UserPaymentEvent($user, 'foo'));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
     }
 }
