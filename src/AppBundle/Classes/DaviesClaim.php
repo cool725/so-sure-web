@@ -38,6 +38,7 @@ class DaviesClaim
     public $handlingFees;
     public $excess;
     public $reserved;
+    public $reciperoFee;
     public $policyNumber;
     public $notificationDate;
     public $dateCreated;
@@ -77,43 +78,50 @@ class DaviesClaim
     public function fromArray($data)
     {
         try {
+            if (count($data) != 31) {
+                throw new \Exception('Excpected 31 columns (Export v5)');
+            }
+
             // TODO: Improve validation - should should exceptions in the setters
-            $this->client = $data[0];
+            $i = 0;
+            $this->client = $data[$i];
             if ($this->client == "") {
+                // empty row - ignore
                 return;
             } elseif ($this->client != "So-Sure -Mobile") {
                 throw new \Exception('Incorrect client');
             }
 
-            $this->claimNumber = $data[1];
-            $this->insuredName = $data[2];
-            $this->riskPostCode = $data[3];
-            $this->lossDate = $this->excelDate($data[4]);
-            $this->startDate = $this->excelDate($data[5]);
-            $this->endDate = $this->excelDate($data[6]);
-            $this->lossType = $data[7];
-            $this->lossDescription = $data[8];
-            $this->location = $data[9];
-            $this->status = $data[10];
-            $this->miStatus = $data[11];
-            $this->brightstarProductNumber = $this->nullIfBlank($data[12]);
-            $this->replacementMake = $this->nullIfBlank($data[13]);
-            $this->replacementModel = $this->nullIfBlank($data[14]);
-            $this->replacementImei = $this->nullIfBlank($data[15]);
-            $this->replacementReceivedDate = $this->excelDate($data[16]);
-            $this->incurred = $this->nullIfBlank($data[17]);
-            $this->unauthorizedCalls = $this->nullIfBlank($data[18]);
-            $this->accessories = $this->nullIfBlank($data[19]);
-            $this->phoneReplacementCost = $this->nullIfBlank($data[20]);
-            $this->transactionFees = $this->nullIfBlank($data[21]);
-            $this->claimHandlingFees = $this->nullIfBlank($data[22]);
-            $this->excess = $this->nullIfBlank($data[23]);
-            $this->reserved = $this->nullIfBlank($data[24]);
-            $this->policyNumber = $data[25];
-            $this->notificationDate = $this->excelDate($data[26]);
-            $this->dateCreated = $this->excelDate($data[27]);
-            $this->dateClosed = $this->excelDate($data[28]);
-            $this->shippingAddress = $this->nullIfBlank($data[29]);
+            $this->claimNumber = $data[++$i];
+            $this->insuredName = $data[++$i];
+            $this->riskPostCode = $data[++$i];
+            $this->lossDate = $this->excelDate($data[++$i]);
+            $this->startDate = $this->excelDate($data[++$i]);
+            $this->endDate = $this->excelDate($data[++$i]);
+            $this->lossType = $data[++$i];
+            $this->lossDescription = $data[++$i];
+            $this->location = $data[++$i];
+            $this->status = $data[++$i];
+            $this->miStatus = $data[++$i];
+            $this->brightstarProductNumber = $this->nullIfBlank($data[++$i]);
+            $this->replacementMake = $this->nullIfBlank($data[++$i]);
+            $this->replacementModel = $this->nullIfBlank($data[++$i]);
+            $this->replacementImei = $this->nullIfBlank($data[++$i]);
+            $this->replacementReceivedDate = $this->excelDate($data[++$i]);
+            $this->incurred = $this->nullIfBlank($data[++$i]);
+            $this->unauthorizedCalls = $this->nullIfBlank($data[++$i]);
+            $this->accessories = $this->nullIfBlank($data[++$i]);
+            $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
+            $this->transactionFees = $this->nullIfBlank($data[++$i]);
+            $this->claimHandlingFees = $this->nullIfBlank($data[++$i]);
+            $this->excess = $this->nullIfBlank($data[++$i]);
+            $this->reserved = $this->nullIfBlank($data[++$i]);
+            $this->reciperoFee = $this->nullIfBlank($data[++$i]);
+            $this->policyNumber = $data[++$i];
+            $this->notificationDate = $this->excelDate($data[++$i]);
+            $this->dateCreated = $this->excelDate($data[++$i]);
+            $this->dateClosed = $this->excelDate($data[++$i]);
+            $this->shippingAddress = $this->nullIfBlank($data[++$i]);
         } catch (\Exception $e) {
             throw new \Exception(sprintf('%s claim: %s', $e->getMessage(), json_encode($this)));
         }

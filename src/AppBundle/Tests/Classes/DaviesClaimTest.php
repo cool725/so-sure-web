@@ -46,6 +46,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '275',
             '50',
             '220',
+            '1.08',
             '07123 456789',
             '42461',
             '42461',
@@ -56,6 +57,71 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $davies->fromArray($data);
         $this->assertEquals(new \DateTime('2017-02-28'), $davies->endDate);
         $this->assertEquals(new \DateTime('2016-03-01'), $davies->startDate);
+
+        $this->assertEquals(1.08, $davies->reciperoFee);
+        $this->assertEquals(220, $davies->reserved);
+        $this->assertEquals(50, $davies->excess);
+        $this->assertEquals(275, $davies->claimHandlingFees);
+        $this->assertEquals(0.75, $davies->transactionFees);
+        $this->assertEquals(250, $davies->phoneReplacementCost);
+        $this->assertEquals(1.3, $davies->accessories);
+        $this->assertEquals(5.29, $davies->unauthorizedCalls);
+        $this->assertEquals(250.49, $davies->incurred);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testFromArrayInvalidNumColumns()
+    {
+        $data = [
+            'So-Sure -Mobile',
+            '320160401000001',
+        ];
+        $davies = new DaviesClaim();
+        $davies->fromArray($data);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testFromArrayInvalidClient()
+    {
+        $data = [
+            'Invalid Client',
+            '320160401000001',
+            'Mr John Smith',
+            'AB12 3CD',
+            '42461',
+            '42430',
+            '42794',
+            'Damage',
+            'Cracked Screen',
+            'Work',
+            'Closed',
+            'Settled',
+            '345678',
+            'Samsung',
+            'S6',
+            '351236666677777',
+            '345678',
+            '250.49',
+            '5.29',
+            '1.30',
+            '250',
+            '0.75',
+            '275',
+            '50',
+            '220',
+            '1.08',
+            '07123 456789',
+            '42461',
+            '42461',
+            '42461',
+            '123 The Street, Town, City, Postcode'
+        ];
+        $davies = new DaviesClaim();
+        $davies->fromArray($data);
     }
 
     public function testClaimsType()
