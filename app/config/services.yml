@@ -193,6 +193,7 @@ services:
             - [setStoreId, ['%receperio_storeid%']]
             - [setEnvironment, ['%kernel.environment%']]
             - [setRateLimit, ['@app.ratelimit']]
+            - [setMailer, ['@app.mailer']]
 
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService
