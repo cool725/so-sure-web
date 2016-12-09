@@ -503,6 +503,7 @@ services:
             -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.payment.failed, method: onPaymentFailedEvent }
+            -  { name: kernel.event_listener, event: event.user.payment.failed, method: onUserPaymentFailedEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener

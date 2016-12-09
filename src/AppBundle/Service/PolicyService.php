@@ -25,6 +25,7 @@ use AppBundle\Document\File\PolicyScheduleFile;
 
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Event\PolicyEvent;
+use AppBundle\Event\UserPaymentEvent;
 
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\InvalidUserDetailsException;
@@ -216,37 +217,100 @@ class PolicyService
         IdentityLog $identityLog = null,
         $phoneData = null
     ) {
-        $this->validateUser($user);
-        $this->validateImei($imei);
+        try {
+            $this->validateUser($user);
+            $this->validateImei($imei);
 
-        if ($identityLog && $identityLog->isSessionDataPresent()) {
-            if (!$this->rateLimit->allowedByDevice(
-                RateLimitService::DEVICE_TYPE_POLICY,
-                $identityLog->getIp(),
-                $identityLog->getCognitoId()
-            )) {
-                throw new RateLimitException();
+            if ($identityLog && $identityLog->isSessionDataPresent()) {
+                if (!$this->rateLimit->allowedByDevice(
+                    RateLimitService::DEVICE_TYPE_POLICY,
+                    $identityLog->getIp(),
+                    $identityLog->getCognitoId()
+                )) {
+                    throw new RateLimitException();
+                }
             }
+
+            $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
+
+            // TODO: items in POST /policy should be moved to service and service called here
+            $policy = new SalvaPhonePolicy();
+            $policy->setPhone($phone);
+            $policy->setImei($imei);
+            $policy->setSerialNumber($serialNumber);
+            $policy->setIdentityLog($identityLog);
+            $policy->setPhoneData($phoneData);
+
+            $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+            $policy->init($user, $latestTerms);
+
+            $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
+            $policy->addCheckmendSerialData($checkmend['serialResponse']);
+
+            return $policy;
+        } catch (InvalidPremiumException $e) {
+            $this->dispatchEvent(
+                UserPaymentEvent::EVENT_FAILED,
+                new UserPaymentEvent($user, 'Invalid premium')
+            );
+            throw $e;
+        } catch (InvalidUserDetailsException $e) {
+            $this->dispatchEvent(
+                UserPaymentEvent::EVENT_FAILED,
+                new UserPaymentEvent($user, 'Invalid User Details')
+            );
+            throw $e;
+        } catch (GeoRestrictedException $e) {
+            $this->dispatchEvent(
+                UserPaymentEvent::EVENT_FAILED,
+                new UserPaymentEvent($user, 'Non-UK Address')
+            );
+            throw $e;
+        } catch (DuplicateImeiException $e) {
+            $this->dispatchEvent(
+                UserPaymentEvent::EVENT_FAILED,
+                new UserPaymentEvent($user, 'IMEI Already In System')
+            );
+            throw $e;
+        } catch (LostStolenImeiException $e) {
+            $this->dispatchEvent(
+                UserPaymentEvent::EVENT_FAILED,
+                new UserPaymentEvent($user, 'IMEI Lost Or Stolen (so-sure)')
+            );
+            throw $e;
+        } catch (ImeiBlacklistedException $e) {
+            $this->dispatchEvent(
+                UserPaymentEvent::EVENT_FAILED,
+                new UserPaymentEvent($user, 'IMEI Blacklisted')
+            );
+            throw $e;
+        } catch (InvalidImeiException $e) {
+            $this->dispatchEvent(
+                UserPaymentEvent::EVENT_FAILED,
+                new UserPaymentEvent($user, 'IMEI Is Invalid')
+            );
+            throw $e;
+        } catch (ImeiPhoneMismatchException $e) {
+            $this->dispatchEvent(
+                UserPaymentEvent::EVENT_FAILED,
+                new UserPaymentEvent($user, 'IMEI/Serial Does Not Match Receperio Make/Model')
+            );
+            throw $e;
+        } catch (RateLimitException $e) {
+            $this->dispatchEvent(
+                UserPaymentEvent::EVENT_FAILED,
+                new UserPaymentEvent($user, 'Rate Limited')
+            );
+            throw $e;
         }
+    }
 
-        $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
-
-        // TODO: items in POST /policy should be moved to service and service called here
-        $policy = new SalvaPhonePolicy();
-        $policy->setPhone($phone);
-        $policy->setImei($imei);
-        $policy->setSerialNumber($serialNumber);
-        $policy->setIdentityLog($identityLog);
-        $policy->setPhoneData($phoneData);
-
-        $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
-        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
-        $policy->init($user, $latestTerms);
-
-        $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
-        $policy->addCheckmendSerialData($checkmend['serialResponse']);
-
-        return $policy;
+    private function dispatchEvent($eventType, $event)
+    {
+        if ($this->dispatcher) {
+            $this->dispatcher->dispatch($eventType, $event);
+        }
     }
 
     public function create(Policy $policy, \DateTime $date = null)

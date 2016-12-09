@@ -40,6 +40,8 @@ class IntercomService
     */
     const QUEUE_EVENT_INVITATION_PENDING = 'invitation-pending';
 
+    const QUEUE_EVENT_USER_PAYMENT_FAILED = 'userpayment-failed';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -318,6 +320,15 @@ class IntercomService
         $this->sendEvent($user, $event, $data);
     }
 
+    private function sendUserPaymentEvent(User $user, $event, $additional)
+    {
+        $data = [];
+        if ($additional && isset($additional['reason'])) {
+            $data['metadata']['Reason'] = $additional['reason'];
+        }
+        $this->sendEvent($user, $event, $data);
+    }
+
     private function sendEvent(User $user, $event, $data, \DateTime $date = null)
     {
         if (!$date) {
@@ -388,6 +399,12 @@ class IntercomService
                     }
 
                     $this->sendInvitationEvent($this->getInvitation($data['invitationId']), $action);
+                } elseif ($action == self::QUEUE_EVENT_USER_PAYMENT_FAILED) {
+                    if (!isset($data['userId']) || !isset($data['additional'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->sendUserPaymentEvent($this->getUser($data['userId']), $action, $data['additional']);
                 } else {
                     throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
@@ -473,10 +490,16 @@ class IntercomService
 
     public function queue(User $user, $retryAttempts = 0)
     {
+        $this->queueUser($user, self::QUEUE_USER, $retryAttempts);
+    }
+
+    public function queueUser(User $user, $event, $additional = null, $retryAttempts = 0)
+    {
         $data = [
-            'action' => self::QUEUE_USER,
+            'action' => $event,
             'userId' => $user->getId(),
-            'retryAttempts' => $retryAttempts
+            'retryAttempts' => $retryAttempts,
+            'additional' => $additional,
         ];
         $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
     }

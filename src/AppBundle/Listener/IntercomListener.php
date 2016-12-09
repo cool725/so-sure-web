@@ -7,6 +7,7 @@ use AppBundle\Event\UserEvent;
 use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\InvitationEvent;
+use AppBundle\Event\UserPaymentEvent;
 use AppBundle\Service\IntercomService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
@@ -62,5 +63,14 @@ class IntercomListener
     public function onPaymentFailedEvent(PaymentEvent $event)
     {
         $this->intercom->queuePayment($event->getPayment(), IntercomService::QUEUE_EVENT_PAYMENT_FAILED);
+    }
+
+    public function onUserPaymentFailedEvent(UserPaymentEvent $event)
+    {
+        $this->intercom->queueUser(
+            $event->getUser(),
+            IntercomService::QUEUE_EVENT_USER_PAYMENT_FAILED,
+            ['reason' => $event->getReason()]
+        );
     }
 }
