@@ -144,6 +144,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setPhone($phone);
         $policy->setImei($this->generateRandomImei());
         $policy->init($user, $latestTerms);
+        $policy->createAddSCode($count);
         if (rand(0, 3) == 0) {
             $this->addClaim($dm, $policy);
         }
@@ -255,7 +256,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         } else {
             $claim->setDaviesStatus('closed');
         }
-        $claim->setExcess($claim->getExpectedExcess());
+        if (in_array($claim->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT, Claim::TYPE_DAMAGE])) {
+            $claim->setExcess($claim->getExpectedExcess());
+        }
         $claim->setClaimHandlingFees(15);
         $claim->setTransactionFees(rand(90,190) / 100);
 
