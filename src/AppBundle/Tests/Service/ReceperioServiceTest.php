@@ -45,20 +45,25 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAreSameModelMemory()
     {
-        $this->assertTrue(self::$imei->areSameModelMemory([
+        $this->assertTrue(self::$imei->areSameModel([
             ['name' => 'foo', 'storage' => '16GB', 'color' => 'white'],
             ['name' => 'foo', 'storage' => '16GB', 'color' => 'black'],
-        ]));
+        ], true));
 
-        $this->assertFalse(self::$imei->areSameModelMemory([
+        $this->assertFalse(self::$imei->areSameModel([
             ['name' => 'foo', 'storage' => '16GB', 'color' => 'white'],
             ['name' => 'bar', 'storage' => '16GB', 'color' => 'white'],
-        ]));
+        ], true));
 
-        $this->assertFalse(self::$imei->areSameModelMemory([
+        $this->assertFalse(self::$imei->areSameModel([
             ['name' => 'foo', 'storage' => '16GB', 'color' => 'white'],
             ['name' => 'foo', 'storage' => '32GB', 'color' => 'white'],
-        ]));
+        ], true));
+
+        $this->assertTrue(self::$imei->areSameModel([
+            ['name' => 'foo', 'storage' => '16GB', 'color' => 'white'],
+            ['name' => 'foo', 'storage' => '32GB', 'color' => 'white'],
+        ], false));
     }
 
     /**
@@ -67,6 +72,11 @@ class ReceperioServiceTest extends WebTestCase
     public function testValidateSamePhoneMissingData()
     {
         self::$imei->validateSamePhone(static::$phoneA, '123', []);
+    }
+
+    public function testValidateSamePhoneNoData()
+    {
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', ['makes' => []]));
     }
 
     /**

@@ -52,6 +52,8 @@ class ReceperioService extends BaseImeiService
     /** @var RateLimitService */
     protected $rateLimit;
 
+    protected $mailer;
+
     /**
      * @param string $environment
      */
@@ -103,6 +105,11 @@ class ReceperioService extends BaseImeiService
     public function setRateLimit($rateLimit)
     {
         $this->rateLimit = $rateLimit;
+    }
+
+    public function setMailer($mailer)
+    {
+        $this->mailer = $mailer;
     }
 
     private function queueMessage(
@@ -557,7 +564,17 @@ class ReceperioService extends BaseImeiService
 
     public function validateSamePhone(Phone $phone, $serialNumber, $data)
     {
-        if (!isset($data['makes']) || count($data['makes']) != 1) {
+        if (isset($data['makes']) && count($data['makes']) == 0) {
+            // @codingStandardsIgnoreStart
+            $this->mailer->send(
+                sprintf('Empty Data Response for %s', $serialNumber),
+                'tech@so-sure.com',
+                sprintf('A recent make/model query for %s returned a successful response but without any data in the makes field. support@recipero.com can be contacted to resolve this issue.', $serialNumber)
+            );
+            // @codingStandardsIgnoreEnd
+
+            return true;
+        } elseif (!isset($data['makes']) || count($data['makes']) != 1) {
             throw new \Exception(sprintf(
                 "Unable to check serial number (no/multiple makes) %s. Data: %s",
                 $serialNumber,
