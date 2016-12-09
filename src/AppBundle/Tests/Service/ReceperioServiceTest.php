@@ -18,6 +18,8 @@ class ReceperioServiceTest extends WebTestCase
     protected static $imei;
     protected static $dm;
     protected static $phoneRepo;
+    protected static $phoneA;
+    protected static $phoneB;
 
     public static function setUpBeforeClass()
     {
@@ -33,6 +35,8 @@ class ReceperioServiceTest extends WebTestCase
         self::$imei = self::$container->get('app.imei');
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$phoneRepo = self::$dm->getRepository(Phone::class);
+        self::$phoneA = self::$phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+        self::$phoneB = self::$phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
     }
 
     public function tearDown()
@@ -55,5 +59,43 @@ class ReceperioServiceTest extends WebTestCase
             ['name' => 'foo', 'storage' => '16GB', 'color' => 'white'],
             ['name' => 'foo', 'storage' => '32GB', 'color' => 'white'],
         ]));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateSamePhoneMissingData()
+    {
+        self::$imei->validateSamePhone(static::$phoneA, '123', []);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateSamePhoneMissingModel()
+    {
+        $data['makes'][] = ['make' => 'Apple'];
+        self::$imei->validateSamePhone(static::$phoneA, '123', $data);
+    }
+
+    public function testValidateSamePhoneApple()
+    {
+        $models[] = ['name' => 'iPhone 5', 'storage' => '64GB'];
+        $data['makes'][] = ['make' => 'Apple', 'models' => $models];
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+    }
+
+    public function testValidateSamePhoneAndroid()
+    {
+        $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
+        $data['makes'][] = ['make' => 'A', 'models' => $models];
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
+    }
+
+    public function testValidateSamePhoneAndroidMissingModelRef()
+    {
+        $models[] = ['name' => 'A', 'storage' => '64GB'];
+        $data['makes'][] = ['make' => 'A', 'models' => $models];
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
     }
 }
