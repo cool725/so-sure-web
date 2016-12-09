@@ -590,7 +590,10 @@ class ReceperioService extends BaseImeiService
         if ($make != 'apple') {
             if (isset($modelData['modelreference']) && $modelData['modelreference']) {
                 $device = $modelData['modelreference'];
-                if (!in_array(strtolower($device), $phone->getDevices())) {
+                if (in_array($device, $phone->getDevices()) ||
+                    in_array(strtolower($device), $phone->getDevices())) {
+                    return true;
+                } else {
                     $this->logger->warning(sprintf(
                         "Mismatching make %s for serial number %s. Data: %s",
                         $phone->getMake(),
@@ -601,7 +604,11 @@ class ReceperioService extends BaseImeiService
                     return false;
                 }
             } else {
-                $this->logger->warning(sprintf('Need to contact reciperio to add modelreference for %s', $phone));
+                $this->logger->warning(sprintf(
+                    'Need to contact reciperio to add modelreference for %s. Data: %s',
+                    $phone,
+                    json_encode($data)
+                ));
             }
 
             return true;
