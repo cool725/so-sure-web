@@ -711,7 +711,30 @@ class ApiController extends BaseController
 
             $platform = $this->getRequestString($request, 'platform');
             $version = $this->getRequestString($request, 'version');
+
+            // TODO: Add missing param check for versions above certain number to require device, memory & uuid fields
+            $uuid = $this->getRequestString($request, 'uuid');
+            $device = $this->getRequestString($request, 'device');
+            $memory = $this->getRequestString($request, 'memory');
+
+            $additional = [
+                        'platform' => $platform,
+                        'version' => $version,
+                        'uuid' => $uuid,
+                        'device' => $device,
+                        'memory' => $memory
+            ];
+
             $redis = $this->get('snc_redis.default');
+            $cognitoId = $this->getCognitoIdentityId($request);
+            $this->setAdditionalIdentityLog($cognitoId, $additional);
+
+            // we could already be logged in
+            $user = $this->getUser();
+            if ($user) {
+                $user->setLatestMobileIdentityLog($this->getIdentityLog($request));
+                $this->getManager()->flush();
+            }
 
             if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
                 return $this->getErrorJsonResponse(
