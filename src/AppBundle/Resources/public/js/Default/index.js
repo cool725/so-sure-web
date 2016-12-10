@@ -21,3 +21,7 @@
             scrollTop: $("#download-now").offset().top
         }, 1500);
     });
+
+    document.getElementById("#open-intercom").onclick=function(){
+      Intercom('show');
+    };
