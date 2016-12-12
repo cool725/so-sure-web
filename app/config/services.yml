@@ -411,6 +411,13 @@ services:
             httpPort: 80
             httpsPort: 443
 
+    app.monitor:
+        class: AppBundle\Service\MonitorService
+        arguments:
+            dm:      "@doctrine_mongodb.odm.default_document_manager"
+            logger:  "@logger"
+            redis:   "@snc_redis.default"
+
     app.voter.user:
         class: AppBundle\Security\UserVoter
         tags:

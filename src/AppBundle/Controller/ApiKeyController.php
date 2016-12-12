@@ -22,6 +22,7 @@ use AppBundle\Service\RateLimitService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use AppBundle\Exception\MonitorException;
 
 /**
  * @Route("/api/v1/key")
@@ -94,6 +95,26 @@ class ApiKeyController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api quoteAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/monitor/{name}", name="api_key_monitor")
+     * @Method({"GET"})
+     */
+    public function monitorAction($name)
+    {
+        try {
+            $monitor = $this->get('app.monitor');
+            $message = $monitor->run($name);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, $message, 200);
+        } catch (MonitorException $ex) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api monitorAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
