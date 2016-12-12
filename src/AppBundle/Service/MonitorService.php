@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Document\Policy;
+use AppBundle\Document\MultiPay;
 
 class MonitorService
 {
