@@ -368,6 +368,8 @@ abstract class Payment
         $data = [
             'total' => 0,
             'numPayments' => 0,
+            'numReceived' => 0,
+            'numRefunded' => 0,
             'received' => 0,
             'refunded' => 0,
             'totalCommission' => 0,
@@ -392,8 +394,10 @@ abstract class Payment
             $data['total'] += $payment->getAmount();
             if ($payment->getAmount() >= 0) {
                 $data['received'] += $payment->getAmount();
+                $data['numReceived']++;
             } else {
                 $data['refunded'] += $payment->getAmount();
+                $data['numRefunded']++;
             }
             $data['totalCommission'] += $payment->getTotalCommission();
             $data['coverholderCommission'] += $payment->getCoverholderCommission();
