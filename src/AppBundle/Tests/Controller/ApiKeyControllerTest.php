@@ -40,4 +40,16 @@ class ApiKeyControllerTest extends BaseControllerTest
         $this->assertGreaterThan(1, count($data['quotes']));
         $this->assertLessThan(5, count($data['quotes']));
     }
+
+    // monitor
+
+    /**
+     *
+     */
+    public function testMonitor()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = self::$client->request('GET', '/api/v1/key/monitor/multipay');
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
+    }
 }
