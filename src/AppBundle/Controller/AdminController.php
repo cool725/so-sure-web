@@ -655,6 +655,7 @@ class AdminController extends BaseController
             $weighted += $i * $data['policyConnections'][$i];
         }
         $data['totalWeightedAvgConnections'] = $weighted / $data['policyConnections']['total'];
+        $data['totalAvgHoursToConnect'] = $connectionRepo->avgHoursToConnect();
 
         return [
             'start' => $start,

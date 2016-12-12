@@ -214,12 +214,14 @@
                         </tr>
                         {% endfor %}
                         <tr>
-                            <td><del>Avg hours to connect</del>
+                            <td>Avg hours to connect
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
            title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+        <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Details" data-content="From when invitation was sent to user to user accepting.  For scode this would starting from when scode was entered as invite code to acceptance."></i>                            
                             </td>
                             <td></td>
-                            <td></td>
+                            <td>{{ data.totalAvgHoursToConnect|number_format(1, '.', ',')  }}</td>
                         </tr>
                     </tbody>
                 </table>
