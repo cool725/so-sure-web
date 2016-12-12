@@ -36,7 +36,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(
             self::$userManager,
-            static::generateEmail('testTokenUnauthOkRecordMobileIdentifier', $this),
+            static::generateEmail('testTokenUnauthOkNoVersionRecordMobileIdentifier', $this),
             'bar'
         );
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/unauth/token', array(
@@ -67,7 +67,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
 
         $user = static::createUser(
             self::$userManager,
-            static::generateEmail('testTokenUnauthOkRecordMobileIdentifier', $this),
+            static::generateEmail('testTokenUnauthOkVersionRecordMobileIdentifier', $this),
             'bar'
         );
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/unauth/token', array(
