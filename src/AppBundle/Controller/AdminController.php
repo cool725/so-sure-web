@@ -1368,6 +1368,7 @@ class AdminController extends BaseController
         foreach ($connections as $connection) {
             if (!isset($data[$connection->getSourcePolicy()->getId()])) {
                 $data[$connection->getSourcePolicy()->getId()] = [
+                    'id' => $connection->getSourcePolicy()->getId(),
                     'date' => $connection->getSourcePolicy()->getStart() ?
                         $connection->getSourcePolicy()->getStart()->format('d M Y') :
                         '',
