@@ -109,4 +109,40 @@ class ConnectionRepository extends BaseDocumentRepository
         $data = $collection->aggregate($ops);
         return count($data['result']);
     }
+
+    public function avgHoursToConnect()
+    {
+        $collection = $this->dm->getDocumentCollection($this->documentName)->getMongoCollection();
+        $match = ['excludeReporting' => [ '$ne' => true]];
+        if ($this->excludedPolicyIds) {
+            $match['sourcePolicy.$id'] = [ '$nin' => $this->excludedPolicyIds];
+            $match['linkedPolicy.$id'] = [ '$nin' => $this->excludedPolicyIds];
+        }
+        $ops = [
+            [
+                '$match' => $match
+            ],
+            [
+                '$project' => [
+                    '_id' => '$_id',
+                    'connectHours' => [
+                        '$divide' => [
+                            ['$subtract' => ['$date', '$initialInvitationDate']],
+                            3600000
+                        ]
+                    ]
+                ]
+            ],
+            [
+                '$group' => [
+                   '_id' => '',
+                   'avgConnectHours' => ['$avg' => '$connectHours']
+                ]
+            ]
+        ];
+
+        $data = $collection->aggregate($ops);
+
+        return $data['result'][0]['avgConnectHours'];
+    }
 }
