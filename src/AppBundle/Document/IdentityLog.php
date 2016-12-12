@@ -44,6 +44,36 @@ class IdentityLog
     protected $country;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $platform;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="0", max="20")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $version;
+
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $uuid;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Phone")
+     * @Gedmo\Versioned
+     */
+    protected $phone;
+
+    /**
      * @MongoDB\EmbedOne(targetDocument="Coordinates")
      * @Gedmo\Versioned
      */
@@ -95,6 +125,46 @@ class IdentityLog
     public function setCountry($country)
     {
         $this->country = $country;
+    }
+
+    public function getUuid()
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
+    }
+
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(Phone $phone = null)
+    {
+        $this->phone = $phone;
+    }
+
+    public function getPlatform()
+    {
+        return $this->platform;
+    }
+
+    public function setPlatform($platform)
+    {
+        $this->platform = $platform;
+    }
+    
+    public function getVersion()
+    {
+        return $this->version;
+    }
+    
+    public function setVersion($version)
+    {
+        $this->version = $version;
     }
 
     public function getLoc()

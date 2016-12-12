@@ -333,6 +333,28 @@ abstract class BaseController extends Controller
         return null;
     }
 
+    private function getAdditionalIdentityLogKey($cognitoId)
+    {
+        return sprintf('device:%s', $cognitoId);
+    }
+
+    protected function getAdditionalIdentityLog($cognitoId)
+    {
+        $key = $this->getAdditionalIdentityLogKey($cognitoId);
+        $data = $this->get('snc_redis.default')->get($key);
+        if ($data) {
+            return json_decode($data, true);
+        }
+
+        return null;
+    }
+
+    protected function setAdditionalIdentityLog($cognitoId, $additional)
+    {
+        $key = $this->getAdditionalIdentityLogKey($cognitoId);
+        $this->get('snc_redis.default')->setex($key, 3900, json_encode($additional));
+    }
+
     protected function getIdentityLog(Request $request)
     {
         // NOTE: not completely secure, but as we're only using for an indication, it's good enough
@@ -341,8 +363,19 @@ abstract class BaseController extends Controller
         $clientIp = $this->getCognitoIdentityIp($request);
 
         $geoip = $this->get('app.geoip');
+        $cognitoIdentityId = $this->getCognitoIdentityId($request);
+        $identityLog = $geoip->getIdentityLog($clientIp, $cognitoIdentityId);
+        $additional = $this->getAdditionalIdentityLog($cognitoIdentityId);
+        if ($additional) {
+            $identityLog->setPlatform(isset($additional['platform']) ? $additional['platform'] : null);
+            $identityLog->setVersion(isset($additional['version']) ? $additional['version'] : null);
+            $identityLog->setUuid(isset($additional['uuid']) ? $additional['uuid'] : null);
+            if (isset($additional['device']) && isset($additional['memory'])) {
+                $identityLog->setPhone($this->getPhone(null, $additional['device'], $additional['memory']));
+            }
+        }
 
-        return $geoip->getIdentityLog($clientIp, $this->getCognitoIdentityId($request));
+        return $identityLog;
     }
 
     protected function getIdentityLogWeb(Request $request)

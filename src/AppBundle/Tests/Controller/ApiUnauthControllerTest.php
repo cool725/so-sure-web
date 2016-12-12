@@ -30,6 +30,64 @@ class ApiUnauthControllerTest extends BaseControllerTest
         $this->assertTrue(strlen($data['token']) > 20);
     }
 
+    public function testTokenUnauthOkNoVersionRecordMobileIdentifier()
+    {
+        $this->clearRateLimit();
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('testTokenUnauthOkNoVersionRecordMobileIdentifier', $this),
+            'bar'
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/unauth/token', array(
+            'token' => $user->getToken(),
+            'cognito_id' => self::$identity->getId(),
+        ));
+        $data = $this->verifyResponse(200);
+        $this->assertTrue(strlen($data['token']) > 20);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $identityLog = $updatedUser->getLatestMobileIdentityLog();
+
+        $this->assertEquals(null, $identityLog->getPlatform());
+        $this->assertEquals(null, $identityLog->getVersion());
+        $this->assertEquals(null, $identityLog->getUuid());
+        $this->assertNull($identityLog->getPhone());
+    }
+
+    public function testTokenUnauthOkVersionRecordMobileIdentifier()
+    {
+        $this->clearRateLimit();
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = '/api/v1/version?platform=ios&version=0.0.1&device=iPhone%205c&memory=32&uuid=1&_method=GET';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
+
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('testTokenUnauthOkVersionRecordMobileIdentifier', $this),
+            'bar'
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/unauth/token', array(
+            'token' => $user->getToken(),
+            'cognito_id' => self::$identity->getId(),
+        ));
+        $data = $this->verifyResponse(200);
+        $this->assertTrue(strlen($data['token']) > 20);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $identityLog = $updatedUser->getLatestMobileIdentityLog();
+
+        $this->assertEquals('ios', $identityLog->getPlatform());
+        $this->assertEquals('0.0.1', $identityLog->getVersion());
+        $this->assertEquals(1, $identityLog->getUuid());
+        $this->assertNotNull($identityLog->getPhone());
+    }
+
     public function testTokenUnauthBad()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
