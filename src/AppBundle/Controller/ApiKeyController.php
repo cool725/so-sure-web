@@ -104,7 +104,7 @@ class ApiKeyController extends BaseController
      * @Route("/monitor/{name}", name="api_key_monitor")
      * @Method({"GET"})
      */
-    public function monitorAction(Request $request, $name)
+    public function monitorAction($name)
     {
         try {
             $monitor = $this->get('app.monitor');
