@@ -44,9 +44,11 @@
                 <th>Connection Date 7</th>
                 <th>Connection Date 8</th>
             </tr>
+            {% set total = 0 %}
             {% for policy in data %}
+                {% set total = total + policy.connection_count %}
                 <tr>
-                    <td style="width: 10%">{{ policy.number }}</td>
+                    <td style="width: 10%"><a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.number }}</a></td>
                     <td>{{ policy.date }}</td>
                     <td>{{ policy.connection_count }}</td>
                     {% for connection in policy.connections %}
@@ -54,7 +56,14 @@
                     {% endfor %}
                 </tr>
             {% endfor %}
+            <tr></tr>
+            <tr>
+                <td><strong>Total</strong></td>
+                <td></td>
+                <td>{{ total }}</td>
+            </tr>
         </table>
+        
     </div>
 </div>
 </div>
