@@ -526,7 +526,7 @@ class AdminController extends BaseController
         // Doesn't make sense to exclude as will skew all figures
         // $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
 
-        $newDirectPolicies = $policyRepo->findAllActivePolicies(null, $start, $end);
+        $newDirectPolicies = $policyRepo->findAllNewPolicies(null, $start, $end);
         $data['newDirectPolicies'] = $newDirectPolicies->count();
         $data['newDirectPoliciesPremium'] = Policy::sumYearlyPremiumPrice($newDirectPolicies);
         if ($data['newDirectPolicies'] != 0) {
@@ -597,17 +597,18 @@ class AdminController extends BaseController
                 $cancellationReason,
                 $start,
                 $end
-            );            
+            );
         }
 
-        $data['newPolicies'] = $policyRepo->countAllActivePolicies($end, $start);
+        $data['newPolicies'] = $policyRepo->countAllNewPolicies($end, $start);
         $data['newPoliciesPremium'] = $data['newDirectPoliciesPremium'] + $data['newInvitationPoliciesPremium'] +
             $data['newSCodePoliciesPremium'];
         if ($data['newPolicies'] != 0) {
             $data['newPoliciesAvgPremium'] = $this->toTwoDp($data['newPoliciesPremium'] / $data['newPolicies']);
         }
 
-        $data['totalPolicies'] = $policyRepo->countAllActivePolicies();
+        $data['totalActivePolicies'] = $policyRepo->countAllActivePolicies();
+        $data['totalPolicies'] = $policyRepo->countAllNewPolicies();
         $data['totalPoliciesPremium'] = $data['totalDirectPoliciesPremium'] + $data['totalInvitationPoliciesPremium'] +
             $data['totalSCodePoliciesPremium'];
         if ($data['totalPolicies'] != 0) {
