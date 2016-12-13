@@ -35,7 +35,7 @@
                             <div class="col-sm-8">
                               <h4>{% if phone %}{{ phone.make }} {{ phone.model }} {% if phone.memory %}{{ phone.memory }}GB{% endif %}{% endif %}
                           <button type="button" class="select-phone btn btn-link" data-toggle="modal" data-target="#phoneModal">
-                            {% if phone %}Edit{% else %}Select{% endif %}</button>
+                            {% if phone %}Edit{% else %}Select phone{% endif %}</button>
                               </h4>
                             </div>
                           </div>
@@ -111,10 +111,10 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">IMEI & Serial Numbers</h4>
+            <h4 class="modal-title">IMEI &amp; Serial Numbers</h4>
           </div>
           <div class="modal-body">
-            It's easy to find your IMEI & Serial Numbers.  Open the Settings app, and navigate to General > About.  The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
+            It's easy to find your IMEI &amp; Serial Numbers.  Open the Settings app, and navigate to General > About.  The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
           </div>
         </div>
       </div>
