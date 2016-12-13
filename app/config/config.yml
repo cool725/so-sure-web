@@ -289,6 +289,7 @@ nelmio_security:
         log: true
         whitelist:
             - sosure.app.link
+            - facebook.com
 
     # forced HTTPS handling, don't combine with flexible mode
     # and make sure you have SSL working on your site before enabling this
