@@ -5,6 +5,7 @@ use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
 use Symfony\Component\Security\Core\User\UserInterface;
 use AppBundle\Service\FacebookService;
+use HWI\Bundle\OAuthBundle\Security\Core\Exception\AccountNotLinkedException;
 
 class FOSUBUserProvider extends BaseClass
 {
@@ -43,9 +44,17 @@ class FOSUBUserProvider extends BaseClass
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
         $username = $response->getUsername();
-        $user = $this->userManager->findUserBy(array($this->getProperty($response) => $username));
+        $search = $this->getProperty($response);
+        if ($search == "facebook_id") {
+            $search = "facebookId";
+        }
+        $user = $this->userManager->findUserBy(array($search => $username));
         //when the user is registrating
         if (null === $user) {
+            throw new AccountNotLinkedException(sprintf(
+                "Sorry, but we're unable to find a linked account. Try logging in with your email or mobile number."
+            ));
+            /*
             $service = $response->getResourceOwner()->getName();
             $setter = 'set'.ucfirst($service);
             $setter_id = $setter.'Id';
@@ -62,10 +71,11 @@ class FOSUBUserProvider extends BaseClass
 
             $this->userManager->updateUser($user);
             return $user;
+            */
         }
 
         //if user exists - go with the HWIOAuth way
-        $user = parent::loadUserByOAuthUserResponse($response);
+        //$user = parent::loadUserByOAuthUserResponse($response);
 
         $serviceName = $response->getResourceOwner()->getName();
         $setter = 'set' . ucfirst($serviceName) . 'AccessToken';
