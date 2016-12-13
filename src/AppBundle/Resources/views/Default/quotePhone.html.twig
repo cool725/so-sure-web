@@ -39,16 +39,16 @@
                                 <div class="col-md-6">
                                     <div class="quote-panel-left">
                                         <div class="row">
-                                            <div class="col-md-12">
                                                 <span>
                                                     <p>Device</p>
                                                     <h4>{{ phone }}</h4>
                                                     {% if phones|length > 1 %}
-                                                        Or do you have the:
+                                                        <div class="memory-select-text">
+                                                          Or do you have:
                                                         {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}">{{ phone_mem.memory }}GB</a>
+                                                           <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-link">{{ phone_mem.memory }}GB</a>
                                                         {% endfor %}
-                                                        <br>
+                                                      </div>
                                                     {% endif %}
                                                     <br>
                                                     <p>Monthly Cost</p>
@@ -61,13 +61,11 @@
                                                     </p>
                                                 </span>
                                             </div>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="quote-panel-right">
                                         <div class="row">
-                                            <div class="col-md-12">
                                                 <span>
                                                     {% set start_friends = phone_price.maxConnections - 1 %}
                                                     {% set start_value = start_friends * connection_value %}
@@ -120,7 +118,6 @@
                                                 </span>
                                             </div>
                                         </div>
-                                    </div>
                                 </div>
                                 <div class="row" style="padding-top: 30px; padding-bottom: 10px;">
                                     <div class="col-sm-12">
