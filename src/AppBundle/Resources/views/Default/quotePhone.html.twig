@@ -43,6 +43,13 @@
                                                 <span>
                                                     <p>Device</p>
                                                     <h4>{{ phone }}</h4>
+                                                    {% if phones|length > 1 %}
+                                                        Or do you have the:
+                                                        {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}">{{ phone_mem.memory }}GB</a>
+                                                        {% endfor %}
+                                                        <br>
+                                                    {% endif %}
                                                     <br>
                                                     <p>Monthly Cost</p>
                                                     <h4>£{{ phone_price.monthlyPremiumPrice }}</h4>
