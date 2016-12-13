@@ -56,7 +56,7 @@ class DoctrineSalvaListener
             }
 
             if ($document instanceof User) {
-                if (!$document->hasValidPolicy()) {
+                if (!$document->hasActivePolicy()) {
                     return;
                 }
                 $fields = [

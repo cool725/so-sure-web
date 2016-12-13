@@ -3155,7 +3155,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
         $user = $userRepo->find($user->getId());
-        $this->assertTrue($user->hasValidPolicy());
+        $this->assertTrue($user->hasActivePolicy());
 
         $url = sprintf('/api/v1/auth/user/%s', $user->getId());
         $data = [

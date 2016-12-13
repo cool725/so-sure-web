@@ -480,11 +480,28 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
-    public function hasValidPolicy()
+    public function hasActivePolicy()
     {
         foreach ($this->getPolicies() as $policy) {
             if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasValidPolicy($active = true)
+    {
+        foreach ($this->getPolicies() as $policy) {
+            if ($policy->isValidPolicy()) {
+                if ($active) {
+                    if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
             }
         }
 
@@ -902,7 +919,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
           'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), true, $debug),
           'has_cancelled_policy' => $this->hasCancelledPolicy(),
           'has_unpaid_policy' => $this->hasUnpaidPolicy(),
-          'has_valid_policy' => $this->hasValidPolicy(),
+          'has_valid_policy' => $this->hasActivePolicy(), // poor initial naming :(
           'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
           'image_url' => $this->getImageUrl(),
           'sns_endpoint' => $this->getSnsEndpoint() ? $this->getSnsEndpoint() : null,

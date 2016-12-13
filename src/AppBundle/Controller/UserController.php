@@ -32,7 +32,7 @@ class UserController extends BaseController
     public function indexAction(Request $request)
     {
         $user = $this->getUser();
-        if (!$user->hasValidPolicy()) {
+        if (!$user->hasActivePolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         }
         $policy = $user->getCurrentPolicy();
