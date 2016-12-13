@@ -597,7 +597,7 @@ class AdminController extends BaseController
                 $cancellationReason,
                 $start,
                 $end
-            );            
+            );
         }
 
         $data['newPolicies'] = $policyRepo->countAllActivePolicies($end, $start);
