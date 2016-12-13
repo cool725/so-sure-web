@@ -42,6 +42,7 @@ $(function(){
         shares: ["twitter", "facebook"],
         url: $('.btn-clipboard').data('clipboard-text'),
         text: $('.btn-clipboard').data('share-text'),
-        shareIn: 'popup'
+        shareIn: 'popup',
+        showCount: false,
     })
 });
