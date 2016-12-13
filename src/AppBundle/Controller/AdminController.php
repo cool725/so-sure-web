@@ -593,7 +593,11 @@ class AdminController extends BaseController
         ];
         foreach ($endingDataset as $key => $cancellationReason) {
             $data[sprintf('total%sPolicies', $key)] = $policyRepo->findAllEndingPolicies($cancellationReason);
-            $data[sprintf('ending%sPolicies', $key)] = $policyRepo->findAllEndingPolicies($cancellationReason, $start, $end);            
+            $data[sprintf('ending%sPolicies', $key)] = $policyRepo->findAllEndingPolicies(
+                $cancellationReason,
+                $start,
+                $end
+            );            
         }
 
         $data['newPolicies'] = $policyRepo->countAllActivePolicies($end, $start);
