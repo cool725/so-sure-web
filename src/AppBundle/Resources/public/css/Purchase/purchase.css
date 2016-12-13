@@ -284,6 +284,9 @@ label {
 
 #purchase_form_amount {
   text-align: left;
+  border: none;
+  background: none;
+  font-size: 14px;
 }
 
 #purchase_form_amount label {
@@ -324,7 +327,7 @@ label {
     margin-top: 40px;
   }
   #purchase_form_amount {
-    margin-top: 25px;
+    margin-top: 31px;
   }
 }
 
@@ -356,6 +359,11 @@ label {
 
 .payment-container .select-phone {
   padding: 0px;
-  float: right;
-  margin-left: 20px;
+}
+
+@media (max-width: 767px) {
+  .payment-container .select-phone {
+    text-align: left;
+    float: none;
+  }
 }
