@@ -122,7 +122,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $policy = new SalvaPhonePolicy();
         $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         $user->addPolicy($policy);
-        $this->assertTrue($user->hasValidPolicy());
+        $this->assertTrue($user->hasActivePolicy());
     }
 
     public function testMobileNumberIsNormalized()
