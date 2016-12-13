@@ -60,6 +60,33 @@ class PhonePolicyRepository extends PolicyRepository
     }
 
     /**
+     * All policies that are new (excluding so-sure test ones)
+     */
+    public function countAllNewPolicies(\DateTime $endDate = null, \DateTime $startDate = null)
+    {
+        if (!$endDate) {
+            $endDate = new \DateTime();
+        }
+
+        $policy = new PhonePolicy();
+
+        $qb = $this->createQueryBuilder()
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+
+        $qb->field('start')->lte($endDate);
+        if ($startDate) {
+            $qb->field('start')->gte($startDate);
+        }
+        if ($this->excludedPolicyIds) {
+            $this->addExcludedPolicyQuery($qb, 'id');
+        }
+
+        return $qb->getQuery()
+            ->execute()
+            ->count();
+    }
+
+    /**
      * All policies that are active (excluding so-sure test ones)
      */
     public function findAllActivePolicies($leadSource, \DateTime $startDate = null, \DateTime $endDate = null)
