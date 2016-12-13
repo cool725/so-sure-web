@@ -29,10 +29,10 @@
     {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
                       <div class="row">
                           <div class="form-group">
-                            <div class="col-sm-3">
-                              <label>Phone</label>
+                            <div class="col-sm-4">
+                              <label>Your Phone</label>
                           </div>
-                            <div class="col-sm-9">
+                            <div class="col-sm-8">
                               <h4>{% if phone %}{{ phone.make }} {{ phone.model }} {% if phone.memory %}{{ phone.memory }}GB{% endif %}{% endif %}
                           <button type="button" class="select-phone btn btn-link" data-toggle="modal" data-target="#phoneModal">
                             {% if phone %}Edit{% else %}Select{% endif %}</button>
@@ -42,10 +42,10 @@
                       </div>
                       <div class="row">
                           <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-                            <div class="col-sm-3">
-                              {{ form_label(purchase_form.amount, 'Payment') }}
+                            <div class="col-sm-4">
+                              {{ form_label(purchase_form.amount, 'Payment Options') }}
                           </div>
-                            <div class="col-sm-9">
+                            <div class="col-sm-8">
                               {{ form_widget(purchase_form.amount, {'attr':{'class':'radio purchase-amount'}}) }}
                               <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
                             </div>
@@ -53,13 +53,13 @@
                       </div>
                     <div class="row">
                         <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
-                          <div class="col-sm-3">
+                          <div class="col-sm-4">
                           <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">
                             <i class="fa fa-question"></i></button>
-                            {{ form_label(purchase_form.imei, 'IMEI') }}
+                            {{ form_label(purchase_form.imei, 'IMEI Number') }}
                           </div>
-                        <div class="col-sm-9">
-                            {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'15 digit number'}}) }}
+                        <div class="col-sm-8">
+                            {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'Dial *#06#'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                             <!-- <p class="help-block">Just dial *#06#</p> -->
                         </div>
@@ -68,13 +68,13 @@
                     {% if purchase_form.serialNumber is defined %}
                     <div class="row">
                         <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
-                          <div class="col-sm-3">
+                          <div class="col-sm-4">
                           <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
                                           ><i class="fa fa-question"></i></button>
-                            {{ form_label(purchase_form.serialNumber, 'Serial') }}
+                            {{ form_label(purchase_form.serialNumber, 'Serial Number') }}
                           </div>
-                        <div class="col-sm-9">
-                            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':''}}) }}
+                        <div class="col-sm-8">
+                            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Go to Settings > General > About'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
                             <!-- <p class="help-block">Find it in your iPhone's Settings > General > About</p> -->
                         </div>

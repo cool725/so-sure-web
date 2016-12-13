@@ -29,10 +29,10 @@
                 {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
                 <div class="row">
                     <div class="form-group {% if form_errors(purchase_form.email) %}has-error{% endif %}">
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             {{ form_label(purchase_form.email, 'Email') }}
                         </div>
-                        <div class="col-sm-9">
+                        <div class="col-sm-8">
                             {{ form_widget(purchase_form.email, {'attr':{'class':'form-control'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.email) }}</div>
                         </div>
@@ -40,10 +40,10 @@
                 </div>
                 <div class="row">
                     <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             {{ form_label(purchase_form.mobileNumber, 'Mobile No.') }}
                         </div>
-                        <div class="col-sm-9">
+                        <div class="col-sm-8">
                             {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'00447[1-9][0-9]{8,8}|[+]447[1-9][0-9]{8,8}|07[1-9][0-9]{8,8}', 'title': 'Enter a valid UK Mobile Number.'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
                         </div>
@@ -51,10 +51,10 @@
                 </div>
                 <div class="row">
                     <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             {{ form_label(purchase_form.firstName, 'First Name') }}
                         </div>
-                        <div class="col-sm-9">
+                        <div class="col-sm-8">
                             {{ form_widget(purchase_form.firstName, {'attr':{'class':'form-control'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.firstName) }}</div>
                         </div>
@@ -62,10 +62,10 @@
                 </div>
                 <div class="row">
                     <div class="form-group {% if form_errors(purchase_form.lastName) %}has-error{% endif %}">
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             {{ form_label(purchase_form.lastName, 'Last Name') }}
                         </div>
-                        <div class="col-sm-9">
+                        <div class="col-sm-8">
                             {{ form_widget(purchase_form.lastName, {'attr':{'class':'form-control'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.lastName) }}</div>
                         </div>
@@ -73,10 +73,10 @@
                 </div>
                 <div class="row">
                     <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %}">
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             {{ form_label(purchase_form.birthday, 'Date of Birth') }}
                         </div>
-                        <div class="col-sm-9">
+                        <div class="col-sm-8">
                             <div class='input-group date' id='birthday'>
                                 {{ form_widget(purchase_form.birthday, {'attr':{'class': 'form-control', 'placeholder':'DD/MM/YYYY'}}) }}
                                 <span class="input-group-addon">

@@ -119,6 +119,11 @@ label {
     display: inline-block;
     position: relative;
 }
+@media (max-width: 543px) {
+  .purchase-amount input {
+    margin-left: 0px !important;
+  }
+}
 
 .payment-container .radio input[type="radio"] {
     position: relative;
@@ -326,7 +331,6 @@ label {
 @media (max-width: 320px) {
   .payment-container h4 {
     float: left;
-    margin-right: 135px;
     margin-top: 0px;
   }
 }
@@ -353,4 +357,5 @@ label {
 .payment-container .select-phone {
   padding: 0px;
   float: right;
+  margin-left: 20px;
 }
