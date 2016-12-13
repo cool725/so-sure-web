@@ -419,16 +419,26 @@ class DefaultController extends BaseController
         if ($id) {
             $phone = $repo->find($id);
         } elseif ($memory) {
-            $phone = $repo->findOneBy(['make' => $make, 'model' => $decodedModel, 'memory' => (int) $memory]);
+            $phone = $repo->findOneBy([
+                'active' => true,
+                'make' => $make,
+                'model' => $decodedModel,
+                'memory' => (int) $memory
+            ]);
             // check for historical urls
             if (!$phone) {
-                $phone = $repo->findOneBy(['make' => $make, 'model' => $model, 'memory' => (int) $memory]);
+                $phone = $repo->findOneBy([
+                    'active' => true,
+                    'make' => $make,
+                    'model' => $model,
+                    'memory' => (int) $memory
+                ]);
             }
         } else {
-            $phone = $repo->findOneBy(['make' => $make, 'model' => $decodedModel]);
+            $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $decodedModel]);
             // check for historical urls
             if (!$phone) {
-                $phone = $repo->findOneBy(['make' => $make, 'model' => $model]);
+                $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $model]);
             }
         }
         if (!$phone) {
@@ -506,6 +516,10 @@ class DefaultController extends BaseController
             'max_pot' => $maxPot,
             'form' => $form->createView(),
             'lead_form' => $leadForm->createView(),
+            'phones' => $repo->findBy(
+                ['active' => true, 'make' => $make, 'model' => $decodedModel],
+                ['memory' => 'asc']
+            ),
         );
     }
 

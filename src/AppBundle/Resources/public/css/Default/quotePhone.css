@@ -47,7 +47,7 @@
 }
 @media (min-width: 992px) {
   .view-quote .panel-primary {
-    height: 365px;
+    height: 395px;
   }
 }
 @media (max-width: 992px) {
@@ -286,4 +286,14 @@
   #download-now img {
     padding-top: 10px;
   }
+}
+
+.memory-select-text {
+  font-size: 13px;
+}
+
+.memory-select-text .btn-link {
+  border: 1px solid #3399ff;
+  border-radius: 30px;
+  font-size: 13px;
 }
