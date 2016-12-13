@@ -195,6 +195,8 @@ h1, h2, h3, h4, h5, h6 {
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
       border: 2px solid #efefef;
       border-radius: 4px;
+      position: absolute;
+      width: 100%;
     }
     .navbar-default .navbar-nav> li> a {
         color: #3399ff !important;
