@@ -89,6 +89,64 @@ class PhonePolicyRepository extends PolicyRepository
             ->execute();
     }
 
+    /**
+     * All policies that are 'new' (e.g. created) during time period (excluding so-sure test ones)
+     */
+    public function findAllNewPolicies($leadSource = null, \DateTime $startDate = null, \DateTime $endDate = null)
+    {
+        if (!$endDate) {
+            $endDate = new \DateTime();
+        }
+
+        $policy = new PhonePolicy();
+
+        $qb = $this->createQueryBuilder()
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+
+        $qb->field('leadSource')->equals($leadSource);
+        $qb->field('start')->lte($endDate);
+        if ($startDate) {
+            $qb->field('start')->gte($startDate);
+        }
+        if ($this->excludedPolicyIds) {
+            $this->addExcludedPolicyQuery($qb, 'id');
+        }
+
+        return $qb->getQuery()
+            ->execute();
+    }
+
+    /**
+     * All policies that are 'ending' (e.g. cancelled) during time period (excluding so-sure test ones)
+     */
+    public function findAllEndingPolicies($cancellationReason, \DateTime $startDate = null, \DateTime $endDate = null)
+    {
+        if (!$endDate) {
+            $endDate = new \DateTime();
+        }
+
+        $policy = new PhonePolicy();
+
+        $qb = $this->createQueryBuilder()
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+
+        if ($cancellationReason) {
+            $qb->field('cancelledReason')->equals($cancellationReason);
+        }
+        $qb->field('end')->lte($endDate);
+        if ($startDate) {
+            $qb->field('end')->gte($startDate);
+        }
+
+        if ($this->excludedPolicyIds) {
+            $this->addExcludedPolicyQuery($qb, 'id');
+        }
+
+        return $qb->getQuery()
+            ->execute()
+            ->count();
+    }
+
     public function getAllPoliciesForExport(\DateTime $date, $environment)
     {
         \AppBundle\Classes\NoOp::noOp([$date]);

@@ -535,7 +535,7 @@ class AdminController extends BaseController
             );
         }
 
-        $totalDirectPolicies = $policyRepo->findAllActivePolicies(null);
+        $totalDirectPolicies = $policyRepo->findAllNewPolicies();
         $data['totalDirectPolicies'] = $totalDirectPolicies->count();
         $data['totalDirectPoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalDirectPolicies);
         if ($data['totalDirectPolicies'] != 0) {
@@ -544,7 +544,7 @@ class AdminController extends BaseController
             );
         }
 
-        $newInvitationPolicies = $policyRepo->findAllActivePolicies(Lead::LEAD_SOURCE_INVITATION, $start, $end);
+        $newInvitationPolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_INVITATION, $start, $end);
         $data['newInvitationPolicies'] = $newInvitationPolicies->count();
         $data['newInvitationPoliciesPremium'] = Policy::sumYearlyPremiumPrice($newInvitationPolicies);
         if ($data['newInvitationPolicies'] != 0) {
@@ -553,7 +553,7 @@ class AdminController extends BaseController
             );
         }
 
-        $totalInvitationPolicies = $policyRepo->findAllActivePolicies(Lead::LEAD_SOURCE_INVITATION);
+        $totalInvitationPolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_INVITATION);
         $data['totalInvitationPolicies'] = $totalInvitationPolicies->count();
         $data['totalInvitationPoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalInvitationPolicies);
         if ($data['totalInvitationPolicies'] != 0) {
@@ -562,7 +562,7 @@ class AdminController extends BaseController
             );
         }
 
-        $newSCodePolicies = $policyRepo->findAllActivePolicies(Lead::LEAD_SOURCE_SCODE, $start, $end);
+        $newSCodePolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_SCODE, $start, $end);
         $data['newSCodePolicies'] = $newSCodePolicies->count();
         $data['newSCodePoliciesPremium'] = Policy::sumYearlyPremiumPrice($newSCodePolicies);
         if ($data['newSCodePolicies'] != 0) {
@@ -571,13 +571,29 @@ class AdminController extends BaseController
             );
         }
 
-        $totalSCodePolicies = $policyRepo->findAllActivePolicies(Lead::LEAD_SOURCE_SCODE);
+        $totalSCodePolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_SCODE);
         $data['totalSCodePolicies'] = $totalSCodePolicies->count();
         $data['totalSCodePoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalInvitationPolicies);
         if ($data['totalSCodePolicies'] != 0) {
             $data['totalSCodePoliciesAvgPremium'] = $this->toTwoDp(
                 $data['totalSCodePoliciesPremium'] / $data['totalSCodePolicies']
             );
+        }
+
+        $endingDataset = [
+            'Ending' => null,
+            'Unpaid' => Policy::CANCELLED_UNPAID,
+            'ActualFraud' => Policy::CANCELLED_ACTUAL_FRAUD,
+            'SuspectedFraud' => Policy::CANCELLED_SUSPECTED_FRAUD,
+            'UserRequested' => Policy::CANCELLED_USER_REQUESTED,
+            'Cooloff' => Policy::CANCELLED_COOLOFF,
+            'BadRisk' => Policy::CANCELLED_BADRISK,
+            'Dispossession' => Policy::CANCELLED_DISPOSSESSION,
+            'Wreckage' => Policy::CANCELLED_WRECKAGE,
+        ];
+        foreach ($endingDataset as $key => $cancellationReason) {
+            $data[sprintf('total%sPolicies', $key)] = $policyRepo->findAllEndingPolicies($cancellationReason);
+            $data[sprintf('ending%sPolicies', $key)] = $policyRepo->findAllEndingPolicies($cancellationReason, $start, $end);            
         }
 
         $data['newPolicies'] = $policyRepo->countAllActivePolicies($end, $start);
