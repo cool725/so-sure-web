@@ -1530,7 +1530,6 @@ class AdminController extends BaseController
                     $week[$stat->getName()] = 0;
                 }
                 $week[$stat->getName()] += $stat->getValue();
-                print $stat->getName();
             }
             if (!isset($week[Stats::INSTALL_GOOGLE])) {
                 $week[Stats::INSTALL_GOOGLE] = 0;
