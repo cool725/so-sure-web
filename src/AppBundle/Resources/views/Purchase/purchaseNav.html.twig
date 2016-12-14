@@ -1,3 +1,17 @@
+<div class="desktop-page-title">
+  <h1 class="section-title">Purchase your so-sure policy</h1>
+  <p class="section-description">We just need a few details before you're covered.</p>
+  {% if phone %}
+      <p class="section-description">{{ phone }} @
+      {% if amount is defined %}
+          £{{ amount|number_format(2, '.', ',') }} / {{ period }}
+      {% else %}
+          £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} / month
+      {% endif %}
+      </p>
+  {% endif %}
+</div>
+
 <div class="purchase-nav">
 <ul>
     <li class="{% if step == 1 %}step-active{% else %}step-inactive{% endif %}">

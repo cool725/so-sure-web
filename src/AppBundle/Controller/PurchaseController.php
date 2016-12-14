@@ -113,6 +113,7 @@ class PurchaseController extends BaseController
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,
+            'phone' => $this->getSessionQuotePhone($request),
         );
 
         return $data;
@@ -165,6 +166,7 @@ class PurchaseController extends BaseController
             'purchase_form' => $purchaseForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 2,
+            'phone' => $this->getSessionQuotePhone($request),
         );
 
         return $data;
@@ -182,14 +184,9 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('purchase_step_address');
         }
 
-        $session = $request->getSession();
         $dm = $this->getManager();
-        $phoneRepo = $dm->getRepository(Phone::class);
 
-        $phone = null;
-        if ($session->get('quote')) {
-            $phone = $phoneRepo->find($session->get('quote'));
-        }
+        $phone = $this->getSessionQuotePhone($request);
 
         $purchase = new PurchaseStepPhone();
         $policy = $user->getUnInitPolicy();
@@ -324,6 +321,7 @@ class PurchaseController extends BaseController
         return $data;
     }
 
+    
     /**
      * @Route("/step-review/monthly", name="purchase_step_review_monthly")
      * @Route("/step-review/yearly", name="purchase_step_review_yearly")
@@ -340,8 +338,12 @@ class PurchaseController extends BaseController
         $routeName = $request->get('_route');
         if ($routeName == "purchase_step_review_monthly") {
             $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+            $period = 'month';
         } elseif ($routeName == "purchase_step_review_yearly") {
             $amount = $policy->getPremium()->getYearlyPremiumPrice();
+            $period = 'year';
+        } else {
+            throw new \Exception('Unknown route');
         }
 
         $webpay = $this->get('app.judopay')->webpay(
@@ -358,6 +360,8 @@ class PurchaseController extends BaseController
             'webpay_reference' => $webpay['payment']->getReference(),
             'step' => 4,
             'is_postback' => 'POST' === $request->getMethod(),
+            'amount' => $amount,
+            'period' => $period,
         ];
         
         return $data;

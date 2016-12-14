@@ -26,20 +26,27 @@ class PurchaseStepPersonalType extends AbstractType
     private $required;
 
     /**
-     * @param boolean $required
+     * @var RequestStack
      */
-    public function __construct($required)
+    private $requestStack;
+
+    /**
+     * @param RequestStack $requestStack
+     * @param boolean      $required
+     */
+    public function __construct(RequestStack $requestStack, $required)
     {
+        $this->requestStack = $requestStack;
         $this->required = $required;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', EmailType::class, ['attr' => ['readonly' => true], 'disabled' => true])
-            ->add('mobileNumber', TextType::class, ['attr' => ['readonly' => true], 'disabled' => true])
-            ->add('firstName', TextType::class, ['required' => $this->required])
-            ->add('lastName', TextType::class, ['required' => $this->required])
+            ->add('email', HiddenType::class, ['required' => false])
+            ->add('firstName', HiddenType::class, ['required' => false])
+            ->add('lastName', HiddenType::class, ['required' => false])
+            ->add('name', TextType::class, ['required' => $this->required])
             ->add('birthday', DateType::class, [
                 'required' => $this->required,
                 'widget' => 'single_text',
@@ -48,6 +55,18 @@ class PurchaseStepPersonalType extends AbstractType
             ])
             ->add('next', SubmitType::class)
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $purchase = $event->getData();
+            $form = $event->getForm();
+
+            // TODO: Better check on mobile number
+            if ($purchase->getMobileNumber() && strlen($purchase->getMobileNumber()) > 0) {
+                $form->add('mobileNumber', HiddenType::class, ['required' => false]);
+            } else {
+                $form->add('mobileNumber', TextType::class, ['required' => $this->required]);
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)
