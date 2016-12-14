@@ -472,6 +472,11 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+.background-image-1 {
+  background-image: url('http://static.so-sure.com.s3.amazonaws.com/images/home/untitled%20folder/background-1.jpg');
+  background-size: cover;
+}
+
 div.col-sm-7.five-three {
 width: 60% !important;
 }
@@ -490,4 +495,43 @@ hr.strong {
 .btn-rounded {
     border-radius: 100px;
     padding: 12px 30px;
+}
+
+
+/* Video Thumb */
+
+.explainer-video-thumb {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.explainer-video-thumb p {
+  padding-top: 25px;
+  padding-left: 20px;
+}
+
+.explainer-video-view-thumb {
+  display: inline-flex;
+}
+
+.explainer-video-frame-thumb {
+    width: 125px;
+    height: 70px;
+    background-image: url(https://cdn.so-sure.com/images/home/explainer-video/explainer-video-frame-2.png);
+    background-size: cover;
+    margin: 0 auto;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 1px;
+}
+
+/* Main CTA */
+
+@media (min-width: 992px) {
+.main-cta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 500px;
+  }
 }

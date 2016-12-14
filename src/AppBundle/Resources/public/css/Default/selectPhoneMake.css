@@ -23,7 +23,6 @@
     text-align: center;
     padding-top: 10px;
     padding-bottom: 10px;
-    background-color: rgba(255, 255, 255, 0.5);
     border-radius: 5px;
 }
 
@@ -95,7 +94,7 @@
 }
 
 #select-phone .device-select li {
-  display: inline;
+  display: block;
 }
 
 #select-phone .input-group-btn {

@@ -33,47 +33,39 @@
 
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-    <section class="hero light-gradient vertical-align-wrap">
-            <div class="vertical-align-middle">
+    <section class="hero light-gradient">
                 <div class="container">
                     <div class="row">
-                        <div class="col-md-7 hero-cta">
-                            <h2 class="text-left">Pay less</h2>
-                            <p class="lead text-left">Cover your phone against theft, loss, breakdown &amp; damage for up to 40% less than the phone companies.</p>
-                            <h2 class="text-left">Enjoy better service</h2>
-                            <p class="lead text-left">24/7 UK-based claims support and we aim to get you a replacement phone the next working day.</p>
-                            <h2 class="text-left">Get money back, every year</h2>
-                            <p class="lead text-left">Connect to friends and get up to 80% of your money back every year when none of you claim.</p>
-                            <div class="row" style="padding-top: 20px;">
-                                <div class="col-md-12 text-left">
-                                  <ul>
-                                    <li>
-                                      <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
-                                    </li>
-                                    <li>
-                                      <a class="btn btn-info" id="learn-more-btn">Learn more
-                                          <i class="fa fa-chevron-down"></i>
-                                      </a>
-                                    </li>
-                                    <li>
-                                      <a data-toggle="modal" data-target="#switchingModal" id="switch-btn" class="btn">Switching providers?</a>
-                                    </li>
-                                  </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="explainer-video">
-                                <a class="explainer-video-view" data-toggle="modal" data-target="#modal-fullscreen">
-                                    <div class="explainer-video-frame">
+                      <div class="col-md-12">
+                      <div class="col-md-6 text-left main-cta">
+                        <h1>Welcome to better phone insurance</h1>
+                        <p class="lead">
+                          Finally, phone insurance that you can rely on (it's also up to 80% cheaper when you connect with friends &amp; don't claim).
+                        </p>
+                            <div class="explainer-video-thumb">
+                                <a class="explainer-video-view-thumb" data-toggle="modal" data-target="#modal-fullscreen">
+                                    <div class="explainer-video-frame-thumb">
                                         <div class="explainer-video-overlay"></div>
                                     </div>
+                                    <p>
+                                      How does so-sure work?
+                                    </p>
                                 </a>
+                                <p>
+                                </p>
                             </div>
-                            <div class="text-center">
-                                <h6 style="text-transform: uppercase">Learn how you can get money back</h6>
-                            </div>
-                        </div>
+                      </div>
+                        <div class="col-md-6 main-cta">
+                              <h3 class="text-center">Get a quote</h3>
+                              <div class="panel panel-primary">
+                                  <div class="panel-left">
+                                      <div class="row">
+                                        <div id="get-quote">
+                                            {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
                     </div>
                 </div>
             </div>
@@ -117,120 +109,11 @@
     </div>
 </section>
 
-{% include 'AppBundle::Default/howItWorks.html.twig' %}
-
-<section class="popular-devices" id="get-quote">
-    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
-
-    <div class="text-break">
-        <div class="line"></div>
-        OR
-        <div class="line"></div>
-    </div>
-
-    <div class="container">
-        <p class="lead text-center" id="hero-description">
-            Select from our most popular devices.
-        </p>
-        <div class="row">
-            <div class="col-md-4">
-                <div id="device-logo">
-                    <img src="{{ cdn_url }}/images/home/phone-logos/Apple_iPhone_7_Logo.svg" alt="Get your iPhone 7 insured today!"></img>
-                    <div id="memory-select">
-                        <h4>Select memory</h4>
-                        <ul>
-                            <li>
-                                <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 7', 'memory': '32'}) }}">32GB</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 7', 'memory': '128'}) }}">128GB</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 7', 'memory': '256'}) }}">256GB</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div id="device-logo">
-                    <img src="{{ cdn_url }}/images/home/phone-logos/Samsung_Galaxy_S7_logo.svg" alt="Get your Samsung Galaxy S7 insured today!"></img>
-                    <div id="memory-select">
-                        <h4>Select memory</h4>
-                        <ul>
-                            <li>
-                                <a href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy S7', 'memory': '32'}) }}">32GB</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div id="device-logo">
-                    <img src="{{ cdn_url }}/images/home/phone-logos/IPhone_6s_Logo.svg" alt="Get your iPhone 6S insured today!"></img>
-                    <div id="memory-select">
-                        <h4>Select memory</h4>
-                        <ul>
-                            <li>
-                                <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6S', 'memory': '16'}) }}">16GB</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6S', 'memory': '64'}) }}">64GB</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone 6S', 'memory': '128'}) }}">128GB</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</section>
-
-<section class="social-proof">
-<div class="container">
-    <h2>Why insurance needs to change</h2>
-    <p class="lead text-center" id="hero-description">Don't take our word for it, just look at these disgruntled people. This is why we're commited to giving you the best possible experience.</p>
-    <div class="row centered">
-        <div class="col-md-4">
-            <blockquote class="twitter-tweet" lang="en">
-                <p lang="en" dir="ltr">
-                    <a href="https://twitter.com/AskNationwide">@AskNationwide</a>
-                    why is your mobile phone insurance claim process via paper and post?
-                    <a href="https://twitter.com/hashtag/1980s?src=hash">#1980s</a>
-                    <a href="https://twitter.com/hashtag/slow?src=hash">#slow</a>
-                    <a href="https://twitter.com/hashtag/needsarethink?src=hash">#needsarethink</a>
-                </p>&mdash; Kerrie Colford (@kerriecolford)
-                <a href="https://twitter.com/kerriecolford/status/684687370843779072">January 6, 2016</a>
-            </blockquote>
-        </div>
-        <div class="col-md-4">
-            <blockquote class="twitter-tweet" lang="en">
-                <p lang="en" dir="ltr">Bad service
-                    <a href="https://twitter.com/AskLloydsBank">@AskLloydsBank</a>
-                    Acc upgrade met with advisor saying &quot;computer says no&quot; just cos I didn&#39;t want your mobile insurance bundled in.</p>&mdash; Tom R. (@Tomptati0n)
-                <a href="https://twitter.com/Tomptati0n/status/614420014419083267">June 26, 2015</a>
-            </blockquote>
-        </div>
-        <div class="col-md-4">
-            <blockquote class="twitter-tweet" lang="en">
-                <p lang="en" dir="ltr">incredibly poor ecommerce experience from
-                    <a href="https://twitter.com/EE">@EE</a>
-                    apparently if you upgrade via the mobile site, they REMOVE your insurance!</p>&mdash; Robert Nicholson (@RobBothan)
-                <a href="https://twitter.com/RobBothan/status/684056441360105472">January 4, 2016</a>
-            </blockquote>
-        </div>
-    </div>
-</div>
-</section>
-
 <div class="pre-footer">
 <div class="row">
     <div class="col-sm-6 col-a">
         <h4>
-            <a href="http://help.wearesosure.com">Learn More</a>
+            <a href="https://help.wearesosure.com/hc/en-us/categories/200913949-How-it-Works" target="_blank">Learn More</a>
         </h4>
         <p>Learn more about how Social Insurance works and why you should join us. We also cover all the basics to help you understand exactly what you're paying for.</p>
     </div>
@@ -240,7 +123,7 @@
             <a href="https://wearesosure.zendesk.com/hc/en-us/articles/207523059-Our-mission">Our Mission</a>
         </h4>
         <p>Insurance is rubbish. We're making it better by returning it to
-            <a href="https://blog.wearesosure.com/how-insurance-works-ccba082dcbe#.r4cj6kbnw" target="_blank">how it all started</a>. We call this Social Insurance. First mobile phones, then the world!</p>
+            <a href="https://blog.wearesosure.com/how-insurance-works-ccba082dcbe#.r4cj6kbnw" target="_blank">how it all started</a>. We call this Social Insurance. Starting with mobile phones, then the world!</p>
     </div>
 </div>
 </div>
