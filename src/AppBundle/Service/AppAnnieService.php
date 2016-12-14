@@ -104,7 +104,8 @@ class AppAnnieService
             throw new \Exception(sprintf(
                 'Data not present for %s to %s',
                 $start->format('Y-m-d'),
-                $end->format('Y-m-d')));
+                $end->format('Y-m-d')
+            ));
         }
 
         return $salesList[0]['units']['product']['downloads'];

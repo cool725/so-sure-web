@@ -1525,7 +1525,7 @@ class AdminController extends BaseController
             $count++;
 
             $stats = $statsRepo->getStatsByRange($start, $date);
-            foreach($stats as $stat) {
+            foreach ($stats as $stat) {
                 if (!isset($week[$stat->getName()])) {
                     $week[$stat->getName()] = 0;
                 }
