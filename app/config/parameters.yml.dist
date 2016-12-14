@@ -30,6 +30,7 @@ parameters:
 
     mailchimp_apikey: bad-mailchimp # exception thrown if - not present in param
     mailchimp_prelaunch_list:
+    appannie_apikey:
 
     google_appname:
     google_apikey:

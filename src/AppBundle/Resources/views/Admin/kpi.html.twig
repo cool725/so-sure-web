@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/moment/moment.min.js'
+        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        '@AppBundle/Resources/public/js/Admin/charge.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>so-sure KPI</h1>
+    </div>
+</div>
+    <div class="row">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Week Number</th>
+                        <th>Date</th>
+                        <th>Google App Installs</th>
+                        <th>Apple App Installs</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for week in weeks %}
+                        <tr>
+                            <td>{{ week.count }}</td>
+                            <td>{{ week.date|date('d M Y') }}</td>
+                            <td>{{ week['install-google'] }}</td>
+                            <td>{{ week['install-apple'] }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

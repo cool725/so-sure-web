@@ -29,6 +29,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Invoice;
 use AppBundle\Document\Connection;
+use AppBundle\Document\Stats;
 use AppBundle\Document\OptOut\OptOut;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -1499,6 +1500,49 @@ class AdminController extends BaseController
 
         return [
             'invoices' => $invoices,
+        ];
+    }
+
+    /**
+     * @Route("/kpi", name="admin_kpi")
+     * @Template
+     */
+    public function kpiAction()
+    {
+        $dm = $this->getManager();
+        $statsRepo = $dm->getRepository(Stats::class);
+        
+        $date = new \DateTime('2016-09-12');
+        $now = new \DateTime('+7 days');
+        $count = 1;
+        while ($date < $now) {
+            $week = [
+                'date' => clone $date,
+                'count' => $count,
+            ];
+            $start = clone $date;
+            $date = $date->add(new \DateInterval('P7D'));
+            $count++;
+
+            $stats = $statsRepo->getStatsByRange($start, $date);
+            foreach ($stats as $stat) {
+                if (!isset($week[$stat->getName()])) {
+                    $week[$stat->getName()] = 0;
+                }
+                $week[$stat->getName()] += $stat->getValue();
+            }
+            if (!isset($week[Stats::INSTALL_GOOGLE])) {
+                $week[Stats::INSTALL_GOOGLE] = 0;
+            }
+            if (!isset($week[Stats::INSTALL_APPLE])) {
+                $week[Stats::INSTALL_APPLE] = 0;
+            }
+
+            $weeks[] = $week;
+        }
+
+        return [
+            'weeks' => $weeks,
         ];
     }
 }
