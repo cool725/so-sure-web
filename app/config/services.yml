@@ -418,6 +418,13 @@ services:
             logger:  "@logger"
             redis:   "@snc_redis.default"
 
+    app.annie:
+        class: AppBundle\Service\AppAnnieService
+        arguments:
+            dm:      "@doctrine_mongodb.odm.default_document_manager"
+            logger:  "@logger"
+            apiKey:  "%appannie_apikey%"
+
     app.voter.user:
         class: AppBundle\Security\UserVoter
         tags:
