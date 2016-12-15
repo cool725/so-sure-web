@@ -75,6 +75,35 @@ class RefundListenerTest extends WebTestCase
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
     }
 
+    public function testRefundListenerCancelledCooloff()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundListenerCancelledCooloff', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+        $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        $policy->setCancellationReason(PhonePolicy::CANCELLED_COOLOFF);
+        static::$dm->flush();
+
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
+        
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($policy->getId());
+        foreach ($policy->getPayments() as $payment) {
+            
+        }
+    }
+
     public function testRefundFreeNovPromo()
     {
         $user = static::createUser(

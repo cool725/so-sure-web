@@ -12,9 +12,12 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\SoSurePayment;
 use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\CurrencyTrait;
 
 class RefundListener
 {
+    use CurrencyTrait;
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -51,6 +54,25 @@ class RefundListener
     public function onPolicyCancelledEvent(PolicyEvent $event)
     {
         $policy = $event->getPolicy();
+
+        // Cooloff cancellations should refund any so-sure payments
+        if ($policy->getCancellationReason() == Policy::CANCELLED_COOLOFF) {
+            $repo = $this->dm->getRepository(SoSurePayment::class);
+            $payments = $repo->findBy(['success' => true]);
+            $total = Payment::sumPayments($payments);
+
+            if (!$this->areEqualToTwoDp(0, $total)) {
+                $sosurePayment = SoSurePayment::init();
+                $sosurePayment->setAmount(0 - $total['total']);
+                $sosurePayment->setTotalCommission(0 - $total['totalCommission']);
+                $sosurePayment->setNotes(sprintf(
+                    'cooloff cancellation refund of promo %s paid by so-sure',
+                    $policy->getPromoCode()
+                ));
+                $policy->addPayment($sosurePayment);
+                $this->dm->flush();
+            }
+        }
 
         $payment = $policy->getLastSuccessfulPaymentCredit();
         $refundAmount = $policy->getRefundAmount($event->getDate());
