@@ -71,11 +71,13 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testQuotePhoneRouteMakeModelMemory()
     {
-        $crawler = self::$client->request('GET', self::$router->generate('quote_make_model_memory', [
+        $url = self::$router->generate('quote_make_model_memory', [
             'make' => 'Apple',
-            'model' => 'iPhone 5',
+            'model' => 'iPhone 5S',
             'memory' => 64,
-        ]));
+        ]);
+
+        $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
     }
 
@@ -83,7 +85,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', self::$router->generate('quote_make_model', [
             'make' => 'Apple',
-            'model' => 'iPhone 5',
+            'model' => 'iPhone 5S',
         ]));
         self::verifyResponse(200);
     }
