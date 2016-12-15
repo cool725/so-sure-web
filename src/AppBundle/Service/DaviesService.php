@@ -250,6 +250,7 @@ class DaviesService
                 if ($daviesClaim->getClaimStatus()) {
                     $claim->setStatus($daviesClaim->getClaimStatus());
                 }
+                $claim->setDaviesStatus($daviesClaim->status);
 
                 $claim->setExcess($daviesClaim->excess);
                 $claim->setIncurred($daviesClaim->incurred);

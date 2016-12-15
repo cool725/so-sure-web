@@ -366,7 +366,7 @@ class SalvaExportService
             $data = [
                 $policy->getSalvaPolicyNumberByDate($claim->getRecordedDate()),
                 $claim->getNumber(),
-                $claim->getDaviesStatus(),
+                $claim->getStatus(),
                 $claim->getNotificationDate() ?
                     $this->adjustDate($claim->getNotificationDate()) :
                     '',
@@ -377,8 +377,8 @@ class SalvaExportService
                 $claim->getDescription(),
                 $this->toTwoDp($claim->getExcess()),
                 $this->toTwoDp($claim->getReservedValue()),
-                $claim->isOpen() ? '' : $this->toTwoDp($claim->getIncurred()),
-                $claim->isOpen() ? '' : $this->toTwoDp($claim->getClaimHandlingFees()),
+                $this->toTwoDp($claim->getIncurred()),
+                $this->toTwoDp($claim->getClaimHandlingFees()),
                 $claim->getReplacementReceivedDate() ?
                     $this->adjustDate($claim->getReplacementReceivedDate()) :
                     '',
