@@ -349,7 +349,7 @@ abstract class Policy
     public function getSuccessfulPaymentCredits()
     {
         return array_filter($this->getSuccessfulPayments(), function ($payment) {
-            return $payment->getAmount() > 0;
+            return $payment->getAmount() > 0 && !$payment instanceof SoSurePayment;
         });
     }
 
@@ -375,7 +375,7 @@ abstract class Policy
     public function getSuccessfulPaymentDebits()
     {
         return array_filter($this->getSuccessfulPayments(), function ($payment) {
-            return $payment->getAmount() <= 0;
+            return $payment->getAmount() <= 0 && !$payment instanceof SoSurePayment;
         });
     }
 
