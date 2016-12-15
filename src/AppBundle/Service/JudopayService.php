@@ -497,14 +497,6 @@ class JudopayService
 
     public function scheduledPayment(ScheduledPayment $scheduledPayment, $prefix = null, $date = null)
     {
-        if (!$scheduledPayment->getPolicy()->getUser()->hasValidPaymentMethod()) {
-            throw new \Exception(sprintf(
-                'Scheduled payment %s does not have a valid payment method (User %s)',
-                $scheduledPayment->getId(),
-                $scheduledPayment->getPolicy()->getUser()->getId()
-            ));
-        }
-
         if (!$scheduledPayment->isBillable($prefix)) {
             throw new \Exception(sprintf(
                 'Scheduled payment %s is not billable (status: %s)',
@@ -685,15 +677,24 @@ class JudopayService
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        $tokenPaymentDetails = $this->runTokenPayment($user, $amount, $payment->getId(), $policy->getId());
+        if ($user->hasValidPaymentMethod()) {
+            $tokenPaymentDetails = $this->runTokenPayment($user, $amount, $payment->getId(), $policy->getId());
 
-        $payment->setReference($tokenPaymentDetails["yourPaymentReference"]);
-        $payment->setReceipt($tokenPaymentDetails["receiptId"]);
-        $payment->setAmount($tokenPaymentDetails["amount"]);
-        $payment->setResult($tokenPaymentDetails["result"]);
-        $payment->setMessage($tokenPaymentDetails["message"]);
-        if (isset($tokenPaymentDetails["riskScore"])) {
-            $payment->setRiskScore($tokenPaymentDetails["riskScore"]);
+            $payment->setReference($tokenPaymentDetails["yourPaymentReference"]);
+            $payment->setReceipt($tokenPaymentDetails["receiptId"]);
+            $payment->setAmount($tokenPaymentDetails["amount"]);
+            $payment->setResult($tokenPaymentDetails["result"]);
+            $payment->setMessage($tokenPaymentDetails["message"]);
+            if (isset($tokenPaymentDetails["riskScore"])) {
+                $payment->setRiskScore($tokenPaymentDetails["riskScore"]);
+            }
+        } else {
+            $this->logger->warning(sprintf(
+                'Scheduled payment %s does not have a valid payment method (User %s)',
+                $scheduledPayment->getId(),
+                $scheduledPayment->getPolicy()->getUser()->getId()
+            ));
+            $payment->setResult(JudoPayment::RESULT_SKIPPED);
         }
 
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
