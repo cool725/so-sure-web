@@ -15,6 +15,7 @@ class JudoPayment extends Payment
 {
     const RESULT_SUCCESS = "Success";
     const RESULT_DECLINED = "Declined";
+    const RESULT_SKIPPED = "Skipped";
 
     /**
      * @AppAssert\Alphanumeric()

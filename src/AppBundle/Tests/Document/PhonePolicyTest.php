@@ -888,6 +888,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(self::generateEmail('testCancelPolicyCancelsScheduledPayments', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
@@ -936,6 +937,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
+        $user->setEmail(self::generateEmail('testGetPremiumPaidFailedPayment', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
