@@ -690,9 +690,9 @@ class JudopayService
             }
         } else {
             $this->logger->warning(sprintf(
-                'Scheduled payment %s does not have a valid payment method (User %s)',
-                $scheduledPayment->getId(),
-                $scheduledPayment->getPolicy()->getUser()->getId()
+                'User %s does not have a valid payment method (Policy %s)',
+                $user->getId(),
+                $policy->getId()
             ));
             $payment->setResult(JudoPayment::RESULT_SKIPPED);
         }

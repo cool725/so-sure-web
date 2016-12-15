@@ -451,9 +451,6 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy->getStatus());
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testJudoScheduledPaymentExpiredCard()
     {
         $user = $this->createValidUser(static::generateEmail('testJudoScheduledPaymentDelayed', $this));
@@ -499,7 +496,9 @@ class JudopayServiceTest extends WebTestCase
         $nextMonth = new \DateTime();
         $nextMonth->add(new \DateInterval('P1M'));
 
-        self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
+        $scheduledPayment = self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
+        $this->assertEquals(JudoPayment::RESULT_SKIPPED, $scheduledPayment->getPayment()->getResult());
+        $this->assertEquals(false, $scheduledPayment->getPayment()->isSuccess());
     }
 
     public function testProcessTokenPayResult()
