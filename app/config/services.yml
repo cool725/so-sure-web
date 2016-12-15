@@ -221,6 +221,7 @@ services:
             redis:             "@snc_redis.default"
             environment:       "%kernel.environment%"
             branchKey:         "%branch_key%"
+            branchDomain:      "%branch_domain%"
             googleAppDownload: "%google_app_download%"
             appleAppDownload": "%apple_app_download%"
 

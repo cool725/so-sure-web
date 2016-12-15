@@ -44,6 +44,12 @@ class KernelListener
             $session = $request->getSession();
             $session->set('utm', serialize(['source' => $source, 'medium' => $medium, 'campaign' => $campaign]));
         }
+
+        $referer = $request->headers->get('referer');
+        if (strlen($referer) > 0) {
+            $session = $request->getSession();
+            $session->set('referer', $referer);
+        }
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
