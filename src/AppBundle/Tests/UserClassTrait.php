@@ -10,6 +10,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\GocardlessPayment;
 use AppBundle\Document\JudoPayment;
+use AppBundle\Document\SoSurePayment;
 use AppBundle\Classes\Salva;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -212,6 +213,34 @@ trait UserClassTrait
         $payment->setTotalCommission($commission);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setReceipt($receiptId);
+        if ($date) {
+            $payment->setDate($date);
+        }
+        $policy->addPayment($payment);
+    }
+
+    public static function addSoSureStandardPayment($policy, $date = null, $refund = true, $monthly = true)
+    {
+        if ($monthly) {
+            $premium = $policy->getPremium()->getMonthlyPremiumPrice($date);
+            $commission = Salva::MONTHLY_TOTAL_COMMISSION;
+        } else {
+            $premium = $policy->getPremium()->getYearlyPremiumPrice($date);
+            $commission = Salva::YEARLY_TOTAL_COMMISSION;
+        }
+        if (!$refund) {
+            $premium = 0 - $premium;
+            $commission = 0 - $commission;
+        }
+        self::addSoSurePayment($policy, $premium, $commission, $date);
+    }
+    
+    public static function addSoSurePayment($policy, $amount, $commission, $date = null)
+    {
+        $payment = new SoSurePayment();
+        $payment->setAmount($amount);
+        $payment->setTotalCommission($commission);
+        $payment->setSuccess(true);
         if ($date) {
             $payment->setDate($date);
         }

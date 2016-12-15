@@ -8,9 +8,12 @@ use AppBundle\Listener\UserListener;
 use AppBundle\Listener\DoctrineUserListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Event\UserEvent;
+use AppBundle\Classes\Salva;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Payment;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Listener\RefundListener;
 use AppBundle\Event\PolicyEvent;
@@ -21,6 +24,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class RefundListenerTest extends WebTestCase
 {
+    use CurrencyTrait;
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
@@ -82,26 +86,93 @@ class RefundListenerTest extends WebTestCase
             static::generateEmail('testRefundListenerCancelledCooloff', $this),
             'bar'
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
+        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-11-01'));
+
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy);
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
         static::$policyService->setEnvironment('test');
 
         $this->assertTrue($policy->isValidPolicy());
+        
+        // simulate a free month - judo refund + so-sure addition
+        static::addPayment(
+            $policy,
+            0 - $policy->getPremium()->getMonthlyPremiumPrice(new \DateTime('2016-11-01')),
+            0 - Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-11-01')
+        );
+        static::addSoSureStandardPayment($policy, new \DateTime('2016-11-01'));
+
+        $policy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
         $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
-        $policy->setCancellationReason(PhonePolicy::CANCELLED_COOLOFF);
         static::$dm->flush();
 
         $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
-        
+
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($policy->getId());
-        foreach ($policy->getPayments() as $payment) {
-            
-        }
+        $totalSoSure = Payment::sumPayments($policy->getPayments(), false, SoSurePayment::class);
+        $this->assertTrue($this->areEqualToTwoDp(0, $totalSoSure['total']));
+
+        $total = Payment::sumPayments($policy->getPayments(), false);
+        $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
+        
+        // judo initial, judo refund for free month
+        // so-sure payment to offset judo refund, so-sure refund for cancellation
+        $this->assertEquals(4, count($policy->getPayments()));
+    }
+
+    public function testRefundListenerCancelledCooloffYearly()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundListenerCancelledCooloffYearly', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
+        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-11-01'), false);
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+        
+        // simulate a free month - judo refund + so-sure addition
+        static::addPayment(
+            $policy,
+            0 - $policy->getPremium()->getMonthlyPremiumPrice(new \DateTime('2016-11-01')),
+            0 - Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-11-01')
+        );
+        static::addSoSureStandardPayment($policy, new \DateTime('2016-11-01'));
+
+        $policy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
+        $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        static::$dm->flush();
+
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($policy->getId());
+        $totalSoSure = Payment::sumPayments($policy->getPayments(), false, SoSurePayment::class);
+        $this->assertTrue($this->areEqualToTwoDp(0, $totalSoSure['total']));
+
+        $total = Payment::sumPayments($policy->getPayments(), false);
+        $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
+        
+        // judo initial, judo refund for free month
+        // so-sure payment to offset judo refund, so-sure refund for cancellation
+        $this->assertEquals(5, count($policy->getPayments()));
     }
 
     public function testRefundFreeNovPromo()

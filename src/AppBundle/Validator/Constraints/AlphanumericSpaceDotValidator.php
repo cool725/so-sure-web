@@ -9,6 +9,10 @@ class AlphanumericSpaceDotValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
+        if (is_object($value)) {
+            throw new \Exception(sprintf('Excpected string %s', json_encode($value)));
+        }
+
         if (!preg_match($this->getRegex(), $value, $matches)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('%string%', $value)

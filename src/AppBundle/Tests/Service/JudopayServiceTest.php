@@ -453,7 +453,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoScheduledPaymentExpiredCard()
     {
-        $user = $this->createValidUser(static::generateEmail('testJudoScheduledPaymentDelayed', $this));
+        $user = $this->createValidUser(static::generateEmail('testJudoScheduledPaymentExpiredCard', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
 
