@@ -57,9 +57,8 @@ class RefundListener
 
         // Cooloff cancellations should refund any so-sure payments
         if ($policy->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            $repo = $this->dm->getRepository(SoSurePayment::class);
-            $payments = $repo->findBy(['success' => true]);
-            $total = Payment::sumPayments($payments, false);
+            $payments = $policy->getPayments();
+            $total = Payment::sumPayments($payments, false, SoSurePayment::class);
 
             if (!$this->areEqualToTwoDp(0, $total['total'])) {
                 $sosurePayment = SoSurePayment::init();
