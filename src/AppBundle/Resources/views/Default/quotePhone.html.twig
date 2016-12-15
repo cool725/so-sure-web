@@ -25,33 +25,42 @@
 {% endblock %}
 
 {% block body %}
-    <section class="view-quote light-gradient">
-                <div class="container">
+    <section class="view-quote background-image-2 vertical-align-wrap">
+                <div class="container vertical-align-middle">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="col-md-6 text-left main-cta">
-                              <h1>Welcome to better phone insurance</h1>
+                              <h2>Rapid replacement</h2>
                               <p class="lead">
-                                Finally, phone insurance that you can rely on (it's also up to 80% cheaper when you connect with friends &amp; don't claim).
+                                We aim to get you a replacement phone the next working day once your claim is approved.
                               </p>
-                                  <div class="explainer-video-thumb">
-                                      <a class="explainer-video-view-thumb" data-toggle="modal" data-target="#modal-fullscreen">
-                                          <div class="explainer-video-frame-thumb">
-                                              <div class="explainer-video-overlay"></div>
-                                          </div>
-                                          <p>
-                                            How does so-sure work?
-                                          </p>
-                                      </a>
-                                      <p>
+                              <h2>Exceptional support</h2>
+                              <p class="lead">
+                                We know that accidents can happen at any time. That's why we're here for you whenever you need us.
+                              </p>
+                              <h2>Money back when you don't claim</h2>
+                              <p class="lead">
+                                Connect with your friends and provided none of you claim you could get up to 80% money back.
+                              </p>
+                              <div class="explainer-video-thumb">
+                                  <a class="explainer-video-view-thumb" data-toggle="modal" data-target="#modal-fullscreen">
+                                      <div class="explainer-video-frame-thumb">
+                                          <div class="explainer-video-overlay"></div>
+                                      </div>
+                                      <p class="text-white">
+                                        How can you get money back?
                                       </p>
-                                  </div>
+                                  </a>
+                                  <p>
+                                  </p>
+                              </div>
                             </div>
                             <div class="col-md-6">
-                                <h3 class="text-center">Your quote</h3>
+                                <h3 class="text-center" style="color: #fff;">Your quote</h3>
+                                <div class="row">
                                 <div class="panel panel-primary">
+                                  <div class="col-md-12">
                                     <div class="quote-panel-left">
-                                        <div class="row">
                                             <span>
                                                 <p>Device</p>
                                                 <h4>{{ phone }}</h4>
@@ -66,6 +75,12 @@
                                                 <br>
                                                 <p>Monthly Cost</p>
                                                 <h4>£{{ phone_price.monthlyPremiumPrice }}</h4>
+                                                <br>
+                                                <p>What You Could Get Back</p>
+                                                <h4>£{{ phone_price.maxPot }}
+                                                    with
+                                                    {{ phone_price.maxConnections }}
+                                                    connections</h4>
                                                 <br>
                                                 <p>Covered for</p>
                                                 <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
@@ -90,13 +105,14 @@
                 </div>
             </div>
         </div>
+      </div>
     </section>
 
-    <section class="banner brand-gradient start-purchase">
+    <section class="banner start-purchase">
         <div class="container">
             <div class="row">
                 <div class="col-sm-4 text-left">
-                    <h3 class="text-white">
+                    <h3>
                         Ready to be part of an insurance revolution?
                     </h3>
                 </div>
@@ -104,7 +120,7 @@
                     <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">Buy online</a>
                 </div>
                 <div class="col-sm-2">
-                    <h4 class="text-white text-center">OR</h4>
+                    <h4 class="text-center">OR</h4>
                 </div>
                 <div class="col-sm-2 app-badge">
                     <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
@@ -120,21 +136,29 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/benefits.html.twig' %}
+    {% include 'AppBundle::Default/howItWorksv2.html.twig' %}
 
-    {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
-    <section class="text-block light-gradient">
-        <div class="container">
-            <h2 class="text-center">
-                Still not sure?
-            </h2>
-            <p class="lead text-center" id="hero-description">
-                Chat with our
-                <a id="open-intercom" href="mailto:bjo63djg@incoming.intercom.io">team</a>
-                or visit our
-                <a href="https://help.wearesosure.com">Help Centre</a>, which has lots of useful information.
-            </p>
+    <section class="footer-cta alt-brand-gradient">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8 text-left">
+          <h2>Still not sure?</h2>
+          <p class="lead">
+            Get in touch, we will usually respond within 2 minutes.
+          </p>
+          </div>
+          <div class="col-md-2 text-center">
+            <a class="btn btn-primary" id="open-intercom" href="mailto:bjo63djg@incoming.intercom.io">Chat with us
+              <i class="fa fa-comments"></i>
+            </a>
+          </div>
+          <div class="col-md-2 text-center">
+            <a class="btn btn-info" id="help-centre" href="https://help.wearesosure.com" target="_blank">Visit Help Centre
+              <i class="fa fa-info-circle"></i>
+            </a>
+          </div>
+          </div>
         </div>
     </section>
 

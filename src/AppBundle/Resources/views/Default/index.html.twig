@@ -33,40 +33,18 @@
 
     <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-    <section class="hero light-gradient">
-                <div class="container">
+    <section class="hero background-image-3 vertical-align-wrap" id="get-quote">
+                <div class="container vertical-align-middle">
                     <div class="row">
-                      <div class="col-md-12">
-                      <div class="col-md-6 text-left main-cta">
+                      <div class="col-md-8 col-md-offset-2">
                         <h1>Welcome to better phone insurance</h1>
                         <p class="lead">
                           Finally, phone insurance that you can rely on (it's also up to 80% cheaper when you connect with friends &amp; don't claim).
                         </p>
-                            <div class="explainer-video-thumb">
-                                <a class="explainer-video-view-thumb" data-toggle="modal" data-target="#modal-fullscreen">
-                                    <div class="explainer-video-frame-thumb">
-                                        <div class="explainer-video-overlay"></div>
-                                    </div>
-                                    <p>
-                                      How does so-sure work?
-                                    </p>
-                                </a>
-                                <p>
-                                </p>
-                            </div>
                       </div>
-                        <div class="col-md-6 main-cta">
-                              <h3 class="text-center">Get a quote</h3>
-                              <div class="panel panel-primary">
-                                  <div class="panel-left">
-                                      <div class="row">
-                                        <div id="get-quote">
-                                            {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                    </div>
+                      <div class="col-md-12">
+                            {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                      </div>
                 </div>
             </div>
         </div>
@@ -76,9 +54,9 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-2">
-                <h5 style="text-transform: uppercase">
+                <h4>
                     Featured in
-                </h5>
+                </h4>
             </div>
             <div class="col-sm-2">
                 <a href="https://www.theguardian.com/technology/2016/sep/18/chatbots-talk-town-interact-humans-technology-silicon-valley" target="_blank">
@@ -96,9 +74,9 @@
                 </a>
             </div>
             <div class="col-sm-2">
-                <h5 style="text-transform: uppercase">
+                <h4>
                     Awarded by
-                </h5>
+                </h4>
             </div>
             <div class="col-sm-2">
                 <a href="http://www.postevents.co.uk/technologyawards/static/shortlist-1" target="_blank">
@@ -109,24 +87,70 @@
     </div>
 </section>
 
-<div class="pre-footer">
-<div class="row">
-    <div class="col-sm-6 col-a">
-        <h4>
-            <a href="https://help.wearesosure.com/hc/en-us/categories/200913949-How-it-Works" target="_blank">Learn More</a>
-        </h4>
-        <p>Learn more about how Social Insurance works and why you should join us. We also cover all the basics to help you understand exactly what you're paying for.</p>
-    </div>
+{% include 'AppBundle::Default/benefits.html.twig' %}
 
-    <div class="col-sm-6 col-b">
-        <h4>
-            <a href="https://wearesosure.zendesk.com/hc/en-us/articles/207523059-Our-mission">Our Mission</a>
-        </h4>
-        <p>Insurance is rubbish. We're making it better by returning it to
-            <a href="https://blog.wearesosure.com/how-insurance-works-ccba082dcbe#.r4cj6kbnw" target="_blank">how it all started</a>. We call this Social Insurance. Starting with mobile phones, then the world!</p>
+<section class="social-proof">
+  <div class="container">
+    <div class="row">
+      <h2 class="text-center">We don't like to talk about ourselves</h2>
+      <p class="lead text-center">
+        But we don't mind if our customers do. 😊
+      </p>
+      <div class="col-md-4">
+        <blockquote class="blockquote">
+          <p>
+            The UX is great. Really smooth process. I also love the tone of voice and iconography. Time to get a few more friends involved!
+          </p>
+          <footer class="blockquote-footer">
+            Adam
+          </footer>
+        </blockquote>
+      </div>
+      <div class="col-md-4">
+          <blockquote class="blockquote">
+            <p>
+              Your T&amp;Cs are so clear and concise it makes the customer feel like you actually care about them!
+            </p>
+            <footer class="blockquote-footer">
+              Honor
+            </footer>
+          </blockquote>
+
+        </div>
+      <div class="col-md-4">
+        <blockquote class="blockquote">
+          <p>
+            Claim was super fast and everyone really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution!
+          </p>
+          <footer class="blockquote-footer">
+            Herve
+          </footer>
+        </blockquote>
+      </div>
     </div>
-</div>
-</div>
+  </div>
+</section>
+
+<section class="footer-cta alt-brand-gradient">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 text-left">
+      <h2>Ready for better phone insurance?</h2>
+      <p class="lead">
+        You can't always have better in life, but you can have better phone insurance.
+      </p>
+      </div>
+      <div class="col-md-2 text-center">
+        <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
+      </div>
+      <div class="col-md-2 text-center">
+        <a class="btn btn-info" id="open-intercom">Chat with us
+            <i class="fa fa-comments"></i>
+        </a>
+      </div>
+      </div>
+    </div>
+</section>
 
 <div class="modal modal-switching fade" id="switchingModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
