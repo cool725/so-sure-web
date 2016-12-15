@@ -555,4 +555,18 @@ abstract class BaseController extends Controller
 
         return $validator->conform(substr($value, 0, $length));
     }
+
+    protected function getSessionQuotePhone(Request $request)
+    {
+        $session = $request->getSession();
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+
+        $phone = null;
+        if ($session->get('quote')) {
+            $phone = $phoneRepo->find($session->get('quote'));
+        }
+
+        return $phone;
+    }
 }

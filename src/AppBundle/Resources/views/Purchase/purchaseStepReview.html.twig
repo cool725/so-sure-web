@@ -18,10 +18,6 @@
 {% block body %}
 <div class="payment-container vertical-align-wrap">
   <div class="vertical-align-middle">
-    <div class="desktop-page-title">
-    <h1 class="section-title">Complete your policy</h1>
-    <p class="section-description lead">Just enter the details below to setup your account.</p>
-    </div>
     {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
     <div class="checkout-step text-left">
     <div class="row">
@@ -39,7 +35,7 @@
                 </li>
             </ol>
             <p>
-                If you confirm that the above is correct and we later discover that it isn’t then you may later be denied you claim.
+                If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.
             </p>
             <div class="row">
                 <div class="form-group col-sm-12 text-center checkbox {% if is_postback %}has-error{% endif %}">

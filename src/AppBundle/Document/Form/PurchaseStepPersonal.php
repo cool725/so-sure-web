@@ -34,6 +34,14 @@ class PurchaseStepPersonal
 
     /**
      * @var string
+     * @AppAssert\FullName()
+     * @Assert\Length(min="1", max="100")
+     * @Assert\NotNull()
+     */
+    protected $name;
+
+    /**
+     * @var string
      * @AppAssert\UkMobile()
      * @Assert\NotNull()
      */
@@ -77,6 +85,21 @@ class PurchaseStepPersonal
         $this->lastName = $lastName;
     }
 
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = trim($name);
+        $parts = explode(" ", trim($name));
+        if (count($parts) == 2) {
+            $this->setFirstName($parts[0]);
+            $this->setLastName($parts[1]);
+        }
+    }
+
     public function getBirthday()
     {
         return $this->birthday;
@@ -116,6 +139,7 @@ class PurchaseStepPersonal
         $this->setEmail($user->getEmail());
         $this->setFirstName($user->getFirstName());
         $this->setLastName($user->getLastName());
+        $this->setName(trim(sprintf('%s %s', $user->getFirstName(), $user->getLastName())));
         $this->setMobileNumber($user->getMobileNumber());
         $this->setBirthday($user->getBirthday());
     }
