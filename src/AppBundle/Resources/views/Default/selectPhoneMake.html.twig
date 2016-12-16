@@ -8,8 +8,6 @@
         {% else %}
             {% set buttonText = 'Quote me' %}
             {% set class = "text-center" %}
-            <h2>Get a quote today</h2>
-            <p class="lead text-center" id="hero-description">Find out how much you could save when you insure your phone with us and connect with friends &amp; family.</p>
         {% endif %}
         <div class="row" id="select-phone">
             <div class="col-sm-12 {{ class }}">
@@ -24,19 +22,19 @@
                           {{ form_widget(form_phone.phoneId, { 'attr': {'class': 'select-phone-dropdown select-phones'}}) }}
                         </li>
                         <li>
-                          <span class="input-group-btn text-center">
+                          <span class="input-group-btn text-center" style="margin-top: 5px;">
                               {{ form_widget(form_phone.next, {'label': buttonText, 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
                           </span>
                         </li>
+                        {% if type is not defined or not type  %}
+                        <p class="text-center" style="padding-top: 5px">
+                            <a class="dark-bg-link" href="mailto:hello@wearesosure.com">Don't see your device? Let us know.</a>
+                        </p>
+                        {% endif %}
                       </ul>
                     </div>
                     {{ form_end(form_phone) }}
                 </div>
             </div>
-            {% if type is not defined or not type  %}
-            <p class="text-center">
-                <a href="mailto:hello@wearesosure.com">Don't see your device? Let us know.</a>
-            </p>
-            {% endif %}
         </div>
     </div>

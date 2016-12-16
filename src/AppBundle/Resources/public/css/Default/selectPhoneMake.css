@@ -14,16 +14,16 @@
     border: 2px solid #efefef;
     color: #202532;
     box-shadow: none;
-    width: 390px;
+    width: 320px;
     margin-bottom: 10px;
     margin-right: 10px;
+    font-size: 14px;
 }
 
 #select-phone {
     text-align: center;
     padding-top: 10px;
     padding-bottom: 10px;
-    background-color: rgba(255, 255, 255, 0.5);
     border-radius: 5px;
 }
 
@@ -53,7 +53,6 @@
     vertical-align: middle;
     font-size: 16px;
     line-height: 1.5;
-
 }
 @media (max-width: 992px) {
   #select-phone .device-select, .device-select .input-group {
@@ -95,7 +94,7 @@
 }
 
 #select-phone .device-select li {
-  display: inline;
+  display: block;
 }
 
 #select-phone .input-group-btn {
