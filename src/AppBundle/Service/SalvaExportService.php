@@ -423,7 +423,9 @@ class SalvaExportService
         $response = $this->send($xml, self::SCHEMA_POLICY_IMPORT);
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
-        $phonePolicy->addSalvaPolicyResults($responseId, false, ['ss_phone_base_tariff' => $phonePolicy->getTotalGwp()]);
+        $phonePolicy->addSalvaPolicyResults($responseId, false, [
+            'ss_phone_base_tariff' => $phonePolicy->getTotalGwp()]
+        );
         $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_ACTIVE);
         $this->dm->flush();
 
