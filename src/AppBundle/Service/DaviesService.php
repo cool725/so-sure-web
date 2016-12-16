@@ -210,12 +210,15 @@ class DaviesService
 
         $claims = [];
         $row = -1;
+        $columns = -1;
         foreach ($lines as $line) {
             $row++;
             if ($row == 0) {
+                $columns = count(array_slice(array_filter($line), 0));
                 continue;
             }
             try {
+                $line = array_slice($line, 0, $columns);
                 $claim = DaviesClaim::create($line);
                 // If the claim is a blank line, just ignore
                 if ($claim) {
