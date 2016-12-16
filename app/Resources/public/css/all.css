@@ -483,21 +483,21 @@ background: rgba(51, 153, 255, 1);
 }
 
 .background-image-1 {
-  background-image: url('http://static.so-sure.com.s3.amazonaws.com/images/home/background/background-6.jpg');
+  background-image: url('https://cdn.so-sure.com/images/home/background/background-6.jpg');
   background-size: cover;
   background-color: #202532;
   background-position: center;
 }
 
 .background-image-2 {
-  background-image: url('http://static.so-sure.com.s3.amazonaws.com/images/home/background/background-6.png');
+  background-image: url('https://cdn.so-sure.com/images/home/background/background-6.png');
   background-size: cover;
   background-color: #202532;
   background-position: center;
 }
 
 .background-image-3 {
-  background-image: url('http://static.so-sure.com.s3.amazonaws.com/images/home/background/background-3.png');
+  background-image: url('https://cdn.so-sure.com/images/home/background/background-3.png');
   background-size: cover;
   background-color: #202532;
   background-position: center;
