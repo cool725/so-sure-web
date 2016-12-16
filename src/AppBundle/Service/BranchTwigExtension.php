@@ -39,16 +39,9 @@ class BranchTwigExtension extends \Twig_Extension
         );
     }
 
-    private function getAppleCampaign()
+    private function getReferer()
     {
-        $utm = $this->getUtm();
-        if ($utm) {
-            $appleCampaign = sprintf('%s-%s-%s', $utm['source'], $utm['campaign'], $utm['medium']);
-
-            return $appleCampaign;
-        }
-
-        return null;
+        return $this->getSession('referer');
     }
 
     private function getUtm()
@@ -79,7 +72,9 @@ class BranchTwigExtension extends \Twig_Extension
 
     private function getData()
     {
-        $data = [];
+        $data = [
+            'referer' => $this->getReferer(),
+        ];
         $scode = $this->getSCode();
         if ($scode) {
             $data['scode'] = $scode;
@@ -89,45 +84,84 @@ class BranchTwigExtension extends \Twig_Extension
         return $data;
     }
 
-    private function getMarketing()
+    private function getSource($source)
     {
-        return ['channel' => 'web', 'campaign' => 'downloadapp'];
+        $utm = $this->getUtm();
+        if ($utm) {
+            return $utm['source'];
+        } else {
+            return $source;
+        }
+    }
+
+    private function getMedium()
+    {
+        $utm = $this->getUtm();
+        if ($utm) {
+            return $utm['medium'];
+        } else {
+            return 'web';
+        }
+    }
+
+    private function getCampaign()
+    {
+        $utm = $this->getUtm();
+        if ($utm) {
+            return $utm['campaign'];
+        } else {
+            return 'downloadapp';
+        }
     }
 
     public function branch($source)
     {
-        return $this->branch->link($this->getData(), [], $source, $this->getAppleCampaign());
+        return $this->branch->link(
+            $this->getData(),
+            $this->getSource($source),
+            $this->getMedium(),
+            $this->getCampaign()
+        );
     }
 
     public function apple($source)
     {
-        if ($this->getSCode()) {
-            try {
-                return $this->branch->appleLink(
-                    $this->getData(),
-                    $this->getMarketing(),
-                    $source,
-                    $this->getAppleCampaign()
-                );
-            } catch (\Exception $e) {
-                $this->logger->error('Failed generating apple scode link', ['exception' => $e]);
-            }
+        try {
+            return $this->branch->appleLink(
+                $this->getData(),
+                $this->getSource($source),
+                $this->getMedium(),
+                $this->getCampaign()
+            );
+        } catch (\Exception $e) {
+            $this->logger->error('Failed generating apple scode link', ['exception' => $e]);
         }
 
-        return $this->branch->downloadAppleLink($source, $this->getAppleCampaign());
+        return $this->branch->downloadAppleLink(
+            $this->getSource($source),
+            $this->getMedium(),
+            $this->getCampaign()
+        );
     }
 
     public function google($source)
     {
-        if ($this->getSCode()) {
-            try {
-                return $this->branch->googleLink($this->getData(), $this->getMarketing(), $source);
-            } catch (\Exception $e) {
-                $this->logger->error('Failed generating google scode link', ['exception' => $e]);
-            }
+        try {
+            return $this->branch->googleLink(
+                $this->getData(),
+                $this->getSource($source),
+                $this->getMedium(),
+                $this->getCampaign()
+            );
+        } catch (\Exception $e) {
+            $this->logger->error('Failed generating google scode link', ['exception' => $e]);
         }
 
-        return $this->branch->downloadGoogleLink($source);
+        return $this->branch->downloadGoogleLink(
+            $this->getSource($source),
+            $this->getMedium(),
+            $this->getCampaign()
+        );
     }
 
     public function getName()

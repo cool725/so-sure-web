@@ -23,6 +23,9 @@ class BranchService
     protected $branchKey;
 
     /** @var string */
+    protected $branchDomain;
+
+    /** @var string */
     protected $googleAppDownload;
 
     /** @var string */
@@ -34,6 +37,7 @@ class BranchService
      * @param                   $redis
      * @param                   $environment
      * @param                   $branchKey
+     * @param                   $branchDomain
      * @param                   $googleAppDownload
      * @param                   $appleAppDownload
      */
@@ -43,6 +47,7 @@ class BranchService
         $redis,
         $environment,
         $branchKey,
+        $branchDomain,
         $googleAppDownload,
         $appleAppDownload
     ) {
@@ -51,95 +56,179 @@ class BranchService
         $this->redis = $redis;
         $this->environment = $environment;
         $this->branchKey = $branchKey;
+        $this->branchDomain = $branchDomain;
         $this->googleAppDownload = $googleAppDownload;
         $this->appleAppDownload = $appleAppDownload;
     }
 
-    public function downloadAppleLink($source, $appleCampaign = null)
+    public function getAppleParams($source, $medium, $campaign)
     {
-        $downloadLink = $this->appleAppDownload;
+        if ($source || $medium || $campaign) {
+            $appleCampaign = sprintf('%s-%s-%s', $source, $campaign, $medium);
+
+            return http_build_query(['cs' => $appleCampaign]);
+        }
+
+        return null;
+    }
+
+    public function getMarketingParams($source, $medium, $campaign)
+    {
+        return [
+            'channel' => $source,
+            'feature' => $medium,
+            'campaign' => $campaign,
+        ];
+    }
+
+    public function getGoogleParams($source, $medium, $campaign)
+    {
+        $utm = [];
+        if ($source) {
+            $utm['utm_source'] = $source;
+        }
+        if ($medium) {
+            $utm['utm_medium'] = $medium;
+        }
+        if ($campaign) {
+            $utm['utm_campaign'] = $campaign;
+        }
+
+        return http_build_query($utm);
+    }
+
+    /*
+    public function autoLinkStandard($source, $medium, $campaign, $custom, $control)
+    {
+        return $this->autoLink(
+            [
+                'channel' => $source,
+                'feature' => $medium,
+                'campaign' => $campaign,
+            ],
+            array_merge($custom, [
+                '$ios_url' => sprintf(
+                    '%s&%s',
+                    urlencode($this->appleAppDownload),
+                    $this->getAppleParams($source, $medium, $campaign)
+                ),
+                '$android_url' => sprintf(
+                    '%s&%s',
+                    urlencode($this->googleAppDownload),
+                    $this->getGoogleParams($source, $medium, $campaign)
+                ),
+            ]),
+            $control
+        );
+    }
+
+    public function autoLink($analytics, $custom, $control)
+    {
+        return sprintf('%s?%s',
+            $this->branchDomain,
+            http_build_query(array_merge($analytics, $custom, $control))
+        );
+    }
+
+    public function downloadAppleAutoLink($source, $medium, $campaign, $custom, $control)
+    {
+        $custom = array_merge($custom, [
+            '$desktop_url' => sprintf(
+                '%s&%s',
+                urlencode($this->appleAppDownload),
+                $this->getAppleParams($source, $medium, $campaign)
+            ),
+        ]);
         if ($this->environment == 'prod') {
-            if ($source) {
-                $downloadLink = sprintf("%s&cs=%s", $downloadLink, $source);
-            }
-            if ($appleCampaign) {
-                $downloadLink = sprintf("%s&ct=%s", $downloadLink, $appleCampaign);
-            }
-        }
-
-        return $downloadLink;
-    }
-
-    public function downloadGoogleLink($source)
-    {
-        if ($source && $this->environment == 'prod') {
-            return sprintf("%s&utm_source=%s", $this->googleAppDownload, $source);
+            return $this->autoLinkStandard($source, $medium, $campaign, $custom, $control);
         } else {
-            return $this->googleAppDownload;
+            return $this->autoLinkStandard($source, $medium, $campaign, $custom, $control);
+        }
+    }
+    */
+
+    /**
+     * @param $source
+     * @param $medium
+     * @param $campaign
+     */
+    public function downloadAppleLink($source, $medium, $campaign)
+    {
+        if ($this->environment == 'prod') {
+            return sprintf("%s&%s", $this->appleAppDownload, $this->getAppleParams($source, $medium, $campaign));
+        } else {
+            return sprintf("%s", $this->appleAppDownload);
         }
     }
 
-    public function googleLink($data, $marketing, $source)
+    public function downloadGoogleLink($source, $medium, $campaign)
     {
-        $data = array_merge($data, [
-            '$desktop_url' => $this->downloadGoogleLink($source),
-            '$android_url' => $this->downloadGoogleLink($source),
-        ]);
-
-        return $this->send($data, $this->marketing($marketing));
+        if ($this->environment == 'prod') {
+            return sprintf("%s&%s", $this->googleAppDownload, $this->getGoogleParams($source, $medium, $campaign));
+        } else {
+            return sprintf("%s", $this->googleAppDownload);
+        }
     }
 
-    public function appleLink($data, $marketing, $source, $appleCampaign = null)
+    public function googleLink($data, $source, $medium, $campaign)
     {
         $data = array_merge($data, [
-            '$desktop_url' => $this->downloadAppleLink($source, $appleCampaign),
-            '$ios_url' => $this->downloadAppleLink($source),
+            '$desktop_url' => $this->downloadGoogleLink($source, $medium, $campaign),
+            '$android_url' => $this->downloadGoogleLink($source, $medium, $campaign),
+            '$ios_url' => $this->downloadGoogleLink($source, $medium, $campaign),
         ]);
 
-        return $this->send($data, $this->marketing($marketing));
+        return $this->send($data, $source, $medium, $campaign);
     }
 
-    public function link($data, $marketing, $source, $appleCampaign = null)
+    public function appleLink($data, $source, $medium, $campaign)
+    {
+        $data = array_merge($data, [
+            '$desktop_url' => $this->downloadAppleLink($source, $medium, $campaign),
+            '$ios_url' => $this->downloadAppleLink($source, $medium, $campaign),
+            '$android_url' => $this->downloadAppleLink($source, $medium, $campaign),
+        ]);
+
+        return $this->send($data, $source, $medium, $campaign);
+    }
+
+    public function link($data, $source, $medium, $campaign)
     {
         $data = array_merge($data, [
             //'$desktop_url' => $this->router->generate('', true),
-            '$ios_url' => $this->downloadAppleLink($source, $appleCampaign),
-            '$android_url' => $this->downloadGoogleLink($source),
+            '$ios_url' => $this->downloadAppleLink($source, $medium, $campaign),
+            '$android_url' => $this->downloadGoogleLink($source, $medium, $campaign),
         ]);
 
-        return $this->send($data, $this->marketing($marketing));
+        return $this->send($data, $source, $medium, $campaign);
     }
 
     public function generateSCode($code)
     {
+        $source = 'app';
+        $medium = 'share';
+        $campaign = 'scode';
+
         // don't generate scodes for testing
         if ($this->environment == 'test') {
             return null;
         }
 
-        $marketing = ['channel' => 'app', 'campaign' => 'scode'];
         $data = [
             'scode' => $code,
             '$deeplink_path' => sprintf('invite/scode/%s', $code),
             '$desktop_url' => $this->router->generate('scode', ['code' => $code], true),
-            '$ios_url' => $this->downloadAppleLink('app', 'scode'),
-            '$android_url' => $this->downloadGoogleLink('app'),
+            '$ios_url' => $this->downloadAppleLink($source, $medium, $campaign),
+            '$android_url' => $this->downloadGoogleLink($source, $medium, $campaign),
         ];
 
-        return $this->send($data, $this->marketing($marketing), $code);
+        return $this->send($data, $source, $medium, $campaign, $code);
     }
 
-    protected function marketing($marketing)
-    {
-        return array_merge($marketing, [
-            // add marketing data here?
-        ]);
-    }
-
-    protected function send($data, $marketing, $alias = null)
+    protected function send($data, $source, $medium, $campaign, $alias = null)
     {
         try {
-            $body = array_merge($marketing, [
+            $body = array_merge($this->getMarketingParams($source, $medium, $campaign), [
                 'branch_key' => $this->branchKey,
                 'data' => json_encode($data),
                 "sdk" => "api"
