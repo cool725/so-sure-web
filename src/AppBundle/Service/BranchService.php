@@ -78,20 +78,20 @@ class BranchService
             'channel' => $source,
             'feature' => $medium,
             'campaign' => $campaign,
-        ];        
+        ];
     }
 
     public function getGoogleParams($source, $medium, $campaign)
     {
         $utm = [];
         if ($source) {
-           $utm['utm_source'] = $source;
+            $utm['utm_source'] = $source;
         }
         if ($medium) {
-           $utm['utm_medium'] = $medium;
+            $utm['utm_medium'] = $medium;
         }
         if ($campaign) {
-           $utm['utm_campaign'] = $campaign;
+            $utm['utm_campaign'] = $campaign;
         }
 
         return http_build_query($utm);
@@ -107,22 +107,21 @@ class BranchService
                 'campaign' => $campaign,
             ],
             array_merge($custom, [
-                '$ios_url' => sprintf('%s&%s', urlencode($this->appleAppDownload), $this->getAppleParams($source, $medium, $campaign)),
-                '$android_url' => sprintf('%s&%s', urlencode($this->googleAppDownload), $this->getGoogleParams($source, $medium, $campaign)),
+                '$ios_url' => sprintf(
+                    '%s&%s',
+                    urlencode($this->appleAppDownload),
+                    $this->getAppleParams($source, $medium, $campaign)
+                ),
+                '$android_url' => sprintf(
+                    '%s&%s',
+                    urlencode($this->googleAppDownload),
+                    $this->getGoogleParams($source, $medium, $campaign)
+                ),
             ]),
             $control
         );
     }
-    */
 
-    /**
-     * @param array $analytics channel, feature, campaign, stage, tags, alias
-     * @param array $custom
-     * @param array $control $fallback_url, $desktop_url, $ios_url, $ipad_url, $deeplink_path
-     *
-     * @see https://github.com/BranchMetrics/branch-deep-linking-public-api#creating-a-deep-linking-url
-     * @see https://dev.branch.io/getting-started/configuring-links/guide/#analytics-labels
-     * @see https://dev.branch.io/getting-started/configuring-links/guide/#redirect-customization
     public function autoLink($analytics, $custom, $control)
     {
         return sprintf('%s?%s',
@@ -142,7 +141,7 @@ class BranchService
             return $this->autoLinkStandard($source, $medium, $campaign, $custom, $control);
         }
     }
-     */
+    */
 
     public function downloadAppleLink($source, $medium, $campaign)
     {
