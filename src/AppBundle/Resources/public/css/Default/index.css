@@ -432,6 +432,7 @@
 }
 .explainer-video-overlay:hover {
     opacity: 1;
+    text-decoration: none;
 }
 /* Video Modal */
 
@@ -514,7 +515,7 @@ blockquote {
   margin: 1.5em 10px;
   padding: 0.5em 10px;
   quotes: "\201C""\201D""\2018""\2019";
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 1px 1px 10px 1px rgba(0, 0, 0, 0.1);
   border-radius: 2px;
 }
 blockquote:before {
