@@ -133,7 +133,11 @@ class BranchService
     public function downloadAppleAutoLink($source, $medium, $campaign, $custom, $control)
     {
         $custom = array_merge($custom, [
-            '$desktop_url' => sprintf('%s&%s', urlencode($this->appleAppDownload), $this->getAppleParams($source, $medium, $campaign)),
+            '$desktop_url' => sprintf(
+                '%s&%s',
+                urlencode($this->appleAppDownload),
+                $this->getAppleParams($source, $medium, $campaign)
+            ),
         ]);
         if ($this->environment == 'prod') {
             return $this->autoLinkStandard($source, $medium, $campaign, $custom, $control);
@@ -143,6 +147,11 @@ class BranchService
     }
     */
 
+    /**
+     * @param $source
+     * @param $medium
+     * @param $campaign
+     */
     public function downloadAppleLink($source, $medium, $campaign)
     {
         if ($this->environment == 'prod') {
