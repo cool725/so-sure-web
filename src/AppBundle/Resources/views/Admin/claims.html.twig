@@ -16,6 +16,8 @@
                         <th>Policy</th>
                         <th>Type</th>
                         <th>Status</th>
+                        <th>Notification Date</th>
+                        <th>Replacement Received Date</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -24,6 +26,8 @@
                             <td><a href="{{ path('admin_policy', {id: claim.policy.id}) }}">{{ claim.policy.policyNumber }}</a></td>
                             <td>{{ claim.type }}</td>
                             <td>{{ claim.status }}</td>
+                            <td>{{ claim.notificationDate|date('d-m-Y H:i', 'Europe/London') }}</td>
+                            <td>{{ claim.replacementReceivedDate|date('d-m-Y H:i', 'Europe/London') }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
