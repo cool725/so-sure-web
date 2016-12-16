@@ -439,7 +439,7 @@ class SalvaExportServiceTest extends WebTestCase
         $policy = $this->createPolicy('basic-export-cooloff-xml', new \DateTime('2016-01-01'));
 
         $this->cancelPolicy($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
-        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'))['xml'];
         $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">0.00</n1:usedFinalPremium>', $xml);
     }
 
@@ -470,7 +470,7 @@ class SalvaExportServiceTest extends WebTestCase
         $policy = $this->createPolicy('basic-export-yearly-cooloff-xml', new \DateTime('2016-01-01'), false);
 
         $this->cancelPolicy($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
-        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'))['xml'];
         $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">0.00</n1:usedFinalPremium>', $xml);
     }
 
@@ -561,7 +561,7 @@ class SalvaExportServiceTest extends WebTestCase
         $policy = $this->createPolicy('basic-export-yearly-wreckage-xml', new \DateTime('2016-01-01'), false);
 
         $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
-        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'))['xml'];
         // 6.38 gwp / 76.60 yearly gpw  * 153 / 366 = 32.02
         $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">32.02</n1:usedFinalPremium>', $xml);
     }
@@ -573,7 +573,7 @@ class SalvaExportServiceTest extends WebTestCase
         static::$salva->incrementPolicyNumber($policy, new \DateTime('2016-01-31 01:00'));
 
         $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
-        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'))['xml'];
         // 6.38 gwp / 76.60 yearly gpw  * (153 - 31) / 366 = 25.53
         $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.53</n1:usedFinalPremium>', $xml);
     }

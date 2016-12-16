@@ -423,7 +423,9 @@ class SalvaExportService
         $response = $this->send($xml, self::SCHEMA_POLICY_IMPORT);
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
-        $phonePolicy->addSalvaPolicyResults($responseId, false);
+        $phonePolicy->addSalvaPolicyResults($responseId, false, [
+            'ss_phone_base_tariff' => $phonePolicy->getTotalGwp()
+        ]);
         $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_ACTIVE);
         $this->dm->flush();
 
@@ -462,7 +464,8 @@ class SalvaExportService
             }
         }
 
-        $xml = $this->cancelXml($phonePolicy, $reason, $date);
+        $cancelXml = $this->cancelXml($phonePolicy, $reason, $date);
+        $xml = $cancelXml['xml'];
         $this->logger->info($xml);
         if (!$this->validate($xml, self::SCHEMA_POLICY_TERMINATE)) {
             throw new \Exception('Failed to validate cancel policy');
@@ -470,7 +473,7 @@ class SalvaExportService
         $response = $this->send($xml, self::SCHEMA_POLICY_TERMINATE);
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
-        $phonePolicy->addSalvaPolicyResults($responseId, true);
+        $phonePolicy->addSalvaPolicyResults($responseId, true, ['usedFinalPremium' => $cancelXml['usedFinalPremium']]);
         if ($phonePolicy->getSalvaStatus() == SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED) {
             $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_CANCELLED);
             $this->dm->flush();
@@ -738,7 +741,7 @@ class SalvaExportService
         $usedFinalPremium->setAttribute('n2:currency', 'GBP');
         $root->appendChild($usedFinalPremium);
 
-        return $dom->saveXML();
+        return ['xml' => $dom->saveXML(), 'usedFinalPremium' => $usedPremium];
     }
 
     public function createXml(SalvaPhonePolicy $phonePolicy)

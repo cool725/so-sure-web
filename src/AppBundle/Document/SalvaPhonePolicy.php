@@ -72,13 +72,16 @@ class SalvaPhonePolicy extends PhonePolicy
         return $this->salvaPolicyResults;
     }
 
-    public function addSalvaPolicyResults($responseId, $cancel)
+    public function addSalvaPolicyResults($responseId, $cancel, $details)
     {
         $key = sprintf('%d-create', $this->getLatestSalvaPolicyNumberVersion());
         if ($cancel) {
             $key = sprintf('%d-cancel', $this->getLatestSalvaPolicyNumberVersion() - 1);
         }
-        $this->salvaPolicyResults[$key] = serialize(['responseId' => $responseId, 'time' => new \DateTime()]);
+        $this->salvaPolicyResults[$key] = serialize(array_merge([
+            'responseId' => $responseId,
+            'time' => new \DateTime()
+        ], $details));
     }
 
     public function getLatestSalvaPolicyNumberVersion()
