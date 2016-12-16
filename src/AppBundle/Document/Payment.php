@@ -13,6 +13,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PaymentRepository")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
+ * make sure to update getType() if adding
  * @MongoDB\DiscriminatorMap({"judo"="JudoPayment","gocardless"="GocardlessPayment","sosure"="SoSurePayment"})
  * @Gedmo\Loggable
  */
@@ -33,6 +34,17 @@ abstract class Payment
      * @MongoDB\Id
      */
     protected $id;
+
+    public function getType()
+    {
+        if ($this instanceof JudoPayment) {
+            return 'judo';
+        } elseif ($this instanceof SoSurePayment) {
+            return 'sosure';
+        } else {
+            return null;
+        }
+    }
 
     /**
      * @Assert\DateTime()
