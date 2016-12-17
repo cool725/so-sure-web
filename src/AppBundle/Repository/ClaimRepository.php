@@ -22,10 +22,13 @@ class ClaimRepository extends DocumentRepository
         $startWeek->sub(new \DateInterval(sprintf('P%dD', $days)));
 
         $qb = $this->createQueryBuilder();
+
+        /*
+         * Aleks requested to see all claims for the time being...
         $qb->addOr($qb->expr()->field('closedDate')->gte($startWeek));
         $qb->addOr($qb->expr()->field('recordedDate')->gte($startWeek));
         $qb->addOr($qb->expr()->field('status')->in([Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED]));
-
+        */
         return $qb->getQuery()->execute();
     }
 
