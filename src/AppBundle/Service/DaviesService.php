@@ -6,11 +6,14 @@ use Aws\S3\S3Client;
 use AppBundle\Classes\DaviesClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class DaviesService
 {
+    use CurrencyTrait;
+
     const PROCESSED_FOLDER = 'processed';
     const UNPROCESSED_FOLDER = 'unprocessed';
     const FAILED_FOLDER = 'failed';
@@ -258,6 +261,7 @@ class DaviesService
                 $claim->setExcess($daviesClaim->excess);
                 $claim->setIncurred($daviesClaim->incurred);
                 $claim->setClaimHandlingFees($daviesClaim->claimHandlingFees);
+                $claim->getReservedValue($daviesClaim->reserved);
 
                 $claim->setReplacementPhone($this->getReplacementPhone($daviesClaim));
                 $claim->setReplacementImei($daviesClaim->replacementImei);
@@ -325,6 +329,18 @@ class DaviesService
                 $daviesClaim->riskPostCode,
                 $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode()
             ));
+        }
+
+        // Open Non-Warranty Claims are expected to either have a total incurred value or a reserved value
+        if ($daviesClaim->isOpen() && !$daviesClaim->isClaimWarrantyOrExtended() &&
+            $this->areEqualToTwoDp($daviesClaim->getIncurred(), 0) &&
+            $this->areEqualToTwoDp($daviesClaim->getReserved(), 0)) {
+            $this->mailer->sendTemplate(
+                sprintf('Claim %s does not have a reserved value', $daviesClaim->claimNumber),
+                'tech@so-sure.com',
+                'AppBundle:Email:davies/missingReserve.html.twig',
+                ['claim' => $claim, 'daviesClaim' => $daviesClaim]
+            );
         }
     }
 
