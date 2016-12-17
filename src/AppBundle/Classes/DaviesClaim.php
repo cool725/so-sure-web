@@ -44,6 +44,29 @@ class DaviesClaim
     public $dateCreated;
     public $dateClosed;
 
+    public function getIncurred()
+    {
+        if (!$this->incurred) {
+            return 0;
+        }
+
+        return $this->incurred;
+    }
+
+    public function getReserved()
+    {
+        if (!$this->reserved) {
+            return 0;
+        }
+
+        return $this->reserved;
+    }
+
+    public function isClaimWarrantyOrExtended()
+    {
+        return in_array($this->getClaimType(), [Claim::TYPE_WARRANTY, Claim::TYPE_EXTENDED_WARRANTY]);
+    }
+
     public function getClaimType()
     {
         if (stripos($this->lossType, "Loss") !== false) {
@@ -59,6 +82,16 @@ class DaviesClaim
         } else {
             return null;
         }
+    }
+
+    public function isOpen()
+    {
+        return strtolower($this->status) == "open";
+    }
+
+    public function isClosed()
+    {
+        return strtolower($this->status) == "closed";
     }
 
     public function getClaimStatus()
