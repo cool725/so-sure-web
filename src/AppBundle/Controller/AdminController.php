@@ -1106,7 +1106,7 @@ class AdminController extends BaseController
                 if ($judoForm->isSubmitted() && $judoForm->isValid()) {
                     $dm = $this->getManager();
                     $judoFile->setBucket('admin.so-sure.com');
-                    $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+                    $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
 
                     $judoService = $this->get('app.judopay');
                     $data = $judoService->processCsv($judoFile);
@@ -1203,7 +1203,7 @@ class AdminController extends BaseController
                 if ($lloydsForm->isSubmitted() && $lloydsForm->isValid()) {
                     $dm = $this->getManager();
                     $lloydsFile->setBucket('admin.so-sure.com');
-                    $lloydsFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+                    $lloydsFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
 
                     $lloydsService = $this->get('app.lloyds');
                     $data = $lloydsService->processCsv($lloydsFile);
@@ -1221,7 +1221,7 @@ class AdminController extends BaseController
                 if ($barclaysForm->isSubmitted() && $barclaysForm->isValid()) {
                     $dm = $this->getManager();
                     $barclaysFile->setBucket('admin.so-sure.com');
-                    $barclaysFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+                    $barclaysFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
 
                     $barclaysService = $this->get('app.barclays');
                     $data = $barclaysService->processCsv($barclaysFile);
