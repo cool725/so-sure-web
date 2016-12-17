@@ -360,10 +360,26 @@ class JudopayService
             ));
         }
 
-        $payment = new JudoPayment();
-        $payment->setReference($transactionDetails["yourPaymentReference"]);
+        // webpayment will already have a payment record
+        $payment = $repo->find($transactionDetails["yourPaymentReference"]);
+        if (!$payment) {
+            $payment = new JudoPayment();
+            $payment->setReference($transactionDetails["yourPaymentReference"]);
+            $payment->setAmount($transactionDetails["amount"]);
+            $this->dm->persist($payment);
+            //\Doctrine\Common\Util\Debug::dump($payment);
+            $policy->addPayment($payment);
+        } else {
+            if (!$this->areEqualToTwoDp($payment->getAmount(), $transactionDetails["amount"])) {
+                $this->logger->error(sprintf(
+                    'Payment %s Expected Matching Payment Amount %f',
+                    $payment->getId(),
+                    $transactionDetails["amount"]
+                ));
+            }
+        }
+
         $payment->setReceipt($transactionDetails["receiptId"]);
-        $payment->setAmount($transactionDetails["amount"]);
         $payment->setResult($transactionDetails["result"]);
         $payment->setMessage($transactionDetails["message"]);
         if (isset($transactionDetails["riskScore"])) {
@@ -381,8 +397,6 @@ class JudopayService
         if ($date) {
             $payment->setDate($date);
         }
-        //\Doctrine\Common\Util\Debug::dump($payment);
-        $policy->addPayment($payment);
 
         $judoPaymentMethod = $policy->getUser()->getPaymentMethod();
         if ($cardToken) {
@@ -397,7 +411,6 @@ class JudopayService
             }
         }
 
-        $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         if (!isset($transactionDetails["yourPaymentMetaData"]) ||
