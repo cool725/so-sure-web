@@ -7,12 +7,14 @@ use AppBundle\Classes\DaviesClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class DaviesService
 {
     use CurrencyTrait;
+    use DateTrait;
 
     const PROCESSED_FOLDER = 'processed';
     const UNPROCESSED_FOLDER = 'unprocessed';
@@ -385,11 +387,17 @@ class DaviesService
         }
 
         if ($claim->getReplacementImei() && !$claim->getReplacementReceivedDate()) {
+            if (!$policy->getImeiReplacementDate()) {
+                throw new \Exception(sprintf(
+                    'Expected imei replacement date for policy %s',
+                    $policy->getId()
+                ));
+            }
+
             $now = new \DateTime();
             // no set time of day when the report is sent, so for this, just assume the day, not time
             $replacementDay = $this->startOfDay(clone $policy->getImeiReplacementDate());
             $twoBusinessDays = $this->addBusinessDays($replacementDay, 2);
-
             if ($now >= $twoBusinessDays) {
                 $this->mailer->sendTemplate(
                     sprintf('Claim %s is missing a replacement recevied date', $daviesClaim->claimNumber),
