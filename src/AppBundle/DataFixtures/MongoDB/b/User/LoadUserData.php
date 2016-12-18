@@ -28,6 +28,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $this->newUser('jamie@so-sure.com', 'w3ares0sure!', 'Jamie', 'Gunson', ['ROLE_ADMIN']);
         $this->newUser('ted@so-sure.com', 'w3ares0sure!', 'Ted', 'Eriksson', ['ROLE_ADMIN']);
         $this->newUser('julien@so-sure.com', 'w3ares0sure!', 'Julien', 'Champagne', ['ROLE_ADMIN']);
+        $this->newUser('nick@so-sure.com', 'w3ares0sure!', 'Nick', 'Waller', ['ROLE_ADMIN']);
         $this->newUser('claims@so-sure.com', 'w3ares0sure!', 'Claims', '', ['ROLE_CLAIMS']);
         $manager->flush();
         // $this->valdiateGedmoLogging();
