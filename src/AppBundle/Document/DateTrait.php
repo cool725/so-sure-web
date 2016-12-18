@@ -66,4 +66,17 @@ trait DateTrait
 
         return $after;
     }
+
+    public function addBusinessDays($date, $days)
+    {
+        $businessDays = clone $date;
+        while ($days > 0) {
+            $businessDays->add(new \DateInterval('P1D'));
+            if (!in_array((int) $businessDays->format('w'), [0, 6])) {
+                $days--;
+            }
+        }
+
+        return $businessDays;
+    }
 }
