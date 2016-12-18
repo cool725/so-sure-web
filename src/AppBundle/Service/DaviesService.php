@@ -390,7 +390,7 @@ class DaviesService
             $count = 0;
             while ($count < 2) {
                 $twoBusinessDays->add(new \DateInterval('P1D'));
-                if (!in_array((int)$twoBusinessDays->format('w'), [0, 6])) {
+                if (!in_array((int) $twoBusinessDays->format('w'), [0, 6])) {
                     $count++;
                 }
             }
