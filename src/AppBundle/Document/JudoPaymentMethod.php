@@ -15,6 +15,8 @@ class JudoPaymentMethod extends PaymentMethod
 {
     use DateTrait;
 
+    const DEVICE_DNA_NOT_PRESENT = 'device-dna-not-present';
+
     /**
      * @AppAssert\Token()
      * @Assert\Length(min="0", max="50")
