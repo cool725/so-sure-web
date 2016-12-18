@@ -44,6 +44,13 @@ class PhonePolicy extends Policy
     protected $imei;
 
     /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $imeiReplacementDate;
+
+    /**
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
@@ -87,7 +94,20 @@ class PhonePolicy extends Policy
 
     public function setImei($imei)
     {
+        if ($this->imei && $imei != $this->imei) {
+            $this->setImeiReplacementDate(new \DateTime());
+        }
         $this->imei = $imei;
+    }
+
+    public function getImeiReplacementDate()
+    {
+        return $this->imeiReplacementDate;
+    }
+
+    public function setImeiReplacementDate(\DateTime $imeiReplacementDate)
+    {
+        $this->imeiReplacementDate = $imeiReplacementDate;
     }
 
     public function getSerialNumber()

@@ -265,6 +265,7 @@ class DaviesService
 
                 $claim->setReplacementPhone($this->getReplacementPhone($daviesClaim));
                 $claim->setReplacementImei($daviesClaim->replacementImei);
+                $claim->setReplacementReceivedDate($daviesClaim->replacementReceivedDate);
 
                 $claim->setDescription($daviesClaim->lossDescription);
                 $claim->setLocation($daviesClaim->location);
@@ -381,6 +382,27 @@ class DaviesService
                 'AppBundle:Email:davies/checkPhone.html.twig',
                 ['policy' => $policy, 'daviesClaim' => $daviesClaim]
             );
+        }
+
+        if ($claim->getReplacementImei() && !$claim->getReplacementReceivedDate()) {
+            $now = new \DateTime();
+            $twoBusinessDays = clone $policy->getImeiReplacementDate();
+            $count = 0;
+            while ($count < 2) {
+                $twoBusinessDays->add(new \DateInterval('P1D'));
+                if (!in_array((int)$twoBusinessDays->format('w'), [0, 6])) {
+                    $count++;
+                }
+            }
+
+            if ($now >= $twoBusinessDays) {
+                $this->mailer->sendTemplate(
+                    sprintf('Claim %s is missing a replacement recevied date', $daviesClaim->claimNumber),
+                    'tech@so-sure.com',
+                    'AppBundle:Email:davies/missingReplacementDate.html.twig',
+                    ['policy' => $policy, 'daviesClaim' => $daviesClaim]
+                );
+            }
         }
     }
 
