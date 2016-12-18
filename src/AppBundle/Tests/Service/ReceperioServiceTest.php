@@ -20,6 +20,7 @@ class ReceperioServiceTest extends WebTestCase
     protected static $phoneRepo;
     protected static $phoneA;
     protected static $phoneB;
+    protected static $phoneC;
 
     public static function setUpBeforeClass()
     {
@@ -37,6 +38,7 @@ class ReceperioServiceTest extends WebTestCase
         self::$phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phoneA = self::$phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneB = self::$phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
+        self::$phoneC = self::$phoneRepo->findOneBy(['devices' => 'hero2lte']);
     }
 
     public function tearDown()
@@ -102,6 +104,20 @@ class ReceperioServiceTest extends WebTestCase
         $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
     }
 
+    public function testValidateSamePhoneAndroidCase()
+    {
+        $models[] = ['name' => 'GALAXY S7 EDGE', 'storage' => '', 'modelreference' => 'HERO2LTE'];
+        $data['makes'][] = ['make' => 'A', 'models' => $models];
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneC, '123', $data));
+    }
+
+    public function testValidateSamePhoneAndroidDifferentModel()
+    {
+        $models[] = ['name' => 'GALAXY S7 EDGE', 'storage' => '', 'modelreference' => 'HERO2LTE'];
+        $data['makes'][] = ['make' => 'A', 'models' => $models];
+        $this->assertFalse(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
+    }
+
     public function testValidateSamePhoneAndroidMissingModelRef()
     {
         $models[] = ['name' => 'A', 'storage' => '64GB'];
@@ -120,7 +136,7 @@ class ReceperioServiceTest extends WebTestCase
     /**
      * @expectedException \Exception
      */
-    public function testValidateSamePhoneAndroidDifferentModel()
+    public function testValidateSamePhoneAndroidDifferentModelMem()
     {
         $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
         $models[] = ['name' => 'B', 'storage' => '64GB', 'modelreference' => 'A0001'];

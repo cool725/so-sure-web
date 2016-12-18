@@ -611,12 +611,13 @@ class ReceperioService extends BaseImeiService
                     in_array(strtolower($device), $phone->getDevices())) {
                     return true;
                 } else {
-                    $this->logger->warning(sprintf(
-                        "Mismatching make %s for serial number %s. Data: %s",
-                        $phone->getMake(),
+                    $errMessage = sprintf(
+                        "Mismatching devices %s for serial number %s. Data: %s",
+                        json_encode($phone->getDevices()),
                         $serialNumber,
                         json_encode($data)
-                    ));
+                    );
+                    $this->logger->warning($errMessage);
 
                     return false;
                 }
