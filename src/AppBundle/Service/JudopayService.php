@@ -656,8 +656,8 @@ class JudopayService
         }
         if ($paymentMethod->getDecodedDeviceDna() && is_array($paymentMethod->getDecodedDeviceDna())) {
             $data['clientDetails'] = $paymentMethod->getDecodedDeviceDna();
-        } elseif ($paymentMethod->getDecodedDeviceDna() &&
-            $paymentMethod->getDecodedDeviceDna() == JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT) {
+        } elseif ($paymentMethod->getDeviceDna() &&
+            $paymentMethod->getDeviceDna() == JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT) {
             // web payment, so no device dna
             \AppBundle\Classes\NoOp::noOp([]);
         } else {
