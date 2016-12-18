@@ -656,6 +656,10 @@ class JudopayService
         }
         if ($paymentMethod->getDecodedDeviceDna() && is_array($paymentMethod->getDecodedDeviceDna())) {
             $data['clientDetails'] = $paymentMethod->getDecodedDeviceDna();
+        } elseif ($paymentMethod->getDeviceDna() &&
+            $paymentMethod->getDeviceDna() == JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT) {
+            // web payment, so no device dna
+            \AppBundle\Classes\NoOp::noOp([]);
         } else {
             // We should always have the clientDetails
             $this->logger->warning(sprintf('Missing JudoPay DeviceDna for user %s', $user->getId()));

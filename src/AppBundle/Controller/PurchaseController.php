@@ -16,6 +16,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Payment;
 use AppBundle\Document\User;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Form\Purchase;
 use AppBundle\Document\Form\PurchaseStepPersonal;
 use AppBundle\Document\Form\PurchaseStepAddress;
@@ -390,7 +391,8 @@ class PurchaseController extends BaseController
             $request->get('ReceiptId'),
             null,
             $request->get('CardToken'),
-            Payment::SOURCE_WEB
+            Payment::SOURCE_WEB,
+            JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
         );
         $this->addFlash(
             'success',
