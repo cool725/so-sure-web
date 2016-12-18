@@ -386,14 +386,9 @@ class DaviesService
 
         if ($claim->getReplacementImei() && !$claim->getReplacementReceivedDate()) {
             $now = new \DateTime();
-            $twoBusinessDays = clone $policy->getImeiReplacementDate();
-            $count = 0;
-            while ($count < 2) {
-                $twoBusinessDays->add(new \DateInterval('P1D'));
-                if (!in_array((int) $twoBusinessDays->format('w'), [0, 6])) {
-                    $count++;
-                }
-            }
+            // no set time of day when the report is sent, so for this, just assume the day, not time
+            $replacementDay = $this->startOfDay(clone $policy->getImeiReplacementDate());
+            $twoBusinessDays = $this->addBusinessDays($replacementDay, 2);
 
             if ($now >= $twoBusinessDays) {
                 $this->mailer->sendTemplate(

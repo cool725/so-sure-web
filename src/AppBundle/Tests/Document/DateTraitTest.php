@@ -58,4 +58,19 @@ class DateTraitTest extends \PHPUnit_Framework_TestCase
             $this->endOfDay(new \DateTime('2016-02-12 15:00'))
         );
     }
+
+    public function testAddBusinessDays()
+    {
+        // mon
+        $this->assertEquals(
+            new \DateTime('2016-12-07 00:00'),
+            $this->addBusinessDays(new \DateTime('2016-12-05 00:00'), 2)
+        );
+
+        // fri
+        $this->assertEquals(
+            new \DateTime('2016-12-13 00:00'),
+            $this->addBusinessDays(new \DateTime('2016-12-09 00:00'), 2)
+        );
+    }
 }

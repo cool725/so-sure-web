@@ -27,7 +27,7 @@
                             <td>{{ claim.type }}</td>
                             <td>{{ claim.status }}</td>
                             <td>{{ claim.notificationDate|date('d-m-Y H:i', 'Europe/London') }}</td>
-                            <td>{{ claim.replacementReceivedDate|date('d-m-Y H:i', 'Europe/London') }}</td>
+                            <td>{% if claim.replacementReceivedDate %}{{ claim.replacementReceivedDate|date('d-m-Y H:i', 'Europe/London') }}{% else %}-{% endif %}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
