@@ -263,7 +263,12 @@ class DaviesService
                 $claim->setExcess($daviesClaim->excess);
                 $claim->setIncurred($daviesClaim->incurred);
                 $claim->setClaimHandlingFees($daviesClaim->claimHandlingFees);
-                $claim->getReservedValue($daviesClaim->reserved);
+                $claim->setReservedValue($daviesClaim->reserved);
+
+                $claim->setAccessories($daviesClaim->accessories);
+                $claim->setUnauthorizedCalls($daviesClaim->unauthorizedCalls);
+                $claim->setPhoneReplacementCost($daviesClaim->phoneReplacementCost);
+                $claim->setTransactionFees($daviesClaim->transactionFees);
 
                 $claim->setReplacementPhone($this->getReplacementPhone($daviesClaim));
                 $claim->setReplacementImei($daviesClaim->replacementImei);
