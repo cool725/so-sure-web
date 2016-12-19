@@ -4,12 +4,15 @@ $('#claimsModal').on('show.bs.modal', function (event) {
   var modal = $(this);
   if (claim) {
     modal.find('.modal-title').text('Claim: ' + claim.number);
+    modal.find('#claims-detail-id').val(claim.id);
     modal.find('#claims-detail-policy').text(claim.policyNumber);
     modal.find('#claims-detail-type').text(claim.type);
     modal.find('#claims-detail-status').text(claim.status);
     modal.find('#claims-detail-davies-status').text(claim.daviesStatus);
     modal.find('#claims-detail-notes').text(claim.notes);
     modal.find('#claims-detail-description').text(claim.description);
+    modal.find('#claims-detail-replacement-phone-details').text(claim.replacementPhoneDetails);
+    modal.find('#claims-detail-replacement-phone').val(claim.replacementPhoneId);
     modal.find('#claims-detail-loss').text(claim.lossDate);
     modal.find('#claims-detail-notification').text(claim.notificationDate);
     modal.find('#claims-detail-recorded').text(claim.recordedDate);
@@ -25,12 +28,15 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-incurred').text(claim.incurred);
   } else {
     modal.find('.modal-title').text('Claim: Unknown');
+    modal.find('#claims-detail-id').val('');
     modal.find('#claims-detail-policy').text('');
     modal.find('#claims-detail-type').text('');
     modal.find('#claims-detail-status').text('');
     modal.find('#claims-detail-davies-status').text('');
     modal.find('#claims-detail-notes').text('');
     modal.find('#claims-detail-description').text('');
+    modal.find('#claims-detail-replacement-phone-details').text('');
+    modal.find('#claims-detail-replacement-phone').val('');
     modal.find('#claims-detail-loss').text('');
     modal.find('#claims-detail-notification').text('');
     modal.find('#claims-detail-recorded').text('');

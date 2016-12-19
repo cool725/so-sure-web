@@ -1012,12 +1012,38 @@ class AdminController extends BaseController
         $repo = $dm->getRepository(Claim::class);
         $qb = $repo->createQueryBuilder();
         $pager = $this->pager($request, $qb);
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phones = $phoneRepo->findActive()->getQuery()->execute();
 
         return [
             'claims' => $pager->getCurrentPageResults(),
             'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
+            'phones' => $phones,
         ];
+    }
+
+    /**
+     * @Route("/claims/replacement-phone", name="admin_claims_replacement_phone")
+     * @Method({"POST"})
+     */
+    public function adminClaimsReplacementPhoneAction(Request $request)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $claim = $repo->find($request->get('id'));
+        $phone = $phoneRepo->find($request->get('phone'));
+        if ($claim && $phone) {
+            $claim->setReplacementPhone($phone);
+            $dm->flush();
+        }
+
+        return $this->redirectToRoute('admin_claims');
     }
 
     /**
