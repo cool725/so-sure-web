@@ -268,11 +268,7 @@ class DaviesService
                 $claim->setReplacementPhone($this->getReplacementPhone($daviesClaim));
                 $claim->setReplacementImei($daviesClaim->replacementImei);
                 $claim->setReplacementReceivedDate($daviesClaim->replacementReceivedDate);
-                $claim->setReplacementPhoneDetails(sprintf(
-                    '%s %s',
-                    $daviesClaim->replacementMake,
-                    $daviesClaim->replacementModel
-                ));
+                $claim->setReplacementPhoneDetails($daviesClaim->getReplacementPhoneDetails());
 
                 $claim->setDescription($daviesClaim->lossDescription);
                 $claim->setLocation($daviesClaim->location);
