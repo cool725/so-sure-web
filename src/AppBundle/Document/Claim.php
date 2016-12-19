@@ -51,6 +51,14 @@ class Claim
     public $replacementPhone;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="0", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $replacementPhoneDetails;
+
+    /**
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
@@ -366,6 +374,16 @@ class Claim
         $this->replacementPhone = $replacementPhone;
     }
 
+    public function getReplacementPhoneDetails()
+    {
+        return $this->replacementPhoneDetails;
+    }
+
+    public function setReplacementPhoneDetails($replacementPhoneDetails)
+    {
+        $this->replacementPhoneDetails = $replacementPhoneDetails;
+    }
+
     public function getReplacementImei()
     {
         return $this->replacementImei;
@@ -674,6 +692,7 @@ class Claim
             'policyNumber' => $this->getPolicy()->getPolicyNumber(),
             'handler' => $this->getHandler() ? $this->getHandler()->getName() : 'unknown',
             'replacementPhone' => $this->getReplacementPhone(),
+            'replacementPhoneDetails' => $this->getReplacementPhoneDetails(),
             'replacementPhoneId' => $this->getReplacementPhone() ? $this->getReplacementPhone()->getId() : null,
             'replacementImei' => $this->getReplacementImei(),
             'recordedDate' => $this->getRecordedDate() ? $this->getRecordedDate()->format(\DateTime::ATOM) : null,

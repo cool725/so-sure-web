@@ -27,7 +27,7 @@
                         <th>Type</th>
                         <th>Status</th>
                         <th>Notification Date</th>
-                        <th>Replacement Received Date</th>
+                        <th>Replacement</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -41,7 +41,17 @@
                             <td>{{ claim.type }}</td>
                             <td>{{ claim.status }}</td>
                             <td>{{ claim.notificationDate|date('d-m-Y H:i', 'Europe/London') }}</td>
-                            <td>{% if claim.replacementReceivedDate %}{{ claim.replacementReceivedDate|date('d-m-Y H:i', 'Europe/London') }}{% else %}-{% endif %}</td>
+                            <td>{% if claim.replacementReceivedDate %}
+                                    {{ claim.replacementReceivedDate|date('d-m-Y H:i', 'Europe/London') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                                {% if claim.replacementPhoneDetails %}
+                                    {% if claim.replacementPhone%}<i class="fa fa-check" title="Davies: '{{ claim.replacementPhoneDetails }}' <==> so-sure: '{{ claim.replacementPhone }}'"></i>
+                                    {% else %}<i class="fa fa-warning" title="{{ claim.replacementPhoneDetails }} recorded, but replacement phone not confirmed"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -63,7 +73,7 @@
     <div class="modal fade" id="claimsModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 50%">
         <div class="modal-content">
-        <form id="phone-alternative-form" method="post">
+        <form id="phone-alternative-form" method="post" action="{{ path('admin_claims_replacement_phone') }}">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title">Claim: Unknown</h4>
@@ -94,6 +104,27 @@
                 <tr>
                     <td>Notes</td>
                     <td id='claims-detail-notes'></td>
+                </tr>
+            </table>
+            <h3>Replacement Phone</h3>
+            <table class="table table-striped">
+                <tr>
+                    <td>Replacement Phone Details</td>
+                    <td id='claims-detail-replacement-phone-details'></td>
+                </tr>
+                <tr>
+                    <td>Replacement Phone</td>
+                    <td>
+                            <input type="hidden" name="token" value="{{ token }}"></input>
+                            <input type="hidden" name="id" id="claims-detail-id"></input>
+                            <select name="phone" id="claims-detail-replacement-phone">
+                                    <option value="">-- Select a phone --</option>
+                                {% for phone in phones %}
+                                    <option value="{{ phone.id }}">{{ phone }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-success">Update Replacement Phone</button>
+                    </td>
                 </tr>
             </table>
             <h3>Dates</h3>
