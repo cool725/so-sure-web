@@ -13,6 +13,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class Claim
 {
+    use CurrencyTrait;
+
     const TYPE_LOSS = 'loss';
     const TYPE_THEFT = 'theft';
     const TYPE_DAMAGE = 'damage';
@@ -660,5 +662,46 @@ class Claim
         }
 
         return $data;
+    }
+
+    public function toModalArray()
+    {
+        return [
+            'number' => $this->getNumber(),
+            'notes' => $this->getNotes(),
+            'id' => $this->getId(),
+            'policyId' => $this->getPolicy()->getId(),
+            'policyNumber' => $this->getPolicy()->getPolicyNumber(),
+            'handler' => $this->getHandler() ? $this->getHandler()->getName() : 'unknown',
+            'replacementPhone' => $this->getReplacementPhone(),
+            'replacementPhoneId' => $this->getReplacementPhone() ? $this->getReplacementPhone()->getId() : null,
+            'replacementImei' => $this->getReplacementImei(),
+            'recordedDate' => $this->getRecordedDate() ? $this->getRecordedDate()->format(\DateTime::ATOM) : null,
+            'lossDate' => $this->getLossDate() ? $this->getLossDate()->format(\DateTime::ATOM) : null,
+            'notificationDate' => $this->getNotificationDate() ? $this->getNotificationDate()->format(\DateTime::ATOM) : null,
+            'replacementReceivedDate' => $this->getReplacementReceivedDate() ? $this->getReplacementReceivedDate()->format(\DateTime::ATOM) : null,
+            'closedDate' => $this->getClosedDate() ? $this->getClosedDate()->format(\DateTime::ATOM) : null,
+            'description' => $this->getDescription(),
+            'location' => $this->getLocation(),
+            'type' => $this->getType(),
+            'status' => $this->getStatus(),
+            'daviesStatus' => $this->getDaviesStatus(),
+            'notes' => $this->getNotes(),
+            'suspectedFraud' => $this->getSuspectedFraud(),
+            'shouldCancelPolicy' => $this->getShouldCancelPolicy(),
+            'processed' => $this->getProcessed(),
+            'excess' => $this->toTwoDp($this->getExcess()),
+            'unauthorizedCalls' => $this->toTwoDp($this->getUnauthorizedCalls()),
+            'accessories' => $this->toTwoDp($this->getAccessories()),
+            'phoneReplacementCost' => $this->toTwoDp($this->getPhoneReplacementCost()),
+            'transactionFees' => $this->toTwoDp($this->getTransactionFees()),
+            'claimHandlingFees' => $this->toTwoDp($this->getClaimHandlingFees()),
+            'reservedValue' => $this->toTwoDp($this->getReservedValue()),
+            'incurred' => $this->toTwoDp($this->getIncurred()),
+            'force' => $this->getForce(),
+            'crimeRef' => $this->getCrimeRef(),
+            'validCrimeRef' => $this->isValidCrimeRef(),
+            'shippingAddress' => $this->getShippingAddress(),            
+        ];
     }
 }

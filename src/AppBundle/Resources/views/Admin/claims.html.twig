@@ -1,5 +1,14 @@
 {% extends 'base.html.twig' %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/Admin/claims.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}            
+{% endblock %}
+
 {% block body %}
 <div class="container">
     {% if claims.count == 0 %}
@@ -13,6 +22,7 @@
                 <table class="table table-striped">
                     <thead>
                     <tr>
+                        <th>Claim Number</th>
                         <th>Policy</th>
                         <th>Type</th>
                         <th>Status</th>
@@ -23,6 +33,10 @@
                     <tbody>
                     {% for claim in claims %}
                         <tr>
+                            <td><button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
+                            data-claim='{{ claim.toModalArray|json_encode }}'>
+                                {{ claim.number }}</button>
+                            </td>
                             <td><a href="{{ path('admin_policy', {id: claim.policy.id}) }}">{{ claim.policy.policyNumber }}</a></td>
                             <td>{{ claim.type }}</td>
                             <td>{{ claim.status }}</td>
@@ -45,4 +59,108 @@
     {% endif %}
 
 </div>
+
+    <div class="modal fade" id="claimsModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 50%">
+        <div class="modal-content">
+        <form id="phone-alternative-form" method="post">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Claim: Unknown</h4>
+          </div>
+          <div class="modal-body">
+            <h3>General</h3>
+            <table class="table table-striped">
+                <tr>
+                    <td>Policy</td>
+                    <td id='claims-detail-policy'></td>
+                </tr>
+                <tr>
+                    <td>Type</td>
+                    <td id='claims-detail-type'></td>
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td id='claims-detail-status'></td>
+                </tr>
+                <tr>
+                    <td>Davies Status</td>
+                    <td id='claims-detail-davies-status'></td>
+                </tr>
+                <tr>
+                    <td>Description</td>
+                    <td id='claims-detail-decription'></td>
+                </tr>
+                <tr>
+                    <td>Notes</td>
+                    <td id='claims-detail-notes'></td>
+                </tr>
+            </table>
+            <h3>Dates</h3>
+            <table class="table table-striped">
+                <tr>
+                    <td>Loss</td>
+                    <td id='claims-detail-loss'></td>
+                </tr>
+                <tr>
+                    <td>Notification</td>
+                    <td id='claims-detail-notification'></td>
+                </tr>
+                <tr>
+                    <td>Recorded</td>
+                    <td id='claims-detail-recorded'></td>
+                </tr>
+                <tr>
+                    <td>Replacement Received</td>
+                    <td id='claims-detail-replacement'></td>
+                </tr>
+                <tr>
+                    <td>Closed</td>
+                    <td id='claims-detail-closed'></td>
+                </tr>
+            </table>
+            <h3>Amounts</h3>
+            <table class="table table-striped">
+                <tr>
+                    <td>Excess</td>
+                    <td id='claims-detail-excess'></td>
+                </tr>
+                <tr>
+                    <td>Unauthorized Calls</td>
+                    <td id='claims-detail-unauthorized-calls'></td>
+                </tr>
+                <tr>
+                    <td>Accessories</td>
+                    <td id='claims-detail-accessories'></td>
+                </tr>
+                <tr>
+                    <td>Phone Replacement Cost</td>
+                    <td id='claims-detail-replacement-cost'></td>
+                </tr>
+                <tr>
+                    <td>Transaction Fees</td>
+                    <td id='claims-detail-transaction'></td>
+                </tr>
+                <tr>
+                    <td>Claim Handling Fees</td>
+                    <td id='claims-detail-handling'></td>
+                </tr>
+                <tr>
+                    <td>Reserved</td>
+                    <td id='claims-detail-reserved'></td>
+                </tr>
+                <tr>
+                    <td>Incurred</td>
+                    <td id='claims-detail-incurred'></td>
+                </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
 {% endblock %}
