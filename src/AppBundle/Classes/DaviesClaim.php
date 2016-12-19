@@ -130,7 +130,7 @@ class DaviesClaim
             $this->riskPostCode = $data[++$i];
             $this->lossDate = $this->excelDate($data[++$i]);
             $this->startDate = $this->excelDate($data[++$i]);
-            $this->endDate = $this->excelDate($data[++$i]);
+            $this->endDate = $this->excelDate($data[++$i], true);
             $this->lossType = $data[++$i];
             $this->lossDescription = $data[++$i];
             $this->location = $data[++$i];
@@ -188,7 +188,7 @@ class DaviesClaim
         return in_array(trim($value), ['', 'TBC', 'Tbc', 'tbc', '-', '0', 0, 'N/A', 'n/a']);
     }
 
-    private function excelDate($days)
+    private function excelDate($days, $skipEndCheck = false)
     {
         try {
             if (!$days || $this->isNullableValue($days)) {
@@ -197,6 +197,13 @@ class DaviesClaim
 
             $origin = new \DateTime("1900-01-01");
             $origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
+
+            $minDate = new \DateTime('2016-01-01');
+            $now = new \DateTime();
+
+            if ($origin < $minDate || ($origin > $now && !$skipEndCheck)) {
+                throw new \Exception(sprintf('Out of range for date %s', $origin->format(\DateTime::ATOM)));
+            }
 
             return $origin;
         } catch (\Exception $e) {
