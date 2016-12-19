@@ -13,7 +13,7 @@ class PurchaseStepAddress
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="250")
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="Address is required.")
      */
     protected $addressLine1;
 
@@ -35,7 +35,7 @@ class PurchaseStepAddress
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="250")
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="City is required.")
      */
     protected $city;
 
@@ -44,7 +44,7 @@ class PurchaseStepAddress
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
      * @AppAssert\Postcode()
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="Postcode is required.")
      */
     protected $postcode;
 

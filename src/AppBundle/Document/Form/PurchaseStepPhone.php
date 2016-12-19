@@ -22,14 +22,14 @@ class PurchaseStepPhone
      *      minMessage = "You must select monthly or annual policy payments",
      *      maxMessage = "You must select monthly or annual policy payments"
      * )
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="You must select monthly or annual policy payments")
      */
     protected $amount;
 
     /**
      * @var string
      * @AppAssert\Imei()
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="IMEI is required.")
      */
     protected $imei;
 
@@ -39,7 +39,7 @@ class PurchaseStepPhone
      * @Assert\Length(min="5", max="32",
      *  minMessage="This doesn't appear to be a valid serial number",
      *  maxMessage="This doesn't appear to be a valid serial number")
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="Serial Number is required.")
      */
     protected $serialNumber;
 
