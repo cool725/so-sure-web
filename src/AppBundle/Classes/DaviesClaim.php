@@ -195,7 +195,7 @@ class DaviesClaim
             return null;
         }
 
-        return trim($field);
+        return str_replace('£', '', trim($field));
     }
 
     private function isNullableValue($value)
