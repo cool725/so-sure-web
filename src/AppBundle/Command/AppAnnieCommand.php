@@ -42,7 +42,7 @@ class AppAnnieCommand extends ContainerAwareCommand
     {
         $skipSave = true === $input->getOption('skip-save');
         $dateOption = $input->getOption('date');
-        $date = new \DateTime('-1 day');
+        $date = new \DateTime('-3 day');
         if ($dateOption) {
             $date = new \DateTime($dateOption);
         }
@@ -54,6 +54,7 @@ class AppAnnieCommand extends ContainerAwareCommand
         }
 
         $appAnnie = $this->getAppAnnie();
+        $output->writeln(sprintf('Checking %s', $date->format(\DateTime::ATOM)));
         $results = $appAnnie->run($date, $endDate, !$skipSave);
         $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
     }
