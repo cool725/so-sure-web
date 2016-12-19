@@ -678,8 +678,12 @@ class Claim
             'replacementImei' => $this->getReplacementImei(),
             'recordedDate' => $this->getRecordedDate() ? $this->getRecordedDate()->format(\DateTime::ATOM) : null,
             'lossDate' => $this->getLossDate() ? $this->getLossDate()->format(\DateTime::ATOM) : null,
-            'notificationDate' => $this->getNotificationDate() ? $this->getNotificationDate()->format(\DateTime::ATOM) : null,
-            'replacementReceivedDate' => $this->getReplacementReceivedDate() ? $this->getReplacementReceivedDate()->format(\DateTime::ATOM) : null,
+            'notificationDate' => $this->getNotificationDate() ?
+                $this->getNotificationDate()->format(\DateTime::ATOM) :
+                null,
+            'replacementReceivedDate' => $this->getReplacementReceivedDate() ?
+                $this->getReplacementReceivedDate()->format(\DateTime::ATOM) :
+                null,
             'closedDate' => $this->getClosedDate() ? $this->getClosedDate()->format(\DateTime::ATOM) : null,
             'description' => $this->getDescription(),
             'location' => $this->getLocation(),
@@ -701,7 +705,7 @@ class Claim
             'force' => $this->getForce(),
             'crimeRef' => $this->getCrimeRef(),
             'validCrimeRef' => $this->isValidCrimeRef(),
-            'shippingAddress' => $this->getShippingAddress(),            
+            'shippingAddress' => $this->getShippingAddress(),
         ];
     }
 }
