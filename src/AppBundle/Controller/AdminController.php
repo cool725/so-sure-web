@@ -1043,7 +1043,7 @@ class AdminController extends BaseController
             $dm->flush();
         }
 
-        return $this->redirectToRoute('admin_claims');        
+        return $this->redirectToRoute('admin_claims');
     }
 
     /**
