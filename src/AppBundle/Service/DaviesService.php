@@ -268,6 +268,11 @@ class DaviesService
                 $claim->setReplacementPhone($this->getReplacementPhone($daviesClaim));
                 $claim->setReplacementImei($daviesClaim->replacementImei);
                 $claim->setReplacementReceivedDate($daviesClaim->replacementReceivedDate);
+                $claim->setReplacementPhoneDetails(sprintf(
+                    '%s %s',
+                    $daviesClaim->replacementMake,
+                    $daviesClaim->replacementModel
+                ));
 
                 $claim->setDescription($daviesClaim->lossDescription);
                 $claim->setLocation($daviesClaim->location);
@@ -375,11 +380,6 @@ class DaviesService
             // Imei has changed, but we can't change their policy premium, which is fixed
             $policy->setImei($claim->getReplacementImei());
             // If phone has been updated (unlikely at the moment)
-            $claim->setReplacementPhoneDetails(sprintf(
-                '%s %s',
-                $daviesClaim->replacementMake,
-                $daviesClaim->replacementModel
-            ));
             if ($claim->getReplacementPhone()) {
                 $policy->setPhone($claim->getReplacementPhone());
             }
