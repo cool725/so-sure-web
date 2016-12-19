@@ -12,7 +12,7 @@ class PurchaseStepPersonal
     /**
      * @var string
      * @Assert\Email(strict=true)
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="This value is required.")
      */
     protected $email;
 
@@ -20,7 +20,7 @@ class PurchaseStepPersonal
      * @var string
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="1", max="50")
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="This value is required.")
      */
     protected $firstName;
 
@@ -28,7 +28,7 @@ class PurchaseStepPersonal
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="This value is required.")
      */
     protected $lastName;
 
@@ -36,14 +36,14 @@ class PurchaseStepPersonal
      * @var string
      * @AppAssert\FullName()
      * @Assert\Length(min="1", max="100")
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="This value is required.")
      */
     protected $name;
 
     /**
      * @var string
      * @AppAssert\UkMobile()
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="This value is required.")
      */
     protected $mobileNumber;
 
@@ -51,7 +51,7 @@ class PurchaseStepPersonal
      * @var \DateTime
      * @Assert\DateTime()
      * @AppAssert\Age()
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="Date of Birth is required.")
      */
     protected $birthday;
 

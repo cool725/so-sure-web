@@ -15,6 +15,9 @@ class AgeValidator extends ConstraintValidator
             $birthday = $value;
         } else {
             try {
+                if (strlen($value) == 0) {
+                    return;
+                }
                 $birthday = \DateTime::createFromFormat('d/m/Y', $value);
             } catch (\Exception $e) {
                 // Do Nothing
