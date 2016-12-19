@@ -62,6 +62,23 @@ class DaviesClaim
         return $this->reserved;
     }
 
+    public function getReplacementPhoneDetails()
+    {
+        if ($this->replacementMake && $this->replacementModel) {
+            return (sprintf(
+                '%s %s',
+                $this->replacementMake,
+                $this->replacementModel
+            ));
+        } elseif ($this->replacementMake) {
+            return $this->replacementMake;
+        } elseif ($this->replacementModel) {
+            return $this->replacementModel;
+        } else {
+            return null;
+        }
+    }
+
     public function isClaimWarrantyOrExtended()
     {
         return in_array($this->getClaimType(), [Claim::TYPE_WARRANTY, Claim::TYPE_EXTENDED_WARRANTY]);
@@ -185,7 +202,7 @@ class DaviesClaim
     {
         // possible values that Davies might use as placeholders
         // when a field is required by their system, but not yet known
-        return in_array(trim($value), ['', 'TBC', 'Tbc', 'tbc', '-', '0', 0, 'N/A', 'n/a']);
+        return in_array(trim($value), ['', 'TBC', 'Tbc', 'tbc', '-', '0', 'N/A', 'n/a']);
     }
 
     private function excelDate($days, $skipEndCheck = false)

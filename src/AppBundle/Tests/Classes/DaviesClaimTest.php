@@ -67,6 +67,11 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1.3, $davies->accessories);
         $this->assertEquals(5.29, $davies->unauthorizedCalls);
         $this->assertEquals(250.49, $davies->incurred);
+
+        $this->assertEquals('351236666677777', $davies->replacementImei);
+        $this->assertEquals('Samsung', $davies->replacementMake);
+        $this->assertEquals('S6', $davies->replacementModel);
+        $this->assertEquals('Samsung S6', $davies->getReplacementPhoneDetails());
     }
 
     /**
