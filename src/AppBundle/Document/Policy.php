@@ -33,7 +33,7 @@ abstract class Policy
     const RISK_CONNECTED_ESTABLISHED_NETWORK_CLAIM = 'connected w/established claim (>30 days)';
     const RISK_CONNECTED_NO_CLAIM = 'connected w/no claim';
     const RISK_NOT_CONNECTED_NEW_POLICY = 'not connected w/new policy';
-    const RISK_NOT_CONNECTED_ESTABLISHED_POLICY = 'not connected w/established polish (>30 days)';
+    const RISK_NOT_CONNECTED_ESTABLISHED_POLICY = 'not connected w/established policy (>30 days)';
 
     const STATUS_PENDING = 'pending';
     const STATUS_ACTIVE = 'active';
