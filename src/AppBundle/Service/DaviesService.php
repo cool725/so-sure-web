@@ -270,7 +270,11 @@ class DaviesService
                 $claim->setPhoneReplacementCost($daviesClaim->phoneReplacementCost);
                 $claim->setTransactionFees($daviesClaim->transactionFees);
 
-                $claim->setReplacementPhone($this->getReplacementPhone($daviesClaim));
+                // Probably not going to be returned, but maybe one day will be able to map Davies/Brighstar data
+                if ($replacementPhone = $this->getReplacementPhone($daviesClaim)) {
+                    $claim->setReplacementPhone($replacementPhone);
+                }
+
                 $claim->setReplacementImei($daviesClaim->replacementImei);
                 $claim->setReplacementReceivedDate($daviesClaim->replacementReceivedDate);
                 $claim->setReplacementPhoneDetails($daviesClaim->getReplacementPhoneDetails());
