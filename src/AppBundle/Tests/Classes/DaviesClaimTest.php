@@ -33,11 +33,11 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'Work',
             'Closed',
             'Settled',
-            '345678',
+            '42461',
             'Samsung',
             'S6',
             '351236666677777',
-            '345678',
+            '42461',
             '250.49',
             '5.29',
             '1.30',
@@ -116,6 +116,90 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '1.08',
             '07123 456789',
             '42461',
+            '42461',
+            '42461',
+            '123 The Street, Town, City, Postcode'
+        ];
+        $davies = new DaviesClaim();
+        $davies->fromArray($data);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testFromArrayDateEarly()
+    {
+        $data = [
+            'So-Sure -Mobile',
+            '320160401000001',
+            'Mr John Smith',
+            'AB12 3CD',
+            '42461',
+            '42430',
+            '42794',
+            'Damage',
+            'Cracked Screen',
+            'Work',
+            'Closed',
+            'Settled',
+            '42461',
+            'Samsung',
+            'S6',
+            '351236666677777',
+            '42461',
+            '250.49',
+            '5.29',
+            '1.30',
+            '250',
+            '0.75',
+            '275',
+            '50',
+            '220',
+            '1.08',
+            '07123 456789',
+            '5',
+            '42461',
+            '42461',
+            '123 The Street, Town, City, Postcode'
+        ];
+        $davies = new DaviesClaim();
+        $davies->fromArray($data);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testFromArrayDateLate()
+    {
+        $data = [
+            'So-Sure -Mobile',
+            '320160401000001',
+            'Mr John Smith',
+            'AB12 3CD',
+            '42461',
+            '42430',
+            '42794',
+            'Damage',
+            'Cracked Screen',
+            'Work',
+            'Closed',
+            'Settled',
+            '42461',
+            'Samsung',
+            'S6',
+            '351236666677777',
+            '42461',
+            '250.49',
+            '5.29',
+            '1.30',
+            '250',
+            '0.75',
+            '275',
+            '50',
+            '220',
+            '1.08',
+            '07123 456789',
+            '52461',
             '42461',
             '42461',
             '123 The Street, Town, City, Postcode'
