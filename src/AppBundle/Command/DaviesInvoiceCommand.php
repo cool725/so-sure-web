@@ -50,7 +50,7 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
         }
 
         $skipEmail = true === $input->getOption('skip-email');
-        $emailAddress = 'accounts.payable@davies-group.com';
+        $emailAddress = ['accounts.payable@davies-group.com', 'Debbie.Moores@davies-group.com'];
         if ($skipEmail) {
             $emailAddress = null;
         }
@@ -82,7 +82,7 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
 
             $invoiceService = $this->getContainer()->get('app.invoice');
             $invoiceService->generateInvoice($invoice, $emailAddress);
-            if ($email) {
+            if ($emailAddress) {
                 $output->writeln(sprintf('Invoice %s generated and emailed', $invoice->getInvoiceNumber()));
             } else {
                 $output->writeln(sprintf('Invoice %s generated', $invoice->getInvoiceNumber()));
