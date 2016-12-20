@@ -46,9 +46,13 @@
                                 {% else %}
                                     -
                                 {% endif %}
-                                {% if claim.replacementPhoneDetails %}
-                                    {% if claim.replacementPhone%}<i class="fa fa-check" title="Davies: '{{ claim.replacementPhoneDetails }}' <==> so-sure: '{{ claim.replacementPhone }}'"></i>
-                                    {% else %}<i class="fa fa-warning" title="{{ claim.replacementPhoneDetails }} recorded, but replacement phone not confirmed"></i>
+                                {% if claim.replacementImei %}
+                                    {% if claim.replacementPhoneDetails %}
+                                        {% if claim.replacementPhone%}<i class="fa fa-check" title="Davies: '{{ claim.replacementPhoneDetails }}' <==> so-sure: '{{ claim.replacementPhone }}'"></i>
+                                        {% else %}<i class="fa fa-warning" title="{{ claim.replacementPhoneDetails }} recorded, but replacement phone not confirmed"></i>
+                                        {% endif %}
+                                    {% else %}
+                                        <i class="fa fa-warning" title="IMEI has been updated, but no replacement phone details"></i>
                                     {% endif %}
                                 {% endif %}
                             </td>
@@ -108,6 +112,10 @@
             </table>
             <h3>Replacement Phone</h3>
             <table class="table table-striped">
+                <tr>
+                    <td>Replacement IMEI</td>
+                    <td id='claims-detail-replacement-imei'></td>
+                </tr>
                 <tr>
                     <td>Replacement Phone Details</td>
                     <td id='claims-detail-replacement-phone-details'></td>
