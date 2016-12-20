@@ -180,7 +180,12 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('claimscheck')) {
                 $formClaimsCheck->handleRequest($request);
                 if ($formClaimsCheck->isValid()) {
-                    $result = $imeiService->policyClaim($policy, $claimscheck->getType(), $claimscheck->getClaim(), $this->getUser());
+                    $result = $imeiService->policyClaim(
+                        $policy,
+                        $claimscheck->getType(),
+                        $claimscheck->getClaim(),
+                        $this->getUser()
+                    );
                     $this->addFlash('success', sprintf(
                         'ClaimCheck <a href="%s" target="_blank">%s</a> (Phone is %s)',
                         $imeiService->getCertUrl(),
