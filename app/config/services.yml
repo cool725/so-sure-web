@@ -72,6 +72,7 @@ services:
             webToken:             "%judopay_webtoken%"
             webSecret:            "%judopay_websecret%"
             dispatcher:           "@event_dispatcher"
+            sms:                  "@app.sms"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
@@ -102,7 +103,6 @@ services:
             dm:                   "@doctrine_mongodb.odm.default_document_manager"
             logger:               "@logger"
             mailer:               "@app.mailer"
-            templating:           "@templating"
             router:               "@api.router"
             shortLink:            "@app.shortlink"
             sms:                  "@app.sms"
@@ -212,6 +212,7 @@ services:
             auth_id:        "%plivo_authid%"
             auth_token:     "%plivo_authtoken%"
             sending_number: "%plivo_sendingnumber%"
+            templating:     "@templating"
 
     app.branch:
         class: AppBundle\Service\BranchService

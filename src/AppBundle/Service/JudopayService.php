@@ -57,6 +57,9 @@ class JudopayService
 
     protected $dispatcher;
 
+    /** @var SmsService */
+    protected $sms;
+
     public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -74,7 +77,8 @@ class JudopayService
      * @param                 $statsd
      * @param string          $webToken
      * @param string          $webSecret
-     * @param                  $dispatcher
+     * @param                 $dispatcher
+     * @param SmsService      $sms
      */
     public function __construct(
         DocumentManager $dm,
@@ -88,7 +92,8 @@ class JudopayService
         $statsd,
         $webToken,
         $webSecret,
-        $dispatcher
+        $dispatcher,
+        SmsService $sms
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -96,6 +101,7 @@ class JudopayService
         $this->judoId = $judoId;
         $this->mailer = $mailer;
         $this->dispatcher = $dispatcher;
+        $this->sms = $sms;
         $apiData = array(
            'apiToken' => $apiToken,
            'apiSecret' => $apiSecret,
@@ -591,15 +597,23 @@ class JudopayService
             $repo = $this->dm->getRepository(ScheduledPayment::class);
 
             // Only allow up to 4 failed payment attempts
-            if ($repo->countUnpaidScheduledPayments($policy, $date) <= 4) {
+            $failedPayments = $repo->countUnpaidScheduledPayments($policy);
+
+            $finalAttempt = $failedPayments == 4;
+            $next = null;
+            if ($failedPayments <= 3) {
                 // create another scheduled payment for 7 days later
                 $rescheduled = $scheduledPayment->reschedule($date);
                 $policy->addScheduledPayment($rescheduled);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                $next = $rescheduled->getScheduled();
+            }
 
-                $this->failedPaymentEmail($policy, $rescheduled->getScheduled());
-            } else {
-                // TODO: Should probably be a final warning email
-                $this->failedPaymentEmail($policy, null);
+            $this->failedPaymentEmail($policy, $next);
+            // Sms is quite invasive and occasionlly a failed payment will just work the next time
+            // so allow 1 failed payment before sending sms
+            if ($failedPayments > 1) {
+                $this->failedPaymentSms($policy, $next);
             }
         }
     }
@@ -608,20 +622,44 @@ class JudopayService
      * @param Policy    $policy
      * @param \DateTime $next
      */
-    private function failedPaymentEmail(Policy $policy, $next)
+    private function failedPaymentEmail(Policy $policy, \DateTime $next = null)
     {
+        $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
         $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
+
+        if (!$next) {
+            $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
+            $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentFinal');
+        }
+
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
         $this->mailer->sendTemplate(
-            sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber()),
+            $subject,
             $policy->getUser()->getEmail(),
             $htmlTemplate,
             ['policy' => $policy, 'next' => $next],
             $textTemplate,
             ['policy' => $policy, 'next' => $next]
         );
+    }
+
+    /**
+     * @param Policy    $policy
+     * @param \DateTime $next
+     */
+    private function failedPaymentSms(Policy $policy, \DateTime $next = null)
+    {
+        if ($this->environment != 'prod') {
+            return;
+        }
+
+        $smsTemplate = 'AppBundle:Sms:failedPayment.txt.twig';
+        if (!$next) {
+            $smsTemplate = 'AppBundle:Sms:failedPaymentFinal.txt.twig';
+        }
+        $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next]);
     }
 
     public function runTokenPayment(User $user, $amount, $paymentRef, $policyId, $customerRef = null)

@@ -56,7 +56,6 @@ class InvitationService
 
     /** @var MailerService */
     protected $mailer;
-    protected $templating;
     protected $router;
 
     /** @var ShortLink */
@@ -86,7 +85,6 @@ class InvitationService
      * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
      * @param MailerService    $mailer
-     * @param                  $templating
      * @param                  $router
      * @param ShortLinkService $shortLink
      * @param SmsService       $sms
@@ -99,7 +97,6 @@ class InvitationService
         DocumentManager $dm,
         LoggerInterface $logger,
         MailerService $mailer,
-        $templating,
         $router,
         ShortLinkService $shortLink,
         SmsService $sms,
@@ -111,7 +108,6 @@ class InvitationService
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
-        $this->templating = $templating;
         $this->router = $router->getRouter();
         $this->shortLink = $shortLink;
         $this->sms = $sms;
@@ -511,8 +507,7 @@ class InvitationService
         }
 
         $smsTemplate = sprintf('AppBundle:Sms:%s.txt.twig', $type);
-        $message = $this->templating->render($smsTemplate, ['invitation' => $invitation]);
-        if ($this->sms->send($invitation->getMobile(), $message)) {
+        if ($this->sms->sendTemplate($invitation->getMobile(), $smsTemplate, ['invitation' => $invitation])) {
             $invitation->setStatus(SmsInvitation::STATUS_SENT);
         } else {
             $invitation->setStatus(SmsInvitation::STATUS_FAILED);

@@ -507,6 +507,7 @@ class JudopayServiceTest extends WebTestCase
         $user = $this->createValidUser(static::generateEmail('judo-process-token', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
+        static::$dm->persist($policy);
 
         $details = self::$judopay->testPayDetails(
             $user,
@@ -547,7 +548,7 @@ class JudopayServiceTest extends WebTestCase
 
         // Payment failures should be rescheduled
         $initialScheduledPayment = $policy->getNextScheduledPayment();
-        for ($i = 1; $i <= 4; $i++) {
+        for ($i = 1; $i <= 3; $i++) {
             $scheduledPayment = $policy->getNextScheduledPayment();
             $this->assertLessThan(
                 29,
@@ -581,8 +582,14 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
-        // 11 + 4
-        $this->assertEquals(15, count($policy->getScheduledPayments()));
+        // 11 + 3 (failed 1 scheduled payment + 3 rescheduled payments = 4 weeks)
+        $this->assertEquals(14, count($policy->getScheduledPayments()));
+        static::$dm->flush();
+
+        //\Doctrine\Common\Util\Debug::dump($policy);
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(ScheduledPayment::class);
+        $this->assertEquals(4, $repo->countUnpaidScheduledPayments($policy));
     }
 
     public function testCommission()

@@ -42,14 +42,13 @@ class ScheduledPaymentRepository extends DocumentRepository
             ->execute();
     }
 
-    public function countUnpaidScheduledPayments(Policy $policy, \DateTime $date = null)
+    public function countUnpaidScheduledPayments(Policy $policy)
     {
-        if (!$date) {
-            $date = new \DateTime();
+        if ($policy->getLastSuccessfulPaymentCredit()) {
+            $date = clone $policy->getLastSuccessfulPaymentCredit()->getDate();
         } else {
-            $date = clone $date;
+            $date = clone $policy->getStart();
         }
-        $date->sub(new \DateInterval('P1M'));
 
         return $this->createQueryBuilder()
             ->field('policy')->references($policy)
