@@ -42,11 +42,15 @@ class ClaimsCheckType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('type', ChoiceType::class, ['choices' => [
-                Claim::TYPE_LOSS => Claim::TYPE_LOSS,
-                Claim::TYPE_THEFT => Claim::TYPE_THEFT,
-                Claim::TYPE_DAMAGE => Claim::TYPE_DAMAGE,
-            ]])
+            ->add('type', ChoiceType::class, [
+                'required' => $this->required,
+                'placeholder' => 'Select a claim type',
+                'choices' => [
+                    Claim::TYPE_LOSS => Claim::TYPE_LOSS,
+                    Claim::TYPE_THEFT => Claim::TYPE_THEFT,
+                    Claim::TYPE_DAMAGE => Claim::TYPE_DAMAGE,
+                ]
+            ])
             ->add('run', SubmitType::class)
         ;
 
@@ -55,6 +59,7 @@ class ClaimsCheckType extends AbstractType
             $form = $event->getForm();
 
             $form->add('claim', DocumentType::class, [
+                    'required' => $this->required,
                     'placeholder' => 'Select a claim',
                     'class' => 'AppBundle:Claim',
                     'choice_label' => 'number',
