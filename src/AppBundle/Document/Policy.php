@@ -1726,7 +1726,7 @@ abstract class Policy
         return $connectionValues;
     }
 
-    public function getTotalSuccessfulPayments(\Datetime $date = null)
+    public function getTotalSuccessfulPayments(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -1741,7 +1741,7 @@ abstract class Policy
         return $totalPaid;
     }
 
-    public function getTotalExpectedPaidToDate($prefix = null, \Datetime $date = null)
+    public function getTotalExpectedPaidToDate($prefix = null, \DateTime $date = null)
     {
         if (!$this->isValidPolicy($prefix) || !$this->getStart()) {
             return null;
@@ -1768,7 +1768,7 @@ abstract class Policy
         return $expectedPaid;
     }
 
-    public function isPolicyPaidToDate($exact = true, $prefix = null, \Datetime $date = null)
+    public function isPolicyPaidToDate($exact = true, $prefix = null, \DateTime $date = null)
     {
         if (!$this->isPolicy()) {
             return null;
@@ -1785,7 +1785,7 @@ abstract class Policy
         }
     }
 
-    public function arePolicyScheduledPaymentsCorrect($prefix = null, \Datetime $date = null)
+    public function arePolicyScheduledPaymentsCorrect($prefix = null, \DateTime $date = null)
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
