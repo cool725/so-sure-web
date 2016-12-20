@@ -1,7 +1,7 @@
 {% set logo_image = 'unhappy' %}
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}Your policy will be cancelled in {{ policyExpirationDateDays }} days.{% endblock %}
+{% block title %}Your policy will be cancelled in {{ policy.policyExpirationDateDays }} days.{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 		<h1>
@@ -12,7 +12,7 @@
 		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 				Your monthly payment of £{{ policy.premium.monthlyPremiumPrice }} was declined.
                 <br><br>
-                Your policy will be cancelled in {{ policyExpirationDateDays }} days if you fail to make payment.
+                Your policy will be cancelled in {{ policy.policyExpirationDateDays }} days if you fail to make payment.
 				<br><br>
 				To cancellation, simply <a href="{{ branch_pot_url }}">open the app</a> and follow the steps on screen.
 				<br><br>

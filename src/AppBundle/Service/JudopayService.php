@@ -629,7 +629,7 @@ class JudopayService
 
         if (!$next) {
             $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
-            $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
+            $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentFinal');
         }
 
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);

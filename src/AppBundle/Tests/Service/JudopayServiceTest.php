@@ -586,7 +586,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(14, count($policy->getScheduledPayments()));
         static::$dm->flush();
 
-        \Doctrine\Common\Util\Debug::dump($policy);
+        //\Doctrine\Common\Util\Debug::dump($policy);
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(ScheduledPayment::class);
         $this->assertEquals(4, $repo->countUnpaidScheduledPayments($policy));
