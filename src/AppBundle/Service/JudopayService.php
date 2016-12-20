@@ -598,18 +598,22 @@ class JudopayService
 
             // Only allow up to 4 failed payment attempts
             $failedPayments = $repo->countUnpaidScheduledPayments($policy);
+
             $finalAttempt = $failedPayments == 4;
-            if ($failedPayments <= 4) {
+            $next = null;
+            if ($failedPayments <= 3) {
                 // create another scheduled payment for 7 days later
                 $rescheduled = $scheduledPayment->reschedule($date);
                 $policy->addScheduledPayment($rescheduled);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                $next = $rescheduled->getScheduled();
+            }
 
-                $this->failedPaymentEmail($policy, $rescheduled->getScheduled(), $finalAttempt);
-                // Sms is quite invasive and occasionlly a failed payment will just work the next time
-                // so allow 1 failed payment before sending sms
-                if ($failedPayments > 1) {
-                    $this->failedPaymentSms($policy, $rescheduled->getScheduled(), $finalAttempt);
-                }
+            $this->failedPaymentEmail($policy, $next);
+            // Sms is quite invasive and occasionlly a failed payment will just work the next time
+            // so allow 1 failed payment before sending sms
+            if ($failedPayments > 1) {
+                $this->failedPaymentSms($policy, $next);
             }
         }
     }
@@ -618,12 +622,12 @@ class JudopayService
      * @param Policy    $policy
      * @param \DateTime $next
      */
-    private function failedPaymentEmail(Policy $policy, $next, $finalAttempt = false)
+    private function failedPaymentEmail(Policy $policy, \DateTime $next = null)
     {
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
         $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
 
-        if ($finalAttempt) {
+        if (!$next) {
             $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
             $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
         }
@@ -645,14 +649,14 @@ class JudopayService
      * @param Policy    $policy
      * @param \DateTime $next
      */
-    private function failedPaymentSms(Policy $policy, $next, $finalAttempt = false)
+    private function failedPaymentSms(Policy $policy, \DateTime $next = null)
     {
         if ($this->environment != 'prod') {
             return;
         }
 
         $smsTemplate = 'AppBundle:Sms:failedPayment.txt.twig';
-        if ($finalAttempt) {
+        if (!$next) {
             $smsTemplate = 'AppBundle:Sms:failedPaymentFinal.txt.twig';
         }
         $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next]);
