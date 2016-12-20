@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Plivo\RestAPI;
 use AppBundle\Document\User;
 use AppBundle\Document\Charge;
+use AppBundle\Document\Policy;
 
 class SmsService
 {
@@ -81,7 +82,8 @@ class SmsService
 
     public function sendTemplate($number, $template, $data)
     {
-        $messsage = $this->templating->render($template, $data);
+        $message = $this->templating->render($template, $data);
+
         return $this->send($number, $message);
     }
 
