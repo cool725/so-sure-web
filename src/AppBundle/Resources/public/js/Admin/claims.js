@@ -11,6 +11,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-davies-status').text(claim.daviesStatus);
     modal.find('#claims-detail-notes').text(claim.notes);
     modal.find('#claims-detail-description').text(claim.description);
+    modal.find('#claims-detail-replacement-imei').text(claim.replacementImei);
     modal.find('#claims-detail-replacement-phone-details').text(claim.replacementPhoneDetails);
     modal.find('#claims-detail-replacement-phone').val(claim.replacementPhoneId);
     modal.find('#claims-detail-loss').text(claim.lossDate);
@@ -35,6 +36,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-davies-status').text('');
     modal.find('#claims-detail-notes').text('');
     modal.find('#claims-detail-description').text('');
+    modal.find('#claims-detail-replacement-imei').text('');
     modal.find('#claims-detail-replacement-phone-details').text('');
     modal.find('#claims-detail-replacement-phone').val('');
     modal.find('#claims-detail-loss').text('');
