@@ -4,16 +4,27 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
 
 class ClaimsCheck
 {
-    /** @var Policy */
+    /**
+     * @var Policy
+     * @Assert\NotNull(message="Policy is required.")
+     */
     protected $policy;
 
-    /** @var Claim */
+    /**
+     * @var Claim
+     * @Assert\NotNull(message="Claim is required.")
+     */
     protected $claim;
 
-    /** @var string */
+    /**
+     * @var string
+     * @Assert\NotNull(message="Claims Type is required.")
+     */
     protected $type;
 
     public function getPolicy()
