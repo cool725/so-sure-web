@@ -2136,4 +2136,18 @@ class PhonePolicyTest extends WebTestCase
         // TODO: Should this be up to /
         $this->assertTrue($sosurePolicy->hasPolicyPrefix('F'));
     }
+
+    public function testPolicyExpirationDate()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        // starts 1/1/16 + 1 month = 1/2/16 + 30 days = 2/3/16
+        $this->assertEquals(new \DateTime('2016-03-02'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(1, $policy->getPolicyExpirationDateDays(new \DateTime('2016-03-01')));
+        $this->assertEquals(30, $policy->getPolicyExpirationDateDays(new \DateTime('2016-02-01')));
+    }
 }

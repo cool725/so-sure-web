@@ -5,6 +5,8 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Plivo\RestAPI;
+use AppBundle\Document\User;
+use AppBundle\Document\Charge;
 
 class SmsService
 {
@@ -22,6 +24,8 @@ class SmsService
 
     protected $router;
 
+    protected $templating;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -29,6 +33,7 @@ class SmsService
      * @param string          $auth_id
      * @param string          $auth_token
      * @param string          $sending_number
+     * @param                 $templating
      */
     public function __construct(
         DocumentManager $dm,
@@ -36,13 +41,15 @@ class SmsService
         $router,
         $auth_id,
         $auth_token,
-        $sending_number
+        $sending_number,
+        $templating
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->router = $router;
         $this->client = new RestAPI($auth_id, $auth_token);
         $this->sending_number = $sending_number;
+        $this->templating = $templating;
     }
 
     /**
@@ -70,5 +77,26 @@ class SmsService
         }
 
         return true;
+    }
+
+    public function sendTemplate($number, $template, $data)
+    {
+        $messsage = $this->templating->render($template, $data);
+        return $this->send($number, $message);
+    }
+
+    public function sendUser(Policy $policy, $template, $data)
+    {
+        $user = $policy->getUser();
+        $this->sendTemplate($user->getMobileNumber(), $template, $data);
+
+        $charge = new Charge();
+        $charge->setType(Charge::TYPE_SMS);
+        $charge->setUser($user);
+        $charge->setPolicy($policy);
+        $charge->setDetails($user->getMobileNumber());
+
+        $this->dm->persist($charge);
+        $this->dm->flush();
     }
 }

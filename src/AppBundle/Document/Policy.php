@@ -1398,9 +1398,27 @@ abstract class Policy
      */
     public function getPolicyExpirationDate()
     {
+        // TODO: Improve this logic - if user was late on last succesfully payment, then could be up to 1 month off
         $date = clone $this->getLastSuccessfulPaymentCredit()->getDate();
+        // 1 month from the last successful payment approximates when the current payment is due
+        $date->add(new \DateInterval('P1M'));
 
-        return $date->add(new \DateInterval('P61D'));
+        // and business rule of 30 days unpaid before auto cancellation
+        $date->add(new \DateInterval('P30D'));
+
+        return $date;
+    }
+
+    public function getPolicyExpirationDateDays(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $diff = $this->getPolicyExpirationDate()->diff($date);
+        $days = $diff->days;
+
+        return $days;
     }
 
     public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)

@@ -1,0 +1,23 @@
+{% set logo_image = 'unhappy' %}
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your policy will be cancelled in {{ policyExpirationDateDays }} days.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				Your monthly payment of £{{ policy.premium.monthlyPremiumPrice }} was declined.
+                <br><br>
+                Your policy is scheduled to be cancelled in {{ policyExpirationDateDays }} days due to non-payment.
+				<br><br>
+				You can avoid cancellation by <a href="{{ branch_pot_url }}">opening the app</a> and following the steps on screen.
+				<br><br>
+			    If you have any questions, please don't hesitate to <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}
