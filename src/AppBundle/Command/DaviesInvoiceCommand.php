@@ -61,20 +61,15 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
             $invoice = Invoice::generateDaviesInvoice();
             $data = [];
             foreach ($charges as $charge) {
-                // multiply by 100 as float's don't work as array keys
-                $amount = $this->toTwoDp($charge->getAmount()) * 100;
-                if (!isset($data[$amount])) {
-                    $data[$amount] = 0;
-                }
-                $data[$amount]++;
                 $charge->setInvoice($invoice);
-            }
-            foreach ($data as $amount => $quantity) {
-                // divide by 100 as was previously incremented to work for array key
                 // add vat
-                $actualAmount = $this->toTwoDp($amount * (1 + $this->getCurrentVatRate()) / 100);
-                $item = new InvoiceItem($actualAmount, $quantity);
-                $item->setDescription(sprintf('ClaimsCheck for %s', $date->format('M Y')));
+                $actualAmount = $this->toTwoDp($charge->getAmount() * (1 + $this->getCurrentVatRate()));
+                $item = new InvoiceItem($actualAmount, 1);
+                $item->setDescription(sprintf(
+                    'ClaimsCheck for %s on %s',
+                    $charge->getClaim() ? $charge->getClaim()->getNumber() : 'unknown claim number',
+                    $date->format('d M Y')
+                ));
                 $invoice->addInvoiceItem($item);
             }
             $dm->persist($invoice);

@@ -4,6 +4,7 @@ namespace AppBundle\Repository;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Policy;
 
 class ClaimRepository extends DocumentRepository
 {
@@ -48,5 +49,10 @@ class ClaimRepository extends DocumentRepository
             ->field('status')->in([Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED]);
 
         return $qb->getQuery()->execute();
+    }
+
+    public function findByPolicy(Policy $policy)
+    {
+        return $this->createQueryBuilder()->field('policy')->references($policy);
     }
 }

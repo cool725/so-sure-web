@@ -12,9 +12,33 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
+use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimsCheckType extends AbstractType
 {
+    /**
+     * @var boolean
+     */
+    private $required;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @param RequestStack $requestStack
+     * @param boolean      $required
+     */
+    public function __construct(RequestStack $requestStack, $required)
+    {
+        $this->requestStack = $requestStack;
+        $this->required = $required;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -25,9 +49,26 @@ class ClaimsCheckType extends AbstractType
             ]])
             ->add('run', SubmitType::class)
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $claimsCheck = $event->getData();
+            $form = $event->getForm();
+
+            $form->add('claim', DocumentType::class, [
+                    'placeholder' => 'Select a claim',
+                    'class' => 'AppBundle:Claim',
+                    'choice_label' => 'number',
+                    'query_builder' => function (DocumentRepository $dr) use ($claimsCheck) {
+                        return $dr->findByPolicy($claimsCheck->getPolicy());
+                    }
+            ]);
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setDefaults(array(
+            'data_class' => 'AppBundle\Document\Form\ClaimsCheck',
+        ));
     }
 }

@@ -12,6 +12,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Document\Form\ClaimsCheck;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\ClaimType;
@@ -140,11 +141,13 @@ class ClaimsController extends BaseController
         }
 
         $claim = new Claim();
+        $claimscheck = new ClaimsCheck();
+        $claimscheck->setPolicy($policy);
         $formClaim = $this->get('form.factory')
             ->createNamedBuilder('claim', ClaimType::class, $claim)
             ->getForm();
         $formClaimsCheck = $this->get('form.factory')
-            ->createNamedBuilder('claimscheck', ClaimsCheckType::class)
+            ->createNamedBuilder('claimscheck', ClaimsCheckType::class, $claimscheck)
             ->getForm();
         $noteForm = $this->get('form.factory')
             ->createNamedBuilder('note_form', NoteType::class)
@@ -177,8 +180,12 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('claimscheck')) {
                 $formClaimsCheck->handleRequest($request);
                 if ($formClaimsCheck->isValid()) {
-                    $type = $formClaimsCheck->get('type')->getData();
-                    $result = $imeiService->policyClaim($policy, $type);
+                    $result = $imeiService->policyClaim(
+                        $policy,
+                        $claimscheck->getType(),
+                        $claimscheck->getClaim(),
+                        $this->getUser()
+                    );
                     $this->addFlash('success', sprintf(
                         'ClaimCheck <a href="%s" target="_blank">%s</a> (Phone is %s)',
                         $imeiService->getCertUrl(),

@@ -59,6 +59,12 @@ class Charge
     protected $policy;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Claim")
+     * @Gedmo\Versioned
+     */
+    protected $claim;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="User")
      * @Gedmo\Versioned
      */
@@ -123,6 +129,16 @@ class Charge
     public function setPolicy($policy)
     {
         $this->policy = $policy;
+    }
+
+    public function getClaim()
+    {
+        return $this->claim;
+    }
+
+    public function setClaim($claim)
+    {
+        $this->claim = $claim;
     }
 
     public function getHandler()

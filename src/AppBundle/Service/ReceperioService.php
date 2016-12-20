@@ -300,11 +300,19 @@ class ReceperioService extends BaseImeiService
      * @param string      $imei
      * @param User        $user
      * @param IdentityLog $identityLog
+     * @param Claim       $claim
+     * @param User        $handler
      *
      * @return boolean True if imei is ok
      */
-    public function checkImei(Phone $phone, $imei, User $user = null, IdentityLog $identityLog = null)
-    {
+    public function checkImei(
+        Phone $phone,
+        $imei,
+        User $user = null,
+        IdentityLog $identityLog = null,
+        Claim $claim = null,
+        User $handler = null
+    ) {
         \AppBundle\Classes\NoOp::noOp([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == self::TEST_INVALID_IMEI) {
@@ -356,6 +364,8 @@ class ReceperioService extends BaseImeiService
                 $charge->setType(Charge::TYPE_GSMA);
                 $charge->setUser($user);
                 $charge->setDetails($imei);
+                $charge->setClaim($claim);
+                $charge->setHandler($handler);
                 $this->dm->persist($charge);
                 $this->dm->flush();
             }
@@ -374,13 +384,20 @@ class ReceperioService extends BaseImeiService
         }
     }
 
-    public function policyClaim(PhonePolicy $policy, $claimType)
+    public function policyClaim(PhonePolicy $policy, $claimType, Claim $claim = null, User $handler = null)
     {
         $result = null;
         if ($claimType == Claim::TYPE_DAMAGE) {
-            $result = $this->checkImei($policy->getPhone(), $policy->getImei(), $policy->getUser());
+            $result = $this->checkImei(
+                $policy->getPhone(),
+                $policy->getImei(),
+                $policy->getUser(),
+                null,
+                $claim,
+                $handler
+            );
         } elseif (in_array($claimType, [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
-            $result = $this->checkClaims($policy->getPhone(), $policy->getImei(), $policy);
+            $result = $this->checkClaims($policy->getPhone(), $policy->getImei(), $policy, $claim, $handler);
         } else {
             throw new \InvalidArgumentException(sprintf('Unknown claim type %s', $claimType));
         }
@@ -397,11 +414,18 @@ class ReceperioService extends BaseImeiService
      * @param Phone       $phone
      * @param string      $imei
      * @param PhonePolicy $policy
+     * @param Claim       $claim
+     * @param User        $handler
      *
      * @return boolean True if imei is ok
      */
-    public function checkClaims(Phone $phone, $imei, PhonePolicy $policy = null)
-    {
+    public function checkClaims(
+        Phone $phone,
+        $imei,
+        PhonePolicy $policy = null,
+        Claim $claim = null,
+        User $handler = null
+    ) {
         \AppBundle\Classes\NoOp::noOp([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == self::TEST_INVALID_IMEI) {
@@ -442,6 +466,8 @@ class ReceperioService extends BaseImeiService
                 if ($policy) {
                     $charge->setUser($policy->getUser());
                 }
+                $charge->setClaim($claim);
+                $charge->setHandler($handler);
                 $charge->setDetails($imei);
                 $this->dm->persist($charge);
                 $this->dm->flush();
