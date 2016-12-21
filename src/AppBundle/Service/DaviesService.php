@@ -330,15 +330,15 @@ class DaviesService
 
         if ($percent < 30) {
             throw new \Exception(sprintf(
-                'Claim %s: %s does not match expected insuredName %s (match %s)',
+                'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
                 $daviesClaim->claimNumber,
                 $daviesClaim->insuredName,
                 $claim->getPolicy()->getUser()->getName(),
                 $percent
             ));
-        } elseif ($percent < 80) {
+        } elseif ($percent < 75) {
             $msg = sprintf(
-                'Claim %s: %s does not match expected insuredName %s (match %s)',
+                'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
                 $daviesClaim->claimNumber,
                 $daviesClaim->insuredName,
                 $claim->getPolicy()->getUser()->getName(),
@@ -371,7 +371,7 @@ class DaviesService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$daviesClaim->isIncurredValueCorrect()) {
+        if ($daviesClaim->isIncurredValueCorrect() === false) {
             $msg = sprintf('Claim %s does not have the correct incurred value', $daviesClaim->claimNumber);
             $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;

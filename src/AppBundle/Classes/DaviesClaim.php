@@ -67,8 +67,11 @@ class DaviesClaim
 
     public function isIncurredValueCorrect()
     {
-        // TODO: May need to have a check if certain values are present prior to running this check
-        // but will see by experimentation
+        // Incurred fee only appears to be populated at the point where the phone replacement cost is known,
+        if (!$this->phoneReplacementCost || $this->areEqualToTwoDp(0, $this->phoneReplacementCost)) {
+            return null;
+        }
+
         $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost +
             $this->transactionFees + $this->handlingFees + $this->reciperoFee - $this->excess;
 
