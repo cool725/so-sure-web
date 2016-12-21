@@ -1699,9 +1699,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'card_token' => '55779911',
             'receipt_id' => $receiptId,
         ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
-        $this->assertEquals($data['id'], $policyData['id']);
+        $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED);
 
         // Ensure that policy creation didn't run twice
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');

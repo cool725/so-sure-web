@@ -2018,6 +2018,76 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(0, $monthlyPolicy->getOutstandingPremium());
     }
 
+    public function testInitialPayment()
+    {
+        $date = new \DateTime('2016-01-01');
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $this->assertTrue($monthlyPolicy->isInitialPayment());
+
+        for ($i = 1; $i <= 11; $i++) {
+            $this->addPayment(
+                $monthlyPolicy,
+                static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
+                Salva::MONTHLY_TOTAL_COMMISSION
+            );
+            $this->assertFalse($monthlyPolicy->isInitialPayment());
+        }
+    }
+
+    public function testOutstandingPremiumToDate()
+    {
+        $date = new \DateTime('2016-01-01');
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $this->assertEquals(0, $monthlyPolicy->getOutstandingPremiumToDate($date));
+        $this->assertTrue($monthlyPolicy->isValidPolicy(null));
+
+        // needs to be just slightly after 1 month
+        $date->add(new \DateInterval('PT1S'));
+
+        for ($i = 1; $i <= 11; $i++) {
+            $date->add(new \DateInterval('P1M'));
+            $this->assertEquals(
+                $monthlyPolicy->getPremium()->getMonthlyPremiumPrice() * $i,
+                $monthlyPolicy->getOutstandingPremiumToDate($date)
+            );
+        }
+    }
+
+    public function testTotalExpectedPaidToDate()
+    {
+        $date = new \DateTime('2016-01-01');
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $this->assertTrue($monthlyPolicy->isValidPolicy(null));
+
+        // needs to be just slightly later
+        $date->add(new \DateInterval('PT1S'));
+
+        $this->assertEquals(
+            $monthlyPolicy->getPremium()->getMonthlyPremiumPrice(),
+            $monthlyPolicy->getTotalExpectedPaidToDate($date)
+        );
+
+        for ($i = 1; $i <= 11; $i++) {
+            $date->add(new \DateInterval('P1M'));
+            $this->assertEquals(
+                $monthlyPolicy->getPremium()->getMonthlyPremiumPrice() * ($i + 1),
+                $monthlyPolicy->getTotalExpectedPaidToDate($date)
+            );
+        }
+    }
+
     /**
      * @expectedException AppBundle\Exception\InvalidPremiumException
      */

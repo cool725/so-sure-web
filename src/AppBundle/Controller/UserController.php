@@ -126,8 +126,8 @@ class UserController extends BaseController
         $amount = 0;
         $webpay = null;
         if (!$policy->isPolicyPaidToDate()) {
-            $amount = $policy->getPremiumInstallmentPrice();
-    
+            $amount = $policy->getOutstandingPremiumToDate();
+
             $webpay = $this->get('app.judopay')->webpay(
                 $policy,
                 $amount,

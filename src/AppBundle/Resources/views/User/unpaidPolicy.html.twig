@@ -26,7 +26,7 @@
             <div class="col-md-8 col-md-offset-2">
                 <h2>Unpaid Policy</h2>
                 {% if webpay_action and webpay_reference and amount > 0 %}
-                <p>Your policy is not up to date on your payments. Click below to pay £{{ amount|number_format(2, '.', ',') }}.</p>
+                <p>Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
                 <form action="{{ webpay_action }}" method="post" id="webpay-form">
                     <div class="row">
                         <div class="form-group col-sm-12 text-center">
@@ -36,7 +36,7 @@
                     </div>
                 </form>
               {% elseif amount == 0 %}
-                <p>Everything seems ok with your policy.</p>
+                <p>Your policy is paid to date.</p>
               {% endif %}
             </div>
         </div>

@@ -574,7 +574,7 @@ class JudopayService
 
     public function validatePolicyStatus(Policy $policy, \DateTime $date = null)
     {
-        $isPaidToDate = $policy->isPolicyPaidToDate(false, $policy->getPolicyPrefix($this->environment), $date);
+        $isPaidToDate = $policy->isPolicyPaidToDate(false, $date);
         // update status if it makes sense to
         if ($isPaidToDate &&
             in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])
