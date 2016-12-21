@@ -822,7 +822,43 @@ class JudopayService
 
         return array('post_url' => $webpaymentDetails["postUrl"], 'payment' => $payment);
     }
-    
+
+    public function webRegister(User $user, $ipAddress, $userAgent)
+    {
+        $payment = new JudoPayment();
+        $payment->setAmount(0);
+        $payment->setUser($user);
+        $payment->setSource(Payment::SOURCE_WEB);
+        $this->dm->persist($payment);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        $webPreAuth = $this->webClient->getModel('WebPayments\Preauth');
+        $date = new \DateTime();
+        $paymentRef = sprintf('%s-%s', $user->getId(), $date->format('Ym'));
+
+        // populate the required data fields.
+        $webPreAuth->setAttributeValues(
+            array(
+                'judoId' => $this->judoId,
+                'yourConsumerReference' => $user->getId(),
+                'yourPaymentReference' => $paymentRef,
+                'amount' => '1.01',
+                'currency' => 'GBP',
+                'clientIpAddress' => $ipAddress,
+                'clientUserAgent' => $userAgent,
+                'webPaymentOperation' => 'register',
+            )
+        );
+
+        $webpaymentDetails = $webPreAuth->create();
+        $this->logger->info(sprintf('Judo Webpayment %s', json_encode($webpaymentDetails)));
+        $payment->setReference($webpaymentDetails["reference"]);
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return array('post_url' => $webpaymentDetails["postUrl"], 'payment' => $payment);
+    }
+
     /**
      * Refund a payment
      *

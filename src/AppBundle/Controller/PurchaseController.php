@@ -380,6 +380,7 @@ class PurchaseController extends BaseController
             $request->get('ReceiptId'),
             $request->get('Reference')
         ));
+        $user = $this->getUser();
         $dm = $this->getManager();
         $repo = $dm->getRepository(Payment::class);
         $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
@@ -391,26 +392,49 @@ class PurchaseController extends BaseController
             throw new AccessDeniedException('Unknown user');
         }
 
+        $judo = $this->get('app.judopay');
         $policy = $payment->getPolicy();
-        $this->get('app.judopay')->add(
-            $policy,
-            $request->get('ReceiptId'),
-            null,
-            $request->get('CardToken'),
-            Payment::SOURCE_WEB,
-            JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
-        );
-        if ($policy->isInitialPayment()) {
-            // TODO: Take to a welcome to so-sure page
+
+        // If there's no policy on the payment, then it's a card update
+        if (!$policy) {
+            $judo->updatePaymentMethod(
+                $user,
+                $request->get('ReceiptId'),
+                null,
+                $request->get('CardToken'),
+                null
+            );
+
             $this->addFlash(
                 'success',
-                'Welcome to so-sure!'
+                sprintf('Your card has been updated')
             );
+
+            return $this->redirectToRoute('user_card_details');
         } else {
-            $this->addFlash(
-                'success',
-                sprintf('Thanks for your payment of £%0.2f', $policy->getLastSuccessfulPaymentCredit()->getAmount())
+            $judo->add(
+                $policy,
+                $request->get('ReceiptId'),
+                null,
+                $request->get('CardToken'),
+                Payment::SOURCE_WEB,
+                JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
             );
+            if ($policy->isInitialPayment()) {
+                // TODO: Take to a welcome to so-sure page
+                $this->addFlash(
+                    'success',
+                    'Welcome to so-sure!'
+                );
+            } else {
+                $this->addFlash(
+                    'success',
+                    sprintf(
+                        'Thanks for your payment of £%0.2f',
+                        $policy->getLastSuccessfulPaymentCredit()->getAmount()
+                    )
+                );
+            }
         }
 
         return $this->redirectToRoute('user_home');
