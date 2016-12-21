@@ -189,7 +189,7 @@ class DaviesClaim
             $this->accessories = $this->nullIfBlank($data[++$i]);
             $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
             $this->transactionFees = $this->nullIfBlank($data[++$i]);
-            $this->claimHandlingFees = $this->nullIfBlank($data[++$i]);
+            $this->handlingFees = $this->nullIfBlank($data[++$i]);
             $this->excess = $this->nullIfBlank($data[++$i]);
             $this->reserved = $this->nullIfBlank($data[++$i]);
             $this->reciperoFee = $this->nullIfBlank($data[++$i]);
