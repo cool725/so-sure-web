@@ -188,9 +188,13 @@ class JudopayService
             throw new \Exception('Unable to apply payment to cancelled/expired policy');
         }
 
-        // TODO: Perhaps this should be allowed - just in case there were multiple payments?
+        // A bit strange for payment to be applied to an active policy
+        // but make sure we credit that policy anyway
         if ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {
-            return true;
+            $this->logger->warning(sprintf(
+                'Non-token payment is being applied to active policy %s',
+                $policy->getId()
+            ));
         }
 
         if (!$policy->getStatus() || $policy->getStatus() == PhonePolicy::STATUS_PENDING) {
@@ -570,7 +574,7 @@ class JudopayService
 
     public function validatePolicyStatus(Policy $policy, \DateTime $date = null)
     {
-        $isPaidToDate = $policy->isPolicyPaidToDate(false, $policy->getPolicyPrefix($this->environment), $date);
+        $isPaidToDate = $policy->isPolicyPaidToDate(false, $date);
         // update status if it makes sense to
         if ($isPaidToDate &&
             in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])

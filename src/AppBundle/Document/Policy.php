@@ -832,7 +832,7 @@ abstract class Policy
 
     public function getPremiumInstallmentCount()
     {
-        if (!$this->isPolicy() || count($this->getPayments()) == 0) {
+        if (!$this->isPolicy()) {
             return null;
         }
 
@@ -841,7 +841,7 @@ abstract class Policy
 
     public function getPremiumInstallmentPrice()
     {
-        if (!$this->isPolicy() || count($this->getPayments()) == 0) {
+        if (!$this->isPolicy()) {
             return null;
         }
 
@@ -1112,6 +1112,15 @@ abstract class Policy
     public function getOutstandingPremium()
     {
         return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
+    }
+
+    public function isInitialPayment(\DateTime $date = null)
+    {
+        if ($this->areEqualToFourDp($this->getTotalSuccessfulPayments($date), $this->getPremiumInstallmentPrice())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function isFinalMonthlyPayment()
@@ -1726,7 +1735,7 @@ abstract class Policy
         return $connectionValues;
     }
 
-    public function getTotalSuccessfulPayments(\Datetime $date = null)
+    public function getTotalSuccessfulPayments(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -1741,9 +1750,9 @@ abstract class Policy
         return $totalPaid;
     }
 
-    public function getTotalExpectedPaidToDate($prefix = null, \Datetime $date = null)
+    public function getTotalExpectedPaidToDate(\DateTime $date = null)
     {
-        if (!$this->isValidPolicy($prefix) || !$this->getStart()) {
+        if (!$this->isPolicy() || !$this->getStart()) {
             return null;
         }
 
@@ -1768,14 +1777,31 @@ abstract class Policy
         return $expectedPaid;
     }
 
-    public function isPolicyPaidToDate($exact = true, $prefix = null, \Datetime $date = null)
+    public function getOutstandingPremiumToDate(\DateTime $date = null)
     {
         if (!$this->isPolicy()) {
             return null;
         }
 
         $totalPaid = $this->getTotalSuccessfulPayments($date);
-        $expectedPaid = $this->getTotalExpectedPaidToDate($prefix, $date);
+        $expectedPaid = $this->getTotalExpectedPaidToDate($date);
+
+        $diff = $expectedPaid - $totalPaid;
+        if ($diff < 0) {
+            return 0;
+        }
+
+        return $diff;
+    }
+
+    public function isPolicyPaidToDate($exact = true, \DateTime $date = null)
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        $totalPaid = $this->getTotalSuccessfulPayments($date);
+        $expectedPaid = $this->getTotalExpectedPaidToDate($date);
 
         if ($exact) {
             return $this->areEqualToTwoDp($expectedPaid, $totalPaid);
@@ -1785,7 +1811,7 @@ abstract class Policy
         }
     }
 
-    public function arePolicyScheduledPaymentsCorrect($prefix = null, \Datetime $date = null)
+    public function arePolicyScheduledPaymentsCorrect($prefix = null, \DateTime $date = null)
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);

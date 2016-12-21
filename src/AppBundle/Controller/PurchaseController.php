@@ -375,6 +375,11 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPayReceiveSuccessAction(Request $request)
     {
+        $this->get('logger')->info(sprintf(
+            'Judo Web Success ReceiptId: %s Ref: %s',
+            $request->get('ReceiptId'),
+            $request->get('Reference')
+        ));
         $dm = $this->getManager();
         $repo = $dm->getRepository(Payment::class);
         $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
@@ -386,18 +391,27 @@ class PurchaseController extends BaseController
             throw new AccessDeniedException('Unknown user');
         }
 
-        $policy = $this->get('app.judopay')->add(
-            $payment->getPolicy(),
+        $policy = $payment->getPolicy();
+        $this->get('app.judopay')->add(
+            $policy,
             $request->get('ReceiptId'),
             null,
             $request->get('CardToken'),
             Payment::SOURCE_WEB,
             JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
         );
-        $this->addFlash(
-            'success',
-            'Welcome to so-sure!'
-        );
+        if ($policy->isInitialPayment()) {
+            // TODO: Take to a welcome to so-sure page
+            $this->addFlash(
+                'success',
+                'Welcome to so-sure!'
+            );
+        } else {
+            $this->addFlash(
+                'success',
+                sprintf('Thanks for your payment of £%0.2f', $policy->getLastSuccessfulPaymentCredit()->getAmount())
+            );
+        }
 
         return $this->redirectToRoute('user_home');
     }
@@ -430,7 +444,14 @@ class PurchaseController extends BaseController
         }
 
         $this->addFlash('error', 'There was a problem processing your payment. You can try again.');
-
-        return $this->redirectToRoute('purchase_step_phone');
+        $user = $this->getUser();
+        if (!$user->hasActivePolicy()) {
+            return $this->redirectToRoute('purchase_step_phone');
+        } elseif ($user->hasUnpaidPolicy()) {
+            return $this->redirectToRoute('user_unpaid_policy');
+        } else {
+            // would expect 1 of the 2 above - default back to user home just in case
+            return $this->redirectToRoute('user_home');
+        }
     }
 }

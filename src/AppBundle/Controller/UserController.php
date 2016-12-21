@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\InvitationType;
@@ -34,6 +35,8 @@ class UserController extends BaseController
         $user = $this->getUser();
         if (!$user->hasActivePolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+        } elseif ($user->hasUnpaidPolicy()) {
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
         $policy = $user->getCurrentPolicy();
 
@@ -107,6 +110,41 @@ class UserController extends BaseController
 
         return array(
         );
+    }
+
+    /**
+     * @Route("/unpaid", name="user_unpaid_policy")
+     * @Template
+     */
+    public function unpaidPolicyAction(Request $request)
+    {
+        $user = $this->getUser();
+        $policy = $user->getCurrentPolicy();
+        if ($policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
+            throw new \Exception('Unpaid policy should only be triggered for monthly plans');
+        }
+        $amount = 0;
+        $webpay = null;
+        if (!$policy->isPolicyPaidToDate()) {
+            $amount = $policy->getOutstandingPremiumToDate();
+
+            $webpay = $this->get('app.judopay')->webpay(
+                $policy,
+                $amount,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent')
+            );
+        }
+
+        $data = [
+            'phone' => $policy->getPhone(),
+            'webpay_action' => $webpay ? $webpay['post_url'] : null,
+            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
+            'amount' => $amount,
+            'policy' => $policy,
+        ];
+
+        return $data;
     }
 
     /**

@@ -74,7 +74,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
 
-            $valid = $policy->isPolicyPaidToDate(true, $prefix, $validateDate);
+            $valid = $policy->isPolicyPaidToDate(true, $validateDate);
             $lines[] = sprintf('Policy %s %s paid to date', $policyNumber, $valid ? 'is' : 'is NOT');
             if (!$valid) {
                 $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
@@ -115,7 +115,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($policy->isCancelled()) {
                     continue;
                 }
-                if ($policy->isPolicyPaidToDate(true, $prefix, $validateDate) === false) {
+                if ($policy->isPolicyPaidToDate(true, $validateDate) === false) {
                     $lines[] = sprintf(
                         'Policy %s is not paid to date. Next attempt on %s. If unpaid, policy will be cancelled on %s',
                         $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
@@ -151,7 +151,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
     private function failurePaymentMessage($policy, $prefix, $date)
     {
         $totalPaid = $policy->getTotalSuccessfulPayments($date);
-        $expectedPaid = $policy->getTotalExpectedPaidToDate($prefix, $date);
+        $expectedPaid = $policy->getTotalExpectedPaidToDate($date);
         return sprintf(
             'Policy %s Paid £%0.2f Expected £%0.2f',
             $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
