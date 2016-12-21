@@ -1114,6 +1114,15 @@ abstract class Policy
         return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
     }
 
+    public function isInitialPayment(\DateTime $date = null)
+    {
+        if ($this->areEqualToFourDp($this->getTotalSuccessfulPayments($date), $this->getPremiumInstallmentPrice())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function isFinalMonthlyPayment()
     {
         if ($this->getPremiumPlan() != self::PLAN_MONTHLY) {
