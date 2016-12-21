@@ -591,6 +591,8 @@ class JudopayService
         $scheduledPayment->setPayment($payment);
         if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+            // will only be sent if card is expiring
+            $this->cardExpiringEmail($policy, $date);
         } else {
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
             // Very important to update status to unpaid as used by the app to update payment
@@ -620,6 +622,43 @@ class JudopayService
                 $this->failedPaymentSms($policy, $next);
             }
         }
+    }
+
+    /**
+     * Should only be called if payment is successful (e.g. card is not already expired)
+     *
+     * @param Policy    $policy
+     * @param \DateTime $date
+     *
+     * @return boolean true if email sent, false if card is not expiring next month
+     */
+    public function cardExpiringEmail(Policy $policy, \DateTime $date = null)
+    {
+        if (!$date) {
+            $nextMonth = new \DateTime();
+        } else {
+            $nextMonth = clone $date;
+        }
+        $nextMonth->add(new \DateInterval('P1M'));
+
+        if (!$policy->getUser()->getPaymentMethod()->isCardExpired($nextMonth)) {
+            return false;
+        }
+
+        $baseTemplate = sprintf('AppBundle:Email:policy/cardExpiring');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $this->mailer->sendTemplate(
+            sprintf('Your card is expiring next month'),
+            $policy->getUser()->getEmail(),
+            $htmlTemplate,
+            ['policy' => $policy],
+            $textTemplate,
+            ['policy' => $policy]
+        );
+
+        return true;
     }
 
     /**

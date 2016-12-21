@@ -668,4 +668,39 @@ class JudopayServiceTest extends WebTestCase
             $payment->getTotalCommission()
         );
     }
+
+    public function testCardExpiringEmail()
+    {
+        $this->clearEmail(static::$container);
+        $user = $this->createValidUser(static::generateEmail('testCardExpiringEmail', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            '4976 0000 0000 3436',
+            '12/20',
+            '452'
+        );
+        if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
+            throw new \Exception('Payment failed');
+        }
+
+        // @codingStandardsIgnoreStart
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
+            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+        );
+        // @codingStandardsIgnoreEnd
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertFalse(self::$judopay->cardExpiringEmail($policy));
+        $this->assertTrue(self::$judopay->cardExpiringEmail($policy, new \DateTime('2020-12-15')));
+    }
 }
