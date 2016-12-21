@@ -25,7 +25,69 @@
 {% endblock %}
 
 {% block body %}
-    <section class="view-quote background-image-3 vertical-align-wrap">
+
+    <section class="background-image-1 vertical-align-wrap">
+        <div class="container vertical-align-middle">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1">
+                    <div class="panel panel-primary quote-panel">
+                        <div class="row">
+                            
+                            <div class="col-xs-12 col-md-6 quote-panel--left">
+                                <p>Device</p>
+                                <h4>{{ phone }}</h4>
+                                {% if phones | length > 1 %}
+                                    <div class="memory-select-text">
+                                        Or do you have:
+                                        {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-link">{{ phone_mem.memory }}GB</a>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}                  
+                                <p>Monthly Cost</p>
+                                <h2>£{{ phone_price.monthlyPremiumPrice }}</h2>                    
+                                <p>What You Could Get Back <a href="https://help.wearesosure.com/hc/en-us/articles/208238055-How-can-I-increase-my-Reward-Pot-" target="_blank"><i class="fa fa-question-circle"></i></a></p>
+                                <h4>£{{ phone_price.maxPot }} with {{ phone_price.maxConnections }} connections</h4>
+                                <p>Covered for</p>
+                                <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
+                                <p><a href="#" data-toggle="modal" data-target="#more-info">More details (including excess)</a></p>     
+                                <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">BUY NOW</a>
+                                {# <a class="btn btn-primary btn-rounded btn-rounded--hollow" href="">How it works</a> #}
+                                <div class="visible-xs-block">
+                                    <h4>OR</h4>
+                                    <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img></a> 
+                                    <a class="ga-outbound-click" href="{{ google_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img></a>                                   
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-6 quote-panel--right">
+                                <ul class="text-left list-unstyled">
+                                    <li>
+                                        <h3>Next-day replacement</h3>
+                                        <p>Once your claim is approved, we aim to get you a replacement phone the next working day.</p>
+                                    </li>
+                                    <li>
+                                        <h3>Exceptional support</h3>
+                                        <p>We know that accidents can happen at any time. That's why we're here for you whenever you need us.</p>
+                                    </li>
+                                    <li>
+                                        <h3>Money back when you don't claim</h3>
+                                        <p>Connect with your friends and provided none of you claim you could get up to 80% money back.</p>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 quote-panel--footer">
+                                <p class="text-center">Not your device? Select another phone <a href="/#get-quote">here</a>.</p>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </section>
+{#     <section class="view-quote background-image-3 vertical-align-wrap">
                 <div class="container vertical-align-middle">
                     <div class="row">
                         <div class="col-md-12">
@@ -106,7 +168,7 @@
             </div>
         </div>
       </div>
-    </section>
+    </section> #}
 
 {#     <section class="press banner">
         <div class="container">
@@ -161,7 +223,7 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/howItWorksv2.html.twig' %}
+    {% include 'AppBundle::Default/howItWorksv3.html.twig' %}
 
 
     <section class="footer-cta alt-brand-gradient">
