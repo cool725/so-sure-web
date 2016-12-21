@@ -429,7 +429,10 @@ class PurchaseController extends BaseController
             } else {
                 $this->addFlash(
                     'success',
-                    sprintf('Thanks for your payment of £%0.2f', $policy->getLastSuccessfulPaymentCredit()->getAmount())
+                    sprintf(
+                        'Thanks for your payment of £%0.2f',
+                        $policy->getLastSuccessfulPaymentCredit()->getAmount()
+                    )
                 );
             }
         }
