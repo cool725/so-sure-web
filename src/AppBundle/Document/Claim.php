@@ -669,6 +669,16 @@ class Claim
         return $total;
     }
 
+    public function totalChargesWithVat()
+    {
+        $total = 0;
+        foreach ($this->getCharges() as $charge) {
+            $total += $charge->getAmountWithVat();
+        }
+
+        return $total;
+    }
+
     public function addCharge(Charge $charge)
     {
         $charge->setClaim($this);
