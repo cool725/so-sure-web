@@ -312,13 +312,13 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
         $charge = new Charge();
-        $charge->setAmount(1.27);
+        $charge->setAmount(0.90);
         $claim->addCharge($charge);
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
-        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->reciperoFee = 1.08;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
 
