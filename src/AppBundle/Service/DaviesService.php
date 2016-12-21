@@ -275,7 +275,7 @@ class DaviesService
 
                 $claim->setExcess($daviesClaim->excess);
                 $claim->setIncurred($daviesClaim->incurred);
-                $claim->setClaimHandlingFees($daviesClaim->claimHandlingFees);
+                $claim->setClaimHandlingFees($daviesClaim->handlingFees);
                 $claim->setReservedValue($daviesClaim->reserved);
 
                 $claim->setAccessories($daviesClaim->accessories);
