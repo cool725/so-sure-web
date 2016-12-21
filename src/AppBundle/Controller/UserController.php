@@ -148,6 +148,28 @@ class UserController extends BaseController
     }
 
     /**
+     * @Route("/card-details", name="user_card_details")
+     * @Template
+     */
+    public function cardDetailsAction(Request $request)
+    {
+        $user = $this->getUser();
+        $webpay = $this->get('app.judopay')->webRegister(
+            $user,
+            $request->getClientIp(),
+            $request->headers->get('User-Agent')
+        );
+
+        $data = [
+            'webpay_action' => $webpay ? $webpay['post_url'] : null,
+            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
+            'user' => $user,
+        ];
+
+        return $data;
+    }
+
+    /**
      * @Route("/fb", name="user_facebook")
      * @Template
      */
