@@ -47,7 +47,7 @@ class DaviesServiceTest extends WebTestCase
         self::$phoneB = $phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
     }
 
-    public function startUp()
+    public function setUp()
     {
         self::$daviesService->clearErrors();
     }
