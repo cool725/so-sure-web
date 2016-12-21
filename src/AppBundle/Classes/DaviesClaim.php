@@ -2,9 +2,12 @@
 namespace AppBundle\Classes;
 
 use AppBundle\Document\Claim;
+use AppBundle\Document\CurrencyTrait;
 
 class DaviesClaim
 {
+    use CurrencyTrait;
+
     public $client;
     public $claimNumber;
     public $insuredName;
@@ -60,6 +63,16 @@ class DaviesClaim
         }
 
         return $this->reserved;
+    }
+
+    public function isIncurredValueCorrect()
+    {
+        // TODO: May need to have a check if certain values are present prior to running this check
+        // but will see by experimentation
+        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost +
+            $this->transactionFees + $this->handlingFees + $this->reciperoFee - $this->excess;
+
+        return $this->areEqualToTwoDp($this->incurred, $total);
     }
 
     public function getReplacementPhoneDetails()

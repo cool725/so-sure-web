@@ -43,6 +43,8 @@ class DaviesService
 
     protected $mailer;
 
+    private $errors = [];
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -71,6 +73,16 @@ class DaviesService
         $this->mailer = $mailer;
     }
 
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    public function clearErrors()
+    {
+        $this->errors = [];
+    }
+
     public function import()
     {
         $lines = [];
@@ -88,6 +100,7 @@ class DaviesService
                 $processed = false;
                 $this->logger->error(sprintf('Error processing %s. Moving to failed. Ex: %s', $key, $e->getMessage()));
             }
+            $this->claimsDailyEmail();
 
             if ($processed) {
                 $this->moveS3($key, self::PROCESSED_FOLDER);
@@ -247,7 +260,7 @@ class DaviesService
                 $repo = $this->dm->getRepository(Claim::class);
                 $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
                 if (!$claim) {
-                    throw new \Exception(sprintf('Unable to locate claim %s', $daviesClaim->claimNumber));
+                    throw new \Exception(sprintf('Unable to locate claim %s in db', $daviesClaim->claimNumber));
                 }
 
                 $this->validateClaimDetails($claim, $daviesClaim);
@@ -295,6 +308,7 @@ class DaviesService
                 $this->claimsService->processClaim($claim);
             } catch (\Exception $e) {
                 $success = false;
+                $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
                 $this->logger->error(sprintf('Error processing file %s', $key), ['exception' => $e]);
             }
         }
@@ -323,37 +337,54 @@ class DaviesService
                 $percent
             ));
         } elseif ($percent < 80) {
-            $this->logger->warning(sprintf(
+            $msg = sprintf(
                 'Claim %s: %s does not match expected insuredName %s (match %s)',
                 $daviesClaim->claimNumber,
                 $daviesClaim->insuredName,
                 $claim->getPolicy()->getUser()->getName(),
                 $percent
-            ));
+            );
+            $this->logger->warning($msg);
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
         if (!$this->postcodeCompare(
             $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode(),
             $daviesClaim->riskPostCode
         )) {
-            $this->logger->warning(sprintf(
+            $msg = sprintf(
                 'Claim %s: %s does not match expected postcode %s',
                 $daviesClaim->claimNumber,
                 $daviesClaim->riskPostCode,
                 $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode()
-            ));
+            );
+            $this->logger->warning($msg);
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
         // Open Non-Warranty Claims are expected to either have a total incurred value or a reserved value
         if ($daviesClaim->isOpen() && !$daviesClaim->isClaimWarrantyOrExtended() &&
             $this->areEqualToTwoDp($daviesClaim->getIncurred(), 0) &&
             $this->areEqualToTwoDp($daviesClaim->getReserved(), 0)) {
-            $this->mailer->sendTemplate(
-                sprintf('Claim %s does not have a reserved value', $daviesClaim->claimNumber),
-                'tech@so-sure.com',
-                'AppBundle:Email:davies/missingReserve.html.twig',
-                ['claim' => $claim, 'daviesClaim' => $daviesClaim]
+            $msg = sprintf('Claim %s does not have a reserved value', $daviesClaim->claimNumber);
+            $this->logger->warning($msg);
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        }
+
+        if (!$daviesClaim->isIncurredValueCorrect()) {
+            $msg = sprintf('Claim %s does not have the correct incurred value', $daviesClaim->claimNumber);
+            $this->logger->warning($msg);
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        }
+
+        if (!$this->areEqualToTwoDp($claim->totalCharges(), $daviesClaim->reciperoFee)) {
+            $msg = sprintf(
+                'Claim %s does not have the correct recipero fee. Expected £%0.2f',
+                $daviesClaim->claimNumber,
+                $claim->totalCharges()
             );
+            $this->logger->warning($msg);
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
     }
 
@@ -409,12 +440,9 @@ class DaviesService
             $replacementDay = $this->startOfDay(clone $policy->getImeiReplacementDate());
             $twoBusinessDays = $this->addBusinessDays($replacementDay, 2);
             if ($now >= $twoBusinessDays) {
-                $this->mailer->sendTemplate(
-                    sprintf('Claim %s is missing a replacement recevied date', $daviesClaim->claimNumber),
-                    'tech@so-sure.com',
-                    'AppBundle:Email:davies/missingReplacementDate.html.twig',
-                    ['policy' => $policy, 'daviesClaim' => $daviesClaim]
-                );
+                $msg = sprintf('Claim %s is missing a replacement recevied date', $daviesClaim->claimNumber);
+                $this->logger->warning($msg);
+                $this->errors[$daviesClaim->claimNumber][] = $msg;
             }
         }
     }
@@ -432,7 +460,7 @@ class DaviesService
             sprintf('Daily Claims'),
             'tech@so-sure.com',
             'AppBundle:Email:davies/dailyEmail.html.twig',
-            ['claims' => $claims, 'latestFile' => $latestFile]
+            ['claims' => $claims, 'latestFile' => $latestFile, 'errors' => $this->errors]
         );
 
         return count($claims);
