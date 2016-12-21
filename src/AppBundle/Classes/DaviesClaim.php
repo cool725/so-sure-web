@@ -67,6 +67,16 @@ class DaviesClaim
 
     public function isIncurredValueCorrect()
     {
+        $expected = $this->getExpectedIncurred();
+        if ($expected === null) {
+            return null;
+        }
+
+        return $this->areEqualToTwoDp($this->incurred, $this->getExpectedIncurred());
+    }
+
+    public function getExpectedIncurred()
+    {
         // Incurred fee only appears to be populated at the point where the phone replacement cost is known,
         if (!$this->phoneReplacementCost || $this->areEqualToTwoDp(0, $this->phoneReplacementCost)) {
             return null;
@@ -75,7 +85,7 @@ class DaviesClaim
         $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost +
             $this->transactionFees + $this->handlingFees + $this->reciperoFee - $this->excess;
 
-        return $this->areEqualToTwoDp($this->incurred, $total);
+        return $this->toTwoDp($total);
     }
 
     public function getReplacementPhoneDetails()

@@ -62,9 +62,7 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
             $data = [];
             foreach ($charges as $charge) {
                 $charge->setInvoice($invoice);
-                // add vat
-                $actualAmount = $this->toTwoDp($charge->getAmount() * (1 + $this->getCurrentVatRate()));
-                $item = new InvoiceItem($actualAmount, 1);
+                $item = new InvoiceItem($charge->getAmountWithVat(), 1);
                 $item->setDescription(sprintf(
                     'ClaimsCheck for %s on %s',
                     $charge->getClaim() ? $charge->getClaim()->getNumber() : 'unknown claim number',

@@ -372,7 +372,12 @@ class DaviesService
         }
 
         if ($daviesClaim->isIncurredValueCorrect() === false) {
-            $msg = sprintf('Claim %s does not have the correct incurred value', $daviesClaim->claimNumber);
+            $msg = sprintf(
+                'Claim %s does not have the correct incurred value. Expected %0.2f Actual %0.2f',
+                $daviesClaim->claimNumber,
+                $daviesClaim->getExpectedIncurred(),
+                $daviesClaim->incurred
+            );
             $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }

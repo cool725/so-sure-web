@@ -13,6 +13,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class Charge
 {
+    use CurrencyTrait;
+
     const TYPE_ADDRESS = 'address';
     const TYPE_SMS = 'sms';
     const TYPE_GSMA = 'gsma';
@@ -170,6 +172,11 @@ class Charge
     public function setAmount($amount)
     {
         $this->amount = $amount;
+    }
+
+    public function getAmountWithVat()
+    {
+        return $this->toTwoDp($this->getAmount() * (1 + $this->getCurrentVatRate()));
     }
 
     public function getDetails()
