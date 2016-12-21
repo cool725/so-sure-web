@@ -382,11 +382,12 @@ class DaviesService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$this->areEqualToTwoDp($claim->totalCharges(), $daviesClaim->reciperoFee)) {
+        if (!$this->areEqualToTwoDp($claim->totalChargesWithVat(), $daviesClaim->reciperoFee)) {
             $msg = sprintf(
-                'Claim %s does not have the correct recipero fee. Expected £%0.2f',
+                'Claim %s does not have the correct recipero fee. Expected £%0.2f Actual £%0.2f',
                 $daviesClaim->claimNumber,
-                $claim->totalCharges()
+                $claim->totalChargesWithVat(),
+                $daviesClaim->reciperoFee
             );
             $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;

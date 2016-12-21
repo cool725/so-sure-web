@@ -61,7 +61,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1.08, $davies->reciperoFee);
         $this->assertEquals(220, $davies->reserved);
         $this->assertEquals(50, $davies->excess);
-        $this->assertEquals(275, $davies->claimHandlingFees);
+        $this->assertEquals(275, $davies->handlingFees);
         $this->assertEquals(0.75, $davies->transactionFees);
         $this->assertEquals(250, $davies->phoneReplacementCost);
         $this->assertEquals(1.3, $davies->accessories);
