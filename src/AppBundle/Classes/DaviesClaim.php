@@ -2,9 +2,12 @@
 namespace AppBundle\Classes;
 
 use AppBundle\Document\Claim;
+use AppBundle\Document\CurrencyTrait;
 
 class DaviesClaim
 {
+    use CurrencyTrait;
+
     public $client;
     public $claimNumber;
     public $insuredName;
@@ -60,6 +63,29 @@ class DaviesClaim
         }
 
         return $this->reserved;
+    }
+
+    public function isIncurredValueCorrect()
+    {
+        $expected = $this->getExpectedIncurred();
+        if ($expected === null) {
+            return null;
+        }
+
+        return $this->areEqualToTwoDp($this->incurred, $this->getExpectedIncurred());
+    }
+
+    public function getExpectedIncurred()
+    {
+        // Incurred fee only appears to be populated at the point where the phone replacement cost is known,
+        if (!$this->phoneReplacementCost || $this->areEqualToTwoDp(0, $this->phoneReplacementCost)) {
+            return null;
+        }
+
+        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost +
+            $this->transactionFees + $this->handlingFees + $this->reciperoFee - $this->excess;
+
+        return $this->toTwoDp($total);
     }
 
     public function getReplacementPhoneDetails()
@@ -163,7 +189,7 @@ class DaviesClaim
             $this->accessories = $this->nullIfBlank($data[++$i]);
             $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
             $this->transactionFees = $this->nullIfBlank($data[++$i]);
-            $this->claimHandlingFees = $this->nullIfBlank($data[++$i]);
+            $this->handlingFees = $this->nullIfBlank($data[++$i]);
             $this->excess = $this->nullIfBlank($data[++$i]);
             $this->reserved = $this->nullIfBlank($data[++$i]);
             $this->reciperoFee = $this->nullIfBlank($data[++$i]);

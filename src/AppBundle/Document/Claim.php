@@ -261,6 +261,11 @@ class Claim
      */
     protected $shippingAddress;
 
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="Charge", mappedBy="claim", cascade={"persist"})
+     */
+    protected $charges = array();
+
     public function __construct()
     {
         $this->recordedDate = new \DateTime();
@@ -647,6 +652,37 @@ class Claim
     public function setShippingAddress($shippingAddress)
     {
         $this->shippingAddress = $shippingAddress;
+    }
+
+    public function getCharges()
+    {
+        return $this->charges;
+    }
+
+    public function totalCharges()
+    {
+        $total = 0;
+        foreach ($this->getCharges() as $charge) {
+            $total += $charge->getAmount();
+        }
+
+        return $total;
+    }
+
+    public function totalChargesWithVat()
+    {
+        $total = 0;
+        foreach ($this->getCharges() as $charge) {
+            $total += $charge->getAmountWithVat();
+        }
+
+        return $total;
+    }
+
+    public function addCharge(Charge $charge)
+    {
+        $charge->setClaim($this);
+        $this->charges[] = $charge;
     }
 
     public function isMonetaryClaim($includeOpen = false)

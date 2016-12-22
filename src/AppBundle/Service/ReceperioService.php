@@ -364,8 +364,10 @@ class ReceperioService extends BaseImeiService
                 $charge->setType(Charge::TYPE_GSMA);
                 $charge->setUser($user);
                 $charge->setDetails($imei);
-                $charge->setClaim($claim);
                 $charge->setHandler($handler);
+                if ($claim) {
+                    $claim->addCharge($charge);
+                }
                 $this->dm->persist($charge);
                 $this->dm->flush();
             }
@@ -466,7 +468,9 @@ class ReceperioService extends BaseImeiService
                 if ($policy) {
                     $charge->setUser($policy->getUser());
                 }
-                $charge->setClaim($claim);
+                if ($claim) {
+                    $claim->addCharge($charge);
+                }
                 $charge->setHandler($handler);
                 $charge->setDetails($imei);
                 $this->dm->persist($charge);

@@ -9,6 +9,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Address;
 use AppBundle\Document\User;
+use AppBundle\Document\Charge;
 
 use AppBundle\Classes\DaviesClaim;
 
@@ -22,6 +23,7 @@ class DaviesServiceTest extends WebTestCase
     protected static $container;
     protected static $dm;
     protected static $daviesService;
+    protected static $phone;
     protected static $phoneA;
     protected static $phoneB;
 
@@ -40,8 +42,14 @@ class DaviesServiceTest extends WebTestCase
 
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $phoneRepo = self::$dm->getRepository(Phone::class);
+        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneA = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneB = $phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
+    }
+
+    public function setUp()
+    {
+        self::$daviesService->clearErrors();
     }
 
     public function tearDown()
@@ -139,5 +147,188 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->riskPostCode = 'AAA';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateClaimDetailsInvalidPolicyNumber()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = -1;
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateClaimDetailsInvalidName()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr Patrick McAndrew';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+    }
+
+    public function testValidateClaimDetailsInvalidPostcode()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $matches = preg_grep('/does not match expected postcode/', self::$daviesService->getErrors()['1']);
+        $this->assertGreaterThan(0, count($matches));
+    }
+
+    public function testValidateClaimDetailsMissingReserved()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $matches = preg_grep('/does not have a reserved value/', self::$daviesService->getErrors()['1']);
+        $this->assertGreaterThan(0, count($matches));
+    }
+
+    public function testValidateClaimDetailsReservedPresent()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 1;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $matches = preg_grep('/does not have a reserved value/', self::$daviesService->getErrors()['1']);
+        $this->assertEquals(0, count($matches));
+    }
+
+    public function testValidateClaimDetailsIncurredPresent()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $matches = preg_grep('/does not have a reserved value/', self::$daviesService->getErrors()['1']);
+        $this->assertEquals(0, count($matches));
+    }
+
+    public function testValidateClaimDetailsIncurredCorrect()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 0.68;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+        $daviesClaim->phoneReplacementCost = 1.07;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $matches = preg_grep('/does not have the correct incurred value/', self::$daviesService->getErrors()['1']);
+        $this->assertEquals(0, count($matches));
+    }
+
+    public function testValidateClaimDetailsIncurredIncorrect()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+        $daviesClaim->phoneReplacementCost = 1.07;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $matches = preg_grep('/does not have the correct incurred value/', self::$daviesService->getErrors()['1']);
+        $this->assertGreaterThan(0, count($matches));
+    }
+
+    public function testValidateClaimDetailsReciperoFee()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+        $charge = new Charge();
+        $charge->setAmount(0.90);
+        $claim->addCharge($charge);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->reciperoFee = 1.08;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $matches = preg_grep('/does not have the correct recipero fee/', self::$daviesService->getErrors()['1']);
+        $this->assertEquals(0, count($matches));
+
+        $daviesClaim->reciperoFee = 1.26;
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $matches = preg_grep('/does not have the correct recipero fee/', self::$daviesService->getErrors()['1']);
+        $this->assertGreaterThan(0, count($matches));
     }
 }

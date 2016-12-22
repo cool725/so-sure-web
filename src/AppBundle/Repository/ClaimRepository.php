@@ -23,6 +23,7 @@ class ClaimRepository extends DocumentRepository
         $startWeek->sub(new \DateInterval(sprintf('P%dD', $days)));
 
         $qb = $this->createQueryBuilder();
+        $qb->field('notificationDate')->notEqual(null);
 
         /*
          * Aleks requested to see all claims for the time being...

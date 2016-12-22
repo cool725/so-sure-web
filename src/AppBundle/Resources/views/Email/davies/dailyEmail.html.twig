@@ -22,6 +22,20 @@
                     </a> - {{ claim.recordedDate|date('d M Y H:i', 'Europe/London') }} - {{ claim.status }} / {{ claim.type }}</p>
            {% endfor %}
 		   </div>
+
+		   <div style="font-size: 14px; text-align: left;"><font face="arial, helvetica neue, helvetica, sans-serif">
+		   {% if errors|length > 0 %}
+			   <h3>Warnings/Errors in last import</h3>
+			{% for claimNumber,msgs in errors %}
+				 <p>Claim: {{ claimNumber }}</p>
+					 <ul>
+						 {% for msg in msgs %}
+							 <li>{{ msg }}</li>
+						 {% endfor %}
+					 </ul>
+			 {% endfor %}
+		   {% endif %}
+		   </div>
 		</div>
 	{{ macros.end_table() }}
 	{{ macros.email_button_table(url('admin_claims'), "View Claims", "View Claims")}}
