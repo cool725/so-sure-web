@@ -48,7 +48,7 @@ $(function(){
 
     $('#scode-form-submit').click(function() {
         var url = '/user/scode/' + $('#scode-form-code').val();
-        var token = '';
+        var token = $(this).data('token');
         $.ajax({
             url: url,
             type: 'POST',

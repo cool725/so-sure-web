@@ -95,6 +95,7 @@ class UserController extends BaseController
             'policy' => $user->getCurrentPolicy(),
             'email_form' => $emailInvitationForm->createView(),
             'invitation_form' => $invitationForm->createView(),
+            'token' => $this->get('form.csrf_provider')->generateCsrfToken('default'),
         );
     }
 
@@ -241,8 +242,16 @@ class UserController extends BaseController
      * @Route("/scode/{code}", name="user_scode")
      * @Method({"POST"})
      */
-    public function scodeAction($code)
+    public function scodeAction(Request $request, $code)
     {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Please reload this page and try again',
+                404
+            );
+        }
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(SCode::class);
         $scode = $repo->findOneBy(['code' => $code]);
