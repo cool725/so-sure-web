@@ -8,9 +8,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\SCode;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\InvitationType;
@@ -243,7 +245,7 @@ class UserController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(SCode::class);
         $scode = $repo->findOneBy(['code' => $code]);
-        if (!$scode || !SCode::isValidSCode($scode)) {
+        if (!$scode || !SCode::isValidSCode($scode->getCode())) {
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_NOT_FOUND,
                 'SCode is missing or been withdrawn',
@@ -251,13 +253,16 @@ class UserController extends BaseController
             );
         }
 
-        $policy = $user->getCurrentPolicy();
-        $invitation = $invitationService->inviteBySCode($policy, $scode);
-
-        return $this->getSuccessJsonResponse(sprintf(
+        $policy = $this->getUser()->getCurrentPolicy();
+        $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
+        $message = sprintf(
             '%s has been invited',
             $invitation->getInvitee()->getName()
-        ));
+        );
+
+        $this->addFlash('success', $message);
+
+        return $this->getSuccessJsonResponse($message);
     }
 
     /**

@@ -44,5 +44,29 @@ $(function(){
         text: $('.btn-clipboard').data('share-text'),
         shareIn: 'popup',
         showCount: false,
-    })
+    });
+
+    $('#scode-form-submit').click(function() {
+        var url = '/user/scode/' + $('#scode-form-code').val();
+        var token = '';
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: { token: token }
+        }).done(function(result) {
+            if (result.code == 0) {
+                window.location = window.location;
+            } else if (result.description) {
+                $('#scode-form-code-err').text(result.description);
+            } else {
+                $('#scode-form-code-err').text('Unknown error, please try again');
+            }
+        }).fail(function(result) {
+            if (result.description) {
+                $('#scode-form-code-err').text(result.description);
+            } else {
+                $('#scode-form-code-err').text('Unknown error, please try again');
+            }
+        });
+    });
 });

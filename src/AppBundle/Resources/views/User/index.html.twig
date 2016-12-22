@@ -16,8 +16,8 @@
             This account page is still a work in progress, so it's a bit limited at the moment. However, if you have any ideas of what might be useful to you, we'd love to
             <a href="mailto:hello@wearesosure.com">hear them</a>.
         </p>
-        <p>
-            Have an <button type="button" class="btn btn-link" data-toggle="modal" data-target="#scodeModal">invitation code</button> from a friend?
+        <p class="text-right">
+            Have an <button type="button" class="btn btn-link" data-toggle="modal" data-target="#scodeModal" style="padding: 0; font-size: 16px;">invitation code</button> from a friend?
         </p>
         {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
         <div class="col-md-12">
@@ -110,15 +110,16 @@
           </div>
           <div class="modal-body">
             <p>Enter the unique 8-digit code below and we'll connect you.</p>
-            <form>
+            <form id="scode-form">
                 <div class="row">
                     <div class="col-sm-12">
-                        <input type="text" placeholder="Enter code"></input>
+                        <div><input type="text" placeholder="Enter code" id="scode-form-code"></input></div>
+                        <div class="help-block with-errors" id="scode-form-code-err"></div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-success">Submit</button>
+                        <button type="button" class="btn btn-success" id="scode-form-submit">Submit</button>
                     </div>
                 </div>
             </form>
