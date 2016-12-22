@@ -62,10 +62,20 @@ ul, li {
 
 .so-sure-logo-xmas {
     background: transparent no-repeat center top url("/images/logo/xmas-full-logo.svg");
-    background-size: 130px;
+    background-size: 90px;
     width: 130px;
     height: 41px;
 }
+
+@media (min-width: 768px) { 
+
+    .so-sure-logo-xmas {
+      background-size: 130px;
+      width: 130px;
+      height: 41px;
+    }
+}
+
 
 
 h1, h2, h3, h4, h5, h6 {
