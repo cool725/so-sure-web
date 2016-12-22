@@ -33,7 +33,8 @@ class SCodeController extends BaseController
 
             // make sure to get policy user in code first rather than in twig in case policy/user was deleted
             if (!$scode ||
-                (in_array($scode->getType(), [SCode::TYPE_STANDARD, SCode::TYPE_MULTIPAY]) && !$scode->getPolicy()->getUser())) {
+                (in_array($scode->getType(), [SCode::TYPE_STANDARD, SCode::TYPE_MULTIPAY]) &&
+                !$scode->getPolicy()->getUser())) {
                 throw new \Exception('Unknown scode');
             }
         } catch (\Exception $e) {
