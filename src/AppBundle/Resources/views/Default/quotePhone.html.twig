@@ -21,7 +21,14 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets 'bundles/app/css/Default/index.css' 'bundles/app/css/Default/quotePhone.css' 'components/seiyria-bootstrap-slider/bootstrap-slider.min.css' 'bundles/app/css/Default/connections.css' 'bundles/app/css/Default/scrollindicator.css' %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    {% stylesheets 
+    'bundles/app/css/Default/index.css' 
+    'bundles/app/css/Default/quotePhone.css' 
+    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css' 
+    'bundles/app/css/Default/connections.css' 
+    'bundles/app/css/Default/scrollindicator.css' 
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
@@ -29,11 +36,11 @@
     <section class="background-image-1 vertical-align-wrap">
         <div class="container vertical-align-middle">
             <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1">
-                    <div class="panel panel-primary quote-panel">
+                <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 view-quote">
+                    <div class="panel panel-primary">
                         <div class="row">
                             
-                            <div class="col-xs-12 col-md-6 quote-panel--left">
+                            <div class="col-xs-12 col-md-6 view-quote--left">
                                 <p>Device</p>
                                 <h4>{{ phone }}</h4>
                                 {% if phones | length > 1 %}
@@ -52,14 +59,14 @@
                                 <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
                                 <p><a href="#" data-toggle="modal" data-target="#more-info">More details (including excess)</a></p>     
                                 <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">BUY NOW</a>
-                                {# <a class="btn btn-primary btn-rounded btn-rounded--hollow" href="">How it works</a> #}
+                                <a id="learn-more-btn" class="btn btn-primary btn-rounded btn-rounded--hollow" href="#">How it works</a>
                                 <div class="visible-xs-block">
                                     <h4>OR</h4>
                                     <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img></a> 
                                     <a class="ga-outbound-click" href="{{ google_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img></a>                                   
                                 </div>
                             </div>
-                            <div class="col-xs-12 col-md-6 quote-panel--right">
+                            <div class="col-xs-12 col-md-6 view-quote--right">
                                 <ul class="text-left list-unstyled">
                                     <li>
                                         <h3>Next-day replacement</h3>
@@ -78,7 +85,7 @@
 
                         </div>
                         <div class="row">
-                            <div class="col-md-12 quote-panel--footer">
+                            <div class="col-md-12 view-quote--footer">
                                 <p class="text-center">Not your device? Select another phone <a href="/#get-quote">here</a>.</p>
                             </div>
                         </div>
