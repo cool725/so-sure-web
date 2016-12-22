@@ -87,88 +87,7 @@
             </div>
         </div>
     </section>
-{#     <section class="view-quote background-image-3 vertical-align-wrap">
-                <div class="container vertical-align-middle">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="col-md-6 text-left main-cta">
-                              <h2>Next-day replacement</h2>
-                              <p class="lead">
-                                Once your claim is approved, we aim to get you a replacement phone the next working day.
-                              </p>
-                              <h2>Exceptional support</h2>
-                              <p class="lead">
-                                We know that accidents can happen at any time. That's why we're here for you whenever you need us.
-                              </p>
-                              <h2>Money back when you don't claim</h2>
-                              <p class="lead">
-                                Connect with your friends and provided none of you claim you could get up to 80% money back.
-                              </p>
-                              <div class="explainer-video-thumb">
-                                  <a class="explainer-video-view-thumb" data-toggle="modal" data-target="#modal-fullscreen">
-                                      <div class="explainer-video-frame-thumb">
-                                          <div class="explainer-video-overlay"></div>
-                                      </div>
-                                      <p class="dark-bg-link">
-                                        Learn how can you get money back
-                                      </p>
-                                  </a>
-                                  <p>
-                                  </p>
-                              </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h3 class="text-center" style="color: #fff;">Your quote</h3>
-                                <div class="row">
-                                <div class="panel panel-primary">
-                                  <div class="col-md-12">
-                                    <div class="quote-panel-left">
-                                            <span>
-                                                <p>Device</p>
-                                                <h4>{{ phone }}</h4>
-                                                {% if phones | length > 1 %}
-                                                    <div class="memory-select-text">
-                                                        Or do you have:
-                                                        {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-link">{{ phone_mem.memory }}GB</a>
-                                                        {% endfor %}
-                                                    </div>
-                                                {% endif %}
-                                                <br>
-                                                <p>Monthly Cost</p>
-                                                <h4>£{{ phone_price.monthlyPremiumPrice }}</h4>
-                                                <br>
-                                                <p>What You Could Get Back <a href="https://help.wearesosure.com/hc/en-us/articles/208238055-How-can-I-increase-my-Reward-Pot-" target="_blank"><i class="fa fa-question-circle"></i></a></p>
-                                                <h4>£{{ phone_price.maxPot }}
-                                                    with
-                                                    {{ phone_price.maxConnections }}
-                                                    connections</h4>
-                                                <br>
-                                                <p>Covered for</p>
-                                                <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
-                                                <p>
-                                                    <a href="#" data-toggle="modal" data-target="#more-info">More details (including excess)</a>
-                                                </p>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="row" style="font-size: 14px;  width: 100%; margin: 0;">
-                                        <div class="col-sm-12" style="border-top: 2px solid #efefef; padding-top: 10px;">
-                                            <p class="text-center">
-                                                Not your device? Select another phone
-                                                <a href="/#get-quote">here</a>.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-      </div>
-    </section> #}
+
 
 {#     <section class="press banner">
         <div class="container">
@@ -193,9 +112,9 @@
                 </div>
             </div>
         </div>
-    </section>  #}   
+    </section>     #}
 
-    <section class="banner start-purchase">
+  {#   <section class="banner start-purchase">
         <div class="container">
             <div class="row">
                 <div class="col-sm-4 text-left">
@@ -221,31 +140,49 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> #}
 
     {% include 'AppBundle::Default/howItWorksv3.html.twig' %}
 
+    <section class="press banner">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2">
+                    <h4>Featured in</h4>
+                </div>
+                <div class="col-sm-2">
+                    <a href="https://www.theguardian.com/technology/2016/sep/18/chatbots-talk-town-interact-humans-technology-silicon-valley" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/g@2x.png" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></img></a>
+                </div>
+                <div class="col-sm-2">
+                    <a href="https://www.ft.com/content/6755beb8-320c-11e6-bda0-04585c31b153" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/ft@2x.png" alt="Financial Times - Innovation to watch: Friends based insurance"></img></a>
+                </div>
+                <div class="col-sm-2">
+                    <a href="http://www.postonline.co.uk/post/news/2466996/so-sure-prepares-to-launch-revolutionary-insurance-model" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/ip@2x.png" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></img></a>
+                </div>
+                <div class="col-sm-2">
+                    <h4>Awarded by</h4>
+                </div>
+                <div class="col-sm-2">
+                    <a href="http://www.postevents.co.uk/technologyawards/static/shortlist-1" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/di@2x.png" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award"></img></a>
+                </div>
+            </div>
+        </div>
+    </section>        
 
     <section class="footer-cta alt-brand-gradient">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-8 text-left">
-          <h2>Still not sure?</h2>
-          <p class="lead">
-            Get in touch, we will usually respond within 2 minutes.
-          </p>
-          </div>
-          <div class="col-md-2 text-center">
-            <a class="btn btn-primary" id="open-intercom" href="mailto:bjo63djg@incoming.intercom.io">Chat with us
-              <i class="fa fa-comments"></i>
-            </a>
-          </div>
-          <div class="col-md-2 text-center">
-            <a class="btn btn-info" id="help-centre" href="https://help.wearesosure.com" target="_blank">Visit Help Centre
-              <i class="fa fa-info-circle"></i>
-            </a>
-          </div>
-          </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 text-left">
+                    <h2>Still not sure?</h2>
+                    <p class="lead">Get in touch, we will usually respond within 2 minutes.</p>
+                </div>
+                <div class="col-md-2 text-center">
+                    <a class="btn btn-primary" id="open-intercom" href="mailto:bjo63djg@incoming.intercom.io">Chat with us <i class="fa fa-comments"></i></a>
+                </div>
+                <div class="col-md-2 text-center">
+                    <a class="btn btn-info" id="help-centre" href="https://help.wearesosure.com" target="_blank">Visit Help Centre <i class="fa fa-info-circle"></i></a>
+                </div>
+            </div>
         </div>
     </section>
 
