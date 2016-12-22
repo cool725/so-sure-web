@@ -1,65 +1,65 @@
 /* VIEW QUOTE */
 
-.view-quote {
-    padding: 60px 20px 60px 20px;
-    color: #fff;
-}
-.view-quote h2 {
-    padding-bottom: 10px;
-    color: #fff;
-}
-.view-quote .panel-primary {
-  color: #202532 !important;
-}
-.clickable {
-    cursor: pointer;
-}
-.view-quote .panel-primary {
-    border: 2px solid #efefef;
-    margin: 0 -1px 39px 0;
-    position: relative;
-    background: white;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
-    text-align: center;
-    height: 100%;
-}
-.quote-panel-left {
-    padding: 20px 25px 20px 25px;
-}
-.quote-panel-right {
-    padding: 20px 25px 20px 25px;
-}
-.view-quote .btn-primary {
-  padding: 12px 30px;
-  border-radius: 30px;
-  -moz-border-radius: 30px;
-  -webkit-border-radius: 30px;
-}
+// .view-quote {
+//     padding: 60px 20px 60px 20px;
+//     color: #fff;
+// }
+// .view-quote h2 {
+//     padding-bottom: 10px;
+//     color: #fff;
+// }
+// .view-quote .panel-primary {
+//   color: #202532 !important;
+// }
+// .clickable {
+//     cursor: pointer;
+// }
+// .view-quote .panel-primary {
+//     border: 2px solid #efefef;
+//     margin: 0 -1px 39px 0;
+//     position: relative;
+//     background: white;
+//     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+//     text-align: center;
+//     height: 100%;
+// }
+// .quote-panel-left {
+//     padding: 20px 25px 20px 25px;
+// }
+// .quote-panel-right {
+//     padding: 20px 25px 20px 25px;
+// }
+// .view-quote .btn-primary {
+//   padding: 12px 30px;
+//   border-radius: 30px;
+//   -moz-border-radius: 30px;
+//   -webkit-border-radius: 30px;
+// }
 
-@media (min-width:767px) {
-.view-quote .panel-primary .your-device {
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
-}
-.got-a-question {
-    font-size: 14px;
-    padding-bottom: -20px;
-  }
-}
-@media (max-width: 992px) {
-  .view-quote p.text-left, .view-quote h3.text-left {
-  text-align: center;
-  }
-  .quote-panel-left {
-      padding: 15px 5px 15px 5px;
-  }
-  .quote-panel-right {
-    padding: 15px 5px 15px 5px;
-  }
-  .view-quote .btn-primary {
-    width: 150px;
-  }
-}
+// @media (min-width:767px) {
+// .view-quote .panel-primary .your-device {
+//     border-top-left-radius: 3px;
+//     border-bottom-left-radius: 3px;
+// }
+// .got-a-question {
+//     font-size: 14px;
+//     padding-bottom: -20px;
+//   }
+// }
+// @media (max-width: 992px) {
+//   .view-quote p.text-left, .view-quote h3.text-left {
+//   text-align: center;
+//   }
+//   .quote-panel-left {
+//       padding: 15px 5px 15px 5px;
+//   }
+//   .quote-panel-right {
+//     padding: 15px 5px 15px 5px;
+//   }
+//   .view-quote .btn-primary {
+//     width: 150px;
+//   }
+// }
 
 /* Connections Indicator */
 
