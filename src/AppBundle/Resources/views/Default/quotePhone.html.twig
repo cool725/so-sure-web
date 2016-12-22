@@ -33,7 +33,7 @@
 
 {% block body %}
 
-    <section class="background-image-1 vertical-align-wrap">
+    <section class="background-image-none vertical-align-wrap">
         <div class="container vertical-align-middle">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 view-quote">
@@ -59,7 +59,7 @@
                                 <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
                                 <p><a href="#" data-toggle="modal" data-target="#more-info">More details (including excess)</a></p>     
                                 <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">BUY NOW</a>
-                                <a id="learn-more-btn" class="btn btn-primary btn-rounded btn-rounded--hollow" href="#">How it works</a>
+                                <a id="learn-more-btn" class="btn btn-primary btn-rounded btn-hollow" href="#">How it works</a>
                                 <div class="visible-xs-block">
                                     <h4>OR</h4>
                                     <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img></a> 

@@ -503,6 +503,12 @@ background: rgba(51, 153, 255, 1);
   background-position: center;
 }
 
+.background-image-none {
+  background-size: cover;
+  background-color: #202532;
+  background-position: center;
+}
+
 .brand-dark-background {
   background: #202532;
 }
@@ -525,6 +531,12 @@ hr.strong {
 .btn-rounded {
     border-radius: 100px;
     padding: 12px 30px;
+}
+
+.btn-hollow {
+    background: none;
+    border-width: 2px;
+    color: #3399ff; /* Bit hacky sort with addition of SASS */
 }
 
 

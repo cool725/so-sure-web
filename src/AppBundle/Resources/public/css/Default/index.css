@@ -89,21 +89,21 @@
         width: 250px;
     }
     #learn-more-btn {
-      margin-top: 0px;
-      margin-left: 10px;
-      width: 250px
+      // margin-top: 0px;
+      // margin-left: 10px;
+      // width: 250px
     }
 }
 @media (max-width: 543px) {
     #learn-more-btn {
-      margin-top: 15px;
-      margin-left: 0px;
-      width: 250px
+      // margin-top: 15px;
+      // margin-left: 0px;
+      // width: 250px
     }
     #switch-btn {
-      margin-top: 15px;
-      margin-left: 10px;
-      width: 250px
+      // margin-top: 15px;
+      // margin-left: 10px;
+      // width: 250px
     }
 }
 
