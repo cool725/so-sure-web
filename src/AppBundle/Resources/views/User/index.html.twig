@@ -16,6 +16,9 @@
             This account page is still a work in progress, so it's a bit limited at the moment. However, if you have any ideas of what might be useful to you, we'd love to
             <a href="mailto:hello@wearesosure.com">hear them</a>.
         </p>
+        <p>
+            Have an <button type="button" class="btn btn-link" data-toggle="modal" data-target="#scodeModal">invitation code</button> from a friend?
+        </p>
         {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
         <div class="col-md-12">
             <div class="panel">
@@ -97,6 +100,33 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="scodeModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Already recevied an invite?</h4>
+          </div>
+          <div class="modal-body">
+            <p>Enter the unique 8-digit code below and we'll connect you.</p>
+            <form>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <input type="text" placeholder="Enter code"></input>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-success">Submit</button>
+                    </div>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js" type="text/javascript"></script>
 
 {% endblock %}

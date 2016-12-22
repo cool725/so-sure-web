@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -231,6 +232,32 @@ class UserController extends BaseController
         $fb->post(sprintf('/me/%s:trust', $fbNamespace), [ 'profile' => $id ]);
 
         return new RedirectResponse($this->generateUrl('user_home'));
+    }
+
+    /**
+     * @Route("/scode/{code}", name="user_scode")
+     * @Method({"POST"})
+     */
+    public function scodeAction($code)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(SCode::class);
+        $scode = $repo->findOneBy(['code' => $code]);
+        if (!$scode || !SCode::isValidSCode($scode)) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'SCode is missing or been withdrawn',
+                404
+            );
+        }
+
+        $policy = $user->getCurrentPolicy();
+        $invitation = $invitationService->inviteBySCode($policy, $scode);
+
+        return $this->getSuccessJsonResponse(sprintf(
+            '%s has been invited',
+            $invitation->getInvitee()->getName()
+        ));
     }
 
     /**
