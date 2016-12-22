@@ -33,10 +33,10 @@
 
 {% block body %}
 
-    <section class="background-image-none vertical-align-wrap">
+    <section class="background-image-2 vertical-align-wrap">
         <div class="container vertical-align-middle">
             <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 view-quote">
+                <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 view-quote">
                     <div class="panel panel-primary">
                         <div class="row">
                             
@@ -61,23 +61,28 @@
                                 <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">BUY NOW</a>
                                 <a id="learn-more-btn" class="btn btn-primary btn-rounded btn-hollow" href="#">How it works</a>
                                 <div class="visible-xs-block">
-                                    <h4>OR</h4>
-                                    <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img></a> 
-                                    <a class="ga-outbound-click" href="{{ google_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img></a>                                   
+                                    <div class="apple-hide">
+                                        <h4>OR</h4>
+                                        <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img></a> 
+                                    </div>
+                                    <div class="android-hide">
+                                        <h4>OR</h4>
+                                        <a class="ga-outbound-click" href="{{ google_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img></a>   
+                                    </div>                                
                                 </div>
                             </div>
                             <div class="col-xs-12 col-md-6 view-quote--right">
                                 <ul class="text-left list-unstyled">
                                     <li>
-                                        <h3>Next-day replacement</h3>
+                                        <h3><img src="{{ cdn_url }}/images/quote-page/blue-tick.png"> Next-day replacement</h3>
                                         <p>Once your claim is approved, we aim to get you a replacement phone the next working day.</p>
                                     </li>
                                     <li>
-                                        <h3>Exceptional support</h3>
+                                        <h3><img src="{{ cdn_url }}/images/quote-page/blue-tick.png"> Exceptional support</h3>
                                         <p>We know that accidents can happen at any time. That's why we're here for you whenever you need us.</p>
                                     </li>
                                     <li>
-                                        <h3>Money back when you don't claim</h3>
+                                        <h3><img src="{{ cdn_url }}/images/quote-page/blue-tick.png"> Money back when you don't claim</h3>
                                         <p>Connect with your friends and provided none of you claim you could get up to 80% money back.</p>
                                     </li>
                                 </ul>
@@ -96,7 +101,7 @@
     </section>
 
 
-{#     <section class="press banner">
+    <section class="press banner">
         <div class="container">
             <div class="row">
                 <div class="col-sm-2">
@@ -119,7 +124,7 @@
                 </div>
             </div>
         </div>
-    </section>     #}
+    </section>    
 
   {#   <section class="banner start-purchase">
         <div class="container">
@@ -149,32 +154,7 @@
         </div>
     </section> #}
 
-    {% include 'AppBundle::Default/howItWorksv3.html.twig' %}
-
-    <section class="press banner">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-2">
-                    <h4>Featured in</h4>
-                </div>
-                <div class="col-sm-2">
-                    <a href="https://www.theguardian.com/technology/2016/sep/18/chatbots-talk-town-interact-humans-technology-silicon-valley" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/g@2x.png" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></img></a>
-                </div>
-                <div class="col-sm-2">
-                    <a href="https://www.ft.com/content/6755beb8-320c-11e6-bda0-04585c31b153" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/ft@2x.png" alt="Financial Times - Innovation to watch: Friends based insurance"></img></a>
-                </div>
-                <div class="col-sm-2">
-                    <a href="http://www.postonline.co.uk/post/news/2466996/so-sure-prepares-to-launch-revolutionary-insurance-model" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/ip@2x.png" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></img></a>
-                </div>
-                <div class="col-sm-2">
-                    <h4>Awarded by</h4>
-                </div>
-                <div class="col-sm-2">
-                    <a href="http://www.postevents.co.uk/technologyawards/static/shortlist-1" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/di@2x.png" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award"></img></a>
-                </div>
-            </div>
-        </div>
-    </section>        
+    {% include 'AppBundle::Default/howItWorksv3.html.twig' %}   
 
     <section class="footer-cta alt-brand-gradient">
         <div class="container">

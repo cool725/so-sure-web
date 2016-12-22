@@ -21,3 +21,19 @@
             scrollTop: $("#download-now").offset().top
         }, 1500);
     });
+
+
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+
+        $('.apple-hide').css('display', 'inline');
+        console.log('Apple');
+    }
+
+    if (/android/i.test(userAgent)) {
+        
+        $('.android-hide').css('display', 'inline');
+        console.log('Android');
+
+    }        

@@ -76,6 +76,15 @@
     // color: #202532;
     // width: 155px;
     // margin-left: 20px;
+    margin-top: 10px;
+}
+
+/* TODO Ergh this is hacky fix in CSS refactor */
+@media (min-width: 351px) { 
+
+    #learn-more-btn {
+        margin-top: 0;
+    }
 }
 
 @media (max-width:992px) {
@@ -139,7 +148,7 @@
 /* HOW IT WORKS */
 
 #learn-more {
-    padding: 80px 20px 150px 20px;
+    padding: 80px 0 150px;
     text-align: center;
 }
 
@@ -158,6 +167,11 @@
 }
 
 @media (max-width:992px) {
+    #learn-more {
+      padding-top: 20px;
+      padding-bottom: 40px;
+    }
+
     #learn-more h3 {
         padding-top: 0;
     }

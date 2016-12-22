@@ -620,7 +620,7 @@ hr.strong {
 }
 
 a#open-intercom.btn.btn-info {
-  padding: 12px 30px;
+  // padding: 12px 30px;
   border: 2px solid #fff;
   background: none !important;
   border-radius: 30px;
@@ -628,11 +628,11 @@ a#open-intercom.btn.btn-info {
   -webkit-border-radius: 30px;
   background: none;
   color: #fff;
-  width: 155px;
+  // width: 155px;
 }
 
 a#get-quote-btn.btn.btn-primary {
-  padding: 12px 30px;
+  // padding: 12px 30px;
   border: 2px solid #202532;
   background: #202532 !important;
   border-radius: 30px;
@@ -640,7 +640,7 @@ a#get-quote-btn.btn.btn-primary {
   -webkit-border-radius: 30px;
   background: none;
   color: #fff;
-  width: 155px;
+  // width: 155px;
 }
 @media (max-width: 992px) {
   a#open-intercom.btn.btn-info {
