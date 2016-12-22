@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use AppBundle\Exception\DuplicateInvitationException;
 
 /**
  * @Route("/user")
@@ -254,15 +255,69 @@ class UserController extends BaseController
         }
 
         $policy = $this->getUser()->getCurrentPolicy();
-        $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
-        $message = sprintf(
-            '%s has been invited',
-            $invitation->getInvitee()->getName()
-        );
+        try {
+            $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
+            $message = sprintf(
+                '%s has been invited',
+                $invitation->getInvitee()->getName()
+            );
 
-        $this->addFlash('success', $message);
+            $this->addFlash('success', $message);
 
-        return $this->getSuccessJsonResponse($message);
+            return $this->getSuccessJsonResponse($message);
+        } catch (DuplicateInvitationException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_DUPLICATE,
+                'Looks like you alredy entered this code',
+                422
+            );
+        } catch (ConnectedInvitationException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_CONNECTED,
+                'Looks like you are already connected',
+                422
+            );
+        } catch (OptOutException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_OPTOUT,
+                'Sorry, but that person does not want to connect anymore',
+                422
+            );
+        } catch (InvalidPolicyException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
+                'Please make sure your policy is paid before connecting',
+                422
+            );
+        } catch (SelfInviteException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_SELF_INVITATION,
+                'Sorry, you can not connect with yourself',
+                422
+            );
+        } catch (FullPotException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_MAXPOT,
+                'Sorry, but either you or your connection has a full pot and can not connect anymore',
+                422
+            );
+        } catch (ClaimException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
+                'Sorry, but you are unable to connect with this user right now',
+                422
+            );
+        } catch (NotFoundHttpException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find policy/code',
+                404
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api newInvitation.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
     }
 
     /**

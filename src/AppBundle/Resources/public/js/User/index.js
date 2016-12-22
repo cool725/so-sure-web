@@ -54,16 +54,17 @@ $(function(){
             type: 'POST',
             data: { token: token }
         }).done(function(result) {
+            console.log(result);
             if (result.code == 0) {
                 window.location = window.location;
-            } else if (result.description) {
+            } else if (typeof result.description !== 'undefined') {
                 $('#scode-form-code-err').text(result.description);
             } else {
                 $('#scode-form-code-err').text('Unknown error, please try again');
             }
         }).fail(function(result) {
-            if (result.description) {
-                $('#scode-form-code-err').text(result.description);
+            if (typeof result.responseJSON !== 'undefined') {
+                $('#scode-form-code-err').text(result.responseJSON.description);
             } else {
                 $('#scode-form-code-err').text('Unknown error, please try again');
             }
