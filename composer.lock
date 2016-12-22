@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
-            "version": "1.0.5",
+            "version": "1.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alcaeus/mongo-php-adapter.git",
-                "reference": "db7ef240fc9de81cd093d4d7e401a30b79023196"
+                "reference": "57bbf534e27161d720a7689cefd6829db9a8eacb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alcaeus/mongo-php-adapter/zipball/db7ef240fc9de81cd093d4d7e401a30b79023196",
-                "reference": "db7ef240fc9de81cd093d4d7e401a30b79023196",
+                "url": "https://api.github.com/repos/alcaeus/mongo-php-adapter/zipball/57bbf534e27161d720a7689cefd6829db9a8eacb",
+                "reference": "57bbf534e27161d720a7689cefd6829db9a8eacb",
                 "shasum": ""
             },
             "require": {
