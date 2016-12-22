@@ -26,7 +26,7 @@
         <div class="row" id="welcome">
             <div class="col-md-12">
                 <h1 class="text-center">
-                    {% if scode is defined and scode %}
+                    {% if scode is defined and scode and scode.policy %}
                         Insure your phone with {{scode.policy.user.name}}.
                     {% else %}
                         Insure your phone.

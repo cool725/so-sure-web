@@ -15,6 +15,7 @@ class SCode
 {
     const TYPE_STANDARD = 'standard';
     const TYPE_MULTIPAY = 'multipay';
+    const TYPE_AFFILIATE = 'affiliate';
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -38,7 +39,7 @@ class SCode
     protected $code;
 
     /**
-     * @Assert\Choice({"standard", "multipay"})
+     * @Assert\Choice({"standard", "multipay", "affiliate"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
