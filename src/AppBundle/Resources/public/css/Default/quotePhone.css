@@ -15,7 +15,9 @@
 
 .view-quote--left {}
 
-.view-quote--right {}
+.view-quote--right {
+    margin-top: 20px;
+}
 
 .view-quote--footer {
     border-top: 2px solid #ddd;
@@ -28,6 +30,10 @@
     .view-quote {
         margin-top: 0;
     }
+
+    .view-quote--right {
+        margin-top: 0;
+    }    
 
 }
 
@@ -45,6 +51,15 @@
 
 .android-hide {
     display: none;
+}
+
+/* Sticky Banner */
+.banner-sticky {
+    width: 100%;
+    position: fixed;
+    bottom: 0; left: 0;
+    z-index: 8888;
+    background-color: #fff;
 }
 
 /* Connections Indicator */
