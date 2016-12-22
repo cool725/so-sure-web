@@ -229,6 +229,11 @@ abstract class BaseController extends Controller
         return true;
     }
 
+    public function getSuccessJsonResponse($description)
+    {
+        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, $description, 200);
+    }
+
     /**
      * Return a standard json error message
      *

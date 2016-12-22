@@ -160,7 +160,7 @@ class DaviesClaim
 
             // TODO: Improve validation - should should exceptions in the setters
             $i = 0;
-            $this->client = $data[$i];
+            $this->client = trim($data[$i]);
             if ($this->client == "") {
                 // empty row - ignore
                 return;
@@ -168,17 +168,17 @@ class DaviesClaim
                 throw new \Exception('Incorrect client');
             }
 
-            $this->claimNumber = $data[++$i];
-            $this->insuredName = $data[++$i];
-            $this->riskPostCode = $data[++$i];
+            $this->claimNumber = $this->nullIfBlank($data[++$i]);
+            $this->insuredName = $this->nullIfBlank($data[++$i]);
+            $this->riskPostCode = $this->nullIfBlank($data[++$i]);
             $this->lossDate = $this->excelDate($data[++$i]);
             $this->startDate = $this->excelDate($data[++$i]);
             $this->endDate = $this->excelDate($data[++$i], true);
-            $this->lossType = $data[++$i];
-            $this->lossDescription = $data[++$i];
-            $this->location = $data[++$i];
-            $this->status = $data[++$i];
-            $this->miStatus = $data[++$i];
+            $this->lossType = $this->nullIfBlank($data[++$i]);
+            $this->lossDescription = $this->nullIfBlank($data[++$i]);
+            $this->location = $this->nullIfBlank($data[++$i]);
+            $this->status = $this->nullIfBlank($data[++$i]);
+            $this->miStatus = $this->nullIfBlank($data[++$i]);
             $this->brightstarProductNumber = $this->nullIfBlank($data[++$i]);
             $this->replacementMake = $this->nullIfBlank($data[++$i]);
             $this->replacementModel = $this->nullIfBlank($data[++$i]);
@@ -193,7 +193,7 @@ class DaviesClaim
             $this->excess = $this->nullIfBlank($data[++$i]);
             $this->reserved = $this->nullIfBlank($data[++$i]);
             $this->reciperoFee = $this->nullIfBlank($data[++$i]);
-            $this->policyNumber = $data[++$i];
+            $this->policyNumber = $this->nullIfBlank($data[++$i]);
             $this->notificationDate = $this->excelDate($data[++$i]);
             $this->dateCreated = $this->excelDate($data[++$i]);
             $this->dateClosed = $this->excelDate($data[++$i]);
