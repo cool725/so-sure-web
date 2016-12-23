@@ -36,7 +36,7 @@
     <section class="background-image-2 vertical-align-wrap">
         <div class="container vertical-align-middle">
             <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 view-quote">
+                <div id="quote" class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 view-quote">
                     <div class="panel panel-primary">
                         <div class="row">
                             
@@ -74,15 +74,15 @@
                             <div class="col-xs-12 col-md-6 view-quote--right">
                                 <ul class="text-left list-unstyled">
                                     <li>
-                                        <h3><img class="hidden-xs" src="{{ cdn_url }}/images/quote-page/blue-tick.png"> Next-day replacement</h3>
+                                        <h3><img class="view-quote-ticks hidden-xs hidden-sm" src="{{ cdn_url }}/images/quote-page/blue-tick.png"> Next-day replacement</h3>
                                         <p>Once your claim is approved, we aim to get you a replacement phone the next working day.</p>
                                     </li>
                                     <li>
-                                        <h3><img class="hidden-xs" src="{{ cdn_url }}/images/quote-page/blue-tick.png"> Exceptional support</h3>
+                                        <h3><img class="view-quote-ticks hidden-xs hidden-sm" src="{{ cdn_url }}/images/quote-page/blue-tick.png"> Exceptional support</h3>
                                         <p>We know that accidents can happen at any time. That's why we're here for you whenever you need us.</p>
                                     </li>
                                     <li>
-                                        <h3><img class="hidden-xs" src="{{ cdn_url }}/images/quote-page/blue-tick.png"> Money back when you don't claim</h3>
+                                        <h3><img class="view-quote-ticks hidden-xs hidden-sm" src="{{ cdn_url }}/images/quote-page/blue-tick.png"> Money back when you don't claim</h3>
                                         <p>Connect with your friends and provided none of you claim you could get up to 80% money back.</p>
                                     </li>
                                 </ul>
@@ -100,8 +100,7 @@
         </div>
     </section>
 
-
-    <section class="press banner">
+   {#  <section class="press banner">
         <div class="container">
             <div class="row">
                 <div class="col-sm-2">
@@ -124,38 +123,22 @@
                 </div>
             </div>
         </div>
-    </section>    
+    </section>     #}
 
-  {#   <section class="banner start-purchase">
+    <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">
             <div class="row">
-                <div class="col-sm-4 text-left">
-                    <h3>
-                        Ready to be part of an insurance revolution?
-                    </h3>
+                <div class="col-md-8 hidden-xs hidden-sm">
+                    <h3><small>Device</small> {{ phone }}</h3>
                 </div>
-                <div class="col-sm-2">
-                    <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">Buy online</a>
+                <div class="col-xs-6 col-md-2">
+                    <h3>£{{ phone_price.monthlyPremiumPrice }} <small>a month</small></h3> 
                 </div>
-                <div class="col-sm-2">
-                    <h4 class="text-center">OR</h4>
-                </div>
-                <div class="col-sm-2 app-badge">
-                    <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
-                        <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-                    </a>
-                </div>
-                <div class="col-sm-2 app-badge">
-                    <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
-                        <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-                    </a>
+                <div class="col-xs-6 col-md-2 text-right">
+                    <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">BUY NOW</a>
                 </div>
             </div>
         </div>
-    </section> #}
-
-    <section class="banner-sticky">
-        Sticky Banner
     </section>
 
     {% include 'AppBundle::Default/howItWorksv3.html.twig' %}   

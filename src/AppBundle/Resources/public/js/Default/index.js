@@ -23,17 +23,44 @@
     });
 
 
+    // Detect browser and show/hide elements using class
+
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
     if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
 
         $('.apple-hide').css('display', 'inline');
-        console.log('Apple');
+        // console.log('Apple');
     }
 
     if (/android/i.test(userAgent)) {
         
         $('.android-hide').css('display', 'inline');
-        console.log('Android');
+        // console.log('Android');
 
     }        
+
+    // Sticky Banner - For quotes TODO make modular
+
+    var quoteBox = $('#quote');
+    var footer   = $('.footer');
+
+    $(window).scroll(function(event) {
+
+        if (quoteBox.length) {
+
+            var quoteBoxBottom = quoteBox.offset().top;
+
+            if ($(window).scrollTop() > quoteBoxBottom + 100) {
+
+                $('#quote-banner').fadeIn();                
+
+            } else {
+
+                $('#quote-banner').fadeOut();                
+
+            }
+            
+        }   
+
+    });    
