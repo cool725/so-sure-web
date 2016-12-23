@@ -15,6 +15,8 @@ class BranchTwigExtension extends \Twig_Extension
     /** @var LoggerInterface */
     protected $logger;
 
+    protected $tokenStorage;
+
     /**
      * @param BranchService   $branch
      * @param RequestStack    $requestStack
@@ -23,11 +25,13 @@ class BranchTwigExtension extends \Twig_Extension
     public function __construct(
         BranchService $branch,
         RequestStack $requestStack,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        $tokenStorage
     ) {
         $this->branch = $branch;
         $this->requestStack = $requestStack;
         $this->logger = $logger;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function getFunctions()
@@ -70,6 +74,11 @@ class BranchTwigExtension extends \Twig_Extension
         return null;
     }
 
+    private function getUser()
+    {
+        return $this->tokenStorage->getToken()->getUser();
+    }
+
     private function getData()
     {
         $data = [
@@ -79,6 +88,19 @@ class BranchTwigExtension extends \Twig_Extension
         if ($scode) {
             $data['scode'] = $scode;
             $data['$deeplink_path'] = sprintf('invite/scode/%s', $scode);
+        }
+
+        // Mainly for new users, but won't hurt for existing users
+        $user = $this->getUser();
+        $this->logger->info(sprintf('BranchTwig User: %s', $user ? $user->getId() : 'null'));
+        if ($user) {
+            $data['email'] = $user->getEmail();
+            if ($user->getMobileNumber()) {
+                $data['mobile'] = $user->getMobileNumber();
+                if (!isset($data['$deeplink_path'])) {
+                    $data['$deeplink_path'] = 'open/login/mobile';
+                }
+            }
         }
 
         return $data;

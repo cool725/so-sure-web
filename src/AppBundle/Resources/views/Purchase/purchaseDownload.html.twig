@@ -1,0 +1,27 @@
+    <div class="row">
+        <div class="form-group col-sm-12 text-center">
+            Did you know you can download our app and continue your purchase? It's easier!
+        </div>
+    </div>
+    {% set show_google_play = true %}
+    {% set show_itunes = true %}
+    {% if phone is defined and not phone.googlePlay %}
+        {% set show_google_play = false %}
+    {% endif %}
+    {% if phone is defined and not phone.iTunes %}
+        {% set show_itunes = false %}
+    {% endif %}
+    <div class="row">
+        <div class="form-group col-sm-12 text-center">
+            {% if show_google_play %}
+            <a class="ga-outbound-click" href="{{ google_download('purchase') }}">
+                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+            </a>
+            {% endif %}
+            {% if show_itunes %}
+            <a class="ga-outbound-click" href="{{ apple_download('purchase') }}">
+                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+            </a>
+            {% endif %}
+        </div>
+    </div>                        
