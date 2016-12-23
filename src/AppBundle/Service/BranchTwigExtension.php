@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
+use AppBundle\Document\User;
 
 class BranchTwigExtension extends \Twig_Extension
 {
@@ -92,8 +93,7 @@ class BranchTwigExtension extends \Twig_Extension
 
         // Mainly for new users, but won't hurt for existing users
         $user = $this->getUser();
-        $this->logger->info(sprintf('BranchTwig User: %s', $user ? $user->getId() : 'null'));
-        if ($user) {
+        if ($user && $user instanceof User) {
             $data['email'] = $user->getEmail();
             if ($user->getMobileNumber()) {
                 $data['mobile'] = $user->getMobileNumber();
