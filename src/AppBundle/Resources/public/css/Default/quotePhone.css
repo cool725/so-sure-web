@@ -318,7 +318,7 @@ a#help-centre.btn.btn-info {
   -webkit-border-radius: 30px;
   background: none;
   color: #fff;
-  // width: 175px;
+  width: 175px;
 }
 
 a#open-intercom.btn.btn-primary {
@@ -330,7 +330,7 @@ a#open-intercom.btn.btn-primary {
   -webkit-border-radius: 30px;
   background: none;
   color: #fff;
-  // width: 175px;
+  width: 175px;
 }
 
 @media (max-width: 992px) {
