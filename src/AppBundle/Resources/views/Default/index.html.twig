@@ -31,151 +31,110 @@
 
 {% block body %}
 
-    <!-- Primary Page Layout
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <section class="hero background-image-2 vertical-align-wrap" id="get-quote">
-                <div class="container vertical-align-middle">
-                    <div class="row">
-                      <div class="col-md-8 col-md-offset-2">
-                        <h1>Welcome to better phone insurance</h1>
-                        <p class="lead">
-                          Finally, phone insurance that you can rely on (it's also up to 80% cheaper when you connect with friends &amp; don't claim).
-                        </p>
-                      </div>
-                      <div class="col-md-12">
-                            {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
-                      </div>
+        <div class="container vertical-align-middle">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <h1>Welcome to better phone insurance</h1>
+                    <p class="lead">Finally, phone insurance that you can rely on (it's also up to 80% cheaper when you connect with friends &amp; don't claim).</p>
+                </div>
+                <div class="col-md-12">
+                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
                 </div>
             </div>
         </div>
-</section>
+    </section>
 
-<section class="press banner">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-2">
-                <h4>
-                    Featured in
-                </h4>
+    <section class="press banner">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2">
+                    <h4>Featured in</h4>
+                </div>
+                <div class="col-sm-2">
+                    <a href="https://www.theguardian.com/technology/2016/sep/18/chatbots-talk-town-interact-humans-technology-silicon-valley" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/g@2x.png" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></img></a>
+                </div>
+                <div class="col-sm-2">
+                    <a href="https://www.ft.com/content/6755beb8-320c-11e6-bda0-04585c31b153" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/ft@2x.png" alt="Financial Times - Innovation to watch: Friends based insurance"></img></a>
+                </div>
+                <div class="col-sm-2">
+                    <a href="http://www.postonline.co.uk/post/news/2466996/so-sure-prepares-to-launch-revolutionary-insurance-model" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/ip@2x.png" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></img></a>
+                </div>
+                <div class="col-sm-2">
+                    <h4>Awarded by</h4>
+                </div>
+                <div class="col-sm-2">
+                    <a href="http://www.postevents.co.uk/technologyawards/static/shortlist-1" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/di@2x.png" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award"></img></a>
+                </div>
             </div>
-            <div class="col-sm-2">
-                <a href="https://www.theguardian.com/technology/2016/sep/18/chatbots-talk-town-interact-humans-technology-silicon-valley" target="_blank">
-                    <img src="{{ cdn_url }}/images/home/press-images/g@2x.png" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></img>
-                </a>
+        </div>
+    </section>
+
+    {% include 'AppBundle::Default/benefits.html.twig' %}
+
+    <section class="social-proof">
+        <div class="container">
+            <div class="row">
+                <h2 class="text-center">We don't like to talk about ourselves</h2>
+                <p class="lead text-center">But we don't mind if our customers do. 😊</p>
+                <div class="col-md-4">
+                    <blockquote class="blockquote">
+                        <p>The UX is great. Really smooth process. I also love the tone of voice and iconography. Time to get a few more friends involved!</p>
+                        <footer class="blockquote-footer">Adam</footer>
+                    </blockquote>
+                </div>
+                <div class="col-md-4">
+                    <blockquote class="blockquote">
+                        <p>Your T &amp; Cs are so clear and concise it makes the customer feel like you actually care about them!</p>
+                        <footer class="blockquote-footer">Honor</footer>
+                    </blockquote>
+                </div>
+                <div class="col-md-4">
+                    <blockquote class="blockquote">
+                    <p>Claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution!</p>
+                        <footer class="blockquote-footer">Herve</footer>
+                    </blockquote>
+                </div>
             </div>
-            <div class="col-sm-2">
-                <a href="https://www.ft.com/content/6755beb8-320c-11e6-bda0-04585c31b153" target="_blank">
-                    <img src="{{ cdn_url }}/images/home/press-images/ft@2x.png" alt="Financial Times - Innovation to watch: Friends based insurance"></img>
-                </a>
+        </div>
+    </section>
+
+    <section class="footer-cta alt-brand-gradient">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 text-left">
+                    <h2>Ready for better phone insurance?</h2>
+                    <p class="lead">You can't always have better in life, but you can have better phone insurance.</p>
+                </div>
+                <div class="col-lg-2 text-center">
+                    <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
+                </div>
+                <div class="col-lg-2 text-center">
+                    <a class="btn btn-info" id="open-intercom">Chat with us <i class="fa fa-comments"></i></a>
+                </div>
             </div>
-            <div class="col-sm-2">
-                <a href="http://www.postonline.co.uk/post/news/2466996/so-sure-prepares-to-launch-revolutionary-insurance-model" target="_blank">
-                    <img src="{{ cdn_url }}/images/home/press-images/ip@2x.png" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></img>
-                </a>
-            </div>
-            <div class="col-sm-2">
-                <h4>
-                    Awarded by
-                </h4>
-            </div>
-            <div class="col-sm-2">
-                <a href="http://www.postevents.co.uk/technologyawards/static/shortlist-1" target="_blank">
-                    <img src="{{ cdn_url }}/images/home/press-images/di@2x.png" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award"></img>
-                </a>
+        </div>
+    </section>
+
+    <div class="modal modal-switching fade" id="switchingModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h2 class="modal-title">Want to switch to so-sure?</h2>
+                </div>
+                <div class="modal-body modal-switching-body">
+                    <h4>Switching to so-sure is easy. Just follow these steps:</h4>
+                    <ol>
+                        <li>Contact your existing insurance provider and request to cancel your policy. Check on their website but often you can email them and, at most, give them a 30 day notice.</li>
+                        <li>Download the so-sure app and purchase your new policy from so-sure.</li>
+                    </ol>
+                    <p class="text-center"><button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Got it!</button></p>
+                </div>
             </div>
         </div>
     </div>
-</section>
 
-{% include 'AppBundle::Default/benefits.html.twig' %}
-
-<section class="social-proof">
-  <div class="container">
-    <div class="row">
-      <h2 class="text-center">We don't like to talk about ourselves</h2>
-      <p class="lead text-center">
-        But we don't mind if our customers do. 😊
-      </p>
-      <div class="col-md-4">
-        <blockquote class="blockquote">
-          <p>
-            The UX is great. Really smooth process. I also love the tone of voice and iconography. Time to get a few more friends involved!
-          </p>
-          <footer class="blockquote-footer">
-            Adam
-          </footer>
-        </blockquote>
-      </div>
-      <div class="col-md-4">
-          <blockquote class="blockquote">
-            <p>
-              Your T&amp;Cs are so clear and concise it makes the customer feel like you actually care about them!
-            </p>
-            <footer class="blockquote-footer">
-              Honor
-            </footer>
-          </blockquote>
-
-        </div>
-      <div class="col-md-4">
-        <blockquote class="blockquote">
-          <p>
-            Claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution!
-          </p>
-          <footer class="blockquote-footer">
-            Herve
-          </footer>
-        </blockquote>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="footer-cta alt-brand-gradient">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-8 text-left">
-      <h2>Ready for better phone insurance?</h2>
-      <p class="lead">
-        You can't always have better in life, but you can have better phone insurance.
-      </p>
-      </div>
-      <div class="col-md-2 text-center">
-        <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
-      </div>
-      <div class="col-md-2 text-center">
-        <a class="btn btn-info" id="open-intercom">Chat with us
-            <i class="fa fa-comments"></i>
-        </a>
-      </div>
-      </div>
-    </div>
-</section>
-
-<div class="modal modal-switching fade" id="switchingModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">Want to switch to so-sure?</h2>
-      </div>
-      <div class="modal-body modal-switching-body">
-        <h4>Switching to so-sure is easy. Just follow these steps:</h4>
-        <ol>
-            <li>Contact your existing insurance provider and request to cancel your policy. Check on their website but often you can email them and, at most, give them a 30 day notice.
-            </li>
-            <li>
-                Download the so-sure app and purchase your new policy from so-sure.
-            </li>
-        </ol>
-        <p class="text-center">
-            <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Got it!</button>
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-{% include 'AppBundle::Default/modalVideo.html.twig' %}
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
 {% endblock %}

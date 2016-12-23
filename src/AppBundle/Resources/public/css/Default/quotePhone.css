@@ -1,64 +1,80 @@
 /* VIEW QUOTE */
 
 .view-quote {
-    padding: 60px 20px 60px 20px;
-    color: #fff;
-}
-.view-quote h2 {
-    padding-bottom: 10px;
-    color: #fff;
-}
-.view-quote .panel-primary {
-  color: #202532 !important;
-}
-.clickable {
-    cursor: pointer;
-}
-.view-quote .panel-primary {
-    border: 2px solid #efefef;
-    margin: 0 -1px 39px 0;
-    position: relative;
-    background: white;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
-    text-align: center;
-    height: 100%;
-}
-.quote-panel-left {
-    padding: 20px 25px 20px 25px;
-}
-.quote-panel-right {
-    padding: 20px 25px 20px 25px;
-}
-.view-quote .btn-primary {
-  padding: 12px 30px;
-  border-radius: 30px;
-  -moz-border-radius: 30px;
-  -webkit-border-radius: 30px;
+    margin-top: 20px;
 }
 
-@media (min-width:767px) {
-.view-quote .panel-primary .your-device {
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
+.view-quote h2 {
+    margin-top: 10px;
 }
-.got-a-question {
-    font-size: 14px;
-    padding-bottom: -20px;
-  }
+
+.view-quote .panel-primary {
+    border: 2px solid #ddd;
+    padding: 30px 20px 0;
 }
-@media (max-width: 992px) {
-  .view-quote p.text-left, .view-quote h3.text-left {
-  text-align: center;
-  }
-  .quote-panel-left {
-      padding: 15px 5px 15px 5px;
-  }
-  .quote-panel-right {
-    padding: 15px 5px 15px 5px;
-  }
-  .view-quote .btn-primary {
-    width: 150px;
-  }
+
+.view-quote--left {}
+
+.view-quote--right {
+    margin-top: 20px;
+}
+
+.view-quote-ticks {
+    display: inline-block;
+    padding: 0 5px 5px 0;
+}
+
+.view-quote--footer {
+    border-top: 2px solid #ddd;
+    margin-top: 30px;
+    padding-top: 15px;
+}
+
+@media (min-width: 768px) { 
+
+    .view-quote {
+        margin-top: 0;
+    }
+
+    .view-quote--right {
+        margin-top: 0;
+    }    
+
+}
+
+@media (min-width: 1200px) { 
+
+    .view-quote .panel-primary {
+        padding: 50px 30px 0;
+    }
+}
+
+/* TODO Move to HELPERS when css is refactored */
+.apple-hide {
+    display: none;
+}
+
+.android-hide {
+    display: none;
+}
+
+/* Sticky Quote */
+.banner-sticky { /* TODO Move to resusable class in refactor */
+    width: 100%;
+    position: fixed;
+    bottom: 0; left: 0;
+    padding: 15px 0;
+    z-index: 8888;
+    background-color: rgba(32, 37, 50, 0.95);
+}
+
+.banner-sticky h3 {
+    margin-top: 10px;
+    color: #fff;
+}
+
+.banner-sticky-hide {
+    display: none;
 }
 
 /* Connections Indicator */
@@ -284,6 +300,7 @@
 
 .memory-select-text {
   font-size: 13px;
+  margin-bottom: 10px;
 }
 
 .memory-select-text .btn-link {

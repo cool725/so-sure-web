@@ -66,16 +66,25 @@
 }
 
 #learn-more-btn {
-    padding: 12px 30px;
-    border: 2px solid #202532;
-    background: none !important;
-    border-radius: 30px;
-    -moz-border-radius: 30px;
-    -webkit-border-radius: 30px;
-    background: none;
-    color: #202532;
-    width: 155px;
-    margin-left: 20px;
+    // padding: 12px 30px;
+    // border: 2px solid #202532;
+    // background: none !important;
+    // border-radius: 30px;
+    // -moz-border-radius: 30px;
+    // -webkit-border-radius: 30px;
+    // background: none;
+    // color: #202532;
+    // width: 155px;
+    // margin-left: 20px;
+    margin-top: 10px;
+}
+
+/* TODO Ergh this is hacky fix in CSS refactor */
+@media (min-width: 351px) { 
+
+    #learn-more-btn {
+        margin-top: 0;
+    }
 }
 
 @media (max-width:992px) {
@@ -89,21 +98,21 @@
         width: 250px;
     }
     #learn-more-btn {
-      margin-top: 0px;
-      margin-left: 10px;
-      width: 250px
+      // margin-top: 0px;
+      // margin-left: 10px;
+      // width: 250px
     }
 }
 @media (max-width: 543px) {
     #learn-more-btn {
-      margin-top: 15px;
-      margin-left: 0px;
-      width: 250px
+      // margin-top: 15px;
+      // margin-left: 0px;
+      // width: 250px
     }
     #switch-btn {
-      margin-top: 15px;
-      margin-left: 10px;
-      width: 250px
+      // margin-top: 15px;
+      // margin-left: 10px;
+      // width: 250px
     }
 }
 
@@ -139,7 +148,7 @@
 /* HOW IT WORKS */
 
 #learn-more {
-    padding: 80px 20px 150px 20px;
+    padding: 80px 0 150px;
     text-align: center;
 }
 
@@ -158,6 +167,11 @@
 }
 
 @media (max-width:992px) {
+    #learn-more {
+      padding-top: 20px;
+      padding-bottom: 40px;
+    }
+
     #learn-more h3 {
         padding-top: 0;
     }
