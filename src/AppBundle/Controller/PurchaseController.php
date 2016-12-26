@@ -56,6 +56,11 @@ class PurchaseController extends BaseController
     public function purchaseStepPersonalAction(Request $request)
     {
         $user = $this->getUser();
+        if ($user->hasPolicy()) {
+            $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
+
+            return $this->redirectToRoute('user_home');
+        }
         /*
         if ($user->getFirstName() && $user->getLastName() && $user->getMobileNumber() && $user->getBirthday()) {
             return $this->redirectToRoute('purchase_step_2');
@@ -127,6 +132,11 @@ class PurchaseController extends BaseController
     public function purchaseStepAddressAction(Request $request)
     {
         $user = $this->getUser();
+        if ($user->hasPolicy()) {
+            $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
+
+            return $this->redirectToRoute('user_home');
+        }
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
         if (!$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
@@ -180,6 +190,11 @@ class PurchaseController extends BaseController
     public function purchaseStepPhoneAction(Request $request)
     {
         $user = $this->getUser();
+        if ($user->hasPolicy()) {
+            $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
+
+            return $this->redirectToRoute('user_home');
+        }
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
         if (!$user->hasValidBillingDetails()) {
             return $this->redirectToRoute('purchase_step_address');
@@ -321,7 +336,6 @@ class PurchaseController extends BaseController
 
         return $data;
     }
-
     
     /**
      * @Route("/step-review/monthly", name="purchase_step_review_monthly")
@@ -331,6 +345,11 @@ class PurchaseController extends BaseController
     public function purchaseStepReviewAction(Request $request)
     {
         $user = $this->getUser();
+        if ($user->hasPolicy()) {
+            $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
+
+            return $this->redirectToRoute('user_home');
+        }
         $policy = $user->getUnInitPolicy();
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
