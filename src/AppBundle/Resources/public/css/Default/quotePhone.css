@@ -33,7 +33,7 @@
 @media (min-width: 768px) { 
 
     .view-quote {
-        margin-top: 0;
+        // margin-top: 0;
     }
 
     .view-quote--right {
@@ -62,7 +62,7 @@
 .banner-sticky { /* TODO Move to resusable class in refactor */
     width: 100%;
     position: fixed;
-    bottom: 0; left: 0;
+    top: 0; left: 0;
     padding: 15px 0;
     z-index: 8888;
     background-color: rgba(32, 37, 50, 0.95);
