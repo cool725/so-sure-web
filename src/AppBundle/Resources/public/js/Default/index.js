@@ -51,7 +51,7 @@
 
             var quoteBoxBottom = quoteBox.offset().top;
 
-            if ($(window).scrollTop() > quoteBoxBottom + 100) {
+            if ($(window).scrollTop() > quoteBoxBottom + 200) {
 
                 $('#quote-banner').fadeIn();                
 

@@ -8,6 +8,10 @@
     margin-top: 10px;
 }
 
+.view-quote p:not(1) {
+    margin-bottom: 10px;
+}
+
 .view-quote .panel-primary {
     border: 2px solid #ddd;
     padding: 30px 20px 0;
@@ -39,6 +43,10 @@
     .view-quote--right {
         margin-top: 0;
     }    
+
+  .view-quote-list li {
+      margin-bottom: 25px;
+  }    
 
 }
 
