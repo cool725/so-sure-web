@@ -575,6 +575,11 @@ hr.strong {
     color: #3399ff; /* Bit hacky sort with addition of SASS */
 }
 
+.explainer-video-thumb {
+    margin: 30px 0;
+    cursor: pointer;
+}
+
 /* Main CTA */
 
 @media (min-width: 992px) {
