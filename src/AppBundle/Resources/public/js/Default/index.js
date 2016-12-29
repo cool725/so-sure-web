@@ -10,9 +10,9 @@
         }, 1500);
     });
 
-    $("#learn-more-btn").click(function() {
+    $("#how-it-works-btn").click(function() {
         $('html, body').animate({
-            scrollTop: $("#learn-more").offset().top
+            scrollTop: $("#how-it-works").offset().top
         }, 1500);
     });
 

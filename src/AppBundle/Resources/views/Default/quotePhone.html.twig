@@ -57,7 +57,7 @@
                                 <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
                                 <p><a href="#" data-toggle="modal" data-target="#more-info">More details (including excess)</a></p>     
                                 <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">BUY NOW</a>
-                                <a id="learn-more-btn" class="btn btn-primary btn-rounded btn-hollow" href="#">How it works</a>
+                                <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow" href="#">How it works</a>
                                 <div class="visible-xs-block">
                                     <div class="apple-hide">
                                         <h4>OR</h4>
@@ -114,20 +114,7 @@
         </div>
     </section>
 
-    <section id="learn-more">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    
-                    <h2>How so-sure works</h2>
-                    <p class="lead" id="hero-description">We designed so-sure to allow you and your friends to get money back when you don't claim.</p>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {# {% include 'AppBundle::Default/howItWorksv3.html.twig' %}    #}
+    {% include 'AppBundle::Default/howItWorks.html.twig' %}   
 
     <section class="footer-cta alt-brand-gradient">
         <div class="container">
