@@ -12,7 +12,7 @@
 
     $("#how-it-works-btn").click(function() {
         $('html, body').animate({
-            scrollTop: $("#how-it-works").offset().top - 50
+            scrollTop: $("#how-it-works").offset().top - 40
         }, 1500);
     });
 
