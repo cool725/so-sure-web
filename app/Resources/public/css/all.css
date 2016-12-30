@@ -573,6 +573,14 @@ hr.strong {
     background: none;
     border-width: 2px;
     color: #3399ff; /* Bit hacky sort with addition of SASS */
+    margin-top: 10px;
+}
+
+@media (min-width: 767px) {
+
+    .btn-hollow {
+        margin-top: 0;
+    }
 }
 
 .explainer-video-thumb {
@@ -584,10 +592,10 @@ hr.strong {
 
 @media (min-width: 992px) {
 .main-cta {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 575px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 575px;
   }
 }
 

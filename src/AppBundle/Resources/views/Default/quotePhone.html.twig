@@ -105,7 +105,7 @@
                     <h3><small>Device</small> {{ phone }}</h3>
                 </div>
                 <div class="col-xs-6 col-md-2">
-                    <h3><small class="hidden-sm hidden-md hidden-lg">Monthly</small> £{{ phone_price.monthlyPremiumPrice }} <small class="hidden-xs">a month</small></h3> 
+                    <h3>£{{ phone_price.monthlyPremiumPrice }} <small>a month</small></h3> 
                 </div>
                 <div class="col-xs-6 col-md-2 text-right">
                     <a class="btn btn-primary btn-rounded" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">BUY NOW</a>

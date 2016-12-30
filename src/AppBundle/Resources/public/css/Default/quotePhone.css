@@ -83,6 +83,17 @@
     color: #fff;
 }
 
+.banner-sticky h3:first-of-type {
+    text-align: center;
+}
+
+@media (min-width: 991px) {
+
+    .banner-sticky h3:first-of-type {
+        text-align: left;
+    }  
+}
+
 .banner-sticky-hide {
     display: none;
 }
