@@ -8,10 +8,6 @@
     margin-top: 10px;
 }
 
-.view-quote p:not(1) {
-    margin-bottom: 10px;
-}
-
 .view-quote .panel-primary {
     border: 2px solid #ddd;
     padding: 30px 20px 0;
@@ -21,6 +17,11 @@
 
 .view-quote--right {
     margin-top: 20px;
+}
+
+.view-quote--left p,
+.view-quote--right {
+    margin-top: 15px;
 }
 
 .view-quote-ticks {
@@ -37,7 +38,8 @@
 @media (min-width: 768px) { 
 
     .view-quote {
-        // margin-top: 0;
+        margin-top: 30px;
+        margin-bottom: 30px;
     }
 
     .view-quote--right {
@@ -79,6 +81,17 @@
 .banner-sticky h3 {
     margin-top: 10px;
     color: #fff;
+}
+
+.banner-sticky h3:first-of-type {
+    text-align: center;
+}
+
+@media (min-width: 991px) {
+
+    .banner-sticky h3:first-of-type {
+        text-align: left;
+    }  
 }
 
 .banner-sticky-hide {
