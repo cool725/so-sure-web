@@ -72,6 +72,16 @@ class SalvaPhonePolicy extends PhonePolicy
         return $this->salvaPolicyResults;
     }
 
+    public function getSalvaPolicyResultsUnserialized()
+    {
+        $data = [];
+        foreach ($this->getSalvaPolicyResults() as $key => $value) {
+            $data[$key] = unserialize($value);
+        }
+
+        return $data;
+    }
+
     public function addSalvaPolicyResults($responseId, $cancel, $details)
     {
         $key = sprintf('%d-create', $this->getLatestSalvaPolicyNumberVersion());

@@ -369,6 +369,26 @@
                       {{ form_end(facebook_form) }}
                     </td>
                 </tr>
+                <tr>
+                    <td>Salva Policy Numbers</td>
+                    <td>
+                        {% for key, value in policy.salvaPolicyNumbers %}
+                            <ul>
+                                {{ key }} - {{ value }}
+                            </ul>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Salva Policy Results</td>
+                    <td>
+                        {% for key, value in policy.salvaPolicyResultsUnserialized %}
+                            <ul>
+                                {{ key }} - {{ value|json_encode }}
+                            </ul>
+                        {% endfor %}
+                    </td>
+                </tr>
             </table>
         </div>
       {% endif %}
