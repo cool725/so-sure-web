@@ -9,11 +9,23 @@
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: center;"><font face="arial, helvetica neue, helvetica, sans-serif">
-           Policy {{ policy.policyNumber }} has a new IMEI due to a claim being processes.  As the phone make/model may have changed,
-           please verify that the new phone <strong>{{ daviesClaim.replacementMake }} {{ daviesClaim.replacementModel }}</strong> matches policy <strong>{{ policy.phone }}</strong>.
-           If not, the policy can be updated via the <a href="{{ url('admin_policy', {'id': policy.id})}}">admin policy page</a>.
+           Policy {{ policy.policyNumber }} has a new IMEI due to a claim being processed.
+           <br />
+           <ol>
+                <li>
+                    Update the claim detail with the so-sure phone on the <a href="{{ url('admin_claims') }}">Claims Page</a>.
+                </li>
+                <li>
+                    Verify that the new phone <strong>{{ daviesClaim.replacementMake }} {{ daviesClaim.replacementModel }}</strong> matches policy <strong>{{ policy.phone }}</strong>.
+                    If not, the policy can be updated via the <a href="{{ url('admin_policy', {'id': policy.id})}}">admin policy page</a>.
+                </li>
+                <li>
+                    Set reminder to trigger any post claim followup that we might want to do.
+                </li>
+           </ol>
 		   </div>
 		</div>
 	{{ macros.end_table() }}
 	{{ macros.email_button_table(url('admin_policy', {'id': policy.id}), "View Policy", "View Policy")}}
+	{{ macros.email_button_table(url('admin_claims'), "View Claims", "View Claims")}}
 {% endblock %}
