@@ -669,9 +669,22 @@ class Claim
         return 0;
     }
 
+    public function getLastChargeAmountWithVat()
+    {
+        $charge = $this->getLastCharge();
+        if ($charge) {
+            return $charge->getAmountWithVat();
+        }
+
+        return 0;
+    }
+
     public function getLastCharge()
     {
         $charges = $this->getCharges();
+        if (!is_array($charges)) {
+            $charges = $charges->getValues();
+        }
         if (count($charges) == 0) {
             return null;
         }

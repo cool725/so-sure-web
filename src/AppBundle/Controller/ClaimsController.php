@@ -188,7 +188,7 @@ class ClaimsController extends BaseController
                     );
                     $this->addFlash('success', sprintf(
                         'ClaimCheck £%0.2f <a href="%s" target="_blank">%s</a> (Phone is %s)',
-                        $claimscheck->getClaim()->getLastChargeAmount(),
+                        $claimscheck->getClaim()->getLastChargeAmountWithVat(),
                         $imeiService->getCertUrl(),
                         $imeiService->getCertId(),
                         $result ? 'not blocked' : 'blocked'
