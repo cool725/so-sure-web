@@ -1455,7 +1455,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
 
-        $promoCode = 'launch';
+        $promoCode = null;
         $now = new \DateTime();
         if ($now->format('Y-m') == '2016-11') {
             $promoCode = Policy::PROMO_FREE_NOV;
@@ -1464,10 +1464,10 @@ class ApiAuthControllerTest extends BaseControllerTest
         }
 
         $this->assertEquals($promoCode, $policyData['promo_code']);
-        $this->assertEquals(6, $policyData['pot']['max_connections'], json_encode($policyData));
+        $this->assertEquals(7, $policyData['pot']['max_connections'], json_encode($policyData));
         // $this->assertEquals(83.88, $policyData['pot']['max_value']);
         // 6.38 gwp * 1.1 = 7.018 * 12 = 84.24 * .8 = 67.39
-        $this->assertEquals(84.24, $policyData['pot']['max_value']);
+        $this->assertEquals(67.39, $policyData['pot']['max_value']);
         $highConnectionValue = 0;
         $lowConnectionValue = null;
         foreach ($policyData['pot']['connection_values'] as $connectionValue) {
