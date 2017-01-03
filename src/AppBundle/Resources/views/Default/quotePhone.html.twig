@@ -59,14 +59,19 @@
                                 <a class="btn btn-primary btn-rounded view-quote--btn" href="{% if app.user is not null and app.user %}{{ path('purchase') }}{% else %}{{ path('register') }}{% endif %}">BUY NOW</a>
                                 <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow view-quote--btn" href="#">How it works</a>
                                 <div class="visible-xs-block">
-                                    <div class="apple-hide">
+                                    {% if phone.isITunes %}
+                                    <div>
                                         <h4>OR</h4>
                                         <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img></a> 
                                     </div>
-                                    <div class="android-hide">
+                                    {% endif %}
+                                    {% if phone.isGooglePlay %}
+                                    <div>
                                         <h4>OR</h4>
                                         <a class="ga-outbound-click" href="{{ google_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img></a>   
-                                    </div>                                
+                                    </div>
+                                    {% endif %}
+                                </div>
                                 </div>
                             </div>
                             <div class="col-xs-12 col-md-6 view-quote--right">

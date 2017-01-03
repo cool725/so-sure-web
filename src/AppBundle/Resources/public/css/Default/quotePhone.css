@@ -63,15 +63,6 @@
     }
 }
 
-/* TODO Move to HELPERS when css is refactored */
-.apple-hide {
-    display: none;
-}
-
-.android-hide {
-    display: none;
-}
-
 /* Sticky Quote */
 .banner-sticky { /* TODO Move to resusable class in refactor */
     width: 100%;
