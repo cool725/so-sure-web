@@ -674,7 +674,7 @@ class ReceperioService extends BaseImeiService
                 $this->mailer->send(
                     sprintf('Missing ModelReference for %s', $serialNumber),
                     'tech@so-sure.com',
-                    sprintf('A recent make/model query for %s returned a successful response but the response was missing a modelreference.  Most likely we did not send the modelreference %s for %s to be added to our account, however, it could also be error by recipero. support@recipero.com can be contacted to resolve this issue.', $serialNumber, $phone->getDevices()[0], $phone)
+                    sprintf('A recent make/model query for %s returned a successful response but the response was missing a modelreference.  Most likely we did not send the modelreference %s for %s to be added to our account, however, it could also be error by recipero. support@recipero.com can be contacted to resolve this issue. Response: %s', $serialNumber, $phone->getDevices()[0], $phone, json_encode($data))
                 );
                 // @codingStandardsIgnoreEnd
             }
