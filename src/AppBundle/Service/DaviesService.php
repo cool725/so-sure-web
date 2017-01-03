@@ -270,7 +270,11 @@ class DaviesService
                 }
                 if ($daviesClaim->getClaimStatus()) {
                     $claim->setStatus($daviesClaim->getClaimStatus());
+                } elseif ($claim->getReplacementImei() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
+                    // If there's a replacement IMEI, the claim has definitely been approved
+                    $claim->setStatus(Claim::STATUS_APPROVED);
                 }
+
                 $claim->setDaviesStatus($daviesClaim->status);
 
                 $claim->setExcess($daviesClaim->excess);
@@ -446,7 +450,10 @@ class DaviesService
             $replacementDay = $this->startOfDay(clone $policy->getImeiReplacementDate());
             $twoBusinessDays = $this->addBusinessDays($replacementDay, 2);
             if ($now >= $twoBusinessDays) {
-                $msg = sprintf('Claim %s is missing a replacement recevied date', $daviesClaim->claimNumber);
+                $msg = sprintf(
+                    'Claim %s is missing a replacement recevied date (expected 2 days after imei replacement)',
+                    $daviesClaim->claimNumber
+                );
                 $this->logger->warning($msg);
                 $this->errors[$daviesClaim->claimNumber][] = $msg;
             }
