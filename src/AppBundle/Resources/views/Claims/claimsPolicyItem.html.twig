@@ -203,6 +203,7 @@
                         <th>Claims Number</th>
                         <th>Claims Type</th>
                         <th>Claims Status</th>
+                        <th>Recipero Fees</th>
                         <th>Crime Ref</th>
                         <th>Flags</th>
                         <th>Notes</th>
@@ -213,6 +214,7 @@
                         <td style="width: 10%;">{{ claim.number }}</td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
+                        <td style="width: 10%;">£{{ claim.totalCharges|number_format(2, '.', ',') }}</td>
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
@@ -220,7 +222,7 @@
                           {% if claim.suspectedFraud %}Suspected Fraud;{% endif %}
                           {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
-                        <td style="width: 30%;">{{ claim.notes }}</td>
+                        <td style="width: 20%;">{{ claim.notes }}</td>
                     </tr>
                     {% endfor %}
                 </table>
