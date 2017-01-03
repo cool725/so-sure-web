@@ -86,6 +86,8 @@ class PolicyService
 
     protected $rateLimit;
 
+    protected $warnMakeModelMismatch = true;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -94,6 +96,11 @@ class PolicyService
     public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    public function setWarnMakeModelMismatch($warnMismatch)
+    {
+        $this->warnMakeModelMismatch = $warnMismatch;
     }
 
     /**
@@ -201,7 +208,7 @@ class PolicyService
         $checkmend['imeiCertId'] = $this->imeiValidator->getCertId();
         $checkmend['imeiResponse'] = $this->imeiValidator->getResponseData();
 
-        if (!$this->imeiValidator->checkSerial($phone, $serialNumber, $user, $identityLog)) {
+        if (!$this->imeiValidator->checkSerial($phone, $serialNumber, $user, $identityLog, $this->warnMakeModelMismatch)) {
             throw new ImeiPhoneMismatchException();
         }
         $checkmend['serialResponse'] = $this->imeiValidator->getResponseData();

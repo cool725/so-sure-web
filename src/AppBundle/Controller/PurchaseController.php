@@ -241,6 +241,7 @@ class PurchaseController extends BaseController
                     if (!$policy) {
                         try {
                             $policyService = $this->get('app.policy');
+                            $policyService->setWarnMakeModelMismatch(false);
                             $policy = $policyService->init(
                                 $user,
                                 $purchase->getPhone(),

@@ -508,10 +508,11 @@ class ReceperioService extends BaseImeiService
      * @param string      $serialNumber
      * @param User        $user
      * @param IdentityLog $identityLog
+     * @param boolean     $warnMismatch For web, we don't need to warn on mismatch as probably user issue
      *
      * @return boolean True if imei is ok
      */
-    public function checkSerial(Phone $phone, $serialNumber, User $user = null, IdentityLog $identityLog = null)
+    public function checkSerial(Phone $phone, $serialNumber, User $user = null, IdentityLog $identityLog = null, $warnMismatch = true)
     {
         \AppBundle\Classes\NoOp::noOp([$phone]);
         if ($serialNumber == self::TEST_INVALID_SERIAL) {
@@ -571,7 +572,7 @@ class ReceperioService extends BaseImeiService
             $this->certId = null;
             $this->responseData = $data;
 
-            return $this->validateSamePhone($phone, $serialNumber, $data);
+            return $this->validateSamePhone($phone, $serialNumber, $data, $warnMismatch);
         } catch (\Exception $e) {
             // TODO: automate a future retry check
             $this->logger->error(
@@ -592,7 +593,7 @@ class ReceperioService extends BaseImeiService
         }
     }
 
-    public function validateSamePhone(Phone $phone, $serialNumber, $data)
+    public function validateSamePhone(Phone $phone, $serialNumber, $data, $warnMismatch = true)
     {
         if (isset($data['makes']) && count($data['makes']) == 0) {
             // @codingStandardsIgnoreStart
@@ -647,28 +648,39 @@ class ReceperioService extends BaseImeiService
                         $serialNumber,
                         json_encode($data)
                     );
-                    $this->logger->warning($errMessage);
+                    if ($warnMismatch) {
+                        $this->logger->warning($errMessage);
+                    } else {
+                        $this->logger->info($errMessage);
+                    }
 
                     return false;
                 }
             } else {
-                $this->logger->warning(sprintf(
-                    'Need to contact reciperio to add modelreference for %s. Data: %s',
-                    $phone,
-                    json_encode($data)
-                ));
+                // @codingStandardsIgnoreStart
+                $this->mailer->send(
+                    sprintf('Missing ModelReference for %s', $serialNumber),
+                    'tech@so-sure.com',
+                    sprintf('A recent make/model query for %s returned a successful response but the response was missing a modelreference.  Most likely we did not send the modelreference %s for %s to be added to our account, however, it could also be error by recipero. support@recipero.com can be contacted to resolve this issue.', $serialNumber, $phone->getDevices()[0], $phone)
+                );
+                // @codingStandardsIgnoreEnd
             }
 
             return true;
         }
 
         if (strtolower($model) != strtolower($phone->getModel())) {
-            $this->logger->warning(sprintf(
+            $errMessage = sprintf(
                 "Mismatching model %s for serial number %s. Data: %s",
                 $phone->getModel(),
                 $serialNumber,
                 json_encode($data)
-            ));
+            );
+            if ($warnMismatch) {
+                $this->logger->warning($errMessage);
+            } else {
+                $this->logger->info($errMessage);
+            }
 
             return false;
         }
