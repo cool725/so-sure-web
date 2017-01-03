@@ -659,6 +659,45 @@ class Claim
         return $this->charges;
     }
 
+    public function getLastChargeAmount()
+    {
+        $charge = $this->getLastCharge();
+        if ($charge) {
+            return $charge->getAmount();
+        }
+
+        return 0;
+    }
+
+    public function getLastChargeAmountWithVat()
+    {
+        $charge = $this->getLastCharge();
+        if ($charge) {
+            return $charge->getAmountWithVat();
+        }
+
+        return 0;
+    }
+
+    public function getLastCharge()
+    {
+        $charges = $this->getCharges();
+        if (!is_array($charges)) {
+            $charges = $charges->getValues();
+        }
+        if (count($charges) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($charges, function ($a, $b) {
+            return $a->getCreatedDate() < $b->getCreatedDate();
+        });
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $charges[0];
+    }
+
     public function totalCharges()
     {
         $total = 0;
