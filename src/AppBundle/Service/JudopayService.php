@@ -555,7 +555,6 @@ class JudopayService
         try {
             $payment = $this->tokenPay($policy, $scheduledPayment->getAmount(), $scheduledPayment->getType());
             $this->processScheduledPaymentResult($scheduledPayment, $payment);
-            $this->validatePolicyStatus($policy, $date);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
@@ -574,7 +573,10 @@ class JudopayService
 
     public function validatePolicyStatus(Policy $policy, \DateTime $date = null)
     {
+        // if payment fails at exactly same second as payment is due, technically policy is still paid to date
+        // this is problematic if setting the policy state to unpaid prior to calling this method
         $isPaidToDate = $policy->isPolicyPaidToDate(false, $date);
+
         // update status if it makes sense to
         if ($isPaidToDate &&
             in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])
@@ -582,6 +584,10 @@ class JudopayService
             $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         } elseif (!$isPaidToDate) {
             $this->logger->error(sprintf('Policy %s is not paid to date', $policy->getPolicyNumber()));
+
+            if (in_array($policy->getStatus(), [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_PENDING])) {
+                $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+            }
         }
     }
 
@@ -593,6 +599,8 @@ class JudopayService
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
             // will only be sent if card is expiring
             $this->cardExpiringEmail($policy, $date);
+
+            $this->validatePolicyStatus($policy, $date);
         } else {
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
             // Very important to update status to unpaid as used by the app to update payment
