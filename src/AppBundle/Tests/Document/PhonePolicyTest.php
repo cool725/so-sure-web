@@ -2220,4 +2220,38 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(1, $policy->getPolicyExpirationDateDays(new \DateTime('2016-03-01')));
         $this->assertEquals(30, $policy->getPolicyExpirationDateDays(new \DateTime('2016-02-01')));
     }
+
+    public function testHasCorrectPolicyStatus()
+    {
+        $policy = new SalvaPhonePolicy();
+        $this->assertNull($policy->hasCorrectPolicyStatus());
+
+        $date = new \DateTime('2016-01-01');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $this->assertEquals(SalvaPhonePolicy::STATUS_PENDING, $policy->getStatus());
+        $this->assertFalse($policy->hasCorrectPolicyStatus($date));
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+        $this->assertTrue($policy->hasCorrectPolicyStatus($date));
+        $this->assertFalse($policy->hasCorrectPolicyStatus(new \DateTime('2016-02-02')));
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
+        $this->assertFalse($policy->hasCorrectPolicyStatus($date));
+        $this->assertTrue($policy->hasCorrectPolicyStatus(new \DateTime('2016-02-02')));
+
+        $ignoredStatuses = [
+            SalvaPhonePolicy::STATUS_CANCELLED,
+            SalvaPhonePolicy::STATUS_EXPIRED,
+            SalvaPhonePolicy::STATUS_MULTIPAY_REJECTED,
+            SalvaPhonePolicy::STATUS_MULTIPAY_REQUESTED
+        ];
+        foreach ($ignoredStatuses as $status) {
+            $policy->setStatus($status);
+            $this->assertNull($policy->hasCorrectPolicyStatus());
+        }
+    }
 }

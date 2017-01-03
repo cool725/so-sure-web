@@ -1794,6 +1794,34 @@ abstract class Policy
         return $diff;
     }
 
+    public function hasCorrectPolicyStatus(\DateTime $date = null)
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+        $ignoredStatuses = [
+            self::STATUS_CANCELLED,
+            self::STATUS_EXPIRED,
+            self::STATUS_MULTIPAY_REJECTED,
+            self::STATUS_MULTIPAY_REQUESTED
+        ];
+
+        // mostly concerned with Active vs Unpaid
+        if (in_array($this->getStatus(), $ignoredStatuses)) {
+            return null;
+        }
+
+        if ($this->getStatus() == self::STATUS_PENDING) {
+            return false;
+        }
+
+        if ($this->isPolicyPaidToDate(false, $date)) {
+            return $this->getStatus() == self::STATUS_ACTIVE;
+        } else {
+            return $this->getStatus() == self::STATUS_UNPAID;
+        }
+
+    }
     public function isPolicyPaidToDate($exact = true, \DateTime $date = null)
     {
         if (!$this->isPolicy()) {
