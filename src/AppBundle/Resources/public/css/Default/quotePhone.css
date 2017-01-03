@@ -24,7 +24,7 @@
     margin-top: 15px;
 }
 
-.view-quote-ticks {
+.view-quote--ticks {
     display: inline-block;
     padding: 0 5px 5px 0;
 }
@@ -33,6 +33,10 @@
     border-top: 2px solid #ddd;
     margin-top: 30px;
     padding-top: 15px;
+}
+
+.view-quote--btn {
+    width: 150px;
 }
 
 @media (min-width: 768px) { 
@@ -55,7 +59,7 @@
 @media (min-width: 1200px) { 
 
     .view-quote .panel-primary {
-        padding: 50px 30px 0;
+        padding: 30px 40px 0;
     }
 }
 
@@ -76,27 +80,41 @@
     padding: 15px 0;
     z-index: 8888;
     background-color: rgba(32, 37, 50, 0.95);
+    text-align: center;
 }
 
 .banner-sticky h3 {
-    margin-top: 10px;
+    margin: 0 0 3px;
     color: #fff;
 }
 
-.banner-sticky h3:first-of-type {
-    text-align: center;
+.banner-sticky h3 span {
+    font-size: 65%;
+}
+
+@media (min-width: 767px) {
+
+    .banner-sticky {
+        text-align: left;
+    }
+
+    .banner-sticky h3 {
+        margin: 10px 0;
+    }    
 }
 
 @media (min-width: 991px) {
 
-    .banner-sticky h3:first-of-type {
-        text-align: left;
-    }  
+    .banner-sticky h3 span {
+        font-size: inherit;
+    }
+
 }
 
 .banner-sticky-hide {
     display: none;
 }
+
 
 /* Connections Indicator */
 

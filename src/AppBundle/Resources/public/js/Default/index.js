@@ -11,8 +11,11 @@
     });
 
     $("#how-it-works-btn").click(function() {
+
+        event.preventDefault();
+
         $('html, body').animate({
-            scrollTop: $("#how-it-works").offset().top - 40
+            scrollTop: $("#how-it-works").offset().top - 100
         }, 1500);
     });
 
@@ -51,7 +54,7 @@
 
             var quoteBoxBottom = quoteBox.offset().top;
 
-            if ($(window).scrollTop() > quoteBoxBottom + 200) {
+            if ($(window).scrollTop() > quoteBoxBottom + 400) {
 
                 $('#quote-banner').fadeIn();                
 
