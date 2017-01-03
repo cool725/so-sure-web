@@ -615,6 +615,16 @@ class Phone
         return in_array($this->getOs(), [self::OS_ANDROID, self::OS_CYANOGEN, self::OS_IOS]);
     }
 
+    public function isITunes()
+    {
+        return $this->getOs() == self::OS_IOS;
+    }
+
+    public function isGooglePlay()
+    {
+        return in_array($this->getOs(), [self::OS_ANDROID, self::OS_CYANOGEN]);
+    }
+
     public function __toString()
     {
         $name = sprintf("%s %s", $this->make, $this->model);

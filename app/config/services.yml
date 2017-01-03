@@ -232,6 +232,7 @@ services:
             branch:       "@app.branch"
             requestStack: "@request_stack"
             logger:       "@logger"
+            tokenStorage: "@security.token_storage"
         public: false
         tags:
             - { name: twig.extension }
