@@ -1150,7 +1150,7 @@ class InvitationServiceTest extends WebTestCase
         foreach ($inviteePolicy->getConnections() as $connection) {
             if ($connection->getLinkedPolicy()->getId() == $inviterPolicy->getId()) {
                 $connectionFound = true;
-                $this->assertEquals(15, $connection->getTotalValue());
+                $this->assertEquals(10, $connection->getTotalValue());
                 $this->assertEquals($invitation->getId(), $connection->getInvitation()->getId());
                 $this->assertEquals($invitation->getCreated(), $connection->getInitialInvitationDate());
                 $this->assertFalse($connection->getExcludeReporting());

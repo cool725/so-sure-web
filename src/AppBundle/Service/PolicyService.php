@@ -387,8 +387,6 @@ class PolicyService
             $promoCode = Policy::PROMO_FREE_NOV;
         } elseif ($isDec2016) {
             $promoCode = Policy::PROMO_FREE_DEC_2016;
-        } elseif ($isPreLaunchPolicy || $isPreLaunchUser) {
-            $promoCode = Policy::PROMO_LAUNCH;
         }
 
         $policy->setPromoCode($promoCode);
