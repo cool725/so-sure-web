@@ -654,7 +654,7 @@ class ReceperioService extends BaseImeiService
                     in_array(strtolower($device), $phone->getDevices())) {
                     return true;
                 } else {
-                    $this->statsd->gauge('recipero.makeModelMismatch', 1);
+                    $this->statsd->increment('recipero.makeModelMismatch');
                     $errMessage = sprintf(
                         "Mismatching devices %s for serial number %s. Data: %s",
                         json_encode($phone->getDevices()),
@@ -683,7 +683,7 @@ class ReceperioService extends BaseImeiService
         }
 
         if (strtolower($model) != strtolower($phone->getModel())) {
-            $this->statsd->gauge('recipero.makeModelMismatch', 1);
+            $this->statsd->increment('recipero.makeModelMismatch');
             $errMessage = sprintf(
                 "Mismatching model %s for serial number %s. Data: %s",
                 $phone->getModel(),
