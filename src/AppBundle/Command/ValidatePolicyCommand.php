@@ -80,6 +80,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
             }
 
+            $valid = $policy->hasCorrectPolicyStatus($validateDate);
+            if ($valid === false) {
+                $lines[] = $this->failureStatusMessage($policy, $prefix, $validateDate);
+            }
+
             $valid = $policy->isPotValueCorrect();
             $lines[] = sprintf(
                 'Policy %s %s the correct pot value',
@@ -136,6 +141,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = sprintf('Policy %s has incorrect scheduled payments', $policy->getPolicyNumber());
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
                 }
+                if ($policy->hasCorrectPolicyStatus($validateDate) === false) {
+                    $lines[] = $this->failureStatusMessage($policy, $prefix, $validateDate);
+                }
             }
         }
 
@@ -146,6 +154,15 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
         $output->writeln(implode(PHP_EOL, $lines));
         $output->writeln('Finished');
+    }
+
+    private function failureStatusMessage($policy, $prefix, $date)
+    {
+        return sprintf(
+            'Policy %s has unexpected status %s',
+            $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
+            $policy->getStatus()
+        );
     }
 
     private function failurePaymentMessage($policy, $prefix, $date)
