@@ -208,7 +208,13 @@ class PolicyService
         $checkmend['imeiCertId'] = $this->imeiValidator->getCertId();
         $checkmend['imeiResponse'] = $this->imeiValidator->getResponseData();
 
-        if (!$this->imeiValidator->checkSerial($phone, $serialNumber, $user, $identityLog, $this->warnMakeModelMismatch)) {
+        if (!$this->imeiValidator->checkSerial(
+            $phone,
+            $serialNumber,
+            $user,
+            $identityLog,
+            $this->warnMakeModelMismatch
+        )) {
             throw new ImeiPhoneMismatchException();
         }
         $checkmend['serialResponse'] = $this->imeiValidator->getResponseData();

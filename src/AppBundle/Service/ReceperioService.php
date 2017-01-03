@@ -54,6 +54,8 @@ class ReceperioService extends BaseImeiService
 
     protected $mailer;
 
+    protected $statsd;
+
     /**
      * @param string $environment
      */
@@ -110,6 +112,11 @@ class ReceperioService extends BaseImeiService
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
+    }
+
+    public function setStatsd($statsd)
+    {
+        $this->statsd = $statsd;
     }
 
     private function queueMessage(
@@ -512,8 +519,13 @@ class ReceperioService extends BaseImeiService
      *
      * @return boolean True if imei is ok
      */
-    public function checkSerial(Phone $phone, $serialNumber, User $user = null, IdentityLog $identityLog = null, $warnMismatch = true)
-    {
+    public function checkSerial(
+        Phone $phone,
+        $serialNumber,
+        User $user = null,
+        IdentityLog $identityLog = null,
+        $warnMismatch = true
+    ) {
         \AppBundle\Classes\NoOp::noOp([$phone]);
         if ($serialNumber == self::TEST_INVALID_SERIAL) {
             return false;
@@ -642,6 +654,7 @@ class ReceperioService extends BaseImeiService
                     in_array(strtolower($device), $phone->getDevices())) {
                     return true;
                 } else {
+                    $this->statsd->gauge('recipero.makeModelMismatch', 1);
                     $errMessage = sprintf(
                         "Mismatching devices %s for serial number %s. Data: %s",
                         json_encode($phone->getDevices()),
@@ -670,6 +683,7 @@ class ReceperioService extends BaseImeiService
         }
 
         if (strtolower($model) != strtolower($phone->getModel())) {
+            $this->statsd->gauge('recipero.makeModelMismatch', 1);
             $errMessage = sprintf(
                 "Mismatching model %s for serial number %s. Data: %s",
                 $phone->getModel(),

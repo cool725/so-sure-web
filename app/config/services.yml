@@ -194,6 +194,7 @@ services:
             - [setEnvironment, ['%kernel.environment%']]
             - [setRateLimit, ['@app.ratelimit']]
             - [setMailer, ['@app.mailer']]
+            - [setStatsd, ['@statsd']]
 
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService
