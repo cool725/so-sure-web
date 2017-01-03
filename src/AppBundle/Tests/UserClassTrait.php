@@ -52,9 +52,6 @@ trait UserClassTrait
         $user->setPlainPassword($password);
         $user->setEnabled(true);
 
-        // Most tests should be against non-prelaunch users
-        $user->setCreated(new \DateTime('2017-01-01'));
-
         if ($phone) {
             $user->setMobileNumber(self::generateRandomMobile());
             $user->setFirstName('foo');
