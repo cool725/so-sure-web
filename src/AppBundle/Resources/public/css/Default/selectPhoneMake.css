@@ -99,3 +99,7 @@
   width: 0% !important;
   display: initial;
 }
+
+.device-select p {
+    margin-top: 10px;
+}
