@@ -520,7 +520,7 @@ background: rgba(51, 153, 255, 1);
     filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1);
 }
 
-.background-image-1 {
+/*.background-image-1 {
   background-image: url('https://cdn.so-sure.com/images/home/background/background-6.jpg');
   background-size: cover;
   background-color: #202532;
@@ -545,6 +545,13 @@ background: rgba(51, 153, 255, 1);
   background-size: cover;
   background-color: #202532;
   background-position: center;
+}*/
+
+.background-image-light {
+    background-image: url('https://cdn.so-sure.com/images/home/background/background-light.png');
+    background-size: cover;
+    background-color: #202532;
+    background-position: center;
 }
 
 .brand-dark-background {

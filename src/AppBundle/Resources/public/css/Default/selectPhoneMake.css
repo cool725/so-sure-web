@@ -35,7 +35,7 @@
     }
     .select-phone-dropdown {
         display: inline-block !important;
-        margin-top: 5px !important;
+        margin-bottom: 15px !important;
         width: 100% !important;
         margin-right: 0px;
     }
@@ -74,12 +74,9 @@
 #select-phone a {
     margin-top: 20px;
     font-size: 14px;
+    color: #ffffff;
 }
 
-#select-phone a:hover, a:focus {
-    text-decoration: none !important;
-    color: #202532;
-}
 
 #select-phone button.btn {
     padding: 12px 30px;
