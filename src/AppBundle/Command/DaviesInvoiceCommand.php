@@ -66,7 +66,7 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
                 $item->setDescription(sprintf(
                     'ClaimsCheck for %s on %s',
                     $charge->getClaim() ? $charge->getClaim()->getNumber() : 'unknown claim number',
-                    $date->format('d M Y')
+                    $charge->getCreatedDate()->format('d M Y')
                 ));
                 $invoice->addInvoiceItem($item);
             }
