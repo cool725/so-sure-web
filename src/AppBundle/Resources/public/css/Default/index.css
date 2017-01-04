@@ -179,13 +179,13 @@
 /* SOCIAL PROOF */
 
 .social-proof {
-    padding: 60px 20px 100px 20px;
-    text-align: center;
+/*    padding: 60px 20px 100px 20px;
+    text-align: center;*/
 }
 
 .social-proof .row {
     text-align: left;
-    margin-top: 40px;
+    /*margin-top: 40px;*/
     display: inline-block;
 }
 
