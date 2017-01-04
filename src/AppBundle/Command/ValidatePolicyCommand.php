@@ -103,7 +103,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             $valid = $policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate);
             $lines[] = sprintf(
-                'Policy %s %s correct scheduled payments',
+                'Policy %s %s correct scheduled payments (likely incorrect if within 2 weeks of cancellation date)',
                 $policyNumber,
                 $valid ? 'has' : 'does NOT have'
             );
@@ -138,7 +138,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = $this->failurePotValueMessage($policy);
                 }
                 if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate) === false) {
-                    $lines[] = sprintf('Policy %s has incorrect scheduled payments', $policy->getPolicyNumber());
+                    $lines[] = sprintf(
+                        'Policy %s has incorrect scheduled payments (likely if within 2 weeks of cancellation date)',
+                        $policy->getPolicyNumber()
+                    );
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
                 }
                 if ($policy->hasCorrectPolicyStatus($validateDate) === false) {
