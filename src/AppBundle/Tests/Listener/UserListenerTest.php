@@ -75,7 +75,8 @@ class UserListenerTest extends WebTestCase
         $listener = new UserListener(
             self::$dm,
             self::$container->get('logger'),
-            self::$container->get('app.mailer')
+            self::$container->get('app.mailer'),
+            self::$container->get('snc_redis.default')
         );
         $listener->onUserUpdatedEvent($event);
 
@@ -132,7 +133,8 @@ class UserListenerTest extends WebTestCase
         $listener = new UserListener(
             self::$dm,
             self::$container->get('logger'),
-            self::$container->get('app.mailer')
+            self::$container->get('app.mailer'),
+            self::$container->get('snc_redis.default')
         );
         $listener->onUserUpdatedEvent($event);
 

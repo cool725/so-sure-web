@@ -838,6 +838,7 @@ class ApiControllerTest extends BaseControllerTest
 
     public function testUserCreate()
     {
+        $this->expectNoUserChangeEvent();
         $cognitoIdentityId = $this->getUnauthIdentity();
 
         $birthday = new \DateTime('1980-01-01');

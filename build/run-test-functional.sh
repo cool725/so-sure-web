@@ -46,23 +46,37 @@ if [ -d /dev/shm/cache/test ]; then
   sudo rm -rf /dev/shm/cache/test/
 fi
 
+function init {
+SKIP_DB=$1
+SKIP_POLICY=$2
 if [ "$SKIP_DB" == "0" ]; then
-app/console --env=test redis:flushdb --client=default -n
-app/console --env=test doctrine:mongodb:schema:drop
+  app/console --env=test redis:flushdb --client=default -n
+  app/console --env=test doctrine:mongodb:schema:drop
 
-if [ "$SKIP_POLICY" == "0" ]; then
-  app/console --env=test doctrine:mongodb:fixtures:load --no-interaction
-else
-  app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/a/PolicyTerms
-  app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/Phone --append
-  app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/PlayDevice --append
-  app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/User --append
-  app/console --env=test sosure:doctrine:index
+  if [ "$SKIP_POLICY" == "0" ]; then
+    app/console --env=test doctrine:mongodb:fixtures:load --no-interaction
+  else
+    app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/a/PolicyTerms
+    app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/Phone --append
+    app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/PlayDevice --append
+    app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/User --append
+    app/console --env=test sosure:doctrine:index
+  fi
 fi
-fi
+}
+
+init $SKIP_DB $SKIP_POLICY
 
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
 if [ "$RUN_FILTER" == "" ]; then
+    # for some reason, some tests do not do work as expected unless run individually
+    echo "Running test cases that need to be run individually :("
+    ./build/phpunit.sh --filter "::testUserCreateNoChangeEmail" --bootstrap vendor/autoload.php src/AppBundle/
+
+    echo "Wiping db again"
+    init $SKIP_DB $SKIP_POLICY
+
+    echo "Running runn test suite"
   ./vendor/phing/phing/bin/phing -f build/test.xml $FUNCTIONAL_TEST
 else
   echo ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/    

@@ -14,6 +14,8 @@ use Psr\Log\LoggerInterface;
 
 class UserListener
 {
+    const DUPLICATE_EMAIL_CACHE_TIME = 300;
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -23,19 +25,24 @@ class UserListener
     /** @var MailerService */
     protected $mailer;
 
+    protected $redis;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param MailerService   $mailer
+     * @param                 $redis
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        MailerService $mailer
+        MailerService $mailer,
+        $redis
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
+        $this->redis = $redis;
     }
 
     /**
@@ -54,6 +61,11 @@ class UserListener
      */
     public function sendUserEmailChangedEmail(User $user, $email)
     {
+        $key = sprintf('user:change-email:%s', $email);
+        if ($this->redis->exists($key)) {
+            return;
+        }
+
         $this->mailer->sendTemplate(
             'Your email has been changed',
             $email,
@@ -62,6 +74,7 @@ class UserListener
             'AppBundle:Email:emailChanged.txt.twig',
             ['user' => $user]
         );
+        $this->redis->setex($key, self::DUPLICATE_EMAIL_CACHE_TIME, 1);
     }
 
     /**
