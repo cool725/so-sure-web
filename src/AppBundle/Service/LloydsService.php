@@ -73,7 +73,14 @@ class LloydsService
                     }
 
                     $this->logger->info(sprintf('Processing line. %s', implode($line)));
+                    // e.g. SEP21
                     $processedDate = new \DateTime($processedDates[1]);
+
+                    // In the case where we're in Jan processing for Dec of previous year, as the above
+                    // doesn't have a year it will assume Dec of current year (e.g. in the future)
+                    if ($processedDate > new \DateTime()) {
+                        $processedDate = $processedDate->sub(new \DateInterval('P1Y'));
+                    }
 
                     if (is_numeric($line['Credit Amount'])) {
                         $amount = $line['Credit Amount'];
