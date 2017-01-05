@@ -457,7 +457,7 @@ class PurchaseController extends BaseController
             }
         }
 
-        return $this->redirectToRoute('user_home');
+        return $this->redirectToRoute('user_welcome');
     }
     /**
      * @Route("/cc/fail", name="purchase_judopay_receive_fail")
