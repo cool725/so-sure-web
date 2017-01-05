@@ -32,6 +32,7 @@ class UserController extends BaseController
 {
     /**
      * @Route("/", name="user_home")
+     * @Route("/welcome", name="user_welcome")
      * @Template
      */
     public function indexAction(Request $request)
