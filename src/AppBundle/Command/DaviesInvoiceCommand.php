@@ -63,11 +63,7 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
             foreach ($charges as $charge) {
                 $charge->setInvoice($invoice);
                 $item = new InvoiceItem($charge->getAmountWithVat(), 1);
-                $item->setDescription(sprintf(
-                    'ClaimsCheck for %s on %s',
-                    $charge->getClaim() ? $charge->getClaim()->getNumber() : 'unknown claim number',
-                    $charge->getCreatedDate()->format('d M Y')
-                ));
+                $item->setDescription($charge->__toString());
                 $invoice->addInvoiceItem($item);
             }
             $dm->persist($invoice);
@@ -101,6 +97,6 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
         $dm = $this->getManager();
         $repo = $dm->getRepository(Charge::class);
 
-        return $repo->findMonthly($date, Charge::TYPE_CLAIMSCHECK, true);
+        return $repo->findMonthly($date, [Charge::TYPE_CLAIMSCHECK, Charge::TYPE_CLAIMSDAMAGE], true);
     }
 }

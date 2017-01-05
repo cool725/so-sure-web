@@ -187,7 +187,8 @@ class ClaimsController extends BaseController
                         $this->getUser()
                     );
                     $this->addFlash('success', sprintf(
-                        'ClaimCheck £%0.2f <a href="%s" target="_blank">%s</a> (Phone is %s)',
+                        '%s £%0.2f <a href="%s" target="_blank">%s</a> (Phone is %s)',
+                        ucfirst($claimscheck->getType()),
                         $claimscheck->getClaim()->getLastChargeAmountWithVat(),
                         $imeiService->getCertUrl(),
                         $imeiService->getCertId(),
