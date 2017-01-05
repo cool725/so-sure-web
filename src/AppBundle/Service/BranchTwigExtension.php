@@ -110,23 +110,29 @@ class BranchTwigExtension extends \Twig_Extension
         return $data;
     }
 
-    private function getSource($source)
+    private function getSource()
     {
         $utm = $this->getUtm();
+        $referer = $this->getReferer();
         if ($utm) {
             return $utm['source'];
+        } elseif ($referer) {
+            return $referer;
         } else {
-            return $source;
+            return 'wearesosure.com';
         }
     }
 
-    private function getMedium()
+    private function getMedium($medium)
     {
         $utm = $this->getUtm();
+        $referer = $this->getReferer();
         if ($utm) {
             return $utm['medium'];
+        } elseif ($referer) {
+            return 'organic';
         } else {
-            return 'web';
+            return $medium;
         }
     }
 
@@ -140,23 +146,23 @@ class BranchTwigExtension extends \Twig_Extension
         }
     }
 
-    public function branch($source)
+    public function branch($medium)
     {
         return $this->branch->link(
             $this->getData(),
-            $this->getSource($source),
-            $this->getMedium(),
+            $this->getSource(),
+            $this->getMedium($medium),
             $this->getCampaign()
         );
     }
 
-    public function apple($source)
+    public function apple($medium)
     {
         try {
             return $this->branch->appleLink(
                 $this->getData(),
-                $this->getSource($source),
-                $this->getMedium(),
+                $this->getSource(),
+                $this->getMedium($medium),
                 $this->getCampaign()
             );
         } catch (\Exception $e) {
@@ -164,19 +170,19 @@ class BranchTwigExtension extends \Twig_Extension
         }
 
         return $this->branch->downloadAppleLink(
-            $this->getSource($source),
-            $this->getMedium(),
+            $this->getSource(),
+            $this->getMedium($medium),
             $this->getCampaign()
         );
     }
 
-    public function google($source)
+    public function google($medium)
     {
         try {
             return $this->branch->googleLink(
                 $this->getData(),
-                $this->getSource($source),
-                $this->getMedium(),
+                $this->getSource(),
+                $this->getMedium($medium),
                 $this->getCampaign()
             );
         } catch (\Exception $e) {
@@ -184,8 +190,8 @@ class BranchTwigExtension extends \Twig_Extension
         }
 
         return $this->branch->downloadGoogleLink(
-            $this->getSource($source),
-            $this->getMedium(),
+            $this->getSource(),
+            $this->getMedium($medium),
             $this->getCampaign()
         );
     }
