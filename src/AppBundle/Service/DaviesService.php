@@ -386,7 +386,9 @@ class DaviesService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$this->areEqualToTwoDp($claim->totalChargesWithVat(), $daviesClaim->reciperoFee)) {
+        // We should always validate Recipero Fee if the fee is present or if the claim is closed
+        if ( ($daviesClaim->isClosed() || $daviesClaim->reciperoFee > 0) &&
+            !$this->areEqualToTwoDp($claim->totalChargesWithVat(), $daviesClaim->reciperoFee)) {
             $msg = sprintf(
                 'Claim %s does not have the correct recipero fee. Expected £%0.2f Actual £%0.2f',
                 $daviesClaim->claimNumber,
