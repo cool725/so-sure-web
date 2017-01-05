@@ -24,7 +24,9 @@ class ChargeRepository extends DocumentRepository
             ->field('createdDate')->gte($start)
             ->field('createdDate')->lt($end);
 
-        if ($type) {
+        if (is_array($type)) {
+            $qb->field('type')->in($type);
+        } elseif ($type) {
             $qb->field('type')->equals($type);
         }
 
@@ -33,7 +35,7 @@ class ChargeRepository extends DocumentRepository
         }
 
         return $qb
-            ->sort('scheduled', 'asc')
+            ->sort('createdDate', 'asc')
             ->getQuery()
             ->execute();
     }

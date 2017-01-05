@@ -20,6 +20,7 @@ class Charge
     const TYPE_GSMA = 'gsma';
     const TYPE_MAKEMODEL = 'makemodel';
     const TYPE_CLAIMSCHECK = 'claimscheck';
+    const TYPE_CLAIMSDAMAGE = 'claimsdamage';
 
     public static $prices = [
         self::TYPE_ADDRESS => 0.037, // ex vat
@@ -27,6 +28,7 @@ class Charge
         self::TYPE_GSMA => 0.02, // ex vat
         self::TYPE_MAKEMODEL => 0.05, // ex vat
         self::TYPE_CLAIMSCHECK => 0.9, // ex vat
+        self::TYPE_CLAIMSDAMAGE => 0.02, // ex vat
     ];
 
     /**
@@ -42,7 +44,7 @@ class Charge
     protected $createdDate;
 
     /**
-     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck"})
+     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -197,5 +199,23 @@ class Charge
     public function setInvoice($invoice)
     {
         $this->invoice = $invoice;
+    }
+
+    public function __toString()
+    {
+        if ($this->getClaim()) {
+            return sprintf(
+                '%s for %s on %s',
+                ucfirst($this->getType()),
+                $this->getClaim()->getNumber(),
+                $this->getCreatedDate()->format('d M Y')
+            );
+        } else {
+            return sprintf(
+                '%s on %s',
+                ucfirst($this->getType()),
+                $this->getCreatedDate()->format('d M Y')
+            );
+        }
     }
 }

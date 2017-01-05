@@ -368,7 +368,11 @@ class ReceperioService extends BaseImeiService
                 $this->redis->zincrby($logKey, 1, $imei);
 
                 $charge = new Charge();
-                $charge->setType(Charge::TYPE_GSMA);
+                if ($claim) {
+                    $charge->setType(Charge::TYPE_CLAIMSDAMAGE);
+                } else {
+                    $charge->setType(Charge::TYPE_GSMA);
+                }
                 $charge->setUser($user);
                 $charge->setDetails($imei);
                 $charge->setHandler($handler);
