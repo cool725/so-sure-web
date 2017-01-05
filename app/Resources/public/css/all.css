@@ -124,7 +124,6 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: space-between;
     -ms-flex-align: center;
     align-items: center;
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
     width: 100%;
 }
 
@@ -433,10 +432,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Benefits */
 
-.benefits {
+/*.benefits {
         padding: 100px 20px 60px 20px;
     text-align: center;
-}
+}*/
 
 .benefits img {
     height: 150px;
@@ -451,13 +450,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .section--pad {
-    padding: 40px 0;
+    padding: 40px 15px;
 }
 
 @media (min-width: 991px) {
 
   .section--pad {
-      padding: 60px 0;
+      padding: 60px 15px;
   }
 }
 
@@ -520,7 +519,7 @@ background: rgba(51, 153, 255, 1);
     filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1);
 }
 
-.background-image-1 {
+/*.background-image-1 {
   background-image: url('https://cdn.so-sure.com/images/home/background/background-6.jpg');
   background-size: cover;
   background-color: #202532;
@@ -545,6 +544,13 @@ background: rgba(51, 153, 255, 1);
   background-size: cover;
   background-color: #202532;
   background-position: center;
+}*/
+
+.background-image-light {
+    background-image: url('https://cdn.so-sure.com/images/home/background/background-light.png');
+    background-size: cover;
+    background-color: #202532;
+    background-position: center;
 }
 
 .brand-dark-background {
