@@ -1,9 +1,13 @@
 $(function(){
-    $('#birthday').datetimepicker({
-        format: "DD/MM/YYYY",
-        allowInputToggle: true,
-        showTodayButton: false,
-        useCurrent: false 
+
+    $('#purchase_form_birthday').daterangepicker({
+        parentEl: '#birthday',
+        singleDatePicker: true,
+        showDropdowns: true,
+        drops: "up",
+        locale: {
+            format: 'DD/MM/YYYY'
+        }            
     });
 
     $('.form-control').on('keyup', function() {
