@@ -450,13 +450,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .section--pad {
-    padding: 40px 0;
+    padding: 40px 15px;
 }
 
 @media (min-width: 991px) {
 
   .section--pad {
-      padding: 60px 0;
+      padding: 60px 15px;
   }
 }
 
