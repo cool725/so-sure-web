@@ -12,8 +12,12 @@
         <td>£{{ paymentTotals.sosure.received|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
-        <td>Refunded</td>
-        <td>£{{ paymentTotals.all.refunded|number_format(2, '.', ',') }}</td>
+        <td>Refunded (cards)</td>
+        <td>£{{ paymentTotals.judo.refunded|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td>Refunded (so-sure)</td>
+        <td>£{{ paymentTotals.sosure.refunded|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
         <td>Total Commissions (so-sure + Afl)</td>
