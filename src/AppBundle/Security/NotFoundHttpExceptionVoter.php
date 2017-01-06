@@ -12,6 +12,9 @@ class NotFoundHttpExceptionVoter implements ReportVoterInterface
         return $exception instanceof NotFoundHttpException;
     }
 
+    /**
+     * @return boolean false to exclude from sending to rollbar; true will allow other voters to decide
+     */
     public function vote($exception)
     {
         return !$this->support($exception);
