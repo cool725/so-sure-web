@@ -505,6 +505,7 @@ services:
             dm:                   "@doctrine_mongodb.odm.default_document_manager"
             logger:               "@logger"
             mailer:               "@app.mailer"
+            redis:                "@snc_redis.default"
         tags:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }

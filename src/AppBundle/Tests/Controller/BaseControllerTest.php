@@ -3,6 +3,8 @@
 namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Listener\UserListener;
+use AppBundle\Event\UserEmailEvent;
 
 class BaseControllerTest extends WebTestCase
 {
@@ -33,6 +35,12 @@ class BaseControllerTest extends WebTestCase
         self::$jwt = self::$container->get('app.jwt');
         self::$redis = self::$container->get('snc_redis.default');
         self::$policyService = self::$container->get('app.policy');
+    }
+    
+    public function setUp()
+    {
+        parent::setUp();
+        $this->expectNoUserChangeEvent();
     }
 
     // helpers
@@ -86,5 +94,31 @@ class BaseControllerTest extends WebTestCase
             $cognitoIdentityId,
             $validateData
         );
+    }
+
+    protected function expectNoUserChangeEvent()
+    {
+        $this->expectUserChangeEvent($this->never());
+    }
+
+    protected function expectUserChangeEvent($count = null, $remove = false)
+    {
+        if (!$count) {
+            $count = $this->once();
+        }
+        $method = 'onUserEmailChangedEvent';
+        $listener = $this->getMockBuilder('UserListener')
+                         ->setMethods(array($method))
+                         ->getMock();
+        $listener->expects($count)
+                     ->method($method);
+
+        $dispatcher = static::$container->get('event_dispatcher');
+        
+        if ($remove) {
+            $dispatcher->removeListener(UserEmailEvent::EVENT_CHANGED, array($listener, $method));
+        } else {
+            $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, $method));
+        }
     }
 }
