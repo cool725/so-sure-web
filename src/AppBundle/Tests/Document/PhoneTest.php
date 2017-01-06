@@ -88,14 +88,7 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
 
         $phone = new Phone();
         $phone->setMake('LG');
-        $this->assertTrue($phone->isSameMake('Google'));
-
-        $phone = new Phone();
-        $phone->setMake('Motorola');
-        $this->assertTrue($phone->isSameMake('Google'));
-
-        $phone = new Phone();
-        $phone->setMake('Huawei');
+        $phone->setAlternativeMake('Google');
         $this->assertTrue($phone->isSameMake('Google'));
 
         $phone = new Phone();
