@@ -40,12 +40,7 @@
                             {{ form_label(purchase_form.birthday, 'Date of Birth') }}
                         </div>
                         <div class="col-sm-8">
-                            <div class='input-group date' id='birthday'>
-                                {{ form_widget(purchase_form.birthday, {'attr':{'class': 'form-control', 'placeholder':'DD/MM/YYYY'}}) }}
-                                <span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
-                            </div>
+                            {{ form_widget(purchase_form.birthday, {'attr':{'class': 'form-control', 'placeholder':'DD/MM/YYYY'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
                         </div>
                     </div>

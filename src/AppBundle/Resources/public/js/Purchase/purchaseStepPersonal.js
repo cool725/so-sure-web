@@ -1,14 +1,33 @@
 $(function(){
 
     $('#purchase_form_birthday').daterangepicker({
+        
         parentEl: '#birthday',
         singleDatePicker: true,
         showDropdowns: true,
-        drops: "up",
+        autoUpdateInput: false,
+        showCustomRangeLabel: false,
+        drops: 'up',
+        opens: 'center',
         locale: {
             format: 'DD/MM/YYYY'
-        }            
+        },
+        minDate: '01/01/1900',
+        maxDate: '01/01/2001'
+
     });
+
+    $('#purchase_form_birthday').on('apply.daterangepicker', function(ev, picker) {
+        
+        $(this).val(picker.startDate.format('DD/MM/YYYY'));
+
+    });    
+
+    $('#purchase_form_birthday').on('cancel.daterangepicker', function(ev, picker) {
+        
+        $(this).val('');
+
+    });        
 
     $('.form-control').on('keyup', function() {
         $(this).parent().removeClass('has-error');
