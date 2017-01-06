@@ -18,12 +18,12 @@
 }
 
 .view-quote--right {
-    padding: 30px 30px 0;
+    padding: 30px 15px 0;
 }
 
 .view-quote--ticks {
     color: #3399FF;
-    margin-right: 5px;
+    margin: 0 5px 5px 0;
 }
 
 .view-quote--footer {
@@ -46,6 +46,10 @@
     .view-quote-list li {
         margin-bottom: 40px;
     }  
+
+    .view-quote--right {
+        padding: 30px 30px 0;
+    }    
 
 }
 
