@@ -3,7 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+    'components/bootstrap-daterangepicker/daterangepicker.css'
     '@AppBundle/Resources/public/css/Purchase/purchase.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -12,7 +12,7 @@
     {{ parent() }}
     {% javascripts
     'components/moment/moment.min.js'
-    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+    'components/bootstrap-daterangepicker/daterangepicker.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStepPersonal.js' %}
     %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -40,12 +40,7 @@
                             {{ form_label(purchase_form.birthday, 'Date of Birth') }}
                         </div>
                         <div class="col-sm-8">
-                            <div class='input-group date' id='birthday'>
-                                {{ form_widget(purchase_form.birthday, {'attr':{'class': 'form-control', 'placeholder':'DD/MM/YYYY'}}) }}
-                                <span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
-                            </div>
+                            {{ form_widget(purchase_form.birthday, {'attr':{'class': 'form-control', 'placeholder':'DD/MM/YYYY'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
                         </div>
                     </div>

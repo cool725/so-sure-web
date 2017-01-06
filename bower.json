@@ -24,7 +24,8 @@
     "datatables.net-bs": "^1.10.12",
     "typeahead.js": "^0.11.1",
     "clipboard": "^1.5.15",
-    "jssocials": "^1.4.0"
+    "jssocials": "^1.4.0",
+    "bootstrap-daterangepicker": "https://github.com/dangrossman/bootstrap-daterangepicker.git#2.1.24"
   },
   "install": {
     "path": "web/components",
@@ -66,6 +67,10 @@
         "bower_components/jssocials/dist/jssocials.min.js",
         "bower_components/jssocials/dist/jssocials.css",
         "bower_components/jssocials/dist/jssocials-theme-flat.css"
+      ],
+      "bootstrap-daterangepicker": [
+        "bower_components/bootstrap-daterangepicker/daterangepicker.js",
+        "bower_components/bootstrap-daterangepicker/daterangepicker.css"
       ]
     }
   }
