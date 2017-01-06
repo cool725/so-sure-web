@@ -12,8 +12,7 @@ $(function(){
         locale: {
             format: 'DD/MM/YYYY'
         },
-        minDate: '01/01/1900',
-        maxDate: '01/01/2001'
+        minDate: '01/01/1867',
 
     });
 
