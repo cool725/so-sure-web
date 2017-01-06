@@ -64,15 +64,15 @@ class KernelListener
             }
 
             // authChecker doesn't seem to be working :(
-            // WARNING - this means that ROLE_ADMIN needs to be directly assigned instead of chainging
+            // WARNING - this means that we needs to directly check the assigned role instead of using role inheritance
             // TODO: Fixme
-            $adminUser = false;
+            $employee = false;
             foreach ($token->getUser()->getRoles() as $role) {
-                if ($role == "ROLE_ADMIN") {
-                    $adminUser = true;
+                if (in_array($role, ["ROLE_ADMIN", "ROLE_EMPLOYEE"])) {
+                    $employee = true;
                 }
             }
-            if (!$adminUser) {
+            if (!$employee) {
                 return;
             }
         } catch (\Exception $e) {
