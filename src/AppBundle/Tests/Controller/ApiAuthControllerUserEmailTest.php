@@ -61,7 +61,10 @@ class ApiAuthControllerUserEmailTest extends BaseControllerTest
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
-        $this->assertEquals(strtolower(self::generateEmail('testUpdateUserChangeEmail-updated', $this)), $result['email']);
+        $this->assertEquals(
+            strtolower(self::generateEmail('testUpdateUserChangeEmail-updated', $this)),
+            $result['email']
+        );
         /** @var EventDataCollector $eventDataCollector */
         //$eventDataCollector = self::$client->getProfile()->getCollector('events');
        // print_r($eventDataCollector);
