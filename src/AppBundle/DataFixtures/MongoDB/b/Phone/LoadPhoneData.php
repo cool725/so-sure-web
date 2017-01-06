@@ -118,6 +118,16 @@ abstract class LoadPhoneData implements ContainerAwareInterface
                 $date
             );
 
+            if ($phone->getMake() == 'LG' && in_array($phone->getModel(), ['Nexus 5', 'Nexus 5X'])) {
+                $phone->setAlternativeMake('Google');
+            }
+            if ($phone->getMake() == 'Motorola' && in_array($phone->getModel(), ['Nexus 6'])) {
+                $phone->setAlternativeMake('Google');
+            }
+            if ($phone->getMake() == 'Huawei' && in_array($phone->getModel(), ['Nexus 6P'])) {
+                $phone->setAlternativeMake('Google');
+            }
+
             $resolution = explode('x', str_replace(' ', '', $data[17]));
             $releaseDate = null;
             $releaseDateText = str_replace(' ', '', $data[21]);

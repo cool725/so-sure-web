@@ -46,6 +46,13 @@ class Phone
     protected $make;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
+    protected $alternativeMake;
+
+    /**
      * @AppAssert\Token()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
@@ -343,6 +350,16 @@ class Phone
         $this->make = $make;
     }
 
+    public function getAlternativeMake()
+    {
+        return $this->alternativeMake;
+    }
+
+    public function setAlternativeMake($alternativeMake)
+    {
+        $this->alternativeMake = $alternativeMake;
+    }
+
     public function getModel()
     {
         return $this->model;
@@ -599,15 +616,9 @@ class Phone
         $make = strtolower($make);
         if ($make == 'lge') {
             $make = 'lg';
-        } elseif ($make == 'google') {
-            // https://en.wikipedia.org/wiki/Google_Nexus
-            // TODO: Improve based on model, but as not really used at this point
-            if (in_array($this->getMake(), ['LG', 'Huawei', 'Motorola'])) {
-                $make = strtolower($this->getMake());
-            }
         }
 
-        return strtolower($this->getMake()) == $make;
+        return strtolower($this->getMake()) == $make || strtolower($this->getAlternativeMake()) == $make;
     }
 
     public function isAppAvailable()
@@ -625,11 +636,21 @@ class Phone
         return in_array($this->getOs(), [self::OS_ANDROID, self::OS_CYANOGEN]);
     }
 
+    public function getMakeWithAlternative()
+    {
+        $make = $this->getMake();
+        if ($this->getAlternativeMake()) {
+            $make = sprintf("%s/%s", $this->getMake(), $this->getAlternativeMake());
+        }
+
+        return $make;
+    }
+
     public function __toString()
     {
-        $name = sprintf("%s %s", $this->make, $this->model);
+        $name = sprintf("%s %s", $this->getMakeWithAlternative(), $this->getModel());
         if ($this->memory) {
-            $name = sprintf("%s (%s GB)", $name, $this->memory);
+            $name = sprintf("%s (%s GB)", $name, $this->getMemory());
         }
 
         return $name;

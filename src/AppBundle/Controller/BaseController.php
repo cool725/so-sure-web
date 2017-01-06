@@ -109,6 +109,12 @@ abstract class BaseController extends Controller
                 $makes[] = $phone->getMake();
             }
             $phones[$phone->getMake()][$phone->getId()] = $phone->getModelMemory();
+            if ($phone->getAlternativeMake()) {
+                if (!in_array($phone->getAlternativeMake(), $makes)) {
+                    $makes[] = $phone->getAlternativeMake();
+                }
+                $phones[$phone->getAlternativeMake()][$phone->getId()] = $phone->getModelMemory();
+            }
         }
 
         return $phones;
