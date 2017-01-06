@@ -13,20 +13,17 @@
     padding: 30px 20px 0;
 }
 
-.view-quote--left {}
-
-.view-quote--right {
-    margin-top: 20px;
-}
-
-.view-quote--left p,
-.view-quote--right {
+.view-quote--left p {
     margin-top: 15px;
 }
 
+.view-quote--right {
+    padding: 30px 30px 0;
+}
+
 .view-quote--ticks {
-    display: inline-block;
-    padding: 0 5px 5px 0;
+    color: #3399FF;
+    margin-right: 5px;
 }
 
 .view-quote--footer {
@@ -46,13 +43,9 @@
         margin-bottom: 30px;
     }
 
-    .view-quote--right {
-        margin-top: 0;
-    }    
-
-  .view-quote-list li {
-      margin-bottom: 25px;
-  }    
+    .view-quote-list li {
+        margin-bottom: 40px;
+    }  
 
 }
 
@@ -61,6 +54,10 @@
     .view-quote .panel-primary {
         padding: 30px 40px 0;
     }
+
+    .view-quote--right {
+        padding: 0 30px 0;
+    }          
 }
 
 /* Sticky Quote */
@@ -83,7 +80,7 @@
     font-size: 65%;
 }
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
 
     .banner-sticky {
         text-align: left;
