@@ -137,10 +137,17 @@ class JudopayService
         $result = [
             'validated' => 0,
             'missing' => 0,
-            'non-payment' => 0
+            'non-payment' => 0,
+            'skipped' => 0,
         ];
         foreach ($details['results'] as $receipt) {
-            if ($receipt['type'] == 'Payment') {
+            $created = new \DateTime($receipt['createdAt']);
+            $now = new \DateTime();
+            $diff = $now->getTimestamp() - $created->getTimestamp();
+            // allow a few (5) minutes before warning if missing receipt
+            if ($diff < 300) {
+                $result['skipped']++;
+            } elseif ($receipt['type'] == 'Payment') {
                 $payment = $repo->findOneBy(['receipt' => $receipt['receiptId']]);
                 if (!$payment) {
                     // Only need to be concerned about successful payments
