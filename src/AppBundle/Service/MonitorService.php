@@ -64,7 +64,7 @@ class MonitorService
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findMissingReceivedDate();
         $now = new \DateTime();
-        foreach($claims as $claim) {
+        foreach ($claims as $claim) {
             $replacementDate = $claim->getPolicy()->getImeiReplacementDate();
             if (!$replacementDate ||
                 $now->getTimestamp() - $replacementDate->getTimestamp() > 3600) {
