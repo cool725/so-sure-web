@@ -19,7 +19,6 @@ class RegisterUserType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class)
-            ->add('mobileNumber', TextType::class)
             ->add('register', SubmitType::class)
         ;
     }

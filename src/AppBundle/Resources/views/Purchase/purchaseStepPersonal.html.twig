@@ -45,7 +45,6 @@
                         </div>
                     </div>
                 </div>
-                {% if purchase_form.mobileNumber.vars.block_prefixes.1 == 'text' %}
                 <div class="row">
                     <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
                         <div class="col-sm-4">
@@ -59,9 +58,6 @@
                         </div>
                     </div>
                 </div>
-                {% else %}
-                    {{ form_widget(purchase_form.mobileNumber) }}
-                {% endif %}
                 <div class="row">
                     <div class="form-group col-sm-12 text-center">
                         {{ form_widget(purchase_form.email) }}

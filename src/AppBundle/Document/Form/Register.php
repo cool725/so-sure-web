@@ -16,13 +16,6 @@ class Register
      */
     protected $email;
 
-    /**
-     * @var string
-     * @AppAssert\UkMobile()
-     * @Assert\NotNull()
-     */
-    protected $mobileNumber;
-
     public function getEmail()
     {
         return $this->email;
@@ -33,25 +26,13 @@ class Register
         $this->email = $email;
     }
 
-    public function getMobileNumber()
-    {
-        return $this->mobileNumber;
-    }
-
-    public function setMobileNumber($mobileNumber)
-    {
-        $this->mobileNumber = $mobileNumber;
-    }
-
     public function populateFromUser($user)
     {
         $this->setEmail($user->getEmail());
-        $this->setMobileNumber($user->getMobileNumber());
     }
 
     public function populateUser($user)
     {
         $user->setEmail($this->getEmail());
-        $user->setMobileNumber($this->getMobileNumber());
     }
 }

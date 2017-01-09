@@ -5,10 +5,10 @@
     </div>
     {% set show_google_play = true %}
     {% set show_itunes = true %}
-    {% if phone is defined and not phone.googlePlay %}
+    {% if phone is defined and phone and not phone.googlePlay %}
         {% set show_google_play = false %}
     {% endif %}
-    {% if phone is defined and not phone.iTunes %}
+    {% if phone is defined and phone and not phone.iTunes %}
         {% set show_itunes = false %}
     {% endif %}
     <div class="row">

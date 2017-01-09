@@ -69,6 +69,5 @@ security:
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ %sosure_patrick_ip% ] }
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
-        - { path: ^/purchase/, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
         - { path: ^/api, access: "isApiPort(8080)" }
