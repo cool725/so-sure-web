@@ -175,33 +175,6 @@
     opacity: 0.96;
 }
 
-
-/* SOCIAL PROOF */
-
-.social-proof {
-/*    padding: 60px 20px 100px 20px;
-    text-align: center;*/
-}
-
-.social-proof .row {
-    text-align: left;
-    /*margin-top: 40px;*/
-    display: inline-block;
-}
-
-@media (max-width: 543px) {
-    .social-proof .row {
-        display: inline;
-    }
-}
-
-@media (max-width: 767px) {
-    .social-proof .row {
-        text-align: center;
-    }
-}
-
-
 /* PRE-FOOTER */
 
 .pre-footer {
@@ -428,22 +401,37 @@
 /* Blockquote */
 
 blockquote {
-  border-left: 8px solid #202532;
-  margin: 1.5em 10px;
-  padding: 0.5em 10px;
-  quotes: "\201C""\201D""\2018""\2019";
-  box-shadow: 1px 1px 10px 1px rgba(0, 0, 0, 0.1);
-  border-radius: 2px;
+    position: relative;
+    margin: 25px 0;
+    padding: 10px 0 10px 20px;
+    font-size: 16px;
 }
+
+blockquote:before, blockquote:after {
+    position: absolute;
+    font-family: FontAwesome;
+    font-size: 50px;
+    color: #ccc;
+    line-height: 1;
+}
+
 blockquote:before {
-  font-size: 4em;
-  line-height: 0.1em;
-  margin-right: 0.25em;
-  vertical-align: -0.4em;
+    top: 5px; left: -15px;
+    content: '“';
 }
-blockquote p {
-  display: inline;
+
+blockquote footer:before {
+    content: '';
 }
+
+@media (min-width: 991px) {
+
+    blockquote {
+      margin: 0;
+    }  
+
+}
+
 
 #select-phone .device-select li {
   display: inline !important;
