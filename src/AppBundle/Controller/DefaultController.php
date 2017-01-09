@@ -201,18 +201,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/launch/{id}", name="launch_share")
-     * @Template
-     */
-    public function launchAction($id)
-    {
-        $launchUser = $this->get('app.user.launch');
-        $url = $launchUser->getShortLink($id);
-
-        return array('id' => $id, 'referral_url' => $url, 'fb_pixel_event' => 'Lead');
-    }
-
-    /**
      * @Route("/usa", name="launch_usa")
      * @Template
      */

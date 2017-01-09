@@ -89,4 +89,19 @@ _security_logout:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /logout
         permanent: true
+
+redirect_launch:
+    path: /launch
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /
+        permanent: true     
+
+
+redirect_launch_id:
+    path: /launch/{id}
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /
+        permanent: true    
     
