@@ -220,6 +220,9 @@ class DefaultController extends BaseController
         $dm = $this->getManager();
         $registerUser = new Register();
         $session = $request->getSession();
+        if ($session->get('email')) {
+            $registerUser->setEmail($session->get('email'));
+        }
 
         $form = $this->get('form.factory')
             ->createNamedBuilder('launch', RegisterUserType::class, $registerUser)
@@ -227,23 +230,19 @@ class DefaultController extends BaseController
         $form->handleRequest($request);
         if ($form->isValid()) {
             $userRepo = $dm->getRepository(User::class);
-            if ($userRepo->existsUser($registerUser->getEmail(), null, $registerUser->getMobileNumber())) {
+            if ($userRepo->existsUser($registerUser->getEmail(), null, null)) {
                 $this->addFlash('warning', 'Looks like you already have an account.');
                 return $this->redirectToRoute('user_home');
             }
 
-            $userManager = $this->get('fos_user.user_manager');
-            $user = $userManager->createUser();
-            $user->setEnabled(true);
-            $registerUser->populateUser($user);
+            // TODO: add to intercom?
+            $lead = new Lead();
+            $lead->setSource(Lead::SOURCE_BUY);
+            $lead->setEmail($registerUser->getEmail());
 
-            $dm->persist($user);
+            $dm->persist($lead);
             $dm->flush();
-
-            $this->get('fos_user.security.login_manager')->loginUser(
-                $this->getParameter('fos_user.firewall_name'),
-                $user
-            );
+            $session->set('email', $registerUser->getEmail());
 
             return $this->redirectToRoute('purchase');
         }

@@ -53,20 +53,9 @@ class PurchaseStepPersonalType extends AbstractType
                 'html5' => false,
                 'format' => 'dd/MM/yyyy'
             ])
+            ->add('mobileNumber', TextType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
         ;
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            $purchase = $event->getData();
-            $form = $event->getForm();
-
-            // TODO: Better check on mobile number
-            if ($purchase->getMobileNumber() && strlen($purchase->getMobileNumber()) > 0) {
-                $form->add('mobileNumber', HiddenType::class, ['required' => false]);
-            } else {
-                $form->add('mobileNumber', TextType::class, ['required' => $this->required]);
-            }
-        });
     }
 
     public function configureOptions(OptionsResolver $resolver)

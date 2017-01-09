@@ -55,8 +55,9 @@ class PurchaseController extends BaseController
     */
     public function purchaseStepPersonalAction(Request $request)
     {
+        $session = $request->getSession();
         $user = $this->getUser();
-        if ($user->hasPolicy()) {
+        if ($user && $user->hasPolicy()) {
             $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
 
             return $this->redirectToRoute('user_home');
@@ -66,12 +67,20 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('purchase_step_2');
         }
         */
-        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+        if ($user) {
+            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+        }
 
         $dm = $this->getManager();
 
         $purchase = new PurchaseStepPersonal();
-        $purchase->populateFromUser($user);
+        if ($user) {
+            $purchase->populateFromUser($user);
+        } elseif ($session->get('email')) {
+            $purchase->setEmail($session->get('email'));
+        } else {
+            return $this->redirectToRoute('register');
+        }
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalType::class, $purchase)
             ->getForm();
@@ -97,7 +106,14 @@ class PurchaseController extends BaseController
                         throw new \Exception($err);
                     }
 
+                    if (!$user) {
+                        $userManager = $this->get('fos_user.user_manager');
+                        $user = $userManager->createUser();
+                        $user->setEnabled(true);
+                        $dm->persist($user);
+                    }
                     $purchase->populateUser($user);
+                    $dm->flush();
 
                     if (!$user->hasValidDetails()) {
                         $this->get('logger')->error(sprintf(
@@ -109,7 +125,10 @@ class PurchaseController extends BaseController
                             $user->getId()
                         ));
                     }
-                    $dm->flush();
+                    $this->get('fos_user.security.login_manager')->loginUser(
+                        $this->getParameter('fos_user.firewall_name'),
+                        $user
+                    );
 
                     return $this->redirectToRoute('purchase_step_address');
                 }
@@ -132,7 +151,9 @@ class PurchaseController extends BaseController
     public function purchaseStepAddressAction(Request $request)
     {
         $user = $this->getUser();
-        if ($user->hasPolicy()) {
+        if (!$user) {
+            return $this->redirectToRoute('purchase');
+        } elseif ($user->hasPolicy()) {
             $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
 
             return $this->redirectToRoute('user_home');
@@ -190,7 +211,9 @@ class PurchaseController extends BaseController
     public function purchaseStepPhoneAction(Request $request)
     {
         $user = $this->getUser();
-        if ($user->hasPolicy()) {
+        if (!$user) {
+            return $this->redirectToRoute('purchase');
+        } elseif ($user->hasPolicy()) {
             $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
 
             return $this->redirectToRoute('user_home');
@@ -346,7 +369,9 @@ class PurchaseController extends BaseController
     public function purchaseStepReviewAction(Request $request)
     {
         $user = $this->getUser();
-        if ($user->hasPolicy()) {
+        if (!$user) {
+            return $this->redirectToRoute('purchase');
+        } elseif ($user->hasPolicy()) {
             $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
 
             return $this->redirectToRoute('user_home');
