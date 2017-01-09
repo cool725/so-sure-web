@@ -1175,11 +1175,21 @@ class InvitationServiceTest extends WebTestCase
         );
         $this->assertTrue($invitation instanceof EmailInvitation);
 
+        // need a slight delay between when invitation is created and new user
+        sleep(1);
+
         $userInvitee = static::createUser(
             static::$userManager,
             static::generateEmail('invite-accept-lead', $this),
             'bar'
         );
+
+        $this->assertTrue($invitation->getCreated() < $userInvitee->getCreated(), sprintf(
+            '%s <? %s',
+            $invitation->getCreated()->format(\DateTime::ATOM),
+            $userInvitee->getCreated()->format(\DateTime::ATOM)
+        ));
+
         $repo = static::$dm->getRepository(User::class);
         $userInviteeUpdated = $repo->find($userInvitee->getId());
         $this->assertEquals('invitation', $userInviteeUpdated->getLeadSource());
