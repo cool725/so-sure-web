@@ -66,6 +66,10 @@
 
 @media (min-width: 600px) {
 
+    .how-it-works--step h3 {
+        text-align: center;
+    }      
+
     .how-it-works--step .img-responsive {
         max-width: 45%;
     }
