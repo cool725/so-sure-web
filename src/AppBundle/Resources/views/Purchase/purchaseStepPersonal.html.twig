@@ -4,8 +4,8 @@
     {{ parent() }}
     {% stylesheets
     'components/bootstrap-daterangepicker/daterangepicker.css'
-    '@AppBundle/Resources/public/css/Purchase/purchase.css'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    '@AppBundle/Resources/public/css/Purchase/purchase.css'%}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block javascripts %}
@@ -14,7 +14,7 @@
     'components/moment/moment.min.js'
     'components/bootstrap-daterangepicker/daterangepicker.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStepPersonal.js' %}
-    %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block body %}
