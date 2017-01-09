@@ -131,7 +131,7 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
         }
 
         if ($user instanceof User && (
-            $user->isExpired() || !$user->isEnabled() || $user->isLocked()
+            !$user->isEnabled() || $user->isLocked()
         )) {
             throw new CustomUserMessageAuthenticationException(
                 sprintf('User %s (%s) is disabled', $user->getName(), $user->getEmail())

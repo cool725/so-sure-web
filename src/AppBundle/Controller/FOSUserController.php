@@ -7,6 +7,7 @@ use FOS\UserBundle\Controller\ResettingController;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use FOS\UserBundle\Model\UserInterface;
@@ -16,8 +17,9 @@ class FOSUserController extends ResettingController
     /**
      * Reset user password
      */
-    public function resetAction($token)
+    public function resetAction(Request $request, $token)
     {
+        \AppBundle\Classes\NoOp::noOp([$request]);
         // @codingStandardsIgnoreStart
         $user = $this->container->get('fos_user.user_manager')->findUserByConfirmationToken($token);
 

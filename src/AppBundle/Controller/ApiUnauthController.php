@@ -46,11 +46,6 @@ class ApiUnauthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Invalid token', 403);
             }
 
-            // soft delete
-            if ($user->isExpired()) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User does not exist', 403);
-            }
-
             if (!$user->isEnabled()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_RESET_PASSWORD,

@@ -131,20 +131,6 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
     /**
      * @expectedException Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException
      */
-    public function testAuthenticateExceptionUserExpired()
-    {
-        $user = static::createUser(self::$userManager, self::generateEmail('user-expired', $this), 'foo');
-        $user->setExpired(true);
-        $cognitoIdentityId = static::authUser(self::$cognito, $user);
-
-        $request = $this->getAuthRequest($cognitoIdentityId);
-        $token = self::$auth->createToken($request, 'login.so-sure.com');
-        $authToken = self::$auth->authenticateToken($token, self::$userProvider, 'login.so-sure.com');
-    }
-
-    /**
-     * @expectedException Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException
-     */
     public function testAuthenticateExceptionUserLocked()
     {
         $user = static::createUser(self::$userManager, self::generateEmail('user-locked', $this), 'foo');

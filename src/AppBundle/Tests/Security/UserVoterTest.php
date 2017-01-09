@@ -88,14 +88,4 @@ class UserVoterTest extends WebTestCase
 
         $this->assertFalse(self::$userVoter->voteOnAttribute('add-policy', $user, $token));
     }
-
-    public function testVoteUserExpired()
-    {
-        $user = new User();
-        $user->setId(1);
-        $user->setExpired(true);
-        $token = new PreAuthenticatedToken($user, '1', 'test');
-
-        $this->assertFalse(self::$userVoter->voteOnAttribute('add-policy', $user, $token));
-    }
 }

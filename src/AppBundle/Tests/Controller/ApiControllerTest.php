@@ -193,21 +193,6 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
     }
 
-    public function testLoginOkUserExpired()
-    {
-        $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, static::generateEmail('token1', $this), 'bar');
-
-        $user->setExpired(true);
-        self::$dm->flush();
-
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
-            'email' => static::generateEmail('login1', $this),
-            'password' => 'bar'
-        ]));
-        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_ABSENT);
-    }
-
     public function testLoginOkUserDisabled()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
@@ -623,7 +608,7 @@ class ApiControllerTest extends BaseControllerTest
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('user-locked', $this), 'bar');
-        $user->setLocked(new \DateTime());
+        $user->setLocked(true);
         self::$dm->flush();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/reset', array(
             'email' => static::generateEmail('user-locked', $this)
@@ -750,20 +735,6 @@ class ApiControllerTest extends BaseControllerTest
         $cognitoIdentityId = $this->getUnauthIdentity();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', []);
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
-    }
-
-    public function testTokenOkUserExpired()
-    {
-        $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, static::generateEmail('token2', $this), 'bar');
-
-        $user->setExpired(true);
-        self::$dm->flush();
-
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
-            'token' => $user->getToken()
-        ));
-        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_ABSENT);
     }
 
     public function testTokenOkUserDisabled()
