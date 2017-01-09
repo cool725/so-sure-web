@@ -23,9 +23,10 @@
 {% block body %}
 <div class="container">
     <h2>so-sure Admin - <a href="{{ path('admin_user', {'id': policy.user.id}) }}">{{policy.user.name }}</a></h2>
-    <div class="bg-danger text-right" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+    <div class="bg-danger text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <div class="row">
             <div class="col-md-6">
+                <h4>User Requested Cancellation (after 14 days)</h4>
                 {{ form_start(pending_cancel_form, {'attr': {'class': 'form-inline'}}) }}
                 <div class="form-group">
                     {{ form_label(pending_cancel_form.pendingCancellation, 'Policy Termination Date') }}
@@ -35,19 +36,20 @@
                 {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
                 {{ form_end(pending_cancel_form) }}
                 <br>
-                <b>This does not actually cancel the policy, rather just flags the record for claims</b>
+                <b>This schedules the policy cancellation (Coming soon)</b>
             </div>
             <div class="col-md-6">
+                <h4>All other cancellations</h4>
                 {{ form_start(cancel_form, {'attr': {'class': 'form-inline'}}) }}
                 <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
                         {{ form_label(cancel_form.cancellationReason, 'Reason') }}
                         {{ form_errors(cancel_form.cancellationReason) }}
-                        {{ form_widget(cancel_form.cancellationReason, { 'separator': '---Unlikely Reasons---' }) }}
+                        {{ form_widget(cancel_form.cancellationReason, { 'separator': '---Unlikely Reasons---', 'attr': {'class': 'cancellation-reason'} }) }}
                     <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true" title="Cancellation Reasons" data-content="
             <b>Cooloff</b>: only visible if within 14 days and no pending claims<br />
-            <b>User Request</b>: any other user requested reason beyond cooloff<br />
+            <b>User Request</b>: any other user requested reason beyond cooloff. Note this immediately cancels the policy - you probably want the scheduled termination to the left!<br />
             <b>Unpaid</b>: only visible if status is unpaid, but should only be cancelled after 30 days<br />
             <b>Fraud (actual)</b>: should only be used in cases where it can be proven<br />
             <b>Fraud (suspected)</b>: use with caution as likely to cause lawsuits<br />
