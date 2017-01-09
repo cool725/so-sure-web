@@ -144,8 +144,12 @@ class DaviesService
 
     public function moveS3($sourceKey, $folder)
     {
-        // TODO: Should split into date folders
-        $destKey = str_replace(sprintf('/%s/', self::UNPROCESSED_FOLDER), sprintf('/%s/', $folder), $sourceKey);
+        $now = new \DateTime();
+        $destKey = str_replace(
+            sprintf('/%s/', self::UNPROCESSED_FOLDER),
+            sprintf('/%s/%d/', $folder, $now->format('Y')),
+            $sourceKey
+        );
         $this->s3->copyObject([
             'Bucket' => $this->bucket,
             'CopySource' => sprintf("%s/%s", $this->bucket, $sourceKey),
