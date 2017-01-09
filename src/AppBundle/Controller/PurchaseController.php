@@ -106,7 +106,6 @@ class PurchaseController extends BaseController
                         throw new \Exception($err);
                     }
 
-                    // TODO: Create from manager?
                     if (!$user) {
                         $userManager = $this->get('fos_user.user_manager');
                         $user = $userManager->createUser();
