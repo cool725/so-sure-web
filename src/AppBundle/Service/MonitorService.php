@@ -7,6 +7,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Document\Policy;
 use AppBundle\Document\MultiPay;
+use AppBundle\Document\Claim;
 
 class MonitorService
 {
@@ -56,5 +57,23 @@ class MonitorService
         }
 
         return sprintf('All multipay requested policies have correct status');
+    }
+
+    public function claimsReplacementPhone()
+    {
+        $repo = $this->dm->getRepository(Claim::class);
+        $claims = $repo->findMissingReceivedDate();
+        $now = new \DateTime();
+        foreach($claims as $claim) {
+            $replacementDate = $claim->getPolicy()->getImeiReplacementDate();
+            if (!$replacementDate ||
+                $now->getTimestamp() - $replacementDate->getTimestamp() > 3600) {
+                throw new \Exception(sprintf(
+                    'Claim %s Policy %s is missing replacement phone',
+                    $claim->getNumber(),
+                    $claim->getPolicy()->getPolicyNumber()
+                ));
+            }
+        }
     }
 }

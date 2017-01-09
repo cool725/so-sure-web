@@ -56,4 +56,12 @@ class ClaimRepository extends DocumentRepository
     {
         return $this->createQueryBuilder()->field('policy')->references($policy);
     }
+
+    public function findMissingReceivedDate()
+    {
+        return $this->createQueryBuilder()
+            ->field('replacementReceivedDate')->equals(null)
+            ->field('replacementImei')->notEqual(null)
+            ->getQuery()->execute();
+    }
 }
