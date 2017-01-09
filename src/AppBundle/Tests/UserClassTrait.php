@@ -166,8 +166,12 @@ trait UserClassTrait
         }
 
         $dm->persist($policy);
-        $dm->flush();
-
+        try {
+            $dm->flush();
+        } catch (\Exception $e) {
+            $policy->createAddSCode(rand(1, 999999));
+            $dm->flush();
+        }
         return $policy;
     }
 
