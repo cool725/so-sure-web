@@ -452,14 +452,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .section--pad {
-    padding: 40px 15px;
+    padding: 40px 15px 0;
 }
 
 @media (min-width: 991px) {
 
-  .section--pad {
-      padding: 60px 15px;
-  }
+    .section--pad {
+        padding: 60px 15px;
+    }
+
 }
 
 
@@ -596,6 +597,7 @@ hr.strong {
 .explainer-video-thumb {
     margin: 30px 0;
     cursor: pointer;
+    border: 2px solid #eee;
 }
 
 /* Main CTA */
