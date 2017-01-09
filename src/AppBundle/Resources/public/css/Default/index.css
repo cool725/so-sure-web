@@ -49,44 +49,27 @@
 
 /* HOW IT WORKS */
 
-#learn-more {
-    padding: 80px 0 150px;
-    text-align: center;
+#how-it-works {}
+
+.how-it-works--step {
+    margin: 40px 0;
 }
 
-#learn-more img {
-    width: 45%;
-    padding-top: 20px;
+.how-it-works--step h4 {
+    line-height: 1.5;
+}  
+
+.how-it-works--step .img-responsive {
+    margin: 0 auto;
+    max-width: 60%;
 }
 
-#learn-more h3 {
-    padding-top: 20px;
-}
+@media (min-width: 600px) {
 
-#learn-more a:hover {
-    color: #202532;
-    text-decoration: none !important;
-}
-
-@media (max-width:992px) {
-    #learn-more {
-      padding-top: 20px;
-      padding-bottom: 40px;
+    .how-it-works--step .img-responsive {
+        max-width: 45%;
     }
 
-    #learn-more h3 {
-        padding-top: 0;
-    }
-    #learn-more .text-right, #learn-more .text-left {
-        text-align: center;
-    }
-}
-
-@media (max-width:543px) {
-    #learn-more img {
-        width: 60%;
-        padding-top: 50px;
-    }
 }
 
 
