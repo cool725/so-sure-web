@@ -1,6 +1,6 @@
 <h1>Choose a new password</h1>
 <p>Make sure it contains a mixture of letters, numbers and special charachters.</p>
-<form action="{{ path('fos_user_resetting_reset', {'token': token}) }}" {{ form_enctype(form) }} method="POST" class="fos_user_resetting_reset" autocomplete="off">
+<form action="{{ path('fos_user_resetting_reset', {'token': token}) }}" method="POST" class="fos_user_resetting_reset" autocomplete="off">
     <div class="reset">
         <div class="reset-error">
         {{ form_errors(form.new.first) }}
