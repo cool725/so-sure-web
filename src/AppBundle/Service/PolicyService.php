@@ -359,7 +359,11 @@ class PolicyService
         $shortLink = $this->branch->generateSCode($scode->getCode());
         // branch is preferred, but can fallback to old website version if branch is down
         if (!$shortLink) {
-            $link = $this->router->generate('scode', ['code' => $scode->getCode()], true);
+            $link = $this->router->generate(
+                'scode',
+                ['code' => $scode->getCode()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
             $shortLink = $this->shortLink->addShortLink($link);
         }
         $scode->setShareLink($shortLink);

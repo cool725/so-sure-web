@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class BranchService
 {
@@ -224,7 +225,7 @@ class BranchService
         $data = [
             'scode' => $code,
             '$deeplink_path' => sprintf('invite/scode/%s', $code),
-            '$desktop_url' => $this->router->generate('scode', ['code' => $code], true),
+            '$desktop_url' => $this->router->generate('scode', ['code' => $code], UrlGeneratorInterface::ABSOLUTE_URL),
             '$ios_url' => $this->downloadAppleLink($source, $medium, $campaign),
             '$android_url' => $this->downloadGoogleLink($source, $medium, $campaign),
         ];

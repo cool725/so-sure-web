@@ -58,6 +58,7 @@ class SCode
     protected $active;
 
     /**
+     * @Assert\Url(protocols = {"http", "https"})
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

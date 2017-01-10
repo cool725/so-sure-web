@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\OptOut\OptOut;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MailerService
 {
@@ -93,7 +94,11 @@ class MailerService
             if ($emailType) {
                 $data['cat'] = $this->emailTypeToOptOut($emailType);
             }
-            $array['unsubscribe_url'] = $this->router->generate('optout_hash', $data, true);
+            $array['unsubscribe_url'] = $this->router->generate(
+                'optout_hash',
+                $data,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
         } else {
             $array['unsubscribe_url'] = "mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!";
         }
