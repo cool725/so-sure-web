@@ -21,7 +21,7 @@ class AgeValidator extends ConstraintValidator
                 $birthday = \DateTime::createFromFormat('d/m/Y', $value);
             } catch (\Exception $e) {
                 // Do Nothing
-                \AppBundle\Classes\NoOp::noOp([$e]);
+                \AppBundle\Classes\NoOp::ignore([$e]);
             }
         }
 

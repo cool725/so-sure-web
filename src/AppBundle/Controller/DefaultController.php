@@ -152,8 +152,8 @@ class DefaultController extends BaseController
                         if (!$phone) {
                             // TODO: Would be better to redirect to a make page instead
                             $this->addFlash('warning', 'Please ensure you select a model as well');
-                            if ($this->getReferer()) {
-                                return new RedirectResponse($this->getReferer());
+                            if ($this->getReferer($request)) {
+                                return new RedirectResponse($this->getReferer($request));
                             } else {
                                 return $this->redirectToRoute('homepage');
                             }

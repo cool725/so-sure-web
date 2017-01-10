@@ -176,7 +176,7 @@ class PhonePolicyRepository extends PolicyRepository
 
     public function getAllPoliciesForExport(\DateTime $date, $environment)
     {
-        \AppBundle\Classes\NoOp::noOp([$date]);
+        \AppBundle\Classes\NoOp::ignore([$date]);
 
         $policy = new PhonePolicy();
 

@@ -195,7 +195,7 @@ class InvitationTest extends WebTestCase
             $this->assertTrue(false);
         } catch (\MongoDuplicateKeyException $e) {
             // expected exeption - ignore
-            \AppBundle\Classes\NoOp::noOp([$e]);
+            \AppBundle\Classes\NoOp::ignore([$e]);
         }
     }
 
@@ -265,7 +265,7 @@ class InvitationTest extends WebTestCase
             $this->assertTrue(false);
         } catch (\MongoDuplicateKeyException $e) {
             // expected exeption - ignore
-            \AppBundle\Classes\NoOp::noOp([$e]);
+            \AppBundle\Classes\NoOp::ignore([$e]);
         }
     }
 

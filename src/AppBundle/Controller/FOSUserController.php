@@ -19,7 +19,7 @@ class FOSUserController extends ResettingController
      */
     public function resetAction(Request $request, $token)
     {
-        \AppBundle\Classes\NoOp::noOp([$request]);
+        \AppBundle\Classes\NoOp::ignore([$request]);
         // @codingStandardsIgnoreStart
         $user = $this->container->get('fos_user.user_manager')->findUserByConfirmationToken($token);
 

@@ -153,7 +153,7 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        \AppBundle\Classes\NoOp::noOp([$request]);
+        \AppBundle\Classes\NoOp::ignore([$request]);
         $this->logger->debug($exception->getMessage());
 
         return new Response(

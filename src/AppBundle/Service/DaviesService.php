@@ -411,7 +411,7 @@ class DaviesService
 
     public function getReplacementPhone(DaviesClaim $daviesClaim)
     {
-        \AppBundle\Classes\NoOp::noOp([$daviesClaim]);
+        \AppBundle\Classes\NoOp::ignore([$daviesClaim]);
         $repo = $this->dm->getRepository(Phone::class);
         // TODO: Can we get the brightstar product numbers?
         // $phone = $repo->findOneBy(['brightstar_number' => $daviesClaim->brightstarProductNumber]);
