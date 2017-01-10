@@ -49,7 +49,6 @@ use AppBundle\Form\Type\SmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
-use AppBundle\Form\Type\YearMonthType;
 use AppBundle\Form\Type\JudoFileType;
 use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
@@ -321,28 +320,6 @@ class AdminController extends BaseController
             'disable_mfa_form' => $disableMFAForm->createView(),
             'enable_mfa_form' => $enableMFAForm->createView(),
             'mfa_image_url' => $mfaImageUrl
-        ];
-    }
-
-    /**
-     * @Route("/claims", name="admin_claims")
-     * @Template("AppBundle::Admin/claims.html.twig")
-     */
-    public function adminClaimsAction(Request $request)
-    {
-        $csrf = $this->get('form.csrf_provider');
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Claim::class);
-        $qb = $repo->createQueryBuilder();
-        $pager = $this->pager($request, $qb);
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $phones = $phoneRepo->findActive()->getQuery()->execute();
-
-        return [
-            'claims' => $pager->getCurrentPageResults(),
-            'token' => $csrf->generateCsrfToken('default'),
-            'pager' => $pager,
-            'phones' => $phones,
         ];
     }
 

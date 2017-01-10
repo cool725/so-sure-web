@@ -38,6 +38,7 @@ security:
                 provider: fos_userbundle
                 default_target_path: /login-redirect
                 always_use_default_target_path: false
+                csrf_token_generator: security.csrf.token_manager
             logout:       true
             anonymous:    true
             security: true

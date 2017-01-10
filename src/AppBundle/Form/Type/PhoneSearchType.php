@@ -42,7 +42,7 @@ class PhoneSearchType extends AbstractType
             ])
             ->add('active', ChoiceType::class, [
                 'required' => false,
-                'choices' => [true => 'Yes', false => 'No'],
+                'choices' => ['Yes' => true, 'No' => false],
                 'expanded' => false,
                 'placeholder' => false,
                 'data' => true,
@@ -50,12 +50,12 @@ class PhoneSearchType extends AbstractType
             ->add('rules', ChoiceType::class, [
                 'required' => false,
                 'choices' => [
-                    'missing' => 'Missing profit',
-                    'retired' => 'Should be retired',
-                    'loss' => 'Neg profit',
-                    'price' => 'Mismatch pricing',
-                    'brightstar' => 'Problematic Replacements',
-                    'replacement' => 'Replacement phones'
+                    'Missing profit' => 'missing',
+                    'Should be retired' => 'retired',
+                    'Neg profit' => 'loss',
+                    'Mismatch pricing' => 'price',
+                    'Problematic Replacements' => 'brightstar',
+                    'Replacement phones' => 'replacement'
                 ],
                 'expanded' => false,
             ])

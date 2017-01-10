@@ -48,7 +48,7 @@ class UserSearchType extends AbstractType
                 'required' => false,
                 'data' => Policy::STATUS_ACTIVE,
                 'choices' => [
-                    null => 'All',
+                    'All' => null,
                     Policy::STATUS_PENDING => Policy::STATUS_PENDING,
                     Policy::STATUS_ACTIVE => Policy::STATUS_ACTIVE,
                     Policy::STATUS_CANCELLED => Policy::STATUS_CANCELLED,
@@ -60,14 +60,14 @@ class UserSearchType extends AbstractType
                 'required' => false,
                 'choices' => [
                     'IMEI' => [
-                        '355424073417084' => 'Patrick iPhone',
-                        '353287074257748' => 'iPhone 6S Plus',
-                        '013834002513072' => 'Julien 5c',
-                        '353627075075872' => 'Jamie Nexus 5X',
-                        '359285060633868' => 'Jamie iPhone',
+                        'Patrick iPhone' => '355424073417084',
+                        'iPhone 6S Plus' => '353287074257748',
+                        'Julien 5c' => '013834002513072',
+                        'Jamie Nexus 5X' => '353627075075872',
+                        'Jamie iPhone' => '359285060633868',
                     ],
                     'Facebook' => [
-                        '10153878106240169' => 'Patrick'
+                        'Patrick' => '10153878106240169',
                     ]
                 ]
             ])

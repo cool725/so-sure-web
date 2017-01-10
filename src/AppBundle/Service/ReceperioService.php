@@ -765,7 +765,7 @@ class ReceperioService extends BaseImeiService
                 $forces = [];
                 if (isset($data['forces'])) {
                     foreach ($data['forces'] as $force) {
-                        $forces[$force['force']] = $force['forcename'];
+                        $forces[$force['forcename']] = $force['forcename'];
                     }
 
                     $this->redis->setex($key, self::FORCES_CACHE_TIME, serialize($forces));
