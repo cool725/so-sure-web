@@ -85,6 +85,8 @@ class UserSearchType extends AbstractType
             $form->get('policy')->setData($currentRequest->query->get('policy'));
             $form->get('status')->setData($currentRequest->query->get('status'));
             $form->get('invalid')->setData($currentRequest->query->get('invalid'));
+            $form->get('imei')->setData($currentRequest->query->get('imei'));
+            $form->get('facebookId')->setData($currentRequest->query->get('facebookId'));
         });
     }
 
