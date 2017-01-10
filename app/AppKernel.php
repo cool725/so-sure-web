@@ -40,7 +40,6 @@ class AppKernel extends Kernel
             new Oneup\FlysystemBundle\OneupFlysystemBundle(),
             new Knp\Bundle\SnappyBundle\KnpSnappyBundle(),
             new Dpn\XmlSitemapBundle\DpnXmlSitemapBundle(),
-            new Domnikl\StatsdBundle\DomniklStatsdBundle(),
             new Scheb\TwoFactorBundle\SchebTwoFactorBundle(),
             new Nexy\SlackBundle\NexySlackBundle(),
             new Rollerworks\Bundle\PasswordStrengthBundle\RollerworksPasswordStrengthBundle(),

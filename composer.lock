@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e2eabe22b9cfd65ddf7ae115d1737339",
-    "content-hash": "b36cc710a5a0065752b56323b90e9c89",
+    "hash": "afe25b15acc9045d1ec933dfe7b07c99",
+    "content-hash": "36c476b88a117fba1fecf320d563b736",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1252,28 +1252,28 @@
         },
         {
             "name": "domnikl/statsd",
-            "version": "1.1.0",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/domnikl/statsd-php.git",
-                "reference": "ab2b63d66343e071011f4df49335a7a88cd88806"
+                "reference": "f1a443f6ff2cae6bab46ebe8e27576d9b4cbeabf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/domnikl/statsd-php/zipball/ab2b63d66343e071011f4df49335a7a88cd88806",
-                "reference": "ab2b63d66343e071011f4df49335a7a88cd88806",
+                "url": "https://api.github.com/repos/domnikl/statsd-php/zipball/f1a443f6ff2cae6bab46ebe8e27576d9b4cbeabf",
+                "reference": "f1a443f6ff2cae6bab46ebe8e27576d9b4cbeabf",
                 "shasum": ""
             },
             "require": {
                 "php": ">= 5.3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "phpunit/phpunit": ">= 4.4.0"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Domnikl": "lib/"
+                "psr-4": {
+                    "Domnikl\\Statsd\\": "lib/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1283,59 +1283,19 @@
             "authors": [
                 {
                     "name": "Dominik Liebler",
-                    "email": "liebler.dominik@googlemail.com"
+                    "email": "liebler.dominik@gmail.com"
                 }
             ],
             "description": "a PHP client for statsd",
-            "homepage": "http://domnikl.github.com/statsd-php",
+            "homepage": "https://domnikl.github.com/statsd-php",
             "keywords": [
+                "Metrics",
                 "monitoring",
-                "statsd"
+                "statistics",
+                "statsd",
+                "udp"
             ],
-            "time": "2014-08-16 09:19:04"
-        },
-        {
-            "name": "domnikl/statsd-bundle",
-            "version": "1.1.2",
-            "target-dir": "Domnikl/StatsdBundle",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/domnikl/DomniklStatsdBundle.git",
-                "reference": "7671e3ebb7b862401f77bf37183abad41ed49c74"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/domnikl/DomniklStatsdBundle/zipball/7671e3ebb7b862401f77bf37183abad41ed49c74",
-                "reference": "7671e3ebb7b862401f77bf37183abad41ed49c74",
-                "shasum": ""
-            },
-            "require": {
-                "domnikl/statsd": "1.1.0",
-                "symfony/framework-bundle": "~2.2"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-0": {
-                    "Domnikl\\StatsdBundle": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Domnik Liebler",
-                    "homepage": "http://thewebdev.de"
-                }
-            ],
-            "description": "adds support for statsd to your Symfony2 application",
-            "keywords": [
-                "monitoring",
-                "statsd"
-            ],
-            "abandoned": true,
-            "time": "2016-04-23 09:10:43"
+            "time": "2016-07-06 07:58:06"
         },
         {
             "name": "dpn/xml-sitemap-bundle",

@@ -361,6 +361,18 @@ services:
             logger:         "@logger"
             environment:    "%kernel.environment%"
 
+    statsd_client:
+        class: Domnikl\Statsd\Connection\Socket
+        arguments:
+            host:         "localhost"
+            port:         "8125"
+
+    statsd:
+        class: Domnikl\Statsd\Client
+        arguments:
+            connection:         "@statsd_client"
+            namespace:          "sosure"
+
     app.stats:
         class: AppBundle\Service\StatsService
         arguments:
