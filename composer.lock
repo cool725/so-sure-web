@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "916ec24a119399a83a49d5858f332054",
-    "content-hash": "b1a2fb7e95ef7c1f9f26bafd26ef2ae8",
+    "hash": "e2eabe22b9cfd65ddf7ae115d1737339",
+    "content-hash": "b36cc710a5a0065752b56323b90e9c89",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -4264,55 +4264,6 @@
                 "random"
             ],
             "time": "2016-04-03 06:00:07"
-        },
-        {
-            "name": "peerj/peerj-user-security-bundle",
-            "version": "v0.1",
-            "target-dir": "Peerj/UserSecurityBundle",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PeerJ/PeerjUserSecurityBundle.git",
-                "reference": "a23907a771cafc95e4c91f166d779b3bc7e61748"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PeerJ/PeerjUserSecurityBundle/zipball/a23907a771cafc95e4c91f166d779b3bc7e61748",
-                "reference": "a23907a771cafc95e4c91f166d779b3bc7e61748",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2",
-                "snc/redis-bundle": "*",
-                "symfony/symfony": "~2.1"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-0": {
-                    "Peerj\\UserSecurityBundle": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "patrick",
-                    "email": "patrick@peerj.com"
-                }
-            ],
-            "description": "Peerj User Security Bundle",
-            "homepage": "http://github.com/PeerJ/PeerjUserSecurityBundle",
-            "keywords": [
-                "CCDNUserSecurityBundle",
-                "brute force",
-                "dictionary attack",
-                "login",
-                "peerj",
-                "security",
-                "user"
-            ],
-            "time": "2014-08-06 07:19:54"
         },
         {
             "name": "phpoffice/phpexcel",

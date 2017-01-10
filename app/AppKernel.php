@@ -39,7 +39,6 @@ class AppKernel extends Kernel
             new Vich\UploaderBundle\VichUploaderBundle(),
             new Oneup\FlysystemBundle\OneupFlysystemBundle(),
             new Knp\Bundle\SnappyBundle\KnpSnappyBundle(),
-            new Peerj\UserSecurityBundle\PeerjUserSecurityBundle(),
             new Dpn\XmlSitemapBundle\DpnXmlSitemapBundle(),
             new Domnikl\StatsdBundle\DomniklStatsdBundle(),
             new Scheb\TwoFactorBundle\SchebTwoFactorBundle(),
