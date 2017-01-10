@@ -47,16 +47,17 @@ class InvitationController extends BaseController
             $invitation = null;
         }
 
-        $form = $this->createFormBuilder()
+        $declineForm = $this->get('form.factory')
+            ->createNamedBuilder('decline_form')
             ->add('decline', SubmitType::class, array(
                 'label' => "No thanks!",
                 'attr' => ['class' => 'btn btn-danger'],
             ))
             ->getForm();
 
-        if ($request->request->has('decline')) {
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
+        if ($request->request->has('decline_form')) {
+            $declineForm->handleRequest($request);
+            if ($declineForm->isSubmitted() && $declineForm->isValid()) {
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
                 $this->addFlash(
@@ -69,7 +70,7 @@ class InvitationController extends BaseController
         }
         return array(
             'invitation' => $invitation,
-            'form' => $form->createView(),
+            'form' => $declineForm->createView(),
         );
     }
 }
