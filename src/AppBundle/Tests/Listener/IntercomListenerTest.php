@@ -11,12 +11,14 @@ use AppBundle\Listener\UserListener;
 use AppBundle\Listener\DoctrineUserListener;
 use AppBundle\Listener\IntercomListener;
 
+use AppBundle\Event\LeadEvent;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\InvitationEvent;
 use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\UserPaymentEvent;
 
+use AppBundle\Document\Lead;
 use AppBundle\Document\User;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\PhonePolicy;
@@ -160,6 +162,22 @@ class IntercomListenerTest extends WebTestCase
         $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
+    }
+
+    public function testIntercomQueueLead()
+    {
+        $lead = new Lead();
+        $lead->setEmail(static::generateEmail('intercom-queue-lead', $this));
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onLeadUpdatedEvent(new LeadEvent($lead));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($lead->getId(), $data['leadId']);
     }
 
     public function testIntercomQueueUser()
