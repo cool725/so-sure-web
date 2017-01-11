@@ -6,6 +6,7 @@ use Dpn\XmlSitemapBundle\Sitemap\GeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Phone;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PhoneSitemapGenerator implements GeneratorInterface
 {
@@ -44,12 +45,12 @@ class PhoneSitemapGenerator implements GeneratorInterface
                     'make' => $phone->getMake(),
                     'model' => $phone->getEncodedModel(),
                     'memory' => $phone->getMemory(),
-                ], true);
+                ], UrlGeneratorInterface::ABSOLUTE_URL);
             } else {
                 $url = $this->router->generate('quote_make_model', [
                     'make' => $phone->getMake(),
                     'model' => $phone->getEncodedModel(),
-                ], true);
+                ], UrlGeneratorInterface::ABSOLUTE_URL);
             }
             $entries[] = new Entry($url, null, 'weekly', '0.7');
         }
