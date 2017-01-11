@@ -198,7 +198,7 @@ class AdminEmployeeController extends BaseController
             foreach ($policies as $policy) {
                 $userIds[] = $policy->getUser()->getId();
             }
-            $users->field('id')->in($userIds);
+            $users->addAnd($users->expr()->field('id')->in($userIds));
         }
         $policiesQb = $policyRepo->createQueryBuilder();
         if ($policies = $this->formToMongoSearch($form, $policiesQb, 'status', 'status', true)) {
@@ -206,14 +206,14 @@ class AdminEmployeeController extends BaseController
             foreach ($policies as $policy) {
                 $userIds[] = $policy->getUser()->getId();
             }
-            $users->field('id')->in($userIds);
+            $users->addAnd($users->expr()->field('id')->in($userIds));
         }
         if ($policies = $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei', true)) {
             $userIds = [];
             foreach ($policies as $policy) {
                 $userIds[] = $policy->getUser()->getId();
             }
-            $users->field('id')->in($userIds);
+            $users->addAnd($users->expr()->field('id')->in($userIds));
         }
         $pager = $this->pager($request, $users);
 
