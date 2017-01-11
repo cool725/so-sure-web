@@ -41,10 +41,13 @@ class BICommand extends ContainerAwareCommand
         ]);
         foreach ($claims as $claim) {
             $lines[] = implode(',', [
-               sprintf('"%s"', $claim->getPolicy()->getPolicyNumber()),
-               sprintf('"%s"', $claim->getPolicy()->getStart()->format('Y-m-d H:i:s')),
-               sprintf('"%s"', $claim->getNotificationDate() ? $claim->getNotificationDate()->format('Y-m-d H:i:s') : ""),
-               sprintf('"%s"', $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode()),
+                sprintf('"%s"', $claim->getPolicy()->getPolicyNumber()),
+                sprintf('"%s"', $claim->getPolicy()->getStart()->format('Y-m-d H:i:s')),
+                sprintf(
+                    '"%s"',
+                    $claim->getNotificationDate() ? $claim->getNotificationDate()->format('Y-m-d H:i:s') : ""
+                ),
+                sprintf('"%s"', $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode()),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
