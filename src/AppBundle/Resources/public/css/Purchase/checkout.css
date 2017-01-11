@@ -89,6 +89,11 @@
     border-width: 2px;
 }
 
+.help-block {
+    text-align: left;
+    font-size: 14px;  
+}
+
 /* Modal */
 
 .modal-confirm {
