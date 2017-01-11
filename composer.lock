@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1f979ae0d797b5a30d9505098da1dcda",
-    "content-hash": "640640fc0b44cc48488662e5165f5066",
+    "hash": "2e2374e523f34db9c133b30486119196",
+    "content-hash": "4bce6f9c215ee4b365020886fb2e233c",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -5017,16 +5017,16 @@
         },
         {
             "name": "snc/redis-bundle",
-            "version": "2.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/snc/SncRedisBundle.git",
-                "reference": "b8aa1a966b32c4fba6b7dac4532d5eeb1d890afb"
+                "reference": "101b7f80c859d932c200f5d75f8805e782a76b55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/snc/SncRedisBundle/zipball/b8aa1a966b32c4fba6b7dac4532d5eeb1d890afb",
-                "reference": "b8aa1a966b32c4fba6b7dac4532d5eeb1d890afb",
+                "url": "https://api.github.com/repos/snc/SncRedisBundle/zipball/101b7f80c859d932c200f5d75f8805e782a76b55",
+                "reference": "101b7f80c859d932c200f5d75f8805e782a76b55",
                 "shasum": ""
             },
             "require": {
@@ -5078,7 +5078,7 @@
                 "redis",
                 "symfony"
             ],
-            "time": "2016-06-17 11:50:26"
+            "time": "2016-12-11 08:54:19"
         },
         {
             "name": "sonata-project/google-authenticator",
@@ -7678,7 +7678,8 @@
     "stability-flags": {
         "friendsofsymfony/user-bundle": 10,
         "drewm/mailchimp-api": 20,
-        "google/apiclient": 5
+        "google/apiclient": 5,
+        "snc/redis-bundle": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
