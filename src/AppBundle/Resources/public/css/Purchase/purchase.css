@@ -297,16 +297,16 @@ label {
 #purchase_form_amount label {
   float: none;
   display: inline;
-  padding: 15px;
+  padding: 10px 15px;
   margin-right: 10px;
   margin-left: 5px;
 }
 
 .payment-container .btn-link {
-    padding: 6px;
+    padding: 4px;
 }
 
-.payment-container .help-block {
+.payment-container .help-block.with-errors {
   font-style: italic;
   text-align: left;
   font-size: 14px;

@@ -72,7 +72,8 @@
                                 {{ form_label(purchase_form.imei, 'IMEI Number') }}
                             </div>
                             <div class="col-sm-8">
-                                {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'Dial *#06# to show your IMEI number'}}) }}
+                                {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':''}}) }}
+                                <p class="help-block">Dial *#06# to show your IMEI number</p>
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                             </div>
                         </div>
@@ -85,9 +86,9 @@
                                     {{ form_label(purchase_form.serialNumber, 'Serial Number') }}
                                 </div>
                                 <div class="col-sm-8">
-                                    {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Go to Settings > General > About'}}) }}
+                                    {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':''}}) }}
+                                    <p class="help-block">Go to Settings > General > About</p>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
-                                    <!-- <p class="help-block">Find it in your iPhone's Settings > General > About</p> -->
                                 </div>
                             </div>
                         </div>
