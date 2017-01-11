@@ -589,7 +589,10 @@ class AdminEmployeeController extends BaseController
         $scheduledPayments = $scheduledPaymentRepo->findMonthlyScheduled($date);
         $total = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
-            if (in_array($scheduledPayment->getStatus(), [ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS])) {
+            if (in_array(
+                $scheduledPayment->getStatus(),
+                [ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS]
+            )) {
                 $total += $scheduledPayment->getAmount();
             }
         }
