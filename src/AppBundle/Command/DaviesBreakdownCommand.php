@@ -58,7 +58,7 @@ class DaviesBreakdownCommand extends ContainerAwareCommand
         if (file_exists($tmpFile)) {
             unlink($tmpFile);
         }
-        
-        $output->writeln('Policy Breakdown Report sent.')
+
+        $output->writeln('Policy Breakdown Report sent.');
     }
 }
