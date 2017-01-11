@@ -43,7 +43,7 @@ class BICommand extends ContainerAwareCommand
             $lines[] = implode(',', [
                sprintf('"%s"', $claim->getPolicy()->getPolicyNumber()),
                sprintf('"%s"', $claim->getPolicy()->getStart()->format('Y-m-d H:i:s')),
-               sprintf('"%s"', $claim->getNotificationDate()->format('Y-m-d H:i:s')),
+               sprintf('"%s"', $claim->getNotificationDate() ? $claim->getNotificationDate()->format('Y-m-d H:i:s') : ""),
                sprintf('"%s"', $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode()),
             ]);
         }
