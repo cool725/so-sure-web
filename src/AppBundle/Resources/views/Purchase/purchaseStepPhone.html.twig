@@ -4,6 +4,7 @@
     {{ parent() }}
     {% stylesheets
     '@AppBundle/Resources/public/css/Purchase/purchase.css'
+    '@AppBundle/Resources/public/css/Purchase/checkout.css'
     'bundles/app/css/Default/selectPhoneMake.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -13,16 +14,18 @@
     {% javascripts
     '@AppBundle/Resources/public/js/Purchase/purchaseStepPhone.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
-     %}
     %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block body %}
+<section class="payment-container vertical-align-wrap">
+    <div class="vertical-align-middle">
+        <div class="container checkout">
 
-    <div class="payment-container vertical-align-wrap">
-        <div class="vertical-align-middle">
             {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
-            <div class="checkout-step">
+            
+            <div class="checkout--step">
+
                 {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
                     <div class="row">
                         <div class="form-group">
@@ -30,9 +33,21 @@
                                 <label>Your Phone</label>
                             </div>
                             <div class="col-sm-8">
-                                <h4>{% if phone %}{{ phone.make }} {{ phone.model }} {% if phone.memory %}{{ phone.memory }}GB{% endif %}{% endif %}
-                                    <button type="button" class="select-phone btn btn-link" data-toggle="modal" data-target="#phoneModal">
-                                {% if phone %}Edit{% else %}Select phone{% endif %}</button>
+                                <h4>
+                                    {% if phone %}
+                                        {{ phone.make }} {{ phone.model }} {%    if phone.memory %}
+                                                {{ phone.memory }}GB
+                                            {% endif %}
+                                    {% endif %}
+                                    <button type="button" 
+                                            class="select-phone btn btn-link" data-toggle="modal" 
+                                            data-target="#phoneModal">
+                                        {% if phone %}
+                                            Edit
+                                        {% else %}
+                                            Select phone
+                                        {% endif %}
+                                    </button>
                                 </h4>
                             </div>
                         </div>
@@ -44,6 +59,7 @@
                             </div>
                             <div class="col-sm-8">
                                 {{ form_widget(purchase_form.amount, {'attr':{'class':'radio purchase-amount'}}) }}
+                                
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
                             </div>
                         </div>
@@ -56,9 +72,8 @@
                                 {{ form_label(purchase_form.imei, 'IMEI Number') }}
                             </div>
                             <div class="col-sm-8">
-                                {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'Dial *#06#'}}) }}
+                                {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'Dial *#06# to show your IMEI number'}}) }}
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
-                                <!-- <p class="help-block">Just dial *#06#</p> -->
                             </div>
                         </div>
                     </div>
@@ -82,53 +97,56 @@
                             {{ form_widget(purchase_form.next, {'label': 'Continue to Purchase', 'attr': {'class': 'btn btn-primary'}}) }}
                         </div>
                     </div>
-                {% include 'AppBundle::Purchase/purchaseDownload.html.twig' %}
-            </div>
+                </div>
             {{ form_end(purchase_form) }}
+
+            </div>
+
         </div>
     </div>
+</section>
 
-    <div class="modal fade" id="nonAppleModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">IMEI Number</h4>
-                </div>
-                <div class="modal-body">
-                    <p>It's easy to find your IMEI numbr.  Just dial <a href="tel:*#06#">*#06#</a> on your mobile and your IMEI will immediately be displayed.  There is no cost to dial this number.</p>
-                </div>
+<div class="modal fade" id="nonAppleModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">IMEI Number</h4>
+            </div>
+            <div class="modal-body">
+                <p>It's easy to find your IMEI numbr.  Just dial <a href="tel:*#06#">*#06#</a> on your mobile and your IMEI will immediately be displayed.  There is no cost to dial this number.</p>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal fade" id="appleModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">IMEI &amp; Serial Numbers</h4>
-                </div>
-                <div class="modal-body">
-                    <p>It's easy to find your IMEI &amp; Serial Numbers.  Open the Settings app, and navigate to General > About.  The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.</p>
-                </div>
+<div class="modal fade" id="appleModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">IMEI &amp; Serial Numbers</h4>
+            </div>
+            <div class="modal-body">
+                <p>It's easy to find your IMEI &amp; Serial Numbers.  Open the Settings app, and navigate to General > About.  The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.</p>
             </div>
         </div>
     </div>
+</div>
 
 
-    <div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Select your phone</h4>
-                </div>
-                <div class="modal-body">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': modal_type})) }}
-                </div>
+<div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Select your phone</h4>
+            </div>
+            <div class="modal-body">
+                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': modal_type})) }}
             </div>
         </div>
     </div>
+</div>
 
 {% endblock %}

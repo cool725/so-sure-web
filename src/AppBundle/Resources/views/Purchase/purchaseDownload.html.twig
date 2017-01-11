@@ -1,6 +1,7 @@
+<div class="purchase-download">
     <div class="row">
-        <div class="form-group col-sm-12 text-center">
-            Did you know you can download our app and continue your purchase? It's easier!
+        <div class="col-md-12">
+            <p class="text-center lead">Did you know you can download our app and continue your purchase? It's easier!</p>
         </div>
     </div>
     {% set show_google_play = true %}
@@ -12,7 +13,7 @@
         {% set show_itunes = false %}
     {% endif %}
     <div class="row">
-        <div class="form-group col-sm-12 text-center">
+        <div class="col-sm-12 text-center">
             {% if show_google_play %}
             <a class="ga-outbound-click" href="{{ google_download('purchase') }}">
                 <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
@@ -24,4 +25,5 @@
             </a>
             {% endif %}
         </div>
-    </div>                        
+    </div>
+</div>                        
