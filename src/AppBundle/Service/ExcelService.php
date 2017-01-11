@@ -5,6 +5,9 @@ use Psr\Log\LoggerInterface;
 
 class ExcelService
 {
+    const FILETYPE_XLS = 'Excel5';
+    const FILETYPE_XLSX = 'Excel2007';
+
     const CACHE_SIZE = '10MB';
     /** @var LoggerInterface */
     protected $logger;
@@ -17,19 +20,40 @@ class ExcelService
         $this->logger = $logger;
     }
 
-    public function convertToCsv($inFile, $outFile)
+    public function getFileType($inFile)
+    {
+        $mimeType = mime_content_type($inFile);
+        if ($mimeType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+            return self::FILETYPE_XLSX;
+        } elseif (in_array($mimeType, ["application/vnd.ms-excel", "application/vnd.ms-office"])) {
+            return self::FILETYPE_XLS;
+        } else {
+            throw new \Exception(sprintf('Unknown excel mime type %s', $mimeType));
+        }
+    }
+
+    public function convertToCsv($inFile, $outFile, $sheetName = null)
     {
         try {
             $cacheMethod = \PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
             $cacheSettings = array('memoryCacheSize' => self::CACHE_SIZE);
             \PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
 
-            $reader = \PHPExcel_IOFactory::createReader('Excel2007');
+            $reader = \PHPExcel_IOFactory::createReader($this->getFileType($inFile));
             $reader->setReadDataOnly(true);
-            // $reader->setLoadSheetsOnly('Details');
+
+            if ($sheetName) {
+                $reader->setLoadSheetsOnly($sheetName);
+            }
 
             $excel = $reader->load($inFile);
-            $objWorksheet = $excel->getActiveSheet();
+
+            if (!$sheetName) {
+                $objWorksheet = $excel->getActiveSheet();
+            } else {
+                $objWorksheet = $excel->getSheetByName($sheetName);
+            }
+
             foreach ($objWorksheet->getRowIterator() as $row) {
                 foreach ($row->getCellIterator() as $cell) {
                     $cell->setValue(str_replace(PHP_EOL, ' ', $cell->getValue()));

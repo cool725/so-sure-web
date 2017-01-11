@@ -54,7 +54,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '123 The Street, Town, City, Postcode'
         ];
         $davies = new DaviesClaim();
-        $davies->fromArray($data);
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
         $this->assertEquals(new \DateTime('2017-02-28'), $davies->endDate);
         $this->assertEquals(new \DateTime('2016-03-01'), $davies->startDate);
 
@@ -84,7 +84,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '320160401000001',
         ];
         $davies = new DaviesClaim();
-        $davies->fromArray($data);
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
     }
 
     /**
@@ -126,7 +126,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '123 The Street, Town, City, Postcode'
         ];
         $davies = new DaviesClaim();
-        $davies->fromArray($data);
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
     }
 
     /**
@@ -168,7 +168,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '123 The Street, Town, City, Postcode'
         ];
         $davies = new DaviesClaim();
-        $davies->fromArray($data);
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
     }
 
     /**
@@ -210,7 +210,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '123 The Street, Town, City, Postcode'
         ];
         $davies = new DaviesClaim();
-        $davies->fromArray($data);
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
     }
 
     public function testClaimsType()

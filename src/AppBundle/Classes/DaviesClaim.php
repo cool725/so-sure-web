@@ -8,6 +8,28 @@ class DaviesClaim
 {
     use CurrencyTrait;
 
+    const SHEET_NAME_V6 = 'Cumulative';
+    const SHEET_NAME_V1 = 'Original';
+    const CLIENT_NAME = "So-Sure -Mobile";
+    const COLUMN_COUNT_V1 = 31;
+    const COLUMN_COUNT_V6 = 36;
+
+    public static $sheetNames = [
+        self::SHEET_NAME_V6,
+        self::SHEET_NAME_V1
+    ];
+
+    public static function getColumnsFromSheetName($sheetName)
+    {
+        if ($sheetName == self::SHEET_NAME_V6) {
+            return self::COLUMN_COUNT_V6;
+        } elseif ($sheetName == self::SHEET_NAME_V1) {
+            return self::COLUMN_COUNT_V1;
+        } else {
+            throw new \Exception(sprintf('Unknown sheet name %s', $sheetName));
+        }
+    }
+
     public $client;
     public $claimNumber;
     public $insuredName;
@@ -33,19 +55,30 @@ class DaviesClaim
     public $replacementModel;
     public $replacementImei;
     public $replacementReceivedDate;
-    public $incurred;
-    public $unauthorizedCalls;
-    public $accessories;
+
     public $phoneReplacementCost;
-    public $transactionFees;
-    public $handlingFees;
-    public $excess;
-    public $reserved;
+    public $phoneReplacementCostReserve;
+    public $accessories;
+    public $accessoriesReserve;
+    public $unauthorizedCalls;
+    public $unauthorizedCallsReserve;
     public $reciperoFee;
+    public $transactionFees;
+    public $feesReserve;
+
+    public $reserved;
+    public $incurred;
+    public $handlingFees;
+    // will appear regardless of if paid/unpaid
+    public $excess;
+
     public $policyNumber;
     public $notificationDate;
     public $dateCreated;
     public $dateClosed;
+
+    // davies use only
+    public $daviesIncurred;
 
     public function getIncurred()
     {
@@ -151,21 +184,19 @@ class DaviesClaim
         }
     }
 
-    public function fromArray($data)
+    public function fromArray($data, $columns)
     {
         try {
-            if (count($data) != 31) {
-                throw new \Exception('Excpected 31 columns (Export v5)');
-            }
-
             // TODO: Improve validation - should should exceptions in the setters
             $i = 0;
             $this->client = trim($data[$i]);
-            if ($this->client == "") {
-                // empty row - ignore
-                return;
-            } elseif ($this->client != "So-Sure -Mobile") {
-                throw new \Exception('Incorrect client');
+            if ($this->client !== self::CLIENT_NAME) {
+                // We now have lots of other data in the report, so just ignore lines that don't match
+                return null;
+            }
+
+            if (count($data) != $columns) {
+                throw new \Exception(sprintf('Expected %d columns', $columns));
             }
 
             $this->claimNumber = $this->nullIfBlank($data[++$i]);
@@ -184,31 +215,53 @@ class DaviesClaim
             $this->replacementModel = $this->nullIfBlank($data[++$i]);
             $this->replacementImei = $this->nullIfBlank($data[++$i]);
             $this->replacementReceivedDate = $this->excelDate($data[++$i]);
-            $this->incurred = $this->nullIfBlank($data[++$i]);
-            $this->unauthorizedCalls = $this->nullIfBlank($data[++$i]);
-            $this->accessories = $this->nullIfBlank($data[++$i]);
-            $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
-            $this->transactionFees = $this->nullIfBlank($data[++$i]);
-            $this->handlingFees = $this->nullIfBlank($data[++$i]);
-            $this->excess = $this->nullIfBlank($data[++$i]);
-            $this->reserved = $this->nullIfBlank($data[++$i]);
-            $this->reciperoFee = $this->nullIfBlank($data[++$i]);
+
+            if ($columns == self::COLUMN_COUNT_V6) {
+                $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
+                $this->phoneReplacementCostReserved = $this->nullIfBlank($data[++$i]);
+                $this->accessories = $this->nullIfBlank($data[++$i]);
+                $this->accessoriesReserved = $this->nullIfBlank($data[++$i]);
+                $this->unauthorizedCalls = $this->nullIfBlank($data[++$i]);
+                $this->unauthorizedCallsReserved = $this->nullIfBlank($data[++$i]);
+                $this->reciperoFee = $this->nullIfBlank($data[++$i]);
+                $this->transactionFees = $this->nullIfBlank($data[++$i]);
+                $this->feesReserve = $this->nullIfBlank($data[++$i]);
+
+                $this->reserved = $this->nullIfBlank($data[++$i]);
+                $this->incurred = $this->nullIfBlank($data[++$i]);
+                $this->handlingFees = $this->nullIfBlank($data[++$i]);
+                $this->excess = $this->nullIfBlank($data[++$i]);
+            } elseif ($columns == self::COLUMN_COUNT_V1) {
+                $this->incurred = $this->nullIfBlank($data[++$i]);
+                $this->unauthorizedCalls = $this->nullIfBlank($data[++$i]);
+                $this->accessories = $this->nullIfBlank($data[++$i]);
+                $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
+                $this->transactionFees = $this->nullIfBlank($data[++$i]);
+                $this->handlingFees = $this->nullIfBlank($data[++$i]);
+                $this->excess = $this->nullIfBlank($data[++$i]);
+                $this->handlingFees = $this->nullIfBlank($data[++$i]);
+                $this->reciperoFee = $this->nullIfBlank($data[++$i]);
+            }
             $this->policyNumber = $this->nullIfBlank($data[++$i]);
             $this->notificationDate = $this->excelDate($data[++$i]);
             $this->dateCreated = $this->excelDate($data[++$i]);
             $this->dateClosed = $this->excelDate($data[++$i]);
             $this->shippingAddress = $this->nullIfBlank($data[++$i]);
+
+            if ($columns == self::COLUMN_COUNT_V6) {
+                $this->daviesIncurred = $this->nullIfBlank($data[++$i]);
+            }
         } catch (\Exception $e) {
             throw new \Exception(sprintf('%s claim: %s', $e->getMessage(), json_encode($this)));
         }
+
+        return true;
     }
 
-    public static function create($data)
+    public static function create($data, $columns)
     {
         $claim = new DaviesClaim();
-        $claim->fromArray($data);
-
-        if ($claim->client == "") {
+        if (!$claim->fromArray($data, $columns)) {
             return null;
         }
 
@@ -238,8 +291,14 @@ class DaviesClaim
                 return null;
             }
 
-            $origin = new \DateTime("1900-01-01");
-            $origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
+            if (!is_numeric($days)) {
+                // unfortunately davies is incapable of formatting dates
+                // so may be an excel date or may be a d/m/Y formatted string
+                $origin = \DateTime::createFromFormat('d/m/Y', $days);
+            } else {
+                $origin = new \DateTime("1900-01-01");
+                $origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
+            }
 
             $minDate = new \DateTime('2016-01-01');
             $now = new \DateTime();

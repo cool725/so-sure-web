@@ -83,7 +83,7 @@ class DaviesService
         $this->errors = [];
     }
 
-    public function import()
+    public function import($sheetName)
     {
         $lines = [];
         $keys = $this->listS3();
@@ -93,7 +93,7 @@ class DaviesService
             try {
                 $emailFile = $this->downloadEmail($key);
                 if ($excelFile = $this->extractExcelFromEmail($emailFile)) {
-                    $claims = $this->parseExcel($excelFile);
+                    $claims = $this->parseExcel($excelFile, $sheetName);
                     $processed = $this->saveClaims($key, $claims);
                 }
             } catch (\Exception $e) {
@@ -118,6 +118,29 @@ class DaviesService
                 unlink($emailFile);
             }
         }
+
+        return $lines;
+    }
+
+    public function importFile($file, $sheetName)
+    {
+        $lines = [];
+        $lines[] = sprintf('Processing %s', $file);
+        $processed = false;
+        try {
+            $claims = $this->parseExcel($file, $sheetName);
+            $processed = $this->saveClaims($file, $claims);
+        } catch (\Exception $e) {
+            $processed = false;
+            $this->logger->error(sprintf('Error processing %s. Ex: %s', $file, $e->getMessage()));
+        }
+
+        if ($processed) {
+            $lines[] = sprintf('Successfully imported %s', $file);
+        } else {
+            $lines[] = sprintf('Failed to import %s', $file);
+        }
+        $this->claimsDailyEmail();
 
         return $lines;
     }
@@ -225,10 +248,10 @@ class DaviesService
         return $excelFile;
     }
 
-    public function parseExcel($filename)
+    public function parseExcel($filename, $sheetName)
     {
         $tempFile = $this->generateTempFile();
-        $this->excel->convertToCsv($filename, $tempFile);
+        $this->excel->convertToCsv($filename, $tempFile, $sheetName);
         $lines = array_map('str_getcsv', file($tempFile));
         unlink($tempFile);
 
@@ -237,14 +260,12 @@ class DaviesService
         $columns = -1;
         foreach ($lines as $line) {
             $row++;
-            if ($row == 0) {
-                $columns = count(array_slice(array_filter($line), 0));
-                continue;
-            }
             try {
+                $columns = DaviesClaim::getColumnsFromSheetName($sheetName);
+                // There may be additional blank columns that need to be ignored
                 $line = array_slice($line, 0, $columns);
-                $claim = DaviesClaim::create($line);
-                // If the claim is a blank line, just ignore
+                $claim = DaviesClaim::create($line, $columns);
+                // If the claim doesn't have correct data, just ignore
                 if ($claim) {
                     $claims[] = $claim;
                 }
@@ -253,6 +274,10 @@ class DaviesService
 
                 throw $e;
             }
+        }
+
+        if (count($claims) == 0) {
+            throw new \Exception(sprintf('Unable to find any data to process in file'));
         }
 
         return $claims;

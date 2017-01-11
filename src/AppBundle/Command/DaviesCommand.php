@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use AppBundle\Classes\Premium;
+use AppBundle\Classes\DaviesClaim;
 
 class DaviesCommand extends ContainerAwareCommand
 {
@@ -23,19 +23,45 @@ class DaviesCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Run a daily check on outstanding claims'
             )
+            ->addOption(
+                'file',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Use a local file instead of s3'
+            )
+            ->addOption(
+                'sheetName',
+                null,
+                InputOption::VALUE_REQUIRED,
+                json_encode(DaviesClaim::$sheetNames)
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $isDaily = true === $input->getOption('daily');
+        $file = $input->getOption('file');
+        $sheetName = $input->getOption('sheetName');
+        if (!$sheetName) {
+            $sheetName = DaviesClaim::SHEET_NAME_V1;
+        }
+        if (!in_array($sheetName, DaviesClaim::$sheetNames)) {
+            throw new \Exception(sprintf(
+                'sheetName must be a valid option %s',
+                json_encode(DaviesClaim::$sheetNames)
+            ));
+        }
 
         $davies = $this->getContainer()->get('app.davies');
         if ($isDaily) {
             $count = $davies->claimsDailyEmail();
             $output->writeln(sprintf('%d outstanding claims. Email report sent.', $count));
+        } elseif ($file) {
+            $lines = $davies->importFile($file, $sheetName);
+            $output->writeln(implode(PHP_EOL, $lines));            
         } else {
-            $lines = $davies->import();
+            $lines = $davies->import($sheetName);
             $output->writeln(implode(PHP_EOL, $lines));
         }
         $output->writeln('Finished');
