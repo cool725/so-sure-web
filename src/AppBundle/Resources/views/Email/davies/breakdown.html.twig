@@ -1,0 +1,17 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}so-sure Policy Breakdown Report{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><font face="arial, helvetica neue, helvetica, sans-serif">
+           <h2>so-sure Policy Breakdown Report</h2>
+		   <p>Please find the so-sure Policy Breakdown Report attached.</p>
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}

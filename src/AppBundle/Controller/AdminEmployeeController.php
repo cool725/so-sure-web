@@ -903,33 +903,23 @@ class AdminEmployeeController extends BaseController
      */
     public function breakdownAction()
     {
+        $policyService = $this->get('app.policy');
         return [
-            'data' => $this->getPolicyDataBreakdown(),
+            'data' => $policyService->getBreakdownData(),
         ];
     }
-    
+
     /**
      * @Route("/policy-breakdown/print", name="admin_policy_breakdown_print")
      * @Template
      */
     public function breakdownPrintAction()
     {
+        $policyService = $this->get('app.policy');
         $now = new \DateTime();
-        $templating = $this->get('templating');
-        $snappyPdf = $this->get('knp_snappy.pdf');
-        $snappyPdf->setOption('orientation', 'Portrait');
-        $snappyPdf->setOption('page-size', 'A4');
-        $html = $templating->render('AppBundle:Pdf:policyBreakdown.html.twig', [
-            'data' => $this->getPolicyDataBreakdown(),
-            'now' => $now,
-        ]);
-        $options = [
-            'margin-top'    => 20,
-            'margin-bottom' => 20,
-        ];
 
         return new Response(
-            $snappyPdf->getOutputFromHtml($html, $options),
+            $policyService->getBreakdownPdf(),
             200,
             array(
                 'Content-Type'          => 'application/pdf',
@@ -937,36 +927,6 @@ class AdminEmployeeController extends BaseController
                     sprintf('attachment; filename="so-sure-policy-breakdown-%s.pdf"', $now->format('Y-m-d'))
             )
         );
-        return [
-            'data' => $this->getPolicyDataBreakdown(),
-        ];
-    }
-
-    private function getPolicyDataBreakdown()
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllActivePolicies(null);
-        $data = [];
-        foreach ($policies as $policy) {
-            if (!isset($data[$policy->getPhone()->getId()])) {
-                $data[$policy->getPhone()->getId()] = [
-                    'phone' => $policy->getPhone()->__toString(),
-                    'count' => 0,
-                ];
-            }
-            $data[$policy->getPhone()->getId()]['count']++;
-        }
-        
-        usort($data, function ($a, $b) {
-            if ($a['count'] == $b['count']) {
-                return strcmp($a['phone'], $b['phone']);
-            }
-
-            return $a['count'] < $b['count'];
-        });
-
-        return ['total' => count($policies), 'data' => $data];
     }
 
     /**
