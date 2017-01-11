@@ -22,6 +22,7 @@ class IntercomService
     const SECURE_ANDROID = 'android';
     const SECURE_IOS = 'ios';
 
+    const QUEUE_LEAD = 'lead';
     const QUEUE_USER = 'user';
 
     const QUEUE_EVENT_POLICY_CREATED = 'policy-created';
@@ -370,6 +371,12 @@ class IntercomService
                     }
 
                     $this->update($this->getUser($data['userId']));
+                } elseif ($action == self::QUEUE_LEAD) {
+                    if (!isset($data['leadId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->updateLead($this->getLead($data['leadId']));
                 } elseif ($action == self::QUEUE_EVENT_POLICY_CREATED ||
                           $action == self::QUEUE_EVENT_POLICY_CANCELLED) {
                     if (!isset($data['policyId'])) {
@@ -432,6 +439,20 @@ class IntercomService
         return $count;
     }
 
+    private function getLead($id)
+    {
+        if (!$id) {
+            throw new \InvalidArgumentException('Missing leadId');
+        }
+        $repo = $this->dm->getRepository(Lead::class);
+        $lead = $repo->find($id);
+        if (!$lead) {
+            throw new \InvalidArgumentException(sprintf('Unable to find leadId: %s', $id));
+        }
+
+        return $lead;
+    }
+
     private function getUser($id)
     {
         if (!$id) {
@@ -491,6 +512,17 @@ class IntercomService
     public function queue(User $user, $retryAttempts = 0)
     {
         $this->queueUser($user, self::QUEUE_USER, null, $retryAttempts);
+    }
+
+    public function queueLead(Lead $lead, $event, $additional = null, $retryAttempts = 0)
+    {
+        $data = [
+            'action' => $event,
+            'leadId' => $lead->getId(),
+            'retryAttempts' => $retryAttempts,
+            'additional' => $additional,
+        ];
+        $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
     }
 
     public function queueUser(User $user, $event, $additional = null, $retryAttempts = 0)

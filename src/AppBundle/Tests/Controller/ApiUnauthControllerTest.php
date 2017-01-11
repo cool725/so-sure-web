@@ -106,21 +106,6 @@ class ApiUnauthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
-    public function testTokenUnauthOkUserExpired()
-    {
-        $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, static::generateEmail('unauth-token2', $this), 'bar');
-
-        $user->setExpired(true);
-        self::$dm->flush();
-
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/unauth/token', array(
-            'token' => $user->getToken(),
-            'cognito_id' => self::$identity->getId(),
-        ));
-        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_ABSENT);
-    }
-
     public function testTokenUnauthOkUserDisabled()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();

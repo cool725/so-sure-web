@@ -50,7 +50,7 @@ class CancelPolicyType extends AbstractType
     private function addCancellationReason($data, $policy, $reason, $name)
     {
         if ($policy->canCancel($reason)) {
-            $data[$reason] = $name;
+            $data[$name] = $reason;
         }
 
         return $data;

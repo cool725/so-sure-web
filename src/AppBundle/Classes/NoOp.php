@@ -3,7 +3,7 @@ namespace AppBundle\Classes;
 
 class NoOp
 {
-    public static function noOp($noop)
+    public static function ignore($noop)
     {
         // do nothing
     }

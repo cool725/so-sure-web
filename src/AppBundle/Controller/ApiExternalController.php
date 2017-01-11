@@ -76,7 +76,7 @@ class ApiExternalController extends BaseController
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $user = $repo->find($userToken);
-            if (!$user || $user->isExpired() || $user->isLocked()) {
+            if (!$user || $user->isLocked()) {
                 // @codingStandardsIgnoreStart
                 // https://support.zendesk.com/hc/en-us/articles/218278138-Building-a-dedicated-JWT-endpoint-for-the-Zendesk-SDK
                 // @codingStandardsIgnoreEnd

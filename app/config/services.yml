@@ -361,6 +361,18 @@ services:
             logger:         "@logger"
             environment:    "%kernel.environment%"
 
+    statsd_client:
+        class: Domnikl\Statsd\Connection\UdpSocket
+        arguments:
+            host:         "localhost"
+            port:         "8125"
+
+    statsd:
+        class: Domnikl\Statsd\Client
+        arguments:
+            connection:         "@statsd_client"
+            namespace:          "sosure"
+
     app.stats:
         class: AppBundle\Service\StatsService
         arguments:
@@ -457,6 +469,15 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
 
+    doctrine.listener.lead:
+        class:   AppBundle\Listener\DoctrineLeadListener
+        arguments:
+            dispatcher: "@event_dispatcher"
+        tags:
+            -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
+            -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
+            -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
+
     doctrine.listener.user:
         class:   AppBundle\Listener\DoctrineUserListener
         arguments:
@@ -515,6 +536,7 @@ services:
         arguments:
             intercom: "@app.intercom"
         tags:
+            -  { name: kernel.event_listener, event: event.lead.updated, method: onLeadUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
@@ -572,7 +594,7 @@ services:
 
     app.form.type.phonemake:
         class: AppBundle\Form\Type\PhoneMakeType
-        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        arguments: ["@doctrine_mongodb.odm.default_document_manager", "%form_required%"]
         tags:
             - { name: form.type }
 

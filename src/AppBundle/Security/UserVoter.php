@@ -41,7 +41,7 @@ class UserVoter extends Voter
         $requestedUser = $subject;
         
         if ($attribute == self::ADD_POLICY &&
-            (!$requestedUser->isEnabled() || $requestedUser->isLocked() || $requestedUser->isExpired())) {
+            (!$requestedUser->isEnabled() || $requestedUser->isLocked())) {
             return false;
         }
 

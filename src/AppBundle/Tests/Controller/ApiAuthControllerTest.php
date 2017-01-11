@@ -900,25 +900,6 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(403);
     }
 
-    public function testNewPolicyExpiredUser()
-    {
-        $this->clearRateLimit();
-        $userExpired = self::createUser(self::$userManager, self::generateEmail('expired', $this), 'foo');
-        $cognitoIdentityId = $this->getAuthUser($userExpired);
-        $userExpired->setExpired(true);
-        self::$dm->flush();
-        $imei = self::generateRandomImei();
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
-            'imei' => $imei,
-            'make' => 'Apple',
-            'device' => 'iPhone 6',
-            'memory' => 64,
-            'rooted' => false,
-            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
-        ]]);
-        $data = $this->verifyResponse(403);
-    }
-
     public function testNewPolicyLockedUser()
     {
         $this->clearRateLimit();

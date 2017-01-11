@@ -49,7 +49,6 @@ use AppBundle\Form\Type\SmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
-use AppBundle\Form\Type\YearMonthType;
 use AppBundle\Form\Type\JudoFileType;
 use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
@@ -88,7 +87,6 @@ class AdminEmployeeController extends BaseController
      */
     public function phonesAction(Request $request)
     {
-        $csrf = $this->get('form.csrf_provider');
         $expectedClaimFrequency = $this->getParameter('expected_claim_frequency');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -155,7 +153,6 @@ class AdminEmployeeController extends BaseController
 
         return [
             'phones' => $pager->getCurrentPageResults(),
-            'token' => $csrf->generateCsrfToken('default'),
             'form' => $form->createView(),
             'pager' => $pager
         ];
@@ -167,7 +164,6 @@ class AdminEmployeeController extends BaseController
      */
     public function adminUsersAction(Request $request)
     {
-        $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
 
@@ -198,7 +194,7 @@ class AdminEmployeeController extends BaseController
             foreach ($policies as $policy) {
                 $userIds[] = $policy->getUser()->getId();
             }
-            $users->field('id')->in($userIds);
+            $users->addAnd($users->expr()->field('id')->in($userIds));
         }
         $policiesQb = $policyRepo->createQueryBuilder();
         if ($policies = $this->formToMongoSearch($form, $policiesQb, 'status', 'status', true)) {
@@ -206,20 +202,19 @@ class AdminEmployeeController extends BaseController
             foreach ($policies as $policy) {
                 $userIds[] = $policy->getUser()->getId();
             }
-            $users->field('id')->in($userIds);
+            $users->addAnd($users->expr()->field('id')->in($userIds));
         }
         if ($policies = $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei', true)) {
             $userIds = [];
             foreach ($policies as $policy) {
                 $userIds[] = $policy->getUser()->getId();
             }
-            $users->field('id')->in($userIds);
+            $users->addAnd($users->expr()->field('id')->in($userIds));
         }
         $pager = $this->pager($request, $users);
 
         return [
             'users' => $pager->getCurrentPageResults(),
-            'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
             'form' => $form->createView(),
             'policy_route' => 'admin_policy',
@@ -551,7 +546,6 @@ class AdminEmployeeController extends BaseController
      */
     public function adminClaimsAction(Request $request)
     {
-        $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
         $qb = $repo->createQueryBuilder();
@@ -561,7 +555,6 @@ class AdminEmployeeController extends BaseController
 
         return [
             'claims' => $pager->getCurrentPageResults(),
-            'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
             'phones' => $phones,
         ];
@@ -587,12 +580,22 @@ class AdminEmployeeController extends BaseController
         $dm = $this->getManager();
         $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
         $scheduledPayments = $scheduledPaymentRepo->findMonthlyScheduled($date);
+        $total = 0;
+        foreach ($scheduledPayments as $scheduledPayment) {
+            if (in_array(
+                $scheduledPayment->getStatus(),
+                [ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS]
+            )) {
+                $total += $scheduledPayment->getAmount();
+            }
+        }
 
         return [
             'year' => $year,
             'month' => $month,
             'end' => $end,
             'scheduledPayments' => $scheduledPayments,
+            'total' => $total,
         ];
     }
 
@@ -900,33 +903,23 @@ class AdminEmployeeController extends BaseController
      */
     public function breakdownAction()
     {
+        $policyService = $this->get('app.policy');
         return [
-            'data' => $this->getPolicyDataBreakdown(),
+            'data' => $policyService->getBreakdownData(),
         ];
     }
-    
+
     /**
      * @Route("/policy-breakdown/print", name="admin_policy_breakdown_print")
      * @Template
      */
     public function breakdownPrintAction()
     {
+        $policyService = $this->get('app.policy');
         $now = new \DateTime();
-        $templating = $this->get('templating');
-        $snappyPdf = $this->get('knp_snappy.pdf');
-        $snappyPdf->setOption('orientation', 'Portrait');
-        $snappyPdf->setOption('page-size', 'A4');
-        $html = $templating->render('AppBundle:Pdf:policyBreakdown.html.twig', [
-            'data' => $this->getPolicyDataBreakdown(),
-            'now' => $now,
-        ]);
-        $options = [
-            'margin-top'    => 20,
-            'margin-bottom' => 20,
-        ];
 
         return new Response(
-            $snappyPdf->getOutputFromHtml($html, $options),
+            $policyService->getBreakdownPdf(),
             200,
             array(
                 'Content-Type'          => 'application/pdf',
@@ -934,36 +927,6 @@ class AdminEmployeeController extends BaseController
                     sprintf('attachment; filename="so-sure-policy-breakdown-%s.pdf"', $now->format('Y-m-d'))
             )
         );
-        return [
-            'data' => $this->getPolicyDataBreakdown(),
-        ];
-    }
-
-    private function getPolicyDataBreakdown()
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllActivePolicies(null);
-        $data = [];
-        foreach ($policies as $policy) {
-            if (!isset($data[$policy->getPhone()->getId()])) {
-                $data[$policy->getPhone()->getId()] = [
-                    'phone' => $policy->getPhone()->__toString(),
-                    'count' => 0,
-                ];
-            }
-            $data[$policy->getPhone()->getId()]['count']++;
-        }
-        
-        usort($data, function ($a, $b) {
-            if ($a['count'] == $b['count']) {
-                return strcmp($a['phone'], $b['phone']);
-            }
-
-            return $a['count'] < $b['count'];
-        });
-
-        return ['total' => count($policies), 'data' => $data];
     }
 
     /**

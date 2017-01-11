@@ -49,7 +49,6 @@ class ClaimsController extends BaseController
             return $this->redirectToRoute('admin_users');
         }
 
-        $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $users = $repo->createQueryBuilder();
@@ -71,7 +70,7 @@ class ClaimsController extends BaseController
             foreach ($policies as $policy) {
                 $userIds[] = $policy->getUser()->getId();
             }
-            $users->field('id')->in($userIds);
+            $users->addAnd($users->expr()->field('id')->in($userIds));
         }
         $policiesQb = $policyRepo->createQueryBuilder();
         if ($policies = $this->formToMongoSearch($form, $policiesQb, 'status', 'status', true)) {
@@ -79,13 +78,12 @@ class ClaimsController extends BaseController
             foreach ($policies as $policy) {
                 $userIds[] = $policy->getUser()->getId();
             }
-            $users->field('id')->in($userIds);
+            $users->addAnd($users->expr()->field('id')->in($userIds));
         }
         $pager = $this->pager($request, $users);
 
         return [
             'users' => $pager->getCurrentPageResults(),
-            'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
             'form' => $form->createView(),
             'policy_route' => 'claims_policy',

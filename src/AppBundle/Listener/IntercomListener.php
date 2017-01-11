@@ -3,6 +3,7 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Document\User;
+use AppBundle\Event\LeadEvent;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\PolicyEvent;
@@ -23,6 +24,13 @@ class IntercomListener
     public function __construct(IntercomService $intercom)
     {
         $this->intercom = $intercom;
+    }
+
+    public function onLeadUpdatedEvent(LeadEvent $event)
+    {
+        if ($event->getLead()->getEmail()) {
+            $this->intercom->queueLead($event->getLead(), IntercomService::QUEUE_LEAD);
+        }
     }
 
     public function onUserUpdatedEvent(UserEvent $event)

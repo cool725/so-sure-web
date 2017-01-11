@@ -15,11 +15,21 @@ use AppBundle\Document\Phone;
 
 class PhoneMakeType extends AbstractType
 {
+    /**
+     * @var boolean
+     */
+    private $required;
+
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /**
+     * @param DocumentManager $dm
+     * @param boolean         $required
+     */
+    public function __construct(DocumentManager $dm, $required)
     {
         $this->dm = $dm;
+        $this->required = $required;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -38,10 +48,12 @@ class PhoneMakeType extends AbstractType
         $builder
             ->add('make', ChoiceType::class, [
                     'placeholder' => 'Select phone make',
-                    'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes()
+                    'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
+                    'required' => $this->required
             ])
             ->add('phoneId', ChoiceType::class, [
                     'choices' => $models,
+                    'required' => $this->required
             ])
             ->add('next', SubmitType::class)
         ;
