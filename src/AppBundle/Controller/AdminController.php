@@ -253,10 +253,12 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
 
-        $users = $repo->findUsersInRole('ROLE_ADMIN');
+        $admins = $repo->findUsersInRole('ROLE_ADMIN');
+        $employees = $repo->findUsersInRole('ROLE_EMPLOYEE');
 
         return [
-            'users' => $users,
+            'admins' => $admins,
+            'employees' => $employees,
         ];
     }
 
