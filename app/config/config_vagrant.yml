@@ -65,6 +65,11 @@ swiftmailer:
         default:
             delivery_address: "tech+envmail@so-sure.com"
 
+snc_redis:
+    profiler_storage:
+        client: session
+        ttl: 3600
+
 #nelmio_security:
 #    forced_ssl:
 #        hsts_max_age: 3600 # 30 days
