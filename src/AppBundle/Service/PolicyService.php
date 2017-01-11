@@ -830,4 +830,51 @@ class PolicyService
             );
         }
     }
+
+    public function getBreakdownData()
+    {
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $repo->findAllActivePolicies(null);
+        $data = [];
+        foreach ($policies as $policy) {
+            if (!isset($data[$policy->getPhone()->getId()])) {
+                $data[$policy->getPhone()->getId()] = [
+                    'phone' => $policy->getPhone()->__toString(),
+                    'count' => 0,
+                ];
+            }
+            $data[$policy->getPhone()->getId()]['count']++;
+        }
+
+        usort($data, function ($a, $b) {
+            if ($a['count'] == $b['count']) {
+                return strcmp($a['phone'], $b['phone']);
+            }
+
+            return $a['count'] < $b['count'];
+        });
+
+        return ['total' => count($policies), 'data' => $data];
+    }
+
+    public function getBreakdownPdf($file = null)
+    {
+        $now = new \DateTime();
+        $this->snappyPdf->setOption('orientation', 'Portrait');
+        $this->snappyPdf->setOption('page-size', 'A4');
+        $html = $this->templating->render('AppBundle:Pdf:policyBreakdown.html.twig', [
+            'data' => $this->getBreakdownData(),
+            'now' => $now,
+        ]);
+        $options = [
+            'margin-top'    => 20,
+            'margin-bottom' => 20,
+        ];
+
+        if (!$file) {
+            return $this->snappyPdf->getOutputFromHtml($html, $options);
+        } else {
+            return $this->snappyPdf->generateFromHtml($html, $file);
+        }
+    }
 }
