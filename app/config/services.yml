@@ -361,6 +361,18 @@ services:
             logger:         "@logger"
             environment:    "%kernel.environment%"
 
+    statsd_client:
+        class: Domnikl\Statsd\Connection\UdpSocket
+        arguments:
+            host:         "localhost"
+            port:         "8125"
+
+    statsd:
+        class: Domnikl\Statsd\Client
+        arguments:
+            connection:         "@statsd_client"
+            namespace:          "sosure"
+
     app.stats:
         class: AppBundle\Service\StatsService
         arguments:
@@ -572,7 +584,7 @@ services:
 
     app.form.type.phonemake:
         class: AppBundle\Form\Type\PhoneMakeType
-        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        arguments: ["@doctrine_mongodb.odm.default_document_manager", "%form_required%"]
         tags:
             - { name: form.type }
 

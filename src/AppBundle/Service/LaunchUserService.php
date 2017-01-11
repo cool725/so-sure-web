@@ -90,7 +90,7 @@ class LaunchUserService
             $this->sendEmail($existingUser);
         }
         */
-        \AppBundle\Classes\NoOp::noOp([$resend]);
+        \AppBundle\Classes\NoOp::ignore([$resend]);
 
         return ['user' => $existingUser, 'new' => $userCreated];
     }

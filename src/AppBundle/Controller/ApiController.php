@@ -107,11 +107,6 @@ class ApiController extends BaseController
             }
             */
 
-            // soft delete
-            if ($user->isExpired()) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User does not exist', 403);
-            }
-
             if (!$user->isEnabled()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_RESET_PASSWORD,
@@ -550,11 +545,6 @@ class ApiController extends BaseController
             $user = $identity->loadUserByUserToken($this->getDataString($data, 'token'));
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'Invalid token', 403);
-            }
-
-            // soft delete
-            if ($user->isExpired()) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User does not exist', 403);
             }
 
             if (!$user->isEnabled()) {

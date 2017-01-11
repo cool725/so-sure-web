@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% macro display_actions(phone, token) %}
+{% macro display_actions(phone) %}
   <button title="Alternatives" type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
       data-query="{{ path('claims_phone_alternatives', {'id': phone.id}) }}"
       data-phone="{{ phone.toAlternativeArray()|json_encode }}"
@@ -12,7 +12,7 @@
       data-salva-standard="{{ phone.getSalvaBinderMonthlyPremium }}"
       data-salva-min="{{ phone.getSalvaMiniumumBinderMonthlyPremium }}"
       data-phone="{{ phone.toPriceArray()|json_encode }}"><i class="fa fa-gbp"></i></button>
-  <button title="Deactive Phone" type="button" class="btn btn-warning phone-active" data-token="{{ token }}"
+  <button title="Deactive Phone" type="button" class="btn btn-warning phone-active" data-token="{{ csrf_token('default') }}"
           data-active="{{ path('admin_phone_active', {'id': phone.id}) }}"><i class="fa fa-power-off"></i></button>
 {% endmacro display_actions %}
 
@@ -122,7 +122,7 @@
                             </span>
                             </td>
                             <td width="152px">
-                              {{ this.display_actions(phone, token) }}
+                              {{ this.display_actions(phone) }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -165,7 +165,7 @@
                             <td>{{ phone.camera }} MP</td>
                             <td>{% if phone.lte %}Yes{%else%}No{%endif%}</td>
                             <td width="152px">
-                              {{ this.display_actions(phone, token) }}
+                              {{ this.display_actions(phone) }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -214,7 +214,7 @@
                             </td>
                             <td><span class="{% if phone.shouldBeRetired %}text-danger{% else %}text-muted{% endif %}">{{ phone.monthAge }} months</span></td>
                             <td width="152px">
-                              {{ this.display_actions(phone, token) }}
+                              {{ this.display_actions(phone) }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -311,7 +311,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <input type="hidden" name="token" value="{{ token }}" />
+            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary">Add</button>
           </div>

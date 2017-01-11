@@ -17,9 +17,4 @@ class RegistrationFormType extends AbstractType
     {
         return 'fos_user_registration';
     }
-
-    public function getName()
-    {
-        return 'appbundle_user_registration';
-    }
 }

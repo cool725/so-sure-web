@@ -125,7 +125,7 @@
                 <tr>
                     <td>Replacement Phone</td>
                     <td>
-                            <input type="hidden" name="token" value="{{ token }}"></input>
+                            <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
                             <input type="hidden" name="id" id="claims-detail-id"></input>
                             <select name="phone" id="claims-detail-replacement-phone">
                                     <option value="">-- Select a phone --</option>

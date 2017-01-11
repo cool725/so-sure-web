@@ -3,7 +3,7 @@
 
 namespace AppBundle\Document;
 
-use FOS\UserBundle\Document\User as BaseUser;
+use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use GeoJson\Geometry\Point;
 use AppBundle\Classes\SoSure;
@@ -186,6 +186,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
+    protected $locked = false;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
     protected $emailVerified;
 
     /**
@@ -277,6 +284,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setId($id)
     {
         $this->id = $id;
+    }
+    
+    public function isLocked()
+    {
+        return $this->locked;
+    }
+
+    public function setLocked($locked)
+    {
+        $this->locked = $locked;
     }
 
     public function getCreated()

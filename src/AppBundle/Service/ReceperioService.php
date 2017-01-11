@@ -320,7 +320,7 @@ class ReceperioService extends BaseImeiService
         Claim $claim = null,
         User $handler = null
     ) {
-        \AppBundle\Classes\NoOp::noOp([$phone]);
+        \AppBundle\Classes\NoOp::ignore([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == self::TEST_INVALID_IMEI) {
             return false;
@@ -439,7 +439,7 @@ class ReceperioService extends BaseImeiService
         Claim $claim = null,
         User $handler = null
     ) {
-        \AppBundle\Classes\NoOp::noOp([$phone]);
+        \AppBundle\Classes\NoOp::ignore([$phone]);
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == self::TEST_INVALID_IMEI) {
             return false;
@@ -530,7 +530,7 @@ class ReceperioService extends BaseImeiService
         IdentityLog $identityLog = null,
         $warnMismatch = true
     ) {
-        \AppBundle\Classes\NoOp::noOp([$phone]);
+        \AppBundle\Classes\NoOp::ignore([$phone]);
         if ($serialNumber == self::TEST_INVALID_SERIAL) {
             return false;
         }
@@ -765,7 +765,7 @@ class ReceperioService extends BaseImeiService
                 $forces = [];
                 if (isset($data['forces'])) {
                     foreach ($data['forces'] as $force) {
-                        $forces[$force['force']] = $force['forcename'];
+                        $forces[$force['forcename']] = $force['forcename'];
                     }
 
                     $this->redis->setex($key, self::FORCES_CACHE_TIME, serialize($forces));

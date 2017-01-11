@@ -96,7 +96,6 @@ class UserController extends BaseController
             'policy' => $user->getCurrentPolicy(),
             'email_form' => $emailInvitationForm->createView(),
             'invitation_form' => $invitationForm->createView(),
-            'token' => $this->get('form.csrf_provider')->generateCsrfToken('default'),
         );
     }
 

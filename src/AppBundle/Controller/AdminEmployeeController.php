@@ -49,7 +49,6 @@ use AppBundle\Form\Type\SmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
-use AppBundle\Form\Type\YearMonthType;
 use AppBundle\Form\Type\JudoFileType;
 use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
@@ -88,7 +87,6 @@ class AdminEmployeeController extends BaseController
      */
     public function phonesAction(Request $request)
     {
-        $csrf = $this->get('form.csrf_provider');
         $expectedClaimFrequency = $this->getParameter('expected_claim_frequency');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -155,7 +153,6 @@ class AdminEmployeeController extends BaseController
 
         return [
             'phones' => $pager->getCurrentPageResults(),
-            'token' => $csrf->generateCsrfToken('default'),
             'form' => $form->createView(),
             'pager' => $pager
         ];
@@ -167,7 +164,6 @@ class AdminEmployeeController extends BaseController
      */
     public function adminUsersAction(Request $request)
     {
-        $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
 
@@ -219,7 +215,6 @@ class AdminEmployeeController extends BaseController
 
         return [
             'users' => $pager->getCurrentPageResults(),
-            'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
             'form' => $form->createView(),
             'policy_route' => 'admin_policy',
@@ -551,7 +546,6 @@ class AdminEmployeeController extends BaseController
      */
     public function adminClaimsAction(Request $request)
     {
-        $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
         $qb = $repo->createQueryBuilder();
@@ -561,7 +555,6 @@ class AdminEmployeeController extends BaseController
 
         return [
             'claims' => $pager->getCurrentPageResults(),
-            'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
             'phones' => $phones,
         ];

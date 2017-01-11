@@ -49,7 +49,6 @@ class ClaimsController extends BaseController
             return $this->redirectToRoute('admin_users');
         }
 
-        $csrf = $this->get('form.csrf_provider');
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $users = $repo->createQueryBuilder();
@@ -85,7 +84,6 @@ class ClaimsController extends BaseController
 
         return [
             'users' => $pager->getCurrentPageResults(),
-            'token' => $csrf->generateCsrfToken('default'),
             'pager' => $pager,
             'form' => $form->createView(),
             'policy_route' => 'claims_policy',
