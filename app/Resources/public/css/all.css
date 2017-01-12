@@ -274,6 +274,14 @@ h1, h2, h3, h4, h5, h6 {
     vertical-align: middle;
 }
 
+.text-break .line:first-of-type {
+    margin-left: 0;
+}
+
+.text-break .line:last-of-type {
+    margin-right: 0;
+}
+
 /* DOWNLOAD APP */
 
 #app-store {
