@@ -4,66 +4,32 @@
 
 }
 
-/*.checkout--step {
-    display: flex;
-    justify-content: center;
-}
-
-.checkout .form-horizontal {
-    width: 100%;
-}
-
-.checkout label {
-    display: block;
-    font-weight: normal;
-    font-size: 14px;
-    float: none;
-    text-align: left;
-    margin-top: 5px;
-}
-
-.checkout .form-control {
-    border: 2px solid #efefef;
-    box-shadow: none;
-}
-
-.checkout .text-break .line {
-    width: 30%;
-}*/
-
 /* Radio Buttons */
 
-/*.purchase-amount label {
-    display: block;
-    margin-bottom: 10px;
-}
-
-.purchase-amount input {
-    margin-left: 10px !important;
+.checkout .radio {
+    width: 45%;
+    font-size: 14px;
     display: inline-block;
-    position: relative;
-}
-@media (max-width: 543px) {
-  .purchase-amount input {
-    margin-left: 0px !important;
-  }
+    padding: 10px 0;
+    border: 2px solid #3399ff;
+    border-radius: 3px;        
 }
 
-.purchase-amount input + .required {
-    border: 2px solid #3399FF;
-    border-radius: 3px;
+.checkout .radio:first-of-type {
+    margin-right: 10%;
 }
 
-.purchase-amount input:checked + .required {
-    background-color: #3399FF;
+.checkout .radio.radio-selected {
+    background-color: #3399ff;
     color: #fff;
-    border-radius: 3px;
 }
 
-.payment-container .radio input[type="radio"] {
-    position: relative;
-}*/
-
+.checkout .radio input {
+    margin-top: 2px;
+/*       -moz-appearance: none;
+    -webkit-appearance: none;
+            appearance: none;    */
+}
 
 /* Includes */
 

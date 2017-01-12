@@ -1,36 +1,4 @@
-.modal-confirm {
-    background: rgba(0, 0, 0, 0.6);
-    padding-top: 10%;
-}
 
-.modal-confirm-wrapper {
-    margin-top: 40px;
-    margin-bottom: 20px;
-}
-
-.modal-summary {
-    background: rgba(0, 0, 0, 0.6);
-    padding-top: 10%;
-}
-
-.modal-summary ul {
-    list-style: none;
-}
-
-.modal-summary ul li {
-    font-weight: 900;
-}
-
-.modal-policy {
-    background: rgba(0, 0, 0, 0.6);
-    padding-top: 2%;
-    max-height: 90%;
-    overflow-y: scroll;
-}
-
-.modal-policy .modal-dialog {
-    width: 70% !important;
-}
 
 /*.help-block ul {
     list-style: none;
