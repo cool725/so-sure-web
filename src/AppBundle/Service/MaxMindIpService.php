@@ -69,7 +69,7 @@ class MaxMindIpService
         } catch (\Exception $e) {
             // Exclude certain ips
             if (!in_array($ip, ['185.153.198.238'])) {
-                $this->logger->error(sprintf('Failed to query ip %s Err: %s', $ip, $e->getMessage()));
+                $this->logger->info(sprintf('Failed to query ip %s Err: %s', $ip, $e->getMessage()));
             }
         }
 
