@@ -66,7 +66,7 @@ $(function(){
         transform: function (response) {
             //console.log(response);
             if (response.Items && response.Items.length > 0 && response.Items[0].Error) {
-                showAddress("Sorry, there's an error with our address lookup.  Please type in manually below.");
+                showAddress("Sorry, there's an error with our address lookup. Please type in manually below.");
             }
             return response.Items;
         }

@@ -48,9 +48,8 @@
                             </div>
 
                             <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}">
-                                <div class="" style="">
-                                <div class="address-show-error form-group col-sm-12" style="display: none;">
-                                    <span class="text-danger address-show-error-text"></span>
+                                <div class="form-group address-show-error" style="display: none;">
+                                    <small class="text-danger address-show-error-text"></small>
                                 </div>
                                 <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
                                     {{ form_label(purchase_form.addressLine1, 'Address 1', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
@@ -89,7 +88,16 @@
                                     </div>
                                 </div>
                                 <div class="form-group {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
-
+                                    {{ form_label(purchase_form.postcode, 'Postcode', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
+                                    <div class="col-sm-6">
+                                        {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode'}}) }}
+                                        {% if showAddress %}
+                                            <div class="help-block with-errors">{{ form_errors(purchase_form.postcode) }}</div>
+                                        {% endif %}
+                                    </div>                                    
+                                </div>
+                                <div class="form-group">
+                                    {{ form_widget(purchase_form.next, {'label': 'Continue to Phone Details', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}                                    
                                 </div>
                             </div>
 
