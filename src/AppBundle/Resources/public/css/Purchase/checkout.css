@@ -4,11 +4,22 @@
 
 }
 
+.checkout .form-group label {
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.checkout .form-group .form-control {
+    border: 2px solid #efefef;
+    box-shadow: none;
+}
+
 /* Radio Buttons */
 
 .checkout .radio {
     width: 45%;
     font-size: 14px;
+    text-align: center;
     display: inline-block;
     padding: 10px 0;
     border: 2px solid #3399ff;
@@ -56,24 +67,6 @@
 
 /*
 
-.help-block li {
-    margin-left: -40px;
-    color: #FF6666;
-    font-size: 14px;
-}
-
-.help-block .list-unstyled li {
-    margin-left: 0px;
-}
-
-.has-error .form-control {
-    border-width: 2px;
-}
-
-.help-block {
-    text-align: left;
-    font-size: 14px;  
-}*/
 
 /* Modal */
 
@@ -149,16 +142,10 @@
 
 @media (min-width: 767px) {
 
-    .checkout .form-horizontal {
-        /*width: 455px;*/
-    }    
 
 }
 
 @media (min-width:992px) {
 
-    .checkout .form-horizontal {
-        /*width: 455px;*/
-    }    
 
 }

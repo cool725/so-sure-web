@@ -4,7 +4,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    '@AppBundle/Resources/public/css/Purchase/purchase.css'
+    '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css'
     'bundles/app/css/Default/selectPhoneMake.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
@@ -66,7 +66,10 @@
                                 {{ form_label(purchase_form.imei, 'IMEI Number', { 'label_attr': {'class': 'control-label col-sm-4'} }) }}
                                 <div class="col-sm-8">
                                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':''}}) }}
-                                    <p class="help-block text-left"><small>Dial *#06# to show your IMEI number</small></p>
+                                    <p class="help-block text-left">
+                                        <small>Dial *#06# to show your IMEI number </small>
+                                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"><i class="fa fa-question"></i></button>
+                                    </p>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                                    
                                 </div>                                
                             </div>
@@ -75,13 +78,19 @@
                                     {{ form_label(purchase_form.serialNumber, 'Serial Number', { 'label_attr': {'class': 'control-label col-sm-4'} }) }}
                                     <div class="col-sm-8">
                                         {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':''}}) }}
-                                        <p class="help-block text-left"><small>Go to Settings > General > About</small></p>
+                                        <p class="help-block text-left">
+                                            <small>Go to Settings > General > About</small>
+                                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
+                                          ><i class="fa fa-question"></i></button>
+                                        </p>
                                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
                                     </div>                                    
                                 </div>
                             {% endif %}
                             <div class="form-group">
-                                {{ form_widget(purchase_form.next, {'label': 'Continue to Purchase', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
+                                <div class="col-sm-12">
+                                    {{ form_widget(purchase_form.next, {'label': 'Continue to Purchase', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
+                                </div>
                             </div>
 
                         {{ form_end(purchase_form) }}

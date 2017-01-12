@@ -474,14 +474,14 @@ h1, h2, h3, h4, h5, h6 {
 .vertical-align-middle {
   vertical-align: middle;
   display: table-cell;
-  text-align: center;
+  /*text-align: center;*/
 }
 
 @media (min-width: 767px) {
 
-/*    .vertical-align-middle {
+    .vertical-align-middle {
         text-align: center;
-    }*/
+    }
 
 }
 

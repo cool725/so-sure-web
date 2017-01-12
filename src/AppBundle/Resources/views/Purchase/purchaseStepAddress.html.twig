@@ -4,7 +4,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    '@AppBundle/Resources/public/css/Purchase/purchase.css'
+    '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -97,7 +97,9 @@
                                     </div>                                    
                                 </div>
                                 <div class="form-group">
-                                    {{ form_widget(purchase_form.next, {'label': 'Continue to Phone Details', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}                                    
+                                    <div class="col-sm-12">
+                                        {{ form_widget(purchase_form.next, {'label': 'Continue to Phone Details', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}        
+                                    </div>                            
                                 </div>
                             </div>
 
