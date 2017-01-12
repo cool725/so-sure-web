@@ -646,23 +646,25 @@ class SalvaExportService
     {
         $dom = new DOMDocument();
         $dom->loadXML($xml, LIBXML_NOBLANKS);
-
         $xpath = new DOMXPath($dom);
         $xpath->registerNamespace('ns1', "http://sims.salva.ee/service/schema/v1");
         $xpath->registerNamespace('ns2', "http://sims.salva.ee/service/schema/policy/v1");
         $xpath->registerNamespace('ns3', "http://sims.salva.ee/service/schema/policy/export/v1");
-        $xpath->registerNamespace('ns4', "http://sims.salva.ee/service/schema/policy/classifier/export/v1");
-        $xpath->registerNamespace('ns5', "http://sims.salva.ee/service/schema/invoice/v1");
-        $xpath->registerNamespace('ns6', "http://sims.salva.ee/service/schema/invoice/export/v1");
-        $xpath->registerNamespace('ns7', "http://sims.salva.ee/service/schema/policy/termination/v1");
-        $xpath->registerNamespace('ns8', "http://sims.salva.ee/service/schema/policy/import/v1");
+        $xpath->registerNamespace('ns4', "http://sims.salva.ee/service/schema/claimfile/v1");
+        $xpath->registerNamespace('ns5', "http://sims.salva.ee/service/schema/claimfile/import/v1");
+        $xpath->registerNamespace('ns6', "http://sims.salva.ee/service/schema/claimfile/import/v1");
+        $xpath->registerNamespace('ns7', "http://sims.salva.ee/service/schema/classifier/export/v1");
+        $xpath->registerNamespace('ns8', "http://sims.salva.ee/service/schema/invoice/v1");
+        $xpath->registerNamespace('ns9', "http://sims.salva.ee/service/schema/invoice/export/v1");
+        $xpath->registerNamespace('ns10', "http://sims.salva.ee/service/schema/policy/termination/v1");
+        $xpath->registerNamespace('ns11', "http://sims.salva.ee/service/schema/policy/import/v1");
 
-        $elementList = $xpath->query('//ns8:serviceResponse/ns8:policies/ns2:policy/ns2:recordId');
+        $elementList = $xpath->query('//ns11:serviceResponse/ns8:policies/ns2:policy/ns2:recordId');
         foreach ($elementList as $element) {
             return $element->nodeValue;
         }
 
-        $elementList = $xpath->query('//ns7:serviceResponse/ns7:policies/ns2:policy/ns2:recordId');
+        $elementList = $xpath->query('//ns10:serviceResponse/ns7:policies/ns2:policy/ns2:recordId');
         foreach ($elementList as $element) {
             return $element->nodeValue;
         }
