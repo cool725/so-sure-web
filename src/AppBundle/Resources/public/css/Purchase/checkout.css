@@ -33,7 +33,7 @@
 
 /* Radio Buttons */
 
-.purchase-amount label {
+/*.purchase-amount label {
     display: block;
     margin-bottom: 10px;
 }
@@ -62,7 +62,7 @@
 
 .payment-container .radio input[type="radio"] {
     position: relative;
-}
+}*/
 
 
 /* Includes */
@@ -77,9 +77,18 @@
 
 /* Errors */
 
-/*.help-block ul {
+.help-block ul {
     list-style: none;
+    text-align: left;
+    margin: 0; padding: 0;
 }
+
+.help-block li {
+    color: #ff6666;
+    font-size: 13px;
+}
+
+/*
 
 .help-block li {
     margin-left: -40px;
