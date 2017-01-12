@@ -264,6 +264,7 @@ h1, h2, h3, h4, h5, h6 {
     color: #202532;
     padding: 20px;
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
 }
 .text-break .line {
     border-bottom: 2px solid #efefef;
@@ -494,6 +495,15 @@ h1, h2, h3, h4, h5, h6 {
   display: table-cell;
   text-align: center;
 }
+
+@media (min-width: 767px) {
+
+/*    .vertical-align-middle {
+        text-align: center;
+    }*/
+
+}
+
 .light-gradient {
   background: #Efefef; /* fallback for old browsers */
   background: -webkit-linear-gradient(to top, #efefef , #FFFFFF); /* Chrome 10-25, Safari 5.1-6 */
