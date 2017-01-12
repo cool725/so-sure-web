@@ -62,13 +62,17 @@
                                     {% if phone.isITunes %}
                                     <div>
                                         <h4>OR</h4>
-                                        <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img></a> 
+                                        <a class="ga-outbound-click" data-event-value="{{ ga_event_outbound_apple }}" href="{{ apple_download('quotepage') }}">
+                                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
+                                        </a> 
                                     </div>
                                     {% endif %}
                                     {% if phone.isGooglePlay %}
                                     <div>
                                         <h4>OR</h4>
-                                        <a class="ga-outbound-click" href="{{ google_download('quotepage') }}"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img></a>   
+                                        <a class="ga-outbound-click" data-event-value="{{ ga_event_outbound_google }}" href="{{ google_download('quotepage') }}">
+                                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
+                                        </a>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -202,12 +206,12 @@
                         <div class="row" style="padding-bottom: 30px;">
                             <p class="lead">Download our app - it's a little bit easier.</p>
                             <div class="col-md-6 text-right">
-                                <a class="ga-outbound-click" href="{{ apple_download('modal') }}">
+                                <a class="ga-outbound-click" data-event-value="{{ ga_event_outbound_apple }}" href="{{ apple_download('modal') }}">
                                     <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
                                 </a>
                             </div>
                             <div class="col-md-6 text-left">
-                                <a class="ga-outbound-click" href="{{ google_download('modal') }}">
+                                <a class="ga-outbound-click" data-event-value="{{ ga_event_outbound_google }}" href="{{ google_download('modal') }}">
                                     <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
                                 </a>
                             </div>

@@ -14,12 +14,12 @@
     <div class="row">
         <div class="form-group col-sm-12 text-center">
             {% if show_google_play %}
-            <a class="ga-outbound-click" href="{{ google_download('purchase') }}">
+            <a class="ga-outbound-click" data-event-value="{{ ga_event_outbound_google }}" href="{{ google_download('purchase') }}">
                 <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
             </a>
             {% endif %}
             {% if show_itunes %}
-            <a class="ga-outbound-click" href="{{ apple_download('purchase') }}">
+            <a class="ga-outbound-click" data-event-value="{{ ga_event_outbound_apple }}" href="{{ apple_download('purchase') }}">
                 <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
             </a>
             {% endif %}
