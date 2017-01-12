@@ -42,6 +42,21 @@
             appearance: none;    */
 }
 
+.checkout .address-manual-cont {    
+    margin-top: 15px;
+}
+
+.checkout .address-manual {
+    padding: 12px 30px;
+    border: 2px solid #202532;
+    background: none !important;
+    border-radius: 30px;
+    -moz-border-radius: 30px;
+    -webkit-border-radius: 30px;
+    background: none;
+    color: #202532;    
+}
+
 /* Includes */
 
 .purchase-download {
