@@ -52,12 +52,12 @@
             <p class="lead text-center" id="hero-description">It makes sense, we are a mobile insurance provider after all!</p>
             <div class="row download-app">
                 <div class="col-md-6 text-right">
-                    <a class="ga-outbound-click" href="{{ apple_download('quotepage') }}">
+                    <a class="ga-outbound-click" data-event-value="{{ ga_event_outbound_apple }}" href="{{ apple_download('quotepage') }}">
                     <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
                     </a>
                 </div>
                 <div class="col-md-6 text-left">
-                    <a class="ga-outbound-click" href="{{ google_download('quotepage') }}">
+                    <a class="ga-outbound-click" data-event-value="{{ ga_event_outbound_google }}" href="{{ google_download('quotepage') }}">
                     <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
                     </a>
                 </div>
