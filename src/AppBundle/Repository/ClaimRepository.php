@@ -64,4 +64,12 @@ class ClaimRepository extends DocumentRepository
             ->field('replacementImei')->notEqual(null)
             ->getQuery()->execute();
     }
+    
+    public function findSettledUnprocessed()
+    {
+        return $this->createQueryBuilder()
+            ->field('status')->equals(Claim::STATUS_SETTLED)
+            ->field('processed')->in([null, false])
+            ->getQuery()->execute();
+    }
 }
