@@ -106,13 +106,17 @@ class PurchaseController extends BaseController
                         throw new \Exception($err);
                     }
 
+                    $newUser = false;
                     if (!$user) {
                         $userManager = $this->get('fos_user.user_manager');
                         $user = $userManager->createUser();
                         $user->setEnabled(true);
-                        $dm->persist($user);
+                        $newUser = true;
                     }
                     $purchase->populateUser($user);
+                    if ($newUser) {
+                        $dm->persist($user);
+                    }
                     $dm->flush();
 
                     if (!$user->hasValidDetails()) {
