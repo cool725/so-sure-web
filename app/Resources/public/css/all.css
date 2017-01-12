@@ -262,35 +262,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-break {
     color: #202532;
-    padding: 20px;
+    padding: 20px 0;
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: center;
 }
 .text-break .line {
     border-bottom: 2px solid #efefef;
     display: inline-block;
-    width: 40%;
+    margin: -2px 10px 0;
+    width: 42%;
     vertical-align: middle;
-}
-.text-break-dark {
-  color: #202532;
-  font-weight: bold;
-}
-.text-break-dark .line-dark {
-  border-bottom: 1px solid #efefef;
-  display: inline-block;
-  width: 30%;
-  vertical-align: middle;
-}
-@media (min-width:544px) {
-    .text-break .line {
-        margin: 10px;
-        width: 20%;
-    }
-    .text-break-dark .line-dark {
-        margin: 10px;
-        width: 20%;
-    }
 }
 
 /* DOWNLOAD APP */

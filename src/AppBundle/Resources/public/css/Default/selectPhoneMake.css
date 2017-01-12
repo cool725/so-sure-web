@@ -39,7 +39,7 @@
         width: 100% !important;
         margin-right: 0px;
     }
-    .form-control {
+    #select-phone .form-control {
         border-width: 0px;
         height: 45px;
     }
