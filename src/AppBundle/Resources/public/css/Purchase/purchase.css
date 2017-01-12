@@ -32,7 +32,7 @@
     width: 70% !important;
 }
 
-.help-block ul {
+/*.help-block ul {
     list-style: none;
 }
 
@@ -67,7 +67,7 @@
 
 .tt-suggestion:hover {
     background-color: #F5F5F5;
-}
+}*/
 
 /*.address-manual {
     padding: 12px 30px;
@@ -85,7 +85,7 @@
     color: #202352;
 }*/
 
-.twitter-typeahead, .tt-hint, .tt-input, .tt-menu {
+/*.twitter-typeahead, .tt-hint, .tt-input, .tt-menu {
     width: 100%;
 }
 
@@ -107,7 +107,7 @@ label {
 .btn-primary.disabled {
     background-color: #ccc;
     border-color: #ccc;
-}
+}*/
 
 
 /* Purchase Ammount - Radio Buttons */
@@ -194,7 +194,7 @@ label {
     }
 }
 
-.payment-container {
+/*.payment-container {
     min-height: 700px;
 }
 
@@ -373,4 +373,4 @@ label {
     text-align: left;
     float: none;
   }
-}
+}*/

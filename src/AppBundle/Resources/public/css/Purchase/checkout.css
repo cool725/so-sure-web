@@ -4,7 +4,7 @@
 
 }
 
-.checkout--step {
+/*.checkout--step {
     display: flex;
     justify-content: center;
 }
@@ -14,9 +14,11 @@
 }
 
 .checkout label {
+    display: block;
     font-weight: normal;
     font-size: 14px;
-    float: left;
+    float: none;
+    text-align: left;
     margin-top: 5px;
 }
 
@@ -27,7 +29,7 @@
 
 .checkout .text-break .line {
     width: 30%;
-}
+}*/
 
 /* Radio Buttons */
 
@@ -69,9 +71,13 @@
     margin: 10px 0 40px;
 }
 
+.purchase-download--btns {
+    text-align: center;
+}
+
 /* Errors */
 
-.help-block ul {
+/*.help-block ul {
     list-style: none;
 }
 
@@ -92,7 +98,7 @@
 .help-block {
     text-align: left;
     font-size: 14px;  
-}
+}*/
 
 /* Modal */
 
@@ -130,28 +136,54 @@
     width: 70% !important;
 }
 
+/* Twitter Typehead */
+
+.tt-menu {
+    background-color: white;
+    border: 1px solid;
+    width: 150%;
+    overflow-y: scroll;
+    border-radius: 5px;
+    max-height: 150px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.tt-suggestion {
+    padding-bottom: 2px;
+}
+
+.tt-suggestion:hover {
+    background-color: #F5F5F5;
+}
+
+.twitter-typeahead, .tt-hint, .tt-input, .tt-menu {
+    width: 100%;
+}
+
 /* Responsive */
 
 @media (min-width: 563px) {
 
     .checkout .form-horizontal {
-        width: 70%;
+        width: 455px;
+        margin: 0 auto;
     }    
 
 }
 
 @media (min-width: 767px) {
 
-    .checkout label {
-        float: right;
-    }
+    .checkout .form-horizontal {
+        /*width: 455px;*/
+    }    
 
 }
 
 @media (min-width:992px) {
 
     .checkout .form-horizontal {
-        width: 50%;
+        /*width: 455px;*/
     }    
 
 }

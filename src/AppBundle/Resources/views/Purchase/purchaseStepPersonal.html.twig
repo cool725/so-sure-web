@@ -24,56 +24,47 @@
         <div class="container checkout">
 
             {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
+            
+            <div class="row">
+                <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
 
-            <div class="checkout--step">
+                    <div class="checkout--step">
                 
-                {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
-
-                    <div class="row">
-                        <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
-                            <div class="col-sm-4">
-                                {{ form_label(purchase_form.name, 'Name') }}
+                        {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
+                        
+                            <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
+                                 {{ form_label(purchase_form.name, 'Name', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
+                                <div class="col-sm-8">
+                                    {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.name) }}</div>
+                                </div>                                 
                             </div>
-                            <div class="col-sm-8">
-                                {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.name) }}</div>
+                            <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %}">
+                                {{ form_label(purchase_form.birthday, 'Date of Birth', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
+                                <div class="col-sm-8">
+                                    {{ form_widget(purchase_form.birthday, {'attr':{'class': 'form-control', 'placeholder':'DD/MM/YYYY'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
+                                </div>                                
                             </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %}">
-                            <div class="col-sm-4">
-                                {{ form_label(purchase_form.birthday, 'Date of Birth') }}
-                            </div>
-                            <div class="col-sm-8">
-                                {{ form_widget(purchase_form.birthday, {'attr':{'class': 'form-control', 'placeholder':'DD/MM/YYYY'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
-                            <div class="col-sm-4">
-                                {{ form_label(purchase_form.mobileNumber, 'Mobile No.') }}
-                            </div>
-                            <div class="col-sm-8">
-                                <div class='input-group'>
+                            <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
+                                {{ form_label(purchase_form.mobileNumber, 'Mobile No.', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
+                                <div class="col-sm-8">
                                     {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'00447[1-9][0-9]{8,8}|[+]447[1-9][0-9]{8,8}|07[1-9][0-9]{8,8}', 'title': 'Enter a valid UK Mobile Number', 'placeholder':'e.g. +447700 111 222'}}) }}
-                                </div>
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
+                                </div>                                
                             </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-sm-12 text-center">
-                            {{ form_widget(purchase_form.email) }}
-                            {{ form_widget(purchase_form.firstName) }}
-                            {{ form_widget(purchase_form.lastName) }}
-                            {{ form_widget(purchase_form.next, {'label': 'Continue to Billing Details', 'attr': {'class': 'btn btn-primary'}}) }}
-                        </div>
-                    </div>                
+                            <div class="form-group">
+                                {{ form_widget(purchase_form.email) }}
+                                {{ form_widget(purchase_form.firstName) }}
+                                {{ form_widget(purchase_form.lastName) }}
+                                {{ form_widget(purchase_form.next, {'label': 'Continue to Billing Details', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}                                
+                            </div>
+                 
 
-                {{ form_end(purchase_form) }}
+                        {{ form_end(purchase_form) }}
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
