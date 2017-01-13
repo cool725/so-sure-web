@@ -1,9 +1,5 @@
 /* Checkout */
 
-.checkout { 
-
-}
-
 .checkout .form-group label {
     display: block;
     text-align: left;
@@ -39,9 +35,6 @@
 
 .checkout .radio input {
     margin-top: 2px;
-/*       -moz-appearance: none;
-    -webkit-appearance: none;
-            appearance: none;    */
 }
 
 .checkout .checkbox-terms {
