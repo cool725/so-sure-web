@@ -28,6 +28,10 @@
     margin-right: 10%;
 }
 
+.checkout .radio label {
+    text-align: center;
+}
+
 .checkout .radio.radio-selected {
     background-color: #3399ff;
     color: #fff;
