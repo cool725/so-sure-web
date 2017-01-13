@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
+use AppBundle\Document\Claim;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
@@ -42,6 +43,10 @@ class IntercomService
     const QUEUE_EVENT_INVITATION_PENDING = 'invitation-pending';
 
     const QUEUE_EVENT_USER_PAYMENT_FAILED = 'userpayment-failed';
+
+    const QUEUE_EVENT_CLAIM_CREATED = 'claim-created';
+    const QUEUE_EVENT_CLAIM_APPROVED = 'claim-approved';
+    const QUEUE_EVENT_CLAIM_SETTLED = 'claim-settled';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -230,6 +235,9 @@ class IntercomService
             $user->getCurrentPolicy()->getPromoCode() :
             '';
         $data['custom_attributes']['Pending Invites'] = count($user->getUnprocessedReceivedInvitations());
+        $data['custom_attributes']['Approved Claims'] = $user->getCurrentPolicy() ?
+            count($user->getCurrentPolicy()->getApprovedClaims()) :
+            0;
 
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
@@ -285,6 +293,12 @@ class IntercomService
     public function sendPaymentEvent(Payment $payment, $event)
     {
         $user = $payment->getPolicy()->getUser();
+        $this->sendEvent($user, $event, []);
+    }
+
+    public function sendClaimEvent(Claim $claim, $event)
+    {
+        $user = $claim->getPolicy()->getUser();
         $this->sendEvent($user, $event, []);
     }
 
@@ -377,6 +391,14 @@ class IntercomService
                     }
 
                     $this->updateLead($this->getLead($data['leadId']));
+                } elseif ($action == self::QUEUE_EVENT_CLAIM_CREATED ||
+                          $action == self::QUEUE_EVENT_CLAIM_APPROVED ||
+                          $action == self::QUEUE_EVENT_CLAIM_SETTLED) {
+                    if (!isset($data['claimId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->sendClaimEvent($this->getClaim($data['claimId']), $action);
                 } elseif ($action == self::QUEUE_EVENT_POLICY_CREATED ||
                           $action == self::QUEUE_EVENT_POLICY_CANCELLED) {
                     if (!isset($data['policyId'])) {
@@ -467,6 +489,20 @@ class IntercomService
         return $user;
     }
 
+    private function getClaim($id)
+    {
+        if (!$id) {
+            throw new \InvalidArgumentException('Missing claimId');
+        }
+        $repo = $this->dm->getRepository(Claim::class);
+        $claim = $repo->find($id);
+        if (!$claim) {
+            throw new \InvalidArgumentException(sprintf('Unable to find claimId: %s', $id));
+        }
+
+        return $claim;
+    }
+
     private function getPolicy($id)
     {
         if (!$id) {
@@ -530,6 +566,17 @@ class IntercomService
         $data = [
             'action' => $event,
             'userId' => $user->getId(),
+            'retryAttempts' => $retryAttempts,
+            'additional' => $additional,
+        ];
+        $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
+    }
+
+    public function queueClaim(Claim $claim, $event, $additional = null, $retryAttempts = 0)
+    {
+        $data = [
+            'action' => $event,
+            'claimId' => $claim->getId(),
             'retryAttempts' => $retryAttempts,
             'additional' => $additional,
         ];

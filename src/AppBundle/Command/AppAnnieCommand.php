@@ -35,6 +35,18 @@ class AppAnnieCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'do not save output'
             )
+            ->addOption(
+                'ignore-zero',
+                null,
+                InputOption::VALUE_NONE,
+                'ok if the results are 0; perhaps due to a bad download app day'
+            )
+            ->addOption(
+                'debug',
+                null,
+                InputOption::VALUE_NONE,
+                'show debug output'
+            )
         ;
     }
 
@@ -42,6 +54,9 @@ class AppAnnieCommand extends ContainerAwareCommand
     {
         $skipSave = true === $input->getOption('skip-save');
         $dateOption = $input->getOption('date');
+        $ignoreZero = $input->getOption('ignore-zero');
+        $debug = $input->getOption('debug');
+
         $date = new \DateTime('-3 day');
         if ($dateOption) {
             $date = new \DateTime($dateOption);
@@ -55,8 +70,13 @@ class AppAnnieCommand extends ContainerAwareCommand
 
         $appAnnie = $this->getAppAnnie();
         $output->writeln(sprintf('Checking %s', $date->format(\DateTime::ATOM)));
-        $results = $appAnnie->run($date, $endDate, !$skipSave);
-        $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
+        $results = $appAnnie->run($date, $endDate, !$skipSave, $ignoreZero);
+        if ($debug) {
+            $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
+        } else {
+            $output->writeln(sprintf("Apple %d", $results['apple']['downloads']));
+            $output->writeln(sprintf("Google %d", $results['google']['downloads']));
+        }
     }
     
     private function getAppAnnie()

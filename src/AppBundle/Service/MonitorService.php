@@ -76,4 +76,16 @@ class MonitorService
             }
         }
     }
+
+    public function claimsSettledUnprocessed()
+    {
+        $repo = $this->dm->getRepository(Claim::class);
+        $claims = $repo->findSettledUnprocessed();
+        foreach ($claims as $claim) {
+            throw new \Exception(sprintf(
+                'Claim %s is settled, but has not been processed (e.g. pot updated)',
+                $claim->getNumber()
+            ));
+        }
+    }
 }

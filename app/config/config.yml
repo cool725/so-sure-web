@@ -68,8 +68,6 @@ twig:
         davies_ip: %davies_ip%
         environment: %kernel.environment%
         digits_consumer_key: %digits_consumer_key%
-        ga_event_outbound_apple: 2
-        ga_event_outbound_google: 3
 
 doctrine_mongodb:
     connections:

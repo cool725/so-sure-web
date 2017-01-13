@@ -5,6 +5,7 @@ namespace AppBundle\Listener;
 use AppBundle\Document\User;
 use AppBundle\Event\LeadEvent;
 use AppBundle\Event\UserEvent;
+use AppBundle\Event\ClaimEvent;
 use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\InvitationEvent;
@@ -80,5 +81,20 @@ class IntercomListener
             IntercomService::QUEUE_EVENT_USER_PAYMENT_FAILED,
             ['reason' => $event->getReason()]
         );
+    }
+
+    public function onClaimCreatedEvent(ClaimEvent $event)
+    {
+        $this->intercom->queueClaim($event->getClaim(), IntercomService::QUEUE_EVENT_CLAIM_CREATED);
+    }
+
+    public function onClaimApprovedEvent(ClaimEvent $event)
+    {
+        $this->intercom->queueClaim($event->getClaim(), IntercomService::QUEUE_EVENT_CLAIM_APPROVED);
+    }
+
+    public function onClaimSettledEvent(ClaimEvent $event)
+    {
+        $this->intercom->queueClaim($event->getClaim(), IntercomService::QUEUE_EVENT_CLAIM_SETTLED);
     }
 }
