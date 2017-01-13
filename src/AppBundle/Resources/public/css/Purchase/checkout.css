@@ -45,6 +45,7 @@
 }
 
 .checkout .checkbox-terms {
+    padding: 15px 0;
     display: block !important;
     text-align: center !important;
 }
