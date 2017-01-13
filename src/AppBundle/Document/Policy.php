@@ -522,6 +522,18 @@ abstract class Policy
         return $this->claims;
     }
 
+    public function getApprovedClaims()
+    {
+        $claims = [];
+        foreach ($this->getClaims() as $claim) {
+            if ($claim->getStatus() == Claim::STATUS_APPROVED) {
+                $claims[] = $claim;
+            }
+        }
+
+        return $claims;
+    }
+
     public function getPotValue()
     {
         return $this->toTwoDp($this->potValue);
