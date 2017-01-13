@@ -4,16 +4,15 @@
     {{ parent() }}
     {% stylesheets
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
-    '@AppBundle/Resources/public/css/Purchase/checkout.css'    
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    '@AppBundle/Resources/public/css/Purchase/checkout.css' %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    '@AppBundle/Resources/public/js/Purchase/purchaseStepReview.js'
-     %}
-    %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
+    '@AppBundle/Resources/public/js/Purchase/purchaseStepReview.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block body %}
@@ -40,9 +39,8 @@
                                 </li>                                
                             </ol>
                             <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
-                            <br>
-                            <div class="form-group text-center checkbox {% if is_postback %}has-error{% endif %}">
-                                <label>
+                            <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
+                                <label class="checkbox-terms">
                                     <input type="checkbox" id="webpay-confirm">I confirm the above is correct</input>
                                 {% if is_postback %}<div class="help-block with-errors">You must agree to the terms</div>{% endif %}
                                 </label>

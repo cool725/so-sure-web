@@ -9,8 +9,8 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    '@AppBundle/Resources/public/css/Purchase/checkout.css'
-    %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    '@AppBundle/Resources/public/css/Purchase/checkout.css' %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
@@ -27,7 +27,7 @@
                     <div class="checkout--step">
                         {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
                         
-                            <div class="form-group{% if form_errors(form.email) %}has-error{% endif %}">
+                            <div class="form-group {% if form_errors(form.email) %}has-error{% endif %}">
                                 {{ form_label(form.email, 'Email', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
                                 <div class="col-sm-8">
                                     {{ form_widget(form.email, {'attr':{'class':'form-control', 'placeholder':'e.g. jane.smith@gmail.com'}}) }}

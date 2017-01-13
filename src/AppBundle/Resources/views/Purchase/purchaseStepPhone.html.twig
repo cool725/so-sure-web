@@ -6,16 +6,16 @@
     {% stylesheets
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css'
-    'bundles/app/css/Default/selectPhoneMake.css'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    'bundles/app/css/Default/selectPhoneMake.css' %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
     '@AppBundle/Resources/public/js/Purchase/purchaseStepPhone.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
-    %}<script src="{{ asset_url }}"></script>{% endjavascripts %}
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block body %}
@@ -32,7 +32,7 @@
                         {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
 
                             <div class="form-group">
-                                <label class="control-label col-sm-4">Your Phone</label>
+                                <label class="control-label col-sm-3">Your Phone</label>
                                 <div class="col-sm-8 text-left">
                                     <span class="h4">
                                         <strong>
@@ -55,7 +55,7 @@
                                 </div>                                
                             </div>
                             <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.amount, 'Payment Options', { 'label_attr': {'class': 'control-label col-sm-4'} }) }}
+                                {{ form_label(purchase_form.amount, 'Payment Options', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
                                 <div class="col-sm-8">
                                     {{ form_widget(purchase_form.amount) }}
                                     
@@ -63,7 +63,7 @@
                                 </div>                                
                             </div>
                             <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.imei, 'IMEI Number', { 'label_attr': {'class': 'control-label col-sm-4'} }) }}
+                                {{ form_label(purchase_form.imei, 'IMEI Number', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
                                 <div class="col-sm-8">
                                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':''}}) }}
                                     <p class="help-block text-left">
@@ -75,7 +75,7 @@
                             </div>
                             {% if purchase_form.serialNumber is defined %}
                                 <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
-                                    {{ form_label(purchase_form.serialNumber, 'Serial Number', { 'label_attr': {'class': 'control-label col-sm-4'} }) }}
+                                    {{ form_label(purchase_form.serialNumber, 'Serial Number', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
                                     <div class="col-sm-8">
                                         {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':''}}) }}
                                         <p class="help-block text-left">

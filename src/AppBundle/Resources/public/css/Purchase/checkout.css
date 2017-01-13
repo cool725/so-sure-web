@@ -5,6 +5,8 @@
 }
 
 .checkout .form-group label {
+    display: block;
+    text-align: left;
     font-weight: normal;
     font-size: 14px;
 }
@@ -40,6 +42,11 @@
 /*       -moz-appearance: none;
     -webkit-appearance: none;
             appearance: none;    */
+}
+
+.checkout .checkbox-terms {
+    display: block !important;
+    text-align: center !important;
 }
 
 .checkout .address-manual-cont {    
@@ -78,6 +85,14 @@
 .help-block li {
     color: #ff6666;
     font-size: 13px;
+}
+
+.has-error .control-label {
+    color: #ff6666;
+}
+
+.address-show-error-text {
+    color: #ff6666;
 }
 
 /*
@@ -157,6 +172,10 @@
 
 @media (min-width: 767px) {
 
+    .checkout .form-group label {
+        display: inline;
+        text-align: inherit;
+    }
 
 }
 

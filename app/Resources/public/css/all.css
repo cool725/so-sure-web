@@ -457,39 +457,52 @@ h1, h2, h3, h4, h5, h6 {
 
 
 .align-middle {
-  background-size: 100% auto;
-  height: 100%;
-  position: relative;
+    background-size: 100% auto;
+    height: 100%;
+    position: relative;
 }
+
 .align-center {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
+
 @media (max-height: 500px) {
-.align-middle {
-    min-height: 450px;
-  }
+    
+    .align-middle {
+        min-height: 450px;
+    }
+    
 }
+
 .vertical-align-wrap {
-  width: 100%;
-  height: 80%;
-  display: table;
+    width: 100%;
+    height: 80%;
+    display: table;
 }
+
 .vertical-align-middle {
-  vertical-align: middle;
-  display: table-cell;
-  /*text-align: center;*/
+    vertical-align: top;
+    display: table-cell;
+}
+
+@media (min-width: 563px) {
+
+    .vertical-align-middle {
+        text-align: center;
+    }
+
 }
 
 @media (min-width: 767px) {
 
     .vertical-align-middle {
-        text-align: center;
-    }
+        vertical-align: middle;
+    }  
 
 }
 
