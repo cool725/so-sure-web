@@ -11,6 +11,7 @@ use AppBundle\Listener\UserListener;
 use AppBundle\Listener\DoctrineUserListener;
 use AppBundle\Listener\IntercomListener;
 
+use AppBundle\Event\ClaimEvent;
 use AppBundle\Event\LeadEvent;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\PolicyEvent;
@@ -18,6 +19,7 @@ use AppBundle\Event\InvitationEvent;
 use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\UserPaymentEvent;
 
+use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
 use AppBundle\Document\User;
 use AppBundle\Document\JudoPayment;
@@ -317,5 +319,59 @@ class IntercomListenerTest extends WebTestCase
         $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
+    }
+
+    public function testIntercomQueueClaimCreated()
+    {
+        $claim = new Claim();
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onClaimCreatedEvent(new ClaimEvent($claim));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($claim->getId(), $data['claimId']);
+        $this->assertEquals(IntercomService::QUEUE_EVENT_CLAIM_CREATED, $data['action']);
+    }
+
+    public function testIntercomQueueClaimApproved()
+    {
+        $claim = new Claim();
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onClaimApprovedEvent(new ClaimEvent($claim));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($claim->getId(), $data['claimId']);
+        $this->assertEquals(IntercomService::QUEUE_EVENT_CLAIM_APPROVED, $data['action']);
+    }
+
+    public function testIntercomQueueClaimSettled()
+    {
+        $claim = new Claim();
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onClaimSettledEvent(new ClaimEvent($claim));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($claim->getId(), $data['claimId']);
+        $this->assertEquals(IntercomService::QUEUE_EVENT_CLAIM_SETTLED, $data['action']);
     }
 }
