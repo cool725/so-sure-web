@@ -522,11 +522,12 @@ abstract class Policy
         return $this->claims;
     }
 
-    public function getApprovedClaims()
+    public function getApprovedClaims($includeSettled = true)
     {
         $claims = [];
         foreach ($this->getClaims() as $claim) {
-            if ($claim->getStatus() == Claim::STATUS_APPROVED) {
+            if ($claim->getStatus() == Claim::STATUS_APPROVED ||
+                ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED)) {
                 $claims[] = $claim;
             }
         }
