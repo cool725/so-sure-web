@@ -9,31 +9,44 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    '@AppBundle/Resources/public/css/Default/register.css'
+    '@AppBundle/Resources/public/css/Purchase/checkout.css'
     %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
-  <section class="register vertical-align-wrap">
+<section class="vertical-align-wrap">
     <div class="vertical-align-middle">
-      <h1 class="section-title">Create your account</h1>
-      <p class="section-description">Just enter your details below to setup your account.</p>
-      <div class="checkout-step">
-      {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
-            <div class="form-group{% if form_errors(form.email) %}has-error{% endif %}">
-                <div class="col-sm-3">
-                {{ form_label(form.email, 'Email') }}
-                </div>
-                <div class="col-sm-9">
-                {{ form_widget(form.email, {'attr':{'class':'form-control', 'placeholder':'e.g. jane.smith@gmail.com'}}) }}
-                <div class="help-block with-errors">{{ form_errors(form.email) }}</div>
-                </div>
+        <div class="container checkout">
+
+            <h1>Create your account</h1>
+            <p class="lead">Choose an option to create your so-sure account below.</p>
+
+            <div class="checkout--step">
+
+                {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+                    <div class="form-group{% if form_errors(form.email) %}has-error{% endif %}">
+                        <div class="col-sm-3">
+                            {{ form_label(form.email, 'Email') }}
+                        </div>
+                        <div class="col-sm-9">
+                            {{ form_widget(form.email, {'attr':{'class':'form-control', 'placeholder':'e.g. jane.smith@gmail.com'}}) }}
+                            <div class="help-block with-errors">{{ form_errors(form.email) }}</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(form.register, {'label': 'Create account', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
+                    </div>
+                {{ form_end(form) }}
+
             </div>
-            <div class="form-group">
-                {{ form_widget(form.register, {'label': 'Create account', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
-            </div>
-          {{ form_end(form) }}
-      </div>
+
+            <div class="text-break">
+                <div class="line"></div>OR<div class="line"></div>
+            </div>            
+    
+            {% include 'AppBundle::Purchase/purchaseDownload.html.twig' %}
+        
+        </div>
     </div>
-  </section>
+</section>
 {% endblock %}

@@ -69,7 +69,7 @@
     background-color: #F5F5F5;
 }
 
-.address-manual {
+/*.address-manual {
     padding: 12px 30px;
     border: 2px solid #202532;
     background: none !important;
@@ -83,7 +83,7 @@
 
 .address-manual:hover {
     color: #202352;
-}
+}*/
 
 .twitter-typeahead, .tt-hint, .tt-input, .tt-menu {
     width: 100%;
@@ -109,7 +109,10 @@ label {
     border-color: #ccc;
 }
 
-.purchase-amount label {
+
+/* Purchase Ammount - Radio Buttons */
+
+/*.purchase-amount label {
     display: block;
     margin-bottom: 10px;
 }
@@ -128,6 +131,8 @@ label {
 .payment-container .radio input[type="radio"] {
     position: relative;
 }
+*/
+/* Purchase Nav */
 
 .purchase-nav {
     text-align: center;
@@ -292,15 +297,16 @@ label {
 #purchase_form_amount label {
   float: none;
   display: inline;
-  padding: 15px;
+  padding: 10px 15px;
   margin-right: 10px;
+  margin-left: 5px;
 }
 
 .payment-container .btn-link {
-    padding: 7px;
+    padding: 4px;
 }
 
-.payment-container .help-block {
+.payment-container .help-block.with-errors {
   font-style: italic;
   text-align: left;
   font-size: 14px;
@@ -315,6 +321,7 @@ label {
 
 .payment-container h4 {
   text-align: left;
+  margin-top: 5px;
 }
 
 @media (max-width: 767px) {

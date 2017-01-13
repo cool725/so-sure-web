@@ -1,0 +1,157 @@
+/* Checkout */
+
+.checkout { 
+
+}
+
+.checkout--step {
+    display: flex;
+    justify-content: center;
+}
+
+.checkout .form-horizontal {
+    width: 100%;
+}
+
+.checkout label {
+    font-weight: normal;
+    font-size: 14px;
+    float: left;
+    margin-top: 5px;
+}
+
+.checkout .form-control {
+    border: 2px solid #efefef;
+    box-shadow: none;
+}
+
+.checkout .text-break .line {
+    width: 30%;
+}
+
+/* Radio Buttons */
+
+.purchase-amount label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.purchase-amount input {
+    margin-left: 10px !important;
+    display: inline-block;
+    position: relative;
+}
+@media (max-width: 543px) {
+  .purchase-amount input {
+    margin-left: 0px !important;
+  }
+}
+
+.purchase-amount input + .required {
+    border: 2px solid #3399FF;
+    border-radius: 3px;
+}
+
+.purchase-amount input:checked + .required {
+    background-color: #3399FF;
+    color: #fff;
+    border-radius: 3px;
+}
+
+.payment-container .radio input[type="radio"] {
+    position: relative;
+}
+
+
+/* Includes */
+
+.purchase-download {
+    margin: 10px 0 40px;
+}
+
+/* Errors */
+
+.help-block ul {
+    list-style: none;
+}
+
+.help-block li {
+    margin-left: -40px;
+    color: #FF6666;
+    font-size: 14px;
+}
+
+.help-block .list-unstyled li {
+    margin-left: 0px;
+}
+
+.has-error .form-control {
+    border-width: 2px;
+}
+
+.help-block {
+    text-align: left;
+    font-size: 14px;  
+}
+
+/* Modal */
+
+.modal-confirm {
+    background: rgba(0, 0, 0, 0.6);
+    padding-top: 10%;
+}
+
+.modal-confirm-wrapper {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.modal-summary {
+    background: rgba(0, 0, 0, 0.6);
+    padding-top: 10%;
+}
+
+.modal-summary ul {
+    list-style: none;
+}
+
+.modal-summary ul li {
+    font-weight: 900;
+}
+
+.modal-policy {
+    background: rgba(0, 0, 0, 0.6);
+    padding-top: 2%;
+    max-height: 90%;
+    overflow-y: scroll;
+}
+
+.modal-policy .modal-dialog {
+    width: 70% !important;
+}
+
+/* Responsive */
+
+@media (min-width: 563px) {
+
+    .checkout .form-horizontal {
+        width: 70%;
+    }    
+
+}
+
+@media (min-width: 767px) {
+
+    .checkout label {
+        float: right;
+    }
+
+}
+
+@media (min-width:992px) {
+
+    .checkout .form-horizontal {
+        width: 50%;
+    }    
+
+}

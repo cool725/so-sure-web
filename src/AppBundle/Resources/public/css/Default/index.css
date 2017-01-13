@@ -1,4 +1,4 @@
-/* HERO - Section Index  */
+/* HERO - Section Index: MOVE TO components > _hero.scss */
 
 .hero {
     padding: 30px 20px 50px 20px;
@@ -9,6 +9,8 @@
 .hero h1 {
     color: #fff;
 }
+
+/* MOVE TO components > _buttons.scss  */
 
 #get-quote-btn {
     padding: 12px 30px;
@@ -24,10 +26,12 @@
 }
 
 
-/* PRESS - Ext Banner */
+/* PRESS - Ext Banner: MOVE TO layouts > _footer.scss */
 
 .press {
     background: #ddd;
+    padding: 20px 0;
+    text-align: center;
 }
 
 .press h4 {
@@ -36,6 +40,7 @@
 
 .press img {
     max-width: 220px;
+    margin: 0 auto;
 }
 
 @media (min-width: 768px) {
@@ -47,7 +52,7 @@
 }
 
 
-/* HOW IT WORKS */
+/* HOW IT WORKS: MOVE TO layouts > _includes.scss */
 
 #how-it-works {}
 
@@ -77,7 +82,7 @@
 }
 
 
-/* POPULAR DEVICES */
+/* POPULAR DEVICES - LEGACY??? Remove */
 
 .popular-devices {
     background-color: #FFF;
@@ -162,7 +167,7 @@
     opacity: 0.96;
 }
 
-/* PRE-FOOTER */
+/* PRE-FOOTER - LEGACY??? Remove */
 
 .pre-footer {
     position: relative;
@@ -249,7 +254,7 @@
 }
 
 
-/* VIDEO OVERLAY */
+/* VIDEO OVERLAY: MOVE TO layouts > _includes.scss */
 
 .explainer-video {
     cursor: pointer;
@@ -311,7 +316,7 @@
     opacity: 1;
     text-decoration: none;
 }
-/* Video Modal */
+/* Video Modal: MOVE TO layouts > _includes.scss */
 
 .modal-fullscreen {
   background: rgba(255, 255, 255, 0.9);
@@ -385,7 +390,7 @@
   padding-top: 10%;
 }
 
-/* Blockquote */
+/* Blockquote: MOVE TO layouts > _quotes.scss */
 
 blockquote {
     position: relative;
@@ -419,6 +424,7 @@ blockquote footer:before {
 
 }
 
+/* MOVE TO components > _forms.scss */
 
 #select-phone .device-select li {
   display: inline !important;

@@ -1,3 +1,5 @@
+/* MOVE TO common > _variable.scss */
+
 @charset "UTF-8";
 @font-face {
     font-family: 'Avenir LT Std 45 Book';
@@ -24,7 +26,7 @@
     src: local('/fonts/Avenir LT Std 35 Light'), url('/fonts/AvenirLTStd-Light.woff') format('woff');
 }
 
-/* Global */
+/* MOVE TO common > _global.scss */
 
 html {
   height: 100%;
@@ -47,6 +49,9 @@ ul, li {
 .error-text {
     color: #FF6666;
 }
+
+/* MOVE TO layout > _header.scss */
+
 .so-sure-logo-dark {
     background: transparent no-repeat center top url("/images/logo/Logo-Dark-with-Social-Insurance.svg");
     background-size: 130px;
@@ -78,7 +83,7 @@ ul, li {
 
 
 
-
+/* MOVE TO common > _global.scss */
 
 h1, h2, h3, h4, h5, h6 {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -111,23 +116,8 @@ h1, h2, h3, h4, h5, h6 {
   padding: 60px 20px 60px 20px;
 }
 
-/* Below Fold Banner - e.g. Press and Start Purchase */
 
-.banner {
-    padding: 30px 0px 30px 0px;
-    text-align: center;
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -ms-flex-pack: justify;
-    justify-content: space-between;
-    -ms-flex-align: center;
-    align-items: center;
-    width: 100%;
-}
-
-/* App Badges classes for stand alone section */
+/* App Badges classes for stand alone section -  LEGACY??? Remove  */
 
 .app-badge img {
   width: inherit;
@@ -151,7 +141,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* NAVIGATION */
+/* Navigation: MOVE TO layout > _header.scss */
 
 .navbar-default {
     z-index: 1000;
@@ -292,7 +282,8 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-/* DOWNLOAD APP */
+
+/* DOWNLOAD APP: MOVE TO components > _buttons.scss  */
 
 #app-store {
     padding-top: 20px;
@@ -326,7 +317,7 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-/* BUTTONS */
+/* BUTTONS: MOVE TO components > _buttons.scss  */
 
 #app-store .btn-danger {
     color: #fff;
@@ -340,9 +331,8 @@ h1, h2, h3, h4, h5, h6 {
     border-color: #ff6666;
 }
 
-/* FORM */
 
-/* LOGIN */
+/* LOGIN: MOVE TO layouts > _pages.scss */
 
 .swap-login-wrapper {
     margin-top: 40px;
@@ -446,7 +436,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-/* Section Tools */
+/* Section Tools: MOVE TO common > _global.scss */
 .section {
     position: relative;
 }
@@ -462,9 +452,6 @@ h1, h2, h3, h4, h5, h6 {
     }
 
 }
-
-
-
 
 .align-middle {
   background-size: 100% auto;
@@ -494,6 +481,10 @@ h1, h2, h3, h4, h5, h6 {
   display: table-cell;
   text-align: center;
 }
+
+
+/* : MOVE TO components > _effects.scss */
+
 .light-gradient {
   background: #Efefef; /* fallback for old browsers */
   background: -webkit-linear-gradient(to top, #efefef , #FFFFFF); /* Chrome 10-25, Safari 5.1-6 */
@@ -522,32 +513,7 @@ background: rgba(51, 153, 255, 1);
     filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1);
 }
 
-/*.background-image-1 {
-  background-image: url('https://cdn.so-sure.com/images/home/background/background-6.jpg');
-  background-size: cover;
-  background-color: #202532;
-  background-position: center;
-}
-
-.background-image-2 {
-  background-image: url('https://cdn.so-sure.com/images/home/background/background-6.png');
-  background-size: cover;
-  background-color: #202532;
-  background-position: center;
-}
-
-.background-image-3 {
-  background-image: url('https://cdn.so-sure.com/images/home/background/background-3.png');
-  background-size: cover;
-  background-color: #202532;
-  background-position: center;
-}
-
-.background-image-none {
-  background-size: cover;
-  background-color: #202532;
-  background-position: center;
-}*/
+/* MOVE TO components > _hero.scss */
 
 .background-image-light {
     background-image: url('https://cdn.so-sure.com/images/home/background/background-light.png');
@@ -600,7 +566,7 @@ hr.strong {
     border: 2px solid #eee;
 }
 
-/* Main CTA */
+/* Main CTA: MOVE TO components > _buttons.scss  */
 
 @media (min-width: 992px) {
 .main-cta {
@@ -611,7 +577,7 @@ hr.strong {
   }
 }
 
-/* Footer CTA */
+/* Footer CTA: MOVE TO components > _buttons.scss / layouts > _footer.scss */
 
 .footer-cta {
   color: #fff;
