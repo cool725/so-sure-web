@@ -34,14 +34,14 @@ class AppAnnieService
         $this->apiKey = $apiKey;
     }
     
-    public function run(\DateTime $start, \DateTime $end = null, $save = true)
+    public function run(\DateTime $start, \DateTime $end = null, $save = true, $ignoreZero = false)
     {
         $start = $this->startOfDay($start);
         if (!$end) {
             $end = $start;
         }
-        $apple = $this->queryApple($start, $end);
-        $google = $this->queryGoogle($start, $end);
+        $apple = $this->queryApple($start, $end, $ignoreZero);
+        $google = $this->queryGoogle($start, $end, $ignoreZero);
         if ($save) {
             if ($start != $end) {
                 throw new \Exception('If using save, must be single day');
@@ -56,7 +56,7 @@ class AppAnnieService
                 $statApple->setName(Stats::INSTALL_APPLE);
                 $this->dm->persist($statApple);
             }
-            $statApple->setValue($apple);
+            $statApple->setValue($apple['downloads']);
 
             $statGoogle = $repo->findOneBy(['name' => Stats::INSTALL_GOOGLE, 'date' => $start]);
             if (!$statGoogle) {
@@ -65,7 +65,7 @@ class AppAnnieService
                 $statGoogle->setName(Stats::INSTALL_GOOGLE);
                 $this->dm->persist($statGoogle);
             }
-            $statGoogle->setValue($google);
+            $statGoogle->setValue($google['downloads']);
 
             $this->dm->flush();
         }
@@ -73,17 +73,17 @@ class AppAnnieService
         return ['apple' => $apple, 'google' => $google];
     }
 
-    public function queryGoogle(\DateTime $start, \DateTime $end)
+    public function queryGoogle(\DateTime $start, \DateTime $end, $ignoreZero = false)
     {
-        return $this->query('393777', '20600005476183', $start, $end);
+        return $this->query('393777', '20600005476183', $start, $end, $ignoreZero);
     }
     
-    public function queryApple(\DateTime $start, \DateTime $end)
+    public function queryApple(\DateTime $start, \DateTime $end, $ignoreZero = false)
     {
-        return $this->query('393774', '1094307449', $start, $end);
+        return $this->query('393774', '1094307449', $start, $end, $ignoreZero);
     }
 
-    public function query($accountId, $productId, \DateTime $start, \DateTime $end)
+    public function query($accountId, $productId, \DateTime $start, \DateTime $end, $ignoreZero = false)
     {
         $url = sprintf(
             'https://api.appannie.com/v1.2/accounts/%s/products/%s/sales?start_date=%s&end_date=%s',
@@ -100,7 +100,7 @@ class AppAnnieService
 
         $data = json_decode($body, true);
         $salesList = $data['sales_list'];
-        if (count($salesList) == 0) {
+        if (count($salesList) == 0 && !$ignoreZero) {
             throw new \Exception(sprintf(
                 'Data not present for %s to %s',
                 $start->format('Y-m-d'),
@@ -108,6 +108,9 @@ class AppAnnieService
             ));
         }
 
-        return $salesList[0]['units']['product']['downloads'];
+        return [
+            'downloads' => isset($salesList[0]) ? $salesList[0]['units']['product']['downloads'] : null,
+            'results' => $data
+        ];
     }
 }
