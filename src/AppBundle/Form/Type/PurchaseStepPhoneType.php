@@ -72,7 +72,7 @@ class PurchaseStepPhoneType extends AbstractType
                 $form->add('amount', TextType::class, [
                     'attr' => [
                         'class' => 'form-control',
-                        'readonly' => true, 
+                        'readonly' => true,
                         'placeholder' => 'Select phone above'],
                         'disabled' => true
                 ]);
