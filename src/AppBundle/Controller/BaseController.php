@@ -301,7 +301,7 @@ abstract class BaseController extends Controller
 
         // Escape special chars
         $data = preg_quote($data, '/');
-        $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data)));
+        $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
         if ($run) {
             return $qb->getQuery()->execute();
         }
@@ -612,9 +612,15 @@ abstract class BaseController extends Controller
         if ($sosure) {
             $imeiService = $this->get('app.imei');
             if ($imeiService->isImei($sosure)) {
-                return new RedirectResponse($this->generateUrl('admin_policies', ['imei' => $sosure, 'invalid' => $includeInvalidPolicies]));
+                return new RedirectResponse($this->generateUrl(
+                    'admin_policies',
+                    ['imei' => $sosure, 'invalid' => $includeInvalidPolicies]
+                ));
             } else {
-                return new RedirectResponse($this->generateUrl('admin_policies', ['facebookId' => $sosure, 'invalid' => $includeInvalidPolicies]));
+                return new RedirectResponse($this->generateUrl(
+                    'admin_policies',
+                    ['facebookId' => $sosure, 'invalid' => $includeInvalidPolicies]
+                ));
             }
         }
 
@@ -635,9 +641,15 @@ abstract class BaseController extends Controller
             'facebookId' => 'facebookId',
         ];
         foreach ($userFormData as $formField => $dataField) {
-            $ids = $this->queryToMongoSearch($form, $userRepo->createQueryBuilder(), $formField, $dataField, function($data) {
-               return $data->getId();
-            });
+            $ids = $this->queryToMongoSearch(
+                $form,
+                $userRepo->createQueryBuilder(),
+                $formField,
+                $dataField,
+                function ($data) {
+                    return $data->getId();
+                }
+            );
             if ($ids !== null) {
                 $policiesQb->addAnd($policiesQb->expr()->field('user.id')->in($ids));
             }
