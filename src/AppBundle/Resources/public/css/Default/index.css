@@ -26,32 +26,6 @@
 }
 
 
-/* PRESS - Ext Banner: MOVE TO layouts > _footer.scss */
-
-.press {
-    background: #ddd;
-    padding: 20px 0;
-    text-align: center;
-}
-
-.press h4 {
-    margin-top: 15px;
-}
-
-.press img {
-    max-width: 220px;
-    margin: 0 auto;
-}
-
-@media (min-width: 768px) {
-
-    .press img {
-        max-width: 100%;
-    }
-
-}
-
-
 /* HOW IT WORKS: MOVE TO layouts > _includes.scss */
 
 #how-it-works {}

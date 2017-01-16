@@ -70,8 +70,11 @@ class PurchaseStepPhoneType extends AbstractType
                 }
             } else {
                 $form->add('amount', TextType::class, [
-                    'attr' => ['readonly' => true, 'placeholder' => 'Select phone above'],
-                    'disabled' => true
+                    'attr' => [
+                        'class' => 'form-control',
+                        'readonly' => true, 
+                        'placeholder' => 'Select phone above'],
+                        'disabled' => true
                 ]);
             }
         });

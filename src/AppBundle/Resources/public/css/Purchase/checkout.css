@@ -1,67 +1,66 @@
 /* Checkout */
 
-.checkout { 
-
-}
-
-.checkout--step {
-    display: flex;
-    justify-content: center;
-}
-
-.checkout .form-horizontal {
-    width: 100%;
-}
-
-.checkout label {
+.checkout .form-group label {
+    display: block;
+    text-align: left;
     font-weight: normal;
     font-size: 14px;
-    float: left;
-    margin-top: 5px;
 }
 
-.checkout .form-control {
+.checkout .form-group .form-control {
     border: 2px solid #efefef;
     box-shadow: none;
 }
 
-.checkout .text-break .line {
-    width: 30%;
-}
-
 /* Radio Buttons */
 
-.purchase-amount label {
-    display: block;
-    margin-bottom: 10px;
-}
-
-.purchase-amount input {
-    margin-left: 10px !important;
+.checkout .radio {
+    width: 45%;
+    font-size: 14px;
+    text-align: center;
     display: inline-block;
-    position: relative;
-}
-@media (max-width: 543px) {
-  .purchase-amount input {
-    margin-left: 0px !important;
-  }
+    padding: 10px 0;
+    border: 2px solid #3399ff;
+    border-radius: 3px;        
 }
 
-.purchase-amount input + .required {
-    border: 2px solid #3399FF;
-    border-radius: 3px;
+.checkout .radio:first-of-type {
+    margin-right: 10%;
 }
 
-.purchase-amount input:checked + .required {
-    background-color: #3399FF;
+.checkout .radio label {
+    text-align: center;
+}
+
+.checkout .radio.radio-selected {
+    background-color: #3399ff;
     color: #fff;
-    border-radius: 3px;
 }
 
-.payment-container .radio input[type="radio"] {
-    position: relative;
+.checkout .radio input {
+    margin-top: 2px;
 }
 
+.checkout .checkbox-terms {
+    padding: 15px 0;
+    display: block !important;
+    text-align: center !important;
+}
+
+.checkout .address-manual-cont {    
+    margin-top: 15px;
+}
+
+.checkout .address-manual {
+    padding: 12px 30px;
+    border: 2px solid #202532;
+    background: none !important;
+    border-radius: 30px;
+    -moz-border-radius: 30px;
+    -webkit-border-radius: 30px;
+    background: none;
+    color: #202532;    
+}
 
 /* Includes */
 
@@ -69,30 +68,33 @@
     margin: 10px 0 40px;
 }
 
+.purchase-download--btns {
+    text-align: center;
+}
+
 /* Errors */
 
 .help-block ul {
     list-style: none;
+    text-align: left;
+    margin: 0; padding: 0;
 }
 
 .help-block li {
-    margin-left: -40px;
-    color: #FF6666;
-    font-size: 14px;
+    color: #ff6666;
+    font-size: 13px;
 }
 
-.help-block .list-unstyled li {
-    margin-left: 0px;
+.has-error .control-label {
+    color: #ff6666;
 }
 
-.has-error .form-control {
-    border-width: 2px;
+.address-show-error-text {
+    color: #ff6666;
 }
 
-.help-block {
-    text-align: left;
-    font-size: 14px;  
-}
+/*
+
 
 /* Modal */
 
@@ -130,28 +132,52 @@
     width: 70% !important;
 }
 
+/* Twitter Typehead */
+
+.tt-menu {
+    background-color: white;
+    border: 1px solid;
+    width: 150%;
+    overflow-y: scroll;
+    border-radius: 5px;
+    max-height: 150px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.tt-suggestion {
+    padding-bottom: 2px;
+}
+
+.tt-suggestion:hover {
+    background-color: #F5F5F5;
+}
+
+.twitter-typeahead, .tt-hint, .tt-input, .tt-menu {
+    width: 100%;
+}
+
 /* Responsive */
 
 @media (min-width: 563px) {
 
     .checkout .form-horizontal {
-        width: 70%;
+        width: 455px;
+        margin: 0 auto;
     }    
 
 }
 
 @media (min-width: 767px) {
 
-    .checkout label {
-        float: right;
+    .checkout .form-group label {
+        display: inline;
+        text-align: inherit;
     }
 
 }
 
 @media (min-width:992px) {
 
-    .checkout .form-horizontal {
-        width: 50%;
-    }    
 
 }
