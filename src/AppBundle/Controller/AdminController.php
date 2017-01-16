@@ -173,6 +173,7 @@ class AdminController extends BaseController
             $price = new PhonePrice();
             $price->setGwp($request->get('gwp'));
             $price->setValidFrom($from);
+            $price->setNotes($request->get('notes'));
             if ($request->get('to')) {
                 $price->setValidTo($to);
             }

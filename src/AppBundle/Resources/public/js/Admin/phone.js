@@ -38,7 +38,8 @@ $('#phoneModal').on('show.bs.modal', function (event) {
         { title: 'Valid From', data: 'valid_from' },
         { title: 'Valid To', data: 'valid_to' },
         { title: 'GWP', data: 'gwp' },
-        { title: 'Premium', data: 'premium' }
+        { title: 'Premium', data: 'premium' },
+        { title: 'Notes', data: 'notes' }
       ]
     });
     modal.find('.modal-title').text(phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
