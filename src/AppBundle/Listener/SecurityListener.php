@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\Security\Core\User\UserInterface;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\User;
 
 class SecurityListener
 {
@@ -26,7 +27,7 @@ class SecurityListener
      */
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
     {
-        if (!$event->getAuthenticationToken()) {
+        if (!$event->getAuthenticationToken() || !$event->getAuthenticationToken()->getUser() instanceof User) {
             return;
         }
 
@@ -34,6 +35,5 @@ class SecurityListener
         $identityLog->setIp($this->requestStack->getCurrentRequest()->getClientIp());
         $user = $event->getAuthenticationToken()->getUser();
         $user->setLatestWebIdentityLog($identityLog);
-
     }
 }
