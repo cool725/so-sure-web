@@ -29,6 +29,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $this->newUser('ted@so-sure.com', 'w3ares0sure!', 'Ted', 'Eriksson', ['ROLE_ADMIN']);
         $this->newUser('julien@so-sure.com', 'w3ares0sure!', 'Julien', 'Champagne', ['ROLE_ADMIN']);
         $this->newUser('nick@so-sure.com', 'w3ares0sure!', 'Nick', 'Waller', ['ROLE_ADMIN']);
+        $this->newUser('rajiv@so-sure.com', 'w3ares0sure!', 'Rajiv', 'Tanna', ['ROLE_ADMIN']);
         $this->newUser('claims@so-sure.com', 'w3ares0sure!', 'so-sure', 'Claims', ['ROLE_CLAIMS']);
         $this->newUser('employee@so-sure.com', 'w3ares0sure!', 'so-sure', 'Employee', ['ROLE_EMPLOYEE']);
         $manager->flush();
