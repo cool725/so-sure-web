@@ -163,6 +163,7 @@ class DaviesService
         $file = new DaviesFile();
         $file->setBucket($this->bucket);
         $file->setKey($destKey);
+        $file->setSuccess($folder == self::PROCESSED_FOLDER);
         $this->dm->persist($file);
         $this->dm->flush();
     }
@@ -469,8 +470,11 @@ class DaviesService
     public function claimsDailyEmail()
     {
         $fileRepo = $this->dm->getRepository(DaviesFile::class);
-        $latestFiles = $fileRepo->findBy([], ['created' => 'desc']);
+        $latestFiles = $fileRepo->findBy([], ['created' => 'desc'], 1);
         $latestFile = count($latestFiles) > 0 ? $latestFiles[0] : null;
+
+        $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
+        $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
 
         $claimsRepo = $this->dm->getRepository(Claim::class);
         $claims = $claimsRepo->findOutstanding();
@@ -479,7 +483,12 @@ class DaviesService
             sprintf('Daily Claims'),
             'tech@so-sure.com',
             'AppBundle:Email:davies/dailyEmail.html.twig',
-            ['claims' => $claims, 'latestFile' => $latestFile, 'errors' => $this->errors]
+            [
+                'claims' => $claims,
+                'latestFile' => $latestFile,
+                'successFile' => $successFile,
+                'errors' => $this->errors
+            ]
         );
 
         return count($claims);

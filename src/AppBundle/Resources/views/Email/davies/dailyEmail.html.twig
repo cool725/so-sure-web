@@ -11,6 +11,7 @@
 		   <div style="font-size: 14px; text-align: center;"><font face="arial, helvetica neue, helvetica, sans-serif">
            <h2>Daily Claims Report</h2>
            <h3>Last received daily export: {% if latestFile %}{{ latestFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
+           <h3>Last successful daily export: {% if successFile %}{{ successFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
            {% if claims|length == 0 %}
                <p>No outstanding claims</p>
            {% endif %}
