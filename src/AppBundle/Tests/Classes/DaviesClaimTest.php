@@ -76,6 +76,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
 
     public function testFromArrayV6()
     {
+        // @codingStandardsIgnoreStart
         $data = [
             'So-Sure -Mobile',
             '320170109000912',
@@ -114,6 +115,8 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'Discount Tyres Redruth Ltd, School Lane, TR15 2DU',
             '£700.26'
         ];
+        // @codingStandardsIgnoreEnd
+
         $davies = new DaviesClaim();
         $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6);
         $this->assertEquals(new \DateTime('2017-11-02'), $davies->endDate);
