@@ -45,7 +45,6 @@ $('#phoneModal').on('show.bs.modal', function (event) {
     modal.find('.modal-title').text(phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
     modal.find('#phone-gwp').val(phone.gwp);
     modal.find('#phone-salva').html('£' + salva_standard + ' / £' + salva_min);
-    modal.find('#phone-notes').val(phone.notes);
 
     modal.find('#phone-gwp').keyup(function() {
       monthly = (modal.find('#phone-gwp').val() * ipt_rate).toFixed(2);
