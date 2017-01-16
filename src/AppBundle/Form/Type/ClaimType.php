@@ -45,7 +45,6 @@ class ClaimType extends AbstractType
                 Claim::STATUS_INREVIEW => Claim::STATUS_INREVIEW,
                 Claim::STATUS_WITHDRAWN => Claim::STATUS_WITHDRAWN,
                 Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
-                Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,
             ]])
             ->add('suspected_fraud', CheckboxType::class, ['required' => false])
             ->add('force', ChoiceType::class, [
