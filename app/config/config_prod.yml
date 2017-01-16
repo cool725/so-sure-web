@@ -84,7 +84,8 @@ staffim_rollbar:
 nelmio_security:
     # forced HTTPS handling, don't combine with flexible mode
     forced_ssl:
-        hsts_max_age: 3600 # 1 hour until we verify
+        hsts_max_age: 15552000 # 6 months
         hsts_subdomains: false
+        hsts_preload: true
         whitelist:
             - ^/ops/status
