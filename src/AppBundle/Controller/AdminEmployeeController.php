@@ -54,6 +54,7 @@ use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
+use AppBundle\Exception\RedirectException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -164,7 +165,11 @@ class AdminEmployeeController extends BaseController
      */
     public function adminUsersAction(Request $request)
     {
-        $data = $this->searchUsers($request);
+        try {
+            $data = $this->searchUsers($request);
+        } catch (RedirectException $e) {
+            return new RedirectResponse($e->getMessage());
+        }
         return array_merge($data, [
             'policy_route' => 'admin_policy'
         ]);

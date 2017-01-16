@@ -20,6 +20,7 @@ use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Exception\RedirectException;
 use AppBundle\Form\Type\UserSearchType;
 
 use MongoRegex;
@@ -612,12 +613,12 @@ abstract class BaseController extends Controller
         if ($sosure) {
             $imeiService = $this->get('app.imei');
             if ($imeiService->isImei($sosure)) {
-                return new RedirectResponse($this->generateUrl(
+                throw new RedirectException($this->generateUrl(
                     'admin_policies',
                     ['imei' => $sosure, 'invalid' => $includeInvalidPolicies]
                 ));
             } else {
-                return new RedirectResponse($this->generateUrl(
+                throw new RedirectException($this->generateUrl(
                     'admin_policies',
                     ['facebookId' => $sosure, 'invalid' => $includeInvalidPolicies]
                 ));
