@@ -34,6 +34,13 @@ abstract class Price
      */
     protected $gwp;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="0", max="1500")
+     * @MongoDB\Field(type="string")
+     */
+    protected $notes;
+
     public function __construct()
     {
     }
@@ -93,6 +100,16 @@ abstract class Price
         $this->setGwp($this->toTwoDp($premium / (1 + $this->getCurrentIptRate($date))));
     }
 
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
+    }
+
     abstract public function createPremium();
 
     protected function populatePremium(Premium $premium, \DateTime $date = null)
@@ -109,6 +126,7 @@ abstract class Price
             'valid_to' => $this->getValidTo() ? $this->getValidTo()->format(\DateTime::ATOM) : null,
             'gwp' => $this->getGwp(),
             'premium' => $this->getMonthlyPremiumPrice($date),
+            'notes' => $this->getNotes(),
         ];
     }
 }

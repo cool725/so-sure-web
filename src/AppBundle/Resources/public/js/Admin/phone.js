@@ -38,12 +38,14 @@ $('#phoneModal').on('show.bs.modal', function (event) {
         { title: 'Valid From', data: 'valid_from' },
         { title: 'Valid To', data: 'valid_to' },
         { title: 'GWP', data: 'gwp' },
-        { title: 'Premium', data: 'premium' }
+        { title: 'Premium', data: 'premium' },
+        { title: 'Notes', data: 'notes' }
       ]
     });
     modal.find('.modal-title').text(phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
     modal.find('#phone-gwp').val(phone.gwp);
     modal.find('#phone-salva').html('£' + salva_standard + ' / £' + salva_min);
+    modal.find('#phone-notes').val(phone.notes);
 
     modal.find('#phone-gwp').keyup(function() {
       monthly = (modal.find('#phone-gwp').val() * ipt_rate).toFixed(2);
