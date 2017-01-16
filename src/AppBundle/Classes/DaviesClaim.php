@@ -3,10 +3,12 @@ namespace AppBundle\Classes;
 
 use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\DateTrait;
 
 class DaviesClaim
 {
     use CurrencyTrait;
+    use DateTrait;
 
     const SHEET_NAME_V6 = 'Cumulative';
     const SHEET_NAME_V1 = 'Original';
@@ -294,7 +296,7 @@ class DaviesClaim
             if (!is_numeric($days)) {
                 // unfortunately davies is incapable of formatting dates
                 // so may be an excel date or may be a d/m/Y formatted string
-                $origin = \DateTime::createFromFormat('d/m/Y', $days);
+                $origin = $this->startOfDay(\DateTime::createFromFormat('d/m/Y', $days));
             } else {
                 $origin = new \DateTime("1900-01-01");
                 $origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
