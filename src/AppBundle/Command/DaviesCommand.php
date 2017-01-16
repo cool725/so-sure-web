@@ -59,7 +59,7 @@ class DaviesCommand extends ContainerAwareCommand
             $output->writeln(sprintf('%d outstanding claims. Email report sent.', $count));
         } elseif ($file) {
             $lines = $davies->importFile($file, $sheetName);
-            $output->writeln(implode(PHP_EOL, $lines));            
+            $output->writeln(implode(PHP_EOL, $lines));
         } else {
             $lines = $davies->import($sheetName);
             $output->writeln(implode(PHP_EOL, $lines));

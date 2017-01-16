@@ -239,7 +239,7 @@ class DaviesClaim
                 $this->transactionFees = $this->nullIfBlank($data[++$i]);
                 $this->handlingFees = $this->nullIfBlank($data[++$i]);
                 $this->excess = $this->nullIfBlank($data[++$i]);
-                $this->handlingFees = $this->nullIfBlank($data[++$i]);
+                $this->reserved = $this->nullIfBlank($data[++$i]);
                 $this->reciperoFee = $this->nullIfBlank($data[++$i]);
             }
             $this->policyNumber = $this->nullIfBlank($data[++$i]);

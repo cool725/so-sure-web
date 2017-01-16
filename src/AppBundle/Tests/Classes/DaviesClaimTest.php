@@ -87,9 +87,6 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testFromArrayInvalidClient()
     {
         $data = [
@@ -126,7 +123,8 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '123 The Street, Town, City, Postcode'
         ];
         $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $this->assertNull($davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1));
+        $this->assertNull($davies->claimNumber);
     }
 
     /**
