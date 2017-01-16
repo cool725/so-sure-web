@@ -1833,8 +1833,8 @@ abstract class Policy
         } else {
             return $this->getStatus() == self::STATUS_UNPAID;
         }
-
     }
+
     public function isPolicyPaidToDate($exact = true, \DateTime $date = null)
     {
         if (!$this->isPolicy()) {
@@ -1861,6 +1861,20 @@ abstract class Policy
         //print sprintf("%f ?= %f\n", $outstanding, $totalScheduledPayments);
 
         return $this->areEqualToTwoDp($outstanding, $totalScheduledPayments);
+    }
+
+    public function getClaimsWarnings()
+    {
+        $warnings = [];
+        if (!$this->isPolicyPaidToDate() || $this->getStatus() == self::STATUS_UNPAID) {
+            $warnings[] = sprintf('Policy is NOT paid to date - Policy must be paid to date prior to approval');
+        }
+
+        if (in_array($this->getStatus(), [self::STATUS_CANCELLED, self::STATUS_EXPIRED])) {
+            $warnings[] = sprintf('Policy is %s - DO NOT ALLOW CLAIM', $this->getStatus());
+        }
+
+        return $warnings;
     }
 
     public function isPotValueCorrect()
