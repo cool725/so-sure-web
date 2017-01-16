@@ -100,7 +100,6 @@ class DaviesService
                 $processed = false;
                 $this->logger->error(sprintf('Error processing %s. Moving to failed. Ex: %s', $key, $e->getMessage()));
             }
-            $this->claimsDailyEmail();
 
             if ($processed) {
                 $this->moveS3($key, self::PROCESSED_FOLDER);
@@ -109,6 +108,8 @@ class DaviesService
                 $this->moveS3($key, self::FAILED_FOLDER);
                 $lines[] = sprintf('Failed to import %s/%s and moved to failed folder', $this->path, $key);
             }
+
+            $this->claimsDailyEmail();
 
             if (file_exists($excelFile)) {
                 unlink($excelFile);
