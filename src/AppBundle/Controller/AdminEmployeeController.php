@@ -159,67 +159,15 @@ class AdminEmployeeController extends BaseController
     }
 
     /**
-     * @Route("/users", name="admin_users")
-     * @Template("AppBundle::Claims/claimsUsers.html.twig")
+     * @Route("/policies", name="admin_policies")
+     * @Template("AppBundle::Claims/claimsPolicies.html.twig")
      */
     public function adminUsersAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(User::class);
-
-        $users = $repo->createQueryBuilder();
-        $form = $this->createForm(UserSearchType::class, null, ['method' => 'GET']);
-        $form->handleRequest($request);
-        $sosure = $form->get('sosure')->getData();
-        if ($sosure) {
-            $imeiService = $this->get('app.imei');
-            if ($imeiService->isImei($sosure)) {
-                return new RedirectResponse($this->generateUrl('admin_users', ['imei' => $sosure]));
-            } else {
-                return new RedirectResponse($this->generateUrl('admin_users', ['facebookId' => $sosure]));
-            }
-        }
-        $includeInvalidPolicies = $form->get('invalid')->getData();
-
-        $this->formToMongoSearch($form, $users, 'email', 'email');
-        $this->formToMongoSearch($form, $users, 'lastname', 'lastName');
-        $this->formToMongoSearch($form, $users, 'mobile', 'mobileNumber');
-        $this->formToMongoSearch($form, $users, 'postcode', 'billingAddress.postcode');
-        $this->formToMongoSearch($form, $users, 'facebookId', 'facebookId');
-
-        $policyRepo = $dm->getRepository(Policy::class);
-        $policiesQb = $policyRepo->createQueryBuilder();
-        if ($policies = $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber', true)) {
-            $userIds = [];
-            foreach ($policies as $policy) {
-                $userIds[] = $policy->getUser()->getId();
-            }
-            $users->addAnd($users->expr()->field('id')->in($userIds));
-        }
-        $policiesQb = $policyRepo->createQueryBuilder();
-        if ($policies = $this->formToMongoSearch($form, $policiesQb, 'status', 'status', true)) {
-            $userIds = [];
-            foreach ($policies as $policy) {
-                $userIds[] = $policy->getUser()->getId();
-            }
-            $users->addAnd($users->expr()->field('id')->in($userIds));
-        }
-        if ($policies = $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei', true)) {
-            $userIds = [];
-            foreach ($policies as $policy) {
-                $userIds[] = $policy->getUser()->getId();
-            }
-            $users->addAnd($users->expr()->field('id')->in($userIds));
-        }
-        $pager = $this->pager($request, $users);
-
-        return [
-            'users' => $pager->getCurrentPageResults(),
-            'pager' => $pager,
-            'form' => $form->createView(),
-            'policy_route' => 'admin_policy',
-            'include_invalid_policies' => $includeInvalidPolicies,
-        ];
+        $data = $this->searchUsers($request);
+        return array_merge($data, [
+            'policy_route' => 'admin_policy'
+        ]);
     }
 
     /**
@@ -341,7 +289,7 @@ class AdminEmployeeController extends BaseController
                         ));
                     }
 
-                    return $this->redirectToRoute('admin_users');
+                    return $this->redirectToRoute('admin_policies');
                 }
             } elseif ($request->request->has('pending_cancel_form')) {
                 $pendingCancelForm->handleRequest($request);
