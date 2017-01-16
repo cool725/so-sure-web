@@ -11,6 +11,7 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 
 use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 use AppBundle\Document\Sns;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
@@ -19,6 +20,8 @@ use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Exception\RedirectException;
+use AppBundle\Form\Type\UserSearchType;
 
 use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;
@@ -270,6 +273,20 @@ abstract class BaseController extends Controller
         return $this->dataToMongoSearch($qb, $this->normalizeUkMobile($data), $mongoField, $run);
     }
 
+    protected function queryToMongoSearch($form, $qb, $formField, $mongoField, $callable)
+    {
+        if ($data = $this->formToMongoSearch($form, $qb, $formField, $mongoField, true)) {
+            $ids = [];
+            foreach ($data as $item) {
+                $ids[] = call_user_func($callable, $item);
+            }
+
+            return $ids;
+        }
+
+        return null;
+    }
+
     protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false)
     {
         $data = (string) $form->get($formField)->getData();
@@ -285,7 +302,7 @@ abstract class BaseController extends Controller
 
         // Escape special chars
         $data = preg_quote($data, '/');
-        $qb = $qb->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data)));
+        $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
         if ($run) {
             return $qb->getQuery()->execute();
         }
@@ -577,5 +594,74 @@ abstract class BaseController extends Controller
         }
 
         return $phone;
+    }
+
+    protected function searchUsers(Request $request, $includeInvalidPolicies = null)
+    {
+        $dm = $this->getManager();
+        $userRepo = $dm->getRepository(User::class);
+        $policyRepo = $dm->getRepository(Policy::class);
+
+        $policiesQb = $policyRepo->createQueryBuilder();
+
+        $form = $this->createForm(UserSearchType::class, null, ['method' => 'GET']);
+        $form->handleRequest($request);
+        if ($includeInvalidPolicies === null) {
+            $includeInvalidPolicies = $form->get('invalid')->getData();
+        }
+        $sosure = $form->get('sosure')->getData();
+        if ($sosure) {
+            $imeiService = $this->get('app.imei');
+            if ($imeiService->isImei($sosure)) {
+                throw new RedirectException($this->generateUrl(
+                    'admin_policies',
+                    ['imei' => $sosure, 'invalid' => $includeInvalidPolicies]
+                ));
+            } else {
+                throw new RedirectException($this->generateUrl(
+                    'admin_policies',
+                    ['facebookId' => $sosure, 'invalid' => $includeInvalidPolicies]
+                ));
+            }
+        }
+
+        $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber');
+        $this->formToMongoSearch($form, $policiesQb, 'status', 'status');
+        $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei');
+        if (!$includeInvalidPolicies) {
+            $policy = new PhonePolicy();
+            $search = sprintf('%s/', $policy->getPolicyNumberPrefix());
+            $this->dataToMongoSearch($policiesQb, $search, 'policyNumber');
+        }
+
+        $userFormData = [
+            'email' => 'emailCanonical',
+            'lastname' => 'lastName',
+            'mobile' => 'mobileNumber',
+            'postcode' => 'billingAddress.postcode',
+            'facebookId' => 'facebookId',
+        ];
+        foreach ($userFormData as $formField => $dataField) {
+            $ids = $this->queryToMongoSearch(
+                $form,
+                $userRepo->createQueryBuilder(),
+                $formField,
+                $dataField,
+                function ($data) {
+                    return $data->getId();
+                }
+            );
+            if ($ids !== null) {
+                $policiesQb->addAnd($policiesQb->expr()->field('user.id')->in($ids));
+            }
+        }
+
+        $pager = $this->pager($request, $policiesQb);
+
+        return [
+            'policies' => $pager->getCurrentPageResults(),
+            'pager' => $pager,
+            'form' => $form->createView()
+        ];
     }
 }

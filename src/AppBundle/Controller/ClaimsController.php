@@ -34,61 +34,25 @@ class ClaimsController extends BaseController
      */
     public function indexAction()
     {
-        return $this->redirectToRoute('claims_users');
+        return $this->redirectToRoute('claims_policies');
     }
 
     /**
-     * @Route("/users", name="claims_users")
+     * @Route("/policies", name="claims_policies")
      * @Template
      */
-    public function claimsUsersAction(Request $request)
+    public function claimsPoliciesAction(Request $request)
     {
         if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
             $this->addFlash('warning', 'Redirected to Admin Site');
 
-            return $this->redirectToRoute('admin_users');
+            return $this->redirectToRoute('admin_policies');
         }
 
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(User::class);
-        $users = $repo->createQueryBuilder();
-        $pager = $this->pager($request, $users);
-
-        $users = $repo->createQueryBuilder();
-        $form = $this->createForm(UserSearchType::class, null, ['method' => 'GET']);
-        $form->handleRequest($request);
-        $this->formToMongoSearch($form, $users, 'email', 'email');
-        $this->formToMongoSearch($form, $users, 'lastname', 'lastName');
-        $this->formToMongoSearch($form, $users, 'postcode', 'billingAddress.postcode');
-
-        $this->mobileToMongoSearch($form, $users, 'mobile', 'mobileNumber');
-
-        $policyRepo = $dm->getRepository(Policy::class);
-        $policiesQb = $policyRepo->createQueryBuilder();
-        if ($policies = $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber', true)) {
-            $userIds = [];
-            foreach ($policies as $policy) {
-                $userIds[] = $policy->getUser()->getId();
-            }
-            $users->addAnd($users->expr()->field('id')->in($userIds));
-        }
-        $policiesQb = $policyRepo->createQueryBuilder();
-        if ($policies = $this->formToMongoSearch($form, $policiesQb, 'status', 'status', true)) {
-            $userIds = [];
-            foreach ($policies as $policy) {
-                $userIds[] = $policy->getUser()->getId();
-            }
-            $users->addAnd($users->expr()->field('id')->in($userIds));
-        }
-        $pager = $this->pager($request, $users);
-
-        return [
-            'users' => $pager->getCurrentPageResults(),
-            'pager' => $pager,
-            'form' => $form->createView(),
-            'policy_route' => 'claims_policy',
-            'include_invalid_policies' => false,
-        ];
+        $data = $this->searchUsers($request, false);
+        return array_merge($data, [
+            'policy_route' => 'claims_policy'
+        ]);
     }
 
     /**
