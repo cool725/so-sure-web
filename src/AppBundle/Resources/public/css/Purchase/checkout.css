@@ -62,6 +62,10 @@
     color: #202532;    
 }
 
+.checkout .birthday-picker {
+    cursor: pointer;
+}
+
 /* Includes */
 
 .purchase-download {
