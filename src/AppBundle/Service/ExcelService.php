@@ -23,9 +23,32 @@ class ExcelService
     public function getFileType($inFile)
     {
         $mimeType = mime_content_type($inFile);
+
+        return $this->getFileFormat($mimeType);
+    }
+
+    public function getFileExtension($mimeType)
+    {
+        $format = $this->getFileFormat($mimeType);
+        if ($format == self::FILETYPE_XLS) {
+            return "xls";
+        } elseif ($format == self::FILETYPE_XLSX) {
+            return "xlsx";
+        }
+
+        return null;
+    }
+
+    public function getFileFormat($mimeType)
+    {
         if ($mimeType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
             return self::FILETYPE_XLSX;
-        } elseif (in_array($mimeType, ["application/vnd.ms-excel", "application/vnd.ms-office"])) {
+        } elseif (in_array($mimeType, [
+            "application/vnd.ms-excel",
+            "application/vnd.ms-office",
+            "application/CDFV2-unknown",
+            "application/octet-stream"
+        ])) {
             return self::FILETYPE_XLS;
         } else {
             throw new \Exception(sprintf('Unknown excel mime type %s', $mimeType));
@@ -52,6 +75,14 @@ class ExcelService
                 $objWorksheet = $excel->getActiveSheet();
             } else {
                 $objWorksheet = $excel->getSheetByName($sheetName);
+            }
+
+            if (!$objWorksheet) {
+                throw new \Exception(sprintf(
+                    'Unable to open excel file %s using sheet name %s. Perhaps the sheet name is incorrect?',
+                    $inFile,
+                    $sheetName
+                ));
             }
 
             foreach ($objWorksheet->getRowIterator() as $row) {

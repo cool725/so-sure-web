@@ -95,6 +95,8 @@ class DaviesService
                 if ($excelFile = $this->extractExcelFromEmail($emailFile)) {
                     $claims = $this->parseExcel($excelFile, $sheetName);
                     $processed = $this->saveClaims($key, $claims);
+                } else {
+                    throw new \Exception('Unable to locate excel file in email message');
                 }
             } catch (\Exception $e) {
                 $processed = false;
@@ -227,14 +229,20 @@ class DaviesService
             foreach ($structure as $element) {
                 $mimePart = mailparse_msg_get_part($mime, $element);
                 $bodyParts = mailparse_msg_get_part_data($mimePart);
-                if (isset($bodyParts['content-type']) &&
-                    $bodyParts['content-type'] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-                    $excelFile = sprintf("%s.xlsx", $this->generateTempFile());
-                    if ($file = fopen($excelFile, "wb")) {
-                        fputs($file, mailparse_msg_extract_part_file($mimePart, $filename, null));
-                        fclose($file);
-                    } else {
-                        $excelFile = null;
+                if (isset($bodyParts['content-type'])) {
+                    try {
+                        $fileExtension = $this->excel->getFileExtension($bodyParts['content-type']);
+                        $testFile = sprintf("%s.%s", $this->generateTempFile(), $fileExtension);
+                        if ($file = fopen($testFile, "wb")) {
+                            fputs($file, mailparse_msg_extract_part_file($mimePart, $filename, null));
+                            fclose($file);
+                            $excelFile = $testFile;
+                        }
+                    } catch (\Exception $e) {
+                        $this->logger->debug(
+                            sprintf('Skipping email attachment %s', $bodyParts['content-type']),
+                            ['exception' => $e]
+                        );
                     }
                 }
             }
@@ -242,7 +250,6 @@ class DaviesService
             $excelFile = null;
             $this->logger->error(sprintf("Unable to parse email. Ex: %s", $e->getMessage()));
         }
-
         mailparse_msg_free($mime);
 
         return $excelFile;
