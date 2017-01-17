@@ -616,7 +616,7 @@ class ReceperioService extends BaseImeiService
             $this->mailer->send(
                 sprintf('Empty Data Response for %s', $serialNumber),
                 'tech@so-sure.com',
-                sprintf('A recent make/model query for %s returned a successful response but without any data in the makes field. support@recipero.com can be contacted to resolve this issue.', $serialNumber)
+                sprintf("A recent make/model query for %s returned a successful response but without any data in the makes field. Email support@recipero.com\n\n--------------\n\nDear Recipero Support,\nA recent make/model query for %s returned a successful response but without any data present for the makes field.  Can you please investigate and add to your db if its a valid serial number.  If it is a valid serial number, can you also confirm the make/model/colour & memory?", $serialNumber, $serialNumber)
             );
             // @codingStandardsIgnoreEnd
 
@@ -678,7 +678,7 @@ class ReceperioService extends BaseImeiService
                 $this->mailer->send(
                     sprintf('Missing ModelReference for %s', $serialNumber),
                     'tech@so-sure.com',
-                    sprintf('A recent make/model query for %s returned a successful response but the response was missing a modelreference.  Most likely we did not send the modelreference %s for %s to be added to our account, however, it could also be error by recipero. support@recipero.com can be contacted to resolve this issue. Response: %s', $serialNumber, $phone->getDevices()[0], $phone, json_encode($data))
+                    sprintf("A recent make/model query for %s returned a successful response but the response was missing a modelreference.  Email support@recipero.com\n\n----------\n\nDear Recipero Support,\nCan you please add modelreference '%s' for the '%s' phone to our account?\n\nResponse returned by recipero: %s", $serialNumber, $phone->getDevices()[0], $phone, json_encode($data))
                 );
                 // @codingStandardsIgnoreEnd
             }
