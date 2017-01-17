@@ -67,11 +67,12 @@ class UserSearchType extends AbstractType
                         'Jamie iPhone' => '359285060633868',
                     ],
                     'Facebook' => [
-                        'Patrick' => '10153878106240169',
+                        'Patrick (Global?)' => '10153878106240169',
+                        'Patrick (App Scoped?)' => '10153899912245169',
                     ]
                 ]
             ])
-            ->add('invalid', CheckboxType::class, ['required' => false, 'data' => $this->environment != 'prod'])
+            ->add('invalid', CheckboxType::class, ['required' => false])
             ->add('search', SubmitType::class)
         ;
 
@@ -84,9 +85,13 @@ class UserSearchType extends AbstractType
             $form->get('lastname')->setData($currentRequest->query->get('lastname'));
             $form->get('policy')->setData($currentRequest->query->get('policy'));
             $form->get('status')->setData($currentRequest->query->get('status'));
-            $form->get('invalid')->setData($currentRequest->query->get('invalid'));
             $form->get('imei')->setData($currentRequest->query->get('imei'));
             $form->get('facebookId')->setData($currentRequest->query->get('facebookId'));
+            if ($currentRequest->query->get('invalid') !== null) {
+                $form->get('invalid')->setData((bool) $currentRequest->query->get('invalid'));
+            } else {
+                $form->get('invalid')->setData($this->environment != 'prod');
+            }
         });
     }
 
