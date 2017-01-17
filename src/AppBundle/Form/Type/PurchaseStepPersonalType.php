@@ -43,7 +43,7 @@ class PurchaseStepPersonalType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', HiddenType::class, ['required' => false])
+            ->add('email', EmailType::class, ['required' => $this->required])
             ->add('firstName', HiddenType::class, ['required' => false])
             ->add('lastName', HiddenType::class, ['required' => false])
             ->add('name', TextType::class, ['required' => $this->required])
