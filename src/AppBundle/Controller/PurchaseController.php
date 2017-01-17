@@ -78,8 +78,6 @@ class PurchaseController extends BaseController
             $purchase->populateFromUser($user);
         } elseif ($session->get('email')) {
             $purchase->setEmail($session->get('email'));
-        } else {
-            return $this->redirectToRoute('register');
         }
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalType::class, $purchase)
