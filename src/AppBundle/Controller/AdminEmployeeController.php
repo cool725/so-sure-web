@@ -30,6 +30,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\Invoice;
 use AppBundle\Document\Connection;
 use AppBundle\Document\Stats;
+use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\OptOut\OptOut;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -72,6 +73,7 @@ class AdminEmployeeController extends BaseController
 {
     use DateTrait;
     use CurrencyTrait;
+    use ImeiTrait;
 
     /**
      * @Route("/", name="admin_home")
@@ -79,7 +81,7 @@ class AdminEmployeeController extends BaseController
      */
     public function indexAction()
     {
-        return [];
+        return ['randomImei' => self::generateRandomImei()];
     }
     
     /**
