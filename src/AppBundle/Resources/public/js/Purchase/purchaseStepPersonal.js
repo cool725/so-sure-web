@@ -5,7 +5,7 @@ $(function(){
         parentEl: '#birthday',
         singleDatePicker: true,
         showDropdowns: true,
-        // autoUpdateInput: false,
+        autoUpdateInput: false,
         showCustomRangeLabel: false,
         drops: 'up',
         opens: 'center',
