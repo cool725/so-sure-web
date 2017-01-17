@@ -19,7 +19,6 @@
                 <li><a class="nav-item" href="http://blog.wearesosure.com" target="_blank">Blog</a></li>
                 <li><a class="nav-item" href="http://help.wearesosure.com" target="_blank">Help Centre</a></li>
                 <li><a class="nav-item" href="https://wearesosure.zendesk.com/hc/en-us/sections/201886655-Making-a-Claim" target="_blank">Make a Claim</a></li>
-                <li><a class="btn btn-info" href="{{ path('sms_app_link') }}">Text Me The App</a></li>
                 {% if app.user is not null and app.user %}
                     {% if is_granted('ROLE_ADMIN') %}
                         <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
