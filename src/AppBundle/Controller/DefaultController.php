@@ -450,6 +450,9 @@ class DefaultController extends BaseController
         $leadForm = $this->get('form.factory')
             ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
             ->getForm();
+        $buyForm = $this->get('form.factory')
+            ->createNamedBuilder('buy_form')->add('buy', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('launch')) {
@@ -493,6 +496,13 @@ class DefaultController extends BaseController
                         "Sorry, didn't quite catch that email.  Please try again."
                     ));
                 }
+            } elseif ($request->request->has('buy_form')) {
+                $buyForm->handleRequest($request);
+                if ($buyForm->isValid()) {
+                    $this->get('app.mixpanel')->track('Click on the Buy Now Button');
+
+                    return $this->redirectToRoute('purchase');
+                }
             }
         }
 
@@ -512,6 +522,7 @@ class DefaultController extends BaseController
             'max_pot' => $maxPot,
             'form' => $form->createView(),
             'lead_form' => $leadForm->createView(),
+            'buy_form' => $buyForm->createView(),
             'phones' => $repo->findBy(
                 ['active' => true, 'make' => $make, 'model' => $decodedModel],
                 ['memory' => 'asc']

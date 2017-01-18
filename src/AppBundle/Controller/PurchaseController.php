@@ -132,6 +132,11 @@ class PurchaseController extends BaseController
                         $user
                     );
 
+                    // Make sure to do after login
+                    if ($newUser) {
+                        $this->get('app.mixpanel')->trackWithUtm('Receive Personal Details');
+                    }
+
                     return $this->redirectToRoute('purchase_step_address');
                 }
             }
@@ -331,6 +336,7 @@ class PurchaseController extends BaseController
                         }
                     }
                     $dm->flush();
+                    $this->get('app.mixpanel')->track('Enter IMEI Number');
 
                     if ($this->areEqualToTwoDp(
                         $purchase->getAmount(),
@@ -468,12 +474,17 @@ class PurchaseController extends BaseController
                 JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
             );
             if ($policy->isInitialPayment()) {
-                // TODO: Take to a welcome to so-sure page
+                $this->get('app.mixpanel')->track('Purchase Policy', [
+                    'Payment Option' => $policy->getPremiumPlan(),
+                ]);
                 $this->addFlash(
                     'success',
                     'Welcome to so-sure!'
                 );
+
+                return $this->redirectToRoute('user_welcome');
             } else {
+                // unpaid policy - outstanding payment
                 $this->addFlash(
                     'success',
                     sprintf(
@@ -481,11 +492,15 @@ class PurchaseController extends BaseController
                         $policy->getLastSuccessfulPaymentCredit()->getAmount()
                     )
                 );
+
+                return $this->redirectToRoute('user_home');
             }
         }
 
-        return $this->redirectToRoute('user_welcome');
+        // shouldn't occur
+        return $this->redirectToRoute('user_home');
     }
+
     /**
      * @Route("/cc/fail", name="purchase_judopay_receive_fail")
      * @Route("/cc/fail/", name="purchase_judopay_receive_fail_slash")

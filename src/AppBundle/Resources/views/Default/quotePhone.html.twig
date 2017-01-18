@@ -55,9 +55,11 @@
                                 <h4>£{{ phone_price.maxPot }} with {{ phone_price.maxConnections }} connections</h4>
                                 <p>Covered for</p>
                                 <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
-                                <p><a href="#" data-toggle="modal" data-target="#more-info">More details (including excess)</a></p>     
-                                <a class="btn btn-primary btn-rounded view-quote--btn" href="{{ path('purchase') }}">BUY NOW</a>
-                                <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow view-quote--btn" href="#">How it works</a>
+                                <p><a href="#" data-toggle="modal" data-target="#more-info">More details (including excess)</a></p>
+                                {{ form_start(buy_form) }}
+                                    {{ form_widget(buy_form.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-primary btn-rounded view-quote--btn'}}) }}
+                                    <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow view-quote--btn" href="#">How it works</a>
+                                {{ form_end(buy_form)}}
                                 <div class="visible-xs-block">
                                     {% if phone.isITunes %}
                                     <div>

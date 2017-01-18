@@ -59,13 +59,38 @@ class MixpanelService
             $user = $this->requestService->getUser();
         }
         if ($user) {
+            $userData = ['$email' => $user->getEmail()];
+            if ($user->getFirstName()) {
+                $userData['$first_name'] = $user->getFirstName();
+            }
+            if ($user->getLastName()) {
+                $userData['$last_name'] = $user->getLastName();
+            }
+            if ($user->getMobileNumber()) {
+                $userData['$phone'] = $user->getMobileNumber();
+            }
+            if ($user->getBirthday()) {
+                $userData['Date of Birth'] = $user->getBirthday()->format(\DateTime::ATOM);
+            }
+            if ($user->getBillingAddress()) {
+                $userData['Billing Address'] = $user->getBillingAddress()->__toString();
+            }
+            if ($policy = $user->getCurrentPolicy()) {
+                if ($phone = $policy->getPhone()) {
+                    $userData['Device'] = $phone->__toString();
+                }
+                if ($premium = $policy->getPremium()) {
+                    $userData['Monthly Cost'] = $premium->getMonthlyPremiumPrice();
+                }
+                if ($plan = $policy->getPremiumPlan()) {
+                    $userData['Payment Option'] = $plan;
+                }
+                $userData['Number of Connections'] = count($policy->getConnections());
+                $userData['Reward Pot Value'] = $policy->getPotValue();
+            }
+
             $this->mixpanel->identify($user->getId());
-            $this->mixpanel->people->set($user->getId(), [
-                '$first_name'       => $user->getFirstName(),
-                '$last_name'        => $user->getLastName(),
-                '$email'            => $user->getEmail(),
-                '$phone'            => $user->getMobileNumber(),
-            ]);
+            $this->mixpanel->people->set($user->getId(), $userData);
         }
 
         if (!$properties) {
