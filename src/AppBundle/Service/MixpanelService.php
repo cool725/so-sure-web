@@ -106,6 +106,9 @@ class MixpanelService
         if ($addUrl) {
             $properties = array_merge($properties, $this->transformUrl());
         }
+        if ($ip = $this->requestService->getClientIp()) {
+            $properties['ip'] = $ip;
+        }
         $this->mixpanel->track($event, $properties);
     }
 

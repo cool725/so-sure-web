@@ -93,4 +93,13 @@ class RequestService
 
         return null;
     }
+
+    public function getClientIp()
+    {
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            return $request->getClientIp();
+        }
+
+        return null;
+    }
 }
