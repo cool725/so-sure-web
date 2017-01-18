@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\User;
 use Mixpanel;
+use UAParser\Parser;
 
 class MixpanelService
 {
@@ -108,6 +109,13 @@ class MixpanelService
         }
         if ($ip = $this->requestService->getClientIp()) {
             $properties['ip'] = $ip;
+        }
+        if ($userAgent = $this->requestService->getUserAgent()) {
+            $parser = Parser::create();
+            $userAgentDetails = $parser->parse($userAgent);
+            $properties['$browser'] = $userAgentDetails->ua->family;
+            $properties['$browser_version'] = $userAgentDetails->ua->toVersion();
+            $properties['User Agent'] = $userAgent;
         }
         $this->mixpanel->track($event, $properties);
     }

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2db2ed4e7bde1c852430ac4b076a2c51",
-    "content-hash": "b54e1b44586834804371e7e24d52aad0",
+    "hash": "69c546145eb0cff313aaedd61a4f8797",
+    "content-hash": "a95cc6792e71744653dad4dc4bc96862",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -6075,6 +6075,55 @@
                 "templating"
             ],
             "time": "2016-12-23 11:06:22"
+        },
+        {
+            "name": "ua-parser/uap-php",
+            "version": "v3.4.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ua-parser/uap-php.git",
+                "reference": "a8397606c112612f981d1feb9cbc3bf4d0a452fb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ua-parser/uap-php/zipball/a8397606c112612f981d1feb9cbc3bf4d0a452fb",
+                "reference": "a8397606c112612f981d1feb9cbc3bf4d0a452fb",
+                "shasum": ""
+            },
+            "require": {
+                "symfony/console": "^2.0 || ^3.0",
+                "symfony/filesystem": "^2.0 || ^3.0",
+                "symfony/finder": "^2.0 || ^3.0",
+                "symfony/yaml": "^2.0 || ^3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0 || ^5.0"
+            },
+            "bin": [
+                "bin/uaparser"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UAParser\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lars Strojny",
+                    "email": "lars@strojny.net"
+                },
+                {
+                    "name": "Dave Olsen",
+                    "email": "dmolsen@gmail.com"
+                }
+            ],
+            "description": "A multi-language port of Browserscope's user agent parser.",
+            "time": "2016-07-09 13:53:59"
         },
         {
             "name": "vich/uploader-bundle",

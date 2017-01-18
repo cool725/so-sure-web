@@ -102,4 +102,13 @@ class RequestService
 
         return null;
     }
+
+    public function getUserAgent()
+    {
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            return $request->headers->get('User-Agent');
+        }
+
+        return null;
+    }
 }
