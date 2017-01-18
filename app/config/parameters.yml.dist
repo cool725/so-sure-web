@@ -43,6 +43,7 @@ parameters:
     rollbar_access_token:
 
     heap_id:
+    mixpanel_apitoken:
 
     judopay_apitoken:
     judopay_apisecret:

@@ -42,7 +42,13 @@ class KernelListener
         $campaign = $request->query->get('utm_campaign');
         if ($source || $medium || $campaign) {
             $session = $request->getSession();
-            $session->set('utm', serialize(['source' => $source, 'medium' => $medium, 'campaign' => $campaign]));
+            $session->set('utm', serialize([
+                'source' => $source,
+                'medium' => $medium,
+                'campaign' => $campaign,
+                'term' => $request->query->get('utm_term'),
+                'content' => $request->query->get('utm_content'),
+            ]));
         }
 
         $referer = $request->headers->get('referer');

@@ -52,7 +52,8 @@
         "rollerworks/password-strength-bundle": "^1.5",
         "nelmio/security-bundle": "^2.0",
         "intercom/intercom-php": "^3.0",
-        "facebook/graph-sdk": "^5.4"
+        "facebook/graph-sdk": "^5.4",
+        "mixpanel/mixpanel-php": "^2.6"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

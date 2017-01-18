@@ -98,6 +98,8 @@ class DefaultController extends BaseController
             }
         }
 
+        $this->get('app.mixpanel')->trackWithUtm('Home Page');
+
         return array(
             'form_top' => $formTop->createView(),
             'form_bottom' => $formBottom->createView(),

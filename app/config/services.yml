@@ -227,13 +227,19 @@ services:
             googleAppDownload: "%google_app_download%"
             appleAppDownload": "%apple_app_download%"
 
-    app.twig.branch:
-        class: AppBundle\Service\BranchTwigExtension
+    app.request:
+        class: AppBundle\Service\RequestService
         arguments:
-            branch:       "@app.branch"
             requestStack: "@request_stack"
             logger:       "@logger"
             tokenStorage: "@security.token_storage"
+
+    app.twig.branch:
+        class: AppBundle\Service\BranchTwigExtension
+        arguments:
+            branch:         "@app.branch"
+            logger:         "@logger"
+            requestService: "@app.request"
         public: false
         tags:
             - { name: twig.extension }
@@ -440,6 +446,20 @@ services:
             dm:      "@doctrine_mongodb.odm.default_document_manager"
             logger:  "@logger"
             apiKey:  "%appannie_apikey%"
+
+    app.mixpanel:
+        class: AppBundle\Service\MixpanelService
+        arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
+            logger:         "@logger"
+            redis:          "@snc_redis.default"
+            mixpanel:       "@mixpanel"
+            requestService: "@app.request"
+
+    mixpanel:
+        class:   Mixpanel
+        factory: ['Mixpanel', getInstance]
+        arguments: ['%mixpanel_apitoken%']
 
     app.voter.user:
         class: AppBundle\Security\UserVoter

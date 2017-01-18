@@ -10,29 +10,25 @@ class BranchTwigExtension extends \Twig_Extension
     /** @var BranchService */
     protected $branch;
 
-    /** @var RequestStack */
-    protected $requestStack;
+    /** @var RequestService */
+    protected $requestService;
 
     /** @var LoggerInterface */
     protected $logger;
 
-    protected $tokenStorage;
-
     /**
      * @param BranchService   $branch
-     * @param RequestStack    $requestStack
      * @param LoggerInterface $logger
+     * @param RequestService  $requestService
      */
     public function __construct(
         BranchService $branch,
-        RequestStack $requestStack,
         LoggerInterface $logger,
-        $tokenStorage
+        RequestService $requestService
     ) {
         $this->branch = $branch;
-        $this->requestStack = $requestStack;
         $this->logger = $logger;
-        $this->tokenStorage = $tokenStorage;
+        $this->requestService = $requestService;
     }
 
     public function getFunctions()
@@ -44,59 +40,19 @@ class BranchTwigExtension extends \Twig_Extension
         );
     }
 
-    private function getReferer()
-    {
-        return $this->getSession('referer');
-    }
-
-    private function getUtm()
-    {
-        $utm = $this->getSession('utm');
-        if ($utm) {
-            return unserialize($utm);
-        }
-
-        return null;
-    }
-
-    private function getSCode()
-    {
-        return $this->getSession('scode');
-    }
-
-    private function getSession($var)
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        $session = $request->getSession();
-        if ($session->isStarted()) {
-            return $session->get($var);
-        }
-
-        return null;
-    }
-
-    private function getUser()
-    {
-        if ($this->tokenStorage->getToken()) {
-            return $this->tokenStorage->getToken()->getUser();
-        }
-
-        return null;
-    }
-
     private function getData()
     {
         $data = [
-            'referer' => $this->getReferer(),
+            'referer' => $this->requestService->getReferer(),
         ];
-        $scode = $this->getSCode();
+        $scode = $this->requestService->getSCode();
         if ($scode) {
             $data['scode'] = $scode;
             $data['$deeplink_path'] = sprintf('invite/scode/%s', $scode);
         }
 
         // Mainly for new users, but won't hurt for existing users
-        $user = $this->getUser();
+        $user = $this->requestService->getUser();
         if ($user && $user instanceof User) {
             $data['email'] = $user->getEmail();
             if ($user->getMobileNumber()) {
@@ -112,8 +68,8 @@ class BranchTwigExtension extends \Twig_Extension
 
     private function getSource()
     {
-        $utm = $this->getUtm();
-        $referer = $this->getReferer();
+        $utm = $this->requestService->getUtm();
+        $referer = $this->requestService->getReferer();
         if ($utm) {
             return $utm['source'];
         } elseif ($referer) {
@@ -125,8 +81,8 @@ class BranchTwigExtension extends \Twig_Extension
 
     private function getMedium($medium)
     {
-        $utm = $this->getUtm();
-        $referer = $this->getReferer();
+        $utm = $this->requestService->getUtm();
+        $referer = $this->requestService->getReferer();
         if ($utm) {
             return $utm['medium'];
         } elseif ($referer) {
@@ -138,7 +94,7 @@ class BranchTwigExtension extends \Twig_Extension
 
     private function getCampaign()
     {
-        $utm = $this->getUtm();
+        $utm = $this->requestService->getUtm();
         if ($utm) {
             return $utm['campaign'];
         } else {
