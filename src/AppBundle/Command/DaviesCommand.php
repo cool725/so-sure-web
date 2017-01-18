@@ -44,7 +44,7 @@ class DaviesCommand extends ContainerAwareCommand
         $file = $input->getOption('file');
         $sheetName = $input->getOption('sheetName');
         if (!$sheetName) {
-            $sheetName = DaviesClaim::SHEET_NAME_V1;
+            $sheetName = DaviesClaim::SHEET_NAME_V6;
         }
         if (!in_array($sheetName, DaviesClaim::$sheetNames)) {
             throw new \Exception(sprintf(
