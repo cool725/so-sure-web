@@ -3,7 +3,9 @@ namespace AppBundle\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\User;
+use Ramsey\Uuid\Uuid;
 
 class RequestService
 {
@@ -107,6 +109,25 @@ class RequestService
     {
         if ($request = $this->requestStack->getCurrentRequest()) {
             return $request->headers->get('User-Agent');
+        }
+
+        return null;
+    }
+
+    public function getTrackingId()
+    {
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            if ($cookie = $request->cookies->get(SoSure::SOSURE_TRACKING_COOKIE_NAME)) {
+                return urldecode($cookie);
+            } elseif ($tracking = $this->getSession(SoSure::SOSURE_TRACKING_SESSION_NAME)) {
+                return $tracking;
+            } else {
+                $uuid4 = Uuid::uuid4();
+                $session = $this->getSession();
+                $session->set(SoSure::SOSURE_TRACKING_SESSION_NAME, $uuid4->toString());
+
+                return $uuid4->toString();
+            }
         }
 
         return null;

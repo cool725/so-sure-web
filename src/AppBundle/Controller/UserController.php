@@ -62,6 +62,11 @@ class UserController extends BaseController
                     'success',
                     sprintf('%s was invited', $emailInvitiation->getEmail())
                 );
+                $now = new \DateTime();
+                $this->get('app.mixpanel')->trackWithUtm('Invite someone', [
+                    'Invitation Date' => $now->format(\DateTime::ATOM),
+                    'Invitation Method' => 'email',
+                ]);
 
                 return new RedirectResponse($this->generateUrl('user_home'));
             }

@@ -54,7 +54,8 @@
         "intercom/intercom-php": "^3.0",
         "facebook/graph-sdk": "^5.4",
         "mixpanel/mixpanel-php": "^2.6",
-        "ua-parser/uap-php": "^3.4"
+        "ua-parser/uap-php": "^3.4",
+        "ramsey/uuid": "^3.5"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

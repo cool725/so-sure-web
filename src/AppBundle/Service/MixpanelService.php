@@ -93,8 +93,8 @@ class MixpanelService
             $this->mixpanel->identify($user->getId());
             $this->mixpanel->people->set($user->getId(), $userData);
         } else {
-            if ($sessionId = $this->requestService->getSessionId()) {
-                $this->mixpanel->identify($sessionId);
+            if ($trackingId = $this->requestService->getTrackingId()) {
+                $this->mixpanel->identify($trackingId);
             }
         }
 
@@ -123,8 +123,8 @@ class MixpanelService
     public function register(User $user = null)
     {
         if ($user &&
-            ($sessionId = $this->requestService->getSessionId())) {
-            $this->mixpanel->createAlias($sessionId, $user->getId());
+            ($trackingId = $this->requestService->getTrackingId())) {
+            $this->mixpanel->createAlias($trackingId, $user->getId());
         }
     }
 
