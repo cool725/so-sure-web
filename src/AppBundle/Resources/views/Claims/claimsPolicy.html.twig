@@ -18,8 +18,8 @@
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <h2>{{policy.user.name }}'s Policy</h2>
+<div class="container"{% if policy.isEnded %}style="background-color: #F2DEDE; opacity: 0.7"{% endif %}>
+    <h2>{{policy.user.name }}'s Policy{% if policy.isEnded %} - {{ policy.status|upper }} POLICY{% endif %}</h2>
     {% if policy.claimsWarnings|length > 0 %}
     <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <h3 class="text-center">Caution - Any Items Below Must Be Considered/Handled Prior To Approval</h3>
@@ -32,6 +32,7 @@
         </ul>
     </div>
     {% endif %}
+  {% if not policy.isEnded %}
     <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <p class="text-center"><strong>Run ClaimsCheck</strong></p>
         <p>
@@ -157,6 +158,7 @@
         </div>
         {{ form_end(formClaim) }}
     </div>
+  {% endif %}
     {% include 'AppBundle::Claims/claimsPolicyItem.html.twig' %}
 
 </div>
