@@ -1316,6 +1316,11 @@ abstract class Policy
         return $this->getStatus() == self::STATUS_CANCELLED;
     }
 
+    public function isEnded()
+    {
+        return $this->isExpired() || $this->isCancelled();
+    }
+
     public function isCancelledWithUserDeclined()
     {
         return $this->getStatus() == self::STATUS_CANCELLED && in_array($this->getCancelledReason(), [
