@@ -499,6 +499,11 @@ class DefaultController extends BaseController
         $maxPot = $phone->getCurrentPhonePrice()->getMaxPot();
         $maxConnections = $phone->getCurrentPhonePrice()->getMaxConnections();
 
+        $this->get('app.mixpanel')->trackWithUtm('Quote Page', [
+            'Device Selected' => $phone->__toString(),
+            'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+        ]);
+
         return array(
             'phone' => $phone,
             'phone_price' => $phone->getCurrentPhonePrice(),

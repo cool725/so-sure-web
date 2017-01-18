@@ -75,7 +75,7 @@ class MixpanelService
             $properties = array_merge($properties, $this->transformUtm());
         }
         if ($addUrl) {
-            $properties = array_merge($properties, $this->transformUrl());            
+            $properties = array_merge($properties, $this->transformUrl());
         }
         $this->mixpanel->track($event, $properties);
     }

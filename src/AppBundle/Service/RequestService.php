@@ -78,6 +78,6 @@ class RequestService
             return $request->getUri();
         }
 
-        return null;        
+        return null;
     }
 }
