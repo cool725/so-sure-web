@@ -127,12 +127,17 @@ class PurchaseController extends BaseController
                             $user->getId()
                         ));
                     }
+                    // Register before login, so we still have old session id before login changes it
+                    if ($newUser) {
+                        $this->get('app.mixpanel')->register($user);
+                    }
+
                     $this->get('fos_user.security.login_manager')->loginUser(
                         $this->getParameter('fos_user.firewall_name'),
                         $user
                     );
 
-                    // Make sure to do after login
+                    // Track after login, so we populate user
                     if ($newUser) {
                         $this->get('app.mixpanel')->trackWithUtm('Receive Personal Details');
                     }

@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Document\User;
 use Mixpanel;
 
 class MixpanelService
@@ -88,9 +89,12 @@ class MixpanelService
                 $userData['Number of Connections'] = count($policy->getConnections());
                 $userData['Reward Pot Value'] = $policy->getPotValue();
             }
-
             $this->mixpanel->identify($user->getId());
             $this->mixpanel->people->set($user->getId(), $userData);
+        } else {
+            if ($sessionId = $this->requestService->getSessionId()) {
+                $this->mixpanel->identify($sessionId);
+            }
         }
 
         if (!$properties) {
@@ -103,6 +107,14 @@ class MixpanelService
             $properties = array_merge($properties, $this->transformUrl());
         }
         $this->mixpanel->track($event, $properties);
+    }
+
+    public function register(User $user = null)
+    {
+        if ($user &&
+            ($sessionId = $this->requestService->getSessionId())) {
+            $this->mixpanel->createAlias($sessionId, $user->getId());
+        }
     }
 
     private function transformUrl()

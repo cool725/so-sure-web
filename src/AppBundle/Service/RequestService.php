@@ -49,12 +49,16 @@ class RequestService
         return $this->getSession('scode');
     }
 
-    public function getSession($var)
+    public function getSession($var = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
         if ($session->isStarted()) {
-            return $session->get($var);
+            if ($var) {
+                return $session->get($var);
+            } else {
+                return $session;
+            }
         }
 
         return null;
@@ -76,6 +80,15 @@ class RequestService
     {
         if ($request = $this->requestStack->getCurrentRequest()) {
             return $request->getUri();
+        }
+
+        return null;
+    }
+
+    public function getSessionId()
+    {
+        if ($session = $this->getSession()) {
+            return $session->getId();
         }
 
         return null;
