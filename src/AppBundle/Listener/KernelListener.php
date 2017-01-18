@@ -62,7 +62,7 @@ class KernelListener
         $response = $event->getResponse();
         $request  = $event->getRequest();
         $this->setSoSureTrackingCookie($request, $response);
-        $this->setSoSureEmployeeCookie($request, $response);
+        $this->setSoSureEmployeeCookie($response);
     }
 
     private function setSoSureTrackingCookie($request, $response)
@@ -93,7 +93,7 @@ class KernelListener
         $response->headers->setCookie($cookie);
     }
 
-    private function setSoSureEmployeeCookie($request, $response)
+    private function setSoSureEmployeeCookie($response)
     {
         try {
             $token = $this->tokenStorage->getToken();
