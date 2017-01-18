@@ -48,10 +48,10 @@ class PurchaseStepPersonalType extends AbstractType
             ->add('lastName', HiddenType::class, ['required' => false])
             ->add('name', TextType::class, ['required' => $this->required])
             ->add('birthday', DateType::class, [
-                'required' => $this->required,
-                'widget' => 'single_text',
-                'html5' => false,
-                'format' => 'dd/MM/yyyy'
+                  'required' => $this->required,
+                  'widget'   => 'single_text',
+                  'html5'    => false,
+                  'format'   => 'dd/MM/yyyy',
             ])
             ->add('mobileNumber', TextType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
