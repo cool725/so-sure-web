@@ -102,6 +102,20 @@ class MixpanelService
         $user = null,
         $addUtm = false
     ) {
+        $userAgentDetails = null;
+        if ($userAgent = $this->requestService->getUserAgent()) {
+            $parser = Parser::create();
+            $userAgentDetails = $parser->parse($userAgent);
+
+            // exclude bots from tracking
+            if (in_array($userAgentDetails->ua->family, [
+                'PhantomJS',
+                'SeznamBot',
+            ])) {
+                return;
+            }
+        }
+
         if (!$user) {
             $user = $this->requestService->getUser();
         }
@@ -164,9 +178,9 @@ class MixpanelService
         if ($ip = $this->requestService->getClientIp()) {
             $properties['ip'] = $ip;
         }
-        if ($userAgent = $this->requestService->getUserAgent()) {
-            $parser = Parser::create();
-            $userAgentDetails = $parser->parse($userAgent);
+
+        // previously parsed from user agent
+        if ($userAgentDetails) {
             $properties['$browser'] = $userAgentDetails->ua->family;
             $properties['$browser_version'] = $userAgentDetails->ua->toVersion();
             $properties['User Agent'] = $userAgent;
