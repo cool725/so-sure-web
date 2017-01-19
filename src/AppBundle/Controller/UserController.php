@@ -17,8 +17,11 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\InvitationType;
 use AppBundle\Document\Invitation\EmailInvitation;
+
 use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
+use AppBundle\Service\MixpanelService;
+
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -63,7 +66,7 @@ class UserController extends BaseController
                     sprintf('%s was invited', $emailInvitiation->getEmail())
                 );
                 $now = new \DateTime();
-                $this->get('app.mixpanel')->trackWithUtm('Invite someone', [
+                $this->get('app.mixpanel')->track(MixpanelService::INVITE, [
                     'Invitation Date' => $now->format(\DateTime::ATOM),
                     'Invitation Method' => 'email',
                 ]);
@@ -76,11 +79,16 @@ class UserController extends BaseController
                 foreach ($user->getUnprocessedReceivedInvitations() as $invitation) {
                     if ($invitationForm->get(sprintf('accept_%s', $invitation->getId()))->isClicked()) {
                         $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
-                        $invitationService->accept($invitation, $policy);
+                        $connection = $invitationService->accept($invitation, $policy);
                         $this->addFlash(
                             'success',
                             sprintf("You're now connected with %s", $invitation->getInviter()->getName())
                         );
+                        $now = new \DateTime();
+                        $this->get('app.mixpanel')->track(MixpanelService::ACCEPT_CONNECTION, [
+                            'Connection Date' => $now->format(\DateTime::ATOM),
+                            'Connection Value' => $connection->getTotalValue(),
+                        ]);
 
                         return new RedirectResponse($this->generateUrl('user_home'));
                     } elseif ($invitationForm->get(sprintf('reject_%s', $invitation->getId()))->isClicked()) {

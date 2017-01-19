@@ -10,6 +10,15 @@ use UAParser\Parser;
 
 class MixpanelService
 {
+    const BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
+    const IMEI_ENTERED = 'Enter IMEI Number';
+    const PURCHASE_POLICY = 'Purchase Policy';
+    const INVITE = 'Invite someone';
+    const ACCEPT_CONNECTION = 'Accept Connection';
+    const HOME_PAGE = 'Home Page';
+    const QUOTE_PAGE = 'Quote Page';
+    const RECEIVE_DETAILS = 'Receive Personal Details';
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -92,6 +101,7 @@ class MixpanelService
             }
             $this->mixpanel->identify($user->getId());
             $this->mixpanel->people->set($user->getId(), $userData);
+            //$this->logger->debug(sprintf('User %s details %s', $user->getId(), json_encode($userData)));
         } else {
             if ($trackingId = $this->requestService->getTrackingId()) {
                 $this->mixpanel->identify($trackingId);
@@ -120,11 +130,24 @@ class MixpanelService
         $this->mixpanel->track($event, $properties);
     }
 
-    public function register(User $user = null)
+    public function register(User $user = null, $trackingId = null)
     {
-        if ($user &&
-            ($trackingId = $this->requestService->getTrackingId())) {
+        if (!$trackingId) {
+            $trackingId = $this->requestService->getTrackingId();
+        }
+        if ($user && $trackingId) {
+            $this->logger->debug(sprintf(
+                'Alias user %s to tracking id: %s',
+                $user ? $user->getId() : 'unknown',
+                $trackingId
+            ));
             $this->mixpanel->createAlias($trackingId, $user->getId());
+        } else {
+            $this->logger->warning(sprintf(
+                'Failed to register user %s id: %s',
+                $user ? $user->getId() : 'unknown',
+                $trackingId
+            ));
         }
     }
 

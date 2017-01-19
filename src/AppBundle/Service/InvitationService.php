@@ -576,8 +576,20 @@ class InvitationService
         }
 
         // If there was a concellation in the network, new connection should replace the cancelled connection
-        $this->addConnection($inviteePolicy, $invitation->getInviter(), $inviterPolicy, $invitation, $date);
-        $this->addConnection($inviterPolicy, $invitation->getInvitee(), $inviteePolicy, $invitation, $date);
+        $inviteeConnection = $this->addConnection(
+            $inviteePolicy,
+            $invitation->getInviter(),
+            $inviterPolicy,
+            $invitation,
+            $date
+        );
+        $inviterConnection = $this->addConnection(
+            $inviterPolicy,
+            $invitation->getInvitee(),
+            $inviteePolicy,
+            $invitation,
+            $date
+        );
 
         $invitation->setAccepted($date);
 
@@ -588,6 +600,8 @@ class InvitationService
         $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
         $this->sendPush($invitation, PushService::MESSAGE_CONNECTED);
         $this->sendEvent($invitation, InvitationEvent::EVENT_ACCEPTED);
+
+        return $inviteeConnection;
     }
 
     protected function addConnection(
@@ -619,6 +633,8 @@ class InvitationService
         $connection->setExcludeReporting(!$policy->isValidPolicy());
         $policy->addConnection($connection);
         $policy->updatePotValue();
+
+        return $connection;
     }
 
     public function reject(Invitation $invitation)

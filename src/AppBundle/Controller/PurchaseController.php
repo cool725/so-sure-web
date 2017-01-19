@@ -29,6 +29,8 @@ use AppBundle\Form\Type\PurchaseStepPersonalType;
 use AppBundle\Form\Type\PurchaseStepAddressType;
 use AppBundle\Form\Type\PurchaseStepPhoneType;
 
+use AppBundle\Service\MixpanelService;
+
 use AppBundle\Security\UserVoter;
 
 use AppBundle\Exception\InvalidPremiumException;
@@ -139,7 +141,7 @@ class PurchaseController extends BaseController
 
                     // Track after login, so we populate user
                     if ($newUser) {
-                        $this->get('app.mixpanel')->trackWithUtm('Receive Personal Details');
+                        $this->get('app.mixpanel')->trackWithUtm(MixpanelService::RECEIVE_DETAILS);
                     }
 
                     return $this->redirectToRoute('purchase_step_address');
@@ -341,7 +343,7 @@ class PurchaseController extends BaseController
                         }
                     }
                     $dm->flush();
-                    $this->get('app.mixpanel')->track('Enter IMEI Number');
+                    $this->get('app.mixpanel')->track(MixpanelService::IMEI_ENTERED);
 
                     if ($this->areEqualToTwoDp(
                         $purchase->getAmount(),
@@ -479,7 +481,7 @@ class PurchaseController extends BaseController
                 JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
             );
             if ($policy->isInitialPayment()) {
-                $this->get('app.mixpanel')->track('Purchase Policy', [
+                $this->get('app.mixpanel')->track(MixpanelService::PURCHASE_POLICY, [
                     'Payment Option' => $policy->getPremiumPlan(),
                 ]);
                 $this->addFlash(

@@ -35,6 +35,8 @@ use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
 
+use AppBundle\Service\MixpanelService;
+
 class DefaultController extends BaseController
 {
     use PhoneTrait;
@@ -98,7 +100,7 @@ class DefaultController extends BaseController
             }
         }
 
-        $this->get('app.mixpanel')->trackWithUtm('Home Page');
+        $this->get('app.mixpanel')->trackWithUtm(MixpanelService::HOME_PAGE);
 
         return array(
             'form_top' => $formTop->createView(),
@@ -499,7 +501,7 @@ class DefaultController extends BaseController
             } elseif ($request->request->has('buy_form')) {
                 $buyForm->handleRequest($request);
                 if ($buyForm->isValid()) {
-                    $this->get('app.mixpanel')->track('Click on the Buy Now Button');
+                    $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED);
 
                     return $this->redirectToRoute('purchase');
                 }
@@ -509,7 +511,7 @@ class DefaultController extends BaseController
         $maxPot = $phone->getCurrentPhonePrice()->getMaxPot();
         $maxConnections = $phone->getCurrentPhonePrice()->getMaxConnections();
 
-        $this->get('app.mixpanel')->trackWithUtm('Quote Page', [
+        $this->get('app.mixpanel')->trackWithUtm(MixpanelService::QUOTE_PAGE, [
             'Device Selected' => $phone->__toString(),
             'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
         ]);

@@ -118,15 +118,21 @@ class RequestService
     {
         if ($request = $this->requestStack->getCurrentRequest()) {
             if ($cookie = $request->cookies->get(SoSure::SOSURE_TRACKING_COOKIE_NAME)) {
+                $this->logger->debug(sprintf('Tracking cookie: %s', urldecode($cookie)));
+
                 return urldecode($cookie);
-            } elseif ($tracking = $this->getSession(SoSure::SOSURE_TRACKING_SESSION_NAME)) {
-                return $tracking;
+            } elseif ($trackingId = $this->getSession(SoSure::SOSURE_TRACKING_SESSION_NAME)) {
+                $this->logger->debug(sprintf('Session tracking: %s', $trackingId));
+
+                return $trackingId;
             } else {
                 $uuid4 = Uuid::uuid4();
                 if ($session = $this->getSession()) {
-                    $session->set(SoSure::SOSURE_TRACKING_SESSION_NAME, $uuid4->toString());
+                    $trackingId = $uuid4->toString();
+                    $session->set(SoSure::SOSURE_TRACKING_SESSION_NAME, $trackingId);
+                    $this->logger->debug(sprintf('Session tracking init: %s', $trackingId));
 
-                    return $uuid4->toString();
+                    return $trackingId;
                 }
             }
         }
