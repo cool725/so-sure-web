@@ -31,7 +31,47 @@
 
 {% block body %}
 
-    <section class="background-image-light vertical-align-wrap">
+    <section id="quote" class="quote-container section--pad">
+        <div class="container">
+
+            <div class="h1"><strong>Your quote for your {{ phone }}</strong></div>
+            <p class="lead">Delivered to you quicker than you'll get it anywhere else - that's a promise.</p>
+                
+            <div class="quote-card">
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <span class="h4"><strong>Device</strong></span>
+                        <p>
+                            {{ phone }}
+                            {% if phones | length > 1 %}
+                                    <br>
+                                    <small>or do you have:
+                                        {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-memory">{{ phone_mem.memory }}GB</a>
+                                        {% endfor %}                   
+                                    </small>             
+                            {% endif %} 
+                        </p>
+                        <span class="h4"><strong>Covered for</strong></span>
+                        <p>Theft, Loss, Accidental Damage &amp; Breakdown <br><a href="#" data-toggle="modal" data-target="#more-info"><small>More details (including excess)</small></a></p>
+                        <span class="h1"><strong>£{{ phone_price.monthlyPremiumPrice }}</strong> <small>per month</small></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <span class="h4"><strong>AND HERE’S THE COOL BIT…</strong></span>
+                        <p>Insure and connect with friends to build a reward pot. At the end of the year, if no one claims, we’ll give you back:</p>
+                        <div class="reward-pot"></div>
+                    </div>
+
+                </div>
+                <div class="quote-card--footer"></div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- <section class="background-image-light vertical-align-wrap">
         <div class="container vertical-align-middle">
             <div class="row">
                 <div id="quote" class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1 view-quote">
@@ -104,7 +144,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">

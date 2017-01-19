@@ -1,3 +1,58 @@
+/* QUOTE CARD */
+
+.quote-container h1 {
+    line-height: 1.25;
+}
+
+.quote-card {
+    padding: 0px;
+    line-height: 1.8;
+}
+
+.quote-card .col-md-6:first-of-type {
+    margin-bottom: 25px;
+}
+
+.quote-card p {
+    margin-bottom: 30px;
+}
+
+.btn-memory {
+    background: none;
+    border: 1px solid #3399ff;
+    color: #3399ff; /* Bit hacky sort with addition of SASS */ 
+    border-radius: 100px; 
+    vertical-align: middle;
+}
+
+@media (min-width: 768px) {
+
+    .quote-container .h1,
+    .quote-container p.lead {
+        text-align: center;
+    }
+
+    .quote-card {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 30px 30px 80px;
+        position: relative;
+        background-color: #fff;
+        border: 1px solid #efefef;
+        border-radius: 8px;
+    }
+
+    .quote-card--footer {
+        width: 100%; height: 50px;
+        position: absolute;
+        left: 0; bottom: 0; right: 0;
+        background-color: #99ccff;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+}
+
 /* VIEW QUOTE */
 
 .view-quote {
