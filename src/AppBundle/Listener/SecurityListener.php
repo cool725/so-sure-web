@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\Security\Core\User\UserInterface;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\User;
+use AppBundle\Service\MixpanelService;
 
 class SecurityListener
 {
@@ -16,10 +17,14 @@ class SecurityListener
     /** @var RequestStack */
     protected $requestStack;
 
-    public function __construct($logger, RequestStack $requestStack)
+    /** @var MixpanelService */
+    protected $mixpanel;
+
+    public function __construct($logger, RequestStack $requestStack, MixpanelService $mixpanel)
     {
         $this->logger = $logger;
         $this->requestStack = $requestStack;
+        $this->mixpanel = $mixpanel;
     }
 
     /**
@@ -35,5 +40,7 @@ class SecurityListener
         $identityLog->setIp($this->requestStack->getCurrentRequest()->getClientIp());
         $user = $event->getAuthenticationToken()->getUser();
         $user->setLatestWebIdentityLog($identityLog);
+
+        $this->mixpanel->trackWithUser($user, MixpanelService::LOGIN);
     }
 }
