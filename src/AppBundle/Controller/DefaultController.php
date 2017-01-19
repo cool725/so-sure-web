@@ -515,6 +515,10 @@ class DefaultController extends BaseController
             'Device Selected' => $phone->__toString(),
             'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
         ]);
+        $this->get('app.mixpanel')->setPersonProperties([
+            'First Device Selected' => $phone->__toString(),
+            'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+        ], true);
 
         return array(
             'phone' => $phone,

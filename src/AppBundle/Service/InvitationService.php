@@ -76,6 +76,9 @@ class InvitationService
     protected $environment;
     protected $dispatcher;
 
+    /** @var MixpanelService */
+    protected $mixpanel;
+
     public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -92,6 +95,7 @@ class InvitationService
      * @param PushService      $push
      * @param string           $environment
      * @param                  $dispatcher
+     * @param MixpanelService  $mixpanel
      */
     public function __construct(
         DocumentManager $dm,
@@ -103,7 +107,8 @@ class InvitationService
         RateLimitService $rateLimit,
         PushService $push,
         $environment,
-        $dispatcher
+        $dispatcher,
+        MixpanelService $mixpanel
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -115,6 +120,7 @@ class InvitationService
         $this->push = $push;
         $this->environment = $environment;
         $this->dispatcher = $dispatcher;
+        $this->mixpanel = $mixpanel;
     }
 
     public function setDebug($debug)
@@ -265,6 +271,9 @@ class InvitationService
             }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
             $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
+            $this->mixpanel->trackWithUser($invitation->getInviter(), MixpanelService::INVITE, [
+                'Invitation Method' => 'email',
+            ]);
         }
 
         return $invitation;
@@ -326,6 +335,9 @@ class InvitationService
             }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
             $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
+            $this->mixpanel->trackWithUser($invitation->getInviter(), MixpanelService::INVITE, [
+                'Invitation Method' => 'sms',
+            ]);
         }
 
         return $invitation;
@@ -600,6 +612,13 @@ class InvitationService
         $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
         $this->sendPush($invitation, PushService::MESSAGE_CONNECTED);
         $this->sendEvent($invitation, InvitationEvent::EVENT_ACCEPTED);
+
+        $this->mixpanel->trackWithUser($invitation->getInviter(), MixpanelService::CONNECTION_COMPLETE, [
+            'Connection Value' => $inviterConnection->getTotalValue(),
+        ]);
+        $this->mixpanel->trackWithUser($invitation->getInvitee(), MixpanelService::CONNECTION_COMPLETE, [
+            'Connection Value' => $inviteeConnection->getTotalValue(),
+        ]);
 
         return $inviteeConnection;
     }

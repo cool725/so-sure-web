@@ -110,6 +110,7 @@ services:
             push:                 "@app.push"
             environment:          "%kernel.environment%"
             dispatcher:           "@event_dispatcher"
+            mixpanel:             "@app.mixpanel"
 
     app.digits:
         class: AppBundle\Service\DigitsService

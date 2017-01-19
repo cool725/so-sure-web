@@ -343,7 +343,11 @@ class PurchaseController extends BaseController
                         }
                     }
                     $dm->flush();
-                    $this->get('app.mixpanel')->track(MixpanelService::IMEI_ENTERED);
+                    $this->get('app.mixpanel')->track(MixpanelService::POLICY_READY, [
+                        'Device Insured' => $purchase->getPhone()->__toString(),
+                        'OS' => $purchase->getPhone()->getOs(),
+                        'Final Monthly Cost' => $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+                    ]);
 
                     if ($this->areEqualToTwoDp(
                         $purchase->getAmount(),

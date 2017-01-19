@@ -10,14 +10,17 @@ use UAParser\Parser;
 
 class MixpanelService
 {
-    const BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
-    const IMEI_ENTERED = 'Enter IMEI Number';
-    const PURCHASE_POLICY = 'Purchase Policy';
-    const INVITE = 'Invite someone';
-    const ACCEPT_CONNECTION = 'Accept Connection';
     const HOME_PAGE = 'Home Page';
     const QUOTE_PAGE = 'Quote Page';
     const RECEIVE_DETAILS = 'Receive Personal Details';
+
+    const PURCHASE_POLICY = 'Purchase Policy';
+    const INVITE = 'Invite someone';
+    const CONNECTION_COMPLETE = 'Connection Complete';
+
+    const BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
+    const POLICY_READY = 'Policy Ready For Purchase';
+    const LOGIN = 'Login';
 
     /** @var DocumentManager */
     protected $dm;
@@ -54,6 +57,30 @@ class MixpanelService
         $this->requestService = $requestService;
     }
 
+    public function setPersonProperties(array $personProperties, $setOnce = false, $user = null)
+    {
+        if (!$user) {
+            $user = $this->requestService->getUser();
+        }
+        if ($user) {
+            $this->mixpanel->identify($user->getId());
+            if (!$setOnce) {
+                $this->mixpanel->people->set($user->getId(), $personProperties);
+            } else {
+                $this->mixpanel->people->setOnce($user->getId(), $personProperties);
+            }
+        } else {
+            if ($trackingId = $this->requestService->getTrackingId()) {
+                $this->mixpanel->identify($trackingId);
+                if (!$setOnce) {
+                    $this->mixpanel->people->set($trackingId, $personProperties);
+                } else {
+                    $this->mixpanel->people->setOnce($trackingId, $personProperties);
+                }
+            }
+        }
+    }
+
     public function track($event, array $properties = null)
     {
         return $this->trackAll($event, $properties);
@@ -61,11 +88,20 @@ class MixpanelService
 
     public function trackWithUtm($event, array $properties = null)
     {
-        return $this->trackAll($event, $properties, null, true, true);
+        return $this->trackAll($event, $properties, null, true);
     }
 
-    public function trackAll($event, array $properties = null, $user = null, $addUtm = false, $addUrl = false)
+    public function trackWithUser($user, $event, array $properties = null)
     {
+        return $this->trackAll($event, $properties, $user);
+    }
+
+    public function trackAll(
+        $event,
+        array $properties = null,
+        $user = null,
+        $addUtm = false
+    ) {
         if (!$user) {
             $user = $this->requestService->getUser();
         }
@@ -88,16 +124,19 @@ class MixpanelService
             }
             if ($policy = $user->getCurrentPolicy()) {
                 if ($phone = $policy->getPhone()) {
-                    $userData['Device'] = $phone->__toString();
+                    $userData['Device Insured'] = $phone->__toString();
+                    $userData['OS'] = $phone->getOs();
                 }
                 if ($premium = $policy->getPremium()) {
-                    $userData['Monthly Cost'] = $premium->getMonthlyPremiumPrice();
+                    $userData['Final Monthly Cost'] = $premium->getMonthlyPremiumPrice();
                 }
                 if ($plan = $policy->getPremiumPlan()) {
                     $userData['Payment Option'] = $plan;
+                    $userData['Number of Payments Received'] = count($policy->getSuccessfulPaymentCredits());
                 }
                 $userData['Number of Connections'] = count($policy->getConnections());
                 $userData['Reward Pot Value'] = $policy->getPotValue();
+                $userData['Number of Invites Sent'] = count($policy->getSentInvitations(false));
             }
             $this->mixpanel->identify($user->getId());
             $this->mixpanel->people->set($user->getId(), $userData);
@@ -112,10 +151,15 @@ class MixpanelService
             $properties = [];
         }
         if ($addUtm) {
-            $properties = array_merge($properties, $this->transformUtm());
+            $utm = $this->transformUtm();
+            $properties = array_merge($properties, $utm);
+            if ($user) {
+                $this->mixpanel->people->setOnce($user->getId(), $utm);
+            }
         }
-        if ($addUrl) {
-            $properties = array_merge($properties, $this->transformUrl());
+
+        if ($uri = $this->requestService->getUri()) {
+            $properties['URL'] = $uri;
         }
         if ($ip = $this->requestService->getClientIp()) {
             $properties['ip'] = $ip;
@@ -149,16 +193,6 @@ class MixpanelService
                 $trackingId
             ));
         }
-    }
-
-    private function transformUrl()
-    {
-        $uri = $this->requestService->getUri();
-        if (!$uri) {
-            return [];
-        }
-
-        return ['URL' => $uri];
     }
 
     private function transformUtm()

@@ -65,11 +65,6 @@ class UserController extends BaseController
                     'success',
                     sprintf('%s was invited', $emailInvitiation->getEmail())
                 );
-                $now = new \DateTime();
-                $this->get('app.mixpanel')->track(MixpanelService::INVITE, [
-                    'Invitation Date' => $now->format(\DateTime::ATOM),
-                    'Invitation Method' => 'email',
-                ]);
 
                 return new RedirectResponse($this->generateUrl('user_home'));
             }
@@ -84,11 +79,6 @@ class UserController extends BaseController
                             'success',
                             sprintf("You're now connected with %s", $invitation->getInviter()->getName())
                         );
-                        $now = new \DateTime();
-                        $this->get('app.mixpanel')->track(MixpanelService::ACCEPT_CONNECTION, [
-                            'Connection Date' => $now->format(\DateTime::ATOM),
-                            'Connection Value' => $connection->getTotalValue(),
-                        ]);
 
                         return new RedirectResponse($this->generateUrl('user_home'));
                     } elseif ($invitationForm->get(sprintf('reject_%s', $invitation->getId()))->isClicked()) {
