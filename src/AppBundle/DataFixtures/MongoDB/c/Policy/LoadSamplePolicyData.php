@@ -311,6 +311,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $claim->setPhoneReplacementCost($phone->getReplacementPriceOrSuggestedReplacementPrice());
             $claim->setUnauthorizedCalls(rand(0, 20000) / 100);
             $claim->setAccessories(rand(0, 20000) / 100);
+            $claim->setClosedDate(new \DateTime());
         }
         $claim->setDescription($this->getRandomDescription($claim));
         $claim->setIncurred(array_sum([$claim->getClaimHandlingFees(), $claim->getTransactionFees(), $claim->getAccessories(),
