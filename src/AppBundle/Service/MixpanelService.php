@@ -172,6 +172,11 @@ class MixpanelService
             $properties['User Agent'] = $userAgent;
         }
         $this->mixpanel->track($event, $properties);
+
+        // Special case for logins - bump number
+        if ($event == self::LOGIN && $user) {
+            $this->mixpanel->people->increment($user->getId(), "Number Of Logins", 1);
+        }
     }
 
     public function register(User $user = null, $trackingId = null)
