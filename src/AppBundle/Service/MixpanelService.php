@@ -111,6 +111,7 @@ class MixpanelService
             if (in_array($userAgentDetails->ua->family, [
                 'PhantomJS',
                 'SeznamBot',
+                'Googlebot',
             ])) {
                 return;
             }
