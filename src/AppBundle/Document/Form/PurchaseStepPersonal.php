@@ -95,8 +95,8 @@ class PurchaseStepPersonal
         $this->name = trim($name);
         $parts = explode(" ", trim($name));
         if (count($parts) == 2) {
-            $this->setFirstName($parts[0]);
-            $this->setLastName($parts[1]);
+            $this->setFirstName(ucfirst($parts[0]));
+            $this->setLastName(ucfirst($parts[1]));
         }
     }
 
