@@ -59,6 +59,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->persist($user);
         $this->newPolicy($manager, $user, $count);
 
+        // claimed user
+        $user = $this->newUser('user-claimed@so-sure.com');
+        $user->setPlainPassword('w3ares0sure!');
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $this->newPolicy($manager, $user, $count);
+
+
         $manager->flush();
     }
 
@@ -238,7 +246,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
     }
 
-    protected function addClaim($manager, Policy $policy)
+    protected function addClaim($manager, Policy $policy, $type = null, $status = null)
     {
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
@@ -249,8 +257,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $date->add(new \DateInterval(sprintf('P%dD', rand(0,4))));
         $claim->setNotificationDate(clone $date);
 
-        $claim->setType($this->getRandomClaimType());
-        $claim->setStatus($this->getRandomStatus($claim->getType()));
+        if (!$type) {
+            $type = $this->getRandomClaimType();
+        }
+        if (!$status) {
+            $status = $this->getRandomStatus($type);
+        }
+        $claim->setType($type);
+        $claim->setStatus($status);
         if ($claim->isOpen()) {
             $claim->setDaviesStatus('open');
         } else {

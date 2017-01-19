@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\Security\Core\User\UserInterface;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\User;
+use AppBundle\Service\MixpanelService;
 
 class SecurityListener
 {

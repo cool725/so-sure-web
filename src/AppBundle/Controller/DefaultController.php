@@ -35,6 +35,8 @@ use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
 
+use AppBundle\Service\MixpanelService;
+
 class DefaultController extends BaseController
 {
     use PhoneTrait;
@@ -97,6 +99,8 @@ class DefaultController extends BaseController
                 return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
             }
         }
+
+        $this->get('app.mixpanel')->trackWithUtm(MixpanelService::HOME_PAGE);
 
         return array(
             'form_top' => $formTop->createView(),
@@ -448,6 +452,9 @@ class DefaultController extends BaseController
         $leadForm = $this->get('form.factory')
             ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
             ->getForm();
+        $buyForm = $this->get('form.factory')
+            ->createNamedBuilder('buy_form')->add('buy', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('launch')) {
@@ -491,11 +498,27 @@ class DefaultController extends BaseController
                         "Sorry, didn't quite catch that email.  Please try again."
                     ));
                 }
+            } elseif ($request->request->has('buy_form')) {
+                $buyForm->handleRequest($request);
+                if ($buyForm->isValid()) {
+                    $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED);
+
+                    return $this->redirectToRoute('purchase');
+                }
             }
         }
 
         $maxPot = $phone->getCurrentPhonePrice()->getMaxPot();
         $maxConnections = $phone->getCurrentPhonePrice()->getMaxConnections();
+
+        $this->get('app.mixpanel')->trackWithUtm(MixpanelService::QUOTE_PAGE, [
+            'Device Selected' => $phone->__toString(),
+            'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+        ]);
+        $this->get('app.mixpanel')->setPersonProperties([
+            'First Device Selected' => $phone->__toString(),
+            'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+        ], true);
 
         return array(
             'phone' => $phone,
@@ -505,6 +528,7 @@ class DefaultController extends BaseController
             'max_pot' => $maxPot,
             'form' => $form->createView(),
             'lead_form' => $leadForm->createView(),
+            'buy_form' => $buyForm->createView(),
             'phones' => $repo->findBy(
                 ['active' => true, 'make' => $make, 'model' => $decodedModel],
                 ['memory' => 'asc']
