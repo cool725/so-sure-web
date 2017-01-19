@@ -9,12 +9,31 @@
     line-height: 1.8;
 }
 
-.quote-card .col-md-6:first-of-type {
+.quote-card .col-md-5 {
     margin-bottom: 25px;
 }
 
 .quote-card p {
     margin-bottom: 30px;
+}
+
+.reward-pot {
+    width: 100px; height: 125px;
+    margin: 0 auto;
+    line-height: 125px;
+    text-align: center;
+    background-image: url('https://cdn.so-sure.com/images/quote-page/pot.png');
+}
+
+.reward-pot--value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.no-of-friends {
+    color: #3399ff;
+    font-weight: bold;
 }
 
 .btn-memory {
@@ -27,19 +46,19 @@
 
 @media (min-width: 768px) {
 
-    .quote-container .h1,
+    .quote-container h1,
     .quote-container p.lead {
         text-align: center;
     }
 
     .quote-card {
-        max-width: 800px;
+        max-width: 840px;
         margin: 0 auto;
         padding: 30px 30px 80px;
         position: relative;
         background-color: #fff;
-        border: 1px solid #efefef;
-        border-radius: 8px;
+        border: 2px solid #efefef;
+        border-radius: 8px;          
     }
 
     .quote-card--footer {
@@ -47,8 +66,8 @@
         position: absolute;
         left: 0; bottom: 0; right: 0;
         background-color: #99ccff;
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
     }
 
 }
@@ -169,7 +188,7 @@
 
 /* Connections Indicator */
 
-.connections {
+/*.connections {
     background-color: #FFF;
     padding-top: 50px;
     padding-bottom: 105px;
@@ -218,7 +237,7 @@
 	.pot-text-container {
 		padding-top: 30px;
 	}
-}
+}*/
 
 
 /* Start Purchase */

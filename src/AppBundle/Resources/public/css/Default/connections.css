@@ -1,35 +1,30 @@
 #connection-slider .slider-selection {
-	background: #202532;
+	background: #3399ff;
 }
+
 #connection-slider {
-	width: 60% !important;
-	height: 35px !important;
+	width: 80% !important;
+	margin-left: 10%;
 }
-@media (max-width: 543px) {
-	#connection-slider {
-		width: 100% !important;
-	}
-}
+
 #connection-slider .slider-handle {
-	background: #202532;
+	background: #3399ff;
 }
+
 #connectionLegend {
 	padding-bottom: 20px;
 	color: #626B78;
 }
+
 #connectionsChartLegend {
 	padding-top: 20px;
 }
+
 #connectionsChartLegend ul {
 	list-style: none;
 	color: #626B78;
 }
+
 #connectionsChartLegend ul li span {
 	padding-right: 5px;
-}
-
-@media (min-width: 992px) {
-	#connection-slider {
-		width: 90% !important;
-	}
 }
