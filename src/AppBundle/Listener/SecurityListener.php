@@ -17,14 +17,10 @@ class SecurityListener
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var MixpanelService */
-    protected $mixpanel;
-
-    public function __construct($logger, RequestStack $requestStack, MixpanelService $mixpanel)
+    public function __construct($logger, RequestStack $requestStack)
     {
         $this->logger = $logger;
         $this->requestStack = $requestStack;
-        $this->mixpanel = $mixpanel;
     }
 
     /**
@@ -40,7 +36,5 @@ class SecurityListener
         $identityLog->setIp($this->requestStack->getCurrentRequest()->getClientIp());
         $user = $event->getAuthenticationToken()->getUser();
         $user->setLatestWebIdentityLog($identityLog);
-
-        $this->mixpanel->trackWithUser($user, MixpanelService::LOGIN);
     }
 }
