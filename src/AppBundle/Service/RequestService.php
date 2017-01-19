@@ -123,10 +123,11 @@ class RequestService
                 return $tracking;
             } else {
                 $uuid4 = Uuid::uuid4();
-                $session = $this->getSession();
-                $session->set(SoSure::SOSURE_TRACKING_SESSION_NAME, $uuid4->toString());
+                if ($session = $this->getSession()) {
+                    $session->set(SoSure::SOSURE_TRACKING_SESSION_NAME, $uuid4->toString());
 
-                return $uuid4->toString();
+                    return $uuid4->toString();
+                }
             }
         }
 
