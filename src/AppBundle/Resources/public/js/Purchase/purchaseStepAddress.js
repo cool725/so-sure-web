@@ -2,9 +2,9 @@ $(function(){
     var maxAddresses = 60;
     var key = $('#ss-root').data('pca-key');
 
-    $('.form-control').on('keyup', function() {
+    $('.form-control').on('change', function() {
         $(this).parent().removeClass('has-error');
-        $(this).parent().find('.with-errors').hide();
+        $(this).parent().find('.with-errors').empty();
     });
 
     var showAddress = function(err) {

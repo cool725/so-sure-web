@@ -1,10 +1,10 @@
 $(function(){
 
-    $('.form-control').on('keyup', function() {
+    $('.form-control').on('change', function() {
         $(this).parent().removeClass('has-error');
-        $(this).parent().find('.with-errors').hide();
+        $(this).parent().find('.with-errors').empty();
     });
-
+    
 	$('input:radio').click(function(){
 
 		$(this).parent().parent().addClass('radio-selected')
