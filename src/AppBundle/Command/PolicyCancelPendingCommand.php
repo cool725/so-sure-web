@@ -57,7 +57,7 @@ class PolicyCancelPendingCommand extends ContainerAwareCommand
             $mailer->send('Policy Pending Cancellations Report', 'tech@so-sure.com', implode('<br />', $lines));
         } else {
             $lines = [];
-            $cancelled = $policyService->getPoliciesPendingCancellation(false, $prefix);
+            $cancelled = $policyService->cancelPoliciesPendingCancellation($prefix);
             foreach ($cancelled as $policy) {
                 $lines[] = sprintf('Cancelled Policy %s', $policy->getPolicyNumber());
                 $output->writeln($lines);
