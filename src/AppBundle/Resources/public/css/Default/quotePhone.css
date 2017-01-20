@@ -1,72 +1,101 @@
-/* VIEW QUOTE */
+/* QUOTE CARD */
 
-.view-quote {
-    margin-top: 20px;
+.quote-container h1 {
+    line-height: 1.25;
 }
 
-.view-quote h2 {
-    margin-top: 10px;
+.quote-card {
+    padding: 0px;
+    margin: 0 0 25px;
+    line-height: 1.8;
 }
 
-.view-quote .panel-primary {
-    border: 2px solid #ddd;
-    padding: 30px 20px 0;
+.quote-card .col-md-5 {
+    margin-bottom: 25px;
 }
 
-.view-quote--left {
+.quote-card p {
+    margin-bottom: 30px;
+}
+
+.quote-card .device {
+    font-size: 22px;
+} 
+
+.reward-pot {
+    width: 100px; height: 125px;
+    margin: 0 auto;
+    line-height: 125px;
     text-align: center;
+    background-image: url('https://cdn.so-sure.com/images/quote-page/pot.png');
 }
 
-.view-quote--left p {
-    margin-top: 15px;
+.reward-pot--value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    margin: 15px 0 0;
 }
 
-.view-quote--right {
-    padding: 30px 15px 0;
+.no-of-friends strong {
+    color: #3399ff;
+    font-weight: bold;
 }
 
-.view-quote--ticks {
-    color: #3399FF;
-    margin: 0 5px 5px 0;
+.btn-memory {
+    background: none;
+    border: 1px solid #3399ff;
+    color: #3399ff; /* Bit hacky sort with addition of SASS */ 
+    border-radius: 100px; 
+    vertical-align: middle;
 }
 
-.view-quote--footer {
-    border-top: 2px solid #ddd;
-    margin-top: 30px;
-    padding-top: 15px;
+.btn-quote-card {
+    width: 170px;
 }
 
-.view-quote--btn {
-    width: 150px;
+.btn-quote-card + .btn-quote-card {
+    margin: 15px 0 0;
 }
 
-@media (min-width: 768px) { 
+@media (min-width: 375px) {
 
-    .view-quote {
-        margin-top: 30px;
-        margin-bottom: 30px;
+    .btn-quote-card + .btn-quote-card {
+        margin: 0;
     }
 
-    .view-quote-list li {
-        margin-bottom: 40px;
-    }  
-
-    .view-quote--right {
-        padding: 30px 30px 0;
-    }    
-
 }
 
-@media (min-width: 1200px) { 
 
-    .view-quote .panel-primary {
-        padding: 30px 40px 0;
+@media (min-width: 768px) {
+
+    .quote-container h1,
+    .quote-container p.lead {
+        text-align: center;
     }
 
-    .view-quote--right {
-        padding: 0 30px 0;
-    }          
+    .quote-card {
+        max-width: 840px;
+        margin: 25px auto;
+        padding: 30px;
+        position: relative;
+        background-color: #fff;
+        /*border: 2px solid #efefef;*/
+        border-radius: 8px;          
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    }
+
+    .quote-card--footer {
+        width: 100%; height: 30px;
+        position: absolute;
+        left: 0; bottom: 0; right: 0;
+        background-color: #99ccff;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+    }
+
 }
+
 
 /* Sticky Quote */
 .banner-sticky { /* TODO Move to resusable class in refactor */
@@ -111,178 +140,6 @@
     display: none;
 }
 
-
-/* Connections Indicator */
-
-.connections {
-    background-color: #FFF;
-    padding-top: 50px;
-    padding-bottom: 105px;
-    text-align: center;
-    color: #202532;
-    border-top: #efefef 2px solid;
-}
-@media (max-width: 992px) {
-.reward-pot  p.text-left, .reward-pot h3.text-left {
-    text-align: center;
-  }
-}
-.connections p {
-    font-size: 15px;
-}
-.connections .explainer {
-    padding-top: 50px;
-    padding-bottom: 20px;
-    max-width: 960px;
-    display: inline-block;
-}
-.connections .explainer h5 {
-    padding-top: 10px;
-}
-.connections .explainer p {
-    text-align: left;
-    padding-top: 10px;
-    font-family: "Avenir LT Std 35 Light", "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
-    color: #626B78;
-}
-.reward-pot {
-  padding-top: 35px;
-}
-@media (max-width:767px) {
-  .connections .explainer p {
-      text-align: center;
-    }
-    .reward-pot {
-      padding-top: 10px;
-    }
-    .slider-container {
-  		padding-top: 10px;
-  	}
-}
-@media (min-width: 767px) {
-	.pot-text-container {
-		padding-top: 30px;
-	}
-}
-
-
-/* Start Purchase */
-
-.start-purchase {
-  text-align: center;
-}
-.start-purchase h4 {
-  padding-top: 0;
-  padding-left: 0;
-}
-.banner .col-sm-2 {
-  padding-top: 20px;
-}
-
-@media (max-width: 992px) {
-.banner .col-sm-2, .banner .col-sm-4 {
-    width: 100%;
-    text-align: center;
-    float: none;
-  }
-}
-
-@media (min-width: 1200px) {
-.start-purchase h4 {
-  padding-top: 6px;
-  padding-left: 10px;
-  }
-}
-@media (min-width: 992px) {
-.start-purchase h4 {
-  padding-top: 6px;
-  }
-}
-
-.start-purchase img {
-    width: 130px;
-}
-@media (min-width: 992px) {
-  .start-purchase img {
-    width: 150px;
-  }
-}
-@media (max-width: 767px) {
-  .start-purchase img {
-    width: 140px;
-  }
-}
-
-/* Page Scroll Indictor */
-
-.connections .download-prompt {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    text-align: center;
-    color: #202532;
-}
-.hero .scroll-indicator {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    text-align: center;
-}
-@media (max-width: 992px) {
-#money_back {
-  margin-top: 10px;
-  }
-}
-.circle {
-  width: 110px;
-  height: 110px;
-  line-height: 115px;
-  border-radius: 50%;
-  font-size: 28px;
-  color: #fff;
-  text-align: center;
-  background: #202532;
-  margin-top: 10px;
-}
-/* Frequently Asked Questions */
-
-.faqs {
-  padding: 30px 15px 120px 15px;
-}
-@media (min-width: 992px) {
-  .faqs {
-  padding-left: 150px;
-  padding-right: 150px;
-  }
-}
-
-/* Download Now */
-
-.download-now {
-    background-color: #FFF;
-    padding: 60px 20px 60px 20px;
-    text-align: center;
-    color: #202532;
-}
-.download-now p {
-    color: #626B78;
-}
-
-/* Video */
-
-.learn-video {
-  background-color: #FFF;
-  padding: 60px 20px 60px 20px;
-  text-align: center;
-}
-.learn-video .explainer-video {
-  margin-top: 20px;
-}
-@media (min-width: 992px) {
-  .learn-video .explainer-video-frame {
-    width: 450px;
-  }
-}
 
 /* Email Modal */
 

@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -453,7 +454,14 @@ class DefaultController extends BaseController
             ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
             ->getForm();
         $buyForm = $this->get('form.factory')
-            ->createNamedBuilder('buy_form')->add('buy', SubmitType::class)
+            ->createNamedBuilder('buy_form')
+            ->add('buy', SubmitType::class)
+            ->add('slider_used', HiddenType::class)
+            ->getForm();
+        $buyBannerForm = $this->get('form.factory')
+            ->createNamedBuilder('buy_form_banner')
+            ->add('buy', SubmitType::class)
+            ->add('slider_used', HiddenType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -501,7 +509,22 @@ class DefaultController extends BaseController
             } elseif ($request->request->has('buy_form')) {
                 $buyForm->handleRequest($request);
                 if ($buyForm->isValid()) {
-                    $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED);
+                    $properties = [];
+                    if ($buyForm->getData('slider_used')) {
+                        $properties['Played with Slider'] = true;
+                    }
+                    $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED, $properties);
+
+                    return $this->redirectToRoute('purchase');
+                }
+            } elseif ($request->request->has('buy_form_banner')) {
+                $buyBannerForm->handleRequest($request);
+                if ($buyBannerForm->isValid()) {
+                    $properties = [];
+                    if ($buyBannerForm->getData('slider_used')) {
+                        $properties['Played with Slider'] = true;
+                    }
+                    $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED, $properties);
 
                     return $this->redirectToRoute('purchase');
                 }
@@ -529,6 +552,7 @@ class DefaultController extends BaseController
             'form' => $form->createView(),
             'lead_form' => $leadForm->createView(),
             'buy_form' => $buyForm->createView(),
+            'buy_form_banner' => $buyBannerForm->createView(),
             'phones' => $repo->findBy(
                 ['active' => true, 'make' => $make, 'model' => $decodedModel],
                 ['memory' => 'asc']

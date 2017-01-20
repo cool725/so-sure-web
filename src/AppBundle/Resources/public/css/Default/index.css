@@ -40,12 +40,12 @@
 
 .how-it-works--step .img-responsive {
     margin: 0 auto;
-    max-width: 60%;
+    max-width: 65%;
 }
 
 @media (min-width: 600px) {
 
-    .how-it-works--step h3 {
+    .how-it-works--step .h3 {
         text-align: center;
     }      
 

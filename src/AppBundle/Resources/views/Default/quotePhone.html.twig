@@ -12,119 +12,134 @@
     {{ parent() }}
     {% javascripts
     '@AppBundle/Resources/public/js/Default/index.js'
-    '@AppBundle/Resources/public/js/Default/modalVideo.js'
+    'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
+    'bundles/app/js/Default/slider.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets 
-    'bundles/app/css/Default/index.css' 
-    'bundles/app/css/Default/quotePhone.css' 
-    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css' 
-    'bundles/app/css/Default/connections.css' 
-    'bundles/app/css/Default/scrollindicator.css' 
+    {% stylesheets
+    'bundles/app/css/Default/index.css'
+    'bundles/app/css/Default/quotePhone.css'
+    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
+    'bundles/app/css/Default/connections.css'
+    'bundles/app/css/Default/scrollindicator.css'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
 
-    <section class="background-image-light vertical-align-wrap">
-        <div class="container vertical-align-middle">
-            <div class="row">
-                <div id="quote" class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1 view-quote">
-                    <div class="panel panel-primary">
-                        <div class="row">
-                            
-                            <div class="col-xs-12 col-md-6 view-quote--left">
-                                <p>Device</p>
-                                <h4>{{ phone }}</h4>
-                                {% if phones | length > 1 %}
-                                    <div class="memory-select-text">
-                                        Or do you have:
-                                        {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-link">{{ phone_mem.memory }}GB</a>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}                  
-                                <p>Monthly Cost</p>
-                                <h2>£{{ phone_price.monthlyPremiumPrice }}</h2>
-                                <p>What You Could Get Back <a href="#how-it-works"><i class="fa fa-question-circle"></i></a></p>
-                                <h4>£{{ phone_price.maxPot }} with {{ phone_price.maxConnections }} connections</h4>
-                                <p>Covered for</p>
-                                <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
-                                <p><a href="#" data-toggle="modal" data-target="#more-info">And more (includes excess information)</a></p>
-                                {{ form_start(buy_form) }}
-                                    {{ form_widget(buy_form.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-primary btn-rounded view-quote--btn'}}) }}
-                                    <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow view-quote--btn" href="#">How it works</a>
-                                {{ form_end(buy_form)}}
-                                <div class="visible-xs-block">
-                                    {% if phone.isITunes %}
-                                    <div>
-                                        <h4>OR</h4>
-                                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('quotepage') }}">
-                                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-                                        </a> 
-                                    </div>
-                                    {% endif %}
-                                    {% if phone.isGooglePlay %}
-                                    <div>
-                                        <h4>OR</h4>
-                                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('quotepage') }}">
-                                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-                                        </a>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-xs-12 col-md-6 view-quote--right">
-                                <ul class="text-left list-unstyled view-quote-list">
-                                    <li>
-                                        <h3><i class="fa fa-check-circle fa-lg view-quote--ticks" aria-hidden="true"></i> Get Up to 80% Money Back</h3>
-                                        <p>Connect to friends to get up to 80% money back at the end of the year provided none of you claim.</p>
-                                    </li>
-                                    <li>
-                                        <h3><i class="fa fa-check-circle fa-lg view-quote--ticks" aria-hidden="true"></i> 24/7 Claims Support</h3>
-                                        <p>We know that accidents can happen at any time. That's why our UK based claims team are here for you whenever you need them.</p>
-                                    </li>
-                                    <li>
-                                        <h3><i class="fa fa-check-circle fa-lg view-quote--ticks" aria-hidden="true"></i> Next-working Day Replacement</h3>
-                                        <p>Some insurers can take up to 3 weeks to get you a new phone. We aim to get you a one the next working day once you claim is approved.</p>
-                                    </li>
-                                </ul>
-                            </div>
+    <section id="quote" class="quote-container section--pad">
 
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 view-quote--footer">
-                                <p class="text-center">Not your device? Select another phone <a href="/#get-quote">here</a>.</p>
-                            </div>
-                        </div>
-                    </div>                    
+        <h1>The only cover you'll ever need</h1>
+        <p class="lead">One price. Complete cover. Worldwide.</p>
+
+        <div class="quote-card">
+            <div class="row">
+
+                <div class="col-md-5">
+                    <span class="h4"><strong>Device</strong></span>
+                    <p>
+                        <span class="device">{{ phone }}</span>
+                        {% if phones | length > 1 %}
+                                <br>
+                                <small>or do you have:
+                                    {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                        <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-memory">{{ phone_mem.memory }}GB</a>
+                                    {% endfor %}
+                                </small>
+                        {% endif %}
+                    </p>
+                    <span class="h4"><strong>Covered for</strong></span>
+                    <p>Theft, Loss, Accidental Damage &amp; Breakdown <br><a href="#" data-toggle="modal" data-target="#more-info"><small>More details (including excess)</small></a></p>
+                    <span class="h1"><strong>£{{ phone_price.monthlyPremiumPrice }}</strong> <small>per month</small></span>
                 </div>
+
+                <div class="col-md-7">
+                    <span class="h4"><strong>AND HERE'S THE COOL BIT... </strong></span>
+
+                    {% set start_friends = phone_price.maxConnections - phone_price.maxConnections + 1  %}
+                    {% set start_value = start_friends * connection_value %}
+                    {% if start_value > phone_price.maxPot %}
+                        {% set start_value = phone_price.maxPot %}
+                    {% endif %}
+
+                    <div class="no-of-friends">
+                        We give you the free option to invite and connect with: <br>
+
+                        <div class="text-center h4">
+                            <strong id="num_friends">{{ start_friends }} friend</strong>
+                        </div>                        
+
+                        <input
+                        type="text"
+                        class="span2"
+                        value=""
+                        data-slider-min="0"
+                        data-slider-max="{{ phone_price.maxConnections }}"
+                        data-slider-maxpot="{{ phone_price.maxPot }}"
+                        data-slider-step="1"
+                        data-slider-value="{{ start_friends }}"
+                        data-slider-id="connection-slider"
+                        id="slider-value"
+                        data-slider-handle="round"
+                        data-slider-connection-value="{{ connection_value }}"/>
+                    </div>
+
+
+                    <span>Then at the end of the year, if no one claims, we’ll give you back:</span>
+
+                    <div class="reward-pot">
+                        <div id="money_back" class="reward-pot--value">£{{ start_value }}</div>
+                    </div>
+
+                </div>
+
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-12 text-center">
+
+                <p>
+                {{ form_start(buy_form) }}
+                    <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">How it works</a>
+                    {{ form_widget(buy_form.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded btn-quote-card'}}) }}
+                {{ form_end(buy_form)}}
+                </p>
+                <p class="text-center"><small>Not your device? Select another phone <a href="{{ path('homepage') }}#get-quote">here</a>.</small></p>
+
+            </div>
+        </div>
+
     </section>
 
     <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-8">
-                    <h3><small class="hidden-xs">Device</small> <span>{{ phone }}</span></h3>
+                    <h3><small>Device</small> <span>{{ phone }}</span></h3>
                 </div>
                 <div class="col-xs-12 col-sm-3 col-md-2">
-                    <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span> <small>a month</small></h3> 
+                    <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span> <small>/month</small></h3>
                 </div>
                 <div class="col-xs-12 col-sm-3 col-md-2">
-                    <a class="btn btn-primary btn-rounded" href="{{ path('purchase') }}">BUY NOW</a>
+
+                    {{ form_start(buy_form_banner) }}
+                        {{ form_widget(buy_form_banner.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
+                    {{ form_end(buy_form_banner)}}
+
                 </div>
             </div>
         </div>
     </section>
 
-    {% include 'AppBundle::Default/howItWorks.html.twig' %}   
+    {% include 'AppBundle::Default/howItWorks.html.twig' %}
+
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
 
     <section class="footer-cta alt-brand-gradient">
         <div class="container">

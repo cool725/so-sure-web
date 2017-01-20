@@ -435,6 +435,10 @@ h1, h2, h3, h4, h5, h6 {
     padding: 40px 15px;
 }
 
+.section--pad:first-of-type {
+    padding-top: 0;
+}
+
 @media (min-width: 991px) {
 
     .section--pad {
@@ -551,16 +555,32 @@ hr.strong {
     background-color:black;
 }
 
+/* MOVE TO components > _buttons.scss */
+
+.btn-success {
+    background-color: #80CE4D;
+    border-color: #80CE4D;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+    background-color: #67A53E;
+    border-color: #67A53E;
+}
+
 .btn-rounded {
     border-radius: 100px;
     padding: 12px 30px;
+}
+
+.btn-rounded.btn-sm {
+    padding: inherit;
 }
 
 .btn-hollow {
     background: none;
     border-width: 2px;
     color: #3399ff; /* Bit hacky sort with addition of SASS */
-    margin-top: 10px;
 }
 
 @media (min-width: 379px) {
