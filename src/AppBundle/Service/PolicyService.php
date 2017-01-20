@@ -884,7 +884,6 @@ class PolicyService
             $policy = new PhonePolicy();
             $prefix = $policy->getPolicyPrefix($this->environment);
         }
-        print $prefix;
         $repo = $this->dm->getRepository(Policy::class);
 
         return $repo->findPoliciesForCancellation($prefix, $includeFuture, $date);

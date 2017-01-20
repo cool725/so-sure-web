@@ -44,16 +44,26 @@ class PolicyCancelPendingCommand extends ContainerAwareCommand
         $policyService = $this->getContainer()->get('app.policy');
         if ($isDaily) {
             $pending = $policyService->getPoliciesPendingCancellation(true, $prefix);
+            $lines = [];
             foreach ($pending as $policy) {
-                $output->writeln(sprintf(
+                $lines[] = sprintf(
                     'Policy %s is pending cancellation on %s',
                     $policy->getPolicyNumber(),
                     $policy->getPendingCancellation()->format(\DateTime::ATOM)
-                ));
+                );
+                $output->writeln($lines);
             }
+            $mailer = $this->getContainer()->get('app.mailer');
+            $mailer->send('Policy Pending Cancellations Report', 'tech@so-sure.com', implode('<br />', $lines));
         } else {
+            $lines = [];
             foreach ($cancelled as $policy) {
-                $output->writeln(sprintf('Cancelled Policy %s', $policy->getPolicyNumber()));
+                $lines[] = sprintf('Cancelled Policy %s', $policy->getPolicyNumber());
+                $output->writeln($lines);
+            }
+            if (count($lines) > 0) {
+                $mailer = $this->getContainer()->get('app.mailer');
+                $mailer->send('Policy Pending Cancellations - Cancelled', 'tech@so-sure.com', implode('<br />', $lines));
             }
         }
 
