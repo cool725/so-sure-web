@@ -112,6 +112,8 @@ class MixpanelService
                 'PhantomJS',
                 'SeznamBot',
                 'Googlebot',
+                'Sogou web spider',
+                'Baiduspider',
             ])) {
                 return;
             }

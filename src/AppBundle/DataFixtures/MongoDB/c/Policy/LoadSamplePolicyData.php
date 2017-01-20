@@ -54,14 +54,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         // Sample user for apple
         $user = $this->newUser('julien+apple@so-sure.com', true);
-        $user->setPlainPassword('test');
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
         $this->newPolicy($manager, $user, $count++);
 
         // claimed user test data
         $networkUser = $this->newUser('user-network-claimed@so-sure.com', true);
-        $networkUser->setPlainPassword('w3ares0sure!');
+        $networkUser->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $networkUser->setEnabled(true);
         $manager->persist($networkUser);
         $this->newPolicy($manager, $networkUser, $count++, false);
