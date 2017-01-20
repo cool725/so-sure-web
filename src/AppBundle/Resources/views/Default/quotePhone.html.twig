@@ -43,7 +43,7 @@
                 <div class="col-md-5">
                     <span class="h4"><strong>Device</strong></span>
                     <p>
-                        {{ phone }}
+                        <span class="device">{{ phone }}</span>
                         {% if phones | length > 1 %}
                                 <br>
                                 <small>or do you have:
@@ -62,7 +62,7 @@
                     <span class="h4"><strong>AND HERE’S THE COOL BIT…</strong></span>
                     <p>Insure and connect with friends to build a reward pot. At the end of the year, if no one claims, we’ll give you back:</p>
 
-                    {% set start_friends = phone_price.maxConnections - 9 %}
+                    {% set start_friends = phone_price.maxConnections %}
                     {% set start_value = start_friends * connection_value %}
                     {% if start_value > phone_price.maxPot %}
                         {% set start_value = phone_price.maxPot %}
@@ -94,99 +94,33 @@
                 </div>
 
             </div>
-            <div class="quote-card--footer"></div>
+            <div class="quote-card--footer"></div>            
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <p><a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">why we're better</a>
+                <a class="btn btn-success btn-rounded btn-quote-card" href="{{ path('purchase') }}" role="button">Insure your phone</a></p>
+                <p class="text-center"><small>Not your device? Select another phone <a href="/#get-quote">here</a>.</small></p>
+            </div>
         </div>
 
     </section>
-
-    <!-- <section class="background-image-light vertical-align-wrap">
-        <div class="container vertical-align-middle">
-            <div class="row">
-                <div id="quote" class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1 view-quote">
-                    <div class="panel panel-primary">
-                        <div class="row">
-                            
-                            <div class="col-xs-12 col-md-6 view-quote--left">
-                                <p>Device</p>
-                                <h4>{{ phone }}</h4>
-                                {% if phones | length > 1 %}
-                                    <div class="memory-select-text">
-                                        Or do you have:
-                                        {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-link">{{ phone_mem.memory }}GB</a>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}                  
-                                <p>Monthly Cost</p>
-                                <h2>£{{ phone_price.monthlyPremiumPrice }}</h2>
-                                <p>What You Could Get Back <a href="#how-it-works"><i class="fa fa-question-circle"></i></a></p>
-                                <h4>£{{ phone_price.maxPot }} with {{ phone_price.maxConnections }} connections</h4>
-                                <p>Covered for</p>
-                                <h4>Theft, Loss, Accidental Damage &amp; Breakdown</h4>
-                                <p><a href="#" data-toggle="modal" data-target="#more-info">And more (includes excess information)</a></p>
-                                {{ form_start(buy_form) }}
-                                    {{ form_widget(buy_form.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-primary btn-rounded view-quote--btn'}}) }}
-                                    <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow view-quote--btn" href="#">How it works</a>
-                                {{ form_end(buy_form)}}
-                                <div class="visible-xs-block">
-                                    {% if phone.isITunes %}
-                                    <div>
-                                        <h4>OR</h4>
-                                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('quotepage') }}">
-                                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-                                        </a> 
-                                    </div>
-                                    {% endif %}
-                                    {% if phone.isGooglePlay %}
-                                    <div>
-                                        <h4>OR</h4>
-                                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('quotepage') }}">
-                                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-                                        </a>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-xs-12 col-md-6 view-quote--right">
-                                <ul class="text-left list-unstyled view-quote-list">
-                                    <li>
-                                        <h3><i class="fa fa-check-circle fa-lg view-quote--ticks" aria-hidden="true"></i> Get Up to 80% Money Back</h3>
-                                        <p>Connect to friends to get up to 80% money back at the end of the year provided none of you claim.</p>
-                                    </li>
-                                    <li>
-                                        <h3><i class="fa fa-check-circle fa-lg view-quote--ticks" aria-hidden="true"></i> 24/7 Claims Support</h3>
-                                        <p>We know that accidents can happen at any time. That's why our UK based claims team are here for you whenever you need them.</p>
-                                    </li>
-                                    <li>
-                                        <h3><i class="fa fa-check-circle fa-lg view-quote--ticks" aria-hidden="true"></i> Next-working Day Replacement</h3>
-                                        <p>Some insurers can take up to 3 weeks to get you a new phone. We aim to get you a one the next working day once you claim is approved.</p>
-                                    </li>
-                                </ul>
-                            </div>
-
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 view-quote--footer">
-                                <p class="text-center">Not your device? Select another phone <a href="/#get-quote">here</a>.</p>
-                            </div>
-                        </div>
-                    </div>                    
-                </div>
-            </div>
-        </div>
-    </section> -->
 
     <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-8">
-                    <h3><small class="hidden-xs">Device</small> <span>{{ phone }}</span></h3>
+                    <h3><span>{{ phone }}</span></h3>
                 </div>
                 <div class="col-xs-12 col-sm-3 col-md-2">
-                    <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span> <small>a month</small></h3> 
+                    <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span><small>/month</small></h3> 
                 </div>
                 <div class="col-xs-12 col-sm-3 col-md-2">
-                    <a class="btn btn-primary btn-rounded" href="{{ path('purchase') }}">BUY NOW</a>
+
+		{{ form_start(buy_form) }}
+		    {{ form_widget(buy_form.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
+		{{ form_end(buy_form)}}
                 </div>
             </div>
         </div>

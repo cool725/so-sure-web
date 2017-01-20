@@ -28,7 +28,7 @@
     // Sticky Banner - For quotes TODO make modular
 
     var quoteBox = $('#quote');
-    var footer   = $('.footer');
+    var quoteBoxHeight = quoteBox.height();
 
     $(window).scroll(function(event) {
 
@@ -36,7 +36,7 @@
 
             var quoteBoxBottom = quoteBox.offset().top;
 
-            if ($(window).scrollTop() > quoteBoxBottom + 400) {
+            if ($(window).scrollTop() > quoteBoxBottom + quoteBoxHeight) {
 
                 $('#quote-banner').fadeIn();                
 
