@@ -67,29 +67,30 @@
                         {% set start_value = phone_price.maxPot %}
                     {% endif %}
 
-                    <p class="no-of-friends">
+                    <div class="no-of-friends">
                         We give you the free option to invite and connect with:
-                    </p>
 
-                    <input
-                    type="text"
-                    class="span2"
-                    value=""
-                    data-slider-min="0"
-                    data-slider-max="{{ phone_price.maxConnections }}"
-                    data-slider-maxpot="{{ phone_price.maxPot }}"
-                    data-slider-step="1"
-                    data-slider-value="{{ start_friends }}"
-                    data-slider-id="connection-slider"
-                    id="slider-value"
-                    data-slider-handle="round"
-                    data-slider-connection-value="{{ connection_value }}"/>
+                        <input
+                        type="text"
+                        class="span2"
+                        value=""
+                        data-slider-min="0"
+                        data-slider-max="{{ phone_price.maxConnections }}"
+                        data-slider-maxpot="{{ phone_price.maxPot }}"
+                        data-slider-step="1"
+                        data-slider-value="{{ start_friends }}"
+                        data-slider-id="connection-slider"
+                        id="slider-value"
+                        data-slider-handle="round"
+                        data-slider-connection-value="{{ connection_value }}"/>
 
-                    <strong id="num_friends">
-                        {{ start_friends }} friend
-                    </strong>
+                        <strong id="num_friends">
+                            {{ start_friends }} friend
+                        </strong>
+                    </div>
 
-                    <p>Then at the end of the year, if no one claims, we’ll give you back:</p>
+                    
+                    <span>Then at the end of the year, if no one claims, we’ll give you back:</span>
 
                     <div class="reward-pot">
                         <div id="money_back" class="reward-pot--value">£{{ start_value }}</div>
@@ -98,7 +99,6 @@
                 </div>
 
             </div>
-<!--             <div class="quote-card--footer"></div>   -->
         </div>
 
         <div class="row">

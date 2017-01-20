@@ -24,7 +24,7 @@
 
 .reward-pot {
     width: 100px; height: 125px;
-    margin: 0 auto 15px;
+    margin: 0 auto;
     line-height: 125px;
     text-align: center;
     background-image: url('https://cdn.so-sure.com/images/quote-page/pot.png');
