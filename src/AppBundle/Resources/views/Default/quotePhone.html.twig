@@ -13,19 +13,19 @@
     {% javascripts
     '@AppBundle/Resources/public/js/Default/index.js'
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
-    'bundles/app/js/Default/slider.js'    
+    'bundles/app/js/Default/slider.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets 
-    'bundles/app/css/Default/index.css' 
-    'bundles/app/css/Default/quotePhone.css' 
-    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css' 
-    'bundles/app/css/Default/connections.css' 
-    'bundles/app/css/Default/scrollindicator.css' 
+    {% stylesheets
+    'bundles/app/css/Default/index.css'
+    'bundles/app/css/Default/quotePhone.css'
+    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
+    'bundles/app/css/Default/connections.css'
+    'bundles/app/css/Default/scrollindicator.css'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -36,7 +36,7 @@
 
         <h1><strong>Your quote for your {{ phone }}</strong></h1>
         <p class="lead">Delivered to you quicker than you'll get it anywhere else - that's a promise.</p>
-            
+
         <div class="quote-card">
             <div class="row">
 
@@ -49,9 +49,9 @@
                                 <small>or do you have:
                                     {% for phone_mem in phones if phone_mem.id != phone.id %}
                                         <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-memory">{{ phone_mem.memory }}GB</a>
-                                    {% endfor %}                   
-                                </small>             
-                        {% endif %} 
+                                    {% endfor %}
+                                </small>
+                        {% endif %}
                     </p>
                     <span class="h4"><strong>Covered for</strong></span>
                     <p>Theft, Loss, Accidental Damage &amp; Breakdown <br><a href="#" data-toggle="modal" data-target="#more-info"><small>More details (including excess)</small></a></p>
@@ -67,6 +67,10 @@
                         {% set start_value = phone_price.maxPot %}
                     {% endif %}
 
+                    <p class="no-of-friends">
+                        We give you the free option to invite and connect with:
+                    </p>
+
                     <input
                     type="text"
                     class="span2"
@@ -79,15 +83,13 @@
                     data-slider-id="connection-slider"
                     id="slider-value"
                     data-slider-handle="round"
-                    data-slider-connection-value="{{ connection_value }}"/>                    
-                    <p class="no-of-friends">
-                        Connect with:
-                        <strong id="num_friends">
-                            {{ start_friends }} friend
-                        </strong>
-                    </p>
+                    data-slider-connection-value="{{ connection_value }}"/>
 
-                    <p>At the end of the year, if no one claims, we’ll give you back</p>
+                    <strong id="num_friends">
+                        {{ start_friends }} friend
+                    </strong>
+
+                    <p>Then at the end of the year, if no one claims, we’ll give you back:</p>
 
                     <div class="reward-pot">
                         <div id="money_back" class="reward-pot--value">£{{ start_value }}</div>
@@ -96,7 +98,7 @@
                 </div>
 
             </div>
-<!--             <div class="quote-card--footer"></div>   -->          
+<!--             <div class="quote-card--footer"></div>   -->
         </div>
 
         <div class="row">
@@ -116,16 +118,16 @@
                     <h3><span>{{ phone }}</span></h3>
                 </div>
                 <div class="col-xs-12 col-sm-3 col-md-2">
-                    <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span><small>/month</small></h3> 
+                    <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span><small>/month</small></h3>
                 </div>
                 <div class="col-xs-12 col-sm-3 col-md-2">
-                    <a class="btn btn-success btn-rounded" href="{{ path('purchase') }}" role="button">Insure your phone</a>          
+                    <a class="btn btn-success btn-rounded" href="{{ path('purchase') }}" role="button">Insure your phone</a>
                 </div>
             </div>
         </div>
     </section>
 
-    {% include 'AppBundle::Default/howItWorks.html.twig' %}   
+    {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
     <section class="footer-cta alt-brand-gradient">
         <div class="container">
