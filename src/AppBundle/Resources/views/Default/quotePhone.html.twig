@@ -121,10 +121,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-8">
-                    <h3><span>{{ phone }}</span></h3>
+                    <h3><small>Device</small> <span>{{ phone }}</span></h3>
                 </div>
                 <div class="col-xs-12 col-sm-3 col-md-2">
-                    <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span><small>/month</small></h3>
+                    <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span> <small>/month</small></h3>
                 </div>
                 <div class="col-xs-12 col-sm-3 col-md-2">
 
@@ -138,6 +138,8 @@
     </section>
 
     {% include 'AppBundle::Default/howItWorks.html.twig' %}
+
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
 
     <section class="footer-cta alt-brand-gradient">
         <div class="container">
