@@ -456,6 +456,7 @@ services:
             redis:          "@snc_redis.default"
             mixpanel:       "@mixpanel"
             requestService: "@app.request"
+            environment:    "%kernel.environment%"
 
     mixpanel:
         class:   Mixpanel

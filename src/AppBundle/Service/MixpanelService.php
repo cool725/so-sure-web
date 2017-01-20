@@ -36,29 +36,43 @@ class MixpanelService
     /** @var RequestService */
     protected $requestService;
 
+    protected $environment;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param                 $redis
      * @param Mixpanel        $mixpanel
      * @param RequestService  $requestService
+     * @param                 $environment
      */
     public function __construct(
         DocumentManager  $dm,
         LoggerInterface $logger,
         $redis,
         Mixpanel $mixpanel,
-        RequestService $requestService
+        RequestService $requestService,
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->redis = $redis;
         $this->mixpanel = $mixpanel;
         $this->requestService = $requestService;
+        $this->environment = $environment;
+    }
+
+    private function canSend()
+    {
+        return $this->environment != 'test';
     }
 
     public function setPersonProperties(array $personProperties, $setOnce = false, $user = null)
     {
+        if (!$this->canSend()) {
+            return;
+        }
+
         if (!$user) {
             $user = $this->requestService->getUser();
         }
@@ -102,6 +116,10 @@ class MixpanelService
         $user = null,
         $addUtm = false
     ) {
+        if (!$this->canSend()) {
+            return;
+        }
+
         $userAgentDetails = null;
         if ($userAgent = $this->requestService->getUserAgent()) {
             $parser = Parser::create();
@@ -198,6 +216,10 @@ class MixpanelService
 
     public function register(User $user = null, $trackingId = null)
     {
+        if (!$this->canSend()) {
+            return;
+        }
+
         if (!$trackingId) {
             $trackingId = $this->requestService->getTrackingId();
         }
