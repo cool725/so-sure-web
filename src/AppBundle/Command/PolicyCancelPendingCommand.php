@@ -63,7 +63,11 @@ class PolicyCancelPendingCommand extends ContainerAwareCommand
             }
             if (count($lines) > 0) {
                 $mailer = $this->getContainer()->get('app.mailer');
-                $mailer->send('Policy Pending Cancellations - Cancelled', 'tech@so-sure.com', implode('<br />', $lines));
+                $mailer->send(
+                    'Policy Pending Cancellations - Cancelled',
+                    'tech@so-sure.com',
+                    implode('<br />', $lines)
+                );
             }
         }
 
