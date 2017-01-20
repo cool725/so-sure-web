@@ -59,47 +59,49 @@
                 </div>
 
                 <div class="col-md-7">
-                    <span class="h4"><strong>AND HERE’S THE COOL BIT…</strong></span>
-                    <p>Insure and connect with friends to build a reward pot. At the end of the year, if no one claims, we’ll give you back:</p>
+                    <span class="h4"><strong>AND HERE'S THE COOL BIT... </strong></span>
 
-                    {% set start_friends = phone_price.maxConnections %}
+                    {% set start_friends = phone_price.maxConnections - phone_price.maxConnections + 1  %}
                     {% set start_value = start_friends * connection_value %}
                     {% if start_value > phone_price.maxPot %}
                         {% set start_value = phone_price.maxPot %}
                     {% endif %}
 
+                    <input
+                    type="text"
+                    class="span2"
+                    value=""
+                    data-slider-min="0"
+                    data-slider-max="{{ phone_price.maxConnections }}"
+                    data-slider-maxpot="{{ phone_price.maxPot }}"
+                    data-slider-step="1"
+                    data-slider-value="{{ start_friends }}"
+                    data-slider-id="connection-slider"
+                    id="slider-value"
+                    data-slider-handle="round"
+                    data-slider-connection-value="{{ connection_value }}"/>                    
+                    <p class="no-of-friends">
+                        Connect with:
+                        <strong id="num_friends">
+                            {{ start_friends }} friend
+                        </strong>
+                    </p>
+
+                    <p>At the end of the year, if no one claims, we’ll give you back</p>
+
                     <div class="reward-pot">
                         <div id="money_back" class="reward-pot--value">£{{ start_value }}</div>
                     </div>
 
-                        <input
-                            type="text"
-                            class="span2"
-                            value=""
-                            data-slider-min="0"
-                            data-slider-max="{{ phone_price.maxConnections }}"
-                            data-slider-maxpot="{{ phone_price.maxPot }}"
-                            data-slider-step="1"
-                            data-slider-value="{{ start_friends }}"
-                            data-slider-id="connection-slider"
-                            id="slider-value"
-                            data-slider-handle="round"
-                            data-slider-connection-value="{{ connection_value }}"/>
-
-
-                    <p id="num_friends" class="no-of-friends text-center">
-                        <strong>{{ start_friends }} friends</strong>
-                    </p>
-
                 </div>
 
             </div>
-            <div class="quote-card--footer"></div>            
+<!--             <div class="quote-card--footer"></div>   -->          
         </div>
 
         <div class="row">
             <div class="col-md-12 text-center">
-                <p><a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">why we're better</a>
+                <p><a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">Why we're better</a>
                 <a class="btn btn-success btn-rounded btn-quote-card" href="{{ path('purchase') }}" role="button">Insure your phone</a></p>
                 <p class="text-center"><small>Not your device? Select another phone <a href="/#get-quote">here</a>.</small></p>
             </div>
