@@ -1611,11 +1611,11 @@ abstract class Policy
         return in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]);
     }
 
-    public function getSentInvitations()
+    public function getSentInvitations($onlyProcessed = true)
     {
         $userId = $this->getUser() ? $this->getUser()->getId() : null;
-        return array_filter($this->getInvitationsAsArray(), function ($invitation) use ($userId) {
-            if ($invitation->isProcessed()) {
+        return array_filter($this->getInvitationsAsArray(), function ($invitation) use ($userId, $onlyProcessed) {
+            if ($onlyProcessed && $invitation->isProcessed()) {
                 return false;
             }
 

@@ -26,18 +26,6 @@ class DoctrineLeadListener
         }
     }
 
-    public function preUpdate(PreUpdateEventArgs $eventArgs)
-    {
-        $document = $eventArgs->getDocument();
-        if ($document instanceof Lead) {
-            if ($eventArgs->hasChangedField('email') &&
-                strlen(trim($eventArgs->getOldValue('email'))) > 0 &&
-                strtolower($eventArgs->getOldValue('email')) != strtolower($eventArgs->getNewValue('email'))) {
-                $this->triggerEvent($document, LeadEvent::EVENT_UPDATED);
-            }
-        }
-    }
-
     public function postUpdate(LifecycleEventArgs $eventArgs)
     {
         $document = $eventArgs->getDocument();

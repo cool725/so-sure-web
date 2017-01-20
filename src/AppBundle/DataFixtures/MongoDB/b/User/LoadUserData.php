@@ -11,6 +11,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 // @codingStandardsIgnoreFile
 class LoadUserData implements FixtureInterface, ContainerAwareInterface
 {
+    const DEFAULT_PASSWORD = 'w3ares0sure!';
+
     /**
      * @var ContainerInterface
      */
@@ -23,15 +25,15 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
 
     public function load(ObjectManager $manager)
     {
-        $this->newUser('patrick@so-sure.com', 'w3ares0sure!', 'Patrick', 'McAndrew', ['ROLE_ADMIN']);
-        $this->newUser('dylan@so-sure.com', 'w3ares0sure!', 'Dylan', 'Bourguignon', ['ROLE_ADMIN']);
-        $this->newUser('jamie@so-sure.com', 'w3ares0sure!', 'Jamie', 'Gunson', ['ROLE_ADMIN']);
-        $this->newUser('ted@so-sure.com', 'w3ares0sure!', 'Ted', 'Eriksson', ['ROLE_ADMIN']);
-        $this->newUser('julien@so-sure.com', 'w3ares0sure!', 'Julien', 'Champagne', ['ROLE_ADMIN']);
-        $this->newUser('nick@so-sure.com', 'w3ares0sure!', 'Nick', 'Waller', ['ROLE_ADMIN']);
-        $this->newUser('rajiv@so-sure.com', 'w3ares0sure!', 'Rajiv', 'Tanna', ['ROLE_ADMIN']);
-        $this->newUser('claims@so-sure.com', 'w3ares0sure!', 'so-sure', 'Claims', ['ROLE_CLAIMS']);
-        $this->newUser('employee@so-sure.com', 'w3ares0sure!', 'so-sure', 'Employee', ['ROLE_EMPLOYEE']);
+        $this->newUser('patrick@so-sure.com', self::DEFAULT_PASSWORD, 'Patrick', 'McAndrew', ['ROLE_ADMIN']);
+        $this->newUser('dylan@so-sure.com', self::DEFAULT_PASSWORD, 'Dylan', 'Bourguignon', ['ROLE_ADMIN']);
+        $this->newUser('jamie@so-sure.com', self::DEFAULT_PASSWORD, 'Jamie', 'Gunson', ['ROLE_ADMIN']);
+        $this->newUser('ted@so-sure.com', self::DEFAULT_PASSWORD, 'Ted', 'Eriksson', ['ROLE_ADMIN']);
+        $this->newUser('julien@so-sure.com', self::DEFAULT_PASSWORD, 'Julien', 'Champagne', ['ROLE_ADMIN']);
+        $this->newUser('nick@so-sure.com', self::DEFAULT_PASSWORD, 'Nick', 'Waller', ['ROLE_ADMIN']);
+        $this->newUser('rajiv@so-sure.com', self::DEFAULT_PASSWORD, 'Rajiv', 'Tanna', ['ROLE_ADMIN']);
+        $this->newUser('claims@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Claims', ['ROLE_CLAIMS']);
+        $this->newUser('employee@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Employee', ['ROLE_EMPLOYEE']);
         $manager->flush();
         // $this->valdiateGedmoLogging();
     }

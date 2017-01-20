@@ -110,6 +110,7 @@ services:
             push:                 "@app.push"
             environment:          "%kernel.environment%"
             dispatcher:           "@event_dispatcher"
+            mixpanel:             "@app.mixpanel"
 
     app.digits:
         class: AppBundle\Service\DigitsService
@@ -227,13 +228,19 @@ services:
             googleAppDownload: "%google_app_download%"
             appleAppDownload": "%apple_app_download%"
 
-    app.twig.branch:
-        class: AppBundle\Service\BranchTwigExtension
+    app.request:
+        class: AppBundle\Service\RequestService
         arguments:
-            branch:       "@app.branch"
             requestStack: "@request_stack"
             logger:       "@logger"
             tokenStorage: "@security.token_storage"
+
+    app.twig.branch:
+        class: AppBundle\Service\BranchTwigExtension
+        arguments:
+            branch:         "@app.branch"
+            logger:         "@logger"
+            requestService: "@app.request"
         public: false
         tags:
             - { name: twig.extension }
@@ -441,6 +448,21 @@ services:
             logger:  "@logger"
             apiKey:  "%appannie_apikey%"
 
+    app.mixpanel:
+        class: AppBundle\Service\MixpanelService
+        arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
+            logger:         "@logger"
+            redis:          "@snc_redis.default"
+            mixpanel:       "@mixpanel"
+            requestService: "@app.request"
+            environment:    "%kernel.environment%"
+
+    mixpanel:
+        class:   Mixpanel
+        factory: ['Mixpanel', getInstance]
+        arguments: ['%mixpanel_apitoken%']
+
     app.voter.user:
         class: AppBundle\Security\UserVoter
         tags:
@@ -475,7 +497,6 @@ services:
             dispatcher: "@event_dispatcher"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
-            -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
 
     doctrine.listener.user:
@@ -595,8 +616,11 @@ services:
         arguments:
             logger:        "@logger"
             requestStack:  "@request_stack"
+            dispatcher:    "@event_dispatcher"
+            mixpanel:      "@app.mixpanel"
         tags:
             -  { name: kernel.event_listener, event: security.interactive_login, method: onSecurityInteractiveLogin }
+            -  { name: kernel.event_listener, event: security.interactive_login.actual, method: onActualSecurityInteractiveLogin }
 
     app.listener.mailer:
         class:  AppBundle\Listener\MailerListener

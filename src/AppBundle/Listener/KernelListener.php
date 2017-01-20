@@ -8,11 +8,10 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use AppBundle\Classes\SoSure;
 
 class KernelListener
 {
-    const SOSURE_EMPLOYEE_COOKIE_NAME = 'sosure-employee';
-    const SOSURE_EMPLOYEE_COOKIE_LENGTH = 604800; // 7 days
     protected $tokenStorage;
     protected $authChecker;
     protected $adminCookieValue;
@@ -42,7 +41,13 @@ class KernelListener
         $campaign = $request->query->get('utm_campaign');
         if ($source || $medium || $campaign) {
             $session = $request->getSession();
-            $session->set('utm', serialize(['source' => $source, 'medium' => $medium, 'campaign' => $campaign]));
+            $session->set('utm', serialize([
+                'source' => $source,
+                'medium' => $medium,
+                'campaign' => $campaign,
+                'term' => $request->query->get('utm_term'),
+                'content' => $request->query->get('utm_content'),
+            ]));
         }
 
         $referer = $request->headers->get('referer');
@@ -56,7 +61,40 @@ class KernelListener
     {
         $response = $event->getResponse();
         $request  = $event->getRequest();
+        $this->setSoSureTrackingCookie($request, $response);
+        $this->setSoSureEmployeeCookie($response);
+    }
 
+    private function setSoSureTrackingCookie($request, $response)
+    {
+        $tracking = null;
+        $session = $request->getSession();
+        if ($session->isStarted()) {
+            $tracking = $session->get(SoSure::SOSURE_TRACKING_SESSION_NAME);
+        }
+
+        if (!$tracking) {
+            return;
+        }
+        $secure = in_array($this->environment, ['prod', 'staging']);
+
+        // create/update cookie
+        $cookie = new Cookie(
+            SoSure::SOSURE_TRACKING_COOKIE_NAME,
+            urlencode($tracking),
+            time() + SoSure::SOSURE_TRACKING_COOKIE_LENGTH,
+            '/',
+            $this->domain,
+            $secure,
+            true
+        );
+
+        // set cookie in response
+        $response->headers->setCookie($cookie);
+    }
+
+    private function setSoSureEmployeeCookie($response)
+    {
         try {
             $token = $this->tokenStorage->getToken();
             if (!$token || !$token->getUser() || !$token->getUser() instanceof UserInterface) {
@@ -79,13 +117,13 @@ class KernelListener
             return;
         }
 
-        $secure = $this->environment == 'prod';
+        $secure = in_array($this->environment, ['prod', 'staging']);
 
         // create/update cookie
         $cookie = new Cookie(
-            self::SOSURE_EMPLOYEE_COOKIE_NAME,
+            SoSure::SOSURE_EMPLOYEE_COOKIE_NAME,
             urlencode($this->adminCookieValue),
-            time() + self::SOSURE_EMPLOYEE_COOKIE_LENGTH,
+            time() + SoSure::SOSURE_EMPLOYEE_COOKIE_LENGTH,
             '/',
             $this->domain,
             $secure,

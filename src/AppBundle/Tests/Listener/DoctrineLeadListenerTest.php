@@ -42,18 +42,6 @@ class DoctrineLeadListenerTest extends WebTestCase
     {
     }
 
-    public function testPreUpdate()
-    {
-        $lead = new Lead();
-        $lead->setEmail(static::generateEmail('pre', $this));
-        static::$dm->persist($lead);
-        $listener = new DoctrineLeadListener(null);
-
-        $changeSet = ['confirmationToken' => ['123', null], 'passwordRequestedAt' => [new \DateTime(), null]];
-        $events = new PreUpdateEventArgs($lead, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-    }
-
     public function testPostUpdate()
     {
         $lead = new Lead();

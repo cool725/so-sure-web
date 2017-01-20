@@ -3636,4 +3636,27 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         return $multipay;
     }
+
+    public function testAuthNoActualSecurityInteractiveLoginEvent()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testAuthNoSecurityInteractiveLoginEvent', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = '/api/v1/auth/ping?_method=GET';
+        self::$client->enableProfiler();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+
+        /** @var EventDataCollector $eventDataCollector */
+        $eventDataCollector = self::$client->getProfile()->getCollector('events');
+        $listeners = $eventDataCollector->getCalledListeners();
+        // @codingStandardsIgnoreStart
+        $this->assertTrue(isset($listeners['security.interactive_login.AppBundle\Listener\SecurityListener::onSecurityInteractiveLogin']));
+        $this->assertFalse(isset($listeners['security.interactive_login.actual.AppBundle\Listener\SecurityListener::onActualSecurityInteractiveLogin']));
+        // @codingStandardsIgnoreEnd
+    }
 }

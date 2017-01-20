@@ -53,11 +53,26 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         // Sample user for apple
-        $user = $this->newUser('julien+apple@so-sure.com');
-        $user->setPlainPassword('test');
+        $user = $this->newUser('julien+apple@so-sure.com', true);
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
-        $this->newPolicy($manager, $user, $count);
+        $this->newPolicy($manager, $user, $count++);
+
+        // claimed user test data
+        $networkUser = $this->newUser('user-network-claimed@so-sure.com', true);
+        $networkUser->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $networkUser->setEnabled(true);
+        $manager->persist($networkUser);
+        $this->newPolicy($manager, $networkUser, $count++, false);
+        //\Doctrine\Common\Util\Debug::dump($networkUser);
+
+        $user = $this->newUser('user-claimed@so-sure.com', true);
+        $user->setPlainPassword('w3ares0sure!');
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $this->newPolicy($manager, $user, $count++, true);
+        $this->addConnections($manager, $user, [$networkUser], 1);
 
         $manager->flush();
     }
@@ -79,7 +94,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $users;
     }
 
-    private function newUser($email)
+    private function newUser($email, $forceEmailAddress = false)
     {
         $user = new User();
         $user->setFirstName($this->faker->firstName);
@@ -93,17 +108,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
 
-        // Use the first/last name as the user portion of the email address so they vaugely match
-        // Keep the random portion of the email domain though
-        $rand = rand(1, 3);
-        if ($rand == 1) {
-            $email = sprintf("%s.%s@%s", $user->getFirstName(), $user->getLastName(), explode("@", $email)[1]);
-        } elseif ($rand == 2) {
-            $email = sprintf("%s%s@%s", substr($user->getFirstName(), 0, 1), $user->getLastName(), explode("@", $email)[1]);
-        } elseif ($rand == 3) {
-            $email = sprintf("%s%s%2d@%s", substr($user->getFirstName(), 0, 1), $user->getLastName(), rand(1, 99), explode("@", $email)[1]);
+        if (!$forceEmailAddress) {
+            // Use the first/last name as the user portion of the email address so they vaugely match
+            // Keep the random portion of the email domain though
+            $rand = rand(1, 3);
+            if ($rand == 1) {
+                $email = sprintf("%s.%s@%s", $user->getFirstName(), $user->getLastName(), explode("@", $email)[1]);
+            } elseif ($rand == 2) {
+                $email = sprintf("%s%s@%s", substr($user->getFirstName(), 0, 1), $user->getLastName(), explode("@", $email)[1]);
+            } elseif ($rand == 3) {
+                $email = sprintf("%s%s%2d@%s", substr($user->getFirstName(), 0, 1), $user->getLastName(), rand(1, 99), explode("@", $email)[1]);
+            }
         }
-        $user->setEmail($email);
+        $user->setEmail(str_replace(' ', '', $email));
 
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
@@ -131,7 +148,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $phone;
     }
 
-    private function newPolicy($manager, $user, $count)
+    private function newPolicy($manager, $user, $count, $claim = null, $promo = null)
     {
         $phone = $this->getRandomPhone($manager);
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
@@ -145,10 +162,22 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setImei($this->generateRandomImei());
         $policy->init($user, $latestTerms);
         $policy->createAddSCode($count);
-        if (rand(0, 3) == 0) {
-            $this->addClaim($dm, $policy);
+
+        $claimStatus = null;
+        $claimType = null;
+        if ($claim === null) {
+            $claim = rand(0, 3) == 0;
+        } else {
+            $claimStatus = Claim::STATUS_SETTLED;
+            $claimType = Claim::TYPE_LOSS;
         }
-        if (rand(0, 1) == 0) {
+        if ($claim) {
+            $this->addClaim($dm, $policy, $claimType, $claimStatus);
+        }
+        if ($promo === null) {
+            $promo = rand(0, 1) == 0;
+        }
+        if ($promo) {
             $policy->setPromoCode(Policy::PROMO_LAUNCH);
         }
 
@@ -192,10 +221,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policyService->generateScheduledPayments($policy, $startDate);
     }
 
-    private function addConnections($manager, $userA, $users)
+    private function addConnections($manager, $userA, $users, $connections = null)
     {
         $policyA = $userA->getPolicies()[0];
-        $connections = rand(0, $policyA->getMaxConnections() - 2);
+        if ($connections === null) {
+            $connections = rand(0, $policyA->getMaxConnections() - 2);
+        }
         //$connections = rand(0, 3);
         for ($i = 0; $i < $connections; $i++) {
             $userB = $users[rand(0, count($users) - 1)];
@@ -238,7 +269,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
     }
 
-    protected function addClaim($manager, Policy $policy)
+    protected function addClaim($manager, Policy $policy, $type = null, $status = null)
     {
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
@@ -249,8 +280,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $date->add(new \DateInterval(sprintf('P%dD', rand(0,4))));
         $claim->setNotificationDate(clone $date);
 
-        $claim->setType($this->getRandomClaimType());
-        $claim->setStatus($this->getRandomStatus($claim->getType()));
+        if (!$type) {
+            $type = $this->getRandomClaimType();
+        }
+        if (!$status) {
+            $status = $this->getRandomStatus($type);
+        }
+        $claim->setType($type);
+        $claim->setStatus($status);
         if ($claim->isOpen()) {
             $claim->setDaviesStatus('open');
         } else {
@@ -274,6 +311,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $claim->setPhoneReplacementCost($phone->getReplacementPriceOrSuggestedReplacementPrice());
             $claim->setUnauthorizedCalls(rand(0, 20000) / 100);
             $claim->setAccessories(rand(0, 20000) / 100);
+            $claim->setClosedDate(new \DateTime());
         }
         $claim->setDescription($this->getRandomDescription($claim));
         $claim->setIncurred(array_sum([$claim->getClaimHandlingFees(), $claim->getTransactionFees(), $claim->getAccessories(),
