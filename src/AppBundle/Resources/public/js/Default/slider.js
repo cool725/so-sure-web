@@ -32,7 +32,7 @@ var setConnectionText = function() {
         save_value = maxpot_value;
     }
     var potential_value = roundToTwo(maxpot_value - save_value);
-    $('#num_friends').text(slider.getValue() + ' friends');
+    $('#num_friends').text(slider.getValue() + (slider.getValue() == 1 ? ' friend' : ' friends'));
     $('#money_back').text('£' + save_value);
 }
 
