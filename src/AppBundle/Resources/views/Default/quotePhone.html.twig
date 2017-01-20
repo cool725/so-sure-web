@@ -61,7 +61,11 @@
                 <div class="col-md-7">
                     <span class="h4"><strong>AND HERE'S THE COOL BIT... </strong></span>
 
-                    {% set start_friends = phone_price.maxConnections - phone_price.maxConnections + 1  %}
+                    {# set start_friends = phone_price.maxConnections - 1  #}
+                    {% set start_friends = 4 %}
+                    {% if start_friends > phone_price.maxConnections %}
+                        {% set start_friends = phone_price.maxConnections %}
+                    {% endif %}
                     {% set start_value = start_friends * connection_value %}
                     {% if start_value > phone_price.maxPot %}
                         {% set start_value = phone_price.maxPot %}
@@ -71,7 +75,7 @@
                         We give you the free option to invite and connect with: <br>
 
                         <div class="text-center h4">
-                            <strong id="num_friends">{{ start_friends }} friend</strong>
+                            <strong id="num_friends">{{ start_friends }} friend{% if start_friends > 1 %}s{% endif %}</strong>
                         </div>                        
 
                         <input
@@ -105,7 +109,7 @@
             <div class="col-md-12 text-center">
                 <p>
                 {{ form_start(buy_form) }}
-                    <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">How it works</a>
+                    <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#how-it-works" role="button">How it works</a>
                     {{ form_widget(buy_form.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded btn-quote-card'}}) }}
                 {{ form_end(buy_form)}}
                 </p>
