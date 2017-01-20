@@ -34,8 +34,8 @@
 
     <section id="quote" class="quote-container section--pad">
 
-        <h1><strong>Your quote for your {{ phone }}</strong></h1>
-        <p class="lead">Delivered to you quicker than you'll get it anywhere else - that's a promise.</p>
+        <h1>The only cover you'll ever need</h1>
+        <p class="lead">One price. Complete cover. Worldwide.</p>
 
         <div class="quote-card">
             <div class="row">
@@ -68,7 +68,11 @@
                     {% endif %}
 
                     <div class="no-of-friends">
-                        We give you the free option to invite and connect with:
+                        We give you the free option to invite and connect with: <br>
+
+                        <div class="text-center h4">
+                            <strong id="num_friends">{{ start_friends }} friend</strong>
+                        </div>                        
 
                         <input
                         type="text"
@@ -83,13 +87,9 @@
                         id="slider-value"
                         data-slider-handle="round"
                         data-slider-connection-value="{{ connection_value }}"/>
-
-                        <strong id="num_friends">
-                            {{ start_friends }} friend
-                        </strong>
                     </div>
 
-                    
+
                     <span>Then at the end of the year, if no one claims, we’ll give you back:</span>
 
                     <div class="reward-pot">
@@ -103,7 +103,7 @@
 
         <div class="row">
             <div class="col-md-12 text-center">
-                <p><a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">Why we're better</a>
+                <p><a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">How it works</a>
                 <a class="btn btn-success btn-rounded btn-quote-card" href="{{ path('purchase') }}" role="button">Insure your phone</a></p>
                 <p class="text-center"><small>Not your device? Select another phone <a href="/#get-quote">here</a>.</small></p>
             </div>
