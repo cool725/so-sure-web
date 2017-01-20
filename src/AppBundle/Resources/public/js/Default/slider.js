@@ -33,7 +33,7 @@ var setConnectionText = function() {
     }
     var potential_value = roundToTwo(maxpot_value - save_value);
     $('#num_friends').text(slider.getValue() + (slider.getValue() == 1 ? ' friend' : ' friends'));
-    $('#money_back').text('£' + save_value);
+    $('#money_back').text('£' + save_value); 
 }
 
 var updateValue = function() {
@@ -42,7 +42,7 @@ var updateValue = function() {
 
 var slider = $('#slider-value').slider({
     formatter: function(value) {
-        return value + ' connections';
+        return value + (value == 1 ? ' connection' : ' connections');
     }})
     .on('change', updateValue)
     .data('slider');
