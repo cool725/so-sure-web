@@ -103,9 +103,15 @@
 
         <div class="row">
             <div class="col-md-12 text-center">
-                <p><a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">How it works</a>
-                <a class="btn btn-success btn-rounded btn-quote-card" href="{{ path('purchase') }}" role="button">Insure your phone</a></p>
-                <p class="text-center"><small>Not your device? Select another phone <a href="/#get-quote">here</a>.</small></p>
+
+                <p>
+                {{ form_start(buy_form) }}
+                    <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">How it works</a>
+                    {{ form_widget(buy_form.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded btn-quote-card'}}) }}
+                {{ form_end(buy_form)}}
+                </p>
+                <p class="text-center"><small>Not your device? Select another phone <a href="{{ path('homepage') }}#get-quote">here</a>.</small></p>
+
             </div>
         </div>
 
@@ -121,7 +127,11 @@
                     <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span><small>/month</small></h3>
                 </div>
                 <div class="col-xs-12 col-sm-3 col-md-2">
-                    <a class="btn btn-success btn-rounded" href="{{ path('purchase') }}" role="button">Insure your phone</a>
+
+                    {{ form_start(buy_form_banner) }}
+                        {{ form_widget(buy_form_banner.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
+                    {{ form_end(buy_form_banner)}}
+
                 </div>
             </div>
         </div>
