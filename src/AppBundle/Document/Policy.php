@@ -1572,7 +1572,7 @@ abstract class Policy
         $prefix = null;
         if ($environment != 'prod') {
             $prefix = strtoupper($environment);
-        } elseif ($this->getUser()->hasSoSureEmail()) {
+        } elseif ($this->getUser() && $this->getUser()->hasSoSureEmail()) {
             // any emails with @so-sure.com will generate an invalid policy
             $prefix = self::PREFIX_INVALID;
         }

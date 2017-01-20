@@ -883,6 +883,9 @@ class PolicyService
         if (!$prefix) {
             $policy = new PhonePolicy();
             $prefix = $policy->getPolicyPrefix($this->environment);
+            if (!$prefix) {
+                $prefix = $policy->getPolicyNumberPrefix();
+            }
         }
         $repo = $this->dm->getRepository(Policy::class);
 
