@@ -877,4 +877,27 @@ class PolicyService
             return $this->snappyPdf->generateFromHtml($html, $file);
         }
     }
+
+    public function getPoliciesPendingCancellation($includeFuture = false, $prefix = null, \DateTime $date = null)
+    {
+        if (!$prefix) {
+            $policy = new PhonePolicy();
+            $prefix = $policy->getPolicyPrefix($this->environment);
+        }
+        $repo = $this->dm->getRepository(Policy::class);
+
+        return $repo->findPoliciesForCancellation($prefix, $includeFuture, $date);
+    }
+
+    public function cancelPoliciesPendingCancellation($prefix = null, \DateTime $date = null)
+    {
+        $cancelled = [];
+        $policies = $this->getPoliciesPendingCancellation(false, $prefix, $date);
+        foreach ($policies as $policy) {
+            $this->cancel($policy, Policy::CANCELLED_USER_REQUESTED, false, $date);
+            $cancelled[] = $policy;
+        }
+
+        return $cancelled;
+    }
 }

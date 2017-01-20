@@ -26,21 +26,28 @@
   {% if not policy.isEnded %}
     <div class="bg-danger text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <div class="row">
+            <div class="col-md-12 text-center">
+                <h3>Policy Cancellation</h3>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-6">
-                <h4>User Requested Cancellation (after 14 days)</h4>
+                <h4>Scheduled Policy Cancellation</h4>
+                <p>For User Requested Cancellation (given after 14 days of policy start date)</p>
                 {{ form_start(pending_cancel_form, {'attr': {'class': 'form-inline'}}) }}
                 <div class="form-group">
                     {{ form_label(pending_cancel_form.pendingCancellation, 'Policy Termination Date') }}
                     {{ form_errors(pending_cancel_form.pendingCancellation) }}
                     {{ form_widget(pending_cancel_form.pendingCancellation) }}
                 </div>
-                {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
+                {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger confirm-cancel', 'placeholder': '30 days after notice'}}) }}
                 {{ form_end(pending_cancel_form) }}
                 <br>
                 <b>This schedules the policy cancellation.</b>
             </div>
             <div class="col-md-6">
-                <h4>All other cancellations</h4>
+                <h4>Immediate Cancellation</h4>
+                <p>Cooloff and others</p>
                 {{ form_start(cancel_form, {'attr': {'class': 'form-inline'}}) }}
                 <div class="row">
                 <div class="col-md-12">
