@@ -105,6 +105,32 @@ class MixpanelService
         return $this->trackAll($event, $properties, null, true);
     }
 
+    public function isUserAgentAllowed($userAgent, $userAgentDetails = null)
+    {
+        if (!$userAgentDetails) {
+            $parser = Parser::create();
+            $userAgentDetails = $parser->parse($userAgent);
+        }
+
+        // exclude bots from tracking
+        if (in_array($userAgentDetails->ua->family, [
+            'PhantomJS',
+            'SeznamBot',
+            'Googlebot',
+            'Sogou web spider',
+            'Baiduspider',
+            'Yahoo! Slurp'
+        ])) {
+            return false;
+        }
+
+        if (stripos($userAgent, 'StatusCake') !== false) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function trackWithUser($user, $event, array $properties = null)
     {
         return $this->trackAll($event, $properties, $user);
@@ -124,15 +150,7 @@ class MixpanelService
         if ($userAgent = $this->requestService->getUserAgent()) {
             $parser = Parser::create();
             $userAgentDetails = $parser->parse($userAgent);
-
-            // exclude bots from tracking
-            if (in_array($userAgentDetails->ua->family, [
-                'PhantomJS',
-                'SeznamBot',
-                'Googlebot',
-                'Sogou web spider',
-                'Baiduspider',
-            ])) {
+            if (!$this->isUserAgentAllowed($userAgent, $userAgentDetails)) {
                 return;
             }
         }
