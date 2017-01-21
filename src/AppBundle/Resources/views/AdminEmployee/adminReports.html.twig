@@ -49,9 +49,15 @@
     </form>
 </div>
 
-
     <div class="row-fluid">
         <div class="col-md-11">
+    <ul class="nav nav-tabs nav-justified">
+      <li role="presentation" class="active"><a data-toggle="tab" href="#general">General</a></li>
+      <li role="presentation"><a data-toggle="tab" href="#connections">Connections</a></li>
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="general">
+
         <h3>Excludes Policies: 
             {% for excluded_policy in excluded_policies %}
             <a href="{{ path('admin_policy', {'id': excluded_policy.id }) }}">{{ excluded_policy.policyNumber }}</a>
@@ -188,6 +194,22 @@
                         </tr>
                         -->
                         <tr>
+                            <td>Current Pot Value
+        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="" data-content="Sum of all of the pots across all policies. Includes the promo pot value portion."></i>
+                            </td>
+                            <td></td>
+                            <td>£{{ data.totalPot|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Current Promo Pot Value
+        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="" data-content="Sum of all of the promo portion of the pots across all policies"></i>
+                            </td>
+                            <td></td>
+                            <td>£{{ data.totalPromoPot|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
                             <td>Connection Links
         <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
            title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
@@ -285,8 +307,11 @@
                         </tr>
                     </tbody>
                 </table>
-                <hr />
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="connections">
                 <h3>Across all Dates - Includes all policies</h3>
+            <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -320,6 +345,8 @@
                         </tr>
                     </tbody>
                 </table>
+        </div>
+    </div>
             </div>        
         </div>
     </div>
