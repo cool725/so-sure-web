@@ -47,12 +47,6 @@ class ClaimType extends AbstractType
                 Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
             ]])
             ->add('suspected_fraud', CheckboxType::class, ['required' => false])
-            ->add('force', ChoiceType::class, [
-                    'choices' => $this->receperio->getForces(),
-                    'required' => false,
-                    'placeholder' => 'Select a Police Force',
-            ])
-            ->add('crime_ref', TextType::class, ['required' => false])
             ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
             ->add('record', SubmitType::class)
