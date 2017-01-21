@@ -599,7 +599,7 @@ class AdminEmployeeController extends BaseController
         // $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
 
         $pot = $policyRepo->getPotValues()[0];
-        $data['totalPot'] = $pot['potValue'] + $pot['promoPotValue'];
+        $data['totalPot'] = $pot['potValue'];
         $data['totalPromoPot'] = $pot['promoPotValue'];
 
         $newDirectPolicies = $policyRepo->findAllNewPolicies(null, $start, $end);
