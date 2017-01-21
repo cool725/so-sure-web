@@ -1019,16 +1019,16 @@
         },
         {
             "name": "doctrine/mongodb-odm",
-            "version": "1.1.2",
+            "version": "1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/mongodb-odm.git",
-                "reference": "e839648ef7649757aae3b9818236a6fa47c016cd"
+                "reference": "12611cff4ff66cd6e1ebf0b56a7754a537572318"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/mongodb-odm/zipball/e839648ef7649757aae3b9818236a6fa47c016cd",
-                "reference": "e839648ef7649757aae3b9818236a6fa47c016cd",
+                "url": "https://api.github.com/repos/doctrine/mongodb-odm/zipball/12611cff4ff66cd6e1ebf0b56a7754a537572318",
+                "reference": "12611cff4ff66cd6e1ebf0b56a7754a537572318",
                 "shasum": ""
             },
             "require": {
@@ -1043,7 +1043,7 @@
                 "symfony/console": "~2.3|~3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.8|~5.0",
+                "phpunit/phpunit": "~5.4",
                 "symfony/yaml": "~2.3|~3.0"
             },
             "suggest": {
@@ -1099,7 +1099,7 @@
                 "odm",
                 "persistence"
             ],
-            "time": "2016-10-07 09:18:05"
+            "time": "2017-01-14 17:19:01"
         },
         {
             "name": "doctrine/mongodb-odm-bundle",

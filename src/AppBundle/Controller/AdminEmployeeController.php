@@ -598,6 +598,10 @@ class AdminEmployeeController extends BaseController
         // Doesn't make sense to exclude as will skew all figures
         // $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
 
+        $pot = $policyRepo->getPotValues()[0];
+        $data['totalPot'] = $pot['potValue'] + $pot['promoPotValue'];
+        $data['totalPromoPot'] = $pot['promoPotValue'];
+
         $newDirectPolicies = $policyRepo->findAllNewPolicies(null, $start, $end);
         $data['newDirectPolicies'] = $newDirectPolicies->count();
         $data['newDirectPoliciesPremium'] = Policy::sumYearlyPremiumPrice($newDirectPolicies);

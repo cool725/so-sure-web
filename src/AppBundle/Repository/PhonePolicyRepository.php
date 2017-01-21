@@ -3,6 +3,7 @@
 namespace AppBundle\Repository;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\MongoDB\Aggregation\Builder;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\DateTrait;
@@ -197,5 +198,21 @@ class PhonePolicyRepository extends PolicyRepository
 
         return $qb->getQuery()
             ->execute();
+    }
+
+    public function getPotValues()
+    {
+        $policy = new PhonePolicy();
+
+        return $this->getDocumentManager()->getDocumentCollection($this->getClassName())->createAggregationBuilder()
+                ->match()
+                    ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
+                ->group()
+                    ->field('_id')->expression(0)
+                    ->field('potValue')
+                    ->sum('$potValue')
+                    ->field('promoPotValue')
+                    ->sum('$promoPotValue')
+                ->execute();
     }
 }
