@@ -513,6 +513,10 @@ abstract class Policy
 
     public function addClaim(Claim $claim)
     {
+        if (!$this->isClaimAllowed($claim)) {
+            throw new \Exception(sprintf('This policy can not have any additional lost/theft claims'));
+        }
+
         $claim->setPolicy($this);
         $this->claims[] = $claim;
     }
@@ -520,6 +524,27 @@ abstract class Policy
     public function getClaims()
     {
         return $this->claims;
+    }
+
+    public function isClaimAllowed($claim)
+    {
+        if (!$claim->isLostTheft()) {
+            return true;
+        }
+
+        return $this->isAdditionalClaimLostTheftApprovedAllowed();
+    }
+
+    public function isAdditionalClaimLostTheftApprovedAllowed()
+    {
+        $count = 0;
+        foreach ($this->getClaims() as $claim) {
+            if ($claim->isLostTheftApproved()) {
+                $count++;
+            }
+        }
+
+        return $count < 2;
     }
 
     public function hasOpenClaim($onlyWithOutFees = false)
@@ -1896,6 +1921,10 @@ abstract class Policy
 
         if ($this->hasOpenClaim(true)) {
             $warnings[] = sprintf('Policy has an open claim, but ClaimsCheck has not been run.');
+        }
+
+        if (!$this->isAdditionalClaimLostTheftApprovedAllowed()) {
+            $warnings[] = sprintf('Policy already has 2 lost/theft claims. No further lost/theft claims are allowed');
         }
 
         return $warnings;
