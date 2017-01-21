@@ -206,7 +206,8 @@ class PhonePolicyRepository extends PolicyRepository
 
         return $this->getDocumentManager()->getDocumentCollection($this->getClassName())->createAggregationBuilder()
                 ->match()
-                    ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
+                    ->field('policyNumber')
+                    ->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
                 ->group()
                     ->field('_id')->expression(0)
                     ->field('potValue')
