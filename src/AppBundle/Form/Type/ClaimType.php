@@ -13,6 +13,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
 use AppBundle\Service\ReceperioService;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
+use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimType extends AbstractType
 {
@@ -33,13 +36,6 @@ class ClaimType extends AbstractType
     {
         $builder
             ->add('number', TextType::class)
-            ->add('type', ChoiceType::class, ['choices' => [
-                Claim::TYPE_LOSS => Claim::TYPE_LOSS,
-                Claim::TYPE_THEFT => Claim::TYPE_THEFT,
-                Claim::TYPE_DAMAGE => Claim::TYPE_DAMAGE,
-                Claim::TYPE_WARRANTY => Claim::TYPE_WARRANTY,
-                Claim::TYPE_EXTENDED_WARRANTY => Claim::TYPE_EXTENDED_WARRANTY,
-            ]])
             ->add('status', ChoiceType::class, ['choices' => [
                 Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,
                 Claim::STATUS_INREVIEW => Claim::STATUS_INREVIEW,
@@ -51,6 +47,24 @@ class ClaimType extends AbstractType
             ->add('notes', TextareaType::class, ['required' => false])
             ->add('record', SubmitType::class)
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $claim = $event->getData();
+            $form = $event->getForm();
+            $choices = [];
+            if ($claim->getPolicy()->isAdditionalClaimLostTheftApprovedAllowed()) {
+                $choices = [
+                    Claim::TYPE_LOSS => Claim::TYPE_LOSS,
+                    Claim::TYPE_THEFT => Claim::TYPE_THEFT,
+                ];
+            }
+            $choices = array_merge($choices, [
+                Claim::TYPE_DAMAGE => Claim::TYPE_DAMAGE,
+                Claim::TYPE_WARRANTY => Claim::TYPE_WARRANTY,
+                Claim::TYPE_EXTENDED_WARRANTY => Claim::TYPE_EXTENDED_WARRANTY,
+            ]);
+            $form->add('type', ChoiceType::class, ['choices' => $choices]);
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)

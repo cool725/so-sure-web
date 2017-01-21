@@ -107,6 +107,7 @@ class ClaimsController extends BaseController
         }
 
         $claim = new Claim();
+        $claim->setPolicy($policy);
         $claimscheck = new ClaimsCheck();
         $claimscheck->setPolicy($policy);
         $crimeRef = new CrimeRef();

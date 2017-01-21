@@ -734,6 +734,22 @@ class Claim
         return in_array($this->getStatus(), $statuses);
     }
 
+    public function isLostTheft()
+    {
+        return in_array($this->getType(), [self::TYPE_LOSS, self::TYPE_THEFT]);
+    }
+
+    public function isLostTheftApproved()
+    {
+        // Including inreview to prevent possible multiple claims at the same time
+        if ($this->isLostTheft() &&
+            in_array($this->getStatus(), [self::STATUS_APPROVED, self::STATUS_SETTLED, self::STATUS_INREVIEW])) {
+                return true;
+        }
+
+        return false;
+    }
+
     public function isOwnershipTransferClaim()
     {
         return in_array($this->getType(), [self::TYPE_LOSS, self::TYPE_THEFT]);
