@@ -759,13 +759,13 @@ class ReceperioService extends BaseImeiService
                 $this->logger->debug(sprintf("Cached Claimscheck Forces"));
             } else {
                 $response = $this->send("/claimscheck/forces");
-                $this->logger->debug(sprintf("Get Claimscheck Forces"));
+                $this->logger->debug(sprintf("Get Claimscheck Forces %s", $response));
 
                 $data = json_decode($response, true);
                 $forces = [];
                 if (isset($data['forces'])) {
                     foreach ($data['forces'] as $force) {
-                        $forces[$force['forcename']] = $force['forcename'];
+                        $forces[$force['forcename']] = $force['force'];
                     }
 
                     $this->redis->setex($key, self::FORCES_CACHE_TIME, serialize($forces));

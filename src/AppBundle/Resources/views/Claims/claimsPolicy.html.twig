@@ -33,130 +33,166 @@
     </div>
     {% endif %}
   {% if not policy.isEnded %}
-    <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-        <p class="text-center"><strong>Run ClaimsCheck</strong></p>
-        <p>
-            ClaimsCheck should be run after the claim has been judged as valid as a final
-            verification of the customer's actions as there is an assocated cost in running
-            this check.
-        </p>
-        {{ form_start(formClaimsCheck) }}
-        <div class="row">
-            <div class="col-md-8">
-                <div class="form-group">
-                    {{ form_label(formClaimsCheck.claim, 'Claim to run against', {'label_attr': {'class': 'col-sm-4'}}) }}
-                    {{ form_errors(formClaimsCheck.claim) }}
-                    {{ form_widget(formClaimsCheck.claim, {'attr': {'class': 'col-sm-5'}}) }}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-8">
-                <div class="form-group">
-                    {{ form_label(formClaimsCheck.type, 'Type of claim', {'label_attr': {'class': 'col-sm-4'}}) }}
-                    {{ form_errors(formClaimsCheck.type) }}
-                    {{ form_widget(formClaimsCheck.type, {'attr': {'class': 'col-sm-4'}}) }}
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group">
-                    {{ form_widget(formClaimsCheck.run, {'label': 'Run ClaimsCheck', 'attr': {'class': 'btn btn-primary'}}) }}
-                </div>
-            </div>
-        </div>
-        {{ form_end(formClaimsCheck) }}
-    </div>
     <div class="bg-danger" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-        <p class="text-center"><strong>Record Claim</strong></p>
-        {{ form_start(formClaim) }}
-        <div class="row">
-            <div class="col-md-6">
+        <ul class="nav nav-tabs nav-justified">
+          <li role="presentation" {% if not policy.hasOpenClaim %}class="active"{% endif %}><a href="#record">Record Claim</a></li>
+          <li role="presentation" {% if policy.hasOpenClaim %}class="active"{% endif %}><a href="#claimscheck">ClaimsCheck</a></li>
+          <li role="presentation"><a href="#crimeref">Crime Ref Check</a></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane {% if not policy.hasOpenClaim %}active"{% endif %}" id="record">
+                <p></p>
+                <p class="text-center"><strong>Record Claim</strong></p>
+                {{ form_start(formClaim) }}
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            {{ form_label(formClaim.number, 'Claim Number', {'label_attr': {'class': 'col-sm-4'}}) }}
-                            {{ form_errors(formClaim.number) }}
-                            {{ form_widget(formClaim.number, {'attr': {'class': 'col-sm-3'}}) }}
+                    <div class="col-md-8">
+                        <div class="row" style="margin-bottom: 5px;">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_label(formClaim.number, 'Claim Number', {'label_attr': {'class': 'col-sm-6'}}) }}
+                                    {{ form_errors(formClaim.number) }}
+                                    {{ form_widget(formClaim.number, {'attr': {'class': 'col-sm-6'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_label(formClaim.type, 'Claim Type', {'label_attr': {'class': 'col-sm-6'}}) }}
+                                    {{ form_errors(formClaim.type) }}
+                                    {{ form_widget(formClaim.type, {'attr': {'class': 'col-sm-6'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_label(formClaim.status, '', {'label_attr': {'class': 'col-sm-6'}}) }}
+                                    {{ form_errors(formClaim.status) }}
+                                    {{ form_widget(formClaim.status, {'attr': {'class': 'col-sm-6'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <i class="col-sm-1 fa fa-question-circle" title="If the claim is suspected of being fraudulent, regardless of status"></i>
+                                    {{ form_label(formClaim.suspected_fraud, '', {'label_attr': {'class': 'col-sm-8'}}) }}
+                                    {{ form_errors(formClaim.suspected_fraud) }}
+                                    {{ form_widget(formClaim.suspected_fraud, {'attr': {'class': 'col-sm-2'}}) }}
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <i class="col-sm-1 fa fa-question-circle" title="If the claim is declined/withdrawn and the phone is lost/stolen/or unusable"></i>
+                                    {{ form_label(formClaim.shouldCancelPolicy, '', {'label_attr': {'class': 'col-sm-8'}}) }}
+                                    {{ form_errors(formClaim.shouldCancelPolicy) }}
+                                    {{ form_widget(formClaim.shouldCancelPolicy, {'attr': {'class': 'col-sm-2'}}) }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="row" style="margin-top: 10px">
-                    <div class="col-md-12">
+                <div class="row" style="margin-top: 5px">
+                    <div class="col-md-8">
                         <div class="form-group">
-                            {{ form_label(formClaim.type, 'Claim Type', {'label_attr': {'class': 'col-sm-4'}}) }}
-                            {{ form_errors(formClaim.type) }}
-                            {{ form_widget(formClaim.type, {'attr': {'class': 'col-sm-3'}}) }}
+                            {{ form_label(formClaim.notes, '', {'label_attr': {'class': 'col-sm-2'}}) }}
+                            {{ form_errors(formClaim.notes) }}
+                            {{ form_widget(formClaim.notes, {'attr': {'class': 'col-sm-10'}}) }}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            {{ form_widget(formClaim.record, {'label': 'Record claim', 'attr': {'class': 'btn btn-primary'}}) }}
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            {{ form_label(formClaim.status, '', {'label_attr': {'class': 'col-sm-4'}}) }}
-                            {{ form_errors(formClaim.status) }}
-                            {{ form_widget(formClaim.status, {'attr': {'class': 'col-sm-3'}}) }}
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            {{ form_label(formClaim.suspected_fraud, '', {'label_attr': {'class': 'col-sm-4'}}) }}
-                            {{ form_errors(formClaim.suspected_fraud) }}
-                            {{ form_widget(formClaim.suspected_fraud, {'attr': {'class': 'col-sm-3'}}) }}
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <i class="fa fa-question-circle" title="If the claim is declined/withdrawn and the phone is lost/stolen/or unusable"></i>
-                            {{ form_label(formClaim.shouldCancelPolicy, '', {'label_attr': {'class': 'col-sm-4'}}) }}
-                            {{ form_errors(formClaim.shouldCancelPolicy) }}
-                            {{ form_widget(formClaim.shouldCancelPolicy, {'attr': {'class': 'col-sm-3'}}) }}
-                        </div>
-                    </div>
-                </div>
+                {{ form_end(formClaim) }}
             </div>
-            <div class="col-md-5" style="border: solid 1px; border-radius: 5px;">
+            <div role="tabpanel" class="tab-pane {% if policy.hasOpenClaim %}active"{% endif %}" id="claimscheck">
+                <p></p>
+                <p class="text-center"><strong>Run ClaimsCheck</strong></p>
+                <p>
+                    ClaimsCheck should be run after the claim has been judged as valid as a final
+                    verification of the customer's actions as there is an assocated cost in running
+                    this check.
+                </p>
+                {{ form_start(formClaimsCheck) }}
                 <div class="row">
-                    <div class="col-md-12">
-                        <h4>Optional Crime Ref Check</h4>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-8">
                         <div class="form-group">
-                            {{ form_label(formClaim.force, '', {'label_attr': {'class': 'col-sm-4'}}) }}
-                            {{ form_errors(formClaim.force) }}
-                            {{ form_widget(formClaim.force, {'attr': {'class': 'col-sm-6'}}) }}
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            {{ form_label(formClaim.crime_ref, 'Crime Ref (Lost/Stolen)', {'label_attr': {'class': 'col-sm-4'}}) }}
-                            {{ form_errors(formClaim.crime_ref) }}
-                            {{ form_widget(formClaim.crime_ref, {'attr': {'class': 'col-sm-3'}}) }}
+                            {{ form_label(formClaimsCheck.claim, 'Claim to run against', {'label_attr': {'class': 'col-sm-4'}}) }}
+                            {{ form_errors(formClaimsCheck.claim) }}
+                            {{ form_widget(formClaimsCheck.claim, {'attr': {'class': 'col-sm-5'}}) }}
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            {{ form_label(formClaimsCheck.type, 'Type of claim', {'label_attr': {'class': 'col-sm-4'}}) }}
+                            {{ form_errors(formClaimsCheck.type) }}
+                            {{ form_widget(formClaimsCheck.type, {'attr': {'class': 'col-sm-4'}}) }}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            {{ form_widget(formClaimsCheck.run, {'label': 'Run ClaimsCheck', 'attr': {'class': 'btn btn-primary'}}) }}
+                        </div>
+                    </div>
+                </div>
+                {{ form_end(formClaimsCheck) }}
+            </div>
+            <div role="tabpanel" class="tab-pane" id="crimeref">
+                <p></p>
+                <p class="text-center"><strong>Run Crime Ref Check</strong></p>
+                <p>
+                    Crime Ref check can be run at any time with no cost to validate
+                    the format of a policy crime reference number.  The check
+                    will be recorded agaist a claim for historical purposes.
+                </p>
+                {{ form_start(formCrimeRef) }}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    {{ form_label(formCrimeRef.claim, 'Claim to run against', {'label_attr': {'class': 'col-sm-4'}}) }}
+                                    {{ form_errors(formCrimeRef.claim) }}
+                                    {{ form_widget(formCrimeRef.claim, {'attr': {'class': 'col-sm-5'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    {{ form_label(formCrimeRef.force, '', {'label_attr': {'class': 'col-sm-4'}}) }}
+                                    {{ form_errors(formCrimeRef.force) }}
+                                    {{ form_widget(formCrimeRef.force, {'attr': {'class': 'col-sm-5'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    {{ form_label(formCrimeRef.crime_ref, 'Crime Ref (Lost/Stolen)', {'label_attr': {'class': 'col-sm-4'}}) }}
+                                    {{ form_errors(formCrimeRef.crime_ref) }}
+                                    {{ form_widget(formCrimeRef.crime_ref, {'attr': {'class': 'col-sm-5'}}) }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    {{ form_widget(formCrimeRef.run, {'label': 'Run Crime Ref Check', 'attr': {'class': 'btn btn-primary'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{ form_end(formCrimeRef) }}
             </div>
         </div>
-        <div class="row" style="margin-top: 5px">
-            <div class="col-md-8">
-                <div class="form-group">
-                    {{ form_label(formClaim.notes, '', {'label_attr': {'class': 'col-sm-2'}}) }}
-                    {{ form_errors(formClaim.notes) }}
-                    {{ form_widget(formClaim.notes, {'attr': {'class': 'col-sm-10'}}) }}
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group">
-                    {{ form_widget(formClaim.record, {'label': 'Record claim', 'attr': {'class': 'btn btn-primary'}}) }}
-                </div>
-            </div>
-        </div>
-        {{ form_end(formClaim) }}
     </div>
   {% endif %}
     {% include 'AppBundle::Claims/claimsPolicyItem.html.twig' %}

@@ -522,6 +522,21 @@ abstract class Policy
         return $this->claims;
     }
 
+    public function hasOpenClaim($onlyWithOutFees = false)
+    {
+        foreach ($this->getClaims() as $claim) {
+            if ($claim->isOpen()) {
+                if ($onlyWithOutFees) {
+                    return $claim->getLastChargeAmount() ==  0;
+                } else {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public function getApprovedClaims($includeSettled = true)
     {
         $claims = [];
@@ -1877,6 +1892,10 @@ abstract class Policy
 
         if (in_array($this->getStatus(), [self::STATUS_CANCELLED, self::STATUS_EXPIRED])) {
             $warnings[] = sprintf('Policy is %s - DO NOT ALLOW CLAIM', $this->getStatus());
+        }
+
+        if ($this->hasOpenClaim(true)) {
+            $warnings[] = sprintf('Policy has an open claim, but ClaimsCheck has not been run.');                            
         }
 
         return $warnings;
