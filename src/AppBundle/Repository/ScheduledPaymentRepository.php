@@ -61,7 +61,8 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
 
     public function getMonthlyValues()
     {
-        $builder = $this->getDocumentManager()->getDocumentCollection($this->getClassName())->createAggregationBuilder();
+        $collection = $this->getDocumentManager()->getDocumentCollection($this->getClassName());
+        $builder = $collection->createAggregationBuilder();
         return $builder
                 ->match()
                     ->field('status')
