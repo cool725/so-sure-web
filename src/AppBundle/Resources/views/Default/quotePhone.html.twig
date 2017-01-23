@@ -21,11 +21,11 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    'bundles/app/css/Default/index.css'
-    'bundles/app/css/Default/quotePhone.css'
+    '@AppBundle/Resources/public/css/Default/index.css'
+    '@AppBundle/Resources/public/css/Default/quotePhone.css'
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
-    'bundles/app/css/Default/connections.css'
-    'bundles/app/css/Default/scrollindicator.css'
+    '@AppBundle/Resources/public/css/Default/connections.css'
+    '@AppBundle/Resources/public/css/Default/scrollindicator.css'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -137,7 +137,7 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/sosureCompared.html.twig' %}
+    {% include 'AppBundle::Default/sosureCompared.html.twig' %}        
 
     {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
