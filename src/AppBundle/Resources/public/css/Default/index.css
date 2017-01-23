@@ -67,10 +67,6 @@
 
 @media (min-width: 600px) {
 
-    .sosure-compared .container {
-        max-width: 960px;
-    }  
-
     .sosure-compared--card {
         padding: 30px;
         margin-bottom: 60px;
@@ -83,10 +79,19 @@
 }
 
 @media (min-width: 767px) {
-    
+
     .sosure-compared--card .col-md-6:first-of-type {
         border-right: 2px solid #efefef;
     }
+
+}
+
+@media (min-width: 992px) {
+
+    .sosure-compared .h3 {
+        /*line-height: 140px;*/
+        text-align: right;
+    }  
 
 }
 
