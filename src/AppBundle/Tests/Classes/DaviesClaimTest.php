@@ -290,4 +290,154 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $davies->lossType = "Theft - From Pocket";
         $this->assertEquals(Claim::TYPE_THEFT, $davies->getClaimType());
     }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testFromArrayV6InvalidStatus()
+    {
+        // @codingStandardsIgnoreStart
+        $data = [
+            'So-Sure -Mobile',
+            '320170109000912',
+            'Mr Steve Morrison',
+            'TR11 2HR',
+            '21/12/2016',
+            '03/11/2016',
+            '02/11/2017',
+            'Accidental Damage - Dropped In Water',
+            'The insured went out for lunch and fell off his motorbike. The insureds phone was in his pocket and this got damage. The screen has got lines across and the back of the phone has completely shattered.',
+            'In Street',
+            'Unknown',
+            '',
+            'TBC',
+            'Samsung',
+            'Galaxy S7 edge (32 GB)',
+            '351236666677777',
+            'TBC',
+            '£0.01',
+            '£700.00',
+            '£0.02',
+            '£0.03',
+            '£0.04',
+            '£0.05',
+            '£1.08',
+            '£0.06',
+            '£0.26',
+            '£700.26',
+            '-£35.00',
+            '£15.00',
+            '£50.00',
+            'Mob/2016/5500048',
+            '09/01/2017',
+            '09/01/2017',
+            'TBC',
+            'Discount Tyres Redruth Ltd, School Lane, TR15 2DU',
+            '£700.26'
+        ];
+        // @codingStandardsIgnoreEnd
+
+        $davies = new DaviesClaim();
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testFromArrayV6InvalidMIStatus()
+    {
+        // @codingStandardsIgnoreStart
+        $data = [
+            'So-Sure -Mobile',
+            '320170109000912',
+            'Mr Steve Morrison',
+            'TR11 2HR',
+            '21/12/2016',
+            '03/11/2016',
+            '02/11/2017',
+            'Accidental Damage - Dropped In Water',
+            'The insured went out for lunch and fell off his motorbike. The insureds phone was in his pocket and this got damage. The screen has got lines across and the back of the phone has completely shattered.',
+            'In Street',
+            'Closed',
+            'Unknown',
+            'TBC',
+            'Samsung',
+            'Galaxy S7 edge (32 GB)',
+            '351236666677777',
+            'TBC',
+            '£0.01',
+            '£700.00',
+            '£0.02',
+            '£0.03',
+            '£0.04',
+            '£0.05',
+            '£1.08',
+            '£0.06',
+            '£0.26',
+            '£700.26',
+            '-£35.00',
+            '£15.00',
+            '£50.00',
+            'Mob/2016/5500048',
+            '09/01/2017',
+            '09/01/2017',
+            'TBC',
+            'Discount Tyres Redruth Ltd, School Lane, TR15 2DU',
+            '£700.26'
+        ];
+        // @codingStandardsIgnoreEnd
+
+        $davies = new DaviesClaim();
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testFromArrayV6MisingClaimType()
+    {
+        // @codingStandardsIgnoreStart
+        $data = [
+            'So-Sure -Mobile',
+            '320170109000912',
+            'Mr Steve Morrison',
+            'TR11 2HR',
+            '21/12/2016',
+            '03/11/2016',
+            '02/11/2017',
+            'Accident',
+            'The insured went out for lunch and fell off his motorbike. The insureds phone was in his pocket and this got damage. The screen has got lines across and the back of the phone has completely shattered.',
+            'In Street',
+            'Open',
+            '',
+            'TBC',
+            'Samsung',
+            'Galaxy S7 edge (32 GB)',
+            '351236666677777',
+            'TBC',
+            '£0.01',
+            '£700.00',
+            '£0.02',
+            '£0.03',
+            '£0.04',
+            '£0.05',
+            '£1.08',
+            '£0.06',
+            '£0.26',
+            '£700.26',
+            '-£35.00',
+            '£15.00',
+            '£50.00',
+            'Mob/2016/5500048',
+            '09/01/2017',
+            '09/01/2017',
+            'TBC',
+            'Discount Tyres Redruth Ltd, School Lane, TR15 2DU',
+            '£700.26'
+        ];
+        // @codingStandardsIgnoreEnd
+
+        $davies = new DaviesClaim();
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6);
+    }
 }

@@ -68,7 +68,7 @@ class DaviesServiceTest extends WebTestCase
 
         $claim = new Claim();
         $policy->addClaim($claim);
-        
+
         $davies = new DaviesClaim();
 
         self::$daviesService->updatePolicy($claim, $davies);
@@ -101,6 +101,34 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->policyNumber = 2;
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateClaimDetailsInvalidStatus()
+    {
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostCode('AAA');
+        $user = new User();
+        $user->setBillingAddress($address);
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+        $policy->setPolicyNumber(1);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = 1;
+        $daviesClaim->replacementImei = '123';
+        $daviesClaim->status = 'Closed';
+        $daviesClaim->miStatus = 'Withdrawn';
+        $daviesClaim->insuredName = 'Mr Foo Bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
     }
@@ -205,7 +233,7 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = 'open';
+        $daviesClaim->status = 'Open';
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();

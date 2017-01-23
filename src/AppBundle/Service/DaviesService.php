@@ -308,7 +308,7 @@ class DaviesService
                 }
                 if ($daviesClaim->getClaimStatus()) {
                     $claim->setStatus($daviesClaim->getClaimStatus());
-                } elseif ($claim->getReplacementImei() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
+                } elseif ($daviesClaim->replacementImei && $claim->getStatus() == Claim::STATUS_INREVIEW) {
                     // If there's a replacement IMEI, the claim has definitely been approved
                     $claim->setStatus(Claim::STATUS_APPROVED);
                 }
@@ -365,6 +365,16 @@ class DaviesService
                 'Claim %s does not match policy number %s',
                 $daviesClaim->claimNumber,
                 $daviesClaim->policyNumber
+            ));
+        }
+
+        if ($daviesClaim->replacementImei && in_array($daviesClaim->getClaimStatus(), [
+            Claim::STATUS_DECLINED,
+            Claim::STATUS_WITHDRAWN
+        ])) {
+            throw new \Exception(sprintf(
+                'Claim %s has a replacement IMEI Number, yet has a withdrawn/declined status',
+                $daviesClaim->claimNumber
             ));
         }
 
@@ -425,7 +435,7 @@ class DaviesService
         }
 
         // We should always validate Recipero Fee if the fee is present or if the claim is closed
-        if (($daviesClaim->isClosed() || $daviesClaim->reciperoFee > 0) &&
+        if (($daviesClaim->isClosed(true) || $daviesClaim->reciperoFee > 0) &&
             !$this->areEqualToTwoDp($claim->totalChargesWithVat(), $daviesClaim->reciperoFee)) {
             $msg = sprintf(
                 'Claim %s does not have the correct recipero fee. Expected £%0.2f Actual £%0.2f',
