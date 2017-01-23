@@ -38,7 +38,7 @@ $(function(){
         }
     }
 
-    $('.address-manual').click(function(e) {
+    $('#address-manual').click(function(e) {
         e.preventDefault();
         showAddress();
     });

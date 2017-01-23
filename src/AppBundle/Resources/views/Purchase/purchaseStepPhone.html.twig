@@ -42,15 +42,15 @@
                                                     {% endif %}
                                             {% endif %}
                                         </strong>
-                                        <button type="button" 
-                                                class="select-phone btn btn-link" data-toggle="modal" 
-                                                data-target="#phoneModal">
-                                            {% if phone %}
-                                                Edit
-                                            {% else %}
-                                                Select phone
-                                            {% endif %}
-                                        </button>
+                                        {% if phone %}                         
+                                            <button type="button" 
+                                                    class="select-phone btn-link btn-xs" data-toggle="modal" 
+                                                    data-target="#phoneModal">Edit</button>
+                                        {% else %}
+                                            <button type="button" 
+                                                    class="select-phone btn-additional btn-xs" data-toggle="modal" 
+                                                    data-target="#phoneModal">Select phone</button>
+                                        {% endif %}
                                     </span>
                                 </div>                                
                             </div>
