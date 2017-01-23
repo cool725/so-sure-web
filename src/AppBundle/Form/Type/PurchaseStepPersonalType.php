@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
@@ -47,11 +47,12 @@ class PurchaseStepPersonalType extends AbstractType
             ->add('firstName', HiddenType::class, ['required' => false])
             ->add('lastName', HiddenType::class, ['required' => false])
             ->add('name', TextType::class, ['required' => $this->required])
-            ->add('birthday', DateType::class, [
+            ->add('birthday', BirthdayType::class, [
                   'required' => $this->required,
-                  'widget'   => 'single_text',
-                  'html5'    => false,
-                  'format'   => 'dd/MM/yyyy',
+                  'format'   => 'dd MM yyyy',
+                  'placeholder' => array(
+                      'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
+                  ),
             ])
             ->add('mobileNumber', TextType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
