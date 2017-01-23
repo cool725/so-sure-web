@@ -43,7 +43,7 @@
                                             {% endif %}
                                         </strong>
                                         <button type="button" 
-                                                class="select-phone btn btn-link" data-toggle="modal" 
+                                                class="select-phone btn-additional btn-xs" data-toggle="modal" 
                                                 data-target="#phoneModal">
                                             {% if phone %}
                                                 Edit
@@ -68,7 +68,7 @@
                                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':''}}) }}
                                     <p class="help-block text-left">
                                         <small>Dial *#06# to show your IMEI number </small>
-                                        <button type="button" class="btn btn-primary btn-rounded btn-xs" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"><i class="fa fa-question"></i></button>
+                                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"><i class="fa fa-question"></i></button>
                                     </p>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                                    
                                 </div>                                
