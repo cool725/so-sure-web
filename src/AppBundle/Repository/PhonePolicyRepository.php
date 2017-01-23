@@ -216,4 +216,15 @@ class PhonePolicyRepository extends PolicyRepository
                     ->sum('$promoPotValue')
                 ->execute();
     }
+
+    public function getActiveInvalidPolicies()
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', Policy::PREFIX_INVALID)));
+
+        return $qb->getQuery()->execute();
+    }
 }
