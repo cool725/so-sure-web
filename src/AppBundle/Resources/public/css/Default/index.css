@@ -56,6 +56,31 @@
 }
 
 
+
+/* SOSURE COMPARED: MOVE TO layouts > _includes.scss */
+.sosure-compared--card {
+    line-height: 1.7;
+}
+
+@media (min-width: 600px) {
+
+    .sosure-compared--card {
+        padding: 20px 30px;
+        margin-bottom: 25px;
+        position: relative;
+        background-color: #fff;
+        border: 2px solid #efefef;
+        border-radius: 8px;          
+    }
+
+    .sosure-compared--card .col-md-6:first-of-type {
+        border-right: 2px solid #efefef;
+    }
+
+}
+
+
+
 /* POPULAR DEVICES - LEGACY??? Remove */
 
 .popular-devices {

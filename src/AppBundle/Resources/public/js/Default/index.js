@@ -19,6 +19,17 @@
         }, 1500);
     });
 
+
+    $("#why-were-better-btn").click(function() {
+
+        event.preventDefault();
+
+        $('html, body').animate({
+            scrollTop: $("#why-were-better").offset().top - 200
+        }, 1500);
+    });
+
+
     $("#get-started").click(function() {
         $('html, body').animate({
             scrollTop: $("#download-now").offset().top

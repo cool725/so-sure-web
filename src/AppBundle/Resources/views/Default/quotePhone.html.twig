@@ -106,7 +106,7 @@
 
                 <p>
                 {{ form_start(buy_form) }}
-                    <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">How it works</a>
+                    <a id="why-were-better-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">Why we're better</a>
                     {{ form_widget(buy_form.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded btn-quote-card'}}) }}
                 {{ form_end(buy_form)}}
                 </p>
@@ -136,6 +136,8 @@
             </div>
         </div>
     </section>
+
+    {% include 'AppBundle::Default/sosureCompared.html.twig' %}
 
     {% include 'AppBundle::Default/howItWorks.html.twig' %}
 
