@@ -59,7 +59,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
         $updatePotValue = $input->getOption('update-pot-value');
-        $skipEmail = $input->getOption('skip-email');
+        $skipEmail = true === $input->getOption('skip-email');
         $validateDate = null;
         if ($date) {
             $validateDate = new \DateTime($date);
@@ -112,6 +112,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
         } else {
             $policies = $policyRepo->findAll();
+            $lines[] = 'Policy Validation';
+            $lines[] = '-------------';
+            $lines[] = '';
             foreach ($policies as $policy) {
                 if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
                     continue;
@@ -147,12 +150,43 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($policy->hasCorrectPolicyStatus($validateDate) === false) {
                     $lines[] = $this->failureStatusMessage($policy, $prefix, $validateDate);
                 }
+                if ($policy->hasOpenClaim()) {
+                    $lines[] = sprintf(
+                        'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
+                        $policy->getPolicyNumber()
+                    );
+                }
+            }
+
+            $lines[] = '';
+            $lines[] = '';
+            $lines[] = '';
+            $lines[] = 'Pending Cancellations';
+            $lines[] = '-------------';
+            $lines[] = '';
+            $policyService = $this->getContainer()->get('app.policy');
+            $pending = $policyService->getPoliciesPendingCancellation(true, $prefix);
+            foreach ($pending as $policy) {
+                $lines[] = sprintf(
+                    'Policy %s is pending cancellation on %s',
+                    $policy->getPolicyNumber(),
+                    $policy->getPendingCancellation()->format(\DateTime::ATOM)
+                );
+                if ($policy->hasOpenClaim()) {
+                    $lines[] = sprintf(
+                        'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
+                        $policy->getPolicyNumber()
+                    );
+                }
+            }
+            if (count($pending) == 0) {
+                $lines[] = 'No pending cancellations';
             }
         }
 
         if (!$skipEmail) {
             $mailer = $this->getContainer()->get('app.mailer');
-            $mailer->send('Policy Validation', 'tech@so-sure.com', implode('<br />', $lines));
+            $mailer->send('Policy Validation & Pending Cancellations', 'tech@so-sure.com', implode('<br />', $lines));
         }
 
         $output->writeln(implode(PHP_EOL, $lines));

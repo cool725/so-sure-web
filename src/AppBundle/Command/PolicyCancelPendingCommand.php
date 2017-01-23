@@ -22,10 +22,10 @@ class PolicyCancelPendingCommand extends ContainerAwareCommand
             ->setName('sosure:policy:cancel-pending')
             ->setDescription('Cancel any policies that are pending cancellation')
             ->addOption(
-                'daily',
+                'show',
                 null,
                 InputOption::VALUE_NONE,
-                'Run a daily reporting on pending cancellations'
+                'Show the pending policies only and do not run the cancellations'
             )
             ->addOption(
                 'prefix',
@@ -38,11 +38,12 @@ class PolicyCancelPendingCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $isDaily = true === $input->getOption('daily');
+        $show = true === $input->getOption('show');
         $prefix = $input->getOption('prefix');
 
         $policyService = $this->getContainer()->get('app.policy');
-        if ($isDaily) {
+        if ($show) {
+            // Note that show has been integrated in the validate policy email to avoid email overload
             $pending = $policyService->getPoliciesPendingCancellation(true, $prefix);
             $lines = [];
             foreach ($pending as $policy) {
@@ -53,8 +54,6 @@ class PolicyCancelPendingCommand extends ContainerAwareCommand
                 );
                 $output->writeln($lines);
             }
-            $mailer = $this->getContainer()->get('app.mailer');
-            $mailer->send('Policy Pending Cancellations Report', 'tech@so-sure.com', implode('<br />', $lines));
         } else {
             $lines = [];
             $cancelled = $policyService->cancelPoliciesPendingCancellation($prefix);
