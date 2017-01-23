@@ -54,6 +54,7 @@
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a data-toggle="tab" href="#general">General</a></li>
       <li role="presentation"><a data-toggle="tab" href="#connections">Connections</a></li>
+      <li role="presentation"><a data-toggle="tab" href="#billing">Monthly Billing</a></li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="general">
@@ -347,6 +348,30 @@
                 </table>
         </div>
     </div>
+        <div role="tabpanel" class="tab-pane" id="billing">
+                <h3>Monthly Billing</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Total
+        <i style="cursor: pointer" class="fa fa-info-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+           data-content="Includes both Successful & Scheduled Payments"></i>                                                        
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for scheduledPayment in data.scheduledPayments %}
+                        <tr>
+                            <td>{{ scheduledPayment._id.month }}/{{ scheduledPayment._id.year }}</td>
+                            <td>£{{ scheduledPayment.total|number_format(2, '.', ',')  }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
             </div>        
         </div>
     </div>

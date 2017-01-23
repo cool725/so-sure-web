@@ -579,9 +579,18 @@ class AdminEmployeeController extends BaseController
         $policyRepo = $dm->getRepository(PhonePolicy::class);
         $connectionRepo = $dm->getRepository(Connection::class);
         $invitationRepo = $dm->getRepository(Invitation::class);
+        $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
         $claimsRepo = $dm->getRepository(Claim::class);
         $claims = $claimsRepo->findFNOLClaims($start, $end);
         $claimsTotals = Claim::sumClaims($claims);
+
+        $invalidPolicies = $policyRepo->getActiveInvalidPolicies();
+        $invalidPoliciesIds = [];
+        foreach ($invalidPolicies as $invalidPolicy) {
+            $invalidPoliciesIds[] = new \MongoId($invalidPolicy->getId());
+        }
+        $scheduledPaymentRepo->setExcludedPolicyIds($invalidPoliciesIds);
+        $data['scheduledPayments'] = $scheduledPaymentRepo->getMonthlyValues();
 
         $excludedPolicyIds = [];
         $excludedPolicies = [];
