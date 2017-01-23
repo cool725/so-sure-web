@@ -64,8 +64,8 @@
 
 /* Birthday */
 .birthday select {
-    padding: 0.6rem 0.8rem;
-    font-size: 1.3rem;
+    font-size: 14px;
+    padding: 6px 12px;
     background-color: #fff;
     background-image: none;
     -webkit-background-clip: padding-box;
@@ -73,16 +73,6 @@
     border: 2px solid #efefef;
     border-radius: 4px;
 }
-
-.birthday select:not([size]):not([multiple]) {
-  height: calc(2.25rem + 2px);
-}
-
-.birthday select:focus::-ms-value {
-  color: #464a4c;
-  background-color: #fff;
-}
-
 
 /* Includes */
 
