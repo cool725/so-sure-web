@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use AppBundle\Document\Phone;
+use AppBundle\Validator\Constraints\AgeValidator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
@@ -42,16 +43,23 @@ class PurchaseStepPersonalType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $years = [];
+        $now = new \DateTime();
+        for ($year = (int) $now->format('Y'); $year >= $now->format('Y') - AgeValidator::MAX_AGE; $year--) {
+            $years[] = $year;
+        }
         $builder
             ->add('email', EmailType::class, ['required' => $this->required])
             ->add('firstName', HiddenType::class, ['required' => false])
             ->add('lastName', HiddenType::class, ['required' => false])
             ->add('name', TextType::class, ['required' => $this->required])
-            ->add('birthday', DateType::class, [
+            ->add('birthday', BirthdayType::class, [
                   'required' => $this->required,
-                  'widget'   => 'single_text',
-                  'html5'    => false,
-                  'format'   => 'dd/MM/yyyy',
+                  'format'   => 'dd MM yyyy',
+                  'placeholder' => array(
+                      'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
+                  ),
+                  'years' => $years,
             ])
             ->add('mobileNumber', TextType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)

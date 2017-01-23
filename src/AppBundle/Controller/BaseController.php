@@ -27,6 +27,7 @@ use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
+use AppBundle\Validator\Constraints\AgeValidator;
 
 abstract class BaseController extends Controller
 {
@@ -330,7 +331,7 @@ abstract class BaseController extends Controller
         }
         $now = new \DateTime();
         $diff = $now->diff($birthday);
-        if ($diff->y > 150) {
+        if ($diff->y > AgeValidator::MAX_AGE) {
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
                 '150 years old not possible for quite some time',
