@@ -7,6 +7,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class AgeValidator extends ConstraintValidator
 {
+    const MAX_AGE = 150;
+
     public function validate($value, Constraint $constraint)
     {
         $birthday = null;

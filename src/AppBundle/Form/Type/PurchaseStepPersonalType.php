@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use AppBundle\Document\Phone;
+use AppBundle\Validator\Constraints\AgeValidator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
@@ -42,6 +43,11 @@ class PurchaseStepPersonalType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $years = [];
+        $now = new \DateTime();
+        for ($year = (int) $now->format('Y'); $year >= $now->format('Y') - AgeValidator::MAX_AGE; $year--) {
+            $years[] = $year;
+        }
         $builder
             ->add('email', EmailType::class, ['required' => $this->required])
             ->add('firstName', HiddenType::class, ['required' => false])
@@ -53,6 +59,7 @@ class PurchaseStepPersonalType extends AbstractType
                   'placeholder' => array(
                       'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
                   ),
+                  'years' => $years,
             ])
             ->add('mobileNumber', TextType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
