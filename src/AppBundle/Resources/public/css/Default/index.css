@@ -58,11 +58,24 @@
 
 
 /* SOSURE COMPARED: MOVE TO layouts > _includes.scss */
+
+.sosure-compared {
+
+}
+
+.sosure-compared h3 {
+    text-align: center;
+}
+
 .sosure-compared--card {
     line-height: 1.7;
 }
 
 @media (min-width: 600px) {
+
+    .sosure-compared h3 {
+        text-align: left;
+    }  
 
     .sosure-compared--card {
         padding: 20px 30px;
