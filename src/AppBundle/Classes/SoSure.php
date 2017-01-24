@@ -17,4 +17,8 @@ class SoSure
     {
         return stripos($email, '@so-sure.com') !== false;
     }
+
+    // make sure uppper case
+    //public static $yearlyOnlyPostcodeOutcodes = ['DE14'];
+    public static $yearlyOnlyPostcodeOutcodes = [];
 }

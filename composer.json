@@ -55,7 +55,8 @@
         "facebook/graph-sdk": "^5.4",
         "mixpanel/mixpanel-php": "^2.6",
         "ua-parser/uap-php": "^3.4",
-        "ramsey/uuid": "^3.5"
+        "ramsey/uuid": "^3.5",
+        "vasildakov/postcode": "^1.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
