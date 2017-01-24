@@ -58,7 +58,7 @@ class FraudServiceTest extends WebTestCase
 
         // policy will set address
         $address = $user->getBillingAddress();
-        $address->setPostcode('BX11LT');
+        $address->setPostcode('se15 2sn');
 
         $user2 = static::createUser(
             static::$userManager,
@@ -67,7 +67,7 @@ class FraudServiceTest extends WebTestCase
         );
         $address2 = new Address();
         $address2->setType(Address::TYPE_BILLING);
-        $address2->setPostcode('BX11LT');
+        $address2->setPostcode('se15 2sn');
         $user2->setBillingAddress($address2);
         self::$dm->persist($user2);
         self::$dm->flush();
