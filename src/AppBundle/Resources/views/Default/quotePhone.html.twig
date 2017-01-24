@@ -21,11 +21,11 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    'bundles/app/css/Default/index.css'
-    'bundles/app/css/Default/quotePhone.css'
+    '@AppBundle/Resources/public/css/Default/index.css'
+    '@AppBundle/Resources/public/css/Default/quotePhone.css'
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
-    'bundles/app/css/Default/connections.css'
-    'bundles/app/css/Default/scrollindicator.css'
+    '@AppBundle/Resources/public/css/Default/connections.css'
+    '@AppBundle/Resources/public/css/Default/scrollindicator.css'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -110,7 +110,7 @@
 
                 <p>
                 {{ form_start(buy_form) }}
-                    <a id="how-it-works-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#how-it-works" role="button">How it works</a>
+                    <a id="so-sure-compared-btn" class="btn btn-primary btn-rounded btn-hollow btn-quote-card" href="#" role="button">See how we compare</a>
                     {{ form_widget(buy_form.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded btn-quote-card'}}) }}
                 {{ form_end(buy_form)}}
                 </p>
@@ -141,7 +141,7 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/howItWorks.html.twig' %}
+    {{ render(controller('AppBundle:Default:sosureCompared')) }}
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
 

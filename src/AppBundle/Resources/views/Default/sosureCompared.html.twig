@@ -1,54 +1,117 @@
-<section class="social-proof section--pad">
-    <div class="container">
-		<div class="row">
-			<div class="col-md-4"></div>
-			<div class="col-md-4">so-sure</div>
-			<div class="col-md-4">Others</div>
-		</div>
-		<div class="row">
-			<div class="col-md-4"><span class="h3">What you're covered for</span></div>
-			<div class="col-md-8">
-				<div class="row">
-					<div class="col-md-6">
-						<ul class="list-unstyled">
-						 	<li>Worldwide cover for:</li>
-						 	<li>Theft + Loss</li>
-						 	<li>Accidental Damage</li>
-						 	<li>Breakdown</li>
-						 	<li>Accesories &amp; Unauthorised Usage</li>
-						</ul>
-					</div>
-					<div class="col-md-6">
-						<p>Theft and Loss is often extra. <br> Accidental Damage can also be extra. Excess can vary.</p>
-						<p><a href="#">Here’s an example of what we’re talking about…</a></p>
-					</div>
-				</div>
+<section id="so-sure-compared" class="sosure-compared">
+	
+	<div class="comparison-table">
+		<div class="comparison-table--head">
+			<div class="comparison-table--left pull-left">
+				so-sure
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-4"><span class="h3">Why we're better</span></div>
-			<div class="col-md-8">
-				<div class="row">
-					<div class="col-md-6">
-						<ul class="list-unstyled">
-							<li>Next-working day replacement</li>
-							<li>24/7 claims support</li>
-							<li>Live chat</li>
-							<li>Instant Cover</li>
-						</ul>
-					</div>
-					<div class="col-md-6">2</div>
-				</div>
+			<div class="comparison-table--title">
+				vs
 			</div>
+			<div class="comparison-table--right pull-right">
+				others
+			</div>	
+			<div class="clearfix"></div>		
 		</div>
+		<div class="comparison-table--body">
 			<div class="row">
-			<div class="col-md-4"><span class="h3">Why we're cheaper</span></div>
-			<div class="col-md-8">
-				<div class="row">
-					<div class="col-md-6">1</div>
-					<div class="col-md-6">2</div>
+				<div class="col-sm-6 col-md-6 border-right">
+					<h3>Why we’re better</h3>
+					<ul class="list-unstyled text-blue">
+						<li>
+							<strong>Next working day repair or replacement</strong>
+						</li>
+						<li>
+							<strong>24/7 claims support</strong>
+						</li>
+						<li>
+							<strong>Live chat</strong>
+						</li>
+						<li>
+							<strong>Instant Cover</strong>
+						</li>
+					</ul>					
+				</div>
+				<div class="col-sm-6 col-md-6">
+					<h3><span class="visible-xs-inline h4">Others</span>&nbsp;</h3>
+					<ul class="list-unstyled text-grey-blue">
+						<li>
+							<strong>Average 4 to 18 days to repair or replace your phone.</strong>
+						</li>
+						<li>
+							<strong>Can take up to a month before cover starts.</strong>
+						</li>
+					</ul>
 				</div>
 			</div>
-		</div>		
-    </div>
+			<div class="row">
+				<div class="col-sm-6 col-md-6 border-right">
+					<h3>What you’re covered for</h3>
+					<ul class="list-unstyled text-blue">
+						<li>
+							<strong>Worldwide cover for:</strong>
+						</li>
+						<li>
+							<strong>Theft + Loss</strong>
+						</li>
+						<li>
+							<strong>Accidental Damage</strong>
+						</li>
+						<li>
+							<strong>Breakdown</strong>
+						</li>
+						<li>
+							<strong>Accesories &amp; Unauthorised Usage</strong>
+						</li>
+					</ul>
+				</div>
+				<div class="col-sm-6 col-md-6">
+					<h3><span class="visible-xs-inline h4">Others</span>&nbsp;</h3>
+					<ul class="list-unstyled text-grey-blue">
+						<li>
+							<strong>Theft and Loss is often extra.</strong>
+						</li>
+						<li>
+							<strong>Accidental Damage can also be extra.</strong>
+						</li>
+						<li>
+							<strong><a href="https://secure.covercloud.co.uk/quote/select?gtype=smartphone" target="_blank">Here’s an example of what we’re talking about…</a></strong>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6 col-md-6 border-right">
+					<h3>Why we’re cheaper</h3>
+					<ul class="list-unstyled text-blue">
+						<li>
+							<strong>Already up to 40% cheaper than the phone companies.</strong>
+						</li>
+						<li>
+							<strong>Free option to get up to 80% money back every year, when you connect with friends and none of you claim.</strong>
+						</li>
+					</ul>		
+				</div>
+				<div class="col-sm-6 col-md-6">
+					<h3><span class="visible-xs-inline h4">Others</span>&nbsp;</h3>
+					<ul class="list-unstyled text-grey-blue">
+						<li>
+							<strong>Some will reduce your excess the following year. Thats about it.</strong>
+						</li>
+					</ul>
+				</div>
+			</div>	
+		</div>	
+		<div class="row">
+			<div class="col-md-12">
+				<div class="comparison-table--cta">
+					{{ form_start(compare_buy_form) }}
+						{{ form_widget(compare_buy_form.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
+					{{ form_end(compare_buy_form)}}
+				</div>					
+			</div>
+		</div>					
+		<div class="comparison-table--footer">&nbsp;</div>				
+	</div>
+
 </section>

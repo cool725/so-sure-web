@@ -10,7 +10,7 @@
         }, 1500);
     });
 
-    $("#how-it-works-btn").click(function() {
+    $("#how-it-works-btn").click(function(event) {
 
         event.preventDefault();
 
@@ -18,6 +18,17 @@
             scrollTop: $("#how-it-works").offset().top - 100
         }, 1500);
     });
+
+
+    $("#so-sure-compared-btn").click(function(event) {
+
+        event.preventDefault();
+
+        $('html, body').animate({
+            scrollTop: $("#so-sure-compared").offset().top - 200
+        }, 1500);
+    });
+
 
     $("#get-started").click(function() {
         $('html, body').animate({
