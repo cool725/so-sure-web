@@ -33,4 +33,13 @@ $(document).ready(function(){
         showTodayButton: true,
         useCurrent: false
     });
+
+    // although policy cancellations can be done 30 days from notice, notice may have been given a few days ago
+    $('.datetimepicker30').datetimepicker({
+        format: "DD-MM-YYYY HH:mm",
+        allowInputToggle: true,
+        showTodayButton: true,
+        useCurrent: false,
+        minDate: moment().add(20, 'days')
+    });
 });

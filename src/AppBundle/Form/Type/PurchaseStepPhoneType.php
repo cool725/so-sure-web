@@ -53,17 +53,23 @@ class PurchaseStepPhoneType extends AbstractType
 
             if ($purchase->getPhone()) {
                 $price = $purchase->getPhone()->getCurrentPhonePrice();
-                $form->add('amount', ChoiceType::class, [
-                    'choices' => [
-                        sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice()) =>
-                            sprintf('%.2f', $price->getMonthlyPremiumPrice()),
-                        sprintf('£%.2f Yearly', $price->getYearlyPremiumPrice()) =>
-                            sprintf('%.2f', $price->getYearlyPremiumPrice()),
-                    ],
-                    'placeholder' => false,
-                    'expanded' => 'true',
-                    'required' => $this->required
-                ]);
+                $choices = [];
+                if ($purchase->getUser()->allowedMonthlyPayments()) {
+                    $choices[sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice())] =
+                            sprintf('%.2f', $price->getMonthlyPremiumPrice());
+                }
+                if ($purchase->getUser()->allowedYearlyPayments()) {
+                    $choices[sprintf('£%.2f Yearly', $price->getYearlyPremiumPrice())] =
+                            sprintf('%.2f', $price->getYearlyPremiumPrice());
+                }
+                if (count($choices) > 0) {
+                    $form->add('amount', ChoiceType::class, [
+                        'choices' => $choices,
+                        'placeholder' => false,
+                        'expanded' => 'true',
+                        'required' => $this->required
+                    ]);
+                }
 
                 if ($purchase->getPhone()->getMake() == "Apple") {
                     $form->add('serialNumber', TextType::class, ['required' => $this->required]);

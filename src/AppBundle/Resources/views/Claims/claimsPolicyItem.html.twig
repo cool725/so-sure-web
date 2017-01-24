@@ -8,17 +8,17 @@
     </div>
     {% endif %}
     <ul class="nav nav-tabs nav-justified">
-      <li role="presentation" class="active"><a href="#policy">Policy</a></li>
+      <li role="presentation" class="active"><a href="#user">User</a></li>
+      <li role="presentation"><a href="#policy">Policy</a></li>
       <li role="presentation"><a href="#claims">Claims <span class="badge" title="Number of claims">{{ policy.claims|length }}</span></a></li>
       <li role="presentation"><a href="#network">Network Claims <span class="badge" title="Number of network claims">{{ policy.networkClaims|length }}</span></a></li>
-      <li role="presentation"><a href="#user">User</a></li>
       <li role="presentation"><a href="#history">History</a></li>
       {% if is_granted('ROLE_ADMIN') %}
         <li role="presentation"><a href="#admin">Admin</a></li>
       {% endif %}
     </ul>
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="policy">
+        <div role="tabpanel" class="tab-pane" id="policy">
             <div class="row">
                 <div class="col-md-7">
                     <h2>Policy</h2>
@@ -33,6 +33,23 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        {% if policy.phone %}
+                        <tr>
+                            <td>Phone</td>
+                            <td>{{ policy.phone }}&nbsp;
+                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
+                                        data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
+                                        data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
+                                        >Show Alternatives</button>
+    
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>IMEI</td>
+                            <td>{{ policy.imei }}
+                            </td>
+                        </tr>
+                        {% endif %}
                         <tr>
                             <td>Policy Status</td>
                             <td>
@@ -86,18 +103,6 @@
                             {% else %}
                             <td class="danger">Missing payment card</td>
                             {% endif %}
-                        </tr>
-                        {% endif %}
-                        {% if policy.phone %}
-                        <tr>
-                            <td>Phone</td>
-                            <td>{{ policy.phone }}&nbsp;
-                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
-                                        data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
-                                        data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
-                                        >Show Alternatives</button>
-    
-                            </td>
                         </tr>
                         {% endif %}
                         <tr>
@@ -270,10 +275,10 @@
             <h4>No network claims</h4>
             {% endif %}
         </div>
-        <div role="tabpanel" class="tab-pane" id="user">
+        <div role="tabpanel" class="tab-pane active" id="user">
             <table class="table table-striped">
                 <tr>
-                    <td>Id</td>
+                    <td>User Id</td>
                     <td>{{ policy.user.id }}</td>
                 </tr>
                 <tr>

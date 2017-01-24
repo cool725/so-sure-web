@@ -42,21 +42,21 @@
                                                     {% endif %}
                                             {% endif %}
                                         </strong>
-                                        <button type="button" 
-                                                class="select-phone btn btn-link" data-toggle="modal" 
-                                                data-target="#phoneModal">
-                                            {% if phone %}
-                                                Edit
-                                            {% else %}
-                                                Select phone
-                                            {% endif %}
-                                        </button>
+                                        {% if phone %}                         
+                                            <button type="button" 
+                                                    class="select-phone btn-link btn-xs" data-toggle="modal" 
+                                                    data-target="#phoneModal">Edit</button>
+                                        {% else %}
+                                            <button type="button" 
+                                                    class="select-phone btn-additional btn-xs" data-toggle="modal" 
+                                                    data-target="#phoneModal">Select phone</button>
+                                        {% endif %}
                                     </span>
                                 </div>                                
                             </div>
                             <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                                 {{ form_label(purchase_form.amount, 'Payment Options', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
-                                <div class="col-sm-8">
+                                <div class="col-sm-8 text-left">
                                     {{ form_widget(purchase_form.amount) }}
                                     
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>

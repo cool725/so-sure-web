@@ -7,6 +7,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class AgeValidator extends ConstraintValidator
 {
+    const MIN_AGE = 18;
+    const MAX_AGE = 150;
+
     public function validate($value, Constraint $constraint)
     {
         $birthday = null;
@@ -30,7 +33,7 @@ class AgeValidator extends ConstraintValidator
             $diff = $now->diff($birthday);
         }
 
-        if (!$diff || $diff->y < 18) {
+        if (!$diff || $diff->y < self::MIN_AGE) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('%string%', $birthday ? $birthday->format(\DateTime::ATOM) : 'not present')
                 ->addViolation();

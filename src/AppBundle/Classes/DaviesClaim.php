@@ -16,6 +16,21 @@ class DaviesClaim
     const COLUMN_COUNT_V1 = 31;
     const COLUMN_COUNT_V6 = 36;
 
+    const STATUS_OPEN = 'Open';
+    const STATUS_CLOSED = 'Closed';
+    const STATUS_REOPENED = 'Re-Opened';
+    const STATUS_RECLOSED = 'Re-Closed';
+
+    const MISTATUS_SETTLED = 'Settled';
+    const MISTATUS_WITHDRAWN = 'Withdrawn';
+    const MISTATUS_REPUDIATED = 'Repudiated';
+
+    const TYPE_LOSS = 'Loss';
+    const TYPE_THEFT = 'Theft';
+    const TYPE_DAMAGE = 'Damage';
+    const TYPE_WARRANTY = 'Warranty';
+    const TYPE_EXTENDED_WARRANTY = 'Extended Warranty';
+
     public static $sheetNames = [
         self::SHEET_NAME_V6,
         self::SHEET_NAME_V1
@@ -147,43 +162,61 @@ class DaviesClaim
 
     public function getClaimType()
     {
-        if (stripos($this->lossType, "Loss") !== false) {
+        if (stripos($this->lossType, self::TYPE_LOSS) !== false) {
             return Claim::TYPE_LOSS;
-        } elseif (stripos($this->lossType, "Theft") !== false) {
+        } elseif (stripos($this->lossType, self::TYPE_THEFT) !== false) {
             return Claim::TYPE_THEFT;
-        } elseif (stripos($this->lossType, "Damage") !== false) {
+        } elseif (stripos($this->lossType, self::TYPE_DAMAGE) !== false) {
             return Claim::TYPE_DAMAGE;
-        } elseif (stripos($this->lossType, "Warranty") !== false) {
+        } elseif (stripos($this->lossType, self::TYPE_WARRANTY) !== false) {
             return Claim::TYPE_WARRANTY;
-        } elseif (stripos($this->lossType, "Extended Warranty") !== false) {
+        } elseif (stripos($this->lossType, self::TYPE_EXTENDED_WARRANTY) !== false) {
             return Claim::TYPE_EXTENDED_WARRANTY;
         } else {
             return null;
         }
     }
 
-    public function isOpen()
+    public function isOpen($includeReOpened = false)
     {
-        return strtolower($this->status) == "open";
+        if ($includeReOpened) {
+            return in_array($this->status, [
+                self::STATUS_OPEN,
+                self::STATUS_REOPENED
+            ]);
+        } else {
+            return in_array($this->status, [self::STATUS_OPEN]);
+        }
     }
 
-    public function isClosed()
+    public function isClosed($includeReClosed = false)
     {
-        return strtolower($this->status) == "closed";
+        if ($includeReClosed) {
+            return in_array($this->status, [
+                self::STATUS_CLOSED,
+                self::STATUS_RECLOSED,
+            ]);
+        } else {
+            return in_array($this->status, [self::STATUS_CLOSED]);
+        }
     }
 
     public function getClaimStatus()
     {
         // open status should not update
-        if (strtolower($this->status) == "open") {
+        if ($this->isOpen(false)) {
             return null;
-        } elseif (strtolower($this->status) == "closed" && strtolower($this->miStatus) == "settled") {
-            return Claim::STATUS_SETTLED;
-        } elseif (strtolower($this->status) == "closed" && strtolower($this->miStatus) == "repudiated") {
-            return Claim::STATUS_DECLINED;
-        } elseif (strtolower($this->status) == "closed" && strtolower($this->miStatus) == "withdrawn") {
-            return Claim::STATUS_WITHDRAWN;
+        } elseif ($this->isClosed(true)) {
+            if ($this->miStatus == self::MISTATUS_SETTLED) {
+                return Claim::STATUS_SETTLED;
+            } elseif ($this->miStatus == self::MISTATUS_REPUDIATED) {
+                return Claim::STATUS_DECLINED;
+            } elseif ($this->miStatus == self::MISTATUS_WITHDRAWN) {
+                return Claim::STATUS_WITHDRAWN;
+            }
         }
+
+        return null;
     }
 
     public function fromArray($data, $columns)
@@ -252,6 +285,27 @@ class DaviesClaim
 
             if ($columns == self::COLUMN_COUNT_V6) {
                 $this->daviesIncurred = $this->nullIfBlank($data[++$i]);
+            }
+
+            if (!in_array($this->status, [
+                self::STATUS_OPEN,
+                self::STATUS_CLOSED,
+                self::STATUS_REOPENED,
+                self::STATUS_RECLOSED,
+            ])) {
+                throw new \Exception('Unknown claim status');
+            }
+
+            if ($this->miStatus !== null && !in_array($this->miStatus, [
+                self::MISTATUS_SETTLED,
+                self::MISTATUS_WITHDRAWN,
+                self::MISTATUS_REPUDIATED,
+            ])) {
+                throw new \Exception('Unknown claim detail status');
+            }
+
+            if ($this->getClaimType() === null) {
+                throw new \Exception('Unknown or missing claim type');
             }
         } catch (\Exception $e) {
             throw new \Exception(sprintf('%s claim: %s', $e->getMessage(), json_encode($this)));

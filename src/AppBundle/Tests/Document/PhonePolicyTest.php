@@ -2254,4 +2254,45 @@ class PhonePolicyTest extends WebTestCase
             $this->assertNull($policy->hasCorrectPolicyStatus());
         }
     }
+
+    public function testAddTwoLostTheftClaims()
+    {
+        $policy = new SalvaPhonePolicy();
+        $claim1 = new Claim();
+        $claim1->setStatus(Claim::STATUS_APPROVED);
+        $claim1->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim1);
+
+        $claim2 = new Claim();
+        $claim2->setStatus(Claim::STATUS_SETTLED);
+        $claim2->setType(Claim::TYPE_DAMAGE);
+        $policy->addClaim($claim2);
+
+        $claim3 = new Claim();
+        $claim3->setStatus(Claim::STATUS_APPROVED);
+        $claim3->setType(Claim::TYPE_THEFT);
+        $policy->addClaim($claim3);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testAddThreeLostTheftClaims()
+    {
+        $policy = new SalvaPhonePolicy();
+        $claim1 = new Claim();
+        $claim1->setStatus(Claim::STATUS_APPROVED);
+        $claim1->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim1);
+
+        $claim2 = new Claim();
+        $claim2->setStatus(Claim::STATUS_SETTLED);
+        $claim2->setType(Claim::TYPE_THEFT);
+        $policy->addClaim($claim2);
+
+        $claim3 = new Claim();
+        $claim3->setStatus(Claim::STATUS_APPROVED);
+        $claim3->setType(Claim::TYPE_THEFT);
+        $policy->addClaim($claim3);
+    }
 }

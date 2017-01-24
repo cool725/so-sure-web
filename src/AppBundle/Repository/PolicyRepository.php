@@ -36,6 +36,30 @@ class PolicyRepository extends BaseDocumentRepository
             ->count();
     }
 
+    public function findPoliciesForCancellation($policyPrefix, $includeFuture, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)));
+        
+        if ($includeFuture) {
+            $qb = $qb->field('pendingCancellation')->notEqual(null);
+        } else {
+            $qb = $qb->field('pendingCancellation')->lte($date);
+        }
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
     public function getWeeklyEmail($environment)
     {
         $lastWeek = new \DateTime();

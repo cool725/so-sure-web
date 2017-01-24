@@ -38,9 +38,9 @@ services:
         class: AppBundle\Service\MailchimpService
         arguments:
           logger: "@logger"
-          apikey: %mailchimp_apikey%
-          list: %mailchimp_prelaunch_list%
-          environment: %kernel.environment%
+          apikey: "%mailchimp_apikey%"
+          list: "%mailchimp_prelaunch_list%"
+          environment: "%kernel.environment%"
 
     app.gocardless:
         class: AppBundle\Service\GocardlessService
@@ -635,6 +635,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.policysearch:
+        class: AppBundle\Form\Type\PolicySearchType
+        arguments: ["@request_stack", "%kernel.environment%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.phonemake:
         class: AppBundle\Form\Type\PhoneMakeType
         arguments: ["@doctrine_mongodb.odm.default_document_manager", "%form_required%"]
@@ -667,6 +673,12 @@ services:
 
     app.form.type.claim:
         class: AppBundle\Form\Type\ClaimType
+        arguments: ["@app.imei"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.claimcrimeref:
+        class: AppBundle\Form\Type\ClaimCrimeRefType
         arguments: ["@app.imei"]
         tags:
             - { name: form.type }

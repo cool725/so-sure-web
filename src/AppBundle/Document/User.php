@@ -13,6 +13,8 @@ use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use Scheb\TwoFactorBundle\Model\TrustedComputerInterface;
+use AppBundle\Validator\Constraints\AgeValidator;
+use VasilDakov\Postcode\Postcode;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
@@ -360,6 +362,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setBillingAddress(Address $billingAddress)
     {
         $this->billingAddress = $billingAddress;
+    }
+
+    public function clearBillingAddress()
+    {
+        $this->billingAddress = null;
     }
 
     public function getPolicyAddress()
@@ -906,7 +913,33 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
-        if ($this->getAge() > 150 || $this->getAge() < 18) {
+        if ($this->getAge() > AgeValidator::MAX_AGE || $this->getAge() < AgeValidator::MIN_AGE) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function allowedMonthlyPayments()
+    {
+        if (!$this->hasValidDetails()) {
+            return false;
+        }
+
+        $postcode = new Postcode($this->getBillingAddress()->getPostcode());
+
+        if (in_array(strtoupper($postcode->outcode()), SoSure::$yearlyOnlyPostcodeOutcodes)) {
+            return false;
+        } elseif (in_array($postcode->normalise(), SoSure::$yearlyOnlyPostcodes)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function allowedYearlyPayments()
+    {
+        if (!$this->hasValidDetails()) {
             return false;
         }
 

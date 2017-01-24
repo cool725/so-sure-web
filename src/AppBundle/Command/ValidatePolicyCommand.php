@@ -59,7 +59,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
         $updatePotValue = $input->getOption('update-pot-value');
-        $skipEmail = $input->getOption('skip-email');
+        $skipEmail = true === $input->getOption('skip-email');
         $validateDate = null;
         if ($date) {
             $validateDate = new \DateTime($date);
@@ -112,6 +112,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
         } else {
             $policies = $policyRepo->findAll();
+            $lines[] = 'Policy Validation';
+            $lines[] = '-------------';
+            $lines[] = '';
             foreach ($policies as $policy) {
                 if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
                     continue;
@@ -120,7 +123,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($policy->isCancelled()) {
                     continue;
                 }
+                $warnPolicyOpenClaim = false;
                 if ($policy->isPolicyPaidToDate(true, $validateDate) === false) {
+                    $warnPolicyOpenClaim = true;
                     $lines[] = sprintf(
                         'Policy %s is not paid to date. Next attempt on %s. If unpaid, policy will be cancelled on %s',
                         $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
@@ -138,6 +143,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = $this->failurePotValueMessage($policy);
                 }
                 if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate) === false) {
+                    $warnPolicy = true;
                     $lines[] = sprintf(
                         'Policy %s has incorrect scheduled payments (likely if within 2 weeks of cancellation date)',
                         $policy->getPolicyNumber()
@@ -145,14 +151,46 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
                 }
                 if ($policy->hasCorrectPolicyStatus($validateDate) === false) {
+                    $warnPolicyOpenClaim = true;
                     $lines[] = $this->failureStatusMessage($policy, $prefix, $validateDate);
                 }
+                if ($warnPolicyOpenClaim && $policy->hasOpenClaim()) {
+                    $lines[] = sprintf(
+                        'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
+                        $policy->getPolicyNumber()
+                    );
+                }
+            }
+
+            $lines[] = '';
+            $lines[] = '';
+            $lines[] = '';
+            $lines[] = 'Pending Cancellations';
+            $lines[] = '-------------';
+            $lines[] = '';
+            $policyService = $this->getContainer()->get('app.policy');
+            $pending = $policyService->getPoliciesPendingCancellation(true, $prefix);
+            foreach ($pending as $policy) {
+                $lines[] = sprintf(
+                    'Policy %s is pending cancellation on %s',
+                    $policy->getPolicyNumber(),
+                    $policy->getPendingCancellation()->format(\DateTime::ATOM)
+                );
+                if ($policy->hasOpenClaim()) {
+                    $lines[] = sprintf(
+                        'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
+                        $policy->getPolicyNumber()
+                    );
+                }
+            }
+            if (count($pending) == 0) {
+                $lines[] = 'No pending cancellations';
             }
         }
 
         if (!$skipEmail) {
             $mailer = $this->getContainer()->get('app.mailer');
-            $mailer->send('Policy Validation', 'tech@so-sure.com', implode('<br />', $lines));
+            $mailer->send('Policy Validation & Pending Cancellations', 'tech@so-sure.com', implode('<br />', $lines));
         }
 
         $output->writeln(implode(PHP_EOL, $lines));

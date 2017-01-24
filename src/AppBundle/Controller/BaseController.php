@@ -22,11 +22,13 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Form\Type\UserSearchType;
+use AppBundle\Form\Type\PolicySearchType;
 
 use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
+use AppBundle\Validator\Constraints\AgeValidator;
 
 abstract class BaseController extends Controller
 {
@@ -330,7 +332,7 @@ abstract class BaseController extends Controller
         }
         $now = new \DateTime();
         $diff = $now->diff($birthday);
-        if ($diff->y > 150) {
+        if ($diff->y > AgeValidator::MAX_AGE) {
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
                 '150 years old not possible for quite some time',
@@ -596,7 +598,7 @@ abstract class BaseController extends Controller
         return $phone;
     }
 
-    protected function searchUsers(Request $request, $includeInvalidPolicies = null)
+    protected function searchPolicies(Request $request, $includeInvalidPolicies = null)
     {
         $dm = $this->getManager();
         $userRepo = $dm->getRepository(User::class);
@@ -604,7 +606,7 @@ abstract class BaseController extends Controller
 
         $policiesQb = $policyRepo->createQueryBuilder();
 
-        $form = $this->createForm(UserSearchType::class, null, ['method' => 'GET']);
+        $form = $this->createForm(PolicySearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
         if ($includeInvalidPolicies === null) {
             $includeInvalidPolicies = $form->get('invalid')->getData();
@@ -660,6 +662,46 @@ abstract class BaseController extends Controller
 
         return [
             'policies' => $pager->getCurrentPageResults(),
+            'pager' => $pager,
+            'form' => $form->createView()
+        ];
+    }
+
+    protected function searchUsers(Request $request)
+    {
+        $dm = $this->getManager();
+        $userRepo = $dm->getRepository(User::class);
+        $usersQb = $userRepo->createQueryBuilder();
+
+        $form = $this->createForm(UserSearchType::class, null, ['method' => 'GET']);
+        $form->handleRequest($request);
+        $sosure = $form->get('sosure')->getData();
+        if ($sosure) {
+            throw new RedirectException($this->generateUrl(
+                'admin_users',
+                ['facebookId' => $sosure]
+            ));
+        }
+        $userFormData = [
+            'email' => 'emailCanonical',
+            'lastname' => 'lastName',
+            'mobile' => 'mobileNumber',
+            'postcode' => 'billingAddress.postcode',
+            'facebookId' => 'facebookId',
+        ];
+        foreach ($userFormData as $formField => $dataField) {
+            $this->formToMongoSearch(
+                $form,
+                $usersQb,
+                $formField,
+                $dataField
+            );
+        }
+
+        $pager = $this->pager($request, $usersQb);
+
+        return [
+            'users' => $pager->getCurrentPageResults(),
             'pager' => $pager,
             'form' => $form->createView()
         ];

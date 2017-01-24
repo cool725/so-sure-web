@@ -13,9 +13,11 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\Form\ClaimsCheck;
+use AppBundle\Document\Form\CrimeRef;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\ClaimType;
+use AppBundle\Form\Type\ClaimCrimeRefType;
 use AppBundle\Form\Type\ClaimsCheckType;
 use AppBundle\Form\Type\UserSearchType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -49,7 +51,7 @@ class ClaimsController extends BaseController
             return $this->redirectToRoute('admin_policies');
         }
 
-        $data = $this->searchUsers($request, false);
+        $data = $this->searchPolicies($request, false);
         return array_merge($data, [
             'policy_route' => 'claims_policy'
         ]);
@@ -105,10 +107,16 @@ class ClaimsController extends BaseController
         }
 
         $claim = new Claim();
+        $claim->setPolicy($policy);
         $claimscheck = new ClaimsCheck();
         $claimscheck->setPolicy($policy);
+        $crimeRef = new CrimeRef();
+        $crimeRef->setPolicy($policy);
         $formClaim = $this->get('form.factory')
             ->createNamedBuilder('claim', ClaimType::class, $claim)
+            ->getForm();
+        $formCrimeRef = $this->get('form.factory')
+            ->createNamedBuilder('crimeref', ClaimCrimeRefType::class, $crimeRef)
             ->getForm();
         $formClaimsCheck = $this->get('form.factory')
             ->createNamedBuilder('claimscheck', ClaimsCheckType::class, $claimscheck)
@@ -121,17 +129,6 @@ class ClaimsController extends BaseController
                 $formClaim->handleRequest($request);
                 if ($formClaim->isValid()) {
                     $claim->setHandler($this->getUser());
-                    if (strlen($claim->getCrimeRef()) > 0) {
-                        $validCrimeRef = $imeiService->validateCrimeRef($claim->getForce(), $claim->getCrimeRef());
-                        $claim->setValidCrimeRef($validCrimeRef);
-                        if (!$validCrimeRef) {
-                            $this->addFlash('error', sprintf(
-                                'CrimeRef %s is not valid. %s',
-                                $claim->getCrimeRef(),
-                                json_encode($imeiService->getResponseData())
-                            ));
-                        }
-                    }
                     $claimsService = $this->get('app.claims');
                     if ($claimsService->addClaim($policy, $claim)) {
                         $this->addFlash('success', sprintf('Claim %s is added', $claim->getNumber()));
@@ -161,6 +158,29 @@ class ClaimsController extends BaseController
 
                     return $this->redirectToRoute('claims_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('crimeref')) {
+                $formCrimeRef->handleRequest($request);
+                if ($formCrimeRef->isValid()) {
+                    $validCrimeRef = $imeiService->validateCrimeRef($crimeRef->getForce(), $crimeRef->getCrimeRef());
+                    $crimeRef->getClaim()->setForce($crimeRef->getForce());
+                    $crimeRef->getClaim()->setCrimeRef($crimeRef->getCrimeRef());
+                    $crimeRef->getClaim()->setValidCrimeRef($validCrimeRef);
+                    $dm->flush();
+                    if (!$validCrimeRef) {
+                        $this->addFlash('error', sprintf(
+                            'CrimeRef %s is not valid. %s',
+                            $claim->getCrimeRef(),
+                            json_encode($imeiService->getResponseData())
+                        ));
+                    } else {
+                        $this->addFlash('error', sprintf(
+                            'CrimeRef %s is valid.',
+                            $claim->getCrimeRef()
+                        ));
+                    }
+
+                    return $this->redirectToRoute('claims_policy', ['id' => $id]);
+                }
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
                 if ($noteForm->isValid()) {
@@ -185,6 +205,7 @@ class ClaimsController extends BaseController
             'policy' => $policy,
             'formClaim' => $formClaim->createView(),
             'formClaimsCheck' => $formClaimsCheck->createView(),
+            'formCrimeRef' => $formCrimeRef->createView(),
             'note_form' => $noteForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'claims_policy',

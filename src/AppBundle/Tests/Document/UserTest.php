@@ -51,6 +51,62 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($user->hasValidDetails());
     }
 
+    public function testAllowedMonthlyPayments()
+    {
+        $user = new User();
+
+        $this->assertFalse($user->allowedMonthlyPayments());
+
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $user->setMobileNumber('+447777711111');
+        $user->setBirthday(new \DateTime("1980-01-01"));
+        $user->setEmail('foo@bar.com');
+
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setLine1('123 foo rd');
+        $address->setCity('London');
+        $address->setPostcode('ec1v 1rx');
+        $user->setBillingAddress($address);
+
+        $this->assertTrue($user->allowedMonthlyPayments());
+
+        $address->setPostcode('de14 2sz');
+        $this->assertFalse($user->allowedMonthlyPayments());
+
+        $address->setPostcode('TN15 7LY');
+        $this->assertFalse($user->allowedMonthlyPayments());
+    }
+
+    public function testAllowedYearlyPayments()
+    {
+        $user = new User();
+
+        $this->assertFalse($user->allowedMonthlyPayments());
+
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $user->setMobileNumber('+447777711111');
+        $user->setBirthday(new \DateTime("1980-01-01"));
+        $user->setEmail('foo@bar.com');
+
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setLine1('123 foo rd');
+        $address->setCity('London');
+        $address->setPostcode('ec1v 1rx');
+        $user->setBillingAddress($address);
+
+        $this->assertTrue($user->allowedYearlyPayments());
+
+        $address->setPostcode('de14 2sz');
+        $this->assertTrue($user->allowedYearlyPayments());
+
+        $address->setPostcode('TN15 7LY');
+        $this->assertTrue($user->allowedYearlyPayments());
+    }
+
     public function testHasValidBillingDetails()
     {
         $user = new User();

@@ -68,7 +68,7 @@ class DaviesServiceTest extends WebTestCase
 
         $claim = new Claim();
         $policy->addClaim($claim);
-        
+
         $davies = new DaviesClaim();
 
         self::$daviesService->updatePolicy($claim, $davies);
@@ -108,6 +108,34 @@ class DaviesServiceTest extends WebTestCase
     /**
      * @expectedException \Exception
      */
+    public function testValidateClaimDetailsInvalidStatus()
+    {
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostCode('AAA');
+        $user = new User();
+        $user->setBillingAddress($address);
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+        $policy->setPolicyNumber(1);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = 1;
+        $daviesClaim->replacementImei = '123';
+        $daviesClaim->status = 'Closed';
+        $daviesClaim->miStatus = 'Withdrawn';
+        $daviesClaim->insuredName = 'Mr Foo Bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
     public function testValidateClaimDetailsName()
     {
         $user = new User();
@@ -130,7 +158,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('AAA');
+        $address->setPostCode('se152sz');
         $user = new User();
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
@@ -144,7 +172,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim = new DaviesClaim();
         $daviesClaim->policyNumber = 1;
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->riskPostCode = 'AAA';
+        $daviesClaim->riskPostCode = 'se152sz';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->assertEquals(0, count(self::$daviesService->getErrors()));
@@ -191,10 +219,17 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->claimNumber = 1;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->riskPostCode = 'se152sz';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $matches = preg_grep('/does not match expected postcode/', self::$daviesService->getErrors()['1']);
-        $this->assertGreaterThan(0, count($matches));
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not match expected postcode/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertTrue($foundMatch);
     }
 
     public function testValidateClaimDetailsMissingReserved()
@@ -205,15 +240,21 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = 'open';
+        $daviesClaim->status = 'Open';
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $matches = preg_grep('/does not have a reserved value/', self::$daviesService->getErrors()['1']);
-        $this->assertGreaterThan(0, count($matches));
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not have a reserved value/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertTrue($foundMatch);
     }
 
     public function testValidateClaimDetailsReservedPresent()
@@ -231,8 +272,14 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $matches = preg_grep('/does not have a reserved value/', self::$daviesService->getErrors()['1']);
-        $this->assertEquals(0, count($matches));
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not have a reserved value/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertFalse($foundMatch);
     }
 
     public function testValidateClaimDetailsIncurredPresent()
@@ -250,8 +297,14 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $matches = preg_grep('/does not have a reserved value/', self::$daviesService->getErrors()['1']);
-        $this->assertEquals(0, count($matches));
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not have a reserved value/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertFalse($foundMatch);
     }
 
     public function testValidateClaimDetailsIncurredCorrect()
@@ -276,8 +329,14 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $matches = preg_grep('/does not have the correct incurred value/', self::$daviesService->getErrors()['1']);
-        $this->assertEquals(0, count($matches));
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not have the correct incurred value/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertFalse($foundMatch);
     }
 
     public function testValidateClaimDetailsIncurredIncorrect()
@@ -302,8 +361,14 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $matches = preg_grep('/does not have the correct incurred value/', self::$daviesService->getErrors()['1']);
-        $this->assertGreaterThan(0, count($matches));
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not have the correct incurred value/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertTrue($foundMatch);
     }
 
     public function testValidateClaimDetailsReciperoFee()
@@ -323,12 +388,24 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $matches = preg_grep('/does not have the correct recipero fee/', self::$daviesService->getErrors()['1']);
-        $this->assertEquals(0, count($matches));
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not have the correct recipero fee/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertFalse($foundMatch);
 
         $daviesClaim->reciperoFee = 1.26;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $matches = preg_grep('/does not have the correct recipero fee/', self::$daviesService->getErrors()['1']);
-        $this->assertGreaterThan(0, count($matches));
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not have the correct recipero fee/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertTrue($foundMatch);
     }
 }

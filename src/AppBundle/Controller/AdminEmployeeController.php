@@ -165,6 +165,22 @@ class AdminEmployeeController extends BaseController
      * @Route("/policies", name="admin_policies")
      * @Template("AppBundle::Claims/claimsPolicies.html.twig")
      */
+    public function adminPoliciesAction(Request $request)
+    {
+        try {
+            $data = $this->searchPolicies($request);
+        } catch (RedirectException $e) {
+            return new RedirectResponse($e->getMessage());
+        }
+        return array_merge($data, [
+            'policy_route' => 'admin_policy'
+        ]);
+    }
+
+    /**
+     * @Route("/users", name="admin_users")
+     * @Template()
+     */
     public function adminUsersAction(Request $request)
     {
         try {
@@ -579,9 +595,18 @@ class AdminEmployeeController extends BaseController
         $policyRepo = $dm->getRepository(PhonePolicy::class);
         $connectionRepo = $dm->getRepository(Connection::class);
         $invitationRepo = $dm->getRepository(Invitation::class);
+        $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
         $claimsRepo = $dm->getRepository(Claim::class);
         $claims = $claimsRepo->findFNOLClaims($start, $end);
         $claimsTotals = Claim::sumClaims($claims);
+
+        $invalidPolicies = $policyRepo->getActiveInvalidPolicies();
+        $invalidPoliciesIds = [];
+        foreach ($invalidPolicies as $invalidPolicy) {
+            $invalidPoliciesIds[] = new \MongoId($invalidPolicy->getId());
+        }
+        $scheduledPaymentRepo->setExcludedPolicyIds($invalidPoliciesIds);
+        $data['scheduledPayments'] = $scheduledPaymentRepo->getMonthlyValues();
 
         $excludedPolicyIds = [];
         $excludedPolicies = [];
@@ -597,6 +622,10 @@ class AdminEmployeeController extends BaseController
         $invitationRepo->setExcludedPolicyIds($excludedPolicyIds);
         // Doesn't make sense to exclude as will skew all figures
         // $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
+
+        $pot = $policyRepo->getPotValues()[0];
+        $data['totalPot'] = $pot['potValue'];
+        $data['totalPromoPot'] = $pot['promoPotValue'];
 
         $newDirectPolicies = $policyRepo->findAllNewPolicies(null, $start, $end);
         $data['newDirectPolicies'] = $newDirectPolicies->count();

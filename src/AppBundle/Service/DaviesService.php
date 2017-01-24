@@ -10,6 +10,7 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use VasilDakov\Postcode\Postcode;
 
 class DaviesService
 {
@@ -308,7 +309,7 @@ class DaviesService
                 }
                 if ($daviesClaim->getClaimStatus()) {
                     $claim->setStatus($daviesClaim->getClaimStatus());
-                } elseif ($claim->getReplacementImei() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
+                } elseif ($daviesClaim->replacementImei && $claim->getStatus() == Claim::STATUS_INREVIEW) {
                     // If there's a replacement IMEI, the claim has definitely been approved
                     $claim->setStatus(Claim::STATUS_APPROVED);
                 }
@@ -368,6 +369,16 @@ class DaviesService
             ));
         }
 
+        if ($daviesClaim->replacementImei && in_array($daviesClaim->getClaimStatus(), [
+            Claim::STATUS_DECLINED,
+            Claim::STATUS_WITHDRAWN
+        ])) {
+            throw new \Exception(sprintf(
+                'Claim %s has a replacement IMEI Number, yet has a withdrawn/declined status',
+                $daviesClaim->claimNumber
+            ));
+        }
+
         similar_text($claim->getPolicy()->getUser()->getName(), $daviesClaim->insuredName, $percent);
 
         if ($percent < 30) {
@@ -390,7 +401,7 @@ class DaviesService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$this->postcodeCompare(
+        if ($daviesClaim->riskPostCode && !$this->postcodeCompare(
             $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode(),
             $daviesClaim->riskPostCode
         )) {
@@ -425,7 +436,7 @@ class DaviesService
         }
 
         // We should always validate Recipero Fee if the fee is present or if the claim is closed
-        if (($daviesClaim->isClosed() || $daviesClaim->reciperoFee > 0) &&
+        if (($daviesClaim->isClosed(true) || $daviesClaim->reciperoFee > 0) &&
             !$this->areEqualToTwoDp($claim->totalChargesWithVat(), $daviesClaim->reciperoFee)) {
             $msg = sprintf(
                 'Claim %s does not have the correct recipero fee. Expected £%0.2f Actual £%0.2f',
@@ -440,7 +451,14 @@ class DaviesService
 
     private function postcodeCompare($postcodeA, $postcodeB)
     {
-        return strtolower(str_replace(' ', '', $postcodeA)) == strtolower(str_replace(' ', '', $postcodeB));
+        $postcodeA = new Postcode($postcodeA);
+        $postcodeB = new Postcode($postcodeB);
+        /*
+        if (!$postcodeA|| !$postcodeB) {
+            return false;
+        }*/
+
+        return $postcodeA->normalise() === $postcodeB->normalise();
     }
 
     public function getReplacementPhone(DaviesClaim $daviesClaim)

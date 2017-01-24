@@ -800,4 +800,96 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertNull(static::$policyService->weeklyEmail($policy));
     }
+
+    public function testPoliciesPendingCancellation()
+    {
+        $yesterday = new \DateTime();
+        $yesterday = $yesterday->sub(new \DateInterval('P1D'));
+        $now = new \DateTime();
+        $tomorrow = new \DateTime();
+        $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
+
+        $userFuture = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPoliciesPendingCancellation-future', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policyFuture = static::initPolicy(
+            $userFuture,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            clone $yesterday,
+            true
+        );
+        static::$policyService->create($policyFuture, clone $yesterday);
+        $policyFuture->setStatus(Policy::STATUS_ACTIVE);
+
+        $userExpire = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPoliciesPendingCancellation-expire', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policyExpire = static::initPolicy(
+            $userExpire,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            clone $yesterday,
+            true
+        );
+        static::$policyService->create($policyExpire, clone $yesterday);
+        $policyExpire->setStatus(Policy::STATUS_ACTIVE);
+
+        $policyFuture->setPendingCancellation(clone $tomorrow);
+        $policyExpire->setPendingCancellation(clone $yesterday);
+        static::$dm->flush();
+
+        $foundFuture = false;
+        $foundExpire = false;
+        $policies = static::$policyService->getPoliciesPendingCancellation(false);
+        foreach ($policies as $policy) {
+            if ($policy->getId() == $policyExpire->getId()) {
+                $foundExpire = true;
+            } elseif ($policy->getId() == $policyFuture->getId()) {
+                $foundFuture = true;
+            }
+        }
+        $this->assertTrue($foundExpire);
+        $this->assertFalse($foundFuture);
+
+        $foundFuture = false;
+        $foundExpire = false;
+        $policies = static::$policyService->getPoliciesPendingCancellation(true);
+        foreach ($policies as $policy) {
+            if ($policy->getId() == $policyExpire->getId()) {
+                $foundExpire = true;
+            } elseif ($policy->getId() == $policyFuture->getId()) {
+                $foundFuture = true;
+            }
+        }
+        $this->assertTrue($foundExpire);
+        $this->assertTrue($foundFuture);
+
+        static::$policyService->setDispatcher(null);
+        $policies = static::$policyService->cancelPoliciesPendingCancellation();
+        $foundFuture = false;
+        $foundExpire = false;
+        foreach ($policies as $policy) {
+            if ($policy->getId() == $policyExpire->getId()) {
+                $foundExpire = true;
+            } elseif ($policy->getId() == $policyFuture->getId()) {
+                $foundFuture = true;
+            }
+        }
+        $this->assertTrue($foundExpire);
+        $this->assertFalse($foundFuture);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $policyRepo->find($policyExpire->getId());
+        $this->assertEquals(Policy::STATUS_CANCELLED, $updatedPolicy->getStatus());
+    }
 }

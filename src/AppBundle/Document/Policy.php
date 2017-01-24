@@ -513,6 +513,10 @@ abstract class Policy
 
     public function addClaim(Claim $claim)
     {
+        if (!$this->isClaimAllowed($claim)) {
+            throw new \Exception(sprintf('This policy can not have any additional lost/theft claims'));
+        }
+
         $claim->setPolicy($this);
         $this->claims[] = $claim;
     }
@@ -520,6 +524,42 @@ abstract class Policy
     public function getClaims()
     {
         return $this->claims;
+    }
+
+    public function isClaimAllowed($claim)
+    {
+        if (!$claim->isLostTheft()) {
+            return true;
+        }
+
+        return $this->isAdditionalClaimLostTheftApprovedAllowed();
+    }
+
+    public function isAdditionalClaimLostTheftApprovedAllowed()
+    {
+        $count = 0;
+        foreach ($this->getClaims() as $claim) {
+            if ($claim->isLostTheftApproved()) {
+                $count++;
+            }
+        }
+
+        return $count < 2;
+    }
+
+    public function hasOpenClaim($onlyWithOutFees = false)
+    {
+        foreach ($this->getClaims() as $claim) {
+            if ($claim->isOpen()) {
+                if ($onlyWithOutFees) {
+                    return $claim->getLastChargeAmount() ==  0;
+                } else {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public function getApprovedClaims($includeSettled = true)
@@ -1572,7 +1612,7 @@ abstract class Policy
         $prefix = null;
         if ($environment != 'prod') {
             $prefix = strtoupper($environment);
-        } elseif ($this->getUser()->hasSoSureEmail()) {
+        } elseif ($this->getUser() && $this->getUser()->hasSoSureEmail()) {
             // any emails with @so-sure.com will generate an invalid policy
             $prefix = self::PREFIX_INVALID;
         }
@@ -1877,6 +1917,14 @@ abstract class Policy
 
         if (in_array($this->getStatus(), [self::STATUS_CANCELLED, self::STATUS_EXPIRED])) {
             $warnings[] = sprintf('Policy is %s - DO NOT ALLOW CLAIM', $this->getStatus());
+        }
+
+        if ($this->hasOpenClaim(true)) {
+            $warnings[] = sprintf('Policy has an open claim, but ClaimsCheck has not been run.');
+        }
+
+        if (!$this->isAdditionalClaimLostTheftApprovedAllowed()) {
+            $warnings[] = sprintf('Policy already has 2 lost/theft claims. No further lost/theft claims are allowed');
         }
 
         return $warnings;

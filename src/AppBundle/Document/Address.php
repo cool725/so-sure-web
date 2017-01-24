@@ -8,6 +8,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use VasilDakov\Postcode\Postcode;
 
 /**
  * @MongoDB\EmbeddedDocument
@@ -142,7 +143,8 @@ class Address
 
     public function setPostcode($postcode)
     {
-        $this->postcode = $postcode;
+        $postcode = new Postcode($postcode);
+        $this->postcode = $postcode->normalise();
     }
 
     public function getPostcode()

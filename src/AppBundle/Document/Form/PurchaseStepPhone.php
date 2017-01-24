@@ -15,6 +15,9 @@ class PurchaseStepPhone
     /** @var Phone */
     protected $phone;
 
+    /** @var User */
+    protected $user;
+
     /**
      * @Assert\Range(
      *      min = 1,
@@ -51,6 +54,16 @@ class PurchaseStepPhone
     public function setPhone(Phone $phone)
     {
         $this->phone = $phone;
+    }
+
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function setUser($user)
+    {
+        $this->user = $user;
     }
 
     public function getAmount()

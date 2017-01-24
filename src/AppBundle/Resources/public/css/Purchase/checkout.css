@@ -51,7 +51,7 @@
     margin-top: 15px;
 }
 
-.checkout .address-manual {
+.checkout .btn-additional {
     padding: 12px 30px;
     border: 2px solid #202532;
     background: none !important;
@@ -62,8 +62,16 @@
     color: #202532;    
 }
 
-.checkout .birthday-picker {
-    cursor: pointer;
+/* Birthday */
+.birthday select {
+    font-size: 14px;
+    padding: 6px 12px;
+    background-color: #fff;
+    background-image: none;
+    -webkit-background-clip: padding-box;
+          background-clip: padding-box;
+    border: 2px solid #efefef;
+    border-radius: 4px;
 }
 
 /* Includes */

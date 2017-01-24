@@ -8,7 +8,7 @@ imports:
 parameters:
     locale: en
     mongo.session.options:
-        database: %mongodb_db%
+        database: "%mongodb_db%"
         collection: session
     cognito_developer_login: 'login.so-sure.com'
     default_sender_address: 'hello@wearesosure.com'
@@ -47,34 +47,34 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
     globals:
-        fb_appid: %fb_appid%
-        fb_pixel_id: %fb_pixel_id%
-        fb_og_namespace: %fb_og_namespace%
+        fb_appid: "%fb_appid%"
+        fb_pixel_id: "%fb_pixel_id%"
+        fb_og_namespace: "%fb_og_namespace%"
         cdn_url: "https://cdn.so-sure.com"
-        heap_id: %heap_id%
-        google_analytics: %google_analytics%
-        ga_tag_manager_env: %ga_tag_manager_env%
-        pca_webkey: %pca_webkey%
-        branch_key: %branch_key%
-        drift_key: %drift_key%
+        heap_id: "%heap_id%"
+        google_analytics: "%google_analytics%"
+        ga_tag_manager_env: "%ga_tag_manager_env%"
+        pca_webkey: "%pca_webkey%"
+        branch_key: "%branch_key%"
+        drift_key: "%drift_key%"
         use_cdn: true
-        branch_pot_url: %branch_pot_url%
-        branch_share_url: %branch_share_url%
-        branch_policy_url: %branch_policy_url%
-        branch_card_url: %branch_card_url%
-        expected_claim_frequency: 0.2
-        consumer_payout: 17.2
-        ipt_rebate: 1.5
-        davies_ip: %davies_ip%
-        environment: %kernel.environment%
-        digits_consumer_key: %digits_consumer_key%
+        branch_pot_url: "%branch_pot_url%"
+        branch_share_url: "%branch_share_url%"
+        branch_policy_url: "%branch_policy_url%"
+        branch_card_url: "%branch_card_url%"
+        expected_claim_frequency: "0.2"
+        consumer_payout: "17.2"
+        ipt_rebate: "1.5"
+        davies_ip: "%davies_ip%"
+        environment: "%kernel.environment%"
+        digits_consumer_key: "%digits_consumer_key%"
 
 doctrine_mongodb:
     connections:
         default:
-            server: %mongodb_url%
+            server: "%mongodb_url%"
             options: {}
-    default_database: %mongodb_db%
+    default_database: "%mongodb_db%"
     document_managers:
         default:
             auto_mapping: true
@@ -141,8 +141,8 @@ hwi_oauth:
     resource_owners:
         facebook:
             type:                facebook
-            client_id:           %fb_appid%
-            client_secret:       %fb_secret%
+            client_id:           "%fb_appid%"
+            client_secret:       "%fb_secret%"
             scope:               "email"
             options:
                 #display: popup #dialog is optimized for popup window
@@ -167,15 +167,17 @@ snc_redis:
         default:
             type: predis
             alias: default
-            dsn: %redis_default_dsn%
+            dsn: "%redis_default_dsn%"
         session:
             type: predis
             alias: session
-            dsn: %redis_session_dsn%
+            dsn: "%redis_session_dsn%"
+            logging: false
         mailer:
             type: predis
             alias: mailer
-            dsn: %redis_mailer_dsn%
+            dsn: "%redis_mailer_dsn%"
+            logging: false
 
     session:
         client: session
@@ -196,7 +198,7 @@ oneup_flysystem:
             awss3v3:
                 client: aws.s3
                 bucket: admin.so-sure.com
-                prefix: %kernel.environment%
+                prefix: "%kernel.environment%"
     filesystems:
         s3admin_fs:
             adapter: s3admin
@@ -269,7 +271,7 @@ scheb_two_factor:
 nexy_slack:
 
     # The Slack API Incoming WebHooks URL.
-    endpoint:             %slack_webhook%
+    endpoint:             "%slack_webhook%"
 
 nelmio_security:
     # prevents framing of the entire site

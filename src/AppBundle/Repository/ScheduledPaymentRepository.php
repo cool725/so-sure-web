@@ -8,7 +8,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
-class ScheduledPaymentRepository extends DocumentRepository
+class ScheduledPaymentRepository extends BaseDocumentRepository
 {
     use DateTrait;
 
@@ -57,5 +57,30 @@ class ScheduledPaymentRepository extends DocumentRepository
             ->getQuery()
             ->execute()
             ->count();
+    }
+
+    public function getMonthlyValues()
+    {
+        $collection = $this->getDocumentManager()->getDocumentCollection($this->getClassName());
+        $builder = $collection->createAggregationBuilder();
+        return $builder
+                ->match()
+                    ->field('status')
+                    ->in([ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS])
+                    ->field('policy.$id')
+                    ->notIn($this->excludedPolicyIds ? $this->excludedPolicyIds : [])
+                ->group()
+                    ->field('_id')
+                    ->expression(
+                        $builder->expr()
+                            ->field('year')
+                            ->year('$scheduled')
+                            ->field('month')
+                            ->month('$scheduled')
+                    )
+                    ->field('total')
+                    ->sum('$amount')
+                ->sort('_id', 'desc')
+                ->execute();
     }
 }
