@@ -51,7 +51,7 @@ class ClaimsController extends BaseController
             return $this->redirectToRoute('admin_policies');
         }
 
-        $data = $this->searchUsers($request, false);
+        $data = $this->searchPolicies($request, false);
         return array_merge($data, [
             'policy_route' => 'claims_policy'
         ]);
