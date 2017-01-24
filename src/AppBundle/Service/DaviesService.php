@@ -10,6 +10,7 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use VasilDakov\Postcode\Postcode;
 
 class DaviesService
 {
@@ -400,7 +401,7 @@ class DaviesService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$this->postcodeCompare(
+        if ($daviesClaim->riskPostCode && !$this->postcodeCompare(
             $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode(),
             $daviesClaim->riskPostCode
         )) {
@@ -450,7 +451,14 @@ class DaviesService
 
     private function postcodeCompare($postcodeA, $postcodeB)
     {
-        return strtolower(str_replace(' ', '', $postcodeA)) == strtolower(str_replace(' ', '', $postcodeB));
+        $postcodeA = new Postcode($postcodeA);
+        $postcodeB = new Postcode($postcodeB);
+        /*
+        if (!$postcodeA|| !$postcodeB) {
+            return false;
+        }*/
+
+        return $postcodeA->normalise() === $postcodeB->normalise();
     }
 
     public function getReplacementPhone(DaviesClaim $daviesClaim)

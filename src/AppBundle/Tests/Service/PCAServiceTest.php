@@ -58,13 +58,13 @@ class PCAServiceTest extends WebTestCase
         $testAddress->Line4 = null;
         $testAddress->Line5 = null;
         $testAddress->City = 'city';
-        $testAddress->PostalCode = 'se15';
+        $testAddress->PostalCode = 'se152sz';
 
         $address = self::$pca->transformAddress($this->getTransformMock($testAddress));
         $this->assertEquals('1', $address->getLine1());
         $this->assertEquals('2', $address->getLine2());
         $this->assertEquals('3', $address->getLine3());
-        $this->assertEquals('se15', $address->getPostcode());
+        $this->assertEquals('SE15 2SZ', $address->getPostcode());
         $this->assertEquals('city', $address->getCity());
     }
 
@@ -77,13 +77,13 @@ class PCAServiceTest extends WebTestCase
         $testAddress->Line4 = '4';
         $testAddress->Line5 = null;
         $testAddress->City = 'city';
-        $testAddress->PostalCode = 'se15';
+        $testAddress->PostalCode = 'se152sz';
 
         $address = self::$pca->transformAddress($this->getTransformMock($testAddress));
         $this->assertEquals('1', $address->getLine1());
         $this->assertEquals('2', $address->getLine2());
         $this->assertEquals('3, 4', $address->getLine3());
-        $this->assertEquals('se15', $address->getPostcode());
+        $this->assertEquals('SE15 2SZ', $address->getPostcode());
         $this->assertEquals('city', $address->getCity());
     }
 
@@ -96,13 +96,13 @@ class PCAServiceTest extends WebTestCase
         $testAddress->Line4 = '4';
         $testAddress->Line5 = '5';
         $testAddress->City = 'city';
-        $testAddress->PostalCode = 'se15';
+        $testAddress->PostalCode = 'se152sz';
 
         $address = self::$pca->transformAddress($this->getTransformMock($testAddress));
         $this->assertEquals('1, 2', $address->getLine1());
         $this->assertEquals('3', $address->getLine2());
         $this->assertEquals('4, 5', $address->getLine3());
-        $this->assertEquals('se15', $address->getPostcode());
+        $this->assertEquals('SE15 2SZ', $address->getPostcode());
         $this->assertEquals('city', $address->getCity());
     }
 
