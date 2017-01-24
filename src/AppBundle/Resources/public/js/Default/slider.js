@@ -40,6 +40,7 @@ var updateValue = function() {
     setConnectionText();
     $('#buy_form_slider_used').val(true);
     $('#buy_form_banner_slider_used').val(true);
+    $('#compare_buy_form_slider_used').val(true);
 }
 
 var slider = $('#slider-value').slider({

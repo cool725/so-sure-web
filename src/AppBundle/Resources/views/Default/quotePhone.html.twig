@@ -141,7 +141,7 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/sosureCompared.html.twig' %}        
+    {{ render(controller('AppBundle:Default:sosureCompared')) }}
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
 

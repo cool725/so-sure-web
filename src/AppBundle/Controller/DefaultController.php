@@ -188,6 +188,39 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/compare", name="compare")
+     * @Template()
+     */
+    public function sosureComparedAction(Request $request, $type = null)
+    {
+        $buyForm = $this->get('form.factory')
+            ->createNamedBuilder('compare_buy_form')
+            ->add('buy', SubmitType::class)
+            ->add('slider_used', HiddenType::class)
+            ->setAction($this->generateUrl('compare'))
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('compare_buy_form')) {
+                $buyForm->handleRequest($request);
+                if ($buyForm->isValid()) {
+                    $properties = [];
+                    $properties['Location'] = 'compare';
+                    if ($buyForm->getData()['slider_used']) {
+                        $properties['Played with Slider'] = true;
+                    }
+                    $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED, $properties);
+
+                    return $this->redirectToRoute('purchase');
+                }
+            }
+        }
+
+        return array(
+            'compare_buy_form' => $buyForm->createView(),
+        );
+    }
+
+    /**
      * @Route("/login-redirect", name="login_redirect")
      */
     public function loginRedirectAction()
@@ -510,7 +543,8 @@ class DefaultController extends BaseController
                 $buyForm->handleRequest($request);
                 if ($buyForm->isValid()) {
                     $properties = [];
-                    if ($buyForm->getData('slider_used')) {
+                    $properties['Location'] = 'main';
+                    if ($buyForm->getData()['slider_used']) {
                         $properties['Played with Slider'] = true;
                     }
                     $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED, $properties);
@@ -521,7 +555,8 @@ class DefaultController extends BaseController
                 $buyBannerForm->handleRequest($request);
                 if ($buyBannerForm->isValid()) {
                     $properties = [];
-                    if ($buyBannerForm->getData('slider_used')) {
+                    $properties['Location'] = 'banner';
+                    if ($buyBannerForm->getData()['slider_used']) {
                         $properties['Played with Slider'] = true;
                     }
                     $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED, $properties);

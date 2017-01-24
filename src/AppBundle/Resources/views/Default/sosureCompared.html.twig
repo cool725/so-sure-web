@@ -105,7 +105,9 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div class="comparison-table--cta">
-					<a href="#" class="btn btn-success btn-rounded">Insure your phone</a>
+					{{ form_start(compare_buy_form) }}
+						{{ form_widget(compare_buy_form.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
+					{{ form_end(compare_buy_form)}}
 				</div>					
 			</div>
 		</div>					
