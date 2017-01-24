@@ -73,8 +73,10 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($user->allowedMonthlyPayments());
 
         $address->setPostcode('de14 2sz');
-        //$this->assertFalse($user->allowedMonthlyPayments());
-        $this->assertTrue($user->allowedMonthlyPayments());
+        $this->assertFalse($user->allowedMonthlyPayments());
+
+        $address->setPostcode('TN15 7LY');
+        $this->assertFalse($user->allowedMonthlyPayments());
     }
 
     public function testAllowedYearlyPayments()
@@ -99,6 +101,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($user->allowedYearlyPayments());
 
         $address->setPostcode('de14 2sz');
+        $this->assertTrue($user->allowedYearlyPayments());
+
+        $address->setPostcode('TN15 7LY');
         $this->assertTrue($user->allowedYearlyPayments());
     }
 
