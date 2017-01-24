@@ -13,6 +13,7 @@ class UkMobileValidator extends ConstraintValidator
         if (strlen($value) == 0) {
             return;
         }
+        $value = str_replace(' ', '', $value);
         if (!preg_match('/^(00447[1-9]\d{8,8}|\+447[1-9]\d{8,8}|07[1-9]\d{8,8})$/', $value, $matches)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('%string%', $value)
