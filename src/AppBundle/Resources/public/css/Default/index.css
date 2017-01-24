@@ -98,6 +98,10 @@
     padding: 15px 25px 25px;
 }
 
+.comparison-table--body a {
+    text-decoration: underline;
+}
+
 .comparison-table--body ul {
     margin: 0 0 25px;
 }
