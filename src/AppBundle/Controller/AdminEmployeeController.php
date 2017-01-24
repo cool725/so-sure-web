@@ -165,6 +165,22 @@ class AdminEmployeeController extends BaseController
      * @Route("/policies", name="admin_policies")
      * @Template("AppBundle::Claims/claimsPolicies.html.twig")
      */
+    public function adminPoliciesAction(Request $request)
+    {
+        try {
+            $data = $this->searchPolicies($request);
+        } catch (RedirectException $e) {
+            return new RedirectResponse($e->getMessage());
+        }
+        return array_merge($data, [
+            'policy_route' => 'admin_policy'
+        ]);
+    }
+
+    /**
+     * @Route("/users", name="admin_users")
+     * @Template()
+     */
     public function adminUsersAction(Request $request)
     {
         try {
