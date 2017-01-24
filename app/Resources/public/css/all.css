@@ -40,14 +40,20 @@ body {
 }
 strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-style: bold;
-    font-weight: 700;
 }
 ul, li {
     margin: auto;
 }
 .error-text {
     color: #FF6666;
+}
+
+.text-blue {
+    color: #3399FF !important;
+}
+
+.text-grey-blue {
+    color: #8B97B5 !important;
 }
 
 /* MOVE TO layout > _header.scss */
