@@ -57,8 +57,8 @@ trait UserClassTrait
 
         if ($phone) {
             $user->setMobileNumber(self::generateRandomMobile());
-            $user->setFirstName('foo');
-            $user->setLastName('bar');
+            $user->setFirstName('Foo');
+            $user->setLastName('Bar');
             $user->setBirthday(new \DateTime('1980-01-01'));
         }
 
