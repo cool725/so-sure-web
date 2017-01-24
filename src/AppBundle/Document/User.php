@@ -928,7 +928,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
         $postcode = new Postcode($this->getBillingAddress()->getPostcode());
 
-        return !in_array(strtoupper($postcode->outcode()), SoSure::$yearlyOnlyPostcodeOutcodes);
+        if (in_array(strtoupper($postcode->outcode()), SoSure::$yearlyOnlyPostcodeOutcodes)) {
+            return false;
+        } elseif (in_array($postcode->normalise(), SoSure::$yearlyOnlyPostcodes)) {
+            return false;
+        }
+
+        return true;
     }
 
     public function allowedYearlyPayments()

@@ -18,7 +18,9 @@ class SoSure
         return stripos($email, '@so-sure.com') !== false;
     }
 
-    // make sure uppper case
-    //public static $yearlyOnlyPostcodeOutcodes = ['DE14'];
-    public static $yearlyOnlyPostcodeOutcodes = [];
+    // make sure uppper case/normalised
+    // Dylan requested DE14 & TN15 7LY in Jan 2017 due to suspecion of fraud in those
+    // postcodes based on claims we receieved
+    public static $yearlyOnlyPostcodeOutcodes = ['DE14'];
+    public static $yearlyOnlyPostcodes = ['TN15 7LY'];
 }
