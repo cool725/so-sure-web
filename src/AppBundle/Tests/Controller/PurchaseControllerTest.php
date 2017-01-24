@@ -46,7 +46,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/purchase/');
         self::verifyResponse(200);
         $form = $crawler->selectButton('purchase_form[next]')->form();
-        $form['purchase_form[email]'] = self::generateEmail('testPurchaseExistingUserDiffDetails', $this);
+        $form['purchase_form[email]'] = $user->getEmail();
         $form['purchase_form[name]'] = 'not me';
         $form['purchase_form[birthday][day]'] = 1;
         $form['purchase_form[birthday][month]'] = 1;
@@ -69,7 +69,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/purchase/');
         self::verifyResponse(200);
         $form = $crawler->selectButton('purchase_form[next]')->form();
-        $form['purchase_form[email]'] = self::generateEmail('testPurchaseExistingUserSameDetails', $this);
+        $form['purchase_form[email]'] = $user->getEmail();
         $form['purchase_form[name]'] = 'foo bar';
         $form['purchase_form[birthday][day]'] = 1;
         $form['purchase_form[birthday][month]'] = 1;
@@ -94,7 +94,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/purchase/');
         self::verifyResponse(200);
         $form = $crawler->selectButton('purchase_form[next]')->form();
-        $form['purchase_form[email]'] = self::generateEmail('testPurchaseExistingUserSameDetailsWithPartialPolicy', $this);
+        $form['purchase_form[email]'] = $user->getEmail();
         $form['purchase_form[name]'] = 'foo bar';
         $form['purchase_form[birthday][day]'] = 1;
         $form['purchase_form[birthday][month]'] = 1;
