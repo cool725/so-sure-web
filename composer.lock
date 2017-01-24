@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a705b185b3f20f422231a883b47cf2dd",
-    "content-hash": "6a59d8ead9b30c2a8bf45c793fde7636",
+    "hash": "286145c6da83b73d9292d31703370176",
+    "content-hash": "e00ce499fd9ad06893f59dbd990501e1",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -6206,6 +6206,55 @@
             ],
             "description": "A multi-language port of Browserscope's user agent parser.",
             "time": "2016-07-09 13:53:59"
+        },
+        {
+            "name": "vasildakov/postcode",
+            "version": "1.1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vasildakov/postcode.git",
+                "reference": "17e66996161931758ceffc79fd78c67558f570f3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vasildakov/postcode/zipball/17e66996161931758ceffc79fd78c67558f570f3",
+                "reference": "17e66996161931758ceffc79fd78c67558f570f3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpunit/php-code-coverage": "^3.0|^4.0",
+                "phpunit/phpunit": "^4.7|^5.0",
+                "satooshi/php-coveralls": "~1.0",
+                "squizlabs/php_codesniffer": "~2.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "VasilDakov\\Postcode\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vasil Dakov",
+                    "email": "vasildakov@gmail.com"
+                }
+            ],
+            "description": "UK Postcode",
+            "homepage": "https://github.com/vasildakov/postcode",
+            "keywords": [
+                "php",
+                "post",
+                "postcode",
+                "uk"
+            ],
+            "time": "2016-10-04 10:30:32"
         },
         {
             "name": "vich/uploader-bundle",

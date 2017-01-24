@@ -242,6 +242,7 @@ class PurchaseController extends BaseController
         $phone = $this->getSessionQuotePhone($request);
 
         $purchase = new PurchaseStepPhone();
+        $purchase->setUser($user);
         $policy = $user->getUnInitPolicy();
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
