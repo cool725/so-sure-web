@@ -109,7 +109,7 @@ Vagrant.configure("2") do |config|
     dev1604_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
     dev1604_config.vm.network "private_network", ip: "10.0.4.2"
     #dev1604_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
-    dev1604_config.vm.synced_folder ".", "/vagrant", nfs: true
+    dev1604_config.vm.synced_folder ".", "/vagrant", nfs: true, mount_options: ['actimeo=1']
     #dev1604_config.vm.synced_folder ".", "/vagrant"
     dev1604_config.ssh.forward_agent = true
     dev1604_config.vm.provision "shell",
