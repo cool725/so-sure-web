@@ -3209,7 +3209,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals($data['type'], $result['addresses'][0]['type']);
         $this->assertEquals($data['line1'], $result['addresses'][0]['line1']);
         $this->assertEquals($data['city'], $result['addresses'][0]['city']);
-        $this->assertEquals($data['postcode'], $result['addresses'][0]['postcode']);
+        $this->assertEquals('BX1 1LT', $result['addresses'][0]['postcode']);
 
         $this->assertFalse(isset($data['intercom_token']));
         $this->assertFalse(isset($data['cognito_token']));
@@ -3238,7 +3238,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('address line 2', $result['addresses'][0]['line2']);
         $this->assertEquals('address line 3', $result['addresses'][0]['line3']);
         $this->assertEquals('London', $result['addresses'][0]['city']);
-        $this->assertEquals('BX11LT', $result['addresses'][0]['postcode']);
+        $this->assertEquals('BX1 1LT', $result['addresses'][0]['postcode']);
     }
 
     public function testUserAddressValidation()

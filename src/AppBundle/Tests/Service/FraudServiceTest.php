@@ -58,7 +58,7 @@ class FraudServiceTest extends WebTestCase
 
         // policy will set address
         $address = $user->getBillingAddress();
-        $address->setPostcode('AB123');
+        $address->setPostcode('BX11LT');
 
         $user2 = static::createUser(
             static::$userManager,
@@ -67,7 +67,7 @@ class FraudServiceTest extends WebTestCase
         );
         $address2 = new Address();
         $address2->setType(Address::TYPE_BILLING);
-        $address2->setPostcode('AB123');
+        $address2->setPostcode('BX11LT');
         $user2->setBillingAddress($address2);
         self::$dm->persist($user2);
         self::$dm->flush();
@@ -85,7 +85,7 @@ class FraudServiceTest extends WebTestCase
         );
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setPostcode('AB123');
+        $address->setPostcode('BX11LT');
         $user->setBillingAddress($address);
         self::$dm->persist($user);
         self::$dm->flush();
@@ -103,7 +103,7 @@ class FraudServiceTest extends WebTestCase
         );
         $address2 = new Address();
         $address2->setType(Address::TYPE_BILLING);
-        $address2->setPostcode('AB123');
+        $address2->setPostcode('BX11LT');
         $user2->setBillingAddress($address2);
         $gocardless2 = new GocardlessPaymentMethod();
         $gocardless2->addAccount('1', $account);
@@ -125,7 +125,7 @@ class FraudServiceTest extends WebTestCase
         );
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setPostcode('AB123');
+        $address->setPostcode('BX11LT');
         $user->setBillingAddress($address);
         self::$dm->persist($user);
         self::$dm->flush();
@@ -143,7 +143,7 @@ class FraudServiceTest extends WebTestCase
         );
         $address2 = new Address();
         $address2->setType(Address::TYPE_BILLING);
-        $address2->setPostcode('AB123');
+        $address2->setPostcode('BX11LT');
         $user2->setBillingAddress($address2);
 
         $judo2 = new JudoPaymentMethod();

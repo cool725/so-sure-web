@@ -64,7 +64,7 @@ class PCAServiceTest extends WebTestCase
         $this->assertEquals('1', $address->getLine1());
         $this->assertEquals('2', $address->getLine2());
         $this->assertEquals('3', $address->getLine3());
-        $this->assertEquals('se15', $address->getPostcode());
+        $this->assertEquals('SE15', $address->getPostcode());
         $this->assertEquals('city', $address->getCity());
     }
 
@@ -83,7 +83,7 @@ class PCAServiceTest extends WebTestCase
         $this->assertEquals('1', $address->getLine1());
         $this->assertEquals('2', $address->getLine2());
         $this->assertEquals('3, 4', $address->getLine3());
-        $this->assertEquals('se15', $address->getPostcode());
+        $this->assertEquals('SE15', $address->getPostcode());
         $this->assertEquals('city', $address->getCity());
     }
 
@@ -102,7 +102,7 @@ class PCAServiceTest extends WebTestCase
         $this->assertEquals('1, 2', $address->getLine1());
         $this->assertEquals('3', $address->getLine2());
         $this->assertEquals('4, 5', $address->getLine3());
-        $this->assertEquals('se15', $address->getPostcode());
+        $this->assertEquals('SE15', $address->getPostcode());
         $this->assertEquals('city', $address->getCity());
     }
 
