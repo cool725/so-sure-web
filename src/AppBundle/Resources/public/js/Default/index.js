@@ -10,7 +10,7 @@
         }, 1500);
     });
 
-    $("#how-it-works-btn").click(function() {
+    $("#how-it-works-btn").click(function(event) {
 
         event.preventDefault();
 
@@ -20,7 +20,7 @@
     });
 
 
-    $("#so-sure-compared-btn").click(function() {
+    $("#so-sure-compared-btn").click(function(event) {
 
         event.preventDefault();
 

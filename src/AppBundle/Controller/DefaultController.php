@@ -191,7 +191,7 @@ class DefaultController extends BaseController
      * @Route("/compare", name="compare")
      * @Template()
      */
-    public function sosureComparedAction(Request $request, $type = null)
+    public function sosureComparedAction(Request $request)
     {
         $buyForm = $this->get('form.factory')
             ->createNamedBuilder('compare_buy_form')
