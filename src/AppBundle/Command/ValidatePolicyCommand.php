@@ -123,7 +123,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($policy->isCancelled()) {
                     continue;
                 }
+                $warnPolicyOpenClaim = false;
                 if ($policy->isPolicyPaidToDate(true, $validateDate) === false) {
+                    $warnPolicyOpenClaim = true;
                     $lines[] = sprintf(
                         'Policy %s is not paid to date. Next attempt on %s. If unpaid, policy will be cancelled on %s',
                         $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
@@ -141,6 +143,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = $this->failurePotValueMessage($policy);
                 }
                 if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate) === false) {
+                    $warnPolicy = true;
                     $lines[] = sprintf(
                         'Policy %s has incorrect scheduled payments (likely if within 2 weeks of cancellation date)',
                         $policy->getPolicyNumber()
@@ -148,9 +151,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
                 }
                 if ($policy->hasCorrectPolicyStatus($validateDate) === false) {
+                    $warnPolicyOpenClaim = true;
                     $lines[] = $this->failureStatusMessage($policy, $prefix, $validateDate);
                 }
-                if ($policy->hasOpenClaim()) {
+                if ($warnPolicyOpenClaim && $policy->hasOpenClaim()) {
                     $lines[] = sprintf(
                         'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
                         $policy->getPolicyNumber()
