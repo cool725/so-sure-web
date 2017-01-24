@@ -97,13 +97,28 @@ class PurchaseController extends BaseController
                         $purchase->getMobileNumber()
                     );
                     if ($userExists) {
-                        // @codingStandardsIgnoreStart
-                        $err = 'It looks like you already have an account.  Please logout and try logging in with a different email/mobile number';
-                        // @codingStandardsIgnoreEnd
-                        $this->addFlash('error', $err);
+                        $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($purchase->getEmail())]);
+                        // If the user didn't start a policy at all
+                        // and all of their details match
+                        // then just let the user proceeed as if they entered data for the first time
+                        // however, make sure to clear out the address just in case to prevent
+                        // data disclosure
+                        if ($existingUser && count($existingUser->getPolicies()) == 0 &&
+                            $purchase->matchesUser($existingUser)) {
+                            $existingUser->clearBillingAddress();
+                            $user = $existingUser;
+                        } else {
+                            $this->get('logger')->warning(sprintf(
+                                '%s received a already have account error and was taken to the login page',
+                                $purchase->getEmail()
+                            ));
+                            // @codingStandardsIgnoreStart
+                            $err = 'It looks like you already have an account.  Please try logging in with your details';
+                            // @codingStandardsIgnoreEnd
+                            $this->addFlash('error', $err);
 
-                        // TODO: would be good to auto logout.  redirecting to /logout doesn't work well
-                        throw new \Exception($err);
+                            return $this->redirectToRoute('fos_user_security_login');
+                        }
                     }
 
                     $newUser = false;
@@ -134,6 +149,7 @@ class PurchaseController extends BaseController
                         $this->get('app.mixpanel')->register($user);
                     }
 
+                    // TODO: Check if user is already logged in?
                     $this->get('fos_user.security.login_manager')->loginUser(
                         $this->getParameter('fos_user.firewall_name'),
                         $user

@@ -364,6 +364,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->billingAddress = $billingAddress;
     }
 
+    public function clearBillingAddress()
+    {
+        $this->billingAddress = null;
+    }
+
     public function getPolicyAddress()
     {
         return $this->policyAddress;

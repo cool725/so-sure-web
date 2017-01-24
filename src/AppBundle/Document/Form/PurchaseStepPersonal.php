@@ -6,9 +6,12 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Address;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use AppBundle\Document\PhoneTrait;
 
 class PurchaseStepPersonal
 {
+    use PhoneTrait;
+
     /**
      * @var string
      * @Assert\Email(strict=true)
@@ -121,7 +124,7 @@ class PurchaseStepPersonal
 
     public function setMobileNumber($mobileNumber)
     {
-        $this->mobileNumber = $mobileNumber;
+        $this->mobileNumber = $this->normalizeUkMobile($mobileNumber);
     }
 
     public function toApiArray()
@@ -151,5 +154,14 @@ class PurchaseStepPersonal
         $user->setLastName($this->getLastName());
         $user->setMobileNumber($this->getMobileNumber());
         $user->setBirthday($this->getBirthday());
+    }
+
+    public function matchesUser($user)
+    {
+        return strtolower($this->getEmail()) == $user->getEmailCanonical() &&
+            $this->getFirstName() == $user->getFirstName() &&
+            $this->getLastName() == $user->getLastName() &&
+            $this->getMobileNumber() == $user->getMobileNumber() &&
+            $this->getBirthday()->diff($user->getBirthday())->days == 0;
     }
 }
