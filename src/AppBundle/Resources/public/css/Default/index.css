@@ -68,6 +68,7 @@
     position: relative;
     font-weight: bold;
     font-size: 30px;
+    letter-spacing: 1.1px;
     color: #fff;
 }
 
@@ -116,9 +117,14 @@
 
 @media (min-width: 767px) {
 
+    .sosure-compared {
+        background-color: #99CCFF;
+        padding: 60px 0;
+    }
+
     .comparison-table {
-        max-width: 800px;
-        margin: 25px auto;
+        max-width: 80%;
+        margin: 25px auto;        
     }
 
     .comparison-table--body {
@@ -143,18 +149,17 @@
         border-top-right-radius: 3px;        
     }    
 
+    .comparison-table--footer {
+        border: none;
+    }    
+
 }
 
 @media (min-width: 991px) {
 
-    .sosure-compared {
-        background-color: #99CCFF;        
-        padding: 60px 0;
-    }
-
-    .comparison-table--footer {
-        border: none;
-    }
+    .comparison-table {
+        max-width: 800px;    
+    }    
 
 }
 
