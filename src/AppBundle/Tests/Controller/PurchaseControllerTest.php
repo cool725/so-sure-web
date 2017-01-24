@@ -85,7 +85,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('testPurchaseExistingUserSameDetails', $this),
+            self::generateEmail('testPurchaseExistingUserSameDetailsWithPartialPolicy', $this),
             'foo',
             $phone
         );
@@ -94,7 +94,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/purchase/');
         self::verifyResponse(200);
         $form = $crawler->selectButton('purchase_form[next]')->form();
-        $form['purchase_form[email]'] = self::generateEmail('testPurchaseExistingUserSameDetails', $this);
+        $form['purchase_form[email]'] = self::generateEmail('testPurchaseExistingUserSameDetailsWithPartialPolicy', $this);
         $form['purchase_form[name]'] = 'foo bar';
         $form['purchase_form[birthday][day]'] = 1;
         $form['purchase_form[birthday][month]'] = 1;
