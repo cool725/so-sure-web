@@ -67,7 +67,7 @@
 .comparison-table--head {
     position: relative;
     font-weight: bold;
-    font-size: 30px;
+    font-size: 28px;
     letter-spacing: 1.1px;
     color: #fff;
 }
@@ -75,14 +75,14 @@
 .comparison-table--title {
     position: absolute;
     left: 0; right: 0; top: 0;
-    padding: 15px 0;
+    padding: 5px 0;
     text-align: center;
 }
 
 .comparison-table--left,
 .comparison-table--right {
     width: 50%;
-    padding: 15px 0;
+    padding: 5px 0;
     text-align: center;   
 }
 
@@ -107,7 +107,7 @@
 }
 
 .comparison-table--cta {
-    padding: 25px 0;
+    padding: 25px 0  0;
     text-align: center;
 }
 
@@ -125,6 +125,12 @@
     .comparison-table {
         max-width: 80%;
         margin: 25px auto;        
+    }
+
+    .comparison-table--left,
+    .comparison-table--title,
+    .comparison-table--right {
+        padding: 15px 0;
     }
 
     .comparison-table--body {

@@ -51,14 +51,14 @@
 }
 
 .btn-quote-card {
-    width: 170px;
+    width: 200px;
 }
 
 .btn-quote-card + .btn-quote-card {
     margin: 15px 0 0;
 }
 
-@media (min-width: 375px) {
+@media (min-width: 435px) {
 
     .btn-quote-card + .btn-quote-card {
         margin: 0;

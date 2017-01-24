@@ -20,12 +20,12 @@
     });
 
 
-    $("#why-were-better-btn").click(function() {
+    $("#so-sure-compared-btn").click(function() {
 
         event.preventDefault();
 
         $('html, body').animate({
-            scrollTop: $("#why-were-better").offset().top - 200
+            scrollTop: $("#so-sure-compared").offset().top - 200
         }, 1500);
     });
 
