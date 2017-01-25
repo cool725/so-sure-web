@@ -380,7 +380,7 @@ class DaviesService
         }
 
         $now = new \DateTime();
-        if ($claim->isOpen() || $claimed->getClosedDate()->diff($now)->days < 5) {
+        if ($daviesClaim->isOpen() || ($daviesClaim->dateClosed && $daviesClaim->dateClosed->diff($now)->days < 5)) {
             similar_text($claim->getPolicy()->getUser()->getName(), $daviesClaim->insuredName, $percent);
 
             if ($percent < 30) {

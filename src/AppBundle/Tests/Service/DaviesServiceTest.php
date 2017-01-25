@@ -150,6 +150,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim = new DaviesClaim();
         $daviesClaim->policyNumber = 3;
         $daviesClaim->insuredName = 'Mr Bar Foo';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
     }
@@ -171,8 +172,11 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->policyNumber = 1;
+        $daviesClaim->reserved = 1;
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->type = DaviesClaim::TYPE_LOSS;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->assertEquals(0, count(self::$daviesService->getErrors()));
@@ -189,6 +193,7 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->policyNumber = -1;
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
     }
@@ -205,6 +210,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim = new DaviesClaim();
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr Patrick McAndrew';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
     }
@@ -220,6 +226,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $foundMatch = false;
@@ -237,9 +244,6 @@ class DaviesServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_SETTLED);
-        $yesterday = new \DateTime();
-        $yesterday = $yesterday->sub(new \DateInterval('-1 day'));
-        $claim->setClosedDate($yesterday);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesClaim();
@@ -247,6 +251,9 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
+        $yesterday = new \DateTime();
+        $yesterday = $yesterday->sub(new \DateInterval('P1D'));
+        $daviesClaim->dateClosed = $yesterday;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $foundMatch = false;
@@ -264,9 +271,6 @@ class DaviesServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_SETTLED);
-        $fiveDaysAgo = new \DateTime();
-        $fiveDaysAgo = $fiveDaysAgo->sub(new \DateInterval('-5 day'));
-        $claim->setClosedDate($fiveDaysAgo);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesClaim();
@@ -274,6 +278,9 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
+        $fiveDaysAgo = new \DateTime();
+        $fiveDaysAgo = $fiveDaysAgo->sub(new \DateInterval('P5D'));
+        $daviesClaim->dateClosed = $fiveDaysAgo;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $foundMatch = false;
@@ -294,11 +301,12 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = 'Open';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $foundMatch = false;
@@ -319,7 +327,7 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = 'open';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 1;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
