@@ -379,40 +379,43 @@ class DaviesService
             ));
         }
 
-        similar_text($claim->getPolicy()->getUser()->getName(), $daviesClaim->insuredName, $percent);
+        $now = new \DateTime();
+        if ($claim->isOpen() || $claimed->getClosedDate()->diff($now)->days < 5) {
+            similar_text($claim->getPolicy()->getUser()->getName(), $daviesClaim->insuredName, $percent);
 
-        if ($percent < 30) {
-            throw new \Exception(sprintf(
-                'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
-                $daviesClaim->claimNumber,
-                $daviesClaim->insuredName,
-                $claim->getPolicy()->getUser()->getName(),
-                $percent
-            ));
-        } elseif ($percent < 75) {
-            $msg = sprintf(
-                'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
-                $daviesClaim->claimNumber,
-                $daviesClaim->insuredName,
-                $claim->getPolicy()->getUser()->getName(),
-                $percent
-            );
-            $this->logger->warning($msg);
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
-        }
+            if ($percent < 30) {
+                throw new \Exception(sprintf(
+                    'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
+                    $daviesClaim->claimNumber,
+                    $daviesClaim->insuredName,
+                    $claim->getPolicy()->getUser()->getName(),
+                    $percent
+                ));
+            } elseif ($percent < 75) {
+                $msg = sprintf(
+                    'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
+                    $daviesClaim->claimNumber,
+                    $daviesClaim->insuredName,
+                    $claim->getPolicy()->getUser()->getName(),
+                    $percent
+                );
+                $this->logger->warning($msg);
+                $this->errors[$daviesClaim->claimNumber][] = $msg;
+            }
 
-        if ($daviesClaim->riskPostCode && !$this->postcodeCompare(
-            $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode(),
-            $daviesClaim->riskPostCode
-        )) {
-            $msg = sprintf(
-                'Claim %s: %s does not match expected postcode %s',
-                $daviesClaim->claimNumber,
-                $daviesClaim->riskPostCode,
-                $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode()
-            );
-            $this->logger->warning($msg);
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            if ($daviesClaim->riskPostCode && !$this->postcodeCompare(
+                $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode(),
+                $daviesClaim->riskPostCode
+            )) {
+                $msg = sprintf(
+                    'Claim %s: %s does not match expected postcode %s',
+                    $daviesClaim->claimNumber,
+                    $daviesClaim->riskPostCode,
+                    $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode()
+                );
+                $this->logger->warning($msg);
+                $this->errors[$daviesClaim->claimNumber][] = $msg;
+            }
         }
 
         // Open Non-Warranty Claims are expected to either have a total incurred value or a reserved value

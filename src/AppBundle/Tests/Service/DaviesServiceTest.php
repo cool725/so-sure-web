@@ -232,6 +232,60 @@ class DaviesServiceTest extends WebTestCase
         $this->assertTrue($foundMatch);
     }
 
+    public function testValidateClaimDetailsInvalidPostcodeClosedRecent()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $yesterday = new \DateTime();
+        $yesterday = $yesterday->sub(new \DateInterval('-1 day'));
+        $claim->setClosedDate($yesterday);
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->riskPostCode = 'se152sz';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not match expected postcode/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertTrue($foundMatch);
+    }
+
+    public function testValidateClaimDetailsInvalidPostcodeClosedOld()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $fiveDaysAgo = new \DateTime();
+        $fiveDaysAgo = $fiveDaysAgo->sub(new \DateInterval('-5 day'));
+        $claim->setClosedDate($fiveDaysAgo);
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->riskPostCode = 'se152sz';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not match expected postcode/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertFalse($foundMatch);
+    }
+
     public function testValidateClaimDetailsMissingReserved()
     {
         $policy = static::createUserPolicy(true);
