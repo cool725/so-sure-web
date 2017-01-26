@@ -187,8 +187,8 @@
 
 /* PRESS - Ext Banner: MOVE TO layouts > _footer.scss */
 
-.press {
-    background: #ddd;
+section.press {
+    background: #ddd !important;
     padding: 20px 0;
     text-align: center;
 }
