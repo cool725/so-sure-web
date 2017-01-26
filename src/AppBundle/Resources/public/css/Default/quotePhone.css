@@ -36,7 +36,7 @@
 }
 
 .quote-card ul {
-    padding-left: 30px;
+    padding-left: 40px;
     margin: 0 0 25px;
     position: relative;
 }
@@ -52,11 +52,30 @@
 
 .quote-card .fa-lg {
     position: absolute;
-    left: 0;
+    left: 10px;
 }
 
 .quote-card p.h4 {
     margin: 0 0 10px;
+}
+
+.quote-tip {
+    background-color: #efefef;
+    position: relative;
+    text-align: center;
+    padding: 10px 15px;
+    margin-top: 25px;
+}
+
+.quote-tip:before {
+    width: 0; height: 0;
+    content: '';
+    position: absolute;
+    bottom: 100%; left: 0; right: 0;
+    margin: 0 auto;    
+    border-style: solid;
+    border-width: 0 10px 10px 10px;
+    border-color: transparent transparent #efefef transparent;  
 }
 
 .btn-memory {
@@ -87,7 +106,7 @@
 
     .quote .device .h3 {
         margin: 0;
-        font-size: inherit;
+        font-size: 26px;
     }
 
     .quote-card {
