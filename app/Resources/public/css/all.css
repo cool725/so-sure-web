@@ -41,9 +41,7 @@ body {
 strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-ul, li {
-    margin: auto;
-}
+
 .error-text {
     color: #FF6666;
 }
