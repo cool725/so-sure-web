@@ -16,24 +16,45 @@ class MixpanelCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sosure:mixpanel')
-            ->setDescription('Run mixpanel test')
+            ->setDescription('Run mixpanel')
+            ->addArgument(
+                'action',
+                InputArgument::REQUIRED,
+                'delete|test'
+            )
             ->addOption(
                 'email',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'email address of user'
             )
+            ->addOption(
+                'id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'id of mixpanel user'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $action = $input->getArgument('action');
         $email = $input->getOption('email');
+        $id = $input->getOption('id');
         $user = null;
         if ($email) {
             $user = $this->getUser($email);
+            $id = $user->getId();
         }
-        $results = $this->getMixpanel()->track("button clicked", array("label" => "sign-up"), $user);
+        if ($action == 'test') {
+            $results = $this->getMixpanel()->track("button clicked", array("label" => "sign-up"), $user);
+        } elseif ($action == 'delete') {
+            if (!$id) {
+                throw new \Exception('email or id is required');
+            }
+            $results = $this->getMixpanel()->delete($id);
+        }
         $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
     }
     

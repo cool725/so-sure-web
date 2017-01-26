@@ -281,4 +281,71 @@ class ApiExternalControllerTest extends BaseControllerTest
             ]));
         }
     }
+
+    public function testMixpanelDelete()
+    {
+        $data = '[
+   {
+      "$distinct_id":"13b20239a29335",
+      "$properties":{
+         "$region":"California",
+         "$email":"harry.q.bovik@andrew.cmu.edu",
+         "$last_name":"Bovik",
+         "$created":"2012-11-20T15:26:16",
+         "$country_code":"US",
+         "$first_name":"Harry",
+         "Referring Domain":"news.ycombinator.com",
+         "$city":"Los Angeles",
+         "Last Seen":"2012-11-20T15:26:17",
+         "Referring URL":"http://news.ycombinator.com/",
+         "$last_seen":"2012-11-20T15:26:19"
+      }
+   },
+   {
+      "$distinct_id":"13a00df8730412",
+      "$properties":{
+         "$region":"California",
+         "$email":"anna.lytics@mixpanel.com",
+         "$last_name":"Lytics",
+         "$created":"2012-11-20T15:25:38",
+         "$country_code":"US",
+         "$first_name":"Anna",
+         "Referring Domain":"www.quora.com",
+         "$city":"Mountain View",
+         "Last Seen":"2012-11-20T15:25:39",
+         "Referring URL":"http://www.quora.com/What-...",
+         "$last_seen":"2012-11-20T15:25:42"
+      }
+   }
+]';
+        $this->clearRateLimit();
+        $url = sprintf(
+            '/external/mixpanel/delete?mixpanel_webhook_key=%s&debug=true',
+            static::$container->getParameter('mixpanel_webhook_key')
+        );
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            ['users' => json_encode($data)]
+        );
+
+        $data = $this->verifyResponse(200);
+    }
+
+    public function testMixpanelDeleteInvalidToken()
+    {
+        $this->clearRateLimit();
+        $url = sprintf(
+            '/external/mixpanel/delete?debug=true'
+        );
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            ['users' => 'a']
+        );
+
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
 }

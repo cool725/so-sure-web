@@ -143,4 +143,39 @@ class ApiExternalController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
+
+    /**
+     * @Route("/mixpanel/delete", name="api_external_mixpanel/delete")
+     * @Method({"POST"})
+     */
+    public function unauthMixpanelDeleteAction(Request $request)
+    {
+        try {
+            $mixpanelKey = $this->getParameter('mixpanel_webhook_key');
+            if ($request->get('mixpanel_webhook_key') != $mixpanelKey) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Invalid key', 404);
+            }
+
+            $users = $this->getRequestString($request, 'users');
+            if (strlen($users) == 0) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $mixpanel = $this->get('app.mixpanel');
+            $userData = json_decode(json_decode($users, true), true);
+            foreach ($userData as $user) {
+                $this->get('logger')->info(sprintf(
+                    'Mixpanel delete %s',
+                    $user['$distinct_id']
+                ));
+                $mixpanel->delete($user['$distinct_id']);
+            }
+
+            return new JsonResponse([]);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api mixpanel delete.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
 }
