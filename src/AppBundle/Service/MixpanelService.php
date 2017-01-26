@@ -208,6 +208,8 @@ class MixpanelService
             $properties = array_merge($properties, $utm);
             if ($user) {
                 $this->mixpanel->people->setOnce($user->getId(), $utm);
+            } elseif ($trackingId = $this->requestService->getTrackingId()) {
+                $this->mixpanel->people->setOnce($trackingId, $utm);
             }
         }
 
