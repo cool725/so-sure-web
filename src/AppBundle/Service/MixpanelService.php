@@ -186,6 +186,9 @@ class MixpanelService
                 if ($plan = $policy->getPremiumPlan()) {
                     $userData['Payment Option'] = $plan;
                     $userData['Number of Payments Received'] = count($policy->getSuccessfulPaymentCredits());
+                    if ($payment = $policy->getLastSuccessfulPaymentCredit()) {
+                        $userData['Last payment received'] = $payment->getDate()->format(\DateTime::ATOM);
+                    }
                 }
                 $userData['Number of Connections'] = count($policy->getConnections());
                 $userData['Reward Pot Value'] = $policy->getPotValue();
