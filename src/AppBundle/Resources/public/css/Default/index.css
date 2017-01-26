@@ -116,7 +116,9 @@
 }
 
 .comparison-table--footer {
-    border-top: 2px solid #efefef;
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 2px solid #efefef;
 }
 
 @media (min-width: 767px) {
