@@ -3,11 +3,62 @@
 .hero {
     padding: 30px 20px 50px 20px;
     color: #fff;
-    text-shadow: 0 0 8px #666;
 }
 
 .hero h1 {
     color: #fff;
+    text-align: left;
+    font-size: 50px;
+    line-height: 1.5em;
+    margin-top: 0;
+}
+
+.hero blockquote {
+    border: none;
+    text-align: right;
+    margin-bottom: 40px;
+}
+
+.hero blockquote em {
+    color: #fff;
+}
+
+#how-it-works, #benefits, .social-proof {
+    background: #fff;
+}
+
+.btn-dark {
+    margin-right: 20px;
+    border: 2px solid #202532;
+    background: #202532 !important;
+    color: #fff;
+}
+
+.margin-top-20 {
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.text-link {
+    vertical-align: middle;
+    padding-left: 30px;
+    cursor: pointer;
+}
+
+.btn-dark:hover {
+    color: #fff;
+}
+
+@media (max-width: 767px) {
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .margin-top-20, .btn-dark {
+        text-align: center;
+        display: block;
+        margin-right: 0;
+    }
 }
 
 /* MOVE TO components > _buttons.scss  */

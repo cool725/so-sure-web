@@ -14,6 +14,7 @@
     {{ parent() }}
     {% stylesheets
     'bundles/app/css/Default/index.css'
+    'bundles/app/css/Default/homepage.css'
     'bundles/app/css/Default/selectPhoneMake.css'
     'bundles/app/css/Default/scrollindicator.css'
     'bundles/app/css/Default/videoOverlay.css'
@@ -32,19 +33,58 @@
 
 {% block body %}
 
-    <section class="hero background-image-light vertical-align-wrap" id="get-quote">
+    <section class="hero vertical-align-wrap" id="get-quote">
         <div class="container vertical-align-middle">
             <div class="row">
                 <div class="col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
-                    <h1>Welcome to better phone insurance</h1>
-                    <p class="lead">Finally, phone insurance that you can rely on (it's also up to 80% cheaper when you connect with friends &amp; don't claim).</p>
+                    <h1>You love your phone.<br>We love insurance.<br>Together we're better</h1>
+                    <blockquote class="col-md-6 col-md-offset-6">
+                <p>Claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution!</p>
+                    <footer><em>Herve</em></footer>
+                </blockquote>
                 </div>
-                <div class="col-md-12">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                <div class="col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1 text-left">
+                    <a class="btn btn-rounded btn-dark margin-top-20" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+6S', 'memory': 16}) }}">
+                        Quote my iPhone 6S
+                    </a>
+                    <a class="btn btn-rounded btn-dark margin-top-20" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+7', 'memory': 32}) }}">
+                        Quote my iPhone 7
+                    </a>
+                    <a class="btn btn-rounded btn-dark margin-top-20" href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy+S7', 'memory': 32}) }}">
+                        Quote my Samsung Galaxy S7
+                    </a>
+                    <div class="margin-top-20 text-link">
+                    <a class="dark-bg-link" data-toggle="modal" data-target="#quoteModel">
+                        Quote another device?
+                    </a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <section class="press">
+    <div class="container">
+        <div class="col-sm-3 col-md-2">
+            <h4 class="footer-press--heading">Featured In</h4>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <a href="https://www.theguardian.com/technology/2016/sep/18/chatbots-talk-town-interact-humans-technology-silicon-valley" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/g@2x.png" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town" class="img-responsive"></a>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <a href="https://www.ft.com/content/6755beb8-320c-11e6-bda0-04585c31b153" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/ft@2x.png" alt="Financial Times - Innovation to watch: Friends based insurance" class="img-responsive"></a>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <a href="http://www.postonline.co.uk/post/news/2466996/so-sure-prepares-to-launch-revolutionary-insurance-model" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/ip@2x.png" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app" class="img-responsive"></a>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <h4 class="footer-press--heading">Awarded by</h4>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <a href="http://www.postevents.co.uk/technologyawards/static/shortlist-1" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/di@2x.png" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award" class="img-responsive"></a>
+        </div>
+    </div>
+</section>
 
     {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}   
 
@@ -90,5 +130,18 @@
     </div>
 
     {% include 'AppBundle::Default/modalVideo.html.twig' %}
+
+    <div class="modal fade modal-switching" id="quoteModel" tabindex="-1" role="dialog" aria-labelledby="quoteModelLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+            </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
