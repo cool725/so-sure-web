@@ -716,6 +716,9 @@ class AdminEmployeeController extends BaseController
             $data['totalPoliciesAvgPremium'] = $this->toTwoDp($data['totalPoliciesPremium'] / $data['totalPolicies']);
         }
 
+        $data['totalActiveMonthlyPolicies'] = $policyRepo->countAllActivePoliciesByInstallments(12);
+        $data['totalActiveYearlyPolicies'] = $policyRepo->countAllActivePoliciesByInstallments(1);
+
         // For reporting, connection numbers should be seen as a 2 way connection
         $newConnections = $connectionRepo->count($start, $end) / 2;
         $totalConnections = $connectionRepo->count() / 2;
