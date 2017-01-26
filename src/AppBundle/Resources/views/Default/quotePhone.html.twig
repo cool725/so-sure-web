@@ -42,12 +42,13 @@
                         <div class="row">
                             <div class="col-xs-12 col-sm-8 col-md-8 device">
                                 <span class="h3">
-                                    <strong>Device:</strong> <br class="visible-xs-block"> <span class="text-dark-grey">{{ phone }}</span>
+                                    <span class="h4">Device:</span> <br class="visible-xs-block"> 
+                                    <span class="text-dark-grey">{{ phone }}</span>
                                 </span>               
                             </div>
                             <div class="col-xs-12 col-sm-4 col-md-4 rrp">
                                 <span class="h4">
-                                    Retail Value:<br class="visible-xs-block">
+                                    <span class="h4">Retail Value:</span><br class="visible-xs-block">
                                     <span class="text-blue">
                                         <strong>£{{ phone.initialPrice|number_format(0, '.', ',') }}</strong>
                                     </span> 
@@ -64,8 +65,8 @@
                     <div class="quote-card">
                         <p class="h4 lead"><strong>Covered for:</strong></p>
                         <ul class="list-unstyled">
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Loss</li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Thef</li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Loss <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-question"></i></a></li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-question"></i></a></li>
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental Damage</li>
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Water Damage</li>
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Breakdown</li> 
@@ -131,7 +132,7 @@
                     </div>  
                     <div class="quote-card">
                         <p class="h4 lead"><strong>Wrong device?</strong></p>
-                        <p>Select another phone <a href="{{ path('homepage') }}#get-quote"><strong>here</strong></a> or select correct storage.</p>
+                        <p>Select another phone <a href="{{ path('homepage') }}#get-quote"><strong>here</strong></a> or select your correct storage.</p>
                         {% if phones | length > 1 %}
                                 {% for phone_mem in phones if phone_mem.id != phone.id %}
                                         <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-memory">{{ phone_mem.memory }}GB</a>
@@ -188,7 +189,7 @@
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
 
-    <!-- <section class="footer-cta alt-brand-gradient">
+    <section class="footer-cta alt-brand-gradient">
         <div class="container">
             <div class="row">
                 <div class="col-md-8 text-left">
@@ -203,7 +204,7 @@
                 </div>
             </div>
         </div>
-    </section> -->
+    </section>
 
     <div class="modal fade" id="more-info" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
@@ -212,28 +213,13 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title">Coverage Summary</h4>
+                    <h4 class="modal-title">In the event of theft or loss you are also covered for:</h4>
                 </div>
                 <div class="modal-body">
-                    <h4>What you are covered for?</h4>
-                    <p>If you take reasonable care of your phone and don't knowingly put it at risk you are covered for:</p>
-                    <ul>
-                        <li>Theft</li>
-                        <li>Accidental Damage</li>
-                        <li>Breakdown (including faults)</li>
-                        <li>Loss</li>
-                    </ul>
-                    <br>
-                    <p>In the event of theft or loss you are also covered for:</p>
                     <ul>
                         <li>Unauthorised network charges (up to £1,000 including VAT)</li>
+                        <br>
                         <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
-                    </ul>
-                    <br>
-                    <h4>What you are NOT covered for?</h4>
-                    <ul>
-                        <li>Excess – You need to pay each time you make a successful claim. £50 for Damage or Breakdown. £70 for Theft or Loss.</li>
-                        <li>More than two theft or loss claims in the same year.</li>
                     </ul>
                 </div>
             </div>
@@ -285,7 +271,5 @@
             </div>
         </div>
     </div>
-
-    {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
 {% endblock %}

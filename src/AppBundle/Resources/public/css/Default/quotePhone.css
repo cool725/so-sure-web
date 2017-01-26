@@ -9,6 +9,7 @@
 .quote .h3 {
     display: block;
     margin-top: 0 ;
+    font-size: 22px;
 }
 
 .quote .device .h3 {
@@ -28,13 +29,16 @@
     font-size: 22px;
 }
 .quote-card {
-    padding: 0;
+    padding: 15px;    
     margin-bottom: 25px;
+    border: 2px solid #efefef;
+    border-radius: 4px;
 }
 
 .quote-card ul {
-    padding-left: 15px;
+    padding-left: 30px;
     margin: 0 0 25px;
+    position: relative;
 }
 
 .quote-card ul:last-of-type {
@@ -46,8 +50,9 @@
     color: #626B78;
 }
 
-.quote-card .fa {
-    margin-right: 5px;
+.quote-card .fa-lg {
+    position: absolute;
+    left: 0;
 }
 
 .quote-card p.h4 {
@@ -80,9 +85,12 @@
         line-height: 1;
     }
 
+    .quote .device .h3 {
+        margin: 0;
+        font-size: inherit;
+    }
+
     .quote-card {
-        border: 2px solid #efefef;
-        border-radius: 4px;
         padding: 25px;
     }
 
