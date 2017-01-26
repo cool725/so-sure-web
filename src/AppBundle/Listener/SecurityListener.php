@@ -71,6 +71,14 @@ class SecurityListener
         $user = $event->getAuthenticationToken()->getUser();
         $user->setLatestWebIdentityLog($identityLog);
 
+
+        if ($event->getRequest() && stripos($event->getRequest()->getPathInfo(), '/purchase/') === 0) {
+            $this->logger->debug(sprintf(
+                'Skipping mixpanel login event for purchase flow login path: %s',
+                $event->getRequest()->getPathInfo()
+            ));
+            return;
+        }
         $this->mixpanel->trackWithUser($user, MixpanelService::LOGIN);
     }
 }

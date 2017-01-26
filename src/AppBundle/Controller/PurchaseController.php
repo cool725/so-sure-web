@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
@@ -132,6 +133,9 @@ class PurchaseController extends BaseController
                     if ($newUser) {
                         $dm->persist($user);
                     }
+                    if (!$user->getIdentityLog()) {
+                        $user->setIdentityLog($this->getIdentityLog($request));
+                    }
                     $dm->flush();
 
                     if (!$user->hasValidDetails()) {
@@ -154,6 +158,11 @@ class PurchaseController extends BaseController
                         $this->getParameter('fos_user.firewall_name'),
                         $user
                     );
+
+                    // Trigger login event
+                    $token = $this->get('security.token_storage')->getToken();
+                    $event = new InteractiveLoginEvent($request, $token);
+                    $this->get("event_dispatcher")->dispatch("security.interactive_login", $event);
 
                     // Track after login, so we populate user
                     if ($newUser) {
