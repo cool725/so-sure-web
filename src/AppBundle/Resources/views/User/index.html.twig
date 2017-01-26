@@ -22,12 +22,12 @@
 
 {% block body %}
     <div class="container reward-pot">
-        <h1 class="text-center">Welcome {{ policy.user.firstname }}!</h1>
-        <p class="lead text-center" style="padding-bottom: 20px;">
-          We are delighted that you chose us to give you the peace of mind you need for your phone!
-        <br>
-          At so-sure, we believe in providing you with the best service, as well as rewarding careful people. That is why you could get up to 80% money back, every year, if you and your friends don't claim.
-        </p>
+        <p>Nice one, {{ policy.user.firstname }}! Your {{ policy.phone.model }} ({{ policy.phone.memory }}GB) is now insured!</p>
+        <p>You’ll receive a confirmation email with the full details of your policy shortly, but here's a summary:</p>
+        <p><strong>Your Phone &amp; Payment Schedule</strong></p>
+        <p>You own an {{ policy.phone.model }} with {{ policy.phone.memory }}GB of memory and you’ve chosen to pay &pound;{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% else %}0{% endif %} on a {{ policy.getPremiumPlan }} basis for it to be insured.</p>
+        <p><strong>Your Policy Details</strong></p>
+        <p>Your phone is now protected against Theft, Loss, Accidental Damage and Breakdown from {{ policy.start|date('jS F Y') }} until {{ policy.end|date('jS F Y') }} (check your policy document for full details).</p>
         <p class="text-right">
             Have an <button type="button" class="btn btn-link" data-toggle="modal" data-target="#scodeModal" style="padding: 0; font-size: 16px;">invitation code</button> from a friend?
         </p>
