@@ -33,6 +33,19 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->findOneBy(['emailCanonical' => strtolower(self::generateEmail('testPurchase', $this))]);
+        $now = new \DateTime();
+
+        $this->assertNotNull($user->getIdentityLog());
+        $diff = $user->getIdentityLog()->getDate()->diff($now);
+        $this->assertTrue($diff->days == 0 && $diff->h == 0 && $diff->i == 0);
+
+        $this->assertNotNull($user->getLatestWebIdentityLog());
+        $diff = $user->getLatestWebIdentityLog()->getDate()->diff($now);
+        $this->assertTrue($diff->days == 0 && $diff->h == 0 && $diff->i == 0);
     }
 
     public function testPurchaseExistingUserDiffDetails()
