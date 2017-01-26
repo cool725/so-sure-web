@@ -40,10 +40,15 @@
                     {{ form_errors(pending_cancel_form.pendingCancellation) }}
                     {{ form_widget(pending_cancel_form.pendingCancellation) }}
                 </div>
+                <div class="form-group">
+                30 days from now is <strong>{{ suggested_cancellation_date|date('d M Y') }}</strong>
+                or use <a href="https://www.timeanddate.com/date/dateadded.html?ad=30" target="_blank">online calculator</a>.
+                </div>
                 {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger confirm-cancel', 'placeholder': '30 days after notice'}}) }}
                 {{ form_end(pending_cancel_form) }}
                 <br>
-                <b>This schedules the policy cancellation.</b>
+                <b>This schedules the policy cancellation.
+                </b>
             </div>
             <div class="col-md-6">
                 <h4>Immediate Cancellation</h4>

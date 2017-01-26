@@ -405,6 +405,7 @@ class AdminEmployeeController extends BaseController
             }
         }
         $checks = $fraudService->runChecks($policy);
+        $now = new \DateTime();
 
         return [
             'policy' => $policy,
@@ -419,6 +420,7 @@ class AdminEmployeeController extends BaseController
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
+            'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
         ];
     }
 

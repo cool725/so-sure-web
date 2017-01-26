@@ -41,8 +41,11 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are active with number of installment payments (excluding so-sure test ones)
      */
-    public function countAllActivePoliciesByInstallments($installments, \DateTime $startDate = null, \DateTime $endDate = null)
-    {
+    public function countAllActivePoliciesByInstallments(
+        $installments,
+        \DateTime $startDate = null,
+        \DateTime $endDate = null
+    ) {
         if (!$endDate) {
             $endDate = new \DateTime();
         }
