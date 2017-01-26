@@ -32,115 +32,7 @@
 
 {% block body %}
 
-    <section id="quote" class="quote-container section--pad">
 
-        <h1>Complete cover, best service and money back</h1>
-
-        <div class="quote">
-
-            <div class="quote-card">
-                <div class="row">
-                    <div class="col-sm-8 col-md-8 device">
-                        <span class="h3">Device: {{ phone }}</span>               
-                    </div>
-                    <div class="col-sm-4 col-md-4 rrp">
-                        <span class="h3">
-                            Retail Value:
-                            <span class="text-blue">
-                                <strong>£{{ phone.initialPrice|number_format(0, '.', ',') }}</strong>
-                            </span> 
-                        </span>
-                    </div>
-                </div>     
-            </div> 
-            
-           <div class="row">
-               <div class="col-sm-8 col-md-8">
-                    <div class="quote-card">
-                        <span class="h3">Covered for:</span>
-                        <ul>
-                            <li>Loss</li>
-                            <li>Thef</li>
-                            <li>Accidental Damage</li>
-                            <li>Water Damage</li>
-                            <li>Breakdown</li>
-                            <li>Worldwide Coverage</li>
-                        </ul>
-                        <span class="h3">Benefits:</span>
-                        <ul>
-                            <li>Next Workig Day Replacement</li>
-                            <li>24/7 UK Live Support</li>
-                            <li>Up to 80% Cashback Every Year</li>
-                        </ul>                   
-                    </div>
-               </div>
-               
-               <div class="visible-xs-block col-md-12">
-                    <div class="quote-cost">
-                        <span class="h1"><strong>£{{ phone_price.monthlyPremiumPrice }}</strong> <small>per month</small></span><br>
-                        <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                        {# {{ form_start(buy_form, {'attr': {'class': 'text-center'}}) }}
-                            {{ form_widget(buy_form.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded '}}) }}
-                        {{ form_end(buy_form)}} #}                          
-                    </div>
-               </div>               
-               
-                <div class="col-sm-4 col-md-4">
-                    <div class="quote-card">
-                        <span class="h4">And here's the cool bit...</span>
-                        {# set start_friends = phone_price.maxConnections - 1  #}
-                        {% set start_friends = 4 %}
-                        {% if start_friends > phone_price.maxConnections %}
-                            {% set start_friends = phone_price.maxConnections %}
-                        {% endif %}
-                        {% set start_value = start_friends * connection_value %}
-                        {% if start_value > phone_price.maxPot %}
-                            {% set start_value = phone_price.maxPot %}
-                        {% endif %}
-     
-                        <p>
-                            <strong id="money_back" class="text-blue">£{{ start_value }}</strong> cashback every year if you connect with
-                            <strong id="num_friends" class="text-blue text-nowrap">
-                                {{ start_friends }} friend{% if start_friends > 1 %}s{% endif %}
-                            </strong>
-                         and no one claims.</p>
-                        <input
-                            type="text"
-                            class="span2"
-                            value=""
-                            data-slider-min="0"
-                            data-slider-max="{{ phone_price.maxConnections }}"
-                            data-slider-maxpot="{{ phone_price.maxPot }}"
-                            data-slider-step="1"
-                            data-slider-value="{{ start_friends }}"
-                            data-slider-id="connection-slider"
-                            id="slider-value"
-                            data-slider-handle="round"
-                            data-slider-connection-value="{{ connection_value }}"/>   
-                    </div>                 
-               </div>
-               
-               <div class="hidden-xs col-md-12">
-                    <div class="quote-cost">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <span class="h1"><strong>£{{ phone_price.monthlyPremiumPrice }}</strong> <small>per month</small></span><br>
-                                <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                            </div>
-                            <div class="col-md-6">
-                                {{ form_start(buy_form, {'attr': {'class': 'text-center'}}) }}
-                                    {{ form_widget(buy_form.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
-                                {{ form_end(buy_form)}}                            
-                            </div>
-                        </div>
-                    </div>
-               </div>                              
-           </div>
-
-        </div>
-
-
-    </section>
 
     <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">
@@ -154,7 +46,7 @@
                 <div class="col-xs-12 col-sm-3 col-md-2">
 
                     {{ form_start(buy_form_banner) }}
-                        {{ form_widget(buy_form_banner.buy, {'label': 'Insure your phone', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
+                        {{ form_widget(buy_form_banner.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
                     {{ form_end(buy_form_banner)}}
 
                 </div>
@@ -166,7 +58,7 @@
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
 
-    <section class="footer-cta alt-brand-gradient">
+    <!-- <section class="footer-cta alt-brand-gradient">
         <div class="container">
             <div class="row">
                 <div class="col-md-8 text-left">
@@ -181,7 +73,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <div class="modal fade" id="more-info" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">

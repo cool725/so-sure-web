@@ -1,13 +1,58 @@
 /* QUOTE CARD */
 
-.quote h1 {
+.quote h1,
+.quote .h3,
+.quote .h4 {
     line-height: 1.25;
+}
+
+.quote .h3 {
+    display: block;
+    margin-top: 0 ;
+}
+
+.quote .device .h3 {
+    margin: 0;
 }
 
 .quote-cost {
     padding: 25px;
     margin: 25px -15px;
     background-color: #efefef;
+}
+
+.quote-cost .btn-block {
+    width: 60%;
+    margin: 0 auto;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.quote-card {
+    padding: 0;
+    margin-bottom: 25px;
+}
+
+.quote-card ul {
+    padding-left: 15px;
+    margin: 0 0 25px;
+}
+
+.quote-card ul:last-of-type {
+    margin: 0;
+}
+
+.quote-card li {
+    padding: 4px 0;
+    color: #626B78;
+}
+
+.quote-card .fa {
+    margin-right: 5px;
+}
+
+.quote-card p.h4 {
+    margin: 0 0 10px;
 }
 
 .btn-memory {
@@ -18,23 +63,6 @@
     vertical-align: middle;
 }
 
-.btn-quote-card {
-    width: 200px;
-}
-
-.btn-quote-card + .btn-quote-card {
-    margin: 15px 0 0;
-}
-
-@media (min-width: 435px) {
-
-    .btn-quote-card + .btn-quote-card {
-        margin: 0;
-    }
-
-}
-
-
 @media (min-width: 768px) {
 
     .quote-container h1 {
@@ -44,20 +72,19 @@
     .quote {
         max-width: 840px;
         margin: 25px auto;
-        /*padding: 30px;*/
         position: relative;
-        /*background-color: #fff;*/
-        /*border: 2px solid #efefef;*/
-        /*border-radius: 8px;          */
-        /*box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);*/
-    
+    }
+
+    .quote h1,
+    .quote .h3,
+    .quote .h4 {
+        line-height: 1;
     }
 
     .quote-card {
         border: 2px solid #efefef;
         border-radius: 4px;
         padding: 25px;
-        margin-bottom: 25px;
     }
 
     .quote-cost {
@@ -68,15 +95,6 @@
     .quote-card .rrp {
         text-align: right;
     }
-
-    /*.quote-card--footer {
-        width: 100%; height: 30px;
-        position: absolute;
-        left: 0; bottom: 0; right: 0;
-        background-color: #99ccff;
-        border-bottom-left-radius: 6px;
-        border-bottom-right-radius: 6px;
-    }*/
 
 }
 
