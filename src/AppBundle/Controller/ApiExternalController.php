@@ -162,7 +162,7 @@ class ApiExternalController extends BaseController
             }
 
             $mixpanel = $this->get('app.mixpanel');
-            $userData = json_decode(json_decode($users, true), true);
+            $userData = json_decode($users, true);
             foreach ($userData as $user) {
                 $this->get('logger')->info(sprintf(
                     'Mixpanel delete %s',

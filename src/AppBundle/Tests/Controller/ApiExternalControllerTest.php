@@ -284,51 +284,19 @@ class ApiExternalControllerTest extends BaseControllerTest
 
     public function testMixpanelDelete()
     {
-        $data = '[
-   {
-      "$distinct_id":"13b20239a29335",
-      "$properties":{
-         "$region":"California",
-         "$email":"harry.q.bovik@andrew.cmu.edu",
-         "$last_name":"Bovik",
-         "$created":"2012-11-20T15:26:16",
-         "$country_code":"US",
-         "$first_name":"Harry",
-         "Referring Domain":"news.ycombinator.com",
-         "$city":"Los Angeles",
-         "Last Seen":"2012-11-20T15:26:17",
-         "Referring URL":"http://news.ycombinator.com/",
-         "$last_seen":"2012-11-20T15:26:19"
-      }
-   },
-   {
-      "$distinct_id":"13a00df8730412",
-      "$properties":{
-         "$region":"California",
-         "$email":"anna.lytics@mixpanel.com",
-         "$last_name":"Lytics",
-         "$created":"2012-11-20T15:25:38",
-         "$country_code":"US",
-         "$first_name":"Anna",
-         "Referring Domain":"www.quora.com",
-         "$city":"Mountain View",
-         "Last Seen":"2012-11-20T15:25:39",
-         "Referring URL":"http://www.quora.com/What-...",
-         "$last_seen":"2012-11-20T15:25:42"
-      }
-   }
-]';
         $this->clearRateLimit();
         $url = sprintf(
             '/external/mixpanel/delete?mixpanel_webhook_key=%s&debug=true',
             static::$container->getParameter('mixpanel_webhook_key')
         );
 
+        // @codingStandardsIgnoreStart
         $crawler =  static::$client->request(
             "POST",
             $url,
-            ['users' => json_encode($data)]
+            ['users' => '[{"$distinct_id": "5881f7d2b660af53781c0361", "$properties": {"Final Monthly Cost": 6.49, "Number of Connections": 1, "$country_code": "IE", "Device Insured": "WileyFox Swift 2 (16 GB)", "$region": "Leinster", "Date of Birth": "1993-02-12T00:00:00", "$email": "ted+a@so-surr.com", "OS": "Cyanogen", "$last_name": "Aaa", "Payment Option": "monthly", "Number of Payments Received": 1, "Billing Address": "so-sure Test Address Line 1 so-sure Test Address Line 2 so-sure Test Address Line 3 so-sure Test City BX1 1LT", "$city": "Dublin", "$first_name": "Gh", "$last_seen": "2017-01-20T11:44:38", "$timezone": "Europe/Dublin", "Number of Invites Sent": 1, "$phone": "+447963123456", "Reward Pot Value": "10.00"}}, {"$distinct_id": "58872649b660af3b5f37d0e2", "$properties": {"Final Monthly Cost": 8.68, "Number of Connections": 1, "$country_code": "IE", "Device Insured": "Apple iPhone SE (16 GB)", "$region": "Leinster", "Date of Birth": "1999-01-24T00:00:00", "$email": "julien+3@so-sure.com", "OS": "iOS", "$last_name": "Bla", "Payment Option": "yearly", "Number of Payments Received": 1, "Billing Address": "so-sure Test Address Line 1 so-sure Test Address Line 2 so-sure Test Address Line 3 so-sure Test City BX1 1LT", "$city": "Dublin", "$first_name": "Ella", "$last_seen": "2017-01-24T11:14:29", "$timezone": "Europe/Dublin", "Number of Invites Sent": 1, "$phone": "+447865432357", "Reward Pot Value": "10.00"}}, {"$distinct_id": "5880eba6b660af370903e0d2", "$properties": {"$country_code": "IE", "Number Of Logins": 2, "$region": "Leinster", "$email": "patrick@so-sure.com", "$last_name": "McAndrew", "First Monthly Cost": 6.52, "$city": "Dublin", "$first_name": "Patrick", "$last_seen": "2017-01-24T14:37:14", "First Device Selected": "HTC Desire 510 (8 GB)", "$timezone": "Europe/Dublin"}}, {"$distinct_id": "0599296a-3688-4ce2-971f-2f1b77b09887", "$properties": {"$country_code": "IE", "$region": "Leinster", "First Monthly Cost": 8.53, "$city": "Dublin", "$last_seen": "2017-01-24T15:47:40", "First Device Selected": "LG G5 (32 GB)", "$timezone": "Europe/Dublin"}}, {"$distinct_id": "58874744b660af425e515531", "$properties": {"Final Monthly Cost": 8.68, "Number of Connections": 1, "$country_code": "IE", "Device Insured": "Apple iPhone SE (16 GB)", "$region": "Leinster", "Date of Birth": "1999-01-24T00:00:00", "$email": "julien+5@so-sure.com", "OS": "iOS", "$last_name": "Bla", "Payment Option": "monthly", "Number of Payments Received": 1, "Billing Address": "so-sure Test Address Line 1 so-sure Test Address Line 2 so-sure Test Address Line 3 so-sure Test City BX1 1LT", "$city": "Dublin", "$first_name": "Bla", "$last_seen": "2017-01-24T12:34:33", "$timezone": "Europe/Dublin", "Number of Invites Sent": 1, "$phone": "+447856456765", "Reward Pot Value": "10.00"}}]']
         );
+        // @codingStandardsIgnoreEnd
 
         $data = $this->verifyResponse(200);
     }
