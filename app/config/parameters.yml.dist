@@ -44,6 +44,7 @@ parameters:
 
     heap_id:
     mixpanel_apitoken:
+    mixpanel_webhook_key:
 
     judopay_apitoken:
     judopay_apisecret:

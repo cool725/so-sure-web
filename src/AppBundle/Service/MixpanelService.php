@@ -262,6 +262,11 @@ class MixpanelService
         }
     }
 
+    public function delete($id)
+    {
+        $this->mixpanel->people->deleteUser($id);
+    }
+
     private function transformUtm()
     {
         $utm = $this->requestService->getUtm();
