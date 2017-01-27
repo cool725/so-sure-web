@@ -33,6 +33,7 @@
 {% block body %}
 
     <section id="quote" class="quote-container section--pad">
+        {{ form_start(buy_form) }}
         <h1>Complete cover, best service and money back</h1>
         <div class="quote">
             
@@ -86,10 +87,8 @@
                             <small>per month</small>
                         </span><br>
                         <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                        {#{ form_start(buy_form, {'attr': {'class': 'text-center'}}) }}
-                            {{ form_widget(buy_form.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                        {{ form_end(buy_form)}#}                        
-                    </div>                   
+                            {{ form_widget(buy_form.buy_mobile, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                    </div>
                </div>  
 
                 <div class="col-xs-12 col-sm-5 col-md-5">
@@ -153,9 +152,7 @@
                                 <small>£50 Excess (£70 for Theft &amp; Loss)</small>
                             </div>
                             <div class="col-sm-6 col-md-6">
-                                {{ form_start(buy_form, {'attr': {'class': ''}}) }}
-                                    {{ form_widget(buy_form.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                                {{ form_end(buy_form)}}  
+                                {{ form_widget(buy_form.buy_tablet, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
                             </div>                            
                         </div>
                     </div>
@@ -164,6 +161,7 @@
             </div>
 
         </div>
+        {{ form_end(buy_form) }}
     </section>
 
     <section id="quote-banner" class="banner-sticky banner-sticky-hide">
