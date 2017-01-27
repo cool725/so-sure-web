@@ -111,12 +111,14 @@
 }
 
 .comparison-table--cta {
-    padding: 25px 0  0;
+    padding: 25px 0;
     text-align: center;
 }
 
 .comparison-table--footer {
-    border-top: 2px solid #efefef;
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 2px solid #efefef;
 }
 
 @media (min-width: 767px) {
