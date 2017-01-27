@@ -41,9 +41,7 @@ body {
 strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-ul, li {
-    margin: auto;
-}
+
 .error-text {
     color: #FF6666;
 }
@@ -54,6 +52,22 @@ ul, li {
 
 .text-grey-blue {
     color: #8B97B5 !important;
+}
+
+.text-dark-grey {
+    color: #626B78;
+}
+
+.text-green {
+    color: #80ce4d !important;
+}
+
+.text-success {
+  color: #33CCCC !important;
+}
+
+.text-white {
+  color: #fff !important
 }
 
 /* MOVE TO layout > _header.scss */
@@ -91,18 +105,14 @@ ul, li {
 
 /* MOVE TO common > _global.scss */
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #202532;
 }
 
-.text-success {
-  color: #33CCCC !important;
-}
 
-.text-white {
-  color: #fff !important
-}
 /* Global Tools */
 
 /* centered columns styles */
