@@ -36,25 +36,31 @@
         <div class="container vertical-align-middle">
             <div class="row">
                 <div class="col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
-                    <h1>You love your phone.<br>We love insurance.<br>Together we're better</h1>
+                    <h1>You love your phone.<br>We love insurance.<br>Together we're better.</h1>
                     <blockquote class="col-md-6 col-md-offset-6">
                 <p>Claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution!</p>
                     <footer><em>Herve</em></footer>
                 </blockquote>
                 </div>
                 <div class="col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1 text-left">
-                    <a class="btn btn-rounded btn-dark margin-top-20" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+6S', 'memory': 16}) }}">
-                        Quote my iPhone 6S
+                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+7', 'memory': 16}) }}">
+                        <img src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" height="40"/>
+                        <br>
+                        <span class="pull-right text-link dark-bg-link">From £8.53</span>
                     </a>
-                    <a class="btn btn-rounded btn-dark margin-top-20" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+7', 'memory': 32}) }}">
-                        Quote my iPhone 7
+                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+6S', 'memory': 32}) }}">
+                        <img src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" height="40"/>
+                        <br>
+                        <span class="pull-right text-link dark-bg-link">From £8.68</span>
                     </a>
-                    <a class="btn btn-rounded btn-dark margin-top-20" href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy+S7', 'memory': 32}) }}">
-                        Quote my Samsung Galaxy S7
+                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy+S7', 'memory': 32}) }}">
+                        <img src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" height="40"/>
+                        <br>
+                        <span class="pull-right dark-bg-link">From £8.53</span>
                     </a>
-                    <div class="margin-top-20 text-link">
-                    <a class="dark-bg-link" data-toggle="modal" data-target="#quoteModel">
-                        Quote another device?
+                    <div class="hero-link">
+                    <a class="btn btn-success btn-rounded" data-toggle="modal" data-target="#quoteModel">
+                        Get a quote
                     </a>
                     </div>
                 </div>
