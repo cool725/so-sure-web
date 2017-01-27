@@ -94,8 +94,8 @@
                 <div class="col-xs-12 col-sm-5 col-md-5">
                     <div class="quote-card">
                         <p class="h4"><strong>And here's the cool bit...</strong></p>
-                        {# set start_friends = phone_price.maxConnections - 1  #}
-                        {% set start_friends = 10 %}
+                        {% set start_friends = phone_price.maxConnections %}
+                        {# set start_friends = 10 #}
                         {% if start_friends > phone_price.maxConnections %}
                             {% set start_friends = phone_price.maxConnections %}
                         {% endif %}
