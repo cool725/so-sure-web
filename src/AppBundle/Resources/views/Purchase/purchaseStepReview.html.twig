@@ -41,13 +41,13 @@
                             <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
                             <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
                                 <label class="checkbox-terms">
-                                    <input type="checkbox" id="webpay-confirm">I confirm the above is correct</input>
+                                    <input type="checkbox" name="form_confirm" id="webpay-confirm">I confirm the above is correct</input>
                                 {% if is_postback %}<div class="help-block with-errors">You must agree to the terms</div>{% endif %}
                                 </label>
                             </div>
                             <div class="form-group text-center">
                                 <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                <input type="submit" class="btn btn-primary btn-rounded" value="Proceed to payment">                                
+                                <input type="submit" name="form_next" class="btn btn-primary btn-rounded" value="Proceed to payment">                                
                             </div>
                             
                         </form>
