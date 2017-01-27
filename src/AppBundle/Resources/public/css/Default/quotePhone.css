@@ -50,6 +50,10 @@
     color: #626B78;
 }
 
+.so-sure-benefits li {
+    color: #fff;
+}
+
 .quote-card .fa-lg {
     position: absolute;
     left: 10px;
