@@ -1,7 +1,7 @@
 body {
     background: #202532;
-  background: -webkit-linear-gradient(to right, #000428 , #004e92);
-  background: linear-gradient(to right, #202532 , #3399ff);
+    background: -webkit-linear-gradient(to right, #000428 , #004e92);
+    background: linear-gradient(to right, #202532 , #3399ff);
 }
 
 .navbar-default .navbar-nav> li> a {

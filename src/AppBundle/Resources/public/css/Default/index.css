@@ -34,15 +34,19 @@
     color: #fff;
 }
 
-.margin-top-20 {
+.hero-link {
     margin-top: 20px;
+    margin-right: 40px;
     display: inline-block;
 }
 
-.text-link {
-    vertical-align: middle;
-    padding-left: 30px;
-    cursor: pointer;
+.hero-link > img {
+    text-decoration: none;
+    opacity: 0.9;
+}
+
+.hero-link > span {
+    padding-top: 10px;
 }
 
 .btn-dark:hover {
@@ -54,10 +58,14 @@
         font-size: 28px;
     }
 
-    .margin-top-20, .btn-dark {
+    .hero-link {
         text-align: center;
-        display: block;
+        display: none;
         margin-right: 0;
+    }
+
+    .hero-link:last-child {
+        display: block;
     }
 }
 
