@@ -488,7 +488,8 @@ class DefaultController extends BaseController
             ->getForm();
         $buyForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form')
-            ->add('buy', SubmitType::class)
+            ->add('buy_mobile', SubmitType::class)
+            ->add('buy_tablet', SubmitType::class)
             ->add('slider_used', HiddenType::class)
             ->getForm();
         $buyBannerForm = $this->get('form.factory')
@@ -543,7 +544,12 @@ class DefaultController extends BaseController
                 $buyForm->handleRequest($request);
                 if ($buyForm->isValid()) {
                     $properties = [];
-                    $properties['Location'] = 'main';
+                    if ($buyForm->get('buy_tablet')->isClicked()) {
+                        $properties['Location'] = 'main';
+                    } elseif ($buyForm->get('buy_mobile')->isClicked()) {
+                        $properties['Location'] = 'mobile';
+                    }
+
                     if ($buyForm->getData()['slider_used']) {
                         $properties['Played with Slider'] = true;
                     }

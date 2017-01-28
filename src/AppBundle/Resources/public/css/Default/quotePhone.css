@@ -24,7 +24,7 @@
 
 .quote-cost .btn-block {
     width: 60%;
-    margin: 0 auto;
+    margin: 15px auto 0;
     font-weight: bold;
     font-size: 22px;
 }
@@ -124,6 +124,10 @@
 
     .quote-card .rrp {
         text-align: right;
+    }
+
+    .quote-cost .btn-block {
+        margin-top: 0;
     }
 
 }

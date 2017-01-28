@@ -33,6 +33,7 @@
 {% block body %}
 
     <section id="quote" class="quote-container section--pad">
+        {{ form_start(buy_form) }}
         <h1>Complete cover, best service and money back</h1>
         <div class="quote">
             
@@ -64,8 +65,8 @@
                     <div class="quote-card">
                         <p class="h4"><strong>Covered for:</strong></p>
                         <ul class="list-unstyled">
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Loss <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-question"></i></a></li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-question"></i></a></li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Loss <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-info-circle"></i></a></li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-info-circle"></i></a></li>
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental Damage</li>
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Breakdown</li> 
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide Coverage</li>                            
@@ -86,17 +87,15 @@
                             <small>per month</small>
                         </span><br>
                         <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                        {#{ form_start(buy_form, {'attr': {'class': 'text-center'}}) }}
-                            {{ form_widget(buy_form.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                        {{ form_end(buy_form)}#}                        
-                    </div>                   
+                            {{ form_widget(buy_form.buy_mobile, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                    </div>
                </div>  
 
                 <div class="col-xs-12 col-sm-5 col-md-5">
                     <div class="quote-card">
                         <p class="h4"><strong>And here's the cool bit...</strong></p>
-                        {# set start_friends = phone_price.maxConnections - 1  #}
-                        {% set start_friends = 10 %}
+                        {% set start_friends = phone_price.maxConnections %}
+                        {# set start_friends = 10 #}
                         {% if start_friends > phone_price.maxConnections %}
                             {% set start_friends = phone_price.maxConnections %}
                         {% endif %}
@@ -153,9 +152,7 @@
                                 <small>£50 Excess (£70 for Theft &amp; Loss)</small>
                             </div>
                             <div class="col-sm-6 col-md-6">
-                                {{ form_start(buy_form, {'attr': {'class': ''}}) }}
-                                    {{ form_widget(buy_form.buy, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                                {{ form_end(buy_form)}}  
+                                {{ form_widget(buy_form.buy_tablet, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
                             </div>                            
                         </div>
                     </div>
@@ -164,6 +161,7 @@
             </div>
 
         </div>
+        {{ form_end(buy_form) }}
     </section>
 
     <section id="quote-banner" class="banner-sticky banner-sticky-hide">
