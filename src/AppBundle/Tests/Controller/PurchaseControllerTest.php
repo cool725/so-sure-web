@@ -137,6 +137,36 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-review/monthly'));
     }
 
+    public function testPurchasePhoneImeiSpace()
+    {
+        $phone = self::getRandomPhone(static::$dm);
+
+        // set phone in session
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhone', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+
+        $crawler = $this->setAddress();
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+
+        $crawler = $this->setPhone($phone, true);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-review/monthly'));
+    }
+
     public function testPurchaseReviewToJudopay()
     {
         // unable to implement test
@@ -196,14 +226,19 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
 
-    private function setPhone($phone)
+    private function setPhone($phone, $generateSpaces = false)
     {
         $crawler = self::$client->request('GET', '/purchase/step-phone');
         $form = $crawler->selectButton('purchase_form[next]')->form();
-        $form['purchase_form[imei]'] = self::generateRandomImei();
+        if ($generateSpaces) {
+            $imei = implode(' ', str_split(self::generateRandomImei(), 3));
+        } else {
+            $imei = self::generateRandomImei();
+        }
+        $form['purchase_form[imei]'] = $imei;
         $form['purchase_form[amount]'] = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
         if ($phone->getMake() == "Appple") {
-            $form['purchase_form[serialNumber]'] = self::generateRandomImei();
+            $form['purchase_form[serialNumber]'] = $imei;
         }
         $crawler = self::$client->submit($form);
 
