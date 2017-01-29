@@ -44,6 +44,19 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue($diff->days == 0 && $diff->h == 0 && $diff->i == 0);
     }
 
+    public function testPurchaseUserPhoneSpace()
+    {
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchaseUserPhoneSpace', $this),
+            'foo bar',
+            new \DateTime('1980-01-01'),
+            implode(' ', str_split(self::generateRandomMobile(), 1))
+        );
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+    }
+
     public function testPurchaseExistingUserDiffDetails()
     {
         $user = self::createUser(
