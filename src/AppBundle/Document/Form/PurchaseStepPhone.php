@@ -88,7 +88,7 @@ class PurchaseStepPhone
 
     public function setImei($imei)
     {
-        $this->imei = $imei;
+        $this->imei = str_replace(' ', '', $imei);
         if ($this->getPhone() && $this->getPhone()->getMake() != "Apple") {
             $this->setSerialNumber($imei);
         }
@@ -101,7 +101,7 @@ class PurchaseStepPhone
 
     public function setSerialNumber($serialNumber)
     {
-        $this->serialNumber = $serialNumber;
+        $this->serialNumber = str_replace(' ', '', $serialNumber);
     }
 
     public function toApiArray()
