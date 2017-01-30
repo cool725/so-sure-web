@@ -130,14 +130,15 @@
                         </div>                             
                     </div>  
                     <div class="">
-                        <p class="h4"><strong>Or do you have the:</strong></p>
-                            {% if phones | length > 1 %}
-                                    {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-memory btn-sm">{{ phone_mem.memory }}GB</a>
-                                    {% endfor %}                                  
-                            {% endif %}                            
-                        </p>                        
-                        Select another phone <a href="{{ path('homepage') }}#get-quote"><strong>here</strong></a>.
+                        {% if phones | length > 1 %}                    
+                            <p class="h4"><strong>Or do you have the:</strong></p>
+                            <p>
+                                {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                        <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-memory btn-sm">{{ phone_mem.memory }}GB</a>
+                                {% endfor %}      
+                            </p>
+                        {% endif %}  
+                        <p>Select another phone <a href="{{ path('homepage') }}#get-quote"><strong>here</strong></a>.</p>                       
                     </div>               
                 </div>
 
