@@ -42,6 +42,8 @@ strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+/*Quick helpers*/
+
 .error-text {
     color: #FF6666;
 }
@@ -62,12 +64,20 @@ strong {
     color: #80ce4d !important;
 }
 
+.text-red {
+    color: #FF6666 !important;
+}
+
 .text-success {
-  color: #33CCCC !important;
+    color: #33CCCC !important;
 }
 
 .text-white {
-  color: #fff !important
+    color: #fff !important
+}
+
+.text-underline {
+    text-decoration: underline !important;
 }
 
 /* MOVE TO layout > _header.scss */

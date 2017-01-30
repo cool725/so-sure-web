@@ -438,7 +438,7 @@
 /* Video Modal: MOVE TO layouts > _includes.scss */
 
 .modal-fullscreen {
-  background: rgba(255, 255, 255, 0.9);
+  background: #ffffff;
 }
 .modal-fullscreen .modal-content {
   background: transparent;

@@ -11,6 +11,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'    
     '@AppBundle/Resources/public/js/Default/index.js'
     'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
     'bundles/app/js/Default/slider.js'
@@ -127,7 +128,8 @@
 
                         <div class="quote-tip">
                            <small>Fewer connections? Alter the slider to see what you could still get!</small>
-                        </div>                             
+                        </div>
+                        <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><span class="text-red text-underline">Learn how it works</span></a>                       
                     </div>  
                     <div class="">
                         {% if phones | length > 1 %}                    
@@ -205,6 +207,8 @@
             </div>
         </div>
     </section> -->
+
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
     <div class="modal fade" id="more-info" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
