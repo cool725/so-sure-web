@@ -42,6 +42,8 @@ strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+/*Quick helpers*/
+
 .error-text {
     color: #FF6666;
 }
