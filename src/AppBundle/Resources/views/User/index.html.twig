@@ -22,68 +22,12 @@
 
 {% block body %}
     <div class="container reward-pot">
-        <h1 class="text-center">Thanks!</h1>
-
-        <div class="col-md-6">
-            <div class="panel panel-default" style="height: 250px;">
-                <div class="panel-heading">
-                    <h4>Device</h4>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <p class="text-center" style="padding: 20px; font-family: 'Avenir LT Std 85 Heavy', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 22px;">
-                            {{ policy.phone.model }} ({{ policy.phone.memory }}GB)
-                        </p>
-                        <p style="text-align: left;">
-                            Click <a href="{{ path('sms_app_link') }}">here</a> to view your Policy Schedule
-                        </p>
-                        <p style="text-align: left;">
-                            Click <a href="{{ path('sms_app_link') }}">here</a> to view the Terms &amp; Conditions
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="panel panel-default" style="height: 250px;">
-                <div class="panel-heading">
-                  <h4>Cost</h4>
-                </div>
-                <div class="panel-body">
-                  <div class="row">
-                    <p class="text-center" style="padding: 20px; font-family: 'Avenir LT Std 85 Heavy', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 22px;">
-                        &pound;{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% else %}0{% endif %} per {% if policy.getPremiumPlan == 'monthly'%}month{% elseif policy.getPremiumPlan == 'yearly' %}year{% else %}{% endif %}
-                    </p>
-                        <p style="text-align: left;">
-                            From {{ policy.start|date('jS F Y') }} to {{ policy.end|date('jS F Y') }}
-                        </p>
-                  </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-12">
-            <h2 style="text-align: center; padding-bottom: 20px;">Now the best bit --> Start Saving</h2>
-        </div>
-
-        <div class="col-md-12">
-            <h3>1) Download our Award Winning App</h3>
-            <ul class="download-app" style="padding-top: 10px; padding-bottom: 10px;">
-                <li>
-                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank"><img style="width: 100%; margin: 20px 0 ;" src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
-                    </a>
-                </li>
-                <li>
-                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank"><img style="width: 100%; margin: 20px 0 ;" src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="col-md-12">
-            <h3>2) Sign up friends and connect for up tp 80% cash back</h3>
-        </div>
-
+        <h1 class="text-center">Welcome {{ policy.user.firstname }}!</h1>
+        <p class="lead text-center" style="padding-bottom: 20px;">
+          We are delighted that you chose us to give you the peace of mind you need for your phone!
+        <br>
+          At so-sure, we believe in providing you with the best service, as well as rewarding careful people. That is why you could get up to 80% money back, every year, if you and your friends don't claim.
+        </p>
         <p class="text-right">
             Have an <button type="button" class="btn btn-link" data-toggle="modal" data-target="#scodeModal" style="padding: 0; font-size: 16px;">invitation code</button> from a friend?
         </p>
