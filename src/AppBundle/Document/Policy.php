@@ -909,6 +909,23 @@ abstract class Policy
         }
     }
 
+    public function getPremiumGwpInstallmentPrice()
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        if (!$this->getPremiumInstallmentCount()) {
+            return null;
+        } elseif ($this->getPremiumInstallmentCount() == 1) {
+            return $this->getPremium()->getYearlyGwp();
+        } elseif ($this->getPremiumInstallmentCount() == 12) {
+            return $this->getPremium()->getGwp();
+        } else {
+            throw new \Exception(sprintf('Policy %s does not have correct installment amount', $this->getId()));
+        }
+    }
+
     public function getYearlyPremiumPrice()
     {
         return $this->getPremiumInstallmentCount() * $this->getPremiumInstallmentPrice();
@@ -1977,6 +1994,7 @@ abstract class Policy
             'premium_plan' => $this->getPremiumPlan(),
             'scodes' => $this->eachApiArray($this->getActiveSCodes()),
             'premium_payments' => $this->getPremiumPayments(),
+            'premium_gwp' => $this->getPremiumGwpInstallmentPrice(),
         ];
     }
 

@@ -1449,6 +1449,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         // $this->assertEquals(83.88, $policyData['pot']['max_value']);
         // 6.38 gwp * 1.1 = 7.018 * 12 = 84.24 * .8 = 67.39
         $this->assertEquals(67.39, $policyData['pot']['max_value']);
+        $this->assertEquals(7.02, $policyData['premium']);
+        $this->assertEquals(6.38, $policyData['premium_gwp']);
         $highConnectionValue = 0;
         $lowConnectionValue = null;
         foreach ($policyData['pot']['connection_values'] as $connectionValue) {
