@@ -22,6 +22,7 @@ use AppBundle\Document\Form\Purchase;
 use AppBundle\Document\Form\PurchaseStepPersonal;
 use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
+use AppBundle\Document\Form\PurchaseStepPhoneNoPhone;
 use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Form\Type\BasicUserType;
@@ -29,6 +30,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\PurchaseStepPersonalType;
 use AppBundle\Form\Type\PurchaseStepAddressType;
 use AppBundle\Form\Type\PurchaseStepPhoneType;
+use AppBundle\Form\Type\PurchaseStepPhoneNoPhoneType;
 
 use AppBundle\Service\MixpanelService;
 
@@ -268,6 +270,10 @@ class PurchaseController extends BaseController
 
         $purchase = new PurchaseStepPhone();
         $purchase->setUser($user);
+
+        $purchaseNoPhone = new PurchaseStepPhoneNoPhone();
+        $purchase->setUser($user);
+
         $policy = $user->getUnInitPolicy();
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
@@ -283,6 +289,9 @@ class PurchaseController extends BaseController
 
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPhoneType::class, $purchase)
+            ->getForm();
+        $purchaseNoPhoneForm = $this->get('form.factory')
+            ->createNamedBuilder('purchase_no_phone_form', PurchaseStepPhoneNoPhoneType::class, $purchaseNoPhone)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -398,6 +407,7 @@ class PurchaseController extends BaseController
         $data = array(
             'phone' => $phone,
             'purchase_form' => $purchaseForm->createView(),
+            'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 3,
             'modal_type' => $phone ? 'purchase-change' : 'purchase-select',
