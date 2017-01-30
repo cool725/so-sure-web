@@ -3,7 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    'bundles/app/css/Default/claimHandling.css'
+    '@AppBundle/Resources/public/css/Default/claimHandling.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -12,6 +12,7 @@
     {% javascripts
         '@AppBundle/Resources/public/js/tabs.js'
         '@AppBundle/Resources/public/js/Claims/phoneAlternativesModal.js'
+        '@AppBundle/Resources/public/js/Claims/tabs.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}

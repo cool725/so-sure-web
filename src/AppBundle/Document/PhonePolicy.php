@@ -156,12 +156,22 @@ class PhonePolicy extends Policy
         return $this->checkmendCerts;
     }
 
-    public function getCheckmendCertsAsArray()
+    public function getCheckmendCertsAsArray($onlyClaims = null)
     {
         $certs = [];
         foreach ($this->getCheckmendCerts() as $date => $data) {
             try {
-                $certs[$date] = unserialize($data);
+                $actualData = unserialize($data);
+                $includeCert = false;
+                if ($onlyClaims && isset($actualData['claimId']) && $actualData['claimId']) {
+                    $includeCert = true;
+                } elseif ($onlyClaims === false && (!isset($actualData['claimId']) || !$actualData['claimId'])) {
+                    $includeCert = true;
+                }
+
+                if ($includeCert) {
+                    $certs[$date] = $actualData;
+                }
             } catch (\Exception $e) {
                 continue;
             }
@@ -180,7 +190,7 @@ class PhonePolicy extends Policy
         $this->addCheckmendCertData('serial', $response);
     }
 
-    public function addCheckmendCertData($certId, $response)
+    public function addCheckmendCertData($certId, $response, $claim = null)
     {
         if (!$certId || strlen(trim($certId)) == 0) {
             return;
@@ -191,6 +201,10 @@ class PhonePolicy extends Policy
             'certId' => $certId,
             'response' => $response,
         ];
+        if ($claim) {
+            $data['claimId'] = $claim->getId();
+            $data['claimNumber'] = $claim->getNumber();
+        }
 
         // in the case of an imei check & serial check running at the same time, just increment the later by a second
         $timestamp = $now->format('U');
