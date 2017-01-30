@@ -415,7 +415,7 @@ class ReceperioService extends BaseImeiService
             throw new \InvalidArgumentException(sprintf('Unknown claim type %s', $claimType));
         }
 
-        $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData());
+        $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData(), $claim);
         $this->dm->flush();
 
         return $result;
