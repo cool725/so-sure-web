@@ -66,9 +66,9 @@
                     <div class="quote-card">
                         <p class="h4"><strong>Covered for:</strong></p>
                         <ul class="list-unstyled">
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Loss <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-info-circle"></i></a></li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-info-circle"></i></a></li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental Damage <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-info-circle"></i></a></li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Loss <a type="button" class="" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a></li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a type="button" class="" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a></li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental Damage <a type="button" class="" data-toggle="modal" data-target="#accidental-damage"><i class="fa fa-info-circle"></i></a></li>
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Breakdown</li> 
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide Coverage</li>                            
                         </ul>
@@ -193,7 +193,7 @@
 
     {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
-    <div class="modal fade" id="more-info" tabindex="-1" role="dialog">
+    <div class="modal fade" id="theft-and-loss" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -208,6 +208,21 @@
                         <li>Unauthorised network charges (up to £1,000 including VAT)</li>
                         <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="accidental-damage" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+                <div class="modal-body">  
                     <p>Accidental Damage:</p>
                     <ul>
                         <li>Including Water Damage.</li>
