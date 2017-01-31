@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Claim;
 
 class PolicyClaimCommand extends ContainerAwareCommand
 {
@@ -30,7 +32,7 @@ class PolicyClaimCommand extends ContainerAwareCommand
             ->addOption(
                 'imei',
                 null,
-                InputOption::VALUE_NONE,
+                InputOption::VALUE_REQUIRED,
                 'if set, requires a policy for the imei/serial/claims and will save results against policy'
             )
         ;
@@ -44,7 +46,13 @@ class PolicyClaimCommand extends ContainerAwareCommand
         $imeiService = $this->getContainer()->get('app.imei');
 
         $policy = $this->getPolicy($policyId);
+        if (!$policy) {
+            throw new \Exception('Unable to find policy');
+        }
         $claim = $this->getClaim($claimId);
+        if (!$claim) {
+            throw new \Exception('Unable to find claim');
+        }
 
         if ($imeiService->policyClaim($policy, $claim->getType(), $claim, null, $imei)) {
             print sprintf("Claimscheck %s is good\n", $imei);
@@ -53,7 +61,7 @@ class PolicyClaimCommand extends ContainerAwareCommand
         }
     }
 
-    private function getPolicy($d)
+    private function getPolicy($id)
     {
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
@@ -62,7 +70,7 @@ class PolicyClaimCommand extends ContainerAwareCommand
         return $policy;
     }
 
-    private function getClaim($d)
+    private function getClaim($id)
     {
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Claim::class);
