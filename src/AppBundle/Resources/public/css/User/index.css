@@ -48,7 +48,6 @@
       width: 200px;
     }
   }
-
 .doughnut-outer {
     width: 500px;
     height: 300px;
@@ -70,4 +69,227 @@
   .doughnut-inner {
     margin-top: -180px;
   }
+}
+
+.user-info {
+  margin-bottom: 20px;
+}
+
+.user-info .small-card {
+  margin: 25px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.user-info .small-card h4 {
+  color: inherit;
+}
+
+.user-info .small-card .title {
+  font-size: 22px;
+}
+
+.user-info .small-card .subtitle {
+  font-size: 18px;
+}
+
+.user-info .small-card .actions {
+  margin: 16px 0 0 0;
+  text-align: center;
+}
+
+.user-info .small-card .actions a {
+  margin: 10px 10px;
+}
+
+.user-info .small-card .info {
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.start-saving {
+  padding: 10px 15px;
+}
+
+.start-saving h2 {
+  color: #fff;
+}
+
+.download-apps .download-btn {
+  width: 40%;
+  display: inline-block;
+}
+
+.download-apps .download-btn.left {
+  margin: 60px 4% 20px 5%;
+}
+
+.download-apps .download-btn.right {
+  margin: 60px 5% 20px 4%;
+}
+
+.download-apps .download-btn.center {
+  margin: 60px 30% 20px 30%;
+}
+
+.download-apps .download-btn img {
+  width: 100%;
+  margin: 0;
+}
+
+@media (max-width:992px) {
+  .download-apps .download-btn.left {
+    margin: 20px 4% 20px 5%;
+  }
+  .download-apps .download-btn.right {
+    margin: 20px 5% 20px 4%;
+  }
+  .download-apps .download-btn.center {
+    margin: 20px 30% 20px 30%;
+  }
+}
+
+.download-apps .badge {
+  padding: 7px 10px 3px 10px;
+  font-size: 24px;
+  border-radius: 16px;
+  background-color: #80CE4D;
+}
+
+/* VIDEO OVERLAY: MOVE TO layouts > _includes.scss */
+
+.explainer-video {
+    cursor: pointer;
+    margin-top: 70px;
+    margin-bottom: 20px;
+}
+.explainer-video-view {
+    position: relative;
+    z-index: 0;
+}
+.explainer-video-frame {
+    background-image: url(https://cdn.so-sure.com/images/home/explainer-video/explainer-video-frame-2.png);
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0 auto;
+    box-shadow: 0 5px 30px -5px rgba(0,0,0,.15);
+    border-radius: 4px;
+    width: 100%;
+    height: 250px;
+}
+@media (max-width: 992px) {
+  .explainer-video {
+    margin-top: 50px;
+  }
+  .explainer-video-frame {
+    width: 60%;
+  }
+}
+@media (max-width: 767px) {
+  .explainer-video-frame {
+    width: 70%;
+  }
+}
+@media (max-width: 543px) {
+  .explainer-video-frame {
+    width: 90%;
+    height: 170px;
+  }
+}
+.explainer-video-overlay {
+  background-image: url(https://cdn.so-sure.com/images/home/explainer-video/video-overlay-play.png);
+  background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.15;
+  height: 100%;
+  width: 100%;
+  border-radius: 4px;
+  transition: opacity 0.5s ease;
+}
+.explainer-video-overlay:hover {
+    opacity: 1;
+    text-decoration: none;
+}
+/* Video Modal: MOVE TO layouts > _includes.scss */
+
+.modal-fullscreen {
+  background: rgba(255, 255, 255, 0.9);
+}
+.modal-fullscreen .modal-content {
+  background: transparent;
+  border: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.modal-backdrop.modal-backdrop-fullscreen {
+  background: #ffffff;
+}
+.modal-backdrop.modal-backdrop-fullscreen.in {
+  opacity: .97;
+  filter: alpha(opacity=97);
+}
+.modal-header {
+  border-bottom: none !important;
+}
+.modal-body {
+  padding: 17px;
+}
+/* .modal-fullscreen size: we use Bootstrap media query breakpoints */
+
+.modal-fullscreen .modal-dialog {
+  margin: 0;
+  margin-right: auto;
+  margin-left: auto;
+  width: 100%;
+}
+.responsive-container {
+  position: relative;
+  padding-bottom: 53.4%;
+  padding-top: 30px;
+  height: 0;
+  overflow: hidden;
+}
+.responsive-container,
+  .responsive-container iframe {
+  max-width: 1280px;
+  max-height: 720px;
+}
+.responsive-container iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+}
+@media (min-width: 768px) {
+  .modal-fullscreen .modal-dialog {
+    width: 750px;
+  }
+}
+@media (min-width: 992px) {
+  .modal-fullscreen .modal-dialog {
+    width: 970px;
+  }
+}
+@media (min-width: 1200px) {
+  .modal-fullscreen .modal-dialog {
+     width: 1170px;
+   }
+}
+
+.modal-switching ol {
+  font-size: larger;
+}
+.modal-switching {
+  background: rgba(0, 0, 0, 0.6);
+  padding-top: 10%;
 }

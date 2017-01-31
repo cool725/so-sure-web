@@ -35,7 +35,6 @@ class UserController extends BaseController
 {
     /**
      * @Route("/", name="user_home")
-     * @Route("/welcome", name="user_welcome")
      * @Template
      */
     public function indexAction(Request $request)
@@ -153,6 +152,23 @@ class UserController extends BaseController
         ];
 
         return $data;
+    }
+
+    /**
+     * @Route("/welcome", name="user_welcome")
+     * @Template
+     */
+    public function welcomeAction()
+    {
+        $user = $this->getUser();
+        if (!$user->hasActivePolicy()) {
+            return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+        }
+
+        return array(
+            'policy_key' => $this->getParameter('policy_key'),
+            'policy' => $user->getCurrentPolicy()
+        );
     }
 
     /**

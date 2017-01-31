@@ -56,7 +56,8 @@
         "mixpanel/mixpanel-php": "^2.6",
         "ua-parser/uap-php": "^3.4",
         "ramsey/uuid": "^3.5",
-        "vasildakov/postcode": "^1.1"
+        "vasildakov/postcode": "^1.1",
+        "twig/extensions": "^1.4"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
