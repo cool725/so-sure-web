@@ -72,21 +72,13 @@
                 <p class="lead text-center">Install the app and login to start saving money!</p>
                 {% if policy.phone.isITunes %}
                 <div class="download-btn center">
-                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
+                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
                     </a>
                 </div>
-                {% elseif policy.phone.isGooglePlay %}
+                {% endif %}
+                {% if policy.phone.isGooglePlay %}
                 <div class="download-btn center">
-                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
-                    </a>
-                </div>
-                {% else %}
-                <div class="download-btn left">
-                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
-                    </a>
-                </div>
-                <div class="download-btn right">
-                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
+                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
                     </a>
                 </div>
                 {% endif %}
