@@ -453,12 +453,25 @@
   opacity: .97;
   filter: alpha(opacity=97);
 }
+
+
+/* Modal: MOVE TO components > _modal.scss */
 .modal-header {
-  border-bottom: none !important;
+    border-bottom: none !important;
 }
+
+.modal-header button.close {
+    z-index: 9999;
+}
+
 .modal-body {
-  padding: 17px;
+    padding: 25px;
 }
+
+.modal-body li {
+    padding: 4px 0;
+}
+
 /* .modal-fullscreen size: we use Bootstrap media query breakpoints */
 
 .modal-fullscreen .modal-dialog {
@@ -469,7 +482,7 @@
 }
 .responsive-container {
 	position: relative;
-  padding-bottom: 53.4%;
+    padding-bottom: 53.4%;
 	padding-top: 30px;
 	height: 0;
 	overflow: hidden;
