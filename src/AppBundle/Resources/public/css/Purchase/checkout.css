@@ -56,6 +56,7 @@
     border: 2px solid #202532;
     background: none !important;
     border-radius: 30px;
+    margin-top: -3px;
     -moz-border-radius: 30px;
     -webkit-border-radius: 30px;
     background: none;
