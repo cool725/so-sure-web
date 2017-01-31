@@ -359,7 +359,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'The insured went out for lunch and fell off his motorbike. The insureds phone was in his pocket and this got damage. The screen has got lines across and the back of the phone has completely shattered.',
             'In Street',
             'Closed',
-            'Unknown',
+            'foo',
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
