@@ -141,21 +141,24 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('claimscheck')) {
                 $formClaimsCheck->handleRequest($request);
                 if ($formClaimsCheck->isValid()) {
-                    $result = $imeiService->policyClaim(
-                        $policy,
-                        $claimscheck->getType(),
-                        $claimscheck->getClaim(),
-                        $this->getUser()
-                    );
-                    $this->addFlash('success', sprintf(
-                        '%s £%0.2f <a href="%s" target="_blank">%s</a> (Phone is %s)',
-                        ucfirst($claimscheck->getType()),
-                        $claimscheck->getClaim()->getLastChargeAmountWithVat(),
-                        $imeiService->getCertUrl(),
-                        $imeiService->getCertId(),
-                        $result ? 'not blocked' : 'blocked'
-                    ));
-
+                    try {
+                        $result = $imeiService->policyClaim(
+                            $policy,
+                            $claimscheck->getType(),
+                            $claimscheck->getClaim(),
+                            $this->getUser()
+                        );
+                        $this->addFlash('success', sprintf(
+                            '%s £%0.2f <a href="%s" target="_blank">%s</a> (Phone is %s)',
+                            ucfirst($claimscheck->getType()),
+                            $claimscheck->getClaim()->getLastChargeAmountWithVat(),
+                            $imeiService->getCertUrl(),
+                            $imeiService->getCertId(),
+                            $result ? 'not blocked' : 'blocked'
+                        ));
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', $e->getMessage());
+                    }
                     return $this->redirectToRoute('claims_policy', ['id' => $id]);
                 }
             } elseif ($request->request->has('crimeref')) {

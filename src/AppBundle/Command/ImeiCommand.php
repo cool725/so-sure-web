@@ -16,7 +16,7 @@ class ImeiCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sosure:imei')
-            ->setDescription('Run manual check on imei')
+            ->setDescription('Run manual check on imei. Also see sosure:policy:claim')
             ->addArgument(
                 'imei',
                 InputArgument::REQUIRED,
@@ -46,6 +46,12 @@ class ImeiCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'memory'
             )
+            ->addOption(
+                'save',
+                null,
+                InputOption::VALUE_NONE,
+                'if set, requires a policy for the imei/serial/claims and will save results against policy'
+            )
         ;
     }
 
@@ -56,30 +62,60 @@ class ImeiCommand extends ContainerAwareCommand
         $device = $input->getOption('device');
         $memory = $input->getOption('memory');
         $claimscheck = $input->getOption('claimscheck');
+        $save = true === $input->getOption('save');
         $phone = $this->getPhone($device, $memory);
         $imeiService = $this->getContainer()->get('app.imei');
 
         if ($claimscheck) {
-            if ($imeiService->checkClaims($phone, $imei)) {
-                print sprintf("Claimscheck %s is good\n", $imei);
-            } else {
-                print sprintf("Claimscheck %s failed validation\n", $imei);
+            $policy = null;
+            if ($save) {
+                $policy = $this->getPolicy($policyId);
+                if ($imeiService->checkClaims($phone, $imei, $policy)) {
+                    print sprintf("Claimscheck %s is good\n", $imei);
+                } else {
+                    print sprintf("Claimscheck %s failed validation\n", $imei);
+                }
             }
         } else {
-            if ($imeiService->checkImei($phone, $imei)) {
-                print sprintf("Imei %s is good\n", $imei);
+            if ($save) {
+                if ($imeiService->reprocessImei($phone, $imei)) {
+                    print sprintf("Imei %s is good\n", $imei);
+                } else {
+                    print sprintf("Imei %s failed validation\n", $imei);
+                }
             } else {
-                print sprintf("Imei %s failed validation\n", $imei);
+                if ($imeiService->checkImei($phone, $imei)) {
+                    print sprintf("Imei %s is good\n", $imei);
+                } else {
+                    print sprintf("Imei %s failed validation\n", $imei);
+                }
             }
         }
 
         if ($serial) {
-            if ($imeiService->checkSerial($phone, $serial)) {
-                print sprintf("Serial %s is good\n", $serial);
+            if ($save) {
+                if ($imeiService->reprocessSerial($phone, $serial)) {
+                    print sprintf("Serial %s is good\n", $serial);
+                } else {
+                    print sprintf("Serial %s failed validation\n", $serial);
+                }
             } else {
-                print sprintf("Serial %s failed validation\n", $serial);
+                if ($imeiService->checkSerial($phone, $serial)) {
+                    print sprintf("Serial %s is good\n", $serial);
+                } else {
+                    print sprintf("Serial %s failed validation\n", $serial);
+                }
             }
         }
+    }
+
+    private function getPolicy($imei)
+    {
+        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(PhonePolicy::class);
+        $policy = $repo->findOneBy(['imei' => $imei]);
+
+        return $policy;
     }
 
     private function getPhone($device, $memory)
