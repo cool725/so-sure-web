@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use GeoJson\Geometry\Point;
+use AppBundle\Document\Claim;
 
 /**
  * @group functional-nonet
@@ -18,6 +19,7 @@ class ReceperioServiceTest extends WebTestCase
     protected static $imei;
     protected static $dm;
     protected static $phoneRepo;
+    protected static $phone;
     protected static $phoneA;
     protected static $phoneB;
     protected static $phoneC;
@@ -36,6 +38,7 @@ class ReceperioServiceTest extends WebTestCase
         self::$imei = self::$container->get('app.imei');
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$phoneRepo = self::$dm->getRepository(Phone::class);
+        self::$phone = self::$phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneA = self::$phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneB = self::$phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
         self::$phoneC = self::$phoneRepo->findOneBy(['devices' => 'hero2lte']);
@@ -189,5 +192,23 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'iPhone 5', 'color' => 'white'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
         $this->assertFalse(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testPolicyClaimThrowException()
+    {
+        $policy = self::createUserPolicy(true);
+        $claim = new Claim();
+        self::$imei->policyClaim($policy, Claim::TYPE_DAMAGE, $claim);
+        $this->assertTrue(true);
+
+        $now = new \DateTime();
+        $yesterday = new \DateTime();
+        $yesterday = $yesterday->sub(new \DateInterval('P1D'));
+        $claim->setRecordedDate($yesterday);
+        $policy->setImeiReplacementDate($now);
+        self::$imei->policyClaim($policy, Claim::TYPE_DAMAGE, $claim);
     }
 }
