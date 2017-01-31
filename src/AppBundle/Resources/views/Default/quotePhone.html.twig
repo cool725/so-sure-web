@@ -66,15 +66,15 @@
                     <div class="quote-card">
                         <p class="h4"><strong>Covered for:</strong></p>
                         <ul class="list-unstyled">
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Loss <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-info-circle"></i></a></li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a type="button" class="" data-toggle="modal" data-target="#more-info"><i class="fa fa-info-circle"></i></a></li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental Damage</li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Loss <a href="#" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a></li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a href="#" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a></li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental Damage <a href="#" data-toggle="modal" data-target="#accidental-damage"><i class="fa fa-info-circle"></i></a></li>
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Breakdown</li> 
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide Coverage</li>                            
                         </ul>
                         <p class="h4"><strong>So-Sure Benefits:</strong></p>
                         <ul class="list-unstyled">
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> Next Working Day Replacement</li>
+                            <li class="h4"><i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> Next Working Day Replacement / Repair</li>
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> 24/7 UK Live Support</li>
                             <li class="h4"><i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> Up to 80% Cashback Every Year</li>
                         </ul>                   
@@ -129,7 +129,7 @@
                         <div class="quote-tip">
                            <small>Fewer connections? Alter the slider to see what you could still get!</small>
                         </div>
-                        <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><span class="text-red text-underline">Learn how it works</span></a>                       
+                        <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><span class="text-underline">Learn how it works</span></i></a>                       
                     </div>  
                     <div class="">
                         {% if phones | length > 1 %}                    
@@ -191,38 +191,21 @@
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
 
-<!--     <section class="footer-cta alt-brand-gradient">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8 text-left">
-                    <h2>Still not sure?</h2>
-                    <p class="lead">Get in touch, we will usually respond within 2 minutes.</p>
-                </div>
-                <div class="col-md-2 text-center">
-                    <a class="btn btn-primary" id="open-intercom" href="mailto:bjo63djg@incoming.intercom.io">Chat with us <i class="fa fa-comments"></i></a>
-                </div>
-                <div class="col-md-2 text-center">
-                    <a class="btn btn-info" id="help-centre" href="https://help.wearesosure.com" target="_blank">Visit Help Centre <i class="fa fa-info-circle"></i></a>
-                </div>
-            </div>
-        </div>
-    </section> -->
-
     {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
-    <div class="modal fade" id="more-info" tabindex="-1" role="dialog">
+    <div class="modal fade" id="theft-and-loss" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
                     </button>
-                    <h4 class="modal-title">In the event of theft or loss you are also covered for:</h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body">  
+                    <p>In the event of theft or loss you are also covered for:</p>          
                     <ul>
                         <li>Unauthorised network charges (up to £1,000 including VAT)</li>
-                        <br>
                         <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
                     </ul>
                 </div>
@@ -230,47 +213,20 @@
         </div>
     </div>
 
-    <div class="modal modal-buy fade" id="buyModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="accidental-damage" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                {{ form_start(lead_form) }}
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
                     </button>
-                    <h3 class="modal-title text-center">Ready to join the Social Insurance revolution?</h3>
                 </div>
-                <div class="modal-body text-center">
-                    <p class="lead">Just enter your email below to get started!</p>
-                    <div class="row">
-                        <div class="form-group col-sm-12">
-                            {{ form_errors(lead_form.email) }}
-                            {{ form_widget(lead_form.email, {'attr': {'placeholder': 'Email address'}}) }}
-                            {{ form_widget(lead_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-primary'}}) }}
-                            {{ form_rest(lead_form) }}
-                        </div>
-                    </div>
-                    {{ form_end(lead_form) }}
-                    <div class="download-app-modal">
-                        <div class="text-break">
-                            <div class="line"></div>
-                            OR
-                            <div class="line"></div>
-                        </div>
-                        <div class="row" style="padding-bottom: 30px;">
-                            <p class="lead">Download our app - it's a little bit easier.</p>
-                            <div class="col-md-6 text-right">
-                                <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('modal') }}">
-                                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-                                </a>
-                            </div>
-                            <div class="col-md-6 text-left">
-                                <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('modal') }}">
-                                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                <div class="modal-body">  
+                    <p>Accidental Damage:</p>
+                    <ul>
+                        <li>Including Water Damage.</li>
+                    </ul>
                 </div>
             </div>
         </div>
