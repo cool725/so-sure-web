@@ -158,7 +158,7 @@ class UserController extends BaseController
      * @Route("/welcome", name="user_welcome")
      * @Template
      */
-    public function welcomeAction(Request $request)
+    public function welcomeAction()
     {
         $user = $this->getUser();
         if (!$user->hasActivePolicy()) {
