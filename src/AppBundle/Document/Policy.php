@@ -802,6 +802,19 @@ abstract class Policy
         $this->id = $id;
     }
 
+    public function getExpectedBillingDate()
+    {
+        // TODO: consolidate with PolicyService::generateScheduledPayments
+        $date = clone $this->getStart();
+
+        // To allow billing on same date every month, 28th is max allowable day on month
+        if ($date->format('d') > 28) {
+            $date->sub(new \DateInterval(sprintf('P%dD', $date->format('d') - 28)));
+        }
+
+        return $date;
+    }
+
     public function getNextBillingDate($date)
     {
         $nextDate = new \DateTime();

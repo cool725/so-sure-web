@@ -762,3 +762,8 @@ services:
         class: AppBundle\Service\DoctrinePersister
         arguments:
             dm:          "@doctrine_mongodb.odm.default_document_manager"
+
+    twig.extension.intl:
+        class: Twig_Extensions_Extension_Intl
+        tags:
+            - { name: twig.extension }

@@ -660,6 +660,7 @@ class PolicyService
     public function generateScheduledPayments(Policy $policy, \DateTime $date = null)
     {
         if (!$date) {
+            // TODO: Should this be policy start date?
             $date = new \DateTime();
         } else {
             $date = clone $date;
