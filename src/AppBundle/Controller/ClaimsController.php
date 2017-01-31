@@ -243,4 +243,28 @@ class ClaimsController extends BaseController
             'suggestedReplacement' => $suggestedReplacement ? $suggestedReplacement->toAlternativeArray() : null,
         ]);
     }
+
+    /**
+     * @Route("/claim/{id}", name="claims_notes")
+     * @Method({"POST"})
+     */
+    public function claimsNotesAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($id);
+        $claim->setNotes($request->get('notes'));
+
+        $dm->flush();
+        $this->addFlash(
+            'success',
+            'Claim notes updated'
+        );
+
+        return new RedirectResponse($this->generateUrl('claims_policy', ['id' => $claim->getPolicy()->getId()]));
+    }
 }
