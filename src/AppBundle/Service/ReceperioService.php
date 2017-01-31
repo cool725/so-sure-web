@@ -412,7 +412,7 @@ class ReceperioService extends BaseImeiService
         $imei = null
     ) {
         if ($policy->getImeiReplacementDate() && $claim
-            && $policy->getImeiReplacementDate() > $claim->getCreatedDate()) {
+            && $policy->getImeiReplacementDate() > $claim->getRecordedDate()) {
             // if passing in imei, then hopefully we know what we're doing, so allow it
             if (!$imei) {
                 // @codingStandardsIgnoreStart
