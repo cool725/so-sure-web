@@ -101,7 +101,7 @@ class DefaultController extends BaseController
             }
         }
 
-        $this->get('app.mixpanel')->trackWithUtm(MixpanelService::HOME_PAGE);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         return array(
             'form_top' => $formTop->createView(),
@@ -208,7 +208,7 @@ class DefaultController extends BaseController
                     if ($buyForm->getData()['slider_used']) {
                         $properties['Played with Slider'] = true;
                     }
-                    $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED, $properties);
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     return $this->redirectToRoute('purchase');
                 }
@@ -553,7 +553,7 @@ class DefaultController extends BaseController
                     if ($buyForm->getData()['slider_used']) {
                         $properties['Played with Slider'] = true;
                     }
-                    $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED, $properties);
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     return $this->redirectToRoute('purchase');
                 }
@@ -565,7 +565,7 @@ class DefaultController extends BaseController
                     if ($buyBannerForm->getData()['slider_used']) {
                         $properties['Played with Slider'] = true;
                     }
-                    $this->get('app.mixpanel')->track(MixpanelService::BUY_BUTTON_CLICKED, $properties);
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     return $this->redirectToRoute('purchase');
                 }
@@ -575,11 +575,11 @@ class DefaultController extends BaseController
         $maxPot = $phone->getCurrentPhonePrice()->getMaxPot();
         $maxConnections = $phone->getCurrentPhonePrice()->getMaxConnections();
 
-        $this->get('app.mixpanel')->trackWithUtm(MixpanelService::QUOTE_PAGE, [
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_PAGE, [
             'Device Selected' => $phone->__toString(),
             'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
         ]);
-        $this->get('app.mixpanel')->setPersonProperties([
+        $this->get('app.mixpanel')->queuePersonProperties([
             'First Device Selected' => $phone->__toString(),
             'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
         ], true);

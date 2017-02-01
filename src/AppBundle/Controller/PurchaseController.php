@@ -168,7 +168,7 @@ class PurchaseController extends BaseController
 
                     // Track after login, so we populate user
                     if ($newUser) {
-                        $this->get('app.mixpanel')->trackWithUtm(MixpanelService::RECEIVE_DETAILS);
+                        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS);
                     }
 
                     return $this->redirectToRoute('purchase_step_address');
@@ -378,7 +378,7 @@ class PurchaseController extends BaseController
                         }
                     }
                     $dm->flush();
-                    $this->get('app.mixpanel')->track(MixpanelService::POLICY_READY, [
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
                         'Device Insured' => $purchase->getPhone()->__toString(),
                         'OS' => $purchase->getPhone()->getOs(),
                         'Final Monthly Cost' => $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
@@ -521,7 +521,7 @@ class PurchaseController extends BaseController
                 JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
             );
             if ($policy->isInitialPayment()) {
-                $this->get('app.mixpanel')->track(MixpanelService::PURCHASE_POLICY, [
+                $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PURCHASE_POLICY, [
                     'Payment Option' => $policy->getPremiumPlan(),
                 ]);
                 $this->addFlash(

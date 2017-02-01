@@ -79,6 +79,6 @@ class SecurityListener
             ));
             return;
         }
-        $this->mixpanel->trackWithUser($user, MixpanelService::LOGIN);
+        $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_LOGIN);
     }
 }
