@@ -145,7 +145,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
 
         $crawler = $this->setPhone($phone);
-
+        //print $crawler->html();
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-review/monthly'));
     }
@@ -341,7 +341,7 @@ class PurchaseControllerTest extends BaseControllerTest
             $imei = self::generateRandomImei();
         }
         $form['purchase_form[imei]'] = $imei;
-        $form['purchase_form[amount]'] = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        $form['purchase_form[amount]'] = (float) $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
         if ($phone->getMake() == "Appple") {
             $form['purchase_form[serialNumber]'] = $imei;
         }

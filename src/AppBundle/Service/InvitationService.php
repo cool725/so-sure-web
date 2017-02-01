@@ -271,7 +271,7 @@ class InvitationService
             }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
             $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
-            $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::INVITE, [
+            $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, [
                 'Invitation Method' => 'email',
             ]);
             $now = new \DateTime();
