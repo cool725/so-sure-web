@@ -118,7 +118,7 @@ strong {
 
 /* MOVE TO common > _global.scss */
 
-h1, h2, h3
+h1, h2, h3,
 .h1, .h2, .h3 {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #202532;
