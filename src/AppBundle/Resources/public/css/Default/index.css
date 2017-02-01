@@ -150,7 +150,7 @@
     }
 
     .comparison-table--body .border-right {
-        border-right: 2px solid #efefef;
+        /*border-right: 2px solid #efefef;*/
     }
 
     .comparison-table--left {
