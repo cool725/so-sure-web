@@ -228,7 +228,7 @@ class MixpanelService
         $this->mixpanel->people->increment($userId, $field, $incrementBy, null, true);
     }
 
-    private function setPersonProperties($userId, array $personProperties, $setOnce = false)
+    private function setPersonProperties($userId, array $personProperties)
     {
         if (!$this->canSend()) {
             return;
@@ -238,7 +238,7 @@ class MixpanelService
         $this->mixpanel->people->set($userId, $personProperties);
     }
 
-    private function setPersonPropertiesOnce($userId, array $personProperties, $setOnce = false)
+    private function setPersonPropertiesOnce($userId, array $personProperties)
     {
         if (!$this->canSend()) {
             return;
