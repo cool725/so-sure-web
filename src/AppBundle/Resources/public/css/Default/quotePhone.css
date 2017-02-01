@@ -1,7 +1,7 @@
 /* QUOTE CARD */
 
 .quote-container h1 {
-    font-size: 4.2vh;
+    font-size: 32px;
 }
 
 .quote h1,
@@ -12,12 +12,8 @@
 
 .quote .h3 {
     display: block;
-    margin-top: 0 ;
+    margin: 0 ;
     font-size: 22px;
-}
-
-.quote .device .h3 {
-    margin: 0 0 10px;
 }
 
 .quote-cost {
@@ -32,18 +28,15 @@
     font-weight: bold;
     font-size: 22px;
 }
+
 .quote-card {
     margin-bottom: 15px;  
 }
 
 .quote-card ul {
-    padding-left: 40px;
-    margin: 0 0 25px;
-    position: relative;
-}
-
-.quote-card ul:last-of-type {
+    padding-left: 30px;
     margin: 0;
+    position: relative;
 }
 
 .quote-card li {
@@ -51,13 +44,13 @@
     color: #626B78;
 }
 
-.so-sure-benefits li {
-    color: #fff;
+li .h4 {
+    margin-top: 0;
 }
 
 .quote-card .fa-lg {
     position: absolute;
-    left: 10px;
+    left: 0;
 }
 
 .quote-card p.h4 {
@@ -95,6 +88,7 @@
 
     .quote-container h1 {
         text-align: center;
+        font-size: 36px;
     }
 
     .quote {
