@@ -1,5 +1,9 @@
 /* QUOTE CARD */
 
+.quote-container {
+    padding: 0 15px;
+}
+
 .quote-container h1 {
     font-size: 32px;
 }

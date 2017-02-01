@@ -33,7 +33,7 @@
 
 {% block body %}
 
-    <section id="quote" class="quote-container section--pad">
+    <section id="quote" class="quote-container">
         {{ form_start(buy_form) }}
 
         <h1>Instant cover for <span>£{{ phone_price.monthlyPremiumPrice }}</span></h1>
@@ -84,7 +84,12 @@
                             </li>
                             <li class="h4">
                                 <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> 
-                                <a id="cashback-link" href="#cashback"><strong class="text-dark-grey text-underline">Up to 80% cashback every year</strong></a>
+                                <span class="visible-xs-inline visible-sm-inline">
+                                    <a id="cashback-link" href="#cashback"><strong class="text-dark-grey text-underline">Up to 80% cashback every year</strong></a>
+                                </span>
+                                <span class="hidden-xs hidden-sm">
+                                    <strong class="text-dark-grey">Up to 80% cashback every year</strong>
+                                </span>
                             </li>
                         </ul>                   
                     </div>

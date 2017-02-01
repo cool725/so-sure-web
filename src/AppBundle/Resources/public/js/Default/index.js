@@ -30,7 +30,7 @@
     });
 
 
-    $("#get-started").click(function() {
+    $("#get-started").click(function(event) {
 
         event.preventDefault();
 
