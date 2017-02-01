@@ -49,6 +49,10 @@
     padding-top: 10px;
 }
 
+a.hero-link:hover {
+    text-decoration: none;
+} 
+
 .btn-dark:hover {
     color: #fff;
 }
