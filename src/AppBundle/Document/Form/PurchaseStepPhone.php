@@ -88,7 +88,13 @@ class PurchaseStepPhone
 
     public function setImei($imei)
     {
-        $this->imei = str_replace(' ', '', $imei);
+        // space, -, / may be present when copy/pasted by user
+        $imei = str_replace(' ', '', $imei);
+        $imei = str_replace('-', '', $imei);
+        $imei = str_replace('/', '', $imei);
+        // There are some cases of 17 digits imei (15 digit imei with additional info attached)
+        // Such as samsung s7 edge
+        $this->imei = substr($imei, 0, 15);
         if ($this->getPhone() && $this->getPhone()->getMake() != "Apple") {
             $this->setSerialNumber($imei);
         }

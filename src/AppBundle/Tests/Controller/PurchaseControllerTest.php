@@ -174,7 +174,101 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
 
-        $crawler = $this->setPhone($phone, true);
+        $imei = implode(' ', str_split(self::generateRandomImei(), 3));
+        $crawler = $this->setPhone($phone, $imei);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-review/monthly'));
+    }
+
+    public function testPurchasePhoneImeiDash()
+    {
+        $phone = self::getRandomPhone(static::$dm);
+
+        // set phone in session
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhone', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+
+        $crawler = $this->setAddress();
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+
+        $imei = implode('-', str_split(self::generateRandomImei(), 3));
+        $crawler = $this->setPhone($phone, $imei);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-review/monthly'));
+    }
+
+    public function testPurchasePhoneImeiSlash()
+    {
+        $phone = self::getRandomPhone(static::$dm);
+
+        // set phone in session
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhone', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+
+        $crawler = $this->setAddress();
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+
+        $imei = implode('/', str_split(self::generateRandomImei(), 3));
+        $crawler = $this->setPhone($phone, $imei);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-review/monthly'));
+    }
+
+    public function testPurchasePhoneImeiS7()
+    {
+        $phone = self::getRandomPhone(static::$dm);
+
+        // set phone in session
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhone', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+
+        $crawler = $this->setAddress();
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+
+        $imei = sprintf('%s/71', self::generateRandomImei());
+        $crawler = $this->setPhone($phone, $imei);
 
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-review/monthly'));
@@ -239,13 +333,11 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
 
-    private function setPhone($phone, $generateSpaces = false)
+    private function setPhone($phone, $imei = null)
     {
         $crawler = self::$client->request('GET', '/purchase/step-phone');
         $form = $crawler->selectButton('purchase_form[next]')->form();
-        if ($generateSpaces) {
-            $imei = implode(' ', str_split(self::generateRandomImei(), 3));
-        } else {
+        if (!$imei) {
             $imei = self::generateRandomImei();
         }
         $form['purchase_form[imei]'] = $imei;
