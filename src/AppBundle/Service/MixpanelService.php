@@ -123,11 +123,16 @@ class MixpanelService
 
                     $this->setPersonPropertiesOnce($data['userId'], $data['properties']);
                 } elseif ($action == self::QUEUE_PERSON_INCREMENT) {
-                    if (!isset($data['userId']) || !isset($data['properties']) || !isset($data['properties']['field']) || !isset($data['properties']['incrementBy'])) {
+                    if (!isset($data['userId']) || !isset($data['properties']) ||
+                        !isset($data['properties']['field']) || !isset($data['properties']['incrementBy'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
 
-                    $this->incrementPerson($data['userId'], $data['properties']['field'], $data['properties']['incrementBy']);
+                    $this->incrementPerson(
+                        $data['userId'],
+                        $data['properties']['field'],
+                        $data['properties']['incrementBy']
+                    );
                 } elseif ($action == self::QUEUE_TRACK) {
                     if (!isset($data['userId']) || !isset($data['event']) || !isset($data['properties'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
@@ -135,7 +140,8 @@ class MixpanelService
 
                     $this->track($data['userId'], $data['event'], $data['properties']);
                 } elseif ($action == self::QUEUE_ALIAS) {
-                    if (!isset($data['userId']) || !isset($data['properties']) || !isset($data['properties']['trackingId'])) {
+                    if (!isset($data['userId']) || !isset($data['properties']) ||
+                        !isset($data['properties']['trackingId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
 
