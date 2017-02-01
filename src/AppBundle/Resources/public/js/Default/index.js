@@ -39,16 +39,6 @@
         }, 1500);
     });
 
-    $("#cashback-link").click(function() {
-
-        event.preventDefault();
-
-        $('html, body').animate({
-            scrollTop: $("#cashback").offset().top
-        }, 1500);
-    });
-
-
     // Sticky Banner - For quotes TODO make modular
 
     var quoteBox = $('#quote');
