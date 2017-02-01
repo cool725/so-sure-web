@@ -1,5 +1,9 @@
 /* QUOTE CARD */
 
+.quote-container h1 {
+    font-size: 4.2vh;
+}
+
 .quote h1,
 .quote .h3,
 .quote .h4 {
@@ -29,10 +33,7 @@
     font-size: 22px;
 }
 .quote-card {
-    padding: 15px;    
-    margin-bottom: 25px;
-    border: 2px solid #efefef;
-    border-radius: 4px;
+    margin-bottom: 15px;  
 }
 
 .quote-card ul {
@@ -115,6 +116,9 @@
 
     .quote-card {
         padding: 25px;
+        margin-bottom: 25px;
+        border: 2px solid #efefef;
+        border-radius: 4px;        
     }
 
     .quote-cost {
