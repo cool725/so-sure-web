@@ -26,6 +26,8 @@
     src: local('/fonts/Avenir LT Std 35 Light'), url('/fonts/AvenirLTStd-Light.woff') format('woff');
 }
 
+
+
 /* MOVE TO common > _global.scss */
 
 html {
@@ -83,19 +85,20 @@ strong {
 /* MOVE TO layout > _header.scss */
 
 .so-sure-logo-dark {
-    background: transparent no-repeat center top url("/images/logo/Logo-Dark-with-Social-Insurance.svg");
-    background-size: 130px;
-    width: 130px;
-    height: 40px;
-}
-.so-sure-logo-light {
-    background: transparent no-repeat center top url("/images/logo/Logo-Light-with-Social-Insurance.svg");
+    background: transparent no-repeat center top url("/images/logo/so-sure-logo-dark.svg");
     background-size: 130px;
     width: 130px;
     height: 40px;
 }
 
-.so-sure-logo-xmas {
+.so-sure-logo-light {
+    background: transparent no-repeat center top url("/images/logo/so-sure-logo-light.svg");
+    background-size: 130px;
+    width: 130px;
+    height: 40px;
+}
+
+/*.so-sure-logo-xmas {
     background: transparent no-repeat center top url("/images/logo/xmas-full-logo.svg");
     background-size: 90px;
     width: 130px;
@@ -109,7 +112,7 @@ strong {
       width: 130px;
       height: 41px;
     }
-}
+}*/
 
 
 
