@@ -36,7 +36,7 @@
     <section id="quote" class="quote-container section--pad">
         {{ form_start(buy_form) }}
 
-        <h1>Complete cover for <span>£{{ phone_price.monthlyPremiumPrice }}</span></h1>
+        <h1>Instant cover for <span>£{{ phone_price.monthlyPremiumPrice }}</span></h1>
 
         <div class="quote">
             
@@ -50,14 +50,6 @@
                                     <small><a href="{{ path('homepage') }}#get-quote"><strong>Change</strong></a></small>
                                 </span>               
                             </div>
-                            <div class="col-xs-12 col-sm-4 col-md-4 hidden-xs rrp">
-                                <span class="h4">
-                                    <span class="h4">Retail Value:</span>
-                                    <span class="text-blue">
-                                        <strong>£{{ phone.initialPrice|number_format(0, '.', ',') }}</strong>
-                                    </span> 
-                                </span>
-                            </div>
                         </div>     
                     </div>                     
                 </div>
@@ -67,22 +59,39 @@
 
                <div class="col-xs-12 col-sm-7 col-md-7">
                     <div class="quote-card">
-                        <p class="h4"><strong>Covered for:</strong></p>
-                        <ul class="list-unstyled">
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Loss <a href="#" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a></li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a href="#" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a></li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental Damage <a href="#" data-toggle="modal" data-target="#accidental-damage"><i class="fa fa-info-circle"></i></a></li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Breakdown</li> 
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide Coverage <a href="#" data-toggle="modal" data-target="#worldwide-coverage"><i class="fa fa-info-circle"></i></a></li>                            
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> Next Working Day Replacement / Repair</li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> 24/7 UK Live Support</li>
-                            <li class="h4"><i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> Up to 80% Cashback Every Year</li>
+                        <ul class="list-unstyled">                 
+                            <li class="h4">
+                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> 
+                                Loss <a href="#" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a>
+                            </li>
+                            <li class="h4">
+                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a href="#" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a>
+                            </li>
+                            <li class="h4">
+                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental damage <a href="#" data-toggle="modal" data-target="#accidental-damage"><i class="fa fa-info-circle"></i></a>
+                            </li>
+                            <li class="h4">
+                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Breakdown
+                            </li> 
+                            <li class="h4">
+                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide coverage <a href="#" data-toggle="modal" data-target="#worldwide-coverage"><i class="fa fa-info-circle"></i></a>
+                            </li>             
+                            <li class="h4">
+                                <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> <strong>Next working day replacement / repair</strong>
+                            </li>                                         
+                            <li class="h4">
+                                <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> <strong>24/7 UK live support</strong>
+                            </li>
+                            <li class="h4">
+                                <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> 
+                                <a id="cashback-link" href="#cashback"><strong class="text-dark-grey text-underline">Up to 80% cashback every year</strong></a>
+                            </li>
                         </ul>                   
                     </div>
                </div>    
 
                <div class="col-xs-12 visible-xs-block">
-                    <div class="quote-cost text-center">
+                    <div id="cashback" class="quote-cost text-center">
                         <span class="h1 cost">
                             <strong>£{{ phone_price.monthlyPremiumPrice }}</strong> 
                             <small>per month</small>
@@ -94,7 +103,7 @@
 
                 <div class="col-xs-12 col-sm-5 col-md-5">
                     <div class="quote-card">
-                        <p class="h4"><strong>And here's the cool bit...</strong></p>
+                        <p class="h4"><strong>Get cashback</strong></p>
                         {% set start_friends = phone_price.maxConnections %}
                         {# set start_friends = 10 #}
                         {% if start_friends > phone_price.maxConnections %}
@@ -105,11 +114,11 @@
                             {% set start_value = phone_price.maxPot %}
                         {% endif %}
      
-                        <p class="">
-                            If you connect with 
+                        <p>
+                            Connect with 
                             <strong id="num_friends" class="text-blue text-nowrap">
                                 {{ start_friends }} friend{% if start_friends > 1 %}s{% endif %}
-                            </strong> and no one claims you get cashback every year.                           
+                            </strong> &amp; when no one claims you get cashback every year.                           
                         </p>
                         <div class="h1 text-center">
                             <strong id="money_back" class="text-green cashback">£{{ start_value }}</strong>
@@ -130,7 +139,7 @@
                             data-slider-connection-value="{{ connection_value }}"/>
 
                         <div class="quote-tip">
-                           <small>Fewer connections? Alter the slider to see what you could still get!</small>
+                           <small>Fewer connections? Move the slider!</small>
                         </div>
                         <div class="text-center">
                             <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><span class="text-underline">Learn how it works</span></i></a>
@@ -142,15 +151,15 @@
                     <div class="quote-cost text-center">
                         <div class="row">
                             <div class="col-sm-6 col-md-6">
+                                {{ form_widget(buy_form.buy_tablet, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                            </div>                             
+                            <div class="col-sm-6 col-md-6">
                                 <span class="h1 cost">
                                     <strong>£{{ phone_price.monthlyPremiumPrice }}</strong> 
                                     <small>per month</small>
                                 </span><br>
                                 <small>£50 Excess (£70 for Theft &amp; Loss)</small>
-                            </div>
-                            <div class="col-sm-6 col-md-6">
-                                {{ form_widget(buy_form.buy_tablet, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                            </div>                            
+                            </div>                       
                         </div>
                     </div>
                 </div>
@@ -238,7 +247,7 @@
                 <div class="modal-body">  
                     <p>Worldwide Coverage:</p>
                     <ul>
-                        <li>eotoiutoietueoi</li>
+                        <li>Valid for 90 days while you are traveling for leisure or business.</li>
                     </ul>
                 </div>
             </div>
