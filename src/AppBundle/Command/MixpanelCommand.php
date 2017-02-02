@@ -19,8 +19,8 @@ class MixpanelCommand extends ContainerAwareCommand
             ->setDescription('Run mixpanel')
             ->addArgument(
                 'action',
-                InputArgument::REQUIRED,
-                'delete|test'
+                InputArgument::OPTIONAL,
+                'delete|test|clear|show (or blank for process)'
             )
             ->addOption(
                 'email',
@@ -34,6 +34,13 @@ class MixpanelCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'id of mixpanel user'
             )
+            ->addOption(
+                'process',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Max Number to process',
+                50
+            )
         ;
     }
 
@@ -42,20 +49,34 @@ class MixpanelCommand extends ContainerAwareCommand
         $action = $input->getArgument('action');
         $email = $input->getOption('email');
         $id = $input->getOption('id');
+        $process = $input->getOption('process');
         $user = null;
         if ($email) {
             $user = $this->getUser($email);
             $id = $user->getId();
         }
         if ($action == 'test') {
-            $results = $this->getMixpanel()->track("button clicked", array("label" => "sign-up"), $user);
+            $results = $this->getMixpanel()->queueTrack("button clicked", array("label" => "sign-up"), $user);
+            $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
         } elseif ($action == 'delete') {
             if (!$id) {
                 throw new \Exception('email or id is required');
             }
             $results = $this->getMixpanel()->delete($id);
+            $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
+        } elseif ($action == 'clear') {
+            $this->getMixpanel()->clearQueue();
+            $output->writeln(sprintf("Queue is cleared"));
+        } elseif ($action == 'show') {
+            $data = $this->getMixpanel()->getQueueData($process);
+            $output->writeln(sprintf("Queue Size: %d", count($data)));
+            foreach ($data as $line) {
+                $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
+            }
+        } else {
+            $count = $this->getMixpanel()->process($process);
+            $output->writeln(sprintf("Sent %s updates", $count));
         }
-        $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
     }
     
     private function getMixpanel()

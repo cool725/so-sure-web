@@ -10,17 +10,23 @@ use UAParser\Parser;
 
 class MixpanelService
 {
-    const HOME_PAGE = 'Home Page';
-    const QUOTE_PAGE = 'Quote Page';
-    const RECEIVE_DETAILS = 'Receive Personal Details';
+    const KEY_MIXPANEL_QUEUE = 'queue:mixpanel';
 
-    const PURCHASE_POLICY = 'Purchase Policy';
-    const INVITE = 'Invite someone';
-    const CONNECTION_COMPLETE = 'Connection Complete';
+    const QUEUE_PERSON_PROPERTIES = 'person';
+    const QUEUE_PERSON_PROPERTIES_ONCE = 'person-once';
+    const QUEUE_PERSON_INCREMENT = 'person-increment';
+    const QUEUE_TRACK = 'track';
+    const QUEUE_ALIAS = 'alias';
 
-    const BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
-    const POLICY_READY = 'Policy Ready For Purchase';
-    const LOGIN = 'Login';
+    const EVENT_HOME_PAGE = 'Home Page';
+    const EVENT_QUOTE_PAGE = 'Quote Page';
+    const EVENT_RECEIVE_DETAILS = 'Receive Personal Details';
+    const EVENT_PURCHASE_POLICY = 'Purchase Policy';
+    const EVENT_INVITE = 'Invite someone';
+    const EVENT_CONNECTION_COMPLETE = 'Connection Complete';
+    const EVENT_BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
+    const EVENT_POLICY_READY = 'Policy Ready For Purchase';
+    const EVENT_LOGIN = 'Login';
 
     /** @var DocumentManager */
     protected $dm;
@@ -64,53 +70,262 @@ class MixpanelService
 
     private function canSend()
     {
-        return $this->environment != 'test';
+        if ($this->environment == 'test') {
+            return false;
+        }
+
+        if ($userAgent = $this->requestService->getUserAgent()) {
+            if (!$this->isUserAgentAllowed($userAgent)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    public function setPersonProperties(array $personProperties, $setOnce = false, $user = null)
+    public function clearQueue()
+    {
+        $this->redis->del(self::KEY_MIXPANEL_QUEUE);
+    }
+
+    public function getQueueData($max)
+    {
+        return $this->redis->lrange(self::KEY_MIXPANEL_QUEUE, 0, $max);
+    }
+
+    public function process($max)
+    {
+        $count = 0;
+        while ($count < $max) {
+            $user = null;
+            $data = null;
+            try {
+                $queueItem = $this->redis->lpop(self::KEY_MIXPANEL_QUEUE);
+                if (!$queueItem) {
+                    return $count;
+                }
+                $data = unserialize($queueItem);
+
+                if (isset($data['action'])) {
+                    $action = $data['action'];
+                }
+
+                if ($action == self::QUEUE_PERSON_PROPERTIES) {
+                    if (!isset($data['userId']) || !isset($data['properties'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->setPersonProperties($data['userId'], $data['properties']);
+                } elseif ($action == self::QUEUE_PERSON_PROPERTIES_ONCE) {
+                    if (!isset($data['userId']) || !isset($data['properties'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->setPersonPropertiesOnce($data['userId'], $data['properties']);
+                } elseif ($action == self::QUEUE_PERSON_INCREMENT) {
+                    if (!isset($data['userId']) || !isset($data['properties']) ||
+                        !isset($data['properties']['field']) || !isset($data['properties']['incrementBy'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->incrementPerson(
+                        $data['userId'],
+                        $data['properties']['field'],
+                        $data['properties']['incrementBy']
+                    );
+                } elseif ($action == self::QUEUE_TRACK) {
+                    if (!isset($data['userId']) || !isset($data['event']) || !isset($data['properties'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->track($data['userId'], $data['event'], $data['properties']);
+                } elseif ($action == self::QUEUE_ALIAS) {
+                    if (!isset($data['userId']) || !isset($data['properties']) ||
+                        !isset($data['properties']['trackingId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->alias($data['properties']['trackingId'], $data['userId']);
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                }
+                $count = $count + 1;
+            } catch (\InvalidArgumentException $e) {
+                $this->logger->error(sprintf(
+                    'Error processing Mixpanel queue message %s. Ex: %s',
+                    json_encode($data),
+                    $e->getMessage()
+                ));
+            } catch (\Exception $e) {
+                if (isset($data['retryAttempts']) && $data['retryAttempts'] < 2) {
+                    $data['retryAttempts'] += 1;
+                    $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
+                } else {
+                    $this->logger->error(sprintf(
+                        'Error (retry exceeded) sending message to Mixpanel %s. Ex: %s',
+                        json_encode($data),
+                        $e->getMessage()
+                    ));
+                }
+            }
+        }
+
+        return $count;
+    }
+
+    public function queue($action, $userId, $properties, $event = null, $retryAttempts = 0)
     {
         if (!$this->canSend()) {
             return;
         }
 
+        if ($action == self::QUEUE_TRACK) {
+            $now = new \DateTime();
+            $properties = array_merge($properties, ['time' => $now->getTimestamp()]);
+        }
+
+        $data = [
+            'action' => $action,
+            'userId' => $userId,
+            'event' => $event,
+            'retryAttempts' => $retryAttempts,
+            'properties' => $properties,
+        ];
+        $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
+    }
+
+    public function queuePersonIncrement($userId, $field, $incrementBy = 1)
+    {
+        $this->queue(self::QUEUE_PERSON_INCREMENT, $userId, [
+            'field' => $field,
+            'incrementBy' => $incrementBy
+        ]);
+    }
+
+    public function queuePersonProperties(array $personProperties, $setOnce = false, $user = null)
+    {
+        $userId = null;
         if (!$user) {
             $user = $this->requestService->getUser();
         }
         if ($user) {
-            $this->mixpanel->identify($user->getId());
-            if (!$setOnce) {
-                $this->mixpanel->people->set($user->getId(), $personProperties);
-            } else {
-                $this->mixpanel->people->setOnce($user->getId(), $personProperties);
-            }
+            $userId = $user->getId();
         } else {
-            if ($trackingId = $this->requestService->getTrackingId()) {
-                $this->mixpanel->identify($trackingId);
-                if (!$setOnce) {
-                    $this->mixpanel->people->set($trackingId, $personProperties);
-                } else {
-                    $this->mixpanel->people->setOnce($trackingId, $personProperties);
+            $userId = $this->requestService->getTrackingId();
+        }
+
+        if ($setOnce) {
+            $this->queue(self::QUEUE_PERSON_PROPERTIES_ONCE, $userId, $personProperties);
+        } else {
+            $this->queue(self::QUEUE_PERSON_PROPERTIES, $userId, $personProperties);
+        }
+    }
+
+    private function incrementPerson($userId, $field, $incrementBy)
+    {
+        if (!$this->canSend()) {
+            return;
+        }
+
+        //$this->mixpanel->identify($userId);
+        // null ip, ignore time
+        $this->mixpanel->people->increment($userId, $field, $incrementBy, null, true);
+    }
+
+    private function setPersonProperties($userId, array $personProperties)
+    {
+        if (!$this->canSend()) {
+            return;
+        }
+
+        //$this->mixpanel->identify($userId);
+        $this->mixpanel->people->set($userId, $personProperties);
+    }
+
+    private function setPersonPropertiesOnce($userId, array $personProperties)
+    {
+        if (!$this->canSend()) {
+            return;
+        }
+
+        //$this->mixpanel->identify($userId);
+        $this->mixpanel->people->setOnce($userId, $personProperties);
+    }
+
+    private function track($userId, $event, $properties)
+    {
+        if (!$this->canSend()) {
+            return;
+        }
+
+        $this->mixpanel->identify($userId);
+        $this->mixpanel->track($event, $properties);
+    }
+
+    private function alias($trackingId, $userId)
+    {
+        if (!$this->canSend()) {
+            return;
+        }
+
+        $this->mixpanel->createAlias($trackingId, $userId);
+    }
+
+    public function updateUser(User $user)
+    {
+        $userData = ['$email' => $user->getEmail()];
+        if ($user->getFirstName()) {
+            $userData['$first_name'] = $user->getFirstName();
+        }
+        if ($user->getLastName()) {
+            $userData['$last_name'] = $user->getLastName();
+        }
+        if ($user->getMobileNumber()) {
+            $userData['$phone'] = $user->getMobileNumber();
+        }
+        if ($user->getBirthday()) {
+            $userData['Date of Birth'] = $user->getBirthday()->format(\DateTime::ATOM);
+        }
+        if ($user->getBillingAddress()) {
+            $userData['Billing Address'] = $user->getBillingAddress()->__toString();
+        }
+        if ($policy = $user->getCurrentPolicy()) {
+            if ($phone = $policy->getPhone()) {
+                $userData['Device Insured'] = $phone->__toString();
+                $userData['OS'] = $phone->getOs();
+            }
+            if ($premium = $policy->getPremium()) {
+                $userData['Final Monthly Cost'] = $premium->getMonthlyPremiumPrice();
+            }
+            if ($plan = $policy->getPremiumPlan()) {
+                $userData['Payment Option'] = $plan;
+                $userData['Number of Payments Received'] = count($policy->getSuccessfulPaymentCredits());
+                if ($payment = $policy->getLastSuccessfulPaymentCredit()) {
+                    $userData['Last payment received'] = $payment->getDate()->format(\DateTime::ATOM);
                 }
             }
+            $userData['Number of Connections'] = count($policy->getConnections());
+            $userData['Reward Pot Value'] = $policy->getPotValue();
+            $userData['Number of Invites Sent'] = count($policy->getSentInvitations(false));
         }
+
+        $this->queuePersonProperties($userData, false, $user);
     }
 
-    public function track($event, array $properties = null)
+    public function queueTrack($event, array $properties = null)
     {
-        return $this->trackAll($event, $properties);
+        return $this->queueTrackAll($event, $properties);
     }
 
-    public function trackWithUtm($event, array $properties = null)
+    public function queueTrackWithUtm($event, array $properties = null)
     {
-        return $this->trackAll($event, $properties, null, true);
+        return $this->queueTrackAll($event, $properties, null, true);
     }
 
-    public function isUserAgentAllowed($userAgent, $userAgentDetails = null)
+    public function isUserAgentAllowed($userAgent)
     {
-        if (!$userAgentDetails) {
-            $parser = Parser::create();
-            $userAgentDetails = $parser->parse($userAgent);
-        }
+        $parser = Parser::create();
+        $userAgentDetails = $parser->parse($userAgent);
 
         // exclude bots from tracking
         if (in_array($userAgentDetails->ua->family, [
@@ -131,76 +346,26 @@ class MixpanelService
         return true;
     }
 
-    public function trackWithUser($user, $event, array $properties = null)
+    public function queueTrackWithUser($user, $event, array $properties = null)
     {
-        return $this->trackAll($event, $properties, $user);
+        return $this->queueTrackAll($event, $properties, $user);
     }
 
-    public function trackAll(
+    public function queueTrackAll(
         $event,
         array $properties = null,
         $user = null,
         $addUtm = false
     ) {
-        if (!$this->canSend()) {
-            return;
-        }
-
-        $userAgentDetails = null;
-        if ($userAgent = $this->requestService->getUserAgent()) {
-            $parser = Parser::create();
-            $userAgentDetails = $parser->parse($userAgent);
-            if (!$this->isUserAgentAllowed($userAgent, $userAgentDetails)) {
-                return;
-            }
-        }
-
+        $userId = null;
         if (!$user) {
             $user = $this->requestService->getUser();
         }
         if ($user) {
-            $userData = ['$email' => $user->getEmail()];
-            if ($user->getFirstName()) {
-                $userData['$first_name'] = $user->getFirstName();
-            }
-            if ($user->getLastName()) {
-                $userData['$last_name'] = $user->getLastName();
-            }
-            if ($user->getMobileNumber()) {
-                $userData['$phone'] = $user->getMobileNumber();
-            }
-            if ($user->getBirthday()) {
-                $userData['Date of Birth'] = $user->getBirthday()->format(\DateTime::ATOM);
-            }
-            if ($user->getBillingAddress()) {
-                $userData['Billing Address'] = $user->getBillingAddress()->__toString();
-            }
-            if ($policy = $user->getCurrentPolicy()) {
-                if ($phone = $policy->getPhone()) {
-                    $userData['Device Insured'] = $phone->__toString();
-                    $userData['OS'] = $phone->getOs();
-                }
-                if ($premium = $policy->getPremium()) {
-                    $userData['Final Monthly Cost'] = $premium->getMonthlyPremiumPrice();
-                }
-                if ($plan = $policy->getPremiumPlan()) {
-                    $userData['Payment Option'] = $plan;
-                    $userData['Number of Payments Received'] = count($policy->getSuccessfulPaymentCredits());
-                    if ($payment = $policy->getLastSuccessfulPaymentCredit()) {
-                        $userData['Last payment received'] = $payment->getDate()->format(\DateTime::ATOM);
-                    }
-                }
-                $userData['Number of Connections'] = count($policy->getConnections());
-                $userData['Reward Pot Value'] = $policy->getPotValue();
-                $userData['Number of Invites Sent'] = count($policy->getSentInvitations(false));
-            }
-            $this->mixpanel->identify($user->getId());
-            $this->mixpanel->people->set($user->getId(), $userData);
-            //$this->logger->debug(sprintf('User %s details %s', $user->getId(), json_encode($userData)));
+            $this->updateUser($user);
+            $userId = $user->getId();
         } else {
-            if ($trackingId = $this->requestService->getTrackingId()) {
-                $this->mixpanel->identify($trackingId);
-            }
+            $userId = $this->requestService->getTrackingId();
         }
 
         if (!$properties) {
@@ -208,12 +373,8 @@ class MixpanelService
         }
         if ($addUtm) {
             $utm = $this->transformUtm();
+            $this->queuePersonProperties($utm, true, $user);
             $properties = array_merge($properties, $utm);
-            if ($user) {
-                $this->mixpanel->people->setOnce($user->getId(), $utm);
-            } elseif ($trackingId = $this->requestService->getTrackingId()) {
-                $this->mixpanel->people->setOnce($trackingId, $utm);
-            }
         }
 
         if ($uri = $this->requestService->getUri()) {
@@ -223,26 +384,23 @@ class MixpanelService
             $properties['ip'] = $ip;
         }
 
-        // previously parsed from user agent
-        if ($userAgentDetails) {
+        if ($userAgent = $this->requestService->getUserAgent()) {
+            $parser = Parser::create();
+            $userAgentDetails = $parser->parse($userAgent);
             $properties['$browser'] = $userAgentDetails->ua->family;
             $properties['$browser_version'] = $userAgentDetails->ua->toVersion();
             $properties['User Agent'] = $userAgent;
         }
-        $this->mixpanel->track($event, $properties);
+        $this->queue(self::QUEUE_TRACK, $userId, $properties, $event);
 
-        // Special case for logins - bump number
-        if ($event == self::LOGIN && $user) {
-            $this->mixpanel->people->increment($user->getId(), "Number Of Logins", 1);
+        // Special case for logins - bump login count
+        if ($event == self::EVENT_LOGIN) {
+            $this->queuePersonIncrement($userId, "Number Of Logins", 1);
         }
     }
 
     public function register(User $user = null, $trackingId = null)
     {
-        if (!$this->canSend()) {
-            return;
-        }
-
         if (!$trackingId) {
             $trackingId = $this->requestService->getTrackingId();
         }
@@ -252,7 +410,7 @@ class MixpanelService
                 $user ? $user->getId() : 'unknown',
                 $trackingId
             ));
-            $this->mixpanel->createAlias($trackingId, $user->getId());
+            $this->queue(self::QUEUE_ALIAS, $user->getId(), ['trackingId' => $trackingId]);
         } else {
             $this->logger->warning(sprintf(
                 'Failed to register user %s id: %s',
