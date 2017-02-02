@@ -179,13 +179,17 @@ class MixpanelService
             return;
         }
 
-        $now = new \DateTime();
+        if ($action == self::QUEUE_TRACK) {
+            $now = new \DateTime();
+            $properties = array_merge($properties, ['time' => $now->getTimestamp()]);
+        }
+
         $data = [
             'action' => $action,
             'userId' => $userId,
             'event' => $event,
             'retryAttempts' => $retryAttempts,
-            'properties' => array_merge($properties, ['time' => $now->getTimestamp()]),
+            'properties' => $properties,
         ];
         $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
     }
