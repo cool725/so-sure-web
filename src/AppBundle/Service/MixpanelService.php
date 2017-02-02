@@ -114,14 +114,16 @@ class MixpanelService
                     if (!isset($data['userId']) || !isset($data['properties'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
+                    $ip = isset($data['ip']) ? $data['ip'] : null;
 
-                    $this->setPersonProperties($data['userId'], $data['properties']);
+                    $this->setPersonProperties($data['userId'], $data['properties'], $ip);
                 } elseif ($action == self::QUEUE_PERSON_PROPERTIES_ONCE) {
                     if (!isset($data['userId']) || !isset($data['properties'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
+                    $ip = isset($data['ip']) ? $data['ip'] : null;
 
-                    $this->setPersonPropertiesOnce($data['userId'], $data['properties']);
+                    $this->setPersonPropertiesOnce($data['userId'], $data['properties'], $ip);
                 } elseif ($action == self::QUEUE_PERSON_INCREMENT) {
                     if (!isset($data['userId']) || !isset($data['properties']) ||
                         !isset($data['properties']['field']) || !isset($data['properties']['incrementBy'])) {
@@ -190,6 +192,7 @@ class MixpanelService
             'event' => $event,
             'retryAttempts' => $retryAttempts,
             'properties' => $properties,
+            'ip' => $this->requestService->getClientIp(),
         ];
         $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
     }
@@ -204,6 +207,11 @@ class MixpanelService
 
     public function queuePersonProperties(array $personProperties, $setOnce = false, $user = null)
     {
+        // don't send empty data
+        if (count($personProperties) == 0) {
+            return;
+        }
+
         $userId = null;
         if (!$user) {
             $user = $this->requestService->getUser();
@@ -232,24 +240,24 @@ class MixpanelService
         $this->mixpanel->people->increment($userId, $field, $incrementBy, null, true);
     }
 
-    private function setPersonProperties($userId, array $personProperties)
+    private function setPersonProperties($userId, array $personProperties, $ip = null)
     {
         if (!$this->canSend()) {
             return;
         }
 
         //$this->mixpanel->identify($userId);
-        $this->mixpanel->people->set($userId, $personProperties);
+        $this->mixpanel->people->set($userId, $personProperties, $ip);
     }
 
-    private function setPersonPropertiesOnce($userId, array $personProperties)
+    private function setPersonPropertiesOnce($userId, array $personProperties, $ip = null)
     {
         if (!$this->canSend()) {
             return;
         }
 
         //$this->mixpanel->identify($userId);
-        $this->mixpanel->people->setOnce($userId, $personProperties);
+        $this->mixpanel->people->setOnce($userId, $personProperties, $ip);
     }
 
     private function track($userId, $event, $properties)
