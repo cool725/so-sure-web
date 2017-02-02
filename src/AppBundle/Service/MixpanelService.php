@@ -177,7 +177,7 @@ class MixpanelService
 
     public function queue($action, $userId, $properties, $event = null, $retryAttempts = 0)
     {
-        if (!$this->canSend()) {
+        if (!$this->canSend() || !$userId) {
             return;
         }
 
