@@ -524,11 +524,6 @@ class PurchaseController extends BaseController
                 $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PURCHASE_POLICY, [
                     'Payment Option' => $policy->getPremiumPlan(),
                 ]);
-                $this->addFlash(
-                    'success',
-                    'Welcome to so-sure!'
-                );
-
                 return $this->redirectToRoute('user_welcome');
             } else {
                 // unpaid policy - outstanding payment
