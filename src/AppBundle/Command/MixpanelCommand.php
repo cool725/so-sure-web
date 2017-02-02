@@ -56,7 +56,10 @@ class MixpanelCommand extends ContainerAwareCommand
             $id = $user->getId();
         }
         if ($action == 'test') {
-            $results = $this->getMixpanel()->queueTrack("button clicked", array("label" => "sign-up"), $user);
+            if (!$user) {
+                throw new \Exception('Requires user; add --email');
+            }
+            $results = $this->getMixpanel()->queueTrackWithUser($user, "button clicked", array("label" => "sign-up"));
             $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
         } elseif ($action == 'delete') {
             if (!$id) {
