@@ -77,32 +77,38 @@
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide coverage <a href="#" data-toggle="modal" data-target="#worldwide-coverage"><i class="fa fa-info-circle"></i></a>
                             </li>             
                             <li class="h4">
-                                <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> <strong>Next working day replacement / repair</strong>
+                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> <strong>Next working day replacement / repair</strong>
                             </li>                                         
                             <li class="h4">
-                                <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> <strong>24/7 UK live support</strong>
+                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> <strong>24/7 UK live support</strong>
                             </li>
                             <li class="h4">
-                                <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> 
+                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> 
                                 <span class="visible-xs-inline visible-sm-inline">
-                                    <a id="cashback-link" href="#cashback"><strong class="text-dark-grey text-underline">Up to 80% cashback every year</strong></a>
+                                    <a id="cashback-link" href="#mobile-price"><strong class="text-dark-grey text-underline">Up to 80% cashback every year</strong></a>
                                 </span>
                                 <span class="hidden-xs hidden-sm">
                                     <strong class="text-dark-grey">Up to 80% cashback every year</strong>
                                 </span>
+                            </li>
+                            <li class="hidden-xs">
+                                <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">See full Terms &amp; Conditions</a></small>                                
                             </li>
                         </ul>                   
                     </div>
                </div>    
 
                <div class="col-xs-12 visible-xs-block">
-                    <div id="cashback" class="quote-cost text-center">
+                    <div id="mobile-price" class="quote-cost text-center">
                         <span class="h1 cost">
                             <strong>£{{ phone_price.monthlyPremiumPrice }}</strong> 
                             <small>per month</small>
                         </span><br>
                         <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                            {{ form_widget(buy_form.buy_mobile, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                        {{ form_widget(buy_form.buy_mobile, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                        <br>
+                        <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">See full Terms &amp; Conditions</a></small>                    
+
                     </div>
                </div>  
 
@@ -148,8 +154,8 @@
                         </div>
                         <div class="text-center">
                             <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><span class="text-underline">Learn how it works</span></i></a>
-                        </div>                       
-                    </div>              
+                        </div>              
+                    </div>                                           
                 </div>
 
                 <div class="col-sm-12 col-md-12 hidden-xs">
@@ -257,6 +263,22 @@
                 </div>
             </div>
         </div>
-    </div>    
+    </div> 
+
+    <div class="modal modal-policy fade" id="policy-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                </div>
+            </div>
+        </div>
+    </div>       
 
 {% endblock %}
