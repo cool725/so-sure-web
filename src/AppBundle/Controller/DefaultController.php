@@ -587,6 +587,7 @@ class DefaultController extends BaseController
         return array(
             'phone' => $phone,
             'phone_price' => $phone->getCurrentPhonePrice(),
+            'policy_key' => $this->getParameter('policy_key'),
             'connection_value' => PhonePolicy::STANDARD_VALUE,
             'max_connections' => $maxConnections,
             'max_pot' => $maxPot,
