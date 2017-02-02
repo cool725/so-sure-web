@@ -164,3 +164,13 @@
   border-radius: 16px;
   background-color: #80CE4D;
 }
+
+.go-to-account {
+  padding: 20px 15px 40px 15px;
+  text-align: center;
+}
+
+.go-to-account .account-btn {
+  font-size: 22px;
+  font-weight: bold;
+}
