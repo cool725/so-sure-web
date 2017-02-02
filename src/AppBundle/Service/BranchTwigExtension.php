@@ -45,10 +45,12 @@ class BranchTwigExtension extends \Twig_Extension
         $data = [
             'referer' => $this->requestService->getReferer(),
         ];
-        $scode = $this->requestService->getSCode();
-        if ($scode) {
+        if ($scode = $this->requestService->getSCode()) {
             $data['scode'] = $scode;
             $data['$deeplink_path'] = sprintf('invite/scode/%s', $scode);
+        }
+        if ($trackingId = $this->requestService->getTrackingId()) {
+            $data['sosure_tracking_id'] = $trackingId;
         }
 
         // Mainly for new users, but won't hurt for existing users
