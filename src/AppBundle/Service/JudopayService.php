@@ -252,6 +252,18 @@ class JudopayService
         $user->setPaymentMethod($judo);
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $source, $date);
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            if ($payment->isSuccess()) {
+                $this->logger->debug('Event Payment Success');
+                $this->dispatcher->dispatch(PaymentEvent::EVENT_SUCCESS, new PaymentEvent($payment));
+            } else {
+                $this->logger->debug('Event Payment Failed');
+                $this->dispatcher->dispatch(PaymentEvent::EVENT_FAILED, new PaymentEvent($payment));
+            }
+        } else {
+            $this->logger->warning('Dispatcher is disabled for Judo Service');
+        }
 
         $this->validateUser($user);
     }

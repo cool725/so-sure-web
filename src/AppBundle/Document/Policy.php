@@ -511,6 +511,22 @@ abstract class Policy
         return $this->connections;
     }
 
+    public function getLastConnection()
+    {
+        $connections = $this->getConnections();
+        if (count($connections) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($connections, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $connections[0];
+    }
+
     public function addClaim(Claim $claim)
     {
         if (!$this->isClaimAllowed($claim)) {
