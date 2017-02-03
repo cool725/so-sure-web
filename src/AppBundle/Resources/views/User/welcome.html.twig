@@ -65,6 +65,14 @@
         </div>
     </section>
 
+    {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
+    <section class="invites section--pad">
+        <div class="row">
+            <h3 class="text-center">It looks like {{ policy.user.unprocessedReceivedInvitations|length }} {% if policy.user.unprocessedReceivedInvitations|length > 1 %}people have{% else %}person has{% endif %} already invited you. 🤗<br>Make sure you download the app below to connect with them.</h3>
+        </div>
+    </section>
+    {% endif %}
+
     <section class="download-apps section--pad">
         <div class="row">
             <div class="col-md-6">

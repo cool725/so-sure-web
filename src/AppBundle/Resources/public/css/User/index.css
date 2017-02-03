@@ -130,6 +130,10 @@
   color: #fff;
 }
 
+.invites {
+  background-color: #efefef;
+}
+
 .download-apps .download-btn {
   width: 40%;
   display: inline-block;
