@@ -16,19 +16,24 @@ class RequestService
     protected $logger;
 
     protected $tokenStorage;
+    protected $adminCookieValue;
 
     /**
      * @param RequestStack    $requestStack
      * @param LoggerInterface $logger
+     * @param                 $tokenStorage
+     * @param string          $adminCookieValue
      */
     public function __construct(
         RequestStack $requestStack,
         LoggerInterface $logger,
-        $tokenStorage
+        $tokenStorage,
+        $adminCookieValue
     ) {
         $this->requestStack = $requestStack;
         $this->logger = $logger;
         $this->tokenStorage = $tokenStorage;
+        $this->adminCookieValue = $adminCookieValue;
     }
 
     public function getReferer()
@@ -138,5 +143,16 @@ class RequestService
         }
 
         return null;
+    }
+
+    public function isSoSureEmployee()
+    {
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            if ($cookie = $request->cookies->get(SoSure::SOSURE_EMPLOYEE_COOKIE_NAME)) {
+                return urldecode($cookie) === $this->adminCookieValue;
+            }
+        }
+
+        return false;
     }
 }

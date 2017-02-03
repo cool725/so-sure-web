@@ -81,6 +81,10 @@ class MixpanelService
             }
         }
 
+        if ($this->requestService->isSoSureEmployee()) {
+            return false;
+        }
+
         return true;
     }
 
