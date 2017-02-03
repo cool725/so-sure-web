@@ -15,7 +15,7 @@ class MixpanelListener
     protected $mixpanel;
 
     /**
-     * @param MixpanelService $intercom
+     * @param MixpanelService $mixpanel
      */
     public function __construct(MixpanelService $mixpanel)
     {
