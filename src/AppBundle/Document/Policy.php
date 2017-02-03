@@ -514,6 +514,9 @@ abstract class Policy
     public function getLastConnection()
     {
         $connections = $this->getConnections();
+        if (!is_array($connections)) {
+            $connections = $connections->getValues();
+        }
         if (count($connections) == 0) {
             return null;
         }
