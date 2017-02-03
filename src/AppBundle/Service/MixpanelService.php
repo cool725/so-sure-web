@@ -22,6 +22,7 @@ class MixpanelService
     const EVENT_QUOTE_PAGE = 'Quote Page';
     const EVENT_RECEIVE_DETAILS = 'Receive Personal Details';
     const EVENT_PURCHASE_POLICY = 'Purchase Policy';
+    const EVENT_PAYMENT = 'Payment';
     const EVENT_INVITE = 'Invite someone';
     const EVENT_CONNECTION_COMPLETE = 'Connection Complete';
     const EVENT_BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';

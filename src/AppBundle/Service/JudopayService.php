@@ -785,6 +785,7 @@ class JudopayService
         $payment = new JudoPayment();
         $payment->setAmount($amount);
         $payment->setNotes($notes);
+        $payment->setUser($policy->getUser());
         $payment->setSource(Payment::SOURCE_TOKEN);
         $policy->addPayment($payment);
         $this->dm->persist($payment);
@@ -820,10 +821,14 @@ class JudopayService
         // Primarily used to allow tests to avoid triggering policy events
         if ($this->dispatcher) {
             if ($payment->isSuccess()) {
+                $this->logger->debug('Event Payment Success');
                 $this->dispatcher->dispatch(PaymentEvent::EVENT_SUCCESS, new PaymentEvent($payment));
             } else {
+                $this->logger->debug('Event Payment Failed');
                 $this->dispatcher->dispatch(PaymentEvent::EVENT_FAILED, new PaymentEvent($payment));
             }
+        } else {
+            $this->logger->warning('Dispatcher is disabled for Judo Service');
         }
 
         return $payment;

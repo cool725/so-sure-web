@@ -578,6 +578,13 @@ services:
             -  { name: kernel.event_listener, event: event.claim.approved, method: onClaimApprovedEvent }
             -  { name: kernel.event_listener, event: event.claim.settled, method: onClaimSettledEvent }
 
+    app.listener.mixpanel:
+        class:   AppBundle\Listener\MixpanelListener
+        arguments:
+            intercom: "@app.mixpanel"
+        tags:
+            -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
+
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener
         arguments:
