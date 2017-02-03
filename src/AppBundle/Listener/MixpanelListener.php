@@ -26,7 +26,7 @@ class MixpanelListener
     {
         $payment = $event->getPayment();
         $this->mixpanel->queueTrackWithUser($payment->getUser(), MixpanelService::EVENT_PAYMENT, [
-            'amount' => $payment->getAmount(),
+            'Amount' => $payment->getAmount(),
         ]);
     }
 }

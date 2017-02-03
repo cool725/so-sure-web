@@ -198,8 +198,18 @@ class MixpanelService
         $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
     }
 
-    public function queuePersonIncrement($userId, $field, $incrementBy = 1)
+    public function queuePersonIncrement($field, $incrementBy = 1, $user = null)
     {
+        $userId = null;
+        if (!$user) {
+            $user = $this->requestService->getUser();
+        }
+        if ($user) {
+            $userId = $user->getId();
+        } else {
+            $userId = $this->requestService->getTrackingId();
+        }
+
         $this->queue(self::QUEUE_PERSON_INCREMENT, $userId, [
             'field' => $field,
             'incrementBy' => $incrementBy
@@ -315,7 +325,9 @@ class MixpanelService
             }
             $userData['Number of Connections'] = count($policy->getConnections());
             $userData['Reward Pot Value'] = $policy->getPotValue();
-            $userData['Number of Invites Sent'] = count($policy->getSentInvitations(false));
+            if ($connection = $policy->getLastConnection()) {
+                $userData['Last connection complete'] = $connection->getDate()->format(\DateTime::ATOM);
+            }
         }
 
         $this->queuePersonProperties($userData, false, $user);
@@ -404,7 +416,7 @@ class MixpanelService
 
         // Special case for logins - bump login count
         if ($event == self::EVENT_LOGIN) {
-            $this->queuePersonIncrement($userId, "Number Of Logins", 1);
+            $this->queuePersonIncrement("Number Of Logins", 1);
         }
     }
 
