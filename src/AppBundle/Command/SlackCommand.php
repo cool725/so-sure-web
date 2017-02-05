@@ -77,6 +77,7 @@ class SlackCommand extends ContainerAwareCommand
         $total = $repo->countAllActivePolicies();
         $daily = $total - $repo->countAllActivePolicies($yesterday);
 
+        // @codingStandardsIgnoreStart
         $text = sprintf(
             'Week %d - Target: %d Actual: %d Remaining: %d Last 24 hours: %d **weekly rounding; growth only compounding',
             $weeks + $weekOffset,
@@ -85,6 +86,8 @@ class SlackCommand extends ContainerAwareCommand
             $target - $total,
             $daily
         );
+        // @codingStandardsIgnoreEnd
+
         $output->writeln($text);
         if ($skipSlack) {
             return;
