@@ -100,7 +100,7 @@ abstract class Policy
 
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "expired", "unpaid",
-     *                  "multipay-requested", "multipay-rejected"})
+     *                  "multipay-requested", "multipay-rejected"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -110,7 +110,7 @@ abstract class Policy
      * @Assert\Choice({
      *  "unpaid", "actual-fraud", "suspected-fraud", "user-requested",
      *  "cooloff", "badrisk", "dispossession", "wreckage"
-     * })
+     * }, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -278,7 +278,7 @@ abstract class Policy
     protected $policyFiles = array();
 
     /**
-     * @Assert\Choice({"invitation", "scode"})
+     * @Assert\Choice({"invitation", "scode"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

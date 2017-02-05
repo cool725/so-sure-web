@@ -71,7 +71,7 @@ abstract class Invitation
     protected $reinvitedCount;
 
     /**
-     * @Assert\Choice({"sent", "failed", "skipped"})
+     * @Assert\Choice({"sent", "failed", "skipped"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $status;

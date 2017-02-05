@@ -39,7 +39,7 @@ class SCode
     protected $code;
 
     /**
-     * @Assert\Choice({"standard", "multipay", "affiliate"})
+     * @Assert\Choice({"standard", "multipay", "affiliate"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

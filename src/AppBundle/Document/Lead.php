@@ -45,7 +45,7 @@ class Lead
     protected $email;
 
     /**
-     * @Assert\Choice({"text-me", "launch-usa", "buy"})
+     * @Assert\Choice({"text-me", "launch-usa", "buy"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
