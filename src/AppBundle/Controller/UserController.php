@@ -167,10 +167,12 @@ class UserController extends BaseController
 
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
-            $this->addFlash(
-                'success',
-                sprintf('Hey, you already have %d invitation%s. 🤗 <a href="#download-apps">Download</a> our app to connect.', $countUnprocessedInvitations, $countUnprocessedInvitations > 1 ? 's' : '')
+            $message = sprintf(
+                'Hey, you already have %d invitation%s. 🤗 <a href="#download-apps">Download</a> our app to connect.',
+                $countUnprocessedInvitations,
+                $countUnprocessedInvitations > 1 ? 's' : ''
             );
+            $this->addFlash('success', $message);
         }
 
         return array(
