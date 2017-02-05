@@ -31,6 +31,12 @@ class SlackCommand extends ContainerAwareCommand
                 'Run for # of weeks instead of current date',
                 null
             )
+            ->addOption(
+                'skip-slack',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not post to slack'
+            )
         ;
     }
 
@@ -38,12 +44,14 @@ class SlackCommand extends ContainerAwareCommand
     {
         $channel = $input->getOption('channel');
         $weeks = $input->getOption('weeks');
+        $skipSlack = $input->getOption('skip-slack');
 
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
 
         $start = new \DateTime('2017-01-02');
         $initial = 86;
+        $growth = 9;
         $weekOffset = 17;
 
         if (!$weeks) {
@@ -54,8 +62,12 @@ class SlackCommand extends ContainerAwareCommand
         }
 
         $target = $initial;
+        $growthTarget = $initial;
         for ($i = 1; $i <= $weeks; $i++) {
             $target = round(1.1 * $target);
+            $growth = round(1.1 * $growth);
+            $growthTarget += $growth;
+            //print sprintf("week %d growth %s\n", $i, $growth);
         }
         // This is what its supposed to be, but due to excel and rounding each week, we've deviated
         // $target = round($initial * pow(1.1, $weeks));
@@ -66,13 +78,17 @@ class SlackCommand extends ContainerAwareCommand
         $daily = $total - $repo->countAllActivePolicies($yesterday);
 
         $text = sprintf(
-            'Week %d - Target: %d Actual: %d Remaining: %d Last 24 hours: %d',
+            'Week %d - Target: %d Actual: %d Remaining: %d Last 24 hours: %d **weekly rounding; growth only compounding',
             $weeks + $weekOffset,
-            $target,
+            $growthTarget,
             $total,
             $target - $total,
             $daily
         );
+        $output->writeln($text);
+        if ($skipSlack) {
+            return;
+        }
 
         $slack = $this->getContainer()->get('nexy_slack.client');
         $message = $slack->createMessage();
