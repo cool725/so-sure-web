@@ -133,14 +133,14 @@ class Claim
     protected $location;
 
     /**
-     * @Assert\Choice({"loss", "theft", "damage", "warranty", "extended-warranty"})
+     * @Assert\Choice({"loss", "theft", "damage", "warranty", "extended-warranty"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $type;
 
     /**
-     * @Assert\Choice({"in-review", "approved", "settled", "declined", "withdrawn"})
+     * @Assert\Choice({"in-review", "approved", "settled", "declined", "withdrawn"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

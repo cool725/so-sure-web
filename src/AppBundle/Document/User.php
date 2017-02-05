@@ -53,7 +53,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $referred;
 
     /**
-     * @Assert\Choice({"invitation", "scode"})
+     * @Assert\Choice({"invitation", "scode"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

@@ -32,7 +32,7 @@ abstract class OptOut
     protected $created;
 
     /**
-     * @Assert\Choice({"all", "invitations", "weekly", "aquire", "retain"})
+     * @Assert\Choice({"all", "invitations", "weekly", "aquire", "retain"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $category;
