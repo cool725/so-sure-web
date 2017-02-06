@@ -103,3 +103,7 @@
 .device-select p {
     margin-top: 10px;
 }
+
+.select-phone-dropdown.has-error {
+    background-color: #ff6666;
+}
