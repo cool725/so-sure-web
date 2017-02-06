@@ -465,7 +465,6 @@ class ReceperioService extends BaseImeiService
      * @param Claim       $claim
      * @param string      $imei
      * @param boolean     $settled
-     * @param User        $handler
      *
      * @return boolean True if imei is ok
      */
