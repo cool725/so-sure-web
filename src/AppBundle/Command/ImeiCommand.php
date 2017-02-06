@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Claim;
 
 class ImeiCommand extends ContainerAwareCommand
 {
@@ -32,7 +34,19 @@ class ImeiCommand extends ContainerAwareCommand
                 'claimscheck',
                 null,
                 InputOption::VALUE_NONE,
-                'expensive £0.90 check'
+                'expensive £0.90 check (implies --save && --register)'
+            )
+            ->addOption(
+                'register',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'true for settled/false for logged; register a phone as belonging to us (implies --save)'
+            )
+            ->addOption(
+                'claim-id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'use claim for register/claimscheck'
             )
             ->addOption(
                 'device',
@@ -61,20 +75,42 @@ class ImeiCommand extends ContainerAwareCommand
         $serial = $input->getOption('serial');
         $device = $input->getOption('device');
         $memory = $input->getOption('memory');
+        $claimId = $input->getOption('claim-id');
         $claimscheck = $input->getOption('claimscheck');
+        $register = filter_var($input->getOption('register'), FILTER_VALIDATE_BOOLEAN);
         $save = true === $input->getOption('save');
         $phone = $this->getPhone($device, $memory);
         $imeiService = $this->getContainer()->get('app.imei');
 
-        if ($claimscheck) {
-            $policy = null;
-            if ($save) {
-                $policy = $this->getPolicy($policyId);
-                if ($imeiService->checkClaims($phone, $imei, $policy)) {
-                    print sprintf("Claimscheck %s is good\n", $imei);
-                } else {
-                    print sprintf("Claimscheck %s failed validation\n", $imei);
-                }
+        if ($register !== null) {
+            $policy = $this->getPolicyByImei($imei);
+            if (!$policy) {
+                throw new \Exception('Unable to find policy');
+            }
+            $claim = $this->getClaim($claimId);
+            if (!$claim) {
+                throw new \Exception('Unable to find claim');
+            }
+
+            if ($imeiService->registerClaims($policy, $claim, $imei, $register)) {
+                print sprintf("Register claim for imei %s is good\n", $imei);
+            } else {
+                print sprintf("Register claim for imei %s failed\n", $imei);
+            }
+        } elseif ($claimscheck) {
+            $policy = $this->getPolicyByImei($imei);
+            if (!$policy) {
+                throw new \Exception('Unable to find policy');
+            }
+            $claim = $this->getClaim($claimId);
+            if (!$claim) {
+                throw new \Exception('Unable to find claim');
+            }
+
+            if ($imeiService->checkClaims($policy, $claim, $imei, null, false)) {
+                print sprintf("Claimscheck for imei %s is good\n", $imei);
+            } else {
+                print sprintf("Claimscheck for imei %s failed validation\n", $imei);
             }
         } else {
             if ($save) {
@@ -109,13 +145,22 @@ class ImeiCommand extends ContainerAwareCommand
         }
     }
 
-    private function getPolicy($imei)
+    private function getPolicyByImei($imei)
     {
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
         $policy = $repo->findOneBy(['imei' => $imei]);
 
         return $policy;
+    }
+
+    private function getClaim($claimId)
+    {
+        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($claimId);
+
+        return $claim;
     }
 
     private function getPhone($device, $memory)
