@@ -792,6 +792,15 @@ class PhonePolicyTest extends WebTestCase
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claimB);
         $this->assertTrue($policy->hasMonetaryClaimed());
+
+        $policyB = new SalvaPhonePolicy();
+        $this->assertFalse($policyB->hasMonetaryClaimed());
+        $claimC = new Claim();
+        $claimC->setRecordedDate(new \DateTime("2016-01-02"));
+        $claimC->setType(Claim::TYPE_EXTENDED_WARRANTY);
+        $claimC->setStatus(Claim::STATUS_SETTLED);
+        $policyB->addClaim($claimB);
+        $this->assertTrue($policyB->hasMonetaryClaimed());
     }
 
     public function testHistoricalMaxPotValue()

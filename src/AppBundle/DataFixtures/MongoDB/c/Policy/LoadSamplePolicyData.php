@@ -293,7 +293,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         } else {
             $claim->setDaviesStatus('closed');
         }
-        if (in_array($claim->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT, Claim::TYPE_DAMAGE])) {
+        if (in_array($claim->getType(), [
+            Claim::TYPE_LOSS,
+            Claim::TYPE_THEFT,
+            Claim::TYPE_DAMAGE,
+            Claim::TYPE_EXTENDED_WARRANTY,
+        ])) {
             $claim->setExcess($claim->getExpectedExcess());
         }
         $claim->setClaimHandlingFees(15);
@@ -352,7 +357,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
     protected function getRandomStatus($type)
     {
-        if (in_array($type, [Claim::TYPE_WARRANTY, Claim::TYPE_EXTENDED_WARRANTY])) {
+        if (in_array($type, [Claim::TYPE_WARRANTY])) {
             $random = rand(0, 1);
             if ($random == 0) {
                 return Claim::STATUS_INREVIEW;

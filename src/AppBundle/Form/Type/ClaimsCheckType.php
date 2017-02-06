@@ -49,6 +49,7 @@ class ClaimsCheckType extends AbstractType
                     Claim::TYPE_LOSS => Claim::TYPE_LOSS,
                     Claim::TYPE_THEFT => Claim::TYPE_THEFT,
                     Claim::TYPE_DAMAGE => Claim::TYPE_DAMAGE,
+                    Claim::TYPE_EXTENDED_WARRANTY => Claim::TYPE_EXTENDED_WARRANTY,
                 ]
             ])
             ->add('run', SubmitType::class)

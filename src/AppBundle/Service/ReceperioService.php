@@ -399,7 +399,8 @@ class ReceperioService extends BaseImeiService
 
     /**
      * @param PhonePolicy $policy
-     * @param string      $claimType Claim::TYPE_DAMAGE, Claim::TYPE_LOSS, Claim::TYPE_THEFT
+     * @param string      $claimType Claim::TYPE_DAMAGE, Claim::TYPE_LOSS, Claim::TYPE_THEFT,
+     *                               Claim::TYPE_EXTENDED_WARRANTY
      * @param Claim       $claim     Optional: Claim to record against
      * @param User        $handler   Optional: User who ran the check
      * @param string      $imei      Optional: Allow running against a previous imei
@@ -421,7 +422,7 @@ class ReceperioService extends BaseImeiService
             }
         }
         $result = null;
-        if ($claimType == Claim::TYPE_DAMAGE) {
+        if (in_array($claimType, [Claim::TYPE_DAMAGE, Claim::TYPE_EXTENDED_WARRANTY])) {
             $result = $this->checkImei(
                 $policy->getPhone(),
                 $policy->getImei(),
