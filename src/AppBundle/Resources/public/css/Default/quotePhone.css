@@ -179,6 +179,19 @@ li .h4 {
 }
 
 
+.stat-banner {
+    padding: 20px 15px;
+    background-color: #3399ff;
+    color: #fff;
+}
+
+@media (min-width: 767px) {
+
+    .stat-banner {
+        text-align: center;
+    }
+}
+
 /* Email Modal */
 
 .modal-buy {
