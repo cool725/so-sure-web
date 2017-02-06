@@ -79,7 +79,7 @@ class SlackCommand extends ContainerAwareCommand
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
-            'Week %d - Target: %d Actual: %d Remaining: %d Last 24 hours: %d **weekly rounding; growth only compounding',
+            '*Week %d*\nTarget: %d\nActual: %d\nRemaining: %d\nLast 24 hours: %d\n\n_weekly rounding; growth only compounding_',
             $weeks + $weekOffset,
             $growthTarget,
             $total,
