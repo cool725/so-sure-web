@@ -2,11 +2,6 @@
     <div class="text-center" style="background-color: {{ policy.riskColour }}; color: white; font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
       Risk: {{ policy.riskReason }} ({{ policy.risk }})
     </div>
-    {% if policy.pendingCancellation %}
-    <div class="text-center" style="background-color: red; color: white; font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
-      Policy is pending cancellation. {{ policy.pendingCancellation | date }}
-    </div>
-    {% endif %}
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#user">User</a></li>
       <li role="presentation"><a href="#policy">Policy</a></li>
@@ -85,7 +80,7 @@
                                     <i class="fa fa-check text-success" title="Policy is paid to date"></i> Policy is paid to date
                                 {% else %}
                                     <i class="fa fa-warning text-danger" title="Policy is NOT paid to date"></i>
-                                    Policy will be cancelled on {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London')}}
+                                    If still unpaid, policy will be cancelled on {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London')}}
                                 {% endif %}
                             </td>
                         </tr>
