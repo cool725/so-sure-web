@@ -432,7 +432,7 @@ class ReceperioService extends BaseImeiService
         }
 
         if ($register) {
-            $this->registerClaims($policy, $claim, $imei, $runClaimsCheck, $handler);
+            $this->registerClaims($policy, $claim, $imei, $runClaimsCheck);
         } else {
             $this->logger->warning(sprintf('Running claims without register for claim %s', $claim->getId()));
         }
@@ -473,8 +473,7 @@ class ReceperioService extends BaseImeiService
         PhonePolicy $policy,
         Claim $claim,
         $imei,
-        $settled,
-        User $handler = null
+        $settled
     ) {
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == self::TEST_INVALID_IMEI) {
