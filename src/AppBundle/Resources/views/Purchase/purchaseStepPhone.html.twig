@@ -65,6 +65,8 @@
                                         <small>Dial *#06# to show your IMEI number </small>
                                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"><i class="fa fa-question"></i></button>
                                     </p>
+                                    <p>or</p>
+                                    <a href="#" onclick="Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">Send us a screenshot of your IMEI</a>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                                    
                                 </div>                                
                             </div>
