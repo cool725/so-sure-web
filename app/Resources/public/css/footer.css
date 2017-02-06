@@ -21,24 +21,17 @@
     color: #fff;
     opacity: 1;
     transition-property: color;
-    text-decoration: none !important;    
+    text-decoration: none !important;  
+    cursor: pointer;  
 }
 
 .footer a:hover {
     color: #3399ff;
 }
 
-.footer ul.list-inline > li:not(:first-of-type) {
-    padding-left: 10px;
-}
-
-.footer li {
-    padding: 5px 0;
-}
-
 .footer .so-sure-logo-light {
     margin: 0 auto 15px;
-}
+}    
 
 @media (min-width: 992px) {
 
@@ -46,10 +39,13 @@
         text-align: left;
     }
 
-    .footer .so-sure-logo-light {
-        margin: 15px 0 0;
-    }    
+}
 
+/* In Partnership - Ext Banner: MOVE TO layouts > _footer.scss */
+.in-partnership {
+    background-color: #3399ff;
+    padding: 20px 0 0;
+    text-align: center;
 }
 
 /* PRESS - Ext Banner: MOVE TO layouts > _footer.scss */
