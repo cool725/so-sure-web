@@ -519,12 +519,10 @@ class ReceperioService extends BaseImeiService
     /**
      * Claimscheck
      *
-     * @param Phone       $phone
-     * @param string      $imei
      * @param PhonePolicy $policy
      * @param Claim       $claim
+     * @param string      $imei
      * @param User        $handler
-     * @param boolean     $register
      *
      * @return boolean True if imei is ok
      */
