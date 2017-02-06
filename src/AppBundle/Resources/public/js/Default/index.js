@@ -97,3 +97,5 @@ $(function(){
             $('form[name="launch_phone"]').submit()
         }
     });
+
+})
