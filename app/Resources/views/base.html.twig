@@ -11,6 +11,7 @@
         {% block stylesheets %}
             {% stylesheets output = 'css/*'
             '../app/Resources/public/css/bootstrap.min.css'
+            '../app/Resources/public/css/cookies.css'
             '../app/Resources/public/css/all.css'
             '../app/Resources/public/css/footer.css'
             %}
@@ -92,10 +93,13 @@
         {% if use_cdn %}
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+            <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
         {% else %}
             <script src="/components/jquery/jquery.min.js"></script>
             <script src="/components/bootstrap/bootstrap.js"></script>
         {% endif %}
+        
+        <script src="/components/cookieconsent/cookieconsent.min.js"></script>
 
         {% block javascripts %}
             {% javascripts
