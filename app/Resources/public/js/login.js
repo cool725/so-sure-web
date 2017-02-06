@@ -30,4 +30,10 @@ $(function() {
       $('.login-email').toggle();
       $('.login-digits').toggle();
     }
+    else {
+      if (window.location.hash == "#mobile") {
+        $('.login-email').toggle();
+        $('.login-digits').toggle();
+      }
+    }
 });
