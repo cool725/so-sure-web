@@ -31,7 +31,7 @@ $(function() {
       $('.login-digits').toggle();
     }
     else {
-      if (window.location.hash == "#mobile") {
+      if (window.location.hash == "#email") {
         $('.login-email').toggle();
         $('.login-digits').toggle();
       }
