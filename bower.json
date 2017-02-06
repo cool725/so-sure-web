@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "jquery": "~2.2.4",
-    "seiyria-bootstrap-slider": "^6.1",
+    "seiyria-bootstrap-slider": "^9.1",
     "Chart.js": "^1.1.0",
     "eonasdan-bootstrap-datetimepicker": "^4.17.42",
     "ouibounce": "^0.0.12",
@@ -71,7 +71,7 @@
       "bootstrap-daterangepicker": [
         "bower_components/bootstrap-daterangepicker/daterangepicker.js",
         "bower_components/bootstrap-daterangepicker/daterangepicker.css"
-      ]
+      ]      
     }
   }
 }

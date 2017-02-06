@@ -4,6 +4,7 @@
 
 #connection-slider {
 	width: 95% !important;
+	margin: 15px 0;
 }
 
 #connection-slider .slider-handle {
