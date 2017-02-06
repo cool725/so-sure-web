@@ -3,7 +3,7 @@
 <section class="press">
     <div class="container">
         <div class="col-sm-3 col-md-2">
-            <h4 class="footer-press--heading">Featured In</h4>
+            <h4 class="footer-press--heading"><strong>Featured In</strong></h4>
         </div>
         <div class="col-sm-3 col-md-2">
             <a href="https://www.theguardian.com/technology/2016/sep/18/chatbots-talk-town-interact-humans-technology-silicon-valley" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/g@2x.png" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town" class="img-responsive"></a>
@@ -15,7 +15,7 @@
             <a href="http://www.postonline.co.uk/post/news/2466996/so-sure-prepares-to-launch-revolutionary-insurance-model" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/ip@2x.png" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app" class="img-responsive"></a>
         </div>
         <div class="col-sm-3 col-md-2">
-            <h4 class="footer-press--heading">Awarded by</h4>
+            <h4 class="footer-press--heading"><strong>Awarded by</strong></h4>
         </div>
         <div class="col-sm-3 col-md-2">
             <a href="http://www.postevents.co.uk/technologyawards/static/shortlist-1" target="_blank"><img src="{{ cdn_url }}/images/home/press-images/di@2x.png" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award" class="img-responsive"></a>
@@ -24,68 +24,63 @@
 </section>
 
 <footer class="footer">
-    <div class="row">
-        <div class="col-sm-4 text-center" id="base-info">
-            <div class="footer-info">
-                <div class="so-sure-logo-light" alt="so-sure Logo"></div>
+    <div class="container">
+    
+        <div class="row footer--top">
+            <div class="col-md-2">
+                <div class="so-sure-logo-light" alt="so-sure Logo"></div>                 
             </div>
-            <ul class="download-app" style="padding-top: 10px; padding-bottom: 10px;">
-                <li>
-                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-app-store.svg" alt="Download so-sure on the App Store"></img>
-                    </a>
-                </li>
-                <li>
-                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-google-play.svg" alt="Get so-sure on Google Play"></img>
-                    </a>
-                </li>
-            </ul>
-            <ul class="social-networks">
-                <li><a href="https://blog.wearesosure.com/" class="icon-medium"><i class="fa fa-medium fa-lg" aria-hidden="true"></i></a></li>
-                <li><a href="https://twitter.com/wearesosure" class="icon-twitter"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-                <li><a href="https://www.facebook.com/wearesosure" class="icon-facebook"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-            </ul>
+            <div class="col-md-3">
+                <ul class="list-inline">
+                    <li>
+                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-app-store.svg" alt="Download so-sure on the App Store"></img>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-google-play.svg" alt="Get so-sure on Google Play"></img>
+                        </a>
+                    </li>
+                </ul>             
+            </div>
+            <div class="col-md-2">
+                <ul class="list-inline text-center">
+                    <li><a href="https://blog.wearesosure.com/" class="icon-medium"><i class="fa fa-medium fa-lg" aria-hidden="true"></i></a></li>
+                    <li>&nbsp;</li>
+                    <li><a href="https://twitter.com/wearesosure" class="icon-twitter"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+                    <li>&nbsp;</li>
+                    <li><a href="https://www.facebook.com/wearesosure" class="icon-facebook"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>                       
+                </ul>    
+            </div>
+            <div class="col-md-3">
+                <ul class="list-unstyled">             
+                    <li><a href="https://wearesosure.zendesk.com/hc/en-us/articles/207523059-Our-mission" target="_blank">OUR MISSION</a></li>
+                    <li></li>
+                    <li><a href="https://blog.wearesosure.com" target="_blank" alt="we are so-sure - Thoughts from inside the Social Insurance revolution.">BLOG</a></li>
+                    <li></li>                    
+                    <li><a href="https://wearesosure.zendesk.com/hc/en-us/sections/201886655-Making-a-Claim" target="_blank">MAKE A CLAIM</a></li>
+                    <li></li>                    
+                    <li><a href="https://wearesosure.zendesk.com/hc/en-us/sections/201886665-How-to-Contact-Us" target="_blank">CONTACT US</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="col-sm-8 text-center" id="base-links">
-            <dl>
-                <dt>About us</dt>
-                <dd><a href="https://wearesosure.zendesk.com/hc/en-us/articles/207532939-The-team" target="_blank">The Team</a></dd>
-                <dd><a href="https://wearesosure.zendesk.com/hc/en-us/articles/207523059-Our-mission" target="_blank">Our Mission</a></dd>
-                <dd><a href="https://blog.wearesosure.com" target="_blank" alt="we are so-sure - Thoughts from inside the Social Insurance revolution.">Blog</a></dd>
-                {# <dd><a href="{{ path('jobs') }}" alt="so-sure Jobs">Jobs</a></dd> #}
-            </dl>
-            <dl>
-                <dt>How it works</dt>
-                <dd><a href="https://wearesosure.zendesk.com/hc/en-us/articles/208234855-What-is-Social-Insurance-" target="_blank">What is Social Insurance?</a></dd>
-                <dd><a href="https://wearesosure.zendesk.com/hc/en-us/articles/207523219-What-is-a-Reward-Pot-" target="_blank">What is a Reward Pot?</a></dd>
-                <dd><a href="https://wearesosure.zendesk.com/hc/en-us/articles/208238275-When-can-I-access-the-money-in-my-Reward-Pot-" target="_blank">How do I get Money Back?</a></dd>
-                <dd><a href="https://wearesosure.zendesk.com/hc/en-us/articles/208238165-What-happens-to-my-Reward-Pot-if-someone-claims-" target="_blank">What Happens if I Claim?</a></dd>
-            </dl>
-            <dl>
-                <dt>Support</dt>
-                <dd><a href="https://wearesosure.zendesk.com/hc/en-us/sections/201886665-How-to-Contact-Us" target="_blank">Contact Us</a></dd>
-                <dd><a href="https://wearesosure.zendesk.com/hc/en-us/sections/201886655-Making-a-Claim" target="_blank">Make a Claim</a></dd>
-                <dd><a href="https://wearesosure.zendesk.com/hc/en-us/categories/200914859-Looking-After-Your-Phone" target="_blank">Phone Care</a></dd>
-            </dl>
-        </div>
-    </div>
 
-    <div class="signup row"></div>
+        <hr>
 
-    <div class="copy">
-        <div class="copy-container">
-            <div class="col-sm-9 text-left">
+        <div class="row footer-bottom">
+            <div class="col-md-9">
                 <ul class="list-inline">
                     <li>&copy; 2016 <a href="/">so-sure Ltd</a></li>
                     <li>|</li>
                     <li><a href="/terms">Terms</a> &amp; {{ macros.iubenda() }}</li>
                 </ul>
-                <p>We are a company registered in England &amp; Wales (No. 09365669) and our registered address is Runway East, 10 Finsbury Square, London EC2A 1AF.</p>
-                <p>so-sure is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is <a href="https://register.fca.org.uk/ShPo_FirmDetailsPage?id=001b000003MOOUGAA5" target="_blank" style="text-decoration: underline !important;">744729</a>.  We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling.</p>
+                <p><small>We are a company registered in England &amp; Wales (No. 09365669) and our registered address is Runway East, 10 Finsbury Square, London EC2A 1AF.</small></p>
+                <p><small>so-sure is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is <a href="https://register.fca.org.uk/ShPo_FirmDetailsPage?id=001b000003MOOUGAA5" target="_blank" style="text-decoration: underline !important;">744729</a>.  We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling.</small></p>
             </div>
-            <div class="col-sm-3 text-right">
+            <div class="col-md-3 text-center">
                 <a href="https://mixpanel.com/f/partner" rel="nofollow"><img src="//cdn.mxpnl.com/site_media/images/partner/badge_light.png" alt="Mobile Analytics" /></a>
-            </div>
+            </div>            
         </div>
+
     </div>
 </footer>
 
