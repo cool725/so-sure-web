@@ -24,10 +24,10 @@
     {% stylesheets
     '@AppBundle/Resources/public/css/Default/index.css'
     '@AppBundle/Resources/public/css/Default/quotePhone.css'
-    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
-    '@AppBundle/Resources/public/css/Default/connections.css'
     '@AppBundle/Resources/public/css/Default/scrollindicator.css'
     '@AppBundle/Resources/public/css/Default/videoOverlay.css'
+    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
+    '@AppBundle/Resources/public/css/Default/connections.css'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -135,6 +135,7 @@
                         <div class="h1 text-center">
                             <strong id="money_back" class="text-green cashback">£{{ start_value }}</strong>
                         </div>
+
                         <input
                             type="text"
                             class="span2"
