@@ -13,7 +13,7 @@
     {% javascripts
     '@AppBundle/Resources/public/js/Default/modalVideo.js'    
     '@AppBundle/Resources/public/js/Default/index.js'
-    'components/seiyria-bootstrap-slider/bootstrap-slider.min.js'
+    'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/slider.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
@@ -26,8 +26,7 @@
     '@AppBundle/Resources/public/css/Default/quotePhone.css'
     '@AppBundle/Resources/public/css/Default/scrollindicator.css'
     '@AppBundle/Resources/public/css/Default/videoOverlay.css'
-    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
-    '@AppBundle/Resources/public/css/Default/connections.css'
+    '@AppBundle/Resources/public/css/Default/rewardCalculator.css'    
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -115,7 +114,12 @@
 
                 <div class="col-xs-12 col-sm-5 col-md-5">
                     <div class="quote-card">
-                        <p class="h4"><strong>Get cashback</strong></p>
+
+                        <p class="h4"><strong>Insurance that gives back</strong></p>          
+                        <p>Connect with friends &amp; save money, see how it works with our handy calculator:</p> 
+                        
+                        <div class="h4 text-blue text-center"><strong>Friends connected</strong></div>  
+
                         {% set start_friends = phone_price.maxConnections %}
                         {# set start_friends = 10 #}
                         {% if start_friends > phone_price.maxConnections %}
@@ -124,39 +128,54 @@
                         {% set start_value = start_friends * connection_value %}
                         {% if start_value > phone_price.maxPot %}
                             {% set start_value = phone_price.maxPot %}
-                        {% endif %}
-     
-                        <p>
-                            Connect with 
-                            <strong id="num_friends" class="text-blue text-nowrap">
-                                {{ start_friends }} friend{% if start_friends > 1 %}s{% endif %}
-                            </strong> &amp; when no one claims you get cashback every year.                           
-                        </p>
-                        <div class="h1 text-center">
-                            <strong id="money_back" class="text-green cashback">£{{ start_value }}</strong>
+                        {% endif %}                        
+                        
+                        <div class="reward-slider">
+                            <input type="range"
+                                   id="reward-slider" 
+                                   min="0"
+                                   max="{{ phone_price.maxConnections }}"
+                                   value="{{ start_friends }}"
+                                   data-slider-maxpot="{{ phone_price.maxPot }}"
+                                   data-slider-connection-value="{{ connection_value }}">
                         </div>
 
-                        <input
-                            type="text"
-                            class="span2"
-                            value=""
-                            data-slider-min="0"
-                            data-slider-max="{{ phone_price.maxConnections }}"
-                            data-slider-maxpot="{{ phone_price.maxPot }}"
-                            data-slider-step="1"
-                            data-slider-value="{{ start_friends }}"
-                            data-slider-id="connection-slider"
-                            id="slider-value"
-                            data-slider-handle="round"
-                            data-slider-tooltip="hide"
-                            data-slider-connection-value="{{ connection_value }}"/>
-
-                        <div class="quote-tip">
-                           <small>Fewer connections? Move the slider!</small>
+                        <div class="premium-table">
+                            <strong class="text-blue">Effective annual premium</strong>
+                            <div class="row">
+                                <div class="col-xs-4"><small>so-sure</small></div>
+                                <div class="col-xs-5">Value</div>
+                                <div class="col-xs-3 text-right">Total</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-4"><small>Networks</small></div>
+                                <div class="col-xs-5">Value</div>
+                                <div class="col-xs-3 text-right">Total</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-4"><small>Protect Your Bubble</small></div>
+                                <div class="col-xs-5">Value</div>
+                                <div class="col-xs-3 text-right">Total</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-4"><small>loveitcoverit</small></div>
+                                <div class="col-xs-5">Value</div>
+                                <div class="col-xs-3 text-right">Total</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-4"><small>insurance2go</small></div>
+                                <div class="col-xs-5">Value</div>
+                                <div class="col-xs-3 text-right">Total</div>
+                            </div>                                      
                         </div>
-                        <div class="text-center">
-                            <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><span class="text-underline">Learn how it works</span></i></a>
-                        </div>              
+
+                        <div class="reward-total">
+                            <strong id="total-text">Cashback when no one claims</strong>
+                            <div class="cashback-value">
+                                <strong id="cashback">£{{ start_value }}</strong>
+                            </div>
+                        </div>
+
                     </div>                                           
                 </div>
 

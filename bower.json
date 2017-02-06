@@ -25,7 +25,8 @@
     "typeahead.js": "^0.11.1",
     "clipboard": "^1.5.15",
     "jssocials": "^1.4.0",
-    "bootstrap-daterangepicker": "https://github.com/dangrossman/bootstrap-daterangepicker.git#2.1.24"
+    "bootstrap-daterangepicker": "https://github.com/dangrossman/bootstrap-daterangepicker.git#2.1.24",
+    "rangeslider.js": "^2.3.0"
   },
   "install": {
     "path": "web/components",
@@ -71,7 +72,10 @@
       "bootstrap-daterangepicker": [
         "bower_components/bootstrap-daterangepicker/daterangepicker.js",
         "bower_components/bootstrap-daterangepicker/daterangepicker.css"
-      ]      
+      ],
+      "rangeslider.js": [
+        "bower_components/rangeslider.js/dist/rangeslider.min.js"
+      ]
     }
   }
 }
