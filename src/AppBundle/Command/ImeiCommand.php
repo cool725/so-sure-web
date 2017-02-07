@@ -49,6 +49,18 @@ class ImeiCommand extends ContainerAwareCommand
                 'use claim for register/claimscheck'
             )
             ->addOption(
+                'claim-number',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'use claim for register/claimscheck'
+            )
+            ->addOption(
+                'policy-id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'for replaced imei cases, use policy id'
+            )
+            ->addOption(
                 'device',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -76,37 +88,32 @@ class ImeiCommand extends ContainerAwareCommand
         $device = $input->getOption('device');
         $memory = $input->getOption('memory');
         $claimId = $input->getOption('claim-id');
+        $claimNumber = $input->getOption('claim-number');
+        $policyId = $input->getOption('policy-id');
         $claimscheck = $input->getOption('claimscheck');
         $register = filter_var($input->getOption('register'), FILTER_VALIDATE_BOOLEAN);
         $save = true === $input->getOption('save');
         $phone = $this->getPhone($device, $memory);
         $imeiService = $this->getContainer()->get('app.imei');
 
-        if ($register !== null) {
+        if ($policyId) {
+            $policy = $this->getPolicy($policyId);
+        } elseif ($register !== null || $claimscheck) {
             $policy = $this->getPolicyByImei($imei);
-            if (!$policy) {
-                throw new \Exception('Unable to find policy');
-            }
+        }
+        if ($claimId) {
             $claim = $this->getClaim($claimId);
-            if (!$claim) {
-                throw new \Exception('Unable to find claim');
-            }
+        } elseif ($claimNumber) {
+            $claim = $this->getClaimByNumber($claimNumber);
+        }
 
+        if ($register !== null) {
             if ($imeiService->registerClaims($policy, $claim, $imei, $register)) {
                 print sprintf("Register claim for imei %s is good\n", $imei);
             } else {
                 print sprintf("Register claim for imei %s failed\n", $imei);
             }
         } elseif ($claimscheck) {
-            $policy = $this->getPolicyByImei($imei);
-            if (!$policy) {
-                throw new \Exception('Unable to find policy');
-            }
-            $claim = $this->getClaim($claimId);
-            if (!$claim) {
-                throw new \Exception('Unable to find claim');
-            }
-
             if ($imeiService->checkClaims($policy, $claim, $imei, null, false)) {
                 print sprintf("Claimscheck for imei %s is good\n", $imei);
             } else {
@@ -150,6 +157,21 @@ class ImeiCommand extends ContainerAwareCommand
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
         $policy = $repo->findOneBy(['imei' => $imei]);
+        if (!$policy) {
+            throw new \Exception('Unable to find policy');
+        }
+
+        return $policy;
+    }
+
+    private function getPolicy($policyId)
+    {
+        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(PhonePolicy::class);
+        $policy = $repo->find($policyId);
+        if (!$policy) {
+            throw new \Exception('Unable to find policy');
+        }
 
         return $policy;
     }
@@ -159,6 +181,21 @@ class ImeiCommand extends ContainerAwareCommand
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Claim::class);
         $claim = $repo->find($claimId);
+        if (!$claim) {
+            throw new \Exception('Unable to find claim');
+        }
+
+        return $claim;
+    }
+
+    private function getClaimByNumber($claimNumber)
+    {
+        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->findOneBy(['number' => $claimNumber]);
+        if (!$claim) {
+            throw new \Exception('Unable to find claim');
+        }
 
         return $claim;
     }
