@@ -192,11 +192,11 @@ class PhonePolicy extends Policy
         $this->addCheckmendCertData('serial', $response);
     }
 
-    public function addCheckmendRegisterData($transactionId, $claim, $claimType)
+    public function addCheckmendRegisterData($transactionId, $imei, $claim, $claimType)
     {
         $this->addCheckmendCertData(
             'register',
-            ['transactionId' => $transactionId, 'claimType' => $claimType],
+            ['imei' => $imei, 'transactionId' => $transactionId, 'claimType' => $claimType],
             $claim
         );
     }
