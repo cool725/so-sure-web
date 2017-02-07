@@ -77,28 +77,36 @@
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide coverage <a href="#" data-toggle="modal" data-target="#worldwide-coverage"><i class="fa fa-info-circle"></i></a>
                             </li>             
                             <li class="h4">
-                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> <strong>Next working day replacement / repair</strong>
+                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> <strong>Next working day replacement or repair</strong>
                             </li>                                         
                             <li class="h4">
-                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> <strong>24/7 UK live support</strong>
+                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> <strong>Average claim approval time: <span class="text-green text-nowrap">1hr 4mins</span></strong>
                             </li>
                             <li class="h4">
                                 <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> 
-                                <span class="visible-xs-inline visible-sm-inline">
+                                <span class="visible-xs-inline">
                                     <a id="cashback-link" href="#mobile-price"><strong class="text-dark-grey text-underline">Up to 80% cashback every year</strong></a>
                                 </span>
-                                <span class="hidden-xs hidden-sm">
+                                <span class="hidden-xs">
                                     <strong class="text-dark-grey">Up to 80% cashback every year</strong>
                                 </span>
                             </li>
-                            <li class="hidden-xs">
-                                <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">Full Terms &amp; Conditions</a></small>                                
-                            </li>
                         </ul>                   
+                    </div>
+
+                    <div id="mobile-price" class="quote-cost text-center">
+                        <span class="h1 cost">
+                            <strong>£{{ phone_price.monthlyPremiumPrice }}</strong> 
+                            <small>per month</small>
+                        </span><br>
+                        <span>£50 Excess (£70 for Theft &amp; Loss)</span>
+                        {{ form_widget(buy_form.buy_tablet, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                        <br>
+                        <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">Full Terms &amp; Conditions</a></small>                                                
                     </div>
                </div>    
 
-               <div class="col-xs-12 visible-xs-block">
+               <!-- <div class="col-xs-12 visible-xs-block">
                     <div id="mobile-price" class="quote-cost text-center">
                         <span class="h1 cost">
                             <strong>£{{ phone_price.monthlyPremiumPrice }}</strong> 
@@ -110,15 +118,16 @@
                         <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">Full Terms &amp; Conditions</a></small>                    
 
                     </div>
-               </div>  
+               </div>   -->
 
                 <div class="col-xs-12 col-sm-5 col-md-5">
                     <div class="quote-card">
 
-                        <p class="h4"><strong>Insurance that gives back</strong></p>          
-                        <p>Connect with friends &amp; save money, see how it works with our handy calculator:</p> 
+                        <h3>Cashback</h3>          
+                        <p>Connect with friends &amp; save money, see how it works:</p> 
                         
-                        <div class="h4 text-blue text-center"><strong>Friends connected</strong></div>  
+                        <div class="h4 text-blue"><strong>Friends connected</strong></div>
+
 
                         {% set start_friends = phone_price.maxConnections %}
                         {# set start_friends = 10 #}
@@ -137,36 +146,72 @@
                                    max="{{ phone_price.maxConnections }}"
                                    value="{{ start_friends }}"
                                    data-slider-maxpot="{{ phone_price.maxPot }}"
-                                   data-slider-connection-value="{{ connection_value }}">
+                                   data-slider-connection-value="{{ connection_value }}"
+                                   data-slider-premium="{{ phone_price.yearlyPremiumPrice }}">
                         </div>
 
+                        <!-- <div class="claim-options">
+                            <div class="h4 text-blue"><strong>What if</strong></div>
+                            <label for="claim-option">
+                                <input type="radio" name="claim-option" value="none" checked=""> Nobody claims
+                            </label><br>
+                            <label for="claim-option">
+                                <input type="radio" name="claim-option" value="me"> I make a claim
+                            </label><br>
+                            <label for="claim-option">
+                                <input type="radio" name="claim-option" value="1"> 1 friend claims
+                            </label><br>
+                            <label for="claim-option">
+                                <input type="radio" name="claim-option" value="2"> 2 friends claim
+                            </label>                        
+                        </div> -->
+
                         <div class="premium-table">
-                            <strong class="text-blue">Effective annual premium</strong>
-                            <div class="row">
-                                <div class="col-xs-4"><small>so-sure</small></div>
-                                <div class="col-xs-5">Value</div>
-                                <div class="col-xs-3 text-right">Total</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-xs-4"><small>Networks</small></div>
-                                <div class="col-xs-5">Value</div>
-                                <div class="col-xs-3 text-right">Total</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-xs-4"><small>Protect Your Bubble</small></div>
-                                <div class="col-xs-5">Value</div>
-                                <div class="col-xs-3 text-right">Total</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-xs-4"><small>loveitcoverit</small></div>
-                                <div class="col-xs-5">Value</div>
-                                <div class="col-xs-3 text-right">Total</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-xs-4"><small>insurance2go</small></div>
-                                <div class="col-xs-5">Value</div>
-                                <div class="col-xs-3 text-right">Total</div>
-                            </div>                                      
+
+                            <div class="h4 text-blue"><strong>Effective annual premium</strong></div>
+                            <table width="100%">
+                                <tr>
+                                    <td width="45%">
+                                        <img src="../images/logo/so-sure-logo-dark.svg" alt="" class="img-resposive" width="60%">
+                                    </td>
+                                    <td width="33%">
+                                        <div class="bar bar-us"><div></div></div>
+                                    </td>
+                                    <td width="22%" align="right">
+                                        <strong>
+                                            <small id="premium" class="premium-value text-blue">total</small>
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><small>Networks</small></td>
+                                    <td>
+                                        <div class="bar"><div></div></div> 
+                                    </td>
+                                    <td align="right">
+                                        <strong><small class="premium-value">£144.50</small></strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><small>Protect Your Bubble</small></td>
+                                    <td>
+                                        <div class="bar"><div></div></div> 
+                                    </td>
+                                    <td align="right">
+                                        <strong><small class="premium-value">£95.88</small></strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><small>loveitcoverit</small></td>
+                                    <td>
+                                        <div class="bar"><div></div></div> 
+                                    </td>
+                                    <td align="right">
+                                        <strong><small class="premium-value">£82.39</small></strong>
+                                    </td>
+                                </tr>
+                            </table>
+                            <a href="#"><small><em class="text-underline text-dark-grey">Learn more about how we calculated this</em></small></a>
                         </div>
 
                         <div class="reward-total">
@@ -176,10 +221,18 @@
                             </div>
                         </div>
 
+                        <div class="text-center h5">
+                            <a href="#"><strong class="text-red text-underline">What happens when someone claims?</strong></a>
+                        </div>      
+
+                        <div class="text-center">
+                            <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><small class="text-underline">Learn how it works</small></a>
+                        </div>                         
+
                     </div>                                           
                 </div>
 
-                <div class="col-sm-12 col-md-12 hidden-xs">
+                <!-- <div class="col-sm-12 col-md-12 hidden-xs">
                     <div class="quote-cost text-center">
                         <div class="row">
                             <div class="col-sm-6 col-md-6">
@@ -194,7 +247,7 @@
                             </div>                       
                         </div>
                     </div>
-                </div>
+                </div> -->
 
             </div>
 
@@ -229,9 +282,9 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
+    {#{% include 'AppBundle::Default/feedbackQuotes.html.twig' %}#}
 
-    {{ render(controller('AppBundle:Default:sosureCompared')) }}
+    {#{ render(controller('AppBundle:Default:sosureCompared')) }#}
 
     {% include 'AppBundle::Default/modalVideo.html.twig' %}
 

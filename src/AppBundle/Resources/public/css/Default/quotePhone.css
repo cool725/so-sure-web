@@ -34,7 +34,11 @@
 }
 
 .quote-card {
-    margin-bottom: 15px;  
+    margin-bottom: 25px;  
+}
+
+.quote-card > h3 {
+    margin-top: 0 !important;
 }
 
 .quote-card ul {
@@ -48,8 +52,12 @@
     color: #626B78;
 }
 
-li .h4 {
+.quote-card li.h4:first-of-type {
     margin-top: 0;
+}
+
+.quote-card li.h4:last-of-type {
+    margin-bottom: 0;
 }
 
 .quote-card .fa-lg {
@@ -114,23 +122,20 @@ li .h4 {
 
     .quote-card {
         padding: 25px;
-        margin-bottom: 25px;
         border: 2px solid #efefef;
         border-radius: 4px;        
     }
-
-    .quote-cost {
-        border: 4px;
-        margin: 0 0 25px;
-    }    
 
     .quote-card .rrp {
         text-align: right;
     }
 
-    .quote-cost .btn-block {
-        margin-top: 0;
-    }
+    .quote-cost {
+        padding: 25px;
+        margin: 0 0 25px;
+        background-color: #efefef;
+    }    
+
 
 }
 
