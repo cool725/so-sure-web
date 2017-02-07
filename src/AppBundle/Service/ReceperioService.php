@@ -474,18 +474,22 @@ class ReceperioService extends BaseImeiService
         $imei,
         $settled
     ) {
+        $claimType = $settled ? 'settled' : 'logged';
+
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == self::TEST_INVALID_IMEI) {
             return false;
         }
 
         if ($this->getEnvironment() != 'prod') {
+            $policy->addCheckmendRegisterData('transaction id', $claim, $claimType);
+            $this->dm->flush();
+
             return true;
         }
 
         try {
             $phone = $policy->getPhone();
-            $claimType = $settled ? 'settled' : 'logged';
             $data = [
                 'claimtype' => $claimType,
                 'serials' => [$imei],
@@ -536,6 +540,9 @@ class ReceperioService extends BaseImeiService
         }
 
         if ($this->getEnvironment() != 'prod') {
+            $policy->addCheckmendCertData('claimscheck', 'n/a', $claim);
+            $this->dm->flush();
+
             return true;
         }
 
