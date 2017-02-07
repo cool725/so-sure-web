@@ -75,7 +75,7 @@ $(function(){
 
                 var premium = montly_premium - save_value;
 
-                $('#premium').text('£' + premium);
+                $('#premium').text('£' + premium.toFixed(2));
             }     
 
             setPremium();
@@ -108,7 +108,7 @@ $(function(){
                     save_value = maxpot_value;
                 }
 
-                $('#cashback').text('£' + save_value);
+                $('#cashback').text('£' + save_value.toFixed(2));
             }
 
             var setPremium = function() {
@@ -119,7 +119,7 @@ $(function(){
                 var save_value = current_value * connection_value; 
                 var premium = montly_premium - save_value;
 
-                $('#premium').text('£' + premium);
+                $('#premium').text('£' + premium.toFixed(2));
  
                 // Re-Set the bar width for us
                 var width = ((premium / $high) * 100);

@@ -36,11 +36,12 @@
     <section id="quote" class="quote-container">
         {{ form_start(buy_form) }}
 
-        <h1>Instant cover for <span>£{{ phone_price.monthlyPremiumPrice }}</span></h1>
+        <h1 class="h2">Instant cover for your <span class="">{{ phone }}</span>
+                                    <small><a href="{{ path('homepage') }}#get-quote"><strong>Change</strong></a></small></h1>
 
         <div class="quote">
             
-            <div class="row">
+    <!--         <div class="row">
                 <div class="col-md-12">
                     <div class="quote-card">
                         <div class="row">
@@ -53,12 +54,15 @@
                         </div>     
                     </div>                     
                 </div>
-            </div>
+            </div> -->
 
             <div class="row">
-
                <div class="col-xs-12 col-sm-7 col-md-7">
                     <div class="quote-card">
+<!--                         <h3>
+                            <span class="">{{ phone }}</span>
+                            <small><a href="{{ path('homepage') }}#get-quote"><strong>Change</strong></a></small>
+                        </h3>    -->                     
                         <ul class="list-unstyled">                 
                             <li class="h4">
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> 
@@ -172,7 +176,7 @@
                             <table width="100%">
                                 <tr>
                                     <td width="45%">
-                                        <img src="../images/logo/so-sure-logo-dark.svg" alt="" class="img-resposive" width="60%">
+                                        <img src="../images/logo/so-sure-logo-dark.svg" alt="so-sure" width="80px">
                                     </td>
                                     <td width="33%">
                                         <div class="bar bar-us"><div></div></div>
@@ -255,12 +259,12 @@
         {{ form_end(buy_form) }}
     </section>
 
-    <section class="stat-banner">
+    <!-- <section class="stat-banner">
         <div class="container">
             <p class="lead">Every year, there are 8 million incidents of lost, stolen or damaged phones – that’s 1 every 4 seconds.</p>
             <small>Source: YouGov/Assurant, 2015</small>
         </div>
-    </section>
+    </section> -->
 
     <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">
