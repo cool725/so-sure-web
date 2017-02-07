@@ -2,7 +2,7 @@
 {% block fos_user_content %}
 <div class="container">
     <h1>Welcome back!</h1>
-    <div class="login-digits" style="{% if error %}display: none;{% endif %}"
+    <div class="login-digits" style=""
          data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
       <p class="text-centre" style="padding-bottom: 20px;">
         Just enter your mobile number below, we'll then text you a code. Enter that code and, hey presto, you'll be logged in!
@@ -16,19 +16,19 @@
         <div class="digits-container">
         </div>
         </div>
-        <form method="POST" action="{{ path('digits_login') }}" id="digits-form">
+        <form method="POST" action="{{ path('digits_login') }}#mobile" id="digits-form">
             <input type="hidden" name="credentials" id="credentials">
             <input type="hidden" name="provider" id="provider">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
         </form>
-        <p class="swap-login-wrapper"><a href="#" class="swap-login btn-info">Prefer email login?</a></p>
+        <p class="swap-login-wrapper"><a href="#email" class="swap-login btn-info">Prefer email login?</a></p>
     </div>
 
-    <div class="login-email" style="{% if not error %}display: none;{% endif %}">
+    <div class="login-email" style="display: none;">
         <p>
             Please login below.
         </p>
-            <form class="form-horizontal" action="{{ path("fos_user_security_check") }}" method="post">
+            <form class="form-horizontal" action="{{ path("fos_user_security_check") }}#email" method="post">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
                 <div class="form-group">
                         <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email Address"/>
@@ -37,7 +37,7 @@
                         <input type="password" id="password" name="_password" required="required" placeholder="Password"/>
                 </div>
                 {% if error %}
-                    <div class="error-text" style="padding-bottom: 10px;">{% if error.message is defined %}{{ error.message }}{% else %}Unable to log you in{% endif %}</div>
+                    <div class="error-text" style="padding-bottom: 10px;">Looks like the email address or password you’ve entered is incorrect. Please try again.</div>
                 {% endif %}
                 <div class="form-group">
                         <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} />
@@ -50,7 +50,7 @@
                     <a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
                 </div>
             </form>
-        <p class="swap-login-wrapper"><a href="#" class="swap-login btn-info">Prefer mobile login?</a></p>
+        <p class="swap-login-wrapper"><a href="#mobile" class="swap-login btn-info">Prefer mobile login?</a></p>
         </div>
 
         <div><a href="#" onclick="fb_login();" class="btn btn-facebook"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a></div>
