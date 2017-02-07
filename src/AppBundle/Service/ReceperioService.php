@@ -482,7 +482,7 @@ class ReceperioService extends BaseImeiService
         }
 
         if ($this->getEnvironment() != 'prod') {
-            $policy->addCheckmendRegisterData('transaction id', $claim, $claimType);
+            $policy->addCheckmendRegisterData('transaction id', $imei, $claim, $claimType);
             $this->dm->flush();
 
             return true;
@@ -508,7 +508,7 @@ class ReceperioService extends BaseImeiService
             $data = json_decode($response, true);
             $this->responseData = $data;
             $this->certId = $data['transactionid'];
-            $policy->addCheckmendRegisterData($this->getCertId(), $claim, $claimType);
+            $policy->addCheckmendRegisterData($this->getCertId(), $imei, $claim, $claimType);
             $this->dm->flush();
 
             return true;
