@@ -37,7 +37,7 @@
                         <input type="password" id="password" name="_password" required="required" placeholder="Password"/>
                 </div>
                 {% if error %}
-                    <div class="error-text" style="padding-bottom: 10px;">Unable to log you in. Please check that the email address and password you've entered are correct.</div>
+                    <div class="error-text" style="padding-bottom: 10px;">Looks like the email address or password you’ve entered is incorrect. Please try again.</div>
                 {% endif %}
                 <div class="form-group">
                         <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} />
