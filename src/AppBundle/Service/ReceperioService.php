@@ -494,6 +494,7 @@ class ReceperioService extends BaseImeiService
                 'claimtype' => $claimType,
                 'serials' => [$imei],
                 'storeid' => $this->storeId,
+                'itemcategory' => '1', // http://gapi.checkmend.com/docs/categories.php
                 'make' => $phone->getMake(),
                 'model' => $phone->getModel(),
                 'itemdescription' => $phone->__toString(),
