@@ -14,6 +14,9 @@ window.cookieconsent.initialise({
   "position": "top",
   "static": true,
   "content": {
-    "href": "https://www.iubenda.com/privacy-policy/7805295"
+    "message": "We use",
+    "dismiss": "Okay",
+    "link": "cookies",
+    "href": "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
   }
 })});

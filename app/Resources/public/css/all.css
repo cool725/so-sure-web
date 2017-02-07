@@ -213,6 +213,20 @@ h4, h5, h6,
     border: none;
 }
 
+.cc-window {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.cc-window .cc-message {
+    margin-bottom: 0 !important;
+}
+
+.cc-floating.cc-theme-classic {
+    border-radius: 0;
+}
+
 @media (min-width: 991px) {
   .navbar-nav>li {
       margin: 0px 5px;
