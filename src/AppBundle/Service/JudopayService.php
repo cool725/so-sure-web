@@ -1006,6 +1006,8 @@ class JudopayService
         $numPayments = 0;
         $refunds = 0;
         $numRefunds = 0;
+        $declined = 0;
+        $numDeclined = 0;
         $total = 0;
         $maxDate = null;
         if (($handle = fopen($filename, 'r')) !== false) {
@@ -1015,15 +1017,23 @@ class JudopayService
                 } else {
                     $line = array_combine($header, $row);
                     $lines[] = $line;
-                    if ($line['TransactionType'] == "Payment") {
-                        $total += $line['Net'];
-                        $payments += $line['Net'];
-                        $numPayments++;
-                    } elseif ($line['TransactionType'] == "Refund") {
-                        $total -= $line['Net'];
-                        $refunds += $line['Net'];
-                        $numRefunds++;
+                    if ($line['TransactionResult'] == "Transaction Successful") {
+                        if ($line['TransactionType'] == "Payment") {
+                            $total += $line['Net'];
+                            $payments += $line['Net'];
+                            $numPayments++;
+                        } elseif ($line['TransactionType'] == "Refund") {
+                            $total -= $line['Net'];
+                            $refunds += $line['Net'];
+                            $numRefunds++;
+                        }
+                    } elseif ($line['TransactionResult'] == "Card Declined") {
+                        $declined += $line['Net'];
+                        $numDeclined++;
+                    } else {
+                        throw new \Exception(sprintf('Unknown Transaction Result: %s', $line['TransactionResult']));
                     }
+
                     $date = new \DateTime($line['Date']);
                     if ($maxDate && $maxDate->format('m') != $date->format('m')) {
                         throw new \Exception('Export should only be for the same calendar month');
@@ -1044,14 +1054,18 @@ class JudopayService
             'refunds' => $this->toTwoDp($refunds),
             'numRefunds' => $numRefunds,
             'date' => $maxDate,
+            'declined' => $this->toTwoDp($declined),
+            'numDeclined' => $numDeclined,
             'data' => $lines,
         ];
-    
+
         $judoFile->addMetadata('total', $data['total']);
         $judoFile->addMetadata('payments', $data['payments']);
         $judoFile->addMetadata('numPayments', $data['numPayments']);
         $judoFile->addMetadata('refunds', $data['refunds']);
         $judoFile->addMetadata('numRefunds', $data['numRefunds']);
+        $judoFile->addMetadata('declined', $data['declined']);
+        $judoFile->addMetadata('numDeclined', $data['numDeclined']);
         $judoFile->setDate($data['date']);
 
         return $data;
