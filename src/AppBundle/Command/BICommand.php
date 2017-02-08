@@ -61,12 +61,14 @@ class BICommand extends ContainerAwareCommand
         $lines[] = implode(',', [
             '"Age"',
             '"Postcode"',
+            '"Policy Start Date"',
         ]);
         foreach ($users as $user) {
             if ($user->hasValidPolicy()) {
                 $lines[] = implode(',', [
                    sprintf('"%d"', $user->getAge()),
                    sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
+                   sprintf('"%s"', $user->getCurrentPolicy()->getStart()->format('Y-m-d')),
                 ]);
             }
         }
