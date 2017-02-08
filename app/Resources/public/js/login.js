@@ -10,17 +10,29 @@ function onLogin(loginResponse) {
   $('#digits-form').submit();
 }
 
-document.getElementById('digits-sdk').onload = function() {
-    Digits.init({ consumerKey: $('.login-digits').data('key') }).done(function() { $('.digits-loading').hide(); });
-    Digits.embed({
-      container: '.digits-container',
-        phoneNumber: '+44'
-    })
-    .done(onLogin)
-    .fail(function() { alert('Sorry, there seems to be a temporary issue with logging in.  Please try the email login or contact support@wearesosure.com'); });
-};
+var loadDigitsInterval;
+
+function loadDigits() {
+  window.Digits.init({ consumerKey: $('.login-digits').data('key') }).done(function() {
+      clearInterval(loadDigitsInterval);
+      $('.digits-loading').hide();
+      window.Digits.embed({
+        container: '.digits-container',
+          phoneNumber: '+44'
+      })
+      .done(onLogin)
+      .fail(function() { alert('Sorry, there seems to be a temporary issue with logging in.  Please try the email login or contact support@wearesosure.com'); });
+  }) 
+}
 
 $(function() {
+  
+    $(window).bind("load", function() { 
+      loadDigits();
+    });
+
+    loadDigitsInterval = setInterval(function(){ loadDigits(); }, 10000);
+
     $('.swap-login').on('click', function() {
       $('.login-email').toggle();
       $('.login-digits').toggle();
