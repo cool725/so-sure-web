@@ -40,18 +40,10 @@ class PhoneSitemapGenerator implements GeneratorInterface
         $repo = $this->dm->getRepository(Phone::class);
         $phones = $repo->findActive()->getQuery()->execute();
         foreach ($phones as $phone) {
-            if ($phone->getMemory()) {
-                $url = $this->router->generate('quote_make_model_memory', [
-                    'make' => $phone->getMake(),
-                    'model' => $phone->getEncodedModel(),
-                    'memory' => $phone->getMemory(),
-                ], UrlGeneratorInterface::ABSOLUTE_URL);
-            } else {
-                $url = $this->router->generate('quote_make_model', [
-                    'make' => $phone->getMake(),
-                    'model' => $phone->getEncodedModel(),
-                ], UrlGeneratorInterface::ABSOLUTE_URL);
-            }
+            $url = $this->router->generate('quote_make_model', [
+                'make' => $phone->getMake(),
+                'model' => $phone->getEncodedModel(),
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
             $entries[] = new Entry($url, null, 'weekly', '0.7');
         }
 
