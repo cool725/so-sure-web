@@ -49,6 +49,7 @@ class SlackCommand extends ContainerAwareCommand
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
 
+        $weekText = '';
         $start = new \DateTime('2017-01-02');
         $initial = 86;
         $growth = 9;
@@ -57,10 +58,19 @@ class SlackCommand extends ContainerAwareCommand
         if (!$weeks) {
             $now = new \DateTime();
             $weeks = floor($now->diff($start)->days / 7);
+            $dow = $now->diff($start)->days % 7;
+            $offset = $dow - 2 >= 0 ? $dow - 2 : 5 + $dow;
+            $start = clone $now;
+            $start = $start->sub(new \DateInterval(sprintf('P%dD', $offset)));
+            $end = clone $start;
+            $end = $end->add(new \DateInterval('P6D'));
+            $weekText = sprintf('%s - %s (Week %d)', $start->format('d/m/Y'), $end->format('d/m/Y'), $weeks + $weekOffset);
         } else {
+            $weekText = sprintf('Week %d', $weeks);
             $weeks = $weeks - $weekOffset;
         }
 
+        /*
         $target = $initial;
         $growthTarget = $initial;
         for ($i = 1; $i <= $weeks; $i++) {
@@ -69,8 +79,10 @@ class SlackCommand extends ContainerAwareCommand
             $growthTarget += $growth;
             //print sprintf("week %d growth %s\n", $i, $growth);
         }
-        // This is what its supposed to be, but due to excel and rounding each week, we've deviated
-        // $target = round($initial * pow(1.1, $weeks));
+        */
+        // This is what its supposed to be
+        $target = round($initial * pow(1.1, $weeks));
+        $growthTarget = $target;
 
         $yesterday = new \DateTime();
         $yesterday->sub(new \DateInterval('P1D'));
@@ -79,8 +91,8 @@ class SlackCommand extends ContainerAwareCommand
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
-            'Week %d - Target: %d Actual: %d Remaining: %d Last 24 hours: %d **weekly rounding; growth only compounding',
-            $weeks + $weekOffset,
+            "*%s*\nTarget: %d\nActual: %d\nRemaining: %d\nLast 24 hours: %d\n\n_policy compounding_",
+            $weekText,
             $growthTarget,
             $total,
             $target - $total,
