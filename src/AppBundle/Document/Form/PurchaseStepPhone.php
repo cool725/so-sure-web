@@ -92,7 +92,7 @@ class PurchaseStepPhone
     {
         $this->imei = $this->normalizeImei($imei);
         if ($this->getPhone() && $this->getPhone()->getMake() != "Apple") {
-            $this->setSerialNumber($imei);
+            $this->setSerialNumber($this->imei);
         }
     }
 
