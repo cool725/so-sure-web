@@ -149,17 +149,18 @@
 
 .tt-menu {
     background-color: white;
-    border: 1px solid;
-    width: 150%;
+    border: 2px solid #efefef;
+    margin-top: -2px;
     overflow-y: scroll;
-    border-radius: 5px;
-    max-height: 150px;
-    padding: 10px;
+    max-height: 176px;
+    padding: 2px;
     cursor: pointer;
 }
 
 .tt-suggestion {
     padding-bottom: 2px;
+    padding-left: 2px;
+    text-align: left;
 }
 
 .tt-suggestion:hover {
