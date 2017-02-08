@@ -358,7 +358,7 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $imei = str_replace(' ', '', $this->getDataString($phonePolicyData, 'imei'));
+            $imei = $this->normalizeImei($this->getDataString($phonePolicyData, 'imei'));
             $serialNumber = $this->getDataString($phonePolicyData, 'serial_number');
             // For phones without a serial number, run check on imei
             if (!$serialNumber) {
