@@ -1110,6 +1110,7 @@ class PhonePolicyTest extends WebTestCase
         }
 
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getPremiumInstallmentPrice());
+        $this->assertEquals($policy->getPremium()->getGwp(), $policy->getPremiumGwpInstallmentPrice());
     }
 
     public function testGetInstallmentAmountYearly()
@@ -1139,6 +1140,7 @@ class PhonePolicyTest extends WebTestCase
         }
 
         $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getPremiumInstallmentPrice());
+        $this->assertEquals($policy->getPremium()->getYearlyGwp(), $policy->getPremiumGwpInstallmentPrice());
     }
 
     public function testGetBrokerFeePaidNotPolicy()

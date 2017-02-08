@@ -122,7 +122,9 @@
                                     N/A
                                 {% endif %}
                             </a></td>
-                            <td>{{ policy.status }}</td>
+                            <td>{{ policy.status }}
+                                {% if policy.status == "cancelled" %} / {{ policy.cancelledReason }}{% endif %}
+                            </td>
                             <td>{{ policy.user.firstname }} {{ policy.user.lastname }}</td>
                             <td>
                                 {% if is_granted('ROLE_ADMIN') %}

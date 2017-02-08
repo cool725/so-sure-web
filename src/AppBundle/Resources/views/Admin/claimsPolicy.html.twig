@@ -4,6 +4,7 @@
     {{ parent() }}
     {% stylesheets
     'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+    '@AppBundle/Resources/public/css/Default/claimHandling.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -15,6 +16,8 @@
         '@AppBundle/Resources/public/js/tabs.js'
         '@AppBundle/Resources/public/js/Admin/claimsPolicy.js'
         '@AppBundle/Resources/public/js/Claims/phoneAlternativesModal.js'
+        '@AppBundle/Resources/public/js/Claims/tabs.js'
+        '@AppBundle/Resources/public/js/Claims/policy.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}            
@@ -40,10 +43,15 @@
                     {{ form_errors(pending_cancel_form.pendingCancellation) }}
                     {{ form_widget(pending_cancel_form.pendingCancellation) }}
                 </div>
+                <div class="form-group">
+                30 days from now is <strong>{{ suggested_cancellation_date|date('d M Y') }}</strong>
+                or use <a href="https://www.timeanddate.com/date/dateadded.html?ad=30" target="_blank">online calculator</a>.
+                </div>
                 {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger confirm-cancel', 'placeholder': '30 days after notice'}}) }}
                 {{ form_end(pending_cancel_form) }}
                 <br>
-                <b>This schedules the policy cancellation.</b>
+                <b>This schedules the policy cancellation.
+                </b>
             </div>
             <div class="col-md-6">
                 <h4>Immediate Cancellation</h4>

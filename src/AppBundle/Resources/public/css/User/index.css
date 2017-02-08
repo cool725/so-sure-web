@@ -48,7 +48,6 @@
       width: 200px;
     }
   }
-
 .doughnut-outer {
     width: 500px;
     height: 300px;
@@ -70,4 +69,98 @@
   .doughnut-inner {
     margin-top: -180px;
   }
+}
+
+.user-info {
+  margin-bottom: 20px;
+}
+
+.user-info .small-card {
+  margin: 25px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  height: 280px;
+}
+
+@media (max-width:992px) {
+  .user-info .small-card {
+    height: 100%;
+  }
+}
+
+.user-info .small-card h4 {
+  color: inherit;
+}
+
+.user-info .small-card .title {
+  font-size: 22px;
+}
+
+.user-info .small-card .subtitle {
+  font-size: 18px;
+}
+
+.user-info .small-card .actions {
+  margin: 16px 0 0 0;
+  text-align: center;
+}
+
+.user-info .small-card .actions a {
+  margin: 10px 10px;
+}
+
+.user-info .small-card .info {
+  margin-top: 26px;
+  margin-bottom: 15px;
+}
+
+.start-saving {
+  padding: 10px 15px;
+}
+
+.start-saving h2 {
+  color: #fff;
+}
+
+.download-apps .download-btn {
+  width: 40%;
+  display: inline-block;
+}
+
+.download-apps .download-btn.left {
+  margin: 60px 4% 20px 5%;
+}
+
+.download-apps .download-btn.right {
+  margin: 60px 5% 20px 4%;
+}
+
+.download-apps .download-btn.center {
+  margin: 60px 30% 20px 30%;
+}
+
+.download-apps .download-btn img {
+  width: 100%;
+  margin: 0;
+}
+
+@media (max-width:992px) {
+  .download-apps .download-btn.left {
+    margin: 20px 4% 20px 5%;
+  }
+  .download-apps .download-btn.right {
+    margin: 20px 5% 20px 4%;
+  }
+  .download-apps .download-btn.center {
+    margin: 20px 30% 20px 30%;
+  }
+}
+
+.download-apps .badge {
+  padding: 7px 10px 3px 10px;
+  font-size: 24px;
+  border-radius: 16px;
+  background-color: #80CE4D;
 }

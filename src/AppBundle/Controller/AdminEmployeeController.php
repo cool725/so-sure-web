@@ -405,6 +405,7 @@ class AdminEmployeeController extends BaseController
             }
         }
         $checks = $fraudService->runChecks($policy);
+        $now = new \DateTime();
 
         return [
             'policy' => $policy,
@@ -419,6 +420,7 @@ class AdminEmployeeController extends BaseController
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
+            'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
         ];
     }
 
@@ -715,6 +717,9 @@ class AdminEmployeeController extends BaseController
         if ($data['totalPolicies'] != 0) {
             $data['totalPoliciesAvgPremium'] = $this->toTwoDp($data['totalPoliciesPremium'] / $data['totalPolicies']);
         }
+
+        $data['totalActiveMonthlyPolicies'] = $policyRepo->countAllActivePoliciesByInstallments(12);
+        $data['totalActiveYearlyPolicies'] = $policyRepo->countAllActivePoliciesByInstallments(1);
 
         // For reporting, connection numbers should be seen as a 2 way connection
         $newConnections = $connectionRepo->count($start, $end) / 2;

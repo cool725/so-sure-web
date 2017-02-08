@@ -84,8 +84,8 @@ p {
 }
 
 @media (min-width: 767px) {
-#how-it-works > .container > .row {
-    display: flex;
-    align-items: center;
-}
+    #how-it-works > .container > .row {
+        display: flex;
+        align-items: center;
+    }
 }

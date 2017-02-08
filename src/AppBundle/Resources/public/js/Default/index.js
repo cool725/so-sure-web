@@ -24,7 +24,10 @@
     });
 
 
-    $("#get-started").click(function() {
+    $("#get-started").click(function(event) {
+
+        event.preventDefault();
+
         $('html, body').animate({
             scrollTop: $("#download-now").offset().top
         }, 1500);

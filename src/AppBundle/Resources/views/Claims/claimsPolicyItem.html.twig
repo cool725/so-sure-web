@@ -70,6 +70,7 @@
                             <td>Policy Payments</td>
                             <td>
                                 Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}&nbsp;
+                            ({{ policy.successfulPaymentCredits|length }} / {{ policy.payments|length }} <span title="Successful / Total">payments</span>)
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
                                             >Payments</button>
                             
@@ -106,27 +107,60 @@
                         </tr>
                         {% endif %}
                         <tr>
-                          <td>ClaimsCheck Cert Id</td>
+                          <td>Initial Policy Recipero Checks<br />
+                            <strong>NOT CLAIMS RELATED</strong>
+                          </td>
                           <td>
-                            {% for key, data in policy.checkmendCertsAsArray if data['certId'] is defined %}
+                            <ul>
+                            {% for key, data in policy.checkmendCertsAsArray(false) if data['certId'] is defined %}
+                                <li>
                                 {% if data['certId'] == 'serial' %}
-                                    <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId'] }}</span>
+                                    <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
                                 {% else %}
                                   <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
                                 {% endif %}
-                                ({{ key|date("F j, Y H:i", "Europe/London") }})<br />
+                                ({{ key|date("F j, Y H:i", "Europe/London") }})</li>
                             {% endfor %}
-                            {% if policy.checkmendCerts|length == 0 %}
-                              Certs not present
+                            {% if policy.checkmendCertsAsArray(false)|length == 0 %}
+                              <li>Certs not present</li>
                             {% endif %}
-                            {% if is_granted('ROLE_ADMIN') %}
+                            </ul>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Claims Related Recipero Checks (ClaimsCheck)
+                          </td>
+                          <td>
+                            <ul>
+                            {% for key, data in policy.checkmendCertsAsArray(true) if data['certId'] is defined %}
+                                <li>
+                                    {# rnd hack to force page reload to adjust tabs #}
+                                    Claim <a href="?rnd={{ random() }}#claim_{{ data['claimId'] }}">{{ data['claimNumber'] }}</a> against
+                                {% if data['certId'] == 'serial' %}
+                                    <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
+                                {% else %}
+                                  <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
+                                {% endif %}
+                                ({{ key|date("F j, Y H:i", "Europe/London") }})</li>
+                            {% endfor %}
+                            {% if policy.checkmendCertsAsArray(true)|length == 0 %}
+                              <li>Certs not present</li>
+                            {% endif %}
+                            </ul>
+                          </td>
+                        </tr>
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <tr>
+                            <td>
+                                Manual Recipero Check
+                            </td>
+                            <td>
                                 {{ form_start(receperio_form, {'attr': {'class': 'form-inline'}}) }}
                                 {{ form_widget(receperio_form.rerun, {'label': 'Re-run check', 'attr': {'class': 'btn btn-danger confirm-imei-rerun'}}) }}
                                 {{ form_end(receperio_form) }}
                               </td>
-                            {% endif %}
-                          </td>
                         </tr>
+                        {% endif %}
                     </table>
                 </div>
                 <div class="col-md-5">
@@ -223,7 +257,7 @@
                     {% for claim in policy.claims %}
                     <tr>
                         <td style="width: 20%;">{{ claim.recordedDate|date }}</td>
-                        <td style="width: 10%;">{{ claim.number }}</td>
+                        <td style="width: 10%;" id="claim_{{ claim.id }}">{{ claim.number }}</td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
                         <td style="width: 10%;">£{{ claim.totalChargesWithVat|number_format(2, '.', ',') }}</td>
@@ -234,7 +268,12 @@
                           {% if claim.suspectedFraud %}Suspected Fraud;{% endif %}
                           {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
-                        <td style="width: 20%;">{{ claim.notes }}</td>
+                        <td style="width: 20%;">{{ claim.notes }}
+                            <button title="Edit notes" type="button" class="btn btn-primary"
+                                    data-toggle="modal" data-target="#notesModal"
+                                data-update="{{ path('claims_notes', {'id': claim.id}) }}"
+                                data-notes="{{ claim.notes }}"><i class="fa fa-edit"></i></button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -511,3 +550,25 @@
     </div>
 
 </div>
+
+    <div class="modal fade" id="notesModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+        <form id="notes-update-form" class="form-horizontal" method="post">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Notes</h4>
+          </div>
+          <div class="modal-body">
+            <textarea type="text" class="form-control" id="notes" name="notes" required="required"></textarea>
+          </div>
+          <div class="modal-footer">
+            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+

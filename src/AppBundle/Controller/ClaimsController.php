@@ -141,21 +141,24 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('claimscheck')) {
                 $formClaimsCheck->handleRequest($request);
                 if ($formClaimsCheck->isValid()) {
-                    $result = $imeiService->policyClaim(
-                        $policy,
-                        $claimscheck->getType(),
-                        $claimscheck->getClaim(),
-                        $this->getUser()
-                    );
-                    $this->addFlash('success', sprintf(
-                        '%s £%0.2f <a href="%s" target="_blank">%s</a> (Phone is %s)',
-                        ucfirst($claimscheck->getType()),
-                        $claimscheck->getClaim()->getLastChargeAmountWithVat(),
-                        $imeiService->getCertUrl(),
-                        $imeiService->getCertId(),
-                        $result ? 'not blocked' : 'blocked'
-                    ));
-
+                    try {
+                        $result = $imeiService->policyClaim(
+                            $policy,
+                            $claimscheck->getType(),
+                            $claimscheck->getClaim(),
+                            $this->getUser()
+                        );
+                        $this->addFlash('success', sprintf(
+                            '%s £%0.2f <a href="%s" target="_blank">%s</a> (Phone is %s)',
+                            ucfirst($claimscheck->getType()),
+                            $claimscheck->getClaim()->getLastChargeAmountWithVat(),
+                            $imeiService->getCertUrl(),
+                            $imeiService->getCertId(),
+                            $result ? 'not blocked' : 'blocked'
+                        ));
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', $e->getMessage());
+                    }
                     return $this->redirectToRoute('claims_policy', ['id' => $id]);
                 }
             } elseif ($request->request->has('crimeref')) {
@@ -239,5 +242,29 @@ class ClaimsController extends BaseController
             'alternatives' => $data,
             'suggestedReplacement' => $suggestedReplacement ? $suggestedReplacement->toAlternativeArray() : null,
         ]);
+    }
+
+    /**
+     * @Route("/claim/{id}", name="claims_notes")
+     * @Method({"POST"})
+     */
+    public function claimsNotesAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($id);
+        $claim->setNotes($request->get('notes'));
+
+        $dm->flush();
+        $this->addFlash(
+            'success',
+            'Claim notes updated'
+        );
+
+        return new RedirectResponse($this->generateUrl('claims_policy', ['id' => $claim->getPolicy()->getId()]));
     }
 }

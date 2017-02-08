@@ -35,6 +35,17 @@ class PhonePolicyRepository extends PolicyRepository
      */
     public function countAllActivePolicies(\DateTime $endDate = null, \DateTime $startDate = null)
     {
+        return $this->countAllActivePoliciesByInstallments(null, $startDate, $endDate);
+    }
+
+    /**
+     * All policies that are active with number of installment payments (excluding so-sure test ones)
+     */
+    public function countAllActivePoliciesByInstallments(
+        $installments,
+        \DateTime $startDate = null,
+        \DateTime $endDate = null
+    ) {
         if (!$endDate) {
             $endDate = new \DateTime();
         }
@@ -47,6 +58,9 @@ class PhonePolicyRepository extends PolicyRepository
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
+        if ($installments) {
+            $qb->field('premiumInstallments')->equals($installments);
+        }
         $qb->field('start')->lte($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);

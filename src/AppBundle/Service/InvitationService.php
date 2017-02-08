@@ -271,9 +271,13 @@ class InvitationService
             }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
             $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
-            $this->mixpanel->trackWithUser($invitation->getInviter(), MixpanelService::INVITE, [
+            $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, [
                 'Invitation Method' => 'email',
             ]);
+            $now = new \DateTime();
+            $this->mixpanel->queuePersonProperties([
+                'Last Invite Sent' => $now->format(\DateTime::ATOM),
+            ], false, $invitation->getInviter());
         }
 
         return $invitation;
@@ -335,9 +339,13 @@ class InvitationService
             }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
             $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
-            $this->mixpanel->trackWithUser($invitation->getInviter(), MixpanelService::INVITE, [
+            $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, [
                 'Invitation Method' => 'sms',
             ]);
+            $now = new \DateTime();
+            $this->mixpanel->queuePersonProperties([
+                'Last Invite Sent' => $now->format(\DateTime::ATOM),
+            ], false, $invitation->getInviter());
         }
 
         return $invitation;
@@ -613,12 +621,20 @@ class InvitationService
         $this->sendPush($invitation, PushService::MESSAGE_CONNECTED);
         $this->sendEvent($invitation, InvitationEvent::EVENT_ACCEPTED);
 
-        $this->mixpanel->trackWithUser($invitation->getInviter(), MixpanelService::CONNECTION_COMPLETE, [
+        $now = new \DateTime();
+        $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
             'Connection Value' => $inviterConnection->getTotalValue(),
         ]);
-        $this->mixpanel->trackWithUser($invitation->getInvitee(), MixpanelService::CONNECTION_COMPLETE, [
+        $this->mixpanel->queuePersonProperties([
+            'Last connection complete' => $now->format(\DateTime::ATOM),
+        ], false, $invitation->getInviter());
+
+        $this->mixpanel->queueTrackWithUser($invitation->getInvitee(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
             'Connection Value' => $inviteeConnection->getTotalValue(),
         ]);
+        $this->mixpanel->queuePersonProperties([
+            'Last connection complete' => $now->format(\DateTime::ATOM),
+        ], false, $invitation->getInvitee());
 
         return $inviteeConnection;
     }

@@ -802,6 +802,19 @@ abstract class Policy
         $this->id = $id;
     }
 
+    public function getExpectedBillingDate()
+    {
+        // TODO: consolidate with PolicyService::generateScheduledPayments
+        $date = clone $this->getStart();
+
+        // To allow billing on same date every month, 28th is max allowable day on month
+        if ($date->format('d') > 28) {
+            $date->sub(new \DateInterval(sprintf('P%dD', $date->format('d') - 28)));
+        }
+
+        return $date;
+    }
+
     public function getNextBillingDate($date)
     {
         $nextDate = new \DateTime();
@@ -904,6 +917,23 @@ abstract class Policy
             return $this->getPremium()->getYearlyPremiumPrice();
         } elseif ($this->getPremiumInstallmentCount() == 12) {
             return $this->getPremium()->getMonthlyPremiumPrice();
+        } else {
+            throw new \Exception(sprintf('Policy %s does not have correct installment amount', $this->getId()));
+        }
+    }
+
+    public function getPremiumGwpInstallmentPrice()
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        if (!$this->getPremiumInstallmentCount()) {
+            return null;
+        } elseif ($this->getPremiumInstallmentCount() == 1) {
+            return $this->getPremium()->getYearlyGwp();
+        } elseif ($this->getPremiumInstallmentCount() == 12) {
+            return $this->getPremium()->getGwp();
         } else {
             throw new \Exception(sprintf('Policy %s does not have correct installment amount', $this->getId()));
         }
@@ -1977,6 +2007,7 @@ abstract class Policy
             'premium_plan' => $this->getPremiumPlan(),
             'scodes' => $this->eachApiArray($this->getActiveSCodes()),
             'premium_payments' => $this->getPremiumPayments(),
+            'premium_gwp' => $this->getPremiumGwpInstallmentPrice(),
         ];
     }
 

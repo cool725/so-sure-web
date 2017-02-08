@@ -397,8 +397,29 @@ class ReceperioService extends BaseImeiService
         }
     }
 
-    public function policyClaim(PhonePolicy $policy, $claimType, Claim $claim = null, User $handler = null)
-    {
+    /**
+     * @param PhonePolicy $policy
+     * @param string      $claimType Claim::TYPE_DAMAGE, Claim::TYPE_LOSS, Claim::TYPE_THEFT
+     * @param Claim       $claim     Optional: Claim to record against
+     * @param User        $handler   Optional: User who ran the check
+     * @param string      $imei      Optional: Allow running against a previous imei
+     */
+    public function policyClaim(
+        PhonePolicy $policy,
+        $claimType,
+        Claim $claim = null,
+        User $handler = null,
+        $imei = null
+    ) {
+        if ($policy->getImeiReplacementDate() && $claim
+            && $policy->getImeiReplacementDate() > $claim->getRecordedDate()) {
+            // if passing in imei, then hopefully we know what we're doing, so allow it
+            if (!$imei) {
+                // @codingStandardsIgnoreStart
+                throw new \Exception('Policy has been updated for the replacement imei from the claim. Claimscheck must be run by so-sure.');
+                // @codingStandardsIgnoreEnd
+            }
+        }
         $result = null;
         if ($claimType == Claim::TYPE_DAMAGE) {
             $result = $this->checkImei(
@@ -410,12 +431,16 @@ class ReceperioService extends BaseImeiService
                 $handler
             );
         } elseif (in_array($claimType, [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
-            $result = $this->checkClaims($policy->getPhone(), $policy->getImei(), $policy, $claim, $handler);
+            if ($imei) {
+                $result = $this->checkClaims($policy->getPhone(), $policy->getImei(), $policy, $claim, $handler);
+            } else {
+                $result = $this->checkClaims($policy->getPhone(), $imei, $policy, $claim, $handler);
+            }
         } else {
             throw new \InvalidArgumentException(sprintf('Unknown claim type %s', $claimType));
         }
 
-        $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData());
+        $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData(), $claim);
         $this->dm->flush();
 
         return $result;

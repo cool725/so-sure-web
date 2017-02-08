@@ -26,6 +26,8 @@
     src: local('/fonts/Avenir LT Std 35 Light'), url('/fonts/AvenirLTStd-Light.woff') format('woff');
 }
 
+
+
 /* MOVE TO common > _global.scss */
 
 html {
@@ -41,9 +43,9 @@ body {
 strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-ul, li {
-    margin: auto;
-}
+
+/*Quick helpers*/
+
 .error-text {
     color: #FF6666;
 }
@@ -56,22 +58,47 @@ ul, li {
     color: #8B97B5 !important;
 }
 
+.text-dark-grey {
+    color: #626B78;
+}
+
+.text-green {
+    color: #80ce4d !important;
+}
+
+.text-red {
+    color: #FF6666 !important;
+}
+
+.text-success {
+    color: #33CCCC !important;
+}
+
+.text-white {
+    color: #fff !important
+}
+
+.text-underline {
+    text-decoration: underline !important;
+}
+
 /* MOVE TO layout > _header.scss */
 
 .so-sure-logo-dark {
-    background: transparent no-repeat center top url("/images/logo/Logo-Dark-with-Social-Insurance.svg");
+    background: transparent no-repeat center top url("/images/logo/so-sure-logo-dark.svg");
     background-size: 130px;
     width: 130px;
-    height: 40px;
-}
-.so-sure-logo-light {
-    background: transparent no-repeat center top url("/images/logo/Logo-Light-with-Social-Insurance.svg");
-    background-size: 130px;
-    width: 130px;
-    height: 40px;
+    height: 30px;
 }
 
-.so-sure-logo-xmas {
+.so-sure-logo-light {
+    background: transparent no-repeat center top url("/images/logo/so-sure-logo-light.svg");
+    background-size: 130px;
+    width: 130px;
+    height: 30px;
+}
+
+/*.so-sure-logo-xmas {
     background: transparent no-repeat center top url("/images/logo/xmas-full-logo.svg");
     background-size: 90px;
     width: 130px;
@@ -85,24 +112,26 @@ ul, li {
       width: 130px;
       height: 41px;
     }
-}
+}*/
 
 
 
 /* MOVE TO common > _global.scss */
-
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3,
+.h1, .h2, .h3 {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #202532;
 }
 
-.text-success {
-  color: #33CCCC !important;
+
+h4, h5, h6,
+.h4, .h5, .h6 {
+    font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;    
+    color: #202532;
 }
 
-.text-white {
-  color: #fff !important
-}
+
+
 /* Global Tools */
 
 /* centered columns styles */
@@ -155,44 +184,26 @@ h1, h2, h3, h4, h5, h6 {
     border: 0;
     background: rgba(0,0,0,0.0);
     display: block;
-    padding: 5px;
 }
-.container .navbar-header {
-    padding-bottom: 5px;
-}
-.navbar-default .navbar-collapse, .navbar-default .navbar-form {
-    padding-bottom: 5px;
-}
-.navbar .btn {
-    font-size: 14px !important;
-    color: #202532 !important;
-    padding: 10px 15px !important;
-    border-radius: 30px;
-    -moz-border-radius: 30px;
-    -webkit-border-radius: 30px;
-    line-height: 15px;
-    margin-top: 9px;
-    margin-left: 10px !important;
-    letter-spacing: 0;
-    text-transform: none;
-    background: none !important;
-    border: 2px solid #202532 !important;
-}
-.navbar .btn:hover {
-  color: #202532 !important;
-}
-.navbar-default .navbar-nav> li> a {
+
+
+.navbar-default .navbar-nav > li > a {
     font-size: 14px;
     padding-top: 20px;
     color: #202532;
 }
-.navbar-default .navbar-nav li> a:hover {
+
+.navbar-default .navbar-nav > li > a:hover {
     color: #3399ff;
 }
-.navbar-default .navbar-nav li> a:focus {
+
+.navbar-default .navbar-nav > li > a:focus {
     border-color: #202352 !important;
     color: #202352 !important;
 }
+
+
+
 .navbar-toggle {
     background-color: transparent;
     border: none;
@@ -201,12 +212,15 @@ h1, h2, h3, h4, h5, h6 {
     background-color: transparent;
     border: none;
 }
+
 @media (min-width: 991px) {
   .navbar-nav>li {
       margin: 0px 5px;
       padding: 0px 5px;
   }
 }
+
+
 @media (max-width: 767px) {
     .navbar-default .navbar-collapse {
       background-color: #fff;

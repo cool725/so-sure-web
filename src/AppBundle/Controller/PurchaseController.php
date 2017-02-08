@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
@@ -21,6 +22,7 @@ use AppBundle\Document\Form\Purchase;
 use AppBundle\Document\Form\PurchaseStepPersonal;
 use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
+use AppBundle\Document\Form\PurchaseStepPhoneNoPhone;
 use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Form\Type\BasicUserType;
@@ -28,6 +30,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\PurchaseStepPersonalType;
 use AppBundle\Form\Type\PurchaseStepAddressType;
 use AppBundle\Form\Type\PurchaseStepPhoneType;
+use AppBundle\Form\Type\PurchaseStepPhoneNoPhoneType;
 
 use AppBundle\Service\MixpanelService;
 
@@ -132,6 +135,9 @@ class PurchaseController extends BaseController
                     if ($newUser) {
                         $dm->persist($user);
                     }
+                    if (!$user->getIdentityLog()) {
+                        $user->setIdentityLog($this->getIdentityLog($request));
+                    }
                     $dm->flush();
 
                     if (!$user->hasValidDetails()) {
@@ -155,9 +161,14 @@ class PurchaseController extends BaseController
                         $user
                     );
 
+                    // Trigger login event
+                    $token = $this->get('security.token_storage')->getToken();
+                    $event = new InteractiveLoginEvent($request, $token);
+                    $this->get("event_dispatcher")->dispatch("security.interactive_login", $event);
+
                     // Track after login, so we populate user
                     if ($newUser) {
-                        $this->get('app.mixpanel')->trackWithUtm(MixpanelService::RECEIVE_DETAILS);
+                        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS);
                     }
 
                     return $this->redirectToRoute('purchase_step_address');
@@ -259,6 +270,10 @@ class PurchaseController extends BaseController
 
         $purchase = new PurchaseStepPhone();
         $purchase->setUser($user);
+
+        $purchaseNoPhone = new PurchaseStepPhoneNoPhone();
+        $purchase->setUser($user);
+
         $policy = $user->getUnInitPolicy();
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
@@ -274,6 +289,9 @@ class PurchaseController extends BaseController
 
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPhoneType::class, $purchase)
+            ->getForm();
+        $purchaseNoPhoneForm = $this->get('form.factory')
+            ->createNamedBuilder('purchase_no_phone_form', PurchaseStepPhoneNoPhoneType::class, $purchaseNoPhone)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -360,7 +378,7 @@ class PurchaseController extends BaseController
                         }
                     }
                     $dm->flush();
-                    $this->get('app.mixpanel')->track(MixpanelService::POLICY_READY, [
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
                         'Device Insured' => $purchase->getPhone()->__toString(),
                         'OS' => $purchase->getPhone()->getOs(),
                         'Final Monthly Cost' => $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
@@ -389,6 +407,7 @@ class PurchaseController extends BaseController
         $data = array(
             'phone' => $phone,
             'purchase_form' => $purchaseForm->createView(),
+            'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 3,
             'modal_type' => $phone ? 'purchase-change' : 'purchase-select',
@@ -502,7 +521,7 @@ class PurchaseController extends BaseController
                 JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
             );
             if ($policy->isInitialPayment()) {
-                $this->get('app.mixpanel')->track(MixpanelService::PURCHASE_POLICY, [
+                $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PURCHASE_POLICY, [
                     'Payment Option' => $policy->getPremiumPlan(),
                 ]);
                 $this->addFlash(

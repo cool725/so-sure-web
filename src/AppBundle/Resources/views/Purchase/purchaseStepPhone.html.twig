@@ -29,6 +29,7 @@
                 <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
 
                     <div class="checkout--step">
+                        {% if phone %}
                         {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
 
                             <div class="form-group">
@@ -42,15 +43,9 @@
                                                     {% endif %}
                                             {% endif %}
                                         </strong>
-                                        {% if phone %}                         
                                             <button type="button" 
                                                     class="select-phone btn-link btn-xs" data-toggle="modal" 
                                                     data-target="#phoneModal">Edit</button>
-                                        {% else %}
-                                            <button type="button" 
-                                                    class="select-phone btn-additional btn-xs" data-toggle="modal" 
-                                                    data-target="#phoneModal">Select phone</button>
-                                        {% endif %}
                                     </span>
                                 </div>                                
                             </div>
@@ -65,7 +60,7 @@
                             <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                                 {{ form_label(purchase_form.imei, 'IMEI Number', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
                                 <div class="col-sm-8">
-                                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':''}}) }}
+                                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'', 'pattern':'[-/\\s]*([0-9][-/\\s]*){15,17}', 'title': 'Enter a valid 15 or 17 digit IMEI Number'}}) }}
                                     <p class="help-block text-left">
                                         <small>Dial *#06# to show your IMEI number </small>
                                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"><i class="fa fa-question"></i></button>
@@ -94,6 +89,19 @@
                             </div>
 
                         {{ form_end(purchase_form) }}
+                    {% else %}
+                        {{ form_start(purchase_no_phone_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Your Phone</label>
+                                <div class="col-sm-8 text-left">
+                                    <button type="button" 
+                                            class="select-phone btn-additional btn-xs" data-toggle="modal" 
+                                            data-target="#phoneModal"><strong>Select phone</strong></button>
+                                </div>                                
+                            </div>
+                        {{ form_end(purchase_no_phone_form) }}
+                        {% endif %}
                     </div>
 
               
