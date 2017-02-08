@@ -51,8 +51,9 @@ $(function(){
             bar.animate({
                 width: bar_width+'%',
                 opacity: 1,
+                easing: 'linear',
                 },
-                900, function() {
+                200, function() {
             });
         });
     }
@@ -151,14 +152,15 @@ $(function(){
                 // Update cashback and premium
                 function updateValues() {
                     $('#cashback').text('£' + save_value);
-                    $('#premium').text('£' + premium);
-                    setBars();                    
+                    $('#premium').text('£' + premium);                  
                 }               
 
                 updateValues();
             },
 
-            onSlideEnd: function(position, value) {}
+            onSlideEnd: function(position, value) {
+                setBars();                  
+            }
 
         })
 
