@@ -132,16 +132,17 @@
                         
                         <div class="h4 text-blue"><strong>Friends connected</strong></div>
 
-
                         {% set start_friends = phone_price.maxConnections %}
-                        {# set start_friends = 10 #}
-                        {% if start_friends > phone_price.maxConnections %}
-                            {% set start_friends = phone_price.maxConnections %}
-                        {% endif %}
+
                         {% set start_value = start_friends * connection_value %}
+
                         {% if start_value > phone_price.maxPot %}
+                        
                             {% set start_value = phone_price.maxPot %}
-                        {% endif %}                        
+                        
+                        {% endif %}
+
+                        {% set start_premium = phone_price.yearlyPremiumPrice - start_value %}     
                         
                         <div class="reward-slider">
                             <input type="range"
@@ -149,26 +150,26 @@
                                    min="0"
                                    max="{{ phone_price.maxConnections }}"
                                    value="{{ start_friends }}"
-                                   data-slider-maxpot="{{ phone_price.maxPot }}"
-                                   data-slider-connection-value="{{ connection_value }}"
-                                   data-slider-premium="{{ phone_price.yearlyPremiumPrice }}">
+                                   data-maxpot="{{ phone_price.maxPot }}"
+                                   data-connection-value="{{ connection_value }}"
+                                   data-premium="{{ phone_price.yearlyPremiumPrice }}">
                         </div>
 
-                        <!-- <div class="claim-options">
+                        <div class="claim-options">
                             <div class="h4 text-blue"><strong>What if</strong></div>
                             <label for="claim-option">
-                                <input type="radio" name="claim-option" value="none" checked=""> Nobody claims
+                                <input type="radio" name="claim-option" value="none" checked=> <small>Nobody claims</small>
                             </label><br>
                             <label for="claim-option">
-                                <input type="radio" name="claim-option" value="me"> I make a claim
+                                <input type="radio" name="claim-option" value="me"> <small>I make a claim</small>
                             </label><br>
                             <label for="claim-option">
-                                <input type="radio" name="claim-option" value="1"> 1 friend claims
+                                <input type="radio" name="claim-option" value="1"> <small>1 friend claims</small>
                             </label><br>
                             <label for="claim-option">
-                                <input type="radio" name="claim-option" value="2"> 2 friends claim
+                                <input type="radio" name="claim-option" value="2"> <small>2 friends claim</small>
                             </label>                        
-                        </div> -->
+                        </div>
 
                         <div class="premium-table">
 
@@ -183,7 +184,9 @@
                                     </td>
                                     <td width="22%" align="right">
                                         <strong>
-                                            <small id="premium" class="premium-value text-blue">total</small>
+                                            <small id="premium" class="premium-value text-blue">
+                                                £{{ start_premium }}
+                                            </small>
                                         </strong>
                                     </td>
                                 </tr>
@@ -215,7 +218,7 @@
                                     </td>
                                 </tr>
                             </table>
-                            <a href="#"><small><em class="text-underline text-dark-grey">Learn more about how we calculated this</em></small></a>
+                            <a href="#"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
                         </div>
 
                         <div class="reward-total">
@@ -226,11 +229,11 @@
                         </div>
 
                         <div class="text-center h5">
-                            <a href="#"><strong class="text-red text-underline">What happens when someone claims?</strong></a>
+                            <a href="#"><strong class="text-underline">What happens when someone claims?</strong></a>
                         </div>      
 
                         <div class="text-center">
-                            <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><small class="text-underline">Learn how it works</small></a>
+                            <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><small class="text-underline">Click for more details</small></a>
                         </div>                         
 
                     </div>                                           
