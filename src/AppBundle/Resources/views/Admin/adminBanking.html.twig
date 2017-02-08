@@ -95,8 +95,12 @@
                 <th>Barclays</th>
             </tr>
             {% for day in 1..days_in_month %}
-                {% if day < 10 %}
+                {% if month < 10 and day < 10 %}
+                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                {% elseif day < 10 %}
                     {% set ymd = year ~ month ~ "0" ~ day %}
+                {% elseif month < 10 %}
+                    {% set ymd = year ~ "0" ~ month ~ day %}
                 {% else %}
                     {% set ymd = year ~ month ~ day %}
                 {% endif %}
@@ -125,8 +129,12 @@
                 <th>Lloyds</th>
             </tr>
             {% for day in 1..days_in_month %}
-                {% if day < 10 %}
+                {% if month < 10 and day < 10 %}
+                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                {% elseif day < 10 %}
                     {% set ymd = year ~ month ~ "0" ~ day %}
+                {% elseif month < 10 %}
+                    {% set ymd = year ~ "0" ~ month ~ day %}
                 {% else %}
                     {% set ymd = year ~ month ~ day %}
                 {% endif %}
@@ -145,10 +153,12 @@
                 </tr>
             {% endfor %}
             {% for next_month_day in 1..3 %}
-                {% if month <= 11 %}
+                {% if month == 12 %}
+                    {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
+                {% elseif month >= 9 %}
                     {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
                 {% else %}
-                    {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
+                    {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
                 {% endif %}
                 {% set color = '' %}
                 {% if dailyBarclaysProcessing[ymd] is defined and dailyLloydsProcessing[ymd] is defined  %}
@@ -174,8 +184,12 @@
                 <th>Lloyds</th>
             </tr>
             {% for day in 1..days_in_month %}
-                {% if day < 10 %}
+                {% if month < 10 and day < 10 %}
+                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                {% elseif day < 10 %}
                     {% set ymd = year ~ month ~ "0" ~ day %}
+                {% elseif month < 10 %}
+                    {% set ymd = year ~ "0" ~ month ~ day %}
                 {% else %}
                     {% set ymd = year ~ month ~ day %}
                 {% endif %}
@@ -185,10 +199,12 @@
                 </tr>
             {% endfor %}
             {% for next_month_day in 1..5 %}
-                {% if month <= 11 %}
+                {% if month == 12 %}
+                    {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
+                {% elseif month >= 9 %}
                     {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
                 {% else %}
-                    {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
+                    {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
                 {% endif %}
                 {% set color = '' %}
                 {% if dailyBarclaysProcessing[ymd] is defined and dailyLloydsProcessing[ymd] is defined  %}

@@ -573,7 +573,7 @@ class AdminController extends BaseController
             'lloydsForm' => $lloydsForm->createView(),
             'barclaysForm' => $barclaysForm->createView(),
             'year' => $year,
-            'month' => sprintf("%02d", $month),
+            'month' => $month,
             'days_in_month' => cal_days_in_month(CAL_GREGORIAN, $month, $year),
             'paymentTotals' => $paymentTotals,
             'totalTransaction' => $totalTransaction,
