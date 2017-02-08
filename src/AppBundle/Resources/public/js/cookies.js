@@ -15,7 +15,7 @@ window.cookieconsent.initialise({
   "static": true,
   "content": {
     "message": "We use",
-    "dismiss": "Okay",
+    "dismiss": "Got it <i class='fa fa-thumbs-up'></i>",
     "link": "cookies",
     "href": "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
   }

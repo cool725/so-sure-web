@@ -11,7 +11,7 @@
         {% block stylesheets %}
             {% stylesheets output = 'css/*'
             '../app/Resources/public/css/bootstrap.min.css'
-            '../app/Resources/public/css/cookies.css'
+            'components/cookieconsent/cookieconsent.min.css'
             '../app/Resources/public/css/all.css'
             '../app/Resources/public/css/footer.css'
             %}
@@ -98,10 +98,9 @@
             <script src="/components/bootstrap/bootstrap.js"></script>
         {% endif %}
         
-        <script src="/components/cookieconsent/cookieconsent.min.js"></script>
-
         {% block javascripts %}
             {% javascripts
+            'components/cookieconsent/cookieconsent.min.js'
             '@AppBundle/Resources/public/js/*' %}
             <script src="{{ asset_url }}"></script>
             {% endjavascripts %}
