@@ -39,22 +39,6 @@ class AboutController extends BaseController
     }
 
     /**
-     * @Route("/what-do-you-do-with-my-personal-information", name="about_what_do_you_do_with_my_personal_information")
-     * @Template
-     */
-    public function whatDoYouDoWithMyPersonalInformationAction(Request $request)
-    {
-    }
-
-    /**
-     * @Route("/what-personal-information-do-you-capture", name="about_what_personal_information_do_you_capture")
-     * @Template
-     */
-    public function whatPersonalInformationDoYouCaptureAction(Request $request)
-    {
-    }
-
-    /**
      * @Route("/the-team", name="about_the_team")
      * @Template
      */
