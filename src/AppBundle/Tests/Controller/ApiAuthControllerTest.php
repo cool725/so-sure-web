@@ -688,6 +688,32 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
     }
 
+    public function testNewPolicy17DigitImei()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicy17DigitImei', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = sprintf('%s/17', self::generateRandomImei());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+            'name' => "Kelvin’s iPhone5",
+        ]]);
+
+        $data = $this->verifyResponse(200);
+    }
+
     public function testNewPolicyBlankPhoneName()
     {
         $this->clearRateLimit();

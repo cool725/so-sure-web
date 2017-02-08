@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Lead;
+use AppBundle\Document\CurrencyTrait;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
@@ -14,6 +15,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 class PurchaseControllerTest extends BaseControllerTest
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
+    use CurrencyTrait;
 
     public function tearDown()
     {
@@ -343,7 +345,8 @@ class PurchaseControllerTest extends BaseControllerTest
         $form['purchase_form[imei]'] = $imei;
         $form['purchase_form[amount]'] = (float) $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
         if ($phone->getMake() == "Appple") {
-            $form['purchase_form[serialNumber]'] = $imei;
+            // use a different number in case we're testing /, -, etc
+            $form['purchase_form[serialNumber]'] = self::generateRandomImei();
         }
         $crawler = self::$client->submit($form);
 
