@@ -352,19 +352,45 @@ class MixpanelService
         $parser = Parser::create();
         $userAgentDetails = $parser->parse($userAgent);
 
+        if (stripos($userAgentDetails->ua->family, 'bot') !== false) {
+            return false;
+        }
+        if (stripos($userAgentDetails->ua->family, 'spider') !== false) {
+            return false;
+        }
+        if (stripos($userAgentDetails->ua->family, 'crawler') !== false) {
+            return false;
+        }
+
         // exclude bots from tracking
         if (in_array($userAgentDetails->ua->family, [
             'PhantomJS',
-            'SeznamBot',
-            'Googlebot',
-            'Sogou web spider',
-            'Baiduspider',
-            'Yahoo! Slurp'
+            'Yahoo! Slurp',
+            'Apache-HttpClient',
+            'Java',
+            'Python Requests',
+            'Python-urllib',
+            'Scrapy',
+            'Google',
+            'ia_archiver',
+            'SimplePie',
         ])) {
             return false;
         }
 
         if (stripos($userAgent, 'StatusCake') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'okhttp') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'curl') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'ips-agent') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'ScoutJet') !== false) {
             return false;
         }
 
