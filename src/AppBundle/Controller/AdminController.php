@@ -536,7 +536,7 @@ class AdminController extends BaseController
                 }
             }
         }
-        
+
         $barclaysFiles = $barclaysFileRepo->getBarclaysFiles($date);
         $dailyTransaction = BarclaysFile::combineDailyTransactions($barclaysFiles);
         $dailyBarclaysProcessing = BarclaysFile::combineDailyProcessing($barclaysFiles);
@@ -573,7 +573,7 @@ class AdminController extends BaseController
             'lloydsForm' => $lloydsForm->createView(),
             'barclaysForm' => $barclaysForm->createView(),
             'year' => $year,
-            'month' => $month,
+            'month' => sprintf("%02d", $month),
             'days_in_month' => cal_days_in_month(CAL_GREGORIAN, $month, $year),
             'paymentTotals' => $paymentTotals,
             'totalTransaction' => $totalTransaction,
