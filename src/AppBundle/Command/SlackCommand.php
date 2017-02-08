@@ -64,7 +64,12 @@ class SlackCommand extends ContainerAwareCommand
             $start = $start->sub(new \DateInterval(sprintf('P%dD', $offset)));
             $end = clone $start;
             $end = $end->add(new \DateInterval('P6D'));
-            $weekText = sprintf('%s - %s (Week %d)', $start->format('d/m/Y'), $end->format('d/m/Y'), $weeks + $weekOffset);
+            $weekText = sprintf(
+                '%s - %s (Week %d)',
+                $start->format('d/m/Y'),
+                $end->format('d/m/Y'),
+                $weeks + $weekOffset
+            );
         } else {
             $weekText = sprintf('Week %d', $weeks);
             $weeks = $weeks - $weekOffset;
