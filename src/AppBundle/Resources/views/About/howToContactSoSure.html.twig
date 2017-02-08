@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+        '@AppBundle/Resources/public/css/About/index.css'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+<section class="about-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="section-title">How to contact so-sure?</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+            	<p>We are always happy to talk and can be found via our <a id="open-intercom">Website's Intercom</a>, <a href="mailto:hello@wearesosure.com">Email</a>, <a target="_blank" href="https://www.facebook.com/wearesosure/">Facebook</a> and <a target="_blank" href="https://twitter.com/wearesosure">Twitter</a>.</p>
+				<p>However, if you have a more technical question you can ask a question in the <a target="_blank" href="https://help.wearesosure.com/hc/en-us/categories/200913929-Support">support section</a>.</p>
+				<p><i>p.s. we're always around and love hearing from you. Please get in touch if you want to ask something or even just to say hello :)</i></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+            	<p class="go-back"><a href="{{ path('about_home') }}"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> Go back</a></p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
