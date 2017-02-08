@@ -41,28 +41,9 @@
 
         <div class="quote">
             
-    <!--         <div class="row">
-                <div class="col-md-12">
-                    <div class="quote-card">
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-8 col-md-8 device">
-                                <span class="h3">
-                                    <span class="">{{ phone }}</span>
-                                    <small><a href="{{ path('homepage') }}#get-quote"><strong>Change</strong></a></small>
-                                </span>               
-                            </div>
-                        </div>     
-                    </div>                     
-                </div>
-            </div> -->
-
             <div class="row">
                <div class="col-xs-12 col-sm-7 col-md-7">
-                    <div class="quote-card">
-<!--                         <h3>
-                            <span class="">{{ phone }}</span>
-                            <small><a href="{{ path('homepage') }}#get-quote"><strong>Change</strong></a></small>
-                        </h3>    -->                     
+                    <div class="quote-card">                
                         <ul class="list-unstyled">                 
                             <li class="h4">
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> 
@@ -99,33 +80,21 @@
                     </div>
 
                     <div id="mobile-price" class="quote-cost text-center">
-                        <span class="h1 cost">
-                            <strong>£{{ phone_price.monthlyPremiumPrice }}</strong> 
-                            <small>per month</small>
-                        </span><br>
-                        <span>£50 Excess (£70 for Theft &amp; Loss)</span>
+                        <span class="h1">
+                            <strong>£{{ phone_price.monthlyPremiumPrice }}</strong>
+                            <small>per month</small><br>
+                        </span>
+                         <span>£50 Excess (£70 for Theft &amp; Loss)</span>
                         {{ form_widget(buy_form.buy_tablet, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                        <br>
-                        <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">Full Terms &amp; Conditions</a></small>                                                
+                        <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">Full Terms &amp; Conditions</a></small>                         
                     </div>
-               </div>    
 
-               <!-- <div class="col-xs-12 visible-xs-block">
-                    <div id="mobile-price" class="quote-cost text-center">
-                        <span class="h1 cost">
-                            <strong>£{{ phone_price.monthlyPremiumPrice }}</strong> 
-                            <small>per month</small>
-                        </span><br>
-                        <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                        {{ form_widget(buy_form.buy_mobile, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                        <br>
-                        <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">Full Terms &amp; Conditions</a></small>                    
-
-                    </div>
-               </div>   -->
+                </div>    
 
                 <div class="col-xs-12 col-sm-5 col-md-5">
                     <div class="quote-card">
+
+                        <div class="loading-overlay"></div>
 
                         <h3>Cashback</h3>          
                         <p>Connect with friends &amp; save money, see how it works:</p> 
@@ -155,24 +124,7 @@
                                    data-premium="{{ phone_price.yearlyPremiumPrice }}">
                         </div>
 
-                        <div class="claim-options">
-                            <div class="h4 text-blue"><strong>What if</strong></div>
-                            <label for="claim-option">
-                                <input type="radio" name="claim-option" value="none" checked=> <small>Nobody claims</small>
-                            </label><br>
-                            <label for="claim-option">
-                                <input type="radio" name="claim-option" value="me"> <small>I make a claim</small>
-                            </label><br>
-                            <label for="claim-option">
-                                <input type="radio" name="claim-option" value="1"> <small>1 friend claims</small>
-                            </label><br>
-                            <label for="claim-option">
-                                <input type="radio" name="claim-option" value="2"> <small>2 friends claim</small>
-                            </label>                        
-                        </div>
-
                         <div class="premium-table">
-
                             <div class="h4 text-blue"><strong>Effective annual premium</strong></div>
                             <table width="100%">
                                 <tr>
@@ -221,45 +173,68 @@
                             <a href="#"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
                         </div>
 
+                        <div class="claim-options">
+                            <div class="h4 text-blue"><strong>What if</strong></div>
+                            <label for="claim-option">
+                                <input type="radio" 
+                                       name="claim-option" 
+                                       value="noclaim"
+                                       data-claim-option="nobody"
+                                       data-cashback-text="Cashback when no one claims" 
+                                       data-cashback-target="#cashback-text"
+                                       checked> 
+                                <small>No claim</small>
+                            </label><br>
+                            <label for="claim-option">
+                                <input type="radio" 
+                                       name="claim-option" 
+                                       data-claim-option="iclaim"             
+                                       data-cashback-text="If I make a claim" 
+                                       data-cashback-target="#cashback-text"
+                                       value="iclaim"> 
+                                <small>I make a claim</small>
+                            </label><br>
+                            <label for="claim-option">
+                                <input type="radio" 
+                                       name="claim-option" 
+                                       data-claim-option="1claim"
+                                       data-cashback-text="If 1 claim in my network" 
+                                       data-cashback-target="#cashback-text"
+                                       value="1claim"> 
+                                <small>1 claim in network</small>
+                            </label><br>
+                            <label for="claim-option">
+                                <input type="radio" 
+                                       name="claim-option" 
+                                       data-claim-option="2claims"
+                                       data-cashback-text="If 2+ claims in my network"  
+                                       data-cashback-target="#cashback-text"
+                                       value="2claims"> 
+                                <small>2+ claims in network</small>
+                            </label>                        
+                        </div>                        
+
                         <div class="reward-total">
-                            <strong id="total-text">Cashback when no one claims</strong>
+                            <strong id="cashback-text">Cashback when no one claims</strong>
                             <div class="cashback-value">
                                 <strong id="cashback">£{{ start_value }}</strong>
+                                <strong id="cashback-with-claim"></strong>
                             </div>
                         </div>
 
                         <div class="text-center h5">
-                            <a href="#"><strong class="text-underline">What happens when someone claims?</strong></a>
+                            <a id="what-if" href="#"><strong class="text-underline">What happens when someone claims?</strong></a>
                         </div>      
 
                         <div class="text-center">
                             <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><small class="text-underline">Click for more details</small></a>
-                        </div>                         
-
-                    </div>                                           
-                </div>
-
-                <!-- <div class="col-sm-12 col-md-12 hidden-xs">
-                    <div class="quote-cost text-center">
-                        <div class="row">
-                            <div class="col-sm-6 col-md-6">
-                                {{ form_widget(buy_form.buy_tablet, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                            </div>                             
-                            <div class="col-sm-6 col-md-6">
-                                <span class="h1 cost">
-                                    <strong>£{{ phone_price.monthlyPremiumPrice }}</strong> 
-                                    <small>per month</small>
-                                </span><br>
-                                <small>£50 Excess (£70 for Theft &amp; Loss)</small>
-                            </div>                       
-                        </div>
+                        </div>                                         
                     </div>
-                </div> -->
+                </div>
 
             </div>
 
         </div>
-        {{ form_end(buy_form) }}
     </section>
 
     <!-- <section class="stat-banner">

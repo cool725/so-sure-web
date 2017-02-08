@@ -17,20 +17,20 @@
 }
 
 .quote-cost {
-    padding: 15px 25px;
     margin: 0 -15px 25px;
     background-color: #efefef;
 }
 
 .quote-cost .btn-block {
-    width: 60%;
-    margin: 15px auto 0;
+    width: 80%;
+    margin: 10px auto;
     font-weight: bold;
     font-size: 22px;
 }
 
 .quote-card {
     margin-bottom: 25px;  
+    position: relative;
 }
 
 .quote-card > h3 {
@@ -129,6 +129,7 @@
         padding: 25px;
         margin: 0 0 25px;
         background-color: #efefef;
+        border-radius: 4px;
     }    
 
 

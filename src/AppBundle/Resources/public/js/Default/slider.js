@@ -9,6 +9,10 @@ $(function(){
     var maxpot_value     = $('#reward-slider').data('maxpot');
     var connection_value = $('#reward-slider').data('connection-value');
     var montly_premium   = $('#reward-slider').data('premium');    
+    var claim_check      = $('#claim-check').data('cashback-check');
+    var cashback         = $('#cashback');
+    var cashback_new     = $('#cashback-with-claim');
+    var save_value       = '';       
 
     // Get data fromtable - Needs to be done better
     var premium_value  = $('.premium-value');      
@@ -46,16 +50,69 @@ $(function(){
 
             bar.animate({
                 width: bar_width+'%',
+                opacity: 1,
                 },
-                800, function() {
+                900, function() {
             });
         });
     }
 
+    // Round to two decimal places
     function roundToTwo(num) {
         return +(Math.round(num + "e+2")  + "e-2");
     }
+     
+         
+    // function whatIf() {
 
+    //     // What if
+    //     $('#what-if').click(function(e) {
+    //         e.preventDefault();
+    //         $('.loading-overlay').fadeIn(function() {
+    //             $('.premium-table, .claim-options').fadeToggle('400', function() {
+    //                 $('.loading-overlay').fadeOut();
+
+    //             });
+    //         });
+    //     });                
+
+    //     $('.claim-options input[type="radio"]').each(function() {
+
+    //         var claim_text = $(this).data('cashback-text');
+    //         var claim_targ = $(this).data('cashback-target');
+    //         var claim_opti = $(this).data('claim-option');
+
+    //         $(this).change(function() {
+    //             $(claim_targ).text(claim_text);
+
+    //             switch(claim_opti) {
+    //                 case 'nobody': {
+    //                     cashback_new.text('');
+    //                     cashback.removeClass('cashback-with-claim');
+    //                     break;
+    //                 }
+    //                 case 'iclaim': {
+    //                     cashback_new.text('£0');
+    //                     cashback.addClass('cashback-with-claim');
+    //                     break;
+    //                 }
+    //                 case '1claim': {
+    //                     cashback_new.text('£0');
+    //                     cashback.addClass('cashback-with-claim');
+    //                     break;
+    //                 }
+    //                 case '2claims': {
+    //                     cashback_new.text('£0');
+    //                     cashback.addClass('cashback-with-claim');
+    //                     break;
+    //                 }                                                            
+    //             }
+    //         });
+
+    //     });
+    // }
+
+    // Begin Range Slider
     $element
 
         .rangeslider({
@@ -69,14 +126,13 @@ $(function(){
             fillClass: 'rewardslider__fill',
             handleClass: 'rewardslider__handle',
 
-
             onInit: function() {
 
                 // Set the number on the slider handle based on pos
                 $handle = $('.rewardslider__handle', this.$range);
                 updateHandle($handle[0], this.value);  
 
-                setBars();    
+                setBars(); 
             },
 
             onSlide: function(position, value) {
@@ -92,13 +148,12 @@ $(function(){
 
                 var premium = roundToTwo(montly_premium - save_value);
 
-
                 // Update cashback and premium
                 function updateValues() {
                     $('#cashback').text('£' + save_value);
                     $('#premium').text('£' + premium);
                     setBars();                    
-                }                
+                }               
 
                 updateValues();
             },
