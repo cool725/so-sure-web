@@ -107,3 +107,14 @@
 .select-phone-dropdown.has-error {
     background-color: #ff6666;
 }
+
+#select-phone .device-select li {
+  display: inline !important;
+}
+
+@media (max-width: 992px) {
+  #select-phone .device-select li {
+    display: block !important;
+  }
+}
+
