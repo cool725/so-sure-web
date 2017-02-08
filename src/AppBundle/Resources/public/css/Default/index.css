@@ -15,7 +15,6 @@
 
 .hero blockquote {
     border: none;
-    text-align: right;
     margin-bottom: 40px;
 }
 
@@ -23,8 +22,12 @@
     color: #fff;
 }
 
-#how-it-works, #benefits, .social-proof {
+#benefits, .social-proof {
     background: #fff;
+}
+
+#how-it-works {
+    background: none;
 }
 
 .btn-dark {
@@ -34,10 +37,8 @@
     color: #fff;
 }
 
-.hero-link {
-    margin-top: 20px;
-    margin-right: 40px;
-    display: inline-block;
+.hero-link > div {
+    margin-bottom: 20px;
 }
 
 .hero-link > img {
@@ -64,13 +65,10 @@ a.hero-link:hover {
 
     .hero-link {
         text-align: center;
-        display: none;
         margin-right: 0;
+        width: 100%;
     }
 
-    .hero-link:last-child {
-        display: block;
-    }
 }
 
 /* MOVE TO components > _buttons.scss  */
