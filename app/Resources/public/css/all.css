@@ -562,7 +562,7 @@ background: rgba(51, 153, 255, 1);
 }
 
 /* MOVE TO components > _hero.scss */
-
+/* this is used on the homepage and the invalid user page, if we change the homepage we need to make sure the invalid user page still works */
 .background-image-light {
     background-image: url('https://cdn.so-sure.com/images/home/background/background-light.png');
     background-size: cover;

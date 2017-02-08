@@ -383,15 +383,3 @@ blockquote footer:before {
     }  
 
 }
-
-/* MOVE TO components > _forms.scss */
-
-#select-phone .device-select li {
-  display: inline !important;
-}
-
-@media (max-width: 992px) {
-  #select-phone .device-select li {
-    display: block !important;
-  }
-}
