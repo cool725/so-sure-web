@@ -1,5 +1,5 @@
 $(function(){
-    var maxAddresses = 50;
+    var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
     var key = $('#ss-root').data('pca-key');
 
     $('.form-control').on('change', function() {
@@ -75,7 +75,7 @@ $(function(){
       display: 'Text',
       source: capture,
       highlight: true,
-      limit: 100
+      limit: 100 // below 100 typeahead stops showing results for less than 4 characters entered
     });
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
         showAddress();
