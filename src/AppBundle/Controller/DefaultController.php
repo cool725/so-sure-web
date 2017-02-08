@@ -462,9 +462,15 @@ class DefaultController extends BaseController
                 ]);
             }
         } else {
-            $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $decodedModel]);
-            // check for historical urls
-            if (!$phone) {
+            $phones = $repo->findBy(
+                ['active' => true, 'make' => $make, 'model' => $decodedModel],
+                ['memory' => 'asc'],
+                1
+            );
+            if (count($phones) != 0) {
+                $phone = $phones[0];
+            } else {
+                // check for historical urls
                 $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $model]);
             }
         }
