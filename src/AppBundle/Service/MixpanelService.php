@@ -492,7 +492,7 @@ class MixpanelService
         $transform = [];
         if ($utm) {
             if (isset($utm['source']) && $utm['source']) {
-                $transform[sprintf('%sCampaign Source', $prefix)] = $utm['source'];                    
+                $transform[sprintf('%sCampaign Source', $prefix)] = $utm['source'];
             }
             if (isset($utm['medium']) && $utm['medium']) {
                 $transform[sprintf('%sCampaign Medium', $prefix)] = $utm['medium'];
@@ -508,9 +508,12 @@ class MixpanelService
             }
         }
 
-        // TODO: avoid sosure referer
         if ($referer) {
-            $transform[sprintf('%sReferer', $prefix)] = $referer;            
+            $refererDomain = parse_url($referer, PHP_URL_HOST);
+            $currentDomain = parse_url($this->requestService->getUri(), PHP_URL_HOST);
+            if (strtolower($refererDomain) != strtolower($currentDomain)) {
+                $transform[sprintf('%sReferer', $prefix)] = $referer;
+            }
         }
 
         return $transform;
