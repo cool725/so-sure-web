@@ -130,7 +130,7 @@
                                 <strong id="cashback">£{{ start_value }}</strong>
                                 <strong id="cashback-with-claim"></strong>
                             </div>
-                            <strong id="cashback-text">Cashback when no one claims</strong>
+                            <small id="cashback-text">Cashback when no one claims</small>
                         </div>                        
 
                         <div class="premium-table">
@@ -180,6 +180,10 @@
                                 </tr>
                             </table>
                             <a href="#" data-toggle="modal" data-target="#calculation-details"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
+
+                            <div class="text-center h5">
+                                <a id="what-if" href="#" data-toggle-text="Return to annual premium"><strong class="text-underline">What happens when someone claims?</strong></a>
+                            </div>                             
                         </div>
 
                         <div class="claim-options">
@@ -190,75 +194,38 @@
                                  data-cashback-target="#cashback-text">
                                 <button 
                                     type="button" 
-                                    class="list-group-item"
-                                    data-claim-option="noclaim"
-                                    data-cashback-text="Cashback when no one claims">
+                                    class="list-group-item active"
+                                    data-claim-option="0"
+                                    data-cashback-text="Cashback if no one claims">
                                     No claim
                                 </button>
                                 <button 
                                     type="button" 
                                     class="list-group-item"
-                                    data-claim-option="iclaim"
-                                    data-cashback-text="Cashback when I make a claim">
+                                    data-claim-option="1"
+                                    data-cashback-text="Cashback if I make a claim">
                                     I make a claim
                                 </button>
                                 <button 
                                     type="button" 
                                     class="list-group-item"
-                                    data-claim-option="1claim"
-                                    data-cashback-text="Cashback when 1 claim in my network">
+                                    data-claim-option="2"
+                                    data-cashback-text="Cashback if 1 claim in my network">
                                     1 claim in network
                                 </button>
                                 <button 
                                     type="button" 
                                     class="list-group-item"
-                                    data-claim-option="noclaim"
-                                    data-cashback-text="Cashback when 2+ claims in my network">
+                                    data-claim-option="3"
+                                    data-cashback-text="Cashback if 2+ claims in my network">
                                     2+ claims in network
                                 </button>
-                            </div>                            
-                        {#     <label for="claim-option">
-                                <input type="radio" 
-                                       name="claim-option" 
-                                       value="noclaim"
-                                       data-claim-option="nobody"
-                                       data-cashback-text="Cashback when no one claims" 
-                                       data-cashback-target="#cashback-text"
-                                       checked> 
-                                <small>No claim</small>
-                            </label><br>
-                            <label for="claim-option">
-                                <input type="radio" 
-                                       name="claim-option" 
-                                       data-claim-option="iclaim"             
-                                       data-cashback-text="If I make a claim" 
-                                       data-cashback-target="#cashback-text"
-                                       value="iclaim"> 
-                                <small>I make a claim</small>
-                            </label><br>
-                            <label for="claim-option">
-                                <input type="radio" 
-                                       name="claim-option" 
-                                       data-claim-option="1claim"
-                                       data-cashback-text="If 1 claim in my network" 
-                                       data-cashback-target="#cashback-text"
-                                       value="1claim"> 
-                                <small>1 claim in network</small>
-                            </label><br>
-                            <label for="claim-option">
-                                <input type="radio" 
-                                       name="claim-option" 
-                                       data-claim-option="2claims"
-                                       data-cashback-text="If 2+ claims in my network"  
-                                       data-cashback-target="#cashback-text"
-                                       value="2claims"> 
-                                <small>2+ claims in network</small>
-                            </label>   #}                      
-                        </div>                        
+                            </div>      
 
-                        <div class="text-center h5">
-                            <a id="what-if" href="#" data-toggle-text="Return to annual premium"><strong class="text-underline">What happens when someone claims?</strong></a>
-                        </div>      
+                            <div class="text-center h5">
+                                <a id="what-if-return" href="#"><strong class="text-underline">Return to annual premium claims?</strong></a>
+                            </div> 
+                    </div>                            
 
                         <div class="text-center">
                             <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><small class="text-underline">Click for more details</small></a>

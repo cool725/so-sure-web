@@ -12,7 +12,6 @@ $(function(){
     var claim_check      = $('#claim-check').data('cashback-check');
     var cashback         = $('#cashback');
     var cashback_new     = $('#cashback-with-claim');
-    var save_value       = '';       
 
     // Get data fromtable - Needs to be done better
     var premium_value  = $('.premium-value');      
@@ -53,7 +52,7 @@ $(function(){
                 opacity: 1,
                 easing: 'linear',
                 },
-                100, function() {
+                300, function() {
             });
 
             bar.css({
@@ -71,8 +70,6 @@ $(function(){
     $('#what-if').click(function(e) {
         e.preventDefault();       
 
-        $(this).find('strong').toggleText('What happens when someone claims?', 'Return to annual premium');
-
         $('.loading-overlay').fadeIn(function() {
             $('.premium-table, .claim-options').fadeToggle('400', function() {
                 $('.loading-overlay').fadeOut();
@@ -81,55 +78,73 @@ $(function(){
         });
     });   
 
-    function whatIf() {
+    $('#what-if-return').click(function(e) {
+        e.preventDefault();       
 
-        $('.list-group-item').click(function() {
-
-            $(this).toggleClass('active').siblings().removeClass('active');
-
+        $('.loading-overlay').fadeIn(function() {
+            $('.premium-table, .claim-options').fadeToggle('400', function() {
+                $('.loading-overlay').fadeOut();
+                $(document).scrollTop( $('#cashback-card').offset().top - 30);  
+                cashback_new.text('');
+                cashback.removeClass('cashback-with-claim');  
+                var option = 0;              
+            });
         });
+    });       
+
+    function whatIf(save_value) {
+
+        $('.list-group-item').each(function() {
+
+            // Get data from element
+            var option = $(this).data('claim-option');
+            var new_text   = $(this).data('cashback-text');
+            var target = $(this).parent().data('cashback-target');
+
+            $(this).click(function() {
+                $(this).toggleClass('active').siblings().removeClass('active');
+                $(target).text(new_text);
+                switchIf();
+            });            
+
+            // Trigger for slider
+            if ($(this).hasClass('active')) {
+                switchIf();
+            }
+
+            function switchIf() {
+
+                switch(option) {
+                    case 0: {
+                        cashback_new.text('');
+                        cashback.removeClass('cashback-with-claim');
+                        break;
+                    }
+                    case 1: {
+                        cashback_new.text('£0');
+                        cashback.addClass('cashback-with-claim');
+                        break;
+                    }
+                    case 2: {
+                        if (save_value >= 40) {
+                            cashback_new.text('£10');
+                        } else {
+                            cashback_new.text('£0');
+                        }
+                        cashback.addClass('cashback-with-claim');
+                        break;
+                    }
+                    case 3: {
+                        cashback.addClass('cashback-with-claim');
+                        cashback_new.text('£0');
+                        break;
+                    }                                                                       
+                }
+            }
+
+        });     
     }   
-         
-    // function whatIf() {
-
-                 
-
-    //     $('.claim-options input[type="radio"]').each(function() {
-
-    //         var claim_text = $(this).data('cashback-text');
-    //         var claim_targ = $(this).data('cashback-target');
-    //         var claim_opti = $(this).data('claim-option');
-
-    //         $(this).change(function() {
-    //             $(claim_targ).text(claim_text);
-
-    //             switch(claim_opti) {
-    //                 case 'nobody': {
-    //                     cashback_new.text('');
-    //                     cashback.removeClass('cashback-with-claim');
-    //                     break;
-    //                 }
-    //                 case 'iclaim': {
-    //                     cashback_new.text('£0');
-    //                     cashback.addClass('cashback-with-claim');
-    //                     break;
-    //                 }
-    //                 case '1claim': {
-    //                     cashback_new.text('£0');
-    //                     cashback.addClass('cashback-with-claim');
-    //                     break;
-    //                 }
-    //                 case '2claims': {
-    //                     cashback_new.text('£0');
-    //                     cashback.addClass('cashback-with-claim');
-    //                     break;
-    //                 }                                                            
-    //             }
-    //         });
-
-    //     });
-    // }
-
+  
     // Begin Range Slider
     $element
 
@@ -150,8 +165,9 @@ $(function(){
                 $handle = $('.rewardslider__handle', this.$range);
                 updateHandle($handle[0], this.value);  
 
+                var save_value = $high;
+                whatIf(save_value);
                 setBars(); 
-                whatIf();
             },
 
             onSlide: function(position, value) {
@@ -173,6 +189,7 @@ $(function(){
                     $('#premium').text('£' + premium.toFixed(2));                  
                 }               
 
+                whatIf(save_value);                             
                 updateValues();
             },
 
