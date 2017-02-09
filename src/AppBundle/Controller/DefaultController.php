@@ -480,6 +480,18 @@ class DefaultController extends BaseController
 
         $session = $request->getSession();
         $session->set('quote', $phone->getId());
+        if ($phone->getMemory()) {
+            $session->set('quote_url', $this->generateUrl('quote_make_model_memory', [
+                'make' => $phone->getMake(),
+                'model' => $phone->getModel(),
+                'memory' => $phone->getMemory(),
+            ], UrlGeneratorInterface::ABSOLUTE_URL));
+        } else {
+            $session->set('quote_url', $this->generateUrl('quote_make_model', [
+                'make' => $phone->getMake(),
+                'model' => $phone->getModel(),
+            ], UrlGeneratorInterface::ABSOLUTE_URL));
+        }
 
         $user = new User();
 
