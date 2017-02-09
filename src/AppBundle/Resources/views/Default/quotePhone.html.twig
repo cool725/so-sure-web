@@ -37,7 +37,8 @@
         {{ form_start(buy_form) }}
 
         <h1 class="h2">Instant cover for your <span class="">{{ phone }}</span>
-                                    <small><a href="{{ path('homepage') }}#get-quote"><strong>Change</strong></a></small></h1>
+            <small><a href="{{ path('homepage') }}#get-quote"><strong>Change</strong></a></small>
+        </h1>
 
         <div class="quote">
             
@@ -92,7 +93,7 @@
                 </div>    
 
                 <div class="col-xs-12 col-sm-5 col-md-5">
-                    <div class="quote-card">
+                    <div id="cashback-card" class="quote-card">
 
                         <div class="loading-overlay"></div>
 
@@ -137,7 +138,7 @@
                                     <td width="22%" align="right">
                                         <strong>
                                             <small id="premium" class="premium-value text-blue">
-                                                £{{ start_premium }}
+                                                £{{ start_premium|number_format(2, '.', ',') }}
                                             </small>
                                         </strong>
                                     </td>
@@ -170,7 +171,7 @@
                                     </td>
                                 </tr>
                             </table>
-                            <a href="#"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
+                            <a href="#" data-toggle="modal" data-target="#calculation-details"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
                         </div>
 
                         <div class="claim-options">
@@ -215,15 +216,15 @@
                         </div>                        
 
                         <div class="reward-total">
-                            <strong id="cashback-text">Cashback when no one claims</strong>
                             <div class="cashback-value">
                                 <strong id="cashback">£{{ start_value }}</strong>
                                 <strong id="cashback-with-claim"></strong>
                             </div>
+                            <strong id="cashback-text">Cashback when no one claims</strong>
                         </div>
 
                         <div class="text-center h5">
-                            <a id="what-if" href="#"><strong class="text-underline">What happens when someone claims?</strong></a>
+                            <a id="what-if" href="#" data-toggle-text="Return to annual premium"><strong class="text-underline">What happens when someone claims?</strong></a>
                         </div>      
 
                         <div class="text-center">
@@ -237,14 +238,14 @@
         </div>
     </section>
 
-    <!-- <section class="stat-banner">
+    <section class="stat-banner">
         <div class="container">
             <p class="lead">Every year, there are 8 million incidents of lost, stolen or damaged phones – that’s 1 every 4 seconds.</p>
             <small>Source: YouGov/Assurant, 2015</small>
         </div>
-    </section> -->
+    </section>
 
-    <section id="quote-banner" class="banner-sticky banner-sticky-hide">
+    {# <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-8">
@@ -262,7 +263,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> #}
 
     {#{% include 'AppBundle::Default/feedbackQuotes.html.twig' %}#}
 
@@ -327,6 +328,24 @@
             </div>
         </div>
     </div> 
+
+    <div class="modal fade" id="calculation-details" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+                <div class="modal-body">  
+                    <p>How we calculate this:</p>
+                    <p>Prices based on data available from competitor websites, last updated on 1 February 2017.  </p>
+                    <p>Networks taken as an average of O2 (£120.00), Vodafone (£144.00), Three (£144), Carphone Warehouse (£169.99).</p>
+                </div>
+            </div>
+        </div>
+    </div>     
 
     <div class="modal modal-policy fade" id="policy-modal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">

@@ -53,7 +53,7 @@ $(function(){
                 opacity: 1,
                 easing: 'linear',
                 },
-                200, function() {
+                900, function() {
             });
         });
     }
@@ -62,20 +62,25 @@ $(function(){
     function roundToTwo(num) {
         return +(Math.round(num + "e+2")  + "e-2");
     }
+
+    // What if
+    $('#what-if').click(function(e) {
+        e.preventDefault();       
+
+        $(this).find('strong').toggleText('What happens when someone claims?', 'Return to annual premium');
+
+        $('.loading-overlay').fadeIn(function() {
+            $('.premium-table, .claim-options').fadeToggle('400', function() {
+                $('.loading-overlay').fadeOut();
+                $(document).scrollTop( $('#cashback-card').offset().top - 30);  
+            });
+        });
+    });      
      
          
     // function whatIf() {
 
-    //     // What if
-    //     $('#what-if').click(function(e) {
-    //         e.preventDefault();
-    //         $('.loading-overlay').fadeIn(function() {
-    //             $('.premium-table, .claim-options').fadeToggle('400', function() {
-    //                 $('.loading-overlay').fadeOut();
-
-    //             });
-    //         });
-    //     });                
+                 
 
     //     $('.claim-options input[type="radio"]').each(function() {
 
@@ -151,8 +156,8 @@ $(function(){
 
                 // Update cashback and premium
                 function updateValues() {
-                    $('#cashback').text('£' + save_value);
-                    $('#premium').text('£' + premium);                  
+                    $('#cashback').text('£' + save_value.toFixed(2));
+                    $('#premium').text('£' + premium.toFixed(2));                  
                 }               
 
                 updateValues();
