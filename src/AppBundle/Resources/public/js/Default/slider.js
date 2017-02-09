@@ -12,6 +12,7 @@ $(function(){
     var claim_check      = $('#claim-check').data('cashback-check');
     var cashback         = $('#cashback');
     var cashback_new     = $('#cashback-with-claim');
+    var cashback_text    = $('#cashback-text');
 
     // Get data fromtable - Needs to be done better
     var premium_value  = $('.premium-value');      
@@ -90,6 +91,7 @@ $(function(){
                 var option = 0;
                 $('.claim-options-list > button.active').removeClass('active');
                 $('.claim-options-list > button:first-child').addClass('active');
+                cashback_text.text('Cashback if no one claims');
 
             });
         });
@@ -102,11 +104,11 @@ $(function(){
             // Get data from element
             var option = $(this).data('claim-option');
             var new_text   = $(this).data('cashback-text');
-            var target = $(this).parent().data('cashback-target');
+            // var target = $(this).parent().data('cashback-target');
 
             $(this).click(function() {
                 $(this).addClass('active').siblings().removeClass('active');
-                $(target).text(new_text);
+                $(cashback_text).text(new_text);
                 switchIf();
             });            
 
