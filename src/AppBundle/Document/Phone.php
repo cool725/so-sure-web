@@ -777,9 +777,10 @@ class Phone
 
     public function getWarrantyLatest()
     {
-        if (!$end = clone $this->getWarrantyEarlist()) {
+        if (!$end = $this->getWarrantyEarlist()) {
             return null;
         }
+        $end = clone $end;
         $end = $end->add(new \DateInterval(sprintf('P6M')));
 
         return $end;
