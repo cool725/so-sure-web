@@ -508,6 +508,7 @@ class MixpanelService
             }
         }
 
+        // TODO: avoid sosure referer
         if ($referer) {
             $transform[sprintf('%sReferer', $prefix)] = $referer;            
         }
