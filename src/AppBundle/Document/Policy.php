@@ -1975,7 +1975,7 @@ abstract class Policy
         }
 
         if ($this->hasOpenClaim(true)) {
-            $warnings[] = sprintf('Policy has an open claim, but ClaimsCheck has not been run.');
+            $warnings[] = sprintf('Policy has an open claim, but Recipero (ClaimsCheck) has not been run.');
         }
 
         if (!$this->isAdditionalClaimLostTheftApprovedAllowed()) {
