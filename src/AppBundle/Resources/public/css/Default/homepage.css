@@ -1,7 +1,7 @@
 body {
     background: #202532;
     /*background: no-repeat right -40% center / 800px url(/images/logo/logo-smile.svg), linear-gradient(to right, #202532 , #3399ff)*/
-    background: linear-gradient(to right, #202532 , #3399ff)
+    background: linear-gradient(to right, rgba(32, 37, 50, 0.84) , rgba(51, 153, 255, 0.64)), url(/images/bg.jpg) right -500px top 100% no-repeat;
 }
 
 .hero h1 {
@@ -87,5 +87,10 @@ p {
     #how-it-works > .container > .row {
         display: flex;
         align-items: center;
+    }
+
+    body {
+        background: #202532;
+        background: linear-gradient(to right, rgba(32, 37, 50, 0.84) , rgba(51, 153, 255, 0.64)), url(/images/bg.jpg) 100% no-repeat;
     }
 }
