@@ -33,9 +33,6 @@
     max-width: 400px;
     margin: 0 auto 25px;
     position: relative;
-    padding: 25px;      
-    border: 2px solid #efefef;
-    border-radius: 4px;    
 }
 
 .quote-card > h3 {
@@ -97,11 +94,20 @@
     vertical-align: middle;
 }
 
-@media (min-width: 768px) {
-
+@media (min-width: 340px) {
+ 
     .quote-container h1 {
         text-align: center;
     }
+
+    .quote-card {
+      padding: 25px;      
+      border: 2px solid #efefef;
+      border-radius: 4px;          
+    } 
+}
+
+@media (min-width: 768px) {
 
     .quote {
         max-width: 840px;
