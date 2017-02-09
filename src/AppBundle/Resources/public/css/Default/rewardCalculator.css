@@ -125,6 +125,14 @@
 	opacity: 0;
 }
 
+.bar-static {
+	height: 20px;
+	background-color: #3399ff;
+	   -moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	        border-radius: 3px;		
+}
+
 .bar-us div {
 	background-color: #80CE4D;
 }

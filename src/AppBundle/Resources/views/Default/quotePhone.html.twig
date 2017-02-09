@@ -238,13 +238,6 @@
         </div>
     </section>
 
-    <section class="stat-banner">
-        <div class="container">
-            <p class="lead">Every year, there are 8 million incidents of lost, stolen or damaged phones – that’s 1 every 4 seconds.</p>
-            <small>Source: YouGov/Assurant, 2015</small>
-        </div>
-    </section>
-
     {# <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">
             <div class="row">
@@ -265,9 +258,56 @@
         </div>
     </section> #}
 
-    {#{% include 'AppBundle::Default/feedbackQuotes.html.twig' %}#}
+    <section class="social-proof section--pad">
+        <div class="container">
+            <h2 class="text-center">Over 95% of approved claims fullfield <br><small class="text-blue">within 1 working day</small></h2>
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+                    <em>Other Providers</em>
+                    <table width="100%">
+                        <tr>
+                            <td width="20%"><strong>Best 3</strong></td>
+                            <td width="60%">
+                                <div class="bar-static" style="width:33%;"></div>
+                            </td>
+                            <td width="20%" align="right">
+                                <strong>4 days</strong>
+                                <br><small>average</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Worst 3</strong></td>
+                            <td>
+                                <div class="bar-static" style="width:80%;"></div>
+                            </td>
+                            <td align="right">
+                                <strong>18 days</strong>
+                                <br><small>average</small>
+                            </td>
+                        </tr>
+                    </table>   
+                    <br>
+                    <blockquote>
+                    <p>Claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution!</p>
+                        <footer><em>- Herve</em></footer>
+                    </blockquote>                                 
+                </div>                 
+            </div>
+        </div>
+    </section>
 
-    {#{ render(controller('AppBundle:Default:sosureCompared')) }#}
+    <section class="section--pad">
+        <div class="container">    
+            <h2 class="text-center">No small print! Simple, transparent cover</h2>
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">    <blockquote>
+                        <p>Your T &amp; Cs are so clear and concise it makes the customer feel like you actually care about them!</p>
+                        <footer><em>- Honor</em></footer>
+                    </blockquote>     
+                </div>
+            </div>       
+        </div>
+    </section>
 
     {% include 'AppBundle::Default/modalVideo.html.twig' %}
 

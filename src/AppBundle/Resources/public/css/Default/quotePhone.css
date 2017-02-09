@@ -30,8 +30,12 @@
 }
 
 .quote-card {
-    margin-bottom: 25px;  
+    max-width: 400px;
+    margin: 0 auto 25px;
     position: relative;
+    padding: 25px;      
+    border: 2px solid #efefef;
+    border-radius: 4px;    
 }
 
 .quote-card > h3 {
@@ -117,9 +121,7 @@
     }
 
     .quote-card {
-        padding: 25px;
-        border: 2px solid #efefef;
-        border-radius: 4px;        
+        max-width: none;   
     }
 
     .quote-card .rrp {
