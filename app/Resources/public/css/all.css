@@ -691,7 +691,7 @@ a#get-quote-btn.btn.btn-primary {
   color: #fff;
   width: 155px;
 }
-@media (max-width: 992px) {
+@media (max-width: 1200px) {
   a#open-intercom.btn.btn-info {
     margin-top: 10px;
   }
