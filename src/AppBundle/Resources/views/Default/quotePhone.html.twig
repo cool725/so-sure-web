@@ -125,6 +125,14 @@
                                    data-premium="{{ phone_price.yearlyPremiumPrice }}">
                         </div>
 
+                        <div class="reward-total">
+                            <div class="cashback-value">
+                                <strong id="cashback">£{{ start_value }}</strong>
+                                <strong id="cashback-with-claim"></strong>
+                            </div>
+                            <strong id="cashback-text">Cashback when no one claims</strong>
+                        </div>                        
+
                         <div class="premium-table">
                             <div class="h4 text-blue"><strong>Effective annual premium</strong></div>
                             <table width="100%">
@@ -176,7 +184,40 @@
 
                         <div class="claim-options">
                             <div class="h4 text-blue"><strong>What if</strong></div>
-                            <label for="claim-option">
+
+
+                            <div class="list-group claim-options-list"
+                                 data-cashback-target="#cashback-text">
+                                <button 
+                                    type="button" 
+                                    class="list-group-item"
+                                    data-claim-option="noclaim"
+                                    data-cashback-text="Cashback when no one claims">
+                                    No claim
+                                </button>
+                                <button 
+                                    type="button" 
+                                    class="list-group-item"
+                                    data-claim-option="iclaim"
+                                    data-cashback-text="Cashback when I make a claim">
+                                    I make a claim
+                                </button>
+                                <button 
+                                    type="button" 
+                                    class="list-group-item"
+                                    data-claim-option="1claim"
+                                    data-cashback-text="Cashback when 1 claim in my network">
+                                    1 claim in network
+                                </button>
+                                <button 
+                                    type="button" 
+                                    class="list-group-item"
+                                    data-claim-option="noclaim"
+                                    data-cashback-text="Cashback when 2+ claims in my network">
+                                    2+ claims in network
+                                </button>
+                            </div>                            
+                        {#     <label for="claim-option">
                                 <input type="radio" 
                                        name="claim-option" 
                                        value="noclaim"
@@ -212,16 +253,8 @@
                                        data-cashback-target="#cashback-text"
                                        value="2claims"> 
                                 <small>2+ claims in network</small>
-                            </label>                        
+                            </label>   #}                      
                         </div>                        
-
-                        <div class="reward-total">
-                            <div class="cashback-value">
-                                <strong id="cashback">£{{ start_value }}</strong>
-                                <strong id="cashback-with-claim"></strong>
-                            </div>
-                            <strong id="cashback-text">Cashback when no one claims</strong>
-                        </div>
 
                         <div class="text-center h5">
                             <a id="what-if" href="#" data-toggle-text="Return to annual premium"><strong class="text-underline">What happens when someone claims?</strong></a>

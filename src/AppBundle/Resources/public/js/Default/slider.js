@@ -53,7 +53,11 @@ $(function(){
                 opacity: 1,
                 easing: 'linear',
                 },
-                900, function() {
+                100, function() {
+            });
+
+            bar.css({
+                width: bar_width+'%'
             });
         });
     }
@@ -75,8 +79,16 @@ $(function(){
                 $(document).scrollTop( $('#cashback-card').offset().top - 30);  
             });
         });
-    });      
-     
+    });   
+
+    function whatIf() {
+
+        $('.list-group-item').click(function() {
+
+            $(this).toggleClass('active').siblings().removeClass('active');
+
+        });
+    }   
          
     // function whatIf() {
 
@@ -139,6 +151,7 @@ $(function(){
                 updateHandle($handle[0], this.value);  
 
                 setBars(); 
+                whatIf();
             },
 
             onSlide: function(position, value) {

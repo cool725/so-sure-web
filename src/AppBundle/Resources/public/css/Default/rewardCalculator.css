@@ -134,3 +134,23 @@
 	display: none;
 }
 
+.claim-options-list button {
+	width: 100%;
+	text-align: left;
+	font-weight: bold;
+	font-size: 0.8em;
+}
+
+.claim-options-list button:hover {
+	background-color: #D6EBFF;
+}
+
+.claim-options-list button:focus,
+.claim-options-list button:active,
+.claim-options-list button .active {
+	background-color: #3399ff;
+	color: #fff;
+	box-shadow: none;
+	outline: none;
+}
+
