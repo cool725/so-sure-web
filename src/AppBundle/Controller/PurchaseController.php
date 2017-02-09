@@ -167,9 +167,8 @@ class PurchaseController extends BaseController
                     $this->get("event_dispatcher")->dispatch("security.interactive_login", $event);
 
                     // Track after login, so we populate user
-                    if ($newUser) {
-                        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS);
-                    }
+                    // Regardless of existing user or new user, track receive details (so funnel works)
+                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS);
 
                     return $this->redirectToRoute('purchase_step_address');
                 }
