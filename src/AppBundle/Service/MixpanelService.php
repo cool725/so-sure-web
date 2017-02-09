@@ -423,8 +423,12 @@ class MixpanelService
             $properties = [];
         }
         if ($addUtm) {
+            $utmLatest = $this->transformUtm(false);
+            $this->queuePersonProperties($utmLatest, false, $user);
+
             $utm = $this->transformUtm();
             $this->queuePersonProperties($utm, true, $user);
+
             $properties = array_merge($properties, $utm);
         }
 
@@ -476,28 +480,36 @@ class MixpanelService
         $this->mixpanel->people->deleteUser($id);
     }
 
-    private function transformUtm()
+    private function transformUtm($setOnce = true)
     {
-        $utm = $this->requestService->getUtm();
-        if (!$utm) {
-            return [];
+        $prefix = '';
+        if (!$setOnce) {
+            $prefix = 'Latest ';
         }
+        $utm = $this->requestService->getUtm();
+        $referer = $this->requestService->getReferer();
 
         $transform = [];
-        if (isset($utm['source']) && $utm['source']) {
-            $transform['Campaign Source'] = $utm['source'];
+        if ($utm) {
+            if (isset($utm['source']) && $utm['source']) {
+                $transform[sprintf('%sCampaign Source', $prefix)] = $utm['source'];                    
+            }
+            if (isset($utm['medium']) && $utm['medium']) {
+                $transform[sprintf('%sCampaign Medium', $prefix)] = $utm['medium'];
+            }
+            if (isset($utm['campaign']) && $utm['campaign']) {
+                $transform[sprintf('%sCampaign Name', $prefix)] = $utm['campaign'];
+            }
+            if (isset($utm['term']) && $utm['term']) {
+                $transform[sprintf('%sCampaign Term', $prefix)] = $utm['term'];
+            }
+            if (isset($utm['content']) && $utm['content']) {
+                $transform[sprintf('%sCampaign Content', $prefix)] = $utm['content'];
+            }
         }
-        if (isset($utm['medium']) && $utm['medium']) {
-            $transform['Campaign Medium'] = $utm['medium'];
-        }
-        if (isset($utm['campaign']) && $utm['campaign']) {
-            $transform['Campaign Name'] = $utm['campaign'];
-        }
-        if (isset($utm['term']) && $utm['term']) {
-            $transform['Campaign Term'] = $utm['term'];
-        }
-        if (isset($utm['content']) && $utm['content']) {
-            $transform['Campaign Content'] = $utm['content'];
+
+        if ($referer) {
+            $transform[sprintf('%sReferer', $prefix)] = $referer;            
         }
 
         return $transform;
