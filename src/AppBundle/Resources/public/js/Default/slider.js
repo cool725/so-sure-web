@@ -87,7 +87,10 @@ $(function(){
                 $(document).scrollTop( $('#cashback-card').offset().top - 30);  
                 cashback_new.text('');
                 cashback.removeClass('cashback-with-claim');  
-                var option = 0;              
+                var option = 0;
+                $('.claim-options-list > button.active').removeClass('active');
+                $('.claim-options-list > button:first-child').addClass('active');
+
             });
         });
     });       
