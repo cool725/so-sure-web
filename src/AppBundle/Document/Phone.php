@@ -784,5 +784,4 @@ class Phone
 
         return $end;
     }
-
 }
