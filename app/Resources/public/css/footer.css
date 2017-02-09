@@ -3,8 +3,10 @@
 .footer {
     position: relative;
     z-index: 100;
-    padding: 35px 0;
-
+    padding: 20px 0 70px 0;
+    background: #202532;
+    color: #fff;
+    text-align: center;
     font-size: 14px;
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;  
     text-align: center;    
@@ -43,15 +45,13 @@
 
 /* In Partnership - Ext Banner: MOVE TO layouts > _footer.scss */
 .in-partnership {
-    background-color: #3399ff;
-    padding: 20px 0 0;
     text-align: center;
 }
 
 /* PRESS - Ext Banner: MOVE TO layouts > _footer.scss */
 
-.press {
-    background: #ddd;
+section.press {
+    background: #ddd !important;
     padding: 20px 0;
     text-align: center;
 }

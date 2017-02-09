@@ -14,6 +14,7 @@
     {{ parent() }}
     {% stylesheets
     'bundles/app/css/Default/index.css'
+    'bundles/app/css/Default/homepage.css'
     'bundles/app/css/Default/selectPhoneMake.css'
     'bundles/app/css/Default/scrollindicator.css'
     'bundles/app/css/Default/videoOverlay.css'
@@ -32,28 +33,80 @@
 
 {% block body %}
 
-    <section class="hero background-image-light vertical-align-wrap" id="get-quote">
+<!-- Background image https://pixabay.com/en/audience-band-blur-celebration-1867983/ -->
+
+    <section class="hero vertical-align-wrap" id="get-quote">
         <div class="container vertical-align-middle">
             <div class="row">
-                <div class="col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
-                    <h1>Welcome to better phone insurance</h1>
-                    <p class="lead">Finally, phone insurance that you can rely on (it's also up to 80% cheaper when you connect with friends &amp; don't claim).</p>
+                <div class="col-sm-6 col-sm-offset-1">
+                    <h1 class="">Sometimes it's better to do it with friends</h1>
+                    <blockquote class="col-md-8 hidden-xs">
+                        <p>Every year, there are 8 million incidents of lost, stolen or damaged phones – that’s 1 every 4 seconds.</p>
+                        <footer><em>YouGov/Assurant, 2015</em></footer>
+                    </blockquote>
                 </div>
-                <div class="col-md-12">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
-                </div>
+                <div class="col-sm-3 col-sm-offset-1 text-left">
+                <div class="hero-box">
+                    <h3 class"">Most popular phones</h3>
+                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+6S', 'memory': 16}) }}">
+                    <div class="row">
+                        <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" height="40"/>
+                        <div class="col-sm-4 text-link dark-bg-link">From £7.99</div>
+                        </div>
+                    </a>
+                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+7', 'memory': 16}) }}">
+                    <div class="row">
+                        <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" height="40"/>
+                        <div class="col-sm-4 text-link dark-bg-link">From £8.53</div>
+                        </div>
+                    </a>
+                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy+S7', 'memory': 32}) }}">
+                        <div class="row">
+                        <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" height="40"/>
+                        <div class="col-sm-4 text-link dark-bg-link">From £8.53</div>
+                        </div>
+                    </a>
+                    </div>
+                    <div class="hero-link text-center">
+                    <a class="btn btn-success btn-rounded btn-lg" data-toggle="modal" data-target="#quoteModel">
+                        Get a quote
+                    </a>
+                </div>         
             </div>
         </div>
     </section>
 
-    {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}   
+    <section class="press">
+    <div class="container">
+        <div class="col-sm-3 col-md-2">
+            <h4 class="footer-press--heading">Featured In</h4>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <img src="{{ cdn_url }}/images/home/press-images/g@2x.png" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town" class="img-responsive">
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <img src="{{ cdn_url }}/images/home/press-images/ft@2x.png" alt="Financial Times - Innovation to watch: Friends based insurance" class="img-responsive">
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <img src="{{ cdn_url }}/images/home/press-images/ip@2x.png" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app" class="img-responsive">
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <h4 class="footer-press--heading">Awarded by</h4>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <img src="{{ cdn_url }}/images/home/press-images/di@2x.png" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award" class="img-responsive">
+        </div>
+    </div>
+</section>
 
     {% include 'AppBundle::Default/benefits.html.twig' %}
+
+    {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}   
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
 
-    <section class="footer-cta alt-brand-gradient">
+    <section class="footer-cta brand-gradient">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 text-left">
@@ -61,7 +114,7 @@
                     <p class="lead">You can't always have better in life, but you can have better phone insurance.</p>
                 </div>
                 <div class="col-lg-2 text-center">
-                    <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
+                    <a class="btn btn-primary" id="get-quote-btn" data-toggle="modal" data-target="#quoteModel">Get a quote</a>
                 </div>
                 <div class="col-lg-2 text-center">
                     <a class="btn btn-info" id="open-intercom">Chat with us <i class="fa fa-comments"></i></a>
@@ -90,5 +143,18 @@
     </div>
 
     {% include 'AppBundle::Default/modalVideo.html.twig' %}
+
+    <div class="modal fade modal-switching" id="quoteModel" tabindex="-1" role="dialog" aria-labelledby="quoteModelLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+            </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

@@ -1,5 +1,6 @@
 {% import "::macros.html.twig" as macros %}
 
+{% if app.request.get('_route') != 'homepage' %}
 <section class="press">
     <div class="container">
         <div class="col-sm-3 col-md-2">
@@ -23,15 +24,7 @@
     </div>
 </section>
 
-<section class="in-partnership">
-    <div class="container">
-        <ul class="list-inline">
-            <li><strong class="text-white">In partnership with</strong></li><br>
-            <li><img src="{{ cdn_url }}/images/footer/munich-re-logo.png" width="150" alt="Munich RE"></li>
-            <li><img src="{{ cdn_url }}/images/footer/salva-logo.png" width="150" alt="Salva"></li>
-        </ul>
-    </div>
-</section>
+{% endif %}
 
 <footer class="footer">
     <div class="container">
@@ -39,6 +32,15 @@
         <div class="row footer--top text-center">
             <div class="col-md-12"> 
                 <div class="so-sure-logo-light"></div>
+                <section class="in-partnership">
+                    <div class="">
+                        <ul class="list-inline">
+                            <li><strong class="text-white">In partnership with</strong></li><br>
+                            <li><img src="{{ cdn_url }}/images/footer/munich-re-logo.png" width="150" alt="Munich RE"></li>
+                            <li><img src="{{ cdn_url }}/images/footer/salva-logo.png" width="150" alt="Salva"></li>
+                        </ul>
+                    </div>
+                </section>
                 <ul class="list-inline">    
                     <li><a href="{{ path('about_our_mission') }}">OUR MISSION</a></li>
                     <li></li>

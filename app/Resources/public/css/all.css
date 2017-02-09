@@ -539,13 +539,13 @@ h4, h5, h6,
   background: linear-gradient(to top, #efefef , #FFFFFF); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 .brand-gradient {
-  background: background: #202532;
+  background: #202532;
   background: -webkit-linear-gradient(to right, #000428 , #004e92);
   background: linear-gradient(to right, #202532 , #3399ff);
 }
 @media (max-width: 992px) {
   .brand-gradient {
-    background: background: #202532;
+    background: #202532;
     background: -webkit-linear-gradient(to bottom, #000428 , #004e92);
     background: linear-gradient(to bottom, #202532 , #3399ff);
   }
@@ -564,9 +564,9 @@ background: rgba(51, 153, 255, 1);
 /* MOVE TO components > _hero.scss */
 /* this is used on the homepage and the invalid user page, if we change the homepage we need to make sure the invalid user page still works */
 .background-image-light {
-    background-image: url('https://cdn.so-sure.com/images/home/background/background-light.png');
+    /*background-image: url('https://cdn.so-sure.com/images/home/background/background-light.png');*/
     background-size: cover;
-    background-color: #202532;
+    /*background-color: #202532;*/
     background-position: center;
 }
 
