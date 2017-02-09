@@ -23,19 +23,19 @@
 <div class="container"{% if policy.isEnded %}style="background-color: #F2DEDE; opacity: 0.7"{% endif %}>
     <h2>{{policy.user.name }}'s Policy{% if policy.isEnded %} - {{ policy.status|upper }} POLICY{% endif %}</h2>
     {% if policy.claimsWarnings|length > 0 %}
-    <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-        <h3 class="text-center">Caution - Any Items Below Must Be Considered/Handled Prior To Approval</h3>
+    <div class="bg-danger" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+        <h2 class="text-center">Caution - Any Items Below Must Be Considered/Handled Prior To Approval</h2>
         <ul>
             {% for warning in policy.claimsWarnings %}
                 <li style="list-style: none">
-                    <i class="fa fa-warning"></i>  {{ warning }}
+                    <h3><i class="fa fa-warning"></i>  {{ warning }}</h3>
                 </li>
             {% endfor %}
         </ul>
     </div>
     {% endif %}
   {% if not policy.isEnded %}
-    <div class="bg-danger" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+    <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <ul class="nav nav-tabs nav-justified">
           <li role="presentation" {% if not policy.hasOpenClaim %}class="active"{% endif %}><a href="#record">Record Claim</a></li>
           <li role="presentation" {% if policy.hasOpenClaim %}class="active"{% endif %}><a href="#claimscheck">ClaimsCheck</a></li>

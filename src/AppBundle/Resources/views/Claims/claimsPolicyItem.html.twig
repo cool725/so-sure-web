@@ -107,6 +107,7 @@
                             {% endif %}
                         </tr>
                         {% endif %}
+                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')  %}
                         <tr>
                           <td>Policy Recipero Checks<br />
                             <strong>NOT CLAIMS RELATED</strong>
@@ -120,7 +121,7 @@
                                 {% else %}
                                   <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
                                 {% endif %}
-                                ({{ key|date("F j, Y H:i", "Europe/London") }})</li>
+                                (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
                             {% endfor %}
                             {% if policy.checkmendCertsAsArray(false)|length == 0 %}
                               <li>Certs not present</li>
@@ -128,10 +129,12 @@
                             </ul>
                           </td>
                         </tr>
+                    {% endif %}
                         <tr>
-                          <td>Claims Related Recipero Checks (ClaimsCheck)
+                          <td>Recipero Checks (ClaimsCheck)
                             <i style="cursor: pointer" class="fa fa-clock-o" data-toggle="popover" data-placement="bottom" data-html="true"
                                title="Recipero Feed Timings" data-content="EE – On the hour, every hour<br />Vodafone – 9.30 am every day<br />O2 – 9.15am, 1.15pm, 5.15pm and 9.15pm<br />3 – 7.20am every day<br ><a href='https://en.wikipedia.org/wiki/List_of_United_Kingdom_mobile_virtual_network_operators' target='_blank'>MVNO's</a> should follow host network timings"></i>
+                            <br /><strong>CLAIMS RELATED</strong>
                           </td>
                           <td>
                             <ul>
@@ -144,7 +147,7 @@
                                 {% else %}
                                   <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
                                 {% endif %}
-                                ({{ key|date("F j, Y H:i", "Europe/London") }})</li>
+                                (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
                             {% endfor %}
                             {% if policy.checkmendCertsAsArray(true)|length == 0 %}
                               <li>Certs not present</li>
@@ -152,7 +155,7 @@
                             </ul>
                           </td>
                         </tr>
-                        {% if is_granted('ROLE_ADMIN') %}
+                        {% if is_granted('ROLE_ADMIN')%}
                         <tr>
                             <td>
                                 Manual Recipero Check
