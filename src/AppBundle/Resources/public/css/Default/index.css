@@ -378,9 +378,9 @@ blockquote footer:before {
 
 @media (min-width: 991px) {
 
-    blockquote {
-      margin: 0;
-    }  
+    // blockquote {
+    //   margin: 0;
+    // }  
 
 }
 
