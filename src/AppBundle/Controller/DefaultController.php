@@ -453,13 +453,20 @@ class DefaultController extends BaseController
                 'memory' => (int) $memory
             ]);
             // check for historical urls
-            if (!$phone) {
+            if (!$phone || stripos($model, ' ') !== false) {
                 $phone = $repo->findOneBy([
                     'active' => true,
                     'make' => $make,
                     'model' => $model,
                     'memory' => (int) $memory
                 ]);
+                if ($phone) {
+                    return $this->redirectToRoute('quote_make_model_memory', [
+                        'make' => $phone->getMake(),
+                        'model' => $phone->getEncodedModel(),
+                        'memory' => $phone->getMemory(),
+                    ], 301);
+                }
             }
         } else {
             $phones = $repo->findBy(
@@ -467,11 +474,17 @@ class DefaultController extends BaseController
                 ['memory' => 'asc'],
                 1
             );
-            if (count($phones) != 0) {
+            if (count($phones) != 0 && stripos($model, ' ') === false) {
                 $phone = $phones[0];
             } else {
                 // check for historical urls
                 $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $model]);
+                if ($phone) {
+                    return $this->redirectToRoute('quote_make_model', [
+                        'make' => $phone->getMake(),
+                        'model' => $phone->getEncodedModel()
+                    ], 301);
+                }
             }
         }
         if (!$phone) {
@@ -483,13 +496,13 @@ class DefaultController extends BaseController
         if ($phone->getMemory()) {
             $session->set('quote_url', $this->generateUrl('quote_make_model_memory', [
                 'make' => $phone->getMake(),
-                'model' => $phone->getModel(),
+                'model' => $phone->getEncodedModel(),
                 'memory' => $phone->getMemory(),
             ], UrlGeneratorInterface::ABSOLUTE_URL));
         } else {
             $session->set('quote_url', $this->generateUrl('quote_make_model', [
                 'make' => $phone->getMake(),
-                'model' => $phone->getModel(),
+                'model' => $phone->getEncodedModel(),
             ], UrlGeneratorInterface::ABSOLUTE_URL));
         }
 
