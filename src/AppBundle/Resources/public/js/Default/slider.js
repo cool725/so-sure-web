@@ -105,7 +105,7 @@ $(function(){
             var target = $(this).parent().data('cashback-target');
 
             $(this).click(function() {
-                $(this).toggleClass('active').siblings().removeClass('active');
+                $(this).addClass('active').siblings().removeClass('active');
                 $(target).text(new_text);
                 switchIf();
             });            
