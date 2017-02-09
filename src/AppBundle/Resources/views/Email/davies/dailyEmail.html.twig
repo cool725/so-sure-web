@@ -20,7 +20,14 @@
                     {# Use claims, so we can forward email to claims team - admins will be redirected #}
                     <a href="{{ url('claims_policy', {'id': claim.policy.id}) }}">
                     {{ claim.policy.policyNumber }}
-                    </a> - {{ claim.recordedDate|date('d M Y H:i', 'Europe/London') }} - {{ claim.status }} / {{ claim.type }}</p>
+					</a>
+				</p>
+				<ul style="text-align: left;">
+					<li>Claim: {{ claim.number }}</li>
+					<li>Recorded: {{ claim.recordedDate|date('d M Y H:i', 'Europe/London') }}</li>
+					<li>Status: {{ claim.status }}</li>
+					<li>Type: {{ claim.type }}</li>
+				</ul>
            {% endfor %}
 		   </div>
 
