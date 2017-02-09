@@ -421,6 +421,9 @@ class ReceperioService extends BaseImeiService
                 // @codingStandardsIgnoreEnd
             }
         }
+        if (!$imei) {
+            $imei = $policy->getImei();
+        }
 
         $runClaimsCheck = null;
         if (in_array($claimType, [Claim::TYPE_DAMAGE, Claim::TYPE_EXTENDED_WARRANTY])) {
@@ -441,18 +444,14 @@ class ReceperioService extends BaseImeiService
         if (!$runClaimsCheck) {
             $result = $this->checkImei(
                 $policy->getPhone(),
-                $policy->getImei(),
+                $imei,
                 $policy->getUser(),
                 null,
                 $claim,
                 $handler
             );
         } else {
-            if ($imei) {
-                $result = $this->checkClaims($policy, $claim, $policy->getImei(), $handler);
-            } else {
-                $result = $this->checkClaims($policy, $claim, $imei, $handler);
-            }
+            $result = $this->checkClaims($policy, $claim, $imei, $handler);
         }
 
         return $result;
