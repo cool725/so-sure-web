@@ -1314,6 +1314,19 @@ abstract class Policy
         }
     }
 
+    public function isPolicyWithin21Days($date = null)
+    {
+        if (!$this->getStart()) {
+            return null;
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $this->getStart()->diff($date)->days <= 21;
+    }
+
     public function isPolicyWithin30Days($date = null)
     {
         if (!$this->getStart()) {
@@ -1984,8 +1997,14 @@ abstract class Policy
 
         if ($this->getPendingCancellation()) {
             $warnings[] = sprintf(
-                'Policy is scheduled to be cancelled by user request on %s.',
+                'Policy is scheduled to be cancelled on %s (requested by user 30 days prior).',
                 $this->getPendingCancellation()->format('d M Y H:i')
+            );
+        }
+
+        if ($this->isPolicyWithin21Days()) {
+            $warnings[] = sprintf(
+                'Policy was created within the last 21 days. High risk of fraud.'
             );
         }
 
