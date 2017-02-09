@@ -1,4 +1,4 @@
-  /* FOOTER: MOVE TO layout > _footer.scss */ 
+/* FOOTER: MOVE TO layout > _footer.scss */ 
 
 .footer {
     position: relative;
@@ -8,181 +8,44 @@
     color: #fff;
     text-align: center;
     font-size: 14px;
-    font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;  
+    text-align: center;    
+    background: #202532;
+    color: #fff;  
 }
-.footer .row {
-  margin: auto;
-  max-width: 1170px;
+
+.footer hr {
+    border: none;
+    border-top: 1px solid #555f6e;
 }
+
 .footer a {
     color: #fff;
     opacity: 1;
     transition-property: color;
-    text-decoration: none !important;
+    text-decoration: none !important;  
+    cursor: pointer;  
 }
+
 .footer a:hover {
     color: #3399ff;
 }
-.footer {
-    color: white;
-}
-@media(max-width:767px) {
-.footer .so-sure-logo {
-    width: 100%;
-}
-}
-#base-info {
-  display: block;
-  padding-bottom: 25px;
-}
-#base-links dl {
-  display: inline-table;
-  margin: 0;
-  padding: 15px 5px 20px 0px;
-  text-align: center;
-  font-size: 0.9em;
-}
-@media (max-width: 767px) {
-  #base-links dl {
-    padding: 15px 45px 20px 0px;
-  }
-}
-@media (max-width: 543px) {
-  #base-links dl {
-    display: block;
-    padding: 15px 5px 20px 0px;
-  }
-}
-@media (min-width: 768px) {
-    #base-links dl {
-        padding-left: 0;
-        width: 25%;
-        font-size: 1em;
+
+.footer .so-sure-logo-light {
+    margin: 0 auto 15px;
+}    
+
+@media (min-width: 992px) {
+
+    .footer {
         text-align: left;
     }
-    #base-links > dl:nth-child(3) {
-      width: 12%;
-    }
-    #base-links {
-        text-align: right;
-    }
-}
-#base-links dt {
-    margin: 0;
-    padding-bottom: 10px;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: bold;
-    font-size: 13px;
-    font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-#base-links dd {
-    margin: 5px 0;
-    font-size: 13px;
-}
-#base-links a {
-    display: block;
-    padding: 5px 0;
-    color: #fff;
-}
-#base-links a:hover {
-    color: #3399ff;
-    text-decoration: none;
-}
-.footer .copy {
-    min-height: 100px;
-    background: #202532;
-    font-size: 13px;
-    padding-bottom: 20px;
-}
-.footer .copy-container {
-    margin: 0 auto;
-    max-width: 1170px;
-}
-@media (max-width: 767px) {
-    .footer .copy .text-left {
-        text-align: center;
-    }
-    .footer .copy .text-right {
-        text-align: center;
-    }
-}
-.footer .signup {
-    clear: both;
-    margin: 0 auto 30px;
-    max-width: 1170px;
-    border-top: 1px solid #555f6e;
+
 }
 
-.footer-info {
-  text-align: left;
-  padding-left: 5px;
-  padding-top: 20px;
-}
-
-/* DOWNLOAD BUTTONS - FOOTER */
-
-.footer .download-app {
-  text-align: left;
-  padding-left: 0;
-}
-.footer .download-app li {
-  list-style-type: none;
-  display: inline;
-  padding: 5px;
-  margin: 0;
-}
-.footer .download-app img {
-  width: 40%;
-  padding: 0;
-}
-@media (max-width: 767px) {
-  .footer .download-app {
+/* In Partnership - Ext Banner: MOVE TO layouts > _footer.scss */
+.in-partnership {
     text-align: center;
-  }
-  .footer .download-app img {
-    width: 25%;
-  }
-  .footer-info {
-    text-align: center;
-  }
-}
-@media (max-width: 543px) {
-  .footer .download-app img {
-    width: 32%;
-  }
-}
-
-/*SOCIAL ICONS - FOOTER*/
-
-.footer .social-networks {
-  padding: 0;
-  padding-top: 5px;
-  text-align: left;
-}
-.footer .social-networks li {
-  display: inline-block;
-  padding: 10px;
-}
-.footer .social-networks .icon-medium:hover {
-  color: #82ffb5;
-}
-.footer .social-networks .icon-facebook:hover {
-  color: #3b5998;
-}
-.footer .social-networks .icon-twitter:hover {
-  color: #4099FF;
-}
-
-@media (max-width: 767px) {
-  .footer .social-networks {
-    text-align: center;
-  }
-  .footer  .so-sure-logo-light {
-      text-align: center;
-      width: 100%;
-  }
 }
 
 /* PRESS - Ext Banner: MOVE TO layouts > _footer.scss */

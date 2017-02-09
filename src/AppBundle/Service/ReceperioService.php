@@ -400,16 +400,17 @@ class ReceperioService extends BaseImeiService
     /**
      * @param PhonePolicy $policy
      * @param string      $claimType Claim::TYPE_DAMAGE, Claim::TYPE_LOSS, Claim::TYPE_THEFT
-     * @param Claim       $claim     Optional: Claim to record against
+     * @param Claim       $claim     Claim to record against
      * @param User        $handler   Optional: User who ran the check
      * @param string      $imei      Optional: Allow running against a previous imei
      */
     public function policyClaim(
         PhonePolicy $policy,
         $claimType,
-        Claim $claim = null,
+        Claim $claim,
         User $handler = null,
-        $imei = null
+        $imei = null,
+        $register = true
     ) {
         if ($policy->getImeiReplacementDate() && $claim
             && $policy->getImeiReplacementDate() > $claim->getRecordedDate()) {
@@ -420,8 +421,24 @@ class ReceperioService extends BaseImeiService
                 // @codingStandardsIgnoreEnd
             }
         }
+
+        $runClaimsCheck = null;
+        if (in_array($claimType, [Claim::TYPE_DAMAGE, Claim::TYPE_EXTENDED_WARRANTY])) {
+            $runClaimsCheck = false;
+        } elseif (in_array($claimType, [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
+            $runClaimsCheck = true;
+        } else {
+            throw new \InvalidArgumentException(sprintf('Unknown claim type %s', $claimType));
+        }
+
+        if ($register) {
+            $this->registerClaims($policy, $claim, $imei, $runClaimsCheck);
+        } else {
+            $this->logger->warning(sprintf('Running claims without register for claim %s', $claim->getId()));
+        }
+
         $result = null;
-        if ($claimType == Claim::TYPE_DAMAGE) {
+        if (!$runClaimsCheck) {
             $result = $this->checkImei(
                 $policy->getPhone(),
                 $policy->getImei(),
@@ -430,47 +447,103 @@ class ReceperioService extends BaseImeiService
                 $claim,
                 $handler
             );
-        } elseif (in_array($claimType, [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
-            if ($imei) {
-                $result = $this->checkClaims($policy->getPhone(), $policy->getImei(), $policy, $claim, $handler);
-            } else {
-                $result = $this->checkClaims($policy->getPhone(), $imei, $policy, $claim, $handler);
-            }
         } else {
-            throw new \InvalidArgumentException(sprintf('Unknown claim type %s', $claimType));
+            if ($imei) {
+                $result = $this->checkClaims($policy, $claim, $policy->getImei(), $handler);
+            } else {
+                $result = $this->checkClaims($policy, $claim, $imei, $handler);
+            }
         }
-
-        $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData(), $claim);
-        $this->dm->flush();
 
         return $result;
     }
 
     /**
-     * Claimscheck
+     * Register a phone
      *
-     * @param Phone       $phone
-     * @param string      $imei
      * @param PhonePolicy $policy
      * @param Claim       $claim
-     * @param User        $handler
+     * @param string      $imei
+     * @param boolean     $settled
      *
      * @return boolean True if imei is ok
      */
-    public function checkClaims(
-        Phone $phone,
+    public function registerClaims(
+        PhonePolicy $policy,
+        Claim $claim,
         $imei,
-        PhonePolicy $policy = null,
-        Claim $claim = null,
-        User $handler = null
+        $settled
     ) {
-        \AppBundle\Classes\NoOp::ignore([$phone]);
+        $claimType = $settled ? 'settled' : 'logged';
+
         // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
         if ($imei == self::TEST_INVALID_IMEI) {
             return false;
         }
 
         if ($this->getEnvironment() != 'prod') {
+            $policy->addCheckmendRegisterData('transaction id', $imei, $claim, $claimType);
+            $this->dm->flush();
+
+            return true;
+        }
+
+        try {
+            $phone = $policy->getPhone();
+            $data = [
+                'claimtype' => $claimType,
+                'serials' => [$imei],
+                'storeid' => $this->storeId,
+                'itemcategory' => '1', // http://gapi.checkmend.com/docs/categories.php
+                'make' => $phone->getMake(),
+                'model' => $phone->getModel(),
+                'itemdescription' => $phone->__toString(),
+                'claimdate' => $claim->getRecordedDate()->format('Y-m-d H:i:s'),
+                'claimreference' => $claim->getId(),
+            ];
+            $response = $this->send("/claimscheck/submitclaim", $data);
+            //$response = '{"transactionid":"CLAIMSCHECK:CLAIM:6ADFFF53-7D92-4778-98E3-CB9844EF089B"}';
+            $this->logger->info(sprintf("Claimscheck register for %s -> %s", $imei, $response));
+
+            $data = json_decode($response, true);
+            $this->responseData = $data;
+            $this->certId = $data['transactionid'];
+            $policy->addCheckmendRegisterData($this->getCertId(), $imei, $claim, $claimType);
+            $this->dm->flush();
+
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf("Unable to register claim for imei %s Ex: %s", $imei, $e->getMessage()));
+
+            return false;
+        }
+    }
+
+    /**
+     * Claimscheck
+     *
+     * @param PhonePolicy $policy
+     * @param Claim       $claim
+     * @param string      $imei
+     * @param User        $handler
+     *
+     * @return boolean True if imei is ok
+     */
+    public function checkClaims(
+        PhonePolicy $policy,
+        Claim $claim,
+        $imei,
+        User $handler = null
+    ) {
+        // gsma should return blacklisted for this imei.  to avoid cost for testing, hardcode to false
+        if ($imei == self::TEST_INVALID_IMEI) {
+            return false;
+        }
+
+        if ($this->getEnvironment() != 'prod') {
+            $policy->addCheckmendCertData('claimscheck', 'n/a', $claim);
+            $this->dm->flush();
+
             return true;
         }
 
@@ -514,6 +587,8 @@ class ReceperioService extends BaseImeiService
             }
             $this->responseData = $data;
             $this->certId = $data['checkmendstatus']['certid'];
+            $policy->addCheckmendCertData($this->getCertId(), $this->getResponseData(), $claim);
+            $this->dm->flush();
 
             return $data['checkmendstatus']['result'] == 'green';
         } catch (\Exception $e) {

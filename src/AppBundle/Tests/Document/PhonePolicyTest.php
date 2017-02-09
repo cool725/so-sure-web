@@ -233,6 +233,22 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_HIGH, $policyA->getRisk());
     }
 
+    public function testGetRiskPolicyPendingCancellation()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testGetRiskPolicyPendingCancellation', $this));
+        self::$dm->persist($user);
+        self::addAddress($user);
+        $policyA = new SalvaPhonePolicy();
+        $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policyA->setPhone(self::$phone);
+        $policyA->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policyA->setStart(new \DateTime("2016-01-01"));
+        $policyA->setPendingCancellation(new \DateTime("2016-02-01"));
+
+        $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_HIGH, $policyA->getRisk());
+    }
+
     public function testGetRiskPolicyConnectionsNoClaims()
     {
         $policyConnected = static::createUserPolicy(true);
@@ -776,6 +792,15 @@ class PhonePolicyTest extends WebTestCase
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claimB);
         $this->assertTrue($policy->hasMonetaryClaimed());
+
+        $policyB = new SalvaPhonePolicy();
+        $this->assertFalse($policyB->hasMonetaryClaimed());
+        $claimC = new Claim();
+        $claimC->setRecordedDate(new \DateTime("2016-01-02"));
+        $claimC->setType(Claim::TYPE_EXTENDED_WARRANTY);
+        $claimC->setStatus(Claim::STATUS_SETTLED);
+        $policyB->addClaim($claimB);
+        $this->assertTrue($policyB->hasMonetaryClaimed());
     }
 
     public function testHistoricalMaxPotValue()

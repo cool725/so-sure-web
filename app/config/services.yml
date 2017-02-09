@@ -231,9 +231,10 @@ services:
     app.request:
         class: AppBundle\Service\RequestService
         arguments:
-            requestStack: "@request_stack"
-            logger:       "@logger"
-            tokenStorage: "@security.token_storage"
+            requestStack:     "@request_stack"
+            logger:           "@logger"
+            tokenStorage:     "@security.token_storage"
+            adminCookieValue: "%sosure_employee_cookie_value%"
 
     app.twig.branch:
         class: AppBundle\Service\BranchTwigExtension
@@ -577,6 +578,13 @@ services:
             -  { name: kernel.event_listener, event: event.claim.created, method: onClaimCreatedEvent }
             -  { name: kernel.event_listener, event: event.claim.approved, method: onClaimApprovedEvent }
             -  { name: kernel.event_listener, event: event.claim.settled, method: onClaimSettledEvent }
+
+    app.listener.mixpanel:
+        class:   AppBundle\Listener\MixpanelListener
+        arguments:
+            intercom: "@app.mixpanel"
+        tags:
+            -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener

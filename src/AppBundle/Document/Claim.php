@@ -133,14 +133,14 @@ class Claim
     protected $location;
 
     /**
-     * @Assert\Choice({"loss", "theft", "damage", "warranty", "extended-warranty"})
+     * @Assert\Choice({"loss", "theft", "damage", "warranty", "extended-warranty"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $type;
 
     /**
-     * @Assert\Choice({"in-review", "approved", "settled", "declined", "withdrawn"})
+     * @Assert\Choice({"in-review", "approved", "settled", "declined", "withdrawn"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -342,7 +342,7 @@ class Claim
             throw new \Exception('Status must be defined');
         }
 
-        if (in_array($this->getType(), [self::TYPE_WARRANTY, self::TYPE_EXTENDED_WARRANTY]) &&
+        if (in_array($this->getType(), [self::TYPE_WARRANTY]) &&
             in_array($status, [self::STATUS_APPROVED, self::STATUS_DECLINED])) {
             throw new \InvalidArgumentException(sprintf('Unable to use approved/declined with Warranty Types'));
         }
@@ -535,7 +535,7 @@ class Claim
 
     public function getExpectedExcess()
     {
-        if ($this->getType() == Claim::TYPE_DAMAGE) {
+        if (in_array($this->getType(), [Claim::TYPE_DAMAGE, Claim::TYPE_EXTENDED_WARRANTY])) {
             return 50;
         } elseif (in_array($this->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
             return 70;

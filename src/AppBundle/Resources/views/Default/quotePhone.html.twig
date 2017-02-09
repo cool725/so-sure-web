@@ -6,6 +6,7 @@
 {% block meta %}
     <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
     <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
+    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.model}) }}" />
 {% endblock %}
 
 {% block javascripts %}
@@ -24,10 +25,10 @@
     {% stylesheets
     '@AppBundle/Resources/public/css/Default/index.css'
     '@AppBundle/Resources/public/css/Default/quotePhone.css'
-    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
-    '@AppBundle/Resources/public/css/Default/connections.css'
     '@AppBundle/Resources/public/css/Default/scrollindicator.css'
     '@AppBundle/Resources/public/css/Default/videoOverlay.css'
+    'components/seiyria-bootstrap-slider/bootstrap-slider.min.css'
+    '@AppBundle/Resources/public/css/Default/connections.css'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -78,32 +79,38 @@
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide coverage <a href="#" data-toggle="modal" data-target="#worldwide-coverage"><i class="fa fa-info-circle"></i></a>
                             </li>             
                             <li class="h4">
-                                <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> <strong>Next working day replacement / repair</strong>
+                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> <strong>Next working day replacement / repair</strong>
                             </li>                                         
                             <li class="h4">
-                                <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> <strong>24/7 UK live support</strong>
+                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> <strong>24/7 UK live support</strong>
                             </li>
                             <li class="h4">
-                                <i class="fa fa-check-circle fa-lg text-blue" aria-hidden="true"></i> 
+                                <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> 
                                 <span class="visible-xs-inline visible-sm-inline">
-                                    <a id="cashback-link" href="#cashback"><strong class="text-dark-grey text-underline">Up to 80% cashback every year</strong></a>
+                                    <a id="cashback-link" href="#mobile-price"><strong class="text-dark-grey text-underline">Up to 80% cashback every year</strong></a>
                                 </span>
                                 <span class="hidden-xs hidden-sm">
                                     <strong class="text-dark-grey">Up to 80% cashback every year</strong>
                                 </span>
+                            </li>
+                            <li class="hidden-xs">
+                                <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">Full Terms &amp; Conditions</a></small>                                
                             </li>
                         </ul>                   
                     </div>
                </div>    
 
                <div class="col-xs-12 visible-xs-block">
-                    <div id="cashback" class="quote-cost text-center">
+                    <div id="mobile-price" class="quote-cost text-center">
                         <span class="h1 cost">
                             <strong>£{{ phone_price.monthlyPremiumPrice }}</strong> 
                             <small>per month</small>
                         </span><br>
                         <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                            {{ form_widget(buy_form.buy_mobile, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                        {{ form_widget(buy_form.buy_mobile, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                        <br>
+                        <small><a href="#" data-toggle="modal" data-target="#policy-modal" class="text-underline">Full Terms &amp; Conditions</a></small>                    
+
                     </div>
                </div>  
 
@@ -129,6 +136,7 @@
                         <div class="h1 text-center">
                             <strong id="money_back" class="text-green cashback">£{{ start_value }}</strong>
                         </div>
+
                         <input
                             type="text"
                             class="span2"
@@ -149,8 +157,8 @@
                         </div>
                         <div class="text-center">
                             <a href="#" data-toggle="modal" data-target="#modal-fullscreen"><span class="text-underline">Learn how it works</span></i></a>
-                        </div>                       
-                    </div>              
+                        </div>              
+                    </div>                                           
                 </div>
 
                 <div class="col-sm-12 col-md-12 hidden-xs">
@@ -174,6 +182,13 @@
 
         </div>
         {{ form_end(buy_form) }}
+    </section>
+
+    <section class="stat-banner">
+        <div class="container">
+            <p class="lead">Every year, there are 8 million incidents of lost, stolen or damaged phones – that’s 1 every 4 seconds.</p>
+            <small>Source: YouGov/Assurant, 2015</small>
+        </div>
     </section>
 
     <section id="quote-banner" class="banner-sticky banner-sticky-hide">
@@ -258,6 +273,22 @@
                 </div>
             </div>
         </div>
-    </div>    
+    </div> 
+
+    <div class="modal modal-policy fade" id="policy-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                </div>
+            </div>
+        </div>
+    </div>       
 
 {% endblock %}

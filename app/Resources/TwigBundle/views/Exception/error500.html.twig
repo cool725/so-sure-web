@@ -3,13 +3,15 @@
 {% block title %}so-sure - Server Error{% endblock %}
 
 {% block body %}
-  <div class="section hero">
-    <div class="container text-center">
-      <img class="logo" src="{{ cdn_url }}/images/logo/unhappy-so-sure-smiley.svg" alt="Unhappy so-sure smiley" style="width: 20%; margin-top: 50px;"></img>
-      <h2 class="section-title">Computer says, no.</h2>
-      <p class="pre-launch-description">
-      It looks like there was a server error. Our engineers will investigate the problem, but in the meantime, try refreshing the page.
-        </p>
+<section class="error-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+		      <h1 class="section-title">Sorry, computer says, no.</h1>
+		      <img class="logo" src="{{ cdn_url }}/images/logo/unhappy-so-sure-smiley.svg" alt="Unhappy so-sure smiley"></img>
+		      <p class="lead">It looks like there was a server error. Our engineers will investigate the problem, but in the meantime, try refreshing the page.</p>
+            </div>
+        </div>
     </div>
-  </div>
+</section>
 {% endblock %}

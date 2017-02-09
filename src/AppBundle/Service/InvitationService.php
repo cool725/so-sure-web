@@ -274,6 +274,7 @@ class InvitationService
             $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, [
                 'Invitation Method' => 'email',
             ]);
+            $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
             $now = new \DateTime();
             $this->mixpanel->queuePersonProperties([
                 'Last Invite Sent' => $now->format(\DateTime::ATOM),
@@ -342,6 +343,7 @@ class InvitationService
             $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, [
                 'Invitation Method' => 'sms',
             ]);
+            $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
             $now = new \DateTime();
             $this->mixpanel->queuePersonProperties([
                 'Last Invite Sent' => $now->format(\DateTime::ATOM),

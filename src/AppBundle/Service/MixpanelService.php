@@ -22,6 +22,7 @@ class MixpanelService
     const EVENT_QUOTE_PAGE = 'Quote Page';
     const EVENT_RECEIVE_DETAILS = 'Receive Personal Details';
     const EVENT_PURCHASE_POLICY = 'Purchase Policy';
+    const EVENT_PAYMENT = 'Payment';
     const EVENT_INVITE = 'Invite someone';
     const EVENT_CONNECTION_COMPLETE = 'Connection Complete';
     const EVENT_BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
@@ -80,6 +81,10 @@ class MixpanelService
             }
         }
 
+        if ($this->requestService->isSoSureEmployee()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -114,14 +119,16 @@ class MixpanelService
                     if (!isset($data['userId']) || !isset($data['properties'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
+                    $ip = isset($data['ip']) ? $data['ip'] : null;
 
-                    $this->setPersonProperties($data['userId'], $data['properties']);
+                    $this->setPersonProperties($data['userId'], $data['properties'], $ip);
                 } elseif ($action == self::QUEUE_PERSON_PROPERTIES_ONCE) {
                     if (!isset($data['userId']) || !isset($data['properties'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
+                    $ip = isset($data['ip']) ? $data['ip'] : null;
 
-                    $this->setPersonPropertiesOnce($data['userId'], $data['properties']);
+                    $this->setPersonPropertiesOnce($data['userId'], $data['properties'], $ip);
                 } elseif ($action == self::QUEUE_PERSON_INCREMENT) {
                     if (!isset($data['userId']) || !isset($data['properties']) ||
                         !isset($data['properties']['field']) || !isset($data['properties']['incrementBy'])) {
@@ -175,7 +182,7 @@ class MixpanelService
 
     public function queue($action, $userId, $properties, $event = null, $retryAttempts = 0)
     {
-        if (!$this->canSend()) {
+        if (!$this->canSend() || !$userId) {
             return;
         }
 
@@ -190,12 +197,23 @@ class MixpanelService
             'event' => $event,
             'retryAttempts' => $retryAttempts,
             'properties' => $properties,
+            'ip' => $this->requestService->getClientIp(),
         ];
         $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
     }
 
-    public function queuePersonIncrement($userId, $field, $incrementBy = 1)
+    public function queuePersonIncrement($field, $incrementBy = 1, $user = null)
     {
+        $userId = null;
+        if (!$user) {
+            $user = $this->requestService->getUser();
+        }
+        if ($user) {
+            $userId = $user->getId();
+        } else {
+            $userId = $this->requestService->getTrackingId();
+        }
+
         $this->queue(self::QUEUE_PERSON_INCREMENT, $userId, [
             'field' => $field,
             'incrementBy' => $incrementBy
@@ -204,6 +222,11 @@ class MixpanelService
 
     public function queuePersonProperties(array $personProperties, $setOnce = false, $user = null)
     {
+        // don't send empty data
+        if (count($personProperties) == 0) {
+            return;
+        }
+
         $userId = null;
         if (!$user) {
             $user = $this->requestService->getUser();
@@ -232,24 +255,24 @@ class MixpanelService
         $this->mixpanel->people->increment($userId, $field, $incrementBy, null, true);
     }
 
-    private function setPersonProperties($userId, array $personProperties)
+    private function setPersonProperties($userId, array $personProperties, $ip = null)
     {
         if (!$this->canSend()) {
             return;
         }
 
         //$this->mixpanel->identify($userId);
-        $this->mixpanel->people->set($userId, $personProperties);
+        $this->mixpanel->people->set($userId, $personProperties, $ip);
     }
 
-    private function setPersonPropertiesOnce($userId, array $personProperties)
+    private function setPersonPropertiesOnce($userId, array $personProperties, $ip = null)
     {
         if (!$this->canSend()) {
             return;
         }
 
         //$this->mixpanel->identify($userId);
-        $this->mixpanel->people->setOnce($userId, $personProperties);
+        $this->mixpanel->people->setOnce($userId, $personProperties, $ip);
     }
 
     private function track($userId, $event, $properties)
@@ -306,7 +329,9 @@ class MixpanelService
             }
             $userData['Number of Connections'] = count($policy->getConnections());
             $userData['Reward Pot Value'] = $policy->getPotValue();
-            $userData['Number of Invites Sent'] = count($policy->getSentInvitations(false));
+            if ($connection = $policy->getLastConnection()) {
+                $userData['Last connection complete'] = $connection->getDate()->format(\DateTime::ATOM);
+            }
         }
 
         $this->queuePersonProperties($userData, false, $user);
@@ -327,19 +352,45 @@ class MixpanelService
         $parser = Parser::create();
         $userAgentDetails = $parser->parse($userAgent);
 
+        if (stripos($userAgentDetails->ua->family, 'bot') !== false) {
+            return false;
+        }
+        if (stripos($userAgentDetails->ua->family, 'spider') !== false) {
+            return false;
+        }
+        if (stripos($userAgentDetails->ua->family, 'crawler') !== false) {
+            return false;
+        }
+
         // exclude bots from tracking
         if (in_array($userAgentDetails->ua->family, [
             'PhantomJS',
-            'SeznamBot',
-            'Googlebot',
-            'Sogou web spider',
-            'Baiduspider',
-            'Yahoo! Slurp'
+            'Yahoo! Slurp',
+            'Apache-HttpClient',
+            'Java',
+            'Python Requests',
+            'Python-urllib',
+            'Scrapy',
+            'Google',
+            'ia_archiver',
+            'SimplePie',
         ])) {
             return false;
         }
 
         if (stripos($userAgent, 'StatusCake') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'okhttp') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'curl') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'ips-agent') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'ScoutJet') !== false) {
             return false;
         }
 
@@ -395,7 +446,7 @@ class MixpanelService
 
         // Special case for logins - bump login count
         if ($event == self::EVENT_LOGIN) {
-            $this->queuePersonIncrement($userId, "Number Of Logins", 1);
+            $this->queuePersonIncrement("Number Of Logins", 1);
         }
     }
 

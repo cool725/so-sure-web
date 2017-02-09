@@ -23,11 +23,13 @@
         <h1 class="text-center">Welcome to so-sure {{ policy.user.firstname }}</h1>
         <p class="text-center">You'll receive a confirmation email with full details of your policy shortly, but here's a summary:
         </p>
+
         <div class="col-md-6">
             <div class="small-card">
                 <div class="row">
                     <h4>Cover</h4>
                     <p class="title">Your {{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB) is now insured!</p>
+                    <p class="subtitle">Your policy number is {{ policy.policyNumber }}</p>
                     <p class="subtitle">Your phone is now protected against Theft, Loss, Accidental Damage and Breakdown.</p>
                     <p class="actions">
                         <a data-toggle="modal" data-target="#policyModal" class="btn btn-success btn-rounded">Policy Details</a>
@@ -64,7 +66,7 @@
         </div>
     </section>
 
-    <section class="download-apps section--pad">
+    <section id="download-apps" class="download-apps section--pad">
         <div class="row">
             <div class="col-md-6">
                 <h3 class="text-center"><span class="badge">1</span> Download our Award Winning App</h3>
@@ -97,6 +99,12 @@
         </div>
     </section>
 
+    <section class="go-to-account">
+        <div class="row">
+            <a href="{{ path('user_home') }}" class="btn btn-primary btn-rounded account-btn">Go to my account</a>
+        </div>
+    </section>
+    
     <div class="modal modal-policy fade" id="policyModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

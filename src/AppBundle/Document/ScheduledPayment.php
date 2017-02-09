@@ -36,14 +36,14 @@ class ScheduledPayment
     protected $created;
 
     /**
-     * @Assert\Choice({"scheduled", "success", "failed", "cancelled"})
+     * @Assert\Choice({"scheduled", "success", "failed", "cancelled"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $status;
 
     /**
-     * @Assert\Choice({"scheduled", "rescheduled"})
+     * @Assert\Choice({"scheduled", "rescheduled"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

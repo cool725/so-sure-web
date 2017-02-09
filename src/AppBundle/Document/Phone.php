@@ -24,6 +24,10 @@ class Phone
 
     const MONTHS_RETIREMENT = 48;
 
+    const WARRANTY_LIKELY = 'likely';
+    const WARRANTY_MAYBE = 'maybe';
+    const WARRANTY_UNLIKELY = 'unlikely';
+
     public static $osTypes = [
         self::OS_CYANOGEN => self::OS_CYANOGEN,
         self::OS_ANDROID => self::OS_ANDROID,
@@ -711,5 +715,74 @@ class Phone
             'age' => $this->getMonthAge(),
             'initial_price' => $this->getInitialPrice(),
         ];
+    }
+
+    public function getWarrantyMonths()
+    {
+        if ($this->getMake() == "Alcatel") {
+            return 12;
+        } elseif ($this->getMake() == "Apple") {
+            return 12;
+        } elseif ($this->getMake() == "BlackBerry") {
+            return 12;
+        } elseif ($this->getMake() == "Doro") {
+            return 12;
+        } elseif ($this->getMake() == "HTC") {
+            return 24;
+        } elseif ($this->getMake() == "Huawei") {
+            return 24;
+        } elseif ($this->getMake() == "LG") {
+            return 24;
+        } elseif ($this->getMake() == "Motorola") {
+            return 12;
+        } elseif ($this->getMake() == "Microsoft") {
+            return 12;
+        } elseif ($this->getMake() == "Nokia") {
+            return 12;
+        } elseif ($this->getMake() == "Samsung") {
+            return 24;
+        } elseif ($this->getMake() == "Sony") {
+            return 24;
+        } else {
+            return null;
+        }
+    }
+
+    public function isUnderWarranty()
+    {
+        $now = new \DateTime();
+        if ($now < $this->getWarrantyEarlist()) {
+            return self::WARRANTY_LIKELY;
+        } elseif ($now < $this->getWarrantyLatest()) {
+            return self::WARRANTY_MAYBE;
+        } else {
+            return self::WARRANTY_UNLIKELY;
+        }
+    }
+
+    public function getWarrantyEarlist()
+    {
+        if (!$this->getReleaseDate()) {
+            return null;
+        }
+        if (!$months = $this->getWarrantyMonths()) {
+            return null;
+        }
+
+        $cutoff = clone $this->getReleaseDate();
+        $cutoff = $cutoff->add(new \DateInterval(sprintf('P%dM', $months)));
+
+        return $cutoff;
+    }
+
+    public function getWarrantyLatest()
+    {
+        if (!$end = $this->getWarrantyEarlist()) {
+            return null;
+        }
+        $end = clone $end;
+        $end = $end->add(new \DateInterval(sprintf('P6M')));
+
+        return $end;
     }
 }

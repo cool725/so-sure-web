@@ -24,4 +24,17 @@ trait PhoneTrait
 
         return preg_match("/^\+447\d{9,9}/", $mobile);
     }
+
+    public function normalizeImei($imei)
+    {
+        // space, -, / may be present when copy/pasted by user
+        $imei = str_replace(' ', '', $imei);
+        $imei = str_replace('-', '', $imei);
+        $imei = str_replace('/', '', $imei);
+        // There are some cases of 17 digits imei (15 digit imei with additional info attached)
+        // Such as samsung s7 edge
+        $imei = substr($imei, 0, 15);
+
+        return $imei;
+    }
 }

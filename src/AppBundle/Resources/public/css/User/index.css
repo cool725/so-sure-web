@@ -81,7 +81,7 @@
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  height: 280px;
+  height: 310px;
 }
 
 @media (max-width:992px) {
@@ -112,8 +112,14 @@
 }
 
 .user-info .small-card .info {
-  margin-top: 26px;
+  margin-top: 56px;
   margin-bottom: 15px;
+}
+
+@media (max-width:992px) {
+  .user-info .small-card .info {
+    margin-top: 36px;
+  }
 }
 
 .start-saving {
@@ -163,4 +169,28 @@
   font-size: 24px;
   border-radius: 16px;
   background-color: #80CE4D;
+}
+
+.go-to-account {
+  padding: 20px 15px 40px 15px;
+  text-align: center;
+}
+
+.go-to-account .account-btn {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.user-invalid {
+  padding-top: 100px;
+  padding-bottom: 150px;
+  text-align: center;
+}
+
+.user-invalid h1 {
+  color: #fff;
+}
+
+.user-invalid p {
+  color: #fff;
 }

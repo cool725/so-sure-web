@@ -462,9 +462,15 @@ class DefaultController extends BaseController
                 ]);
             }
         } else {
-            $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $decodedModel]);
-            // check for historical urls
-            if (!$phone) {
+            $phones = $repo->findBy(
+                ['active' => true, 'make' => $make, 'model' => $decodedModel],
+                ['memory' => 'asc'],
+                1
+            );
+            if (count($phones) != 0) {
+                $phone = $phones[0];
+            } else {
+                // check for historical urls
                 $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $model]);
             }
         }
@@ -474,6 +480,18 @@ class DefaultController extends BaseController
 
         $session = $request->getSession();
         $session->set('quote', $phone->getId());
+        if ($phone->getMemory()) {
+            $session->set('quote_url', $this->generateUrl('quote_make_model_memory', [
+                'make' => $phone->getMake(),
+                'model' => $phone->getModel(),
+                'memory' => $phone->getMemory(),
+            ], UrlGeneratorInterface::ABSOLUTE_URL));
+        } else {
+            $session->set('quote_url', $this->generateUrl('quote_make_model', [
+                'make' => $phone->getMake(),
+                'model' => $phone->getModel(),
+            ], UrlGeneratorInterface::ABSOLUTE_URL));
+        }
 
         $user = new User();
 
@@ -587,6 +605,7 @@ class DefaultController extends BaseController
         return array(
             'phone' => $phone,
             'phone_price' => $phone->getCurrentPhonePrice(),
+            'policy_key' => $this->getParameter('policy_key'),
             'connection_value' => PhonePolicy::STANDARD_VALUE,
             'max_connections' => $maxConnections,
             'max_pot' => $maxPot,

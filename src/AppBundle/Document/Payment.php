@@ -147,7 +147,7 @@ abstract class Payment
     protected $notes;
 
     /**
-     * @Assert\Choice({"mobile", "web", "web-api", "token", "apple-pay", "android-pay", "sosure"})
+     * @Assert\Choice({"mobile", "web", "web-api", "token", "apple-pay", "android-pay", "sosure"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
