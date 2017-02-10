@@ -101,12 +101,36 @@ class DefaultController extends BaseController
             }
         }
 
+        $i6s = $phoneRepo->findOneBy([
+                'active' => true,
+                'make' => 'Apple',
+                'model' => 'iPhone 6S',
+                'memory' => (int) 32
+        ]);
+
+        $i7 = $phoneRepo->findOneBy([
+            'active' => true,
+            'make' => 'Apple',
+            'model' => 'iPhone 7',
+            'memory' => (int) 32
+        ]);
+
+        $s7 = $phoneRepo->findOneBy([
+            'active' => true,
+            'make' => 'Samsung',
+            'model' => 'Galaxy S7',
+            'memory' => (int) 32
+        ]);
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         return array(
             'form_top' => $formTop->createView(),
             'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
+            'i6s_from' => $i6s->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            'i7_from' => $i7->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            's7_from' => $s7->getCurrentPhonePrice()->getMonthlyPremiumPrice()
         );
     }
 
