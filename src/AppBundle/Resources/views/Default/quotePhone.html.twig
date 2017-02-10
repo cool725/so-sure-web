@@ -144,7 +144,7 @@
                                             <img src="../images/logo/so-sure-logo-dark.svg" alt="so-sure" width="80px">
                                         </td>
                                         <td width="33%">
-                                            <div class="bar bar-us"><div></div></div>
+                                            <div data-max-comparision="{{ comparision_max }}" class="bar bar-us"><div></div></div>
                                         </td>
                                         <td width="22%" align="right">
                                             <strong>
@@ -154,33 +154,17 @@
                                             </strong>
                                         </td>
                                     </tr>
+                                    {% for name, value in comparision %}
                                     <tr>
-                                        <td><small>Networks</small></td>
+                                        <td><small>{{ name }}</small></td>
                                         <td>
                                             <div class="bar"><div></div></div> 
                                         </td>
                                         <td align="right">
-                                            <strong><small class="premium-value">£144.50</small></strong>
+                                            <strong><small class="premium-value">£{{ value|number_format(2, '.', ',') }}</small></strong>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td><small>Protect Your Bubble</small></td>
-                                        <td>
-                                            <div class="bar"><div></div></div> 
-                                        </td>
-                                        <td align="right">
-                                            <strong><small class="premium-value">£95.88</small></strong>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><small>loveit coverit</small></td>
-                                        <td>
-                                            <div class="bar"><div></div></div> 
-                                        </td>
-                                        <td align="right">
-                                            <strong><small class="premium-value">£82.39</small></strong>
-                                        </td>
-                                    </tr>
+                                    {% endfor %}
                                 </table>
                                 <a href="#" data-toggle="modal" data-target="#calculation-details"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
 
