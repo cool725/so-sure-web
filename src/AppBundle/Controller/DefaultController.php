@@ -128,9 +128,9 @@ class DefaultController extends BaseController
             'form_top' => $formTop->createView(),
             'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
-            'i6s_from' => $i6s->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            'i7_from' => $i7->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            's7_from' => $s7->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+            'i6s' => $i6s,
+            'i7' => $i7,
+            's7' => $s7
         );
     }
 
