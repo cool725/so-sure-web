@@ -621,8 +621,8 @@ class DefaultController extends BaseController
                 ['active' => true, 'make' => $make, 'model' => $decodedModel],
                 ['memory' => 'asc']
             ),
-            'comparision' => ['Network' => 144.50, 'Protect Your Bubble' => 95.88, 'loveit coverit' => 82.39],
-            'comparision_max' => 144.50,
+            'comparision' => $phone->getComparisions(),
+            'comparision_max' => $phone->getMaxComparision(),
         );
     }
 
