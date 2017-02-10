@@ -10,28 +10,13 @@ $(function(){
     var connection_value = $('#reward-slider').data('connection-value');
     var montly_premium   = $('#reward-slider').data('premium');    
     var claim_check      = $('#claim-check').data('cashback-check');
+    var yearly_high      = $('#reward-slider').data('max-comparison');
 
     // Page Vars
     var cashback         = $('#cashback');
     var cashback_new     = $('#cashback-with-claim');
     var cashback_text    = $('#cashback-text');
-
-    // Get data from table - Needs to be done better
-    var premium_value  = $('.premium-value');      
-    var all_premiums   = [];
-
-    // Store Values from table
-    $(premium_value).each(function() {
-        all_premiums.push($(this).text().replace(/[^\d\.]/g, ''));
-    });
-
-    // Sort in descending order
-    all_premiums.sort(function(a,b) {
-        return b - a;
-    });  
-
-    // We use the highest as the 100% value 
-    $high = all_premiums[0];     
+    var premium_value  = $('.premium-value');    
 
     // The Handle
     var $handle;
@@ -47,7 +32,7 @@ $(function(){
         premium_value.each(function() {
             
             var price     = ($(this).text().replace(/[^\d\.]/g, ''));
-            var bar_width = ((price / $high) * 100);
+            var bar_width = ((price / yearly_high) * 100);
             var bar       = $(this).closest('td').prev().find('.bar div');
 
             bar.css({
@@ -175,7 +160,7 @@ $(function(){
                 $handle = $('.rewardslider__handle', this.$range);
                 updateHandle($handle[0], this.value);  
 
-                var save_value = $high;
+                var save_value = yearly_high;
                 whatIf(save_value);
                 setBars(); 
             },
