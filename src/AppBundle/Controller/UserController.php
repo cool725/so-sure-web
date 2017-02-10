@@ -40,7 +40,7 @@ class UserController extends BaseController
     public function indexAction(Request $request)
     {
         $user = $this->getUser();
-        if (!$user->hasActivePolicy()) {
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         } elseif ($user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
