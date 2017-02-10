@@ -795,11 +795,35 @@ class Phone
                 'High Street' => 169.99,
                 'Protect Your Bubble' => 95.88
             ];
+        } elseif ($this->__toString() == "Apple iPhone 7 Plus (32 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 101.88
+            ];
         } elseif ($this->__toString() == "Apple iPhone 6S (32 GB)") {
             $comparision = [
                 'Networks' => 154,
                 'High Street' => 169.99,
                 'Protect Your Bubble' => 95.88
+            ];
+        } elseif ($this->__toString() == "Apple iPhone 6S (16 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 95.88
+            ];
+        } elseif ($this->__toString() == "Samsung Galaxy S7 edge (32 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 119.88
+            ];
+        } elseif ($this->__toString() == "Samsung Galaxy S7 (32 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 119.88
             ];
         }
 
