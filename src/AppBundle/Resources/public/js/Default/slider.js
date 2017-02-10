@@ -50,17 +50,10 @@ $(function(){
             var bar_width = ((price / $high) * 100);
             var bar       = $(this).closest('td').prev().find('.bar div');
 
-            bar.animate({
-                width: bar_width+'%',
-                opacity: 1,
-                easing: 'linear',
-                },
-                300, function() {
-            });
-
             bar.css({
                 width: bar_width+'%'
             });
+
         });
     }
 
@@ -71,13 +64,17 @@ $(function(){
 
     // What if - Needs improving
     $('#what-if').click(function(e) {
+        
         e.preventDefault();       
 
         $('.loading-overlay').fadeIn(function() {
-            $('.premium-table, .claim-options').fadeToggle('400', function() {
+
+            $('.premium-table').fadeToggle('400', function() {
+                $('.claim-options').fadeIn();
                 $('.loading-overlay').fadeOut();
-                $(document).scrollTop( $('#cashback-card').offset().top - 30);  
+                // $(document).scrollTop( $('#cashback-card').offset().top - 30);  
             });
+
         });
     });   
 
@@ -85,9 +82,13 @@ $(function(){
         e.preventDefault();       
 
         $('.loading-overlay').fadeIn(function() {
-            $('.premium-table, .claim-options').fadeToggle('400', function() {
+
+            $('.claim-options').fadeToggle('400', function() {
+                $('.premium-table').fadeIn();
                 $('.loading-overlay').fadeOut();
-                $(document).scrollTop( $('#cashback-card').offset().top - 30);  
+                // $(document).scrollTop( $('#cashback-card').offset().top - 30); 
+
+                // Reset the claims
                 cashback_new.text('');
                 cashback.removeClass('cashback-with-claim');  
                 var option = 0;
@@ -106,7 +107,6 @@ $(function(){
             // Get data from element
             var option = $(this).data('claim-option');
             var new_text   = $(this).data('cashback-text');
-            // var target = $(this).parent().data('cashback-target');
 
             $(this).click(function() {
                 $(this).addClass('active').siblings().removeClass('active');
@@ -200,10 +200,11 @@ $(function(){
 
                 whatIf(save_value);                             
                 updateValues();
+                setBars();
             },
 
             onSlideEnd: function(position, value) {
-                setBars();                  
+                // setBars();                  
             }
 
         })
