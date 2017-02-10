@@ -33,19 +33,22 @@
 
 {% block body %}
 
-<!-- Background image https://pixabay.com/en/audience-band-blur-celebration-1867983/ -->
+    <!-- Background image https://pixabay.com/en/audience-band-blur-celebration-1867983/ -->
 
     <section class="hero vertical-align-wrap" id="get-quote">
         <div class="container vertical-align-middle">
             <div class="row">
-                <div class="col-sm-6 col-sm-offset-1">
-                    <h1 class="">Sometimes it's better to do it with friends</h1>
-                    <blockquote class="col-md-8 hidden-xs">
-                        <p>Every year, there are 8 million incidents of lost, stolen or damaged phones – that’s 1 every 4 seconds.</p>
+                <div class="col-sm-6 col-md-5 col-md-offset-1">
+                    <h1>
+                        Better &amp; Cheaper <br>
+                        <small>Sometimes it's better to do it with friends</small>
+                    </h1>
+                    <blockquote class="text-left hidden-xs">
+                        <p class="lead">Every year, there are 8 million incidents of lost, stolen or damaged phones – that’s 1 every 4 seconds.</p>
                         <footer><em>YouGov/Assurant, 2015</em></footer>
                     </blockquote>
                 </div>
-                <div class="col-sm-3 col-sm-offset-1 text-left">
+                <div class="col-sm-6 col-md-4 col-md-offset-1 text-left">
                 <div class="hero-box">
                     <h3 class"">Most popular phones</h3>
                     <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i6s.make, 'model': i6s.getEncodedModel(), 'memory': i6s.memory}) }}">
@@ -76,28 +79,7 @@
         </div>
     </section>
 
-    <section class="press">
-    <div class="container">
-        <div class="col-sm-3 col-md-2">
-            <h4 class="footer-press--heading">Featured In</h4>
-        </div>
-        <div class="col-sm-3 col-md-2">
-            <img src="{{ cdn_url }}/images/home/press-images/g@2x.png" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town" class="img-responsive">
-        </div>
-        <div class="col-sm-3 col-md-2">
-            <img src="{{ cdn_url }}/images/home/press-images/ft@2x.png" alt="Financial Times - Innovation to watch: Friends based insurance" class="img-responsive">
-        </div>
-        <div class="col-sm-3 col-md-2">
-            <img src="{{ cdn_url }}/images/home/press-images/ip@2x.png" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app" class="img-responsive">
-        </div>
-        <div class="col-sm-3 col-md-2">
-            <h4 class="footer-press--heading">Awarded by</h4>
-        </div>
-        <div class="col-sm-3 col-md-2">
-            <img src="{{ cdn_url }}/images/home/press-images/di@2x.png" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award" class="img-responsive">
-        </div>
-    </div>
-</section>
+    {% include 'AppBundle::Default/press.html.twig' %}
 
     {% include 'AppBundle::Default/benefits.html.twig' %}
 
