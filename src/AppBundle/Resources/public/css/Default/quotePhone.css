@@ -4,10 +4,6 @@
     padding: 0 15px;
 }
 
-.quote-container h1 {
-    font-size: 32px;
-}
-
 .quote h1,
 .quote .h3,
 .quote .h4 {
@@ -21,20 +17,26 @@
 }
 
 .quote-cost {
-    padding: 25px;
     margin: 0 -15px 25px;
+    padding: 25px 15px;
     background-color: #efefef;
 }
 
 .quote-cost .btn-block {
-    width: 60%;
-    margin: 15px auto 0;
+    width: 80%;
+    margin: 10px auto;
     font-weight: bold;
     font-size: 22px;
 }
 
 .quote-card {
-    margin-bottom: 15px;  
+    max-width: 400px;
+    margin: 0 auto 25px;
+    position: relative;
+}
+
+.quote-card > h3 {
+    margin-top: 0 !important;
 }
 
 .quote-card ul {
@@ -48,8 +50,12 @@
     color: #626B78;
 }
 
-li .h4 {
+.quote-card li.h4:first-of-type {
     margin-top: 0;
+}
+
+.quote-card li.h4:last-of-type {
+    margin-bottom: 0;
 }
 
 .quote-card .fa-lg {
@@ -88,12 +94,23 @@ li .h4 {
     vertical-align: middle;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 340px) {
 
+    .quote-card {
+      padding: 25px;      
+      border: 2px solid #efefef;
+      border-radius: 4px;          
+    } 
+}
+
+@media (min-width: 500px) {
+    
     .quote-container h1 {
         text-align: center;
-        font-size: 36px;
     }
+}
+
+@media (min-width: 768px) {
 
     .quote {
         max-width: 840px;
@@ -113,24 +130,20 @@ li .h4 {
     }
 
     .quote-card {
-        padding: 25px;
-        margin-bottom: 25px;
-        border: 2px solid #efefef;
-        border-radius: 4px;        
+        max-width: none;   
     }
-
-    .quote-cost {
-        border: 4px;
-        margin: 0 0 25px;
-    }    
 
     .quote-card .rrp {
         text-align: right;
     }
 
-    .quote-cost .btn-block {
-        margin-top: 0;
-    }
+    .quote-cost {
+        padding: 25px;
+        margin: 0 0 25px;
+        background-color: #efefef;
+        border-radius: 4px;
+    }    
+
 
 }
 
@@ -285,4 +298,38 @@ a#open-intercom.btn.btn-primary {
     margin-top: 10px;
   }
 
+}
+
+#how-it-works h2, #how-it-works p, #how-it-works h3 {
+    color: #fff !important;
+}
+
+#play-button {
+    position: absolute;
+    top: calc(50% - 40px);
+    left: calc(50% - 40px);
+    width: 80px;
+}
+
+.explainer-video-view-thumb svg #play-bg {
+    transition: 200ms;
+  transition-timing-function: ease-in-out;
+  -webkit-transition: 200ms;
+  -webkit-transition-timing-function: ease-in-out;
+}
+
+.explainer-video-view-thumb:hover svg #play-bg {
+    fill: #3399ff;
+}
+
+.explainer-video-view-thumb img {
+    box-shadow: none;
+    transition: 200ms;
+  transition-timing-function: ease-in-out;
+  -webkit-transition: 200ms;
+  -webkit-transition-timing-function: ease-in-out;
+}
+
+.explainer-video-view-thumb:hover img {
+    box-shadow: 0px 0px 20px 3px rgba(0, 0, 0, 0.5);
 }

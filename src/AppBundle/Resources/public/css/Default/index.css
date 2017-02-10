@@ -432,10 +432,15 @@ blockquote footer:before {
     content: '';
 }
 
-@media (min-width: 991px) {
+/* MOVE TO components > _forms.scss */
 
-    blockquote {
-      margin: 0;
-    }  
+#select-phone .device-select li {
+  display: inline !important;
+}
+
+@media (max-width: 992px) {
+  #select-phone .device-select li {
+    display: block !important;
+  }
 
 }

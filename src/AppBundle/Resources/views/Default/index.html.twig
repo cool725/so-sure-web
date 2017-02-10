@@ -13,11 +13,11 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    'bundles/app/css/Default/index.css'
-    'bundles/app/css/Default/homepage.css'
-    'bundles/app/css/Default/selectPhoneMake.css'
-    'bundles/app/css/Default/scrollindicator.css'
-    'bundles/app/css/Default/videoOverlay.css'
+    '@AppBundle/Resources/public/css/Default/index.css'
+    '@AppBundle/Resources/public/css/Default/homepage.css'
+    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
+    '@AppBundle/Resources/public/css/Default/scrollindicator.css'
+    '@AppBundle/Resources/public/css/Default/videoOverlay.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 

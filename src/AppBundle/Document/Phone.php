@@ -785,4 +785,64 @@ class Phone
 
         return $end;
     }
+
+    public function getComparisions()
+    {
+        $comparision = [];
+        if ($this->__toString() == "Apple iPhone 7 (32 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 95.88
+            ];
+        } elseif ($this->__toString() == "Apple iPhone 7 Plus (32 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 101.88
+            ];
+        } elseif ($this->__toString() == "Apple iPhone 6S (32 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 95.88
+            ];
+        } elseif ($this->__toString() == "Apple iPhone 6S (16 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 95.88
+            ];
+        } elseif ($this->__toString() == "Samsung Galaxy S7 edge (32 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 119.88
+            ];
+        } elseif ($this->__toString() == "Samsung Galaxy S7 (32 GB)") {
+            $comparision = [
+                'Networks' => 154,
+                'High Street' => 169.99,
+                'Protect Your Bubble' => 119.88
+            ];
+        }
+
+        return $comparision;
+    }
+
+    public function getMaxComparision()
+    {
+        $maxComparision = $this->getCurrentPhonePrice()->getYearlyPremiumPrice();
+        $comparision = $this->getComparisions();
+        if (count($comparision) > 0) {
+            $maxComparision = 0;
+            foreach ($comparision as $name => $value) {
+                if ($value > $maxComparision) {
+                    $maxComparision = $value;
+                }
+            }
+        }
+
+        return $maxComparision;
+    }
 }

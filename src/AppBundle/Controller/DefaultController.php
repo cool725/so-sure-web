@@ -212,39 +212,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/compare", name="compare")
-     * @Template()
-     */
-    public function sosureComparedAction(Request $request)
-    {
-        $buyForm = $this->get('form.factory')
-            ->createNamedBuilder('compare_buy_form')
-            ->add('buy', SubmitType::class)
-            ->add('slider_used', HiddenType::class)
-            ->setAction($this->generateUrl('compare'))
-            ->getForm();
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('compare_buy_form')) {
-                $buyForm->handleRequest($request);
-                if ($buyForm->isValid()) {
-                    $properties = [];
-                    $properties['Location'] = 'compare';
-                    if ($buyForm->getData()['slider_used']) {
-                        $properties['Played with Slider'] = true;
-                    }
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
-
-                    return $this->redirectToRoute('purchase');
-                }
-            }
-        }
-
-        return array(
-            'compare_buy_form' => $buyForm->createView(),
-        );
-    }
-
-    /**
      * @Route("/login-redirect", name="login_redirect")
      */
     public function loginRedirectAction()
@@ -654,6 +621,8 @@ class DefaultController extends BaseController
                 ['active' => true, 'make' => $make, 'model' => $decodedModel],
                 ['memory' => 'asc']
             ),
+            'comparision' => $phone->getComparisions(),
+            'comparision_max' => $phone->getMaxComparision(),
         );
     }
 
