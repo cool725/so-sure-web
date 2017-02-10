@@ -10,11 +10,13 @@ $(function(){
     var connection_value = $('#reward-slider').data('connection-value');
     var montly_premium   = $('#reward-slider').data('premium');    
     var claim_check      = $('#claim-check').data('cashback-check');
+
+    // Page Vars
     var cashback         = $('#cashback');
     var cashback_new     = $('#cashback-with-claim');
     var cashback_text    = $('#cashback-text');
 
-    // Get data fromtable - Needs to be done better
+    // Get data from table - Needs to be done better
     var premium_value  = $('.premium-value');      
     var all_premiums   = [];
 
@@ -31,7 +33,7 @@ $(function(){
     // We use the highest as the 100% value 
     $high = all_premiums[0];     
 
-    // var currentState;
+    // The Handle
     var $handle;
 
     // Update the slider value
@@ -67,7 +69,7 @@ $(function(){
         return +(Math.round(num + "e+2")  + "e-2");
     }
 
-    // What if
+    // What if - Needs improving
     $('#what-if').click(function(e) {
         e.preventDefault();       
 
@@ -154,6 +156,8 @@ $(function(){
     $element
 
         .rangeslider({
+
+            'update': true,
 
             polyfill: false,
 
