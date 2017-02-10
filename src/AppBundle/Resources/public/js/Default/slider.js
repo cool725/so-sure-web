@@ -79,6 +79,7 @@ $(function(){
     });   
 
     $('#what-if-return').click(function(e) {
+        
         e.preventDefault();       
 
         $('.loading-overlay').fadeIn(function() {
