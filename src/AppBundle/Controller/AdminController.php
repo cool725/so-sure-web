@@ -536,7 +536,7 @@ class AdminController extends BaseController
                 }
             }
         }
-        
+
         $barclaysFiles = $barclaysFileRepo->getBarclaysFiles($date);
         $dailyTransaction = BarclaysFile::combineDailyTransactions($barclaysFiles);
         $dailyBarclaysProcessing = BarclaysFile::combineDailyProcessing($barclaysFiles);

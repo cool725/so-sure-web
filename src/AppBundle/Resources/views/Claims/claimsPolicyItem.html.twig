@@ -2,11 +2,6 @@
     <div class="text-center" style="background-color: {{ policy.riskColour }}; color: white; font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
       Risk: {{ policy.riskReason }} ({{ policy.risk }})
     </div>
-    {% if policy.pendingCancellation %}
-    <div class="text-center" style="background-color: red; color: white; font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
-      Policy is pending cancellation. {{ policy.pendingCancellation | date }}
-    </div>
-    {% endif %}
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#user">User</a></li>
       <li role="presentation"><a href="#policy">Policy</a></li>
@@ -42,6 +37,12 @@
                                         data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
                                         >Show Alternatives</button>
     
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Phone Warranty Status</td>
+                            <td class="{% if policy.phone.underWarranty == 'likely'%}success{% elseif policy.phone.underWarranty == 'maybe'%}warning{% else %}danger{% endif %}">
+                                Phone is {{ policy.phone.underWarranty }} under warranty. Warranty likely ends between {{ policy.phone.warrantyEarlist|date('M Y') }} and {{ policy.phone.warrantyLatest|date('M Y') }}.
                             </td>
                         </tr>
                         <tr>
@@ -85,7 +86,7 @@
                                     <i class="fa fa-check text-success" title="Policy is paid to date"></i> Policy is paid to date
                                 {% else %}
                                     <i class="fa fa-warning text-danger" title="Policy is NOT paid to date"></i>
-                                    Policy will be cancelled on {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London')}}
+                                    If still unpaid, policy will be cancelled on {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London')}}
                                 {% endif %}
                             </td>
                         </tr>
@@ -106,20 +107,21 @@
                             {% endif %}
                         </tr>
                         {% endif %}
+                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')  %}
                         <tr>
-                          <td>Initial Policy Recipero Checks<br />
+                          <td>Policy Recipero Checks<br />
                             <strong>NOT CLAIMS RELATED</strong>
                           </td>
                           <td>
                             <ul>
                             {% for key, data in policy.checkmendCertsAsArray(false) if data['certId'] is defined %}
                                 <li>
-                                {% if data['certId'] == 'serial' %}
+                                {% if data['certId'] == 'serial' or data['certId'] == 'register' %}
                                     <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
                                 {% else %}
                                   <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
                                 {% endif %}
-                                ({{ key|date("F j, Y H:i", "Europe/London") }})</li>
+                                (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
                             {% endfor %}
                             {% if policy.checkmendCertsAsArray(false)|length == 0 %}
                               <li>Certs not present</li>
@@ -127,8 +129,12 @@
                             </ul>
                           </td>
                         </tr>
+                    {% endif %}
                         <tr>
-                          <td>Claims Related Recipero Checks (ClaimsCheck)
+                          <td>Recipero Checks (ClaimsCheck)
+                            <i style="cursor: pointer" class="fa fa-clock-o" data-toggle="popover" data-placement="bottom" data-html="true"
+                               title="Recipero Feed Timings" data-content="EE – On the hour, every hour<br />Vodafone – 9.30 am every day<br />O2 – 9.15am, 1.15pm, 5.15pm and 9.15pm<br />3 – 7.20am every day<br ><a href='https://en.wikipedia.org/wiki/List_of_United_Kingdom_mobile_virtual_network_operators' target='_blank'>MVNO's</a> should follow host network timings"></i>
+                            <br /><strong>CLAIMS RELATED</strong>
                           </td>
                           <td>
                             <ul>
@@ -136,12 +142,12 @@
                                 <li>
                                     {# rnd hack to force page reload to adjust tabs #}
                                     Claim <a href="?rnd={{ random() }}#claim_{{ data['claimId'] }}">{{ data['claimNumber'] }}</a> against
-                                {% if data['certId'] == 'serial' %}
+                                {% if data['certId'] == 'serial' or data['certId'] == 'register' %}
                                     <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
                                 {% else %}
                                   <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
                                 {% endif %}
-                                ({{ key|date("F j, Y H:i", "Europe/London") }})</li>
+                                (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
                             {% endfor %}
                             {% if policy.checkmendCertsAsArray(true)|length == 0 %}
                               <li>Certs not present</li>
@@ -149,7 +155,7 @@
                             </ul>
                           </td>
                         </tr>
-                        {% if is_granted('ROLE_ADMIN') %}
+                        {% if is_granted('ROLE_ADMIN')%}
                         <tr>
                             <td>
                                 Manual Recipero Check

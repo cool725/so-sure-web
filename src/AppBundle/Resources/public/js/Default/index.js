@@ -12,12 +12,6 @@ $(function(){
         });
     });
 
-    $("#get-quote-btn").click(function() {
-        $('html, body').animate({
-            scrollTop: $("#get-quote").offset().top
-        }, 1500);
-    });
-
     $("#how-it-works-btn").click(function(event) {
 
         event.preventDefault();
@@ -70,6 +64,6 @@ $(function(){
             
         }   
 
-    });    
+    });  
 
-});    
+})

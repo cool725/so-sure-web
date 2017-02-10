@@ -7,10 +7,12 @@ use AppBundle\Document\Address;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\PhoneTrait;
 
 class PurchaseStepPhone
 {
     use CurrencyTrait;
+    use PhoneTrait;
 
     /** @var Phone */
     protected $phone;
@@ -88,15 +90,9 @@ class PurchaseStepPhone
 
     public function setImei($imei)
     {
-        // space, -, / may be present when copy/pasted by user
-        $imei = str_replace(' ', '', $imei);
-        $imei = str_replace('-', '', $imei);
-        $imei = str_replace('/', '', $imei);
-        // There are some cases of 17 digits imei (15 digit imei with additional info attached)
-        // Such as samsung s7 edge
-        $this->imei = substr($imei, 0, 15);
+        $this->imei = $this->normalizeImei($imei);
         if ($this->getPhone() && $this->getPhone()->getMake() != "Apple") {
-            $this->setSerialNumber($imei);
+            $this->setSerialNumber($this->imei);
         }
     }
 

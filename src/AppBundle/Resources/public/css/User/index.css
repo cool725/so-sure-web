@@ -180,3 +180,17 @@
   font-size: 22px;
   font-weight: bold;
 }
+
+.user-invalid {
+  padding-top: 100px;
+  padding-bottom: 150px;
+  text-align: center;
+}
+
+.user-invalid h1 {
+  color: #fff;
+}
+
+.user-invalid p {
+  color: #fff;
+}

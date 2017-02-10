@@ -101,12 +101,36 @@ class DefaultController extends BaseController
             }
         }
 
+        $i6s = $phoneRepo->findOneBy([
+                'active' => true,
+                'make' => 'Apple',
+                'model' => 'iPhone 6S',
+                'memory' => (int) 32
+        ]);
+
+        $i7 = $phoneRepo->findOneBy([
+            'active' => true,
+            'make' => 'Apple',
+            'model' => 'iPhone 7',
+            'memory' => (int) 32
+        ]);
+
+        $s7 = $phoneRepo->findOneBy([
+            'active' => true,
+            'make' => 'Samsung',
+            'model' => 'Galaxy S7',
+            'memory' => (int) 32
+        ]);
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         return array(
             'form_top' => $formTop->createView(),
             'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
+            'i6s_from' => $i6s->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            'i7_from' => $i7->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            's7_from' => $s7->getCurrentPhonePrice()->getMonthlyPremiumPrice()
         );
     }
 
@@ -420,19 +444,38 @@ class DefaultController extends BaseController
                 'memory' => (int) $memory
             ]);
             // check for historical urls
-            if (!$phone) {
+            if (!$phone || stripos($model, ' ') !== false) {
                 $phone = $repo->findOneBy([
                     'active' => true,
                     'make' => $make,
                     'model' => $model,
                     'memory' => (int) $memory
                 ]);
+                if ($phone) {
+                    return $this->redirectToRoute('quote_make_model_memory', [
+                        'make' => $phone->getMake(),
+                        'model' => $phone->getEncodedModel(),
+                        'memory' => $phone->getMemory(),
+                    ], 301);
+                }
             }
         } else {
-            $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $decodedModel]);
-            // check for historical urls
-            if (!$phone) {
+            $phones = $repo->findBy(
+                ['active' => true, 'make' => $make, 'model' => $decodedModel],
+                ['memory' => 'asc'],
+                1
+            );
+            if (count($phones) != 0 && stripos($model, ' ') === false) {
+                $phone = $phones[0];
+            } else {
+                // check for historical urls
                 $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $model]);
+                if ($phone) {
+                    return $this->redirectToRoute('quote_make_model', [
+                        'make' => $phone->getMake(),
+                        'model' => $phone->getEncodedModel()
+                    ], 301);
+                }
             }
         }
         if (!$phone) {
@@ -441,6 +484,18 @@ class DefaultController extends BaseController
 
         $session = $request->getSession();
         $session->set('quote', $phone->getId());
+        if ($phone->getMemory()) {
+            $session->set('quote_url', $this->generateUrl('quote_make_model_memory', [
+                'make' => $phone->getMake(),
+                'model' => $phone->getEncodedModel(),
+                'memory' => $phone->getMemory(),
+            ], UrlGeneratorInterface::ABSOLUTE_URL));
+        } else {
+            $session->set('quote_url', $this->generateUrl('quote_make_model', [
+                'make' => $phone->getMake(),
+                'model' => $phone->getEncodedModel(),
+            ], UrlGeneratorInterface::ABSOLUTE_URL));
+        }
 
         $user = new User();
 

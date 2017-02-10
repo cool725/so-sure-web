@@ -32,7 +32,7 @@ class Address
     protected $created;
 
     /**
-     * @Assert\Choice({"billing"})
+     * @Assert\Choice({"billing"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

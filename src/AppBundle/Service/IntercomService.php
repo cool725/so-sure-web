@@ -216,6 +216,9 @@ class IntercomService
         if ($user->getIntercomId()) {
             $data['id'] = $user->getIntercomId();
         }
+        if ($user->getMobileNumber()) {
+            $data['phone'] = $user->getMobileNumber();
+        }
 
         $policyValue = 0;
         $pot = 0;

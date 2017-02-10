@@ -40,7 +40,7 @@ class SalvaPhonePolicy extends PhonePolicy
 
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "wait-cancelled", "pending-cancelled",
-     *      "replacement-cancel", "replacement-create", "skipped"})
+     *      "replacement-cancel", "replacement-create", "skipped"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

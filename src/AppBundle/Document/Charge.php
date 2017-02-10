@@ -44,7 +44,7 @@ class Charge
     protected $createdDate;
 
     /**
-     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage"})
+     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

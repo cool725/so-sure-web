@@ -62,7 +62,7 @@ class MultiPay
     protected $scode;
 
     /**
-     * @Assert\Choice({"requested", "cancelled", "accepted", "rejected"})
+     * @Assert\Choice({"requested", "cancelled", "accepted", "rejected"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

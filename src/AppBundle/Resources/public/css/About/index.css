@@ -1,0 +1,25 @@
+
+.about-section {
+	padding: 30px 20px 60px 20px;
+}
+
+.about-section h1 {
+	margin-bottom: 20px;
+}
+
+.about-section h3 {
+	color: #626b78;
+	font-size: 18px;
+}
+
+.about-section ul {
+	margin-bottom: 20px;
+}
+
+.about-section small {
+	font-size: 60%;
+}
+
+.about-section .go-back {
+	margin-top: 20px;
+}

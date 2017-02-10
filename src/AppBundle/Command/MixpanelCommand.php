@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
+use AppBundle\Document\PhonePolicy;
 
 class MixpanelCommand extends ContainerAwareCommand
 {
@@ -20,7 +21,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|test|clear|show (or blank for process)'
+                'delete|test|clear|show|sync|sync-all (or blank for process)'
             )
             ->addOption(
                 'email',
@@ -61,6 +62,20 @@ class MixpanelCommand extends ContainerAwareCommand
             }
             $results = $this->getMixpanel()->queueTrackWithUser($user, "button clicked", array("label" => "sign-up"));
             $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
+        } elseif ($action == 'sync') {
+            if (!$user) {
+                throw new \Exception('Requires user; add --email');
+            }
+            $results = $this->getMixpanel()->updateUser($user);
+            $output->writeln('Queued user update');
+        } elseif ($action == 'sync-all') {
+            $policies = $this->getPhonePolicyRepository()->findAllActivePolicies(null);
+            $count = 0;
+            foreach ($policies as $policy) {
+                $results = $this->getMixpanel()->updateUser($policy->getUser());
+                $count++;
+            }
+            $output->writeln(sprintf('Queued %d user update', $count));
         } elseif ($action == 'delete') {
             if (!$id) {
                 throw new \Exception('email or id is required');
@@ -102,6 +117,14 @@ class MixpanelCommand extends ContainerAwareCommand
     {
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $repo = $dm->getRepository(User::class);
+
+        return $repo;
+    }
+
+    private function getPhonePolicyRepository()
+    {
+        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $repo = $dm->getRepository(PhonePolicy::class);
 
         return $repo;
     }

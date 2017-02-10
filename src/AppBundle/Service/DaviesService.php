@@ -419,7 +419,7 @@ class DaviesService
         }
 
         // Open Non-Warranty Claims are expected to either have a total incurred value or a reserved value
-        if ($daviesClaim->isOpen() && !$daviesClaim->isClaimWarrantyOrExtended() &&
+        if ($daviesClaim->isOpen() && !$daviesClaim->isClaimWarranty() &&
             $this->areEqualToTwoDp($daviesClaim->getIncurred(), 0) &&
             $this->areEqualToTwoDp($daviesClaim->getReserved(), 0)) {
             $msg = sprintf('Claim %s does not have a reserved value', $daviesClaim->claimNumber);

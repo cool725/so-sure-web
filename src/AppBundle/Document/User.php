@@ -53,7 +53,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $referred;
 
     /**
-     * @Assert\Choice({"invitation", "scode"})
+     * @Assert\Choice({"invitation", "scode"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -546,7 +546,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getCurrentPolicy()
     {
         foreach ($this->getPolicies() as $policy) {
-            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_PENDING])) {
+            if (in_array($policy->getStatus(), [
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_PENDING,
+                Policy::STATUS_UNPAID
+            ])) {
                 return $policy;
             }
         }

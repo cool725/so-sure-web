@@ -1,5 +1,5 @@
 $(function(){
-    var maxAddresses = 60;
+    var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
     var key = $('#ss-root').data('pca-key');
 
     $('.form-control').on('change', function() {
@@ -56,15 +56,13 @@ $(function(){
             settings.type = "POST";
             settings.data = {
 				Key: key,
-                Method: "Predict",
 				SearchTerm: query,
 				Country : "GBR",
-                Limit: maxAddresses
+                MaxSuggestions: maxAddresses
             };
             return settings;
         },
         transform: function (response) {
-            //console.log(response);
             if (response.Items && response.Items.length > 0 && response.Items[0].Error) {
                 showAddress("Sorry, there's an error with our address lookup. Please type in manually below.");
             }
@@ -77,10 +75,9 @@ $(function(){
       display: 'Text',
       source: capture,
       highlight: true,
-      limit: maxAddresses,
+      limit: 100 // below 100 typeahead stops showing results for less than 4 characters entered
     });
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
-        console.log(suggestion);
         showAddress();
         $.ajax({
             method: "POST",
@@ -91,7 +88,6 @@ $(function(){
             }
           })
             .done(function( msg ) {
-                //console.log(msg);
                 var addr = msg.Items[0];
                 setAddress(addr);
           });
