@@ -163,7 +163,9 @@ class PhonePolicy extends Policy
             try {
                 $actualData = unserialize($data);
                 $includeCert = false;
-                if ($onlyClaims && isset($actualData['claimId']) && $actualData['claimId']) {
+                if ($actualData['certId'] == 'register') {
+                    $includeCert = !$onlyClaims;
+                } elseif ($onlyClaims && isset($actualData['claimId']) && $actualData['claimId']) {
                     $includeCert = true;
                 } elseif ($onlyClaims === false && (!isset($actualData['claimId']) || !$actualData['claimId'])) {
                     $includeCert = true;
@@ -188,6 +190,15 @@ class PhonePolicy extends Policy
     public function addCheckmendSerialData($response)
     {
         $this->addCheckmendCertData('serial', $response);
+    }
+
+    public function addCheckmendRegisterData($transactionId, $imei, $claim, $claimType)
+    {
+        $this->addCheckmendCertData(
+            'register',
+            ['imei' => $imei, 'transactionId' => $transactionId, 'claimType' => $claimType],
+            $claim
+        );
     }
 
     public function addCheckmendCertData($certId, $response, $claim = null)

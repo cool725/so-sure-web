@@ -34,7 +34,7 @@ class KernelListener
         if (!$event->isMasterRequest()) {
             return;
         }
-        
+
         $request  = $event->getRequest();
         $source = $request->query->get('utm_source');
         $medium = $request->query->get('utm_medium');

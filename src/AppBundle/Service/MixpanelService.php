@@ -81,6 +81,11 @@ class MixpanelService
             }
         }
 
+        if ($this->requestService->isSoSureEmployee() ||
+            $this->requestService->isExcludedAnalyticsIp()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -198,8 +203,18 @@ class MixpanelService
         $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
     }
 
-    public function queuePersonIncrement($userId, $field, $incrementBy = 1)
+    public function queuePersonIncrement($field, $incrementBy = 1, $user = null)
     {
+        $userId = null;
+        if (!$user) {
+            $user = $this->requestService->getUser();
+        }
+        if ($user) {
+            $userId = $user->getId();
+        } else {
+            $userId = $this->requestService->getTrackingId();
+        }
+
         $this->queue(self::QUEUE_PERSON_INCREMENT, $userId, [
             'field' => $field,
             'incrementBy' => $incrementBy
@@ -315,7 +330,9 @@ class MixpanelService
             }
             $userData['Number of Connections'] = count($policy->getConnections());
             $userData['Reward Pot Value'] = $policy->getPotValue();
-            $userData['Number of Invites Sent'] = count($policy->getSentInvitations(false));
+            if ($connection = $policy->getLastConnection()) {
+                $userData['Last connection complete'] = $connection->getDate()->format(\DateTime::ATOM);
+            }
         }
 
         $this->queuePersonProperties($userData, false, $user);
@@ -336,19 +353,45 @@ class MixpanelService
         $parser = Parser::create();
         $userAgentDetails = $parser->parse($userAgent);
 
+        if (stripos($userAgentDetails->ua->family, 'bot') !== false) {
+            return false;
+        }
+        if (stripos($userAgentDetails->ua->family, 'spider') !== false) {
+            return false;
+        }
+        if (stripos($userAgentDetails->ua->family, 'crawler') !== false) {
+            return false;
+        }
+
         // exclude bots from tracking
         if (in_array($userAgentDetails->ua->family, [
             'PhantomJS',
-            'SeznamBot',
-            'Googlebot',
-            'Sogou web spider',
-            'Baiduspider',
-            'Yahoo! Slurp'
+            'Yahoo! Slurp',
+            'Apache-HttpClient',
+            'Java',
+            'Python Requests',
+            'Python-urllib',
+            'Scrapy',
+            'Google',
+            'ia_archiver',
+            'SimplePie',
         ])) {
             return false;
         }
 
         if (stripos($userAgent, 'StatusCake') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'okhttp') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'curl') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'ips-agent') !== false) {
+            return false;
+        }
+        if (stripos($userAgent, 'ScoutJet') !== false) {
             return false;
         }
 
@@ -381,8 +424,12 @@ class MixpanelService
             $properties = [];
         }
         if ($addUtm) {
+            $utmLatest = $this->transformUtm(false);
+            $this->queuePersonProperties($utmLatest, false, $user);
+
             $utm = $this->transformUtm();
             $this->queuePersonProperties($utm, true, $user);
+
             $properties = array_merge($properties, $utm);
         }
 
@@ -404,7 +451,7 @@ class MixpanelService
 
         // Special case for logins - bump login count
         if ($event == self::EVENT_LOGIN) {
-            $this->queuePersonIncrement($userId, "Number Of Logins", 1);
+            $this->queuePersonIncrement("Number Of Logins", 1);
         }
     }
 
@@ -434,28 +481,40 @@ class MixpanelService
         $this->mixpanel->people->deleteUser($id);
     }
 
-    private function transformUtm()
+    private function transformUtm($setOnce = true)
     {
-        $utm = $this->requestService->getUtm();
-        if (!$utm) {
-            return [];
+        $prefix = '';
+        if (!$setOnce) {
+            $prefix = 'Latest ';
         }
+        $utm = $this->requestService->getUtm();
+        $referer = $this->requestService->getReferer();
 
         $transform = [];
-        if (isset($utm['source']) && $utm['source']) {
-            $transform['Campaign Source'] = $utm['source'];
+        if ($utm) {
+            if (isset($utm['source']) && $utm['source']) {
+                $transform[sprintf('%sCampaign Source', $prefix)] = $utm['source'];
+            }
+            if (isset($utm['medium']) && $utm['medium']) {
+                $transform[sprintf('%sCampaign Medium', $prefix)] = $utm['medium'];
+            }
+            if (isset($utm['campaign']) && $utm['campaign']) {
+                $transform[sprintf('%sCampaign Name', $prefix)] = $utm['campaign'];
+            }
+            if (isset($utm['term']) && $utm['term']) {
+                $transform[sprintf('%sCampaign Term', $prefix)] = $utm['term'];
+            }
+            if (isset($utm['content']) && $utm['content']) {
+                $transform[sprintf('%sCampaign Content', $prefix)] = $utm['content'];
+            }
         }
-        if (isset($utm['medium']) && $utm['medium']) {
-            $transform['Campaign Medium'] = $utm['medium'];
-        }
-        if (isset($utm['campaign']) && $utm['campaign']) {
-            $transform['Campaign Name'] = $utm['campaign'];
-        }
-        if (isset($utm['term']) && $utm['term']) {
-            $transform['Campaign Term'] = $utm['term'];
-        }
-        if (isset($utm['content']) && $utm['content']) {
-            $transform['Campaign Content'] = $utm['content'];
+
+        if ($referer) {
+            $refererDomain = parse_url($referer, PHP_URL_HOST);
+            $currentDomain = parse_url($this->requestService->getUri(), PHP_URL_HOST);
+            if (strtolower($refererDomain) != strtolower($currentDomain)) {
+                $transform[sprintf('%sReferer', $prefix)] = $referer;
+            }
         }
 
         return $transform;

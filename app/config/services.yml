@@ -231,9 +231,10 @@ services:
     app.request:
         class: AppBundle\Service\RequestService
         arguments:
-            requestStack: "@request_stack"
-            logger:       "@logger"
-            tokenStorage: "@security.token_storage"
+            requestStack:     "@request_stack"
+            logger:           "@logger"
+            tokenStorage:     "@security.token_storage"
+            adminCookieValue: "%sosure_employee_cookie_value%"
 
     app.twig.branch:
         class: AppBundle\Service\BranchTwigExtension

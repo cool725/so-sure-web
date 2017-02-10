@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\User;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class RequestService
 {
@@ -16,19 +17,24 @@ class RequestService
     protected $logger;
 
     protected $tokenStorage;
+    protected $adminCookieValue;
 
     /**
      * @param RequestStack    $requestStack
      * @param LoggerInterface $logger
+     * @param                 $tokenStorage
+     * @param string          $adminCookieValue
      */
     public function __construct(
         RequestStack $requestStack,
         LoggerInterface $logger,
-        $tokenStorage
+        $tokenStorage,
+        $adminCookieValue
     ) {
         $this->requestStack = $requestStack;
         $this->logger = $logger;
         $this->tokenStorage = $tokenStorage;
+        $this->adminCookieValue = $adminCookieValue;
     }
 
     public function getReferer()
@@ -138,5 +144,32 @@ class RequestService
         }
 
         return null;
+    }
+
+    public function isSoSureEmployee()
+    {
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            if ($cookie = $request->cookies->get(SoSure::SOSURE_EMPLOYEE_COOKIE_NAME)) {
+                return urldecode($cookie) === $this->adminCookieValue;
+            }
+        }
+
+        return false;
+    }
+
+    public function isExcludedAnalyticsIp()
+    {
+        if ($clientIp = $this->getClientIp()) {
+            return IpUtils::checkIp($clientIp, [
+                '62.253.24.186', // rwe
+                '213.86.221.35', // wework
+                '80.169.94.194', // rwe shoreditch
+                '167.98.14.60', // coccoon
+                '217.158.0.52', // davies
+                // '10.0.2.2', // for debugging - vagrant
+            ]);
+        }
+
+        return false;
     }
 }

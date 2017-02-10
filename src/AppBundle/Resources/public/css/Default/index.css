@@ -3,11 +3,67 @@
 .hero {
     padding: 30px 20px 50px 20px;
     color: #fff;
-    text-shadow: 0 0 8px #666;
 }
 
 .hero h1 {
     color: #fff;
+    text-align: left;
+    font-size: 50px;
+    line-height: 1.5em;
+    margin-top: 0;
+}
+
+.hero blockquote {
+    border: none;
+    margin-bottom: 40px;
+}
+
+.hero blockquote em {
+    color: #fff;
+}
+
+#benefits, .social-proof {
+    background: #fff;
+}
+
+.btn-dark {
+    margin-right: 20px;
+    border: 2px solid #202532;
+    background: #202532 !important;
+    color: #fff;
+}
+
+.hero-link > div {
+    margin-bottom: 20px;
+}
+
+.hero-link > img {
+    text-decoration: none;
+    opacity: 0.9;
+}
+
+.hero-link > span {
+    padding-top: 10px;
+}
+
+a.hero-link:hover {
+    text-decoration: none;
+} 
+
+.btn-dark:hover {
+    color: #fff;
+}
+
+@media (max-width: 767px) {
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .hero-link {
+        text-align: center;
+        margin-right: 0;
+        width: 100%;
+    }
 }
 
 /* MOVE TO components > _buttons.scss  */
@@ -386,4 +442,5 @@ blockquote footer:before {
   #select-phone .device-select li {
     display: block !important;
   }
+
 }

@@ -155,6 +155,11 @@ class DaviesClaim
         }
     }
 
+    public function isClaimWarranty()
+    {
+        return in_array($this->getClaimType(), [Claim::TYPE_WARRANTY]);
+    }
+
     public function isClaimWarrantyOrExtended()
     {
         return in_array($this->getClaimType(), [Claim::TYPE_WARRANTY, Claim::TYPE_EXTENDED_WARRANTY]);

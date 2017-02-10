@@ -34,6 +34,7 @@ abstract class Policy
     const RISK_CONNECTED_NO_CLAIM = 'connected w/no claim';
     const RISK_NOT_CONNECTED_NEW_POLICY = 'not connected w/new policy';
     const RISK_NOT_CONNECTED_ESTABLISHED_POLICY = 'not connected w/established policy (>30 days)';
+    const RISK_PENDING_CANCELLATION_POLICY = 'policy is pending cancellation';
 
     const STATUS_PENDING = 'pending';
     const STATUS_ACTIVE = 'active';
@@ -74,6 +75,7 @@ abstract class Policy
         self::RISK_CONNECTED_NO_CLAIM => self::RISK_LEVEL_LOW,
         self::RISK_NOT_CONNECTED_NEW_POLICY => self::RISK_LEVEL_HIGH,
         self::RISK_NOT_CONNECTED_ESTABLISHED_POLICY => self::RISK_LEVEL_MEDIUM,
+        self::RISK_PENDING_CANCELLATION_POLICY => self::RISK_LEVEL_HIGH,
     ];
 
     /**
@@ -100,7 +102,7 @@ abstract class Policy
 
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "expired", "unpaid",
-     *                  "multipay-requested", "multipay-rejected"})
+     *                  "multipay-requested", "multipay-rejected"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -110,7 +112,7 @@ abstract class Policy
      * @Assert\Choice({
      *  "unpaid", "actual-fraud", "suspected-fraud", "user-requested",
      *  "cooloff", "badrisk", "dispossession", "wreckage"
-     * })
+     * }, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -278,7 +280,7 @@ abstract class Policy
     protected $policyFiles = array();
 
     /**
-     * @Assert\Choice({"invitation", "scode"})
+     * @Assert\Choice({"invitation", "scode"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -509,6 +511,25 @@ abstract class Policy
     public function getConnections()
     {
         return $this->connections;
+    }
+
+    public function getLastConnection()
+    {
+        $connections = $this->getConnections();
+        if (!is_array($connections)) {
+            $connections = $connections->getValues();
+        }
+        if (count($connections) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($connections, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $connections[0];
     }
 
     public function addClaim(Claim $claim)
@@ -1251,6 +1272,10 @@ abstract class Policy
             $date = new \DateTime();
         }
 
+        if ($this->getPendingCancellation()) {
+            return self::RISK_PENDING_CANCELLATION_POLICY;
+        }
+
         if (count($this->getConnections()) > 0) {
             // Connected and value of their pot is zero
             if ($this->hasMonetaryClaimed(true)) {
@@ -1287,6 +1312,19 @@ abstract class Policy
             return self::RISK_NOT_CONNECTED_ESTABLISHED_POLICY;
             // return self::RISK_LEVEL_MEDIUM;
         }
+    }
+
+    public function isPolicyWithin21Days($date = null)
+    {
+        if (!$this->getStart()) {
+            return null;
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $this->getStart()->diff($date)->days <= 21;
     }
 
     public function isPolicyWithin30Days($date = null)
@@ -1950,11 +1988,24 @@ abstract class Policy
         }
 
         if ($this->hasOpenClaim(true)) {
-            $warnings[] = sprintf('Policy has an open claim, but ClaimsCheck has not been run.');
+            $warnings[] = sprintf('Policy has an open claim, but Recipero (ClaimsCheck) has not been run.');
         }
 
         if (!$this->isAdditionalClaimLostTheftApprovedAllowed()) {
             $warnings[] = sprintf('Policy already has 2 lost/theft claims. No further lost/theft claims are allowed');
+        }
+
+        if ($this->getPendingCancellation()) {
+            $warnings[] = sprintf(
+                'Policy is scheduled to be cancelled on %s (requested by user 30 days prior).',
+                $this->getPendingCancellation()->format('d M Y H:i')
+            );
+        }
+
+        if ($this->isPolicyWithin21Days()) {
+            $warnings[] = sprintf(
+                'Policy was created within the last 21 days. High risk of fraud.'
+            );
         }
 
         return $warnings;

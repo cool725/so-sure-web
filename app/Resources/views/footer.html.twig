@@ -1,5 +1,6 @@
 {% import "::macros.html.twig" as macros %}
 
+{% if app.request.get('_route') != 'homepage' %}
 <section class="press">
     <div class="container">
         <div class="col-sm-3 col-md-2">
@@ -23,14 +24,34 @@
     </div>
 </section>
 
+{% endif %}
+
 <footer class="footer">
     <div class="container">
     
-        <div class="row footer--top">
-            <div class="col-md-2">
-                <div class="so-sure-logo-light" alt="so-sure Logo"></div>                 
-            </div>
-            <div class="col-md-3">
+        <div class="row footer--top text-center">
+            <div class="col-md-12"> 
+                <div class="so-sure-logo-light"></div>
+                <section class="in-partnership">
+                    <div class="">
+                        <ul class="list-inline">
+                            <li><strong class="text-white">In partnership with</strong></li><br>
+                            <li><img src="{{ cdn_url }}/images/footer/munich-re-logo.png" width="150" alt="Munich RE"></li>
+                            <li><img src="{{ cdn_url }}/images/footer/salva-logo.png" width="150" alt="Salva"></li>
+                        </ul>
+                    </div>
+                </section>
+                <ul class="list-inline">    
+                    <li><a href="{{ path('about_our_mission') }}">OUR MISSION</a></li>
+                    <li></li>
+                    <li><a href="https://blog.wearesosure.com" target="_blank" alt="we are so-sure - Thoughts from inside the Social Insurance revolution.">BLOG</a></li>
+                    <li></li>                    
+                    <li><a href="https://wearesosure.zendesk.com/hc/en-us/sections/201886655-Making-a-Claim" target="_blank">MAKE A CLAIM</a></li>
+                    <li></li>                    
+                    <li><a href="{{ path('about_how_to_contact_so_sure') }}">CONTACT US</a></li>
+                    <li><a href="https://twitter.com/wearesosure" class="icon-twitter"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+                    <li><a href="https://www.facebook.com/wearesosure" class="icon-facebook"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>                                                             
+                </ul>
                 <ul class="list-inline">
                     <li>
                         <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-app-store.svg" alt="Download so-sure on the App Store"></img>
@@ -39,27 +60,9 @@
                     <li>
                         <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-google-play.svg" alt="Get so-sure on Google Play"></img>
                         </a>
-                    </li>
-                </ul>             
-            </div>
-            <div class="col-md-2">
-                <ul class="list-inline text-center">
-                    <li><a href="https://blog.wearesosure.com/" class="icon-medium"><i class="fa fa-medium fa-lg" aria-hidden="true"></i></a></li>
-                    <li><a href="https://twitter.com/wearesosure" class="icon-twitter"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-                    <li><a href="https://www.facebook.com/wearesosure" class="icon-facebook"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>                       
-                </ul>    
-            </div>
-            <div class="col-md-3">
-                <ul class="list-unstyled">             
-                    <li><a href="https://wearesosure.zendesk.com/hc/en-us/articles/207523059-Our-mission" target="_blank">OUR MISSION</a></li>
-                    <li></li>
-                    <li><a href="https://blog.wearesosure.com" target="_blank" alt="we are so-sure - Thoughts from inside the Social Insurance revolution.">BLOG</a></li>
-                    <li></li>                    
-                    <li><a href="https://wearesosure.zendesk.com/hc/en-us/sections/201886655-Making-a-Claim" target="_blank">MAKE A CLAIM</a></li>
-                    <li></li>                    
-                    <li><a href="https://wearesosure.zendesk.com/hc/en-us/sections/201886665-How-to-Contact-Us" target="_blank">CONTACT US</a></li>
+                    </li>                    
                 </ul>
-            </div>
+            </div>                       
         </div>
 
         <hr>
@@ -69,7 +72,11 @@
                 <ul class="list-inline">
                     <li>&copy; 2016 <a href="/">so-sure Ltd</a></li>
                     <li>|</li>
-                    <li><a href="/terms">Terms</a> &amp; {{ macros.iubenda() }}</li>
+                    <li><a href="{{ path('terms') }}">Terms</a></li>
+                    <li>|</li>
+                    <li>{{ macros.iubenda() }}</li>
+                    <li>|</li>
+                    <li><a href="https://www.iubenda.com/privacy-policy/7805295/cookie-policy">Cookie Policy</a></li>
                 </ul>
                 <p><small>We are a company registered in England &amp; Wales (No. 09365669) and our registered address is Runway East, 10 Finsbury Square, London EC2A 1AF.</small></p>
                 <p><small>so-sure is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is <a href="https://register.fca.org.uk/ShPo_FirmDetailsPage?id=001b000003MOOUGAA5" target="_blank" style="text-decoration: underline !important;">744729</a>.  We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling.</small></p>

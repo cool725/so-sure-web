@@ -24,6 +24,13 @@ class ClaimTest extends \PHPUnit_Framework_TestCase
         $claim->setStatus(Claim::STATUS_INREVIEW);
     }
 
+    public function testSetStatusExtended()
+    {
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_EXTENDED_WARRANTY);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */

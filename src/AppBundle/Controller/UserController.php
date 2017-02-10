@@ -40,7 +40,7 @@ class UserController extends BaseController
     public function indexAction(Request $request)
     {
         $user = $this->getUser();
-        if (!$user->hasActivePolicy()) {
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         } elseif ($user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
@@ -163,6 +163,16 @@ class UserController extends BaseController
         $user = $this->getUser();
         if (!$user->hasActivePolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+        }
+
+        $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
+        if ($countUnprocessedInvitations > 0) {
+            $message = sprintf(
+                'Hey, you already have %d invitation%s. 🤗 <a href="#download-apps">Download</a> our app to connect.',
+                $countUnprocessedInvitations,
+                $countUnprocessedInvitations > 1 ? 's' : ''
+            );
+            $this->addFlash('success', $message);
         }
 
         return array(

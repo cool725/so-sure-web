@@ -3,8 +3,10 @@
 .footer {
     position: relative;
     z-index: 100;
-    padding: 35px 0;
-
+    padding: 20px 0 70px 0;
+    background: #202532;
+    color: #fff;
+    text-align: center;
     font-size: 14px;
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;  
     text-align: center;    
@@ -21,24 +23,17 @@
     color: #fff;
     opacity: 1;
     transition-property: color;
-    text-decoration: none !important;    
+    text-decoration: none !important;  
+    cursor: pointer;  
 }
 
 .footer a:hover {
     color: #3399ff;
 }
 
-.footer ul.list-inline > li:not(:first-of-type) {
-    padding-left: 10px;
-}
-
-.footer li {
-    padding: 5px 0;
-}
-
 .footer .so-sure-logo-light {
     margin: 0 auto 15px;
-}
+}    
 
 @media (min-width: 992px) {
 
@@ -46,16 +41,17 @@
         text-align: left;
     }
 
-    .footer .so-sure-logo-light {
-        margin: 15px 0 0;
-    }    
+}
 
+/* In Partnership - Ext Banner: MOVE TO layouts > _footer.scss */
+.in-partnership {
+    text-align: center;
 }
 
 /* PRESS - Ext Banner: MOVE TO layouts > _footer.scss */
 
-.press {
-    background: #ddd;
+section.press {
+    background: #ddd !important;
     padding: 20px 0;
     text-align: center;
 }
