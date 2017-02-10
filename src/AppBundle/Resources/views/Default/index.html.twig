@@ -48,22 +48,22 @@
                 <div class="col-sm-3 col-sm-offset-1 text-left">
                 <div class="hero-box">
                     <h3 class"">Most popular phones</h3>
-                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+6S', 'memory': 16}) }}">
+                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+6S', 'memory': 32}) }}">
                     <div class="row">
                         <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" height="40"/>
-                        <div class="col-sm-4 text-link dark-bg-link">From £7.99</div>
+                        <div class="col-sm-4 text-link dark-bg-link">From £{{ i6s_from }}</div>
                         </div>
                     </a>
-                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+7', 'memory': 16}) }}">
+                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Apple', 'model': 'iPhone+7', 'memory': 32}) }}">
                     <div class="row">
                         <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" height="40"/>
-                        <div class="col-sm-4 text-link dark-bg-link">From £8.53</div>
+                        <div class="col-sm-4 text-link dark-bg-link">From £{{ i7_from }}</div>
                         </div>
                     </a>
                     <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': 'Samsung', 'model': 'Galaxy+S7', 'memory': 32}) }}">
                         <div class="row">
                         <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" height="40"/>
-                        <div class="col-sm-4 text-link dark-bg-link">From £8.53</div>
+                        <div class="col-sm-4 text-link dark-bg-link">From £{{ s7_from }}</div>
                         </div>
                     </a>
                     </div>
