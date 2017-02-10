@@ -23,7 +23,7 @@ class DownloadController extends BaseController
     {
         $url = $this->get('app.twig.branch')->apple($medium);
 
-        return new RedirectResponse($url);        
+        return new RedirectResponse($url);
     }
 
     /**
@@ -34,6 +34,6 @@ class DownloadController extends BaseController
     {
         $url = $this->get('app.twig.branch')->google($medium);
 
-        return new RedirectResponse($url);        
+        return new RedirectResponse($url);
     }
 }
