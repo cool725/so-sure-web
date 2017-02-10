@@ -167,7 +167,10 @@
                                     </tr>
                                     {% endfor %}
                                 </table>
-                                <a href="#" data-toggle="modal" data-target="#calculation-details"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
+                                
+                                {% if comparision | length > 0 %}
+                                    <a href="#" data-toggle="modal" data-target="#calculation-details"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
+                                {% endif %}
 
                                 <div class="text-center h5">
                                     <a id="what-if" href="#" data-toggle-text="Return to annual premium"><strong class="text-underline">What happens when someone claims?</strong></a>

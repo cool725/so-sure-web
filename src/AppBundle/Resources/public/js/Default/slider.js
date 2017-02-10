@@ -47,6 +47,23 @@ $(function(){
         return +(Math.round(num + "e+2")  + "e-2");
     }
 
+    function flipReset(el, feature) {
+
+        $(el).click(function(e) {
+
+            e.preventDefault();
+
+            // Loading Overlay
+            $('.loading-overlay').fadeIn('400', function() {
+                
+            });
+
+            // Reset - if neeeded
+
+        });
+
+    }
+
     // What if - Needs improving
     $('#what-if').click(function(e) {
         
