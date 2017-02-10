@@ -81,12 +81,50 @@ class DefaultControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    public function testQuotePhoneSpaceRouteMakeModelMemory()
+    {
+        $url = self::$router->generate('quote_make_model_memory', [
+            'make' => 'Apple',
+            'model' => 'iPhone 5S',
+            'memory' => 64,
+        ]);
+        $redirectUrl = self::$router->generate('quote_make_model_memory', [
+            'make' => 'Apple',
+            'model' => 'iPhone+5S',
+            'memory' => 64,
+        ]);
+
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(301);
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $crawler = self::$client->followRedirect();
+        self::verifyResponse(200);
+    }
+
     public function testQuotePhoneRouteMakeModel()
     {
         $crawler = self::$client->request('GET', self::$router->generate('quote_make_model', [
             'make' => 'Apple',
             'model' => 'iPhone+5S',
         ]));
+        self::verifyResponse(200);
+    }
+
+    public function testQuotePhoneSpaceRouteMakeModel()
+    {
+        $url = self::$router->generate('quote_make_model', [
+            'make' => 'Apple',
+            'model' => 'iPhone 5S',
+        ]);
+        $redirectUrl = self::$router->generate('quote_make_model', [
+            'make' => 'Apple',
+            'model' => 'iPhone+5S',
+        ]);
+
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(301);
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
 
