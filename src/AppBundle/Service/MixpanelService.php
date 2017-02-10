@@ -81,7 +81,8 @@ class MixpanelService
             }
         }
 
-        if ($this->requestService->isSoSureEmployee()) {
+        if ($this->requestService->isSoSureEmployee() ||
+            $this->requestService->isExcludedAnalyticsIp()) {
             return false;
         }
 
