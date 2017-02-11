@@ -22,7 +22,7 @@ class SupportController extends BaseController
      * @Route("/{file}", name="support", requirements={"file"=".*"})
      * @Template()
      */
-    public function allAction(Request $request, $file = null)
+    public function allAction($file = null)
     {
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3support_fs');
 
