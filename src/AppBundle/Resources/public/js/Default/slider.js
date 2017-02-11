@@ -177,9 +177,13 @@ $(function(){
                 $handle = $('.rewardslider__handle', this.$range);
                 updateHandle($handle[0], this.value);  
 
-                var save_value = yearly_high;
-                whatIf(save_value);
-                setBars(); 
+                $('.loading-overlay-init').fadeOut('slow', function() {                    
+
+                    var save_value = yearly_high;
+                    whatIf(save_value);
+                    setBars(); 
+
+                });
             },
 
             onSlide: function(position, value) {
