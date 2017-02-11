@@ -128,9 +128,9 @@ class DefaultController extends BaseController
             'form_top' => $formTop->createView(),
             'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
-            'i6s_from' => $i6s->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            'i7_from' => $i7->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            's7_from' => $s7->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+            'i6s' => $i6s,
+            'i7' => $i7,
+            's7' => $s7
         );
     }
 
@@ -510,7 +510,6 @@ class DefaultController extends BaseController
             ->getForm();
         $buyForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form')
-            ->add('buy_mobile', SubmitType::class)
             ->add('buy_tablet', SubmitType::class)
             ->add('slider_used', HiddenType::class)
             ->getForm();
@@ -568,8 +567,6 @@ class DefaultController extends BaseController
                     $properties = [];
                     if ($buyForm->get('buy_tablet')->isClicked()) {
                         $properties['Location'] = 'main';
-                    } elseif ($buyForm->get('buy_mobile')->isClicked()) {
-                        $properties['Location'] = 'mobile';
                     }
 
                     if ($buyForm->getData()['slider_used']) {
