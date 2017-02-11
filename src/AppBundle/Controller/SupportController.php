@@ -30,7 +30,7 @@ class SupportController extends BaseController
         if (pathinfo($file, PATHINFO_EXTENSION) == "") {
             $html = sprintf('%s.html', $file);
             if (!$filesystem->has($html)) {
-               $html = sprintf("%s/index.html", $file);
+                $html = sprintf("%s/index.html", $file);
             }
             $file = $html;
         }
