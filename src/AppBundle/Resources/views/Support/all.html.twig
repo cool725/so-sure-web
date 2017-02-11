@@ -1,5 +1,13 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block meta %}
+    {{ head|raw }}
+{% endblock %}
+
 {% block body %}
-    {{ data|raw }}
+ {{ body|raw }}
 {% endblock %}

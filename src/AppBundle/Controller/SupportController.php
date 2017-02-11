@@ -19,22 +19,34 @@ use Symfony\Component\DomCrawler\Crawler;
 class SupportController extends BaseController
 {
     /**
-     * @Route("/{name}", name="support", requirements={"name"=".+"})
+     * @Route("/{file}", name="support", requirements={"file"=".*"})
      * @Template()
      */
-    public function allAction(Request $request, $name)
+    public function allAction(Request $request, $file = null)
     {
-        if ($name == "") {
-            $name = "index.html";
-        }
-        $file = sprintf('%s', $name);
-
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3support_fs');
+
+        // assume html extension if not given
+        if (pathinfo($file, PATHINFO_EXTENSION) == "") {
+            $html = sprintf('%s.html', $file);
+            if (!$filesystem->has($html)) {
+               $html = sprintf("%s/index.html", $file);
+            }
+            $file = $html;
+        }
+
+        if (!$filesystem->has($file)) {
+            throw $this->createNotFoundException('URL not found');
+        }
         $mimetype = $filesystem->getMimetype($file);
         if (stripos($mimetype, 'text/html') !== false) {
             $html = $filesystem->read($file);
             $crawler = new Crawler($html);
-            return ['data' => $crawler->filter('body')->html()];
+            return [
+                'title' => $crawler->filter('head title')->text(),
+                'head' => $crawler->filter('head')->html(),
+                'body' => $crawler->filter('body')->html(),
+            ];
         } else {
             return StreamedResponse::create(
                 function () use ($file, $filesystem) {
