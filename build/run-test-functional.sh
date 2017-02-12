@@ -13,13 +13,16 @@ fi
 SKIP_POLICY=0
 SKIP_DB=0
 FUNCTIONAL_TEST="test:functional"
-while getopts ":snpdh" opt; do
+while getopts ":snpdhc" opt; do
   case $opt in
     s)
       SKIP_POLICY=1
       ;;
     d)
       SKIP_DB=1
+      ;;
+    c)
+      FUNCTIONAL_TEST="test:functional:cover"
       ;;
     n)
       FUNCTIONAL_TEST="test:functional:nonet"
@@ -28,7 +31,7 @@ while getopts ":snpdh" opt; do
       FUNCTIONAL_TEST="test:functional:paid"
       ;;
     h)
-      echo "Usage: $0 [-d skip db refresh] [-s skip policy] [-n no network test | -p run paid test] [filter e.g. (::Method or namespace - use \\)"
+      echo "Usage: $0 [-d skip db refresh] [-c run coverage] [-s skip policy] [-n no network test | -p run paid test] [filter e.g. (::Method or namespace - use \\)"
       ;;
   esac
 done
