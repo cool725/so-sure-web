@@ -19,7 +19,7 @@ class DownloadController extends BaseController
      * @Route("/apple/{medium}", name="download_apple")
      * @Template
      */
-    public function appleAction(Request $request, $medium = null)
+    public function appleAction($medium = null)
     {
         $url = $this->get('app.twig.branch')->apple($medium);
 
@@ -30,7 +30,7 @@ class DownloadController extends BaseController
      * @Route("/google/{medium}", name="download_google")
      * @Template
      */
-    public function googleAction(Request $request, $medium = null)
+    public function googleAction($medium = null)
     {
         $url = $this->get('app.twig.branch')->google($medium);
 
