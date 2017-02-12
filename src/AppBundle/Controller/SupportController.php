@@ -13,18 +13,25 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\DomCrawler\Crawler;
 
-/**
- * @Route("/support")
- */
 class SupportController extends BaseController
 {
     /**
-     * @Route("/{file}", name="support", requirements={"file"=".*"})
+     * @Route("/support/{file}", name="support", requirements={"file"=".*"})
+     * @Route("/how-it-works/{file}", name="howitworks", requirements={"file"=".*"})
+     * @Route("/looking-after-your-phone/{file}", name="advise", requirements={"file"=".*"})
      * @Template()
      */
-    public function allAction($file = null)
+    public function allAction(Request $request, $file = null)
     {
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3support_fs');
+        $routeName = $request->get('_route');
+        if ($routeName == 'support') {
+            $file = sprintf('/support/%s', $file);
+        } elseif ($routeName == 'howitworks') {
+            $file = sprintf('/how-it-works/%s', $file);
+        } elseif ($routeName == 'advise') {
+            $file = sprintf('/looking-after-your-phone/%s', $file);            
+        }
 
         // assume html extension if not given
         if (pathinfo($file, PATHINFO_EXTENSION) == "") {
