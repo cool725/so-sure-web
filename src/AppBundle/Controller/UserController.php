@@ -45,6 +45,15 @@ class UserController extends BaseController
         } elseif ($user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
+
+        $scode = null;
+        $session = $request->getSession();
+        if ($code = $session->get('scode')) {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(SCode::class);
+            $scode = $repo->findOneBy(['code' => $code]);
+        }
+
         $policy = $user->getCurrentPolicy();
 
         $invitationService = $this->get('app.invitation');
@@ -98,6 +107,7 @@ class UserController extends BaseController
             'policy' => $user->getCurrentPolicy(),
             'email_form' => $emailInvitationForm->createView(),
             'invitation_form' => $invitationForm->createView(),
+            'scode' => $scode,
         );
     }
 
@@ -108,6 +118,12 @@ class UserController extends BaseController
     public function invalidPolicyAction()
     {
         $user = $this->getUser();
+        if ($user->hasUnpaidPolicy() || $user->hasActivePolicy()) {
+            // Causes too much user confusion to hit this page if they do have a policy in any state
+            // but better to throw exception as shouldn't be getting here anyway and redirecting
+            // could cause redirect loop
+            throw new \Exception('Attempting to access invalid policy page with active/unpaid policy');
+        }
 
         // If there are any policies in progress, redirect to the purchase
         $initPolicies = $user->getInitPolicies();
