@@ -29,7 +29,7 @@
     </target>
                 
     <target name="test:functional" description="Run functional tests">
-        <phpunit configuration="${dir.app}/phpunit.xml.dist" codecoverage="true"
+        <phpunit configuration="${dir.app}/phpunit.xml.dist"
         haltonfailure="true" haltonerror="true" groups="functional-net,functional-nonet">
           <formatter type="plain" usefile="false"/>
           <batchtest>
@@ -48,7 +48,7 @@
                 <exclude name="**/DataFixtures/**/*.php"/>
             </fileset>
         </coverage-setup>
-        <phpunit configuration="${dir.app}/phpunit.xml.dist"
+        <phpunit configuration="${dir.app}/phpunit.xml.dist" codecoverage="true"
         haltonfailure="false" haltonerror="false" groups="functional-net,functional-nonet">
           <formatter type="plain" usefile="false"/>
           <batchtest>
