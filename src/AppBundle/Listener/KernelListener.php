@@ -51,7 +51,9 @@ class KernelListener
         }
 
         $referer = $request->headers->get('referer');
-        if (strlen($referer) > 0) {
+        $refererDomain = parse_url($referer, PHP_URL_HOST);
+        $currentDomain = parse_url($request->getUri(), PHP_URL_HOST);
+        if (strtolower($refererDomain) != strtolower($currentDomain)) {
             $session = $request->getSession();
             $session->set('referer', $referer);
         }
