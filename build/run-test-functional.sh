@@ -12,8 +12,9 @@ fi
 
 SKIP_POLICY=0
 SKIP_DB=0
+COVER=0
 FUNCTIONAL_TEST="test:functional"
-while getopts ":snpdhc" opt; do
+while getopts ":snpdhcC" opt; do
   case $opt in
     s)
       SKIP_POLICY=1
@@ -23,6 +24,11 @@ while getopts ":snpdhc" opt; do
       ;;
     c)
       FUNCTIONAL_TEST="test:functional:cover"
+      COVER=1
+      ;;
+    C)
+      FUNCTIONAL_TEST="test:functional:nonet:cover"
+      COVER=1
       ;;
     n)
       FUNCTIONAL_TEST="test:functional:nonet"
@@ -31,7 +37,7 @@ while getopts ":snpdhc" opt; do
       FUNCTIONAL_TEST="test:functional:paid"
       ;;
     h)
-      echo "Usage: $0 [-d skip db refresh] [-c run coverage] [-s skip policy] [-n no network test | -p run paid test] [filter e.g. (::Method or namespace - use \\)"
+      echo "Usage: $0 [-d skip db refresh] [-s skip policy] [-n no network test | -p run paid test | -c run coverage | -C run coverage no network] [filter e.g. (::Method or namespace - use \\)"
       ;;
   esac
 done
@@ -72,14 +78,16 @@ init $SKIP_DB $SKIP_POLICY
 
 ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
 if [ "$RUN_FILTER" == "" ]; then
-    # for some reason, some tests do not do work as expected unless run individually
-    echo "Running test cases that need to be run individually :("
-    ./build/phpunit.sh --filter "::testUserCreateNoChangeEmail" --bootstrap vendor/autoload.php src/AppBundle/
+    if [ "$COVER" == "0" ]; then
+        # for some reason, some tests do not do work as expected unless run individually
+        echo "Running test cases that need to be run individually :("
+        ./build/phpunit.sh --filter "::testUserCreateNoChangeEmail" --bootstrap vendor/autoload.php src/AppBundle/
+    
+        echo "Wiping db again"
+        init $SKIP_DB $SKIP_POLICY
+    fi
 
-    echo "Wiping db again"
-    init $SKIP_DB $SKIP_POLICY
-
-    echo "Running runn test suite"
+    echo "Running test suite"
   ./vendor/phing/phing/bin/phing -f build/test.xml $FUNCTIONAL_TEST
 else
   echo ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/    

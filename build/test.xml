@@ -63,6 +63,29 @@
         </coverage-report>
     </target>
 
+    <target name="test:functional:nonet:cover" depends="clean, prepare" description="Run functional tests">
+        <coverage-setup database="/tmp/coverage-report/db">
+            <fileset dir="${dir.src}">
+                <include name="**/*.php"/>
+                <exclude name="**/Tests/**/*.php"/>
+                <exclude name="**/DataFixtures/**/*.php"/>
+            </fileset>
+        </coverage-setup>
+        <phpunit configuration="${dir.app}/phpunit.xml.dist" codecoverage="true"
+        haltonfailure="false" haltonerror="false" groups="functional-nonet">
+          <formatter type="plain" usefile="false"/>
+          <batchtest>
+              <fileset dir="${dir.src}">
+                 <include name="**/Tests/**/*Test*.php"/>
+              </fileset>
+          </batchtest>
+       </phpunit>
+        <coverage-report outfile="/tmp/coverage-report/coverage.xml">
+            <report 
+              todir="${dir.src}/../web/cover"/>
+        </coverage-report>
+    </target>
+
     <target name="test:functional:nonet" description="Run functional tests">
         <phpunit configuration="${dir.app}/phpunit.xml.dist"
         haltonfailure="true" haltonerror="true" groups="functional-nonet">
