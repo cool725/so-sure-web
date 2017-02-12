@@ -39,6 +39,8 @@ class UserController extends BaseController
      */
     public function indexAction(Request $request)
     {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(SCode::class);
         $user = $this->getUser();
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
@@ -46,6 +48,10 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
         $policy = $user->getCurrentPolicy();
+        $scode = null;
+        if ($session = $this->get('session')) {
+            $scode = $repo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
+        }
 
         $invitationService = $this->get('app.invitation');
         $emailInvitiation = new EmailInvitation();
@@ -92,12 +98,21 @@ class UserController extends BaseController
                     }
                 }
             }
+        } elseif ($scode) {
+            $this->addFlash(
+                'success',
+                sprintf(
+                    '%s has invited you to connect. <a href="#" data-toggle="modal" data-target="#scodeModal">Connect here!</a>',
+                    $scode->getPolicy()->getUser()->__toString()
+                )
+            );
         }
 
         return array(
             'policy' => $user->getCurrentPolicy(),
             'email_form' => $emailInvitationForm->createView(),
             'invitation_form' => $invitationForm->createView(),
+            'scode' => $scode,
         );
     }
 
@@ -279,6 +294,10 @@ class UserController extends BaseController
                 'Please reload this page and try again',
                 404
             );
+        }
+
+        if ($session = $this->get('session')) {
+            $session->remove('scode');
         }
 
         $dm = $this->getManager();
