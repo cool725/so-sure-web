@@ -211,6 +211,16 @@ class BranchService
         return $this->send($data, $source, $medium, $campaign);
     }
 
+    public function linkToAppleDownload($medium)
+    {
+        return $this->router->generate('download_apple', ['medium' => $medium]);
+    }
+
+    public function linkToGoogleDownload($medium)
+    {
+        return $this->router->generate('download_google', ['medium' => $medium]);
+    }
+
     public function generateSCode($code)
     {
         $source = 'app';

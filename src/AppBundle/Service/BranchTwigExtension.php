@@ -35,8 +35,8 @@ class BranchTwigExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('branch_download', array($this, 'branch')),
-            new \Twig_SimpleFunction('google_download', array($this, 'google')),
-            new \Twig_SimpleFunction('apple_download', array($this, 'apple')),
+            new \Twig_SimpleFunction('google_download', array($this, 'linkToGoogleDownload')),
+            new \Twig_SimpleFunction('apple_download', array($this, 'linkToAppleDownload')),
         );
     }
 
@@ -114,6 +114,11 @@ class BranchTwigExtension extends \Twig_Extension
         );
     }
 
+    public function linkToAppleDownload($medium)
+    {
+        return $this->branch->linkToAppleDownload($medium);
+    }
+
     public function apple($medium)
     {
         try {
@@ -132,6 +137,11 @@ class BranchTwigExtension extends \Twig_Extension
             $this->getMedium($medium),
             $this->getCampaign()
         );
+    }
+
+    public function linkToGoogleDownload($medium)
+    {
+        return $this->branch->linkToGoogleDownload($medium);
     }
 
     public function google($medium)

@@ -242,7 +242,7 @@ services:
             branch:         "@app.branch"
             logger:         "@logger"
             requestService: "@app.request"
-        public: false
+        public: true
         tags:
             - { name: twig.extension }
 
