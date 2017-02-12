@@ -76,7 +76,6 @@ fi
 
 init $SKIP_DB $SKIP_POLICY
 
-./vendor/phing/phing/bin/phing -f build/test.xml test:unit
 if [ "$RUN_FILTER" == "" ]; then
     if [ "$COVER" == "0" ]; then
         # for some reason, some tests do not do work as expected unless run individually
@@ -90,6 +89,7 @@ if [ "$RUN_FILTER" == "" ]; then
     echo "Running test suite"
   ./vendor/phing/phing/bin/phing -f build/test.xml $FUNCTIONAL_TEST
 else
+  ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
   echo ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/    
   ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/    
 fi
