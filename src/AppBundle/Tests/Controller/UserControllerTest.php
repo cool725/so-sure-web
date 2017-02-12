@@ -40,6 +40,9 @@ class UserControllerTest extends BaseControllerTest
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->getUser()->hasActivePolicy());
         $this->login($email, $password, 'user/');
+
+        $crawler = self::$client->request('GET', '/user/invalid');
+        self::verifyResponse(500);
     }
 
     public function testUserUnpaidPolicy()
@@ -60,6 +63,9 @@ class UserControllerTest extends BaseControllerTest
         //print_r($policy->getClaimsWarnings());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $this->login($email, $password, 'user/unpaid');
+
+        $crawler = self::$client->request('GET', '/user/invalid');
+        self::verifyResponse(500);
     }
 
     public function testUserInvalidPolicy()
@@ -76,6 +82,9 @@ class UserControllerTest extends BaseControllerTest
         );
         self::$dm->flush();
         $this->login($email, $password, 'user/invalid');
+
+        $crawler = self::$client->request('GET', '/user/invalid');
+        self::verifyResponse(200);
     }
 
     private function login($username, $password, $location = null)
