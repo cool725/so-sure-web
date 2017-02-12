@@ -379,7 +379,7 @@ class AdminController extends BaseController
 
     private function getAllPaymentTotals(\DateTime $date)
     {
-        $isProd = $this->getParameter('kernel.environment') == 'prod';
+        $isProd = $this->isProduction();
         $payments = $this->getPayments($date);
 
         return [
@@ -484,7 +484,7 @@ class AdminController extends BaseController
         $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
-        $isProd = $this->getParameter('kernel.environment') == 'prod';
+        $isProd = $this->isProduction();
         $paymentTotals = Payment::sumPayments($payments, $isProd, JudoPayment::class);
         $paymentDailys = Payment::dailyPayments($payments, $isProd, JudoPayment::class);
 
