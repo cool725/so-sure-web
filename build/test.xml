@@ -49,7 +49,7 @@
             </fileset>
         </coverage-setup>
         <phpunit configuration="${dir.app}/phpunit.xml.dist"
-        haltonfailure="true" haltonerror="true" groups="functional-net,functional-nonet">
+        haltonfailure="false" haltonerror="false" groups="functional-net,functional-nonet">
           <formatter type="plain" usefile="false"/>
           <batchtest>
               <fileset dir="${dir.src}">
