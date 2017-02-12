@@ -627,8 +627,16 @@ abstract class BaseController extends Controller
             }
         }
 
+        $status = (string) $form->get('status')->getData();
+        if ($status == 'current') {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
+            );
+        } else {
+            $this->formToMongoSearch($form, $policiesQb, 'status', 'status');
+        }
+
         $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber');
-        $this->formToMongoSearch($form, $policiesQb, 'status', 'status');
         $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei');
         if (!$includeInvalidPolicies) {
             $policy = new PhonePolicy();

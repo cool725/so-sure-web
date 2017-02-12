@@ -46,9 +46,10 @@ class PolicySearchType extends AbstractType
             ->add('facebookId', TextType::class, ['required' => false])
             ->add('status', ChoiceType::class, [
                 'required' => false,
-                'data' => Policy::STATUS_ACTIVE,
+                'data' => 'current',
                 'choices' => [
-                    'All' => null,
+                    'Any' => null,
+                    'Current' => 'current',
                     Policy::STATUS_PENDING => Policy::STATUS_PENDING,
                     Policy::STATUS_ACTIVE => Policy::STATUS_ACTIVE,
                     Policy::STATUS_CANCELLED => Policy::STATUS_CANCELLED,
