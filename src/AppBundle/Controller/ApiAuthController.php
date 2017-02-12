@@ -623,7 +623,7 @@ class ApiAuthController extends BaseController
             $judoData = null;
             if (isset($data['bank_account'])) {
                 // Not doing anymore, but too many tests currently expect gocardless, so allow for non-prod
-                if ($this->getParameter('kernel.environment') == 'prod') {
+                if ($this->isProduction()) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
                 }
                 if (!$this->validateFields(

@@ -13,6 +13,7 @@ use AppBundle\Document\Connection;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\Salva;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -219,6 +220,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $policyService = $this->container->get('app.policy');
         $policyService->generateScheduledPayments($policy, $startDate);
+
+        $invitation = new EmailInvitation();
+        $invitation->setInviter($user);
+        $invitation->setPolicy($policy);
+        $invitation->setEmail($this->faker->email);
+        $rand = rand(0, 2);
+        if ($rand == 0) {
+            $invitation->setCancelled($policy->getStart());
+        } elseif ($rand == 1) {
+            $invitation->setRejected($policy->getStart());
+        }
+        $manager->persist($invitation);
+
     }
 
     private function addConnections($manager, $userA, $users, $connections = null)
@@ -241,6 +255,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     continue;
                 }
             }
+
+            $invitation = new EmailInvitation();
+            $invitation->setInviter($userA);
+            $invitation->setPolicy($policyA);
+            $invitation->setEmail($userB->getEmail());
+            $invitation->setInvitee($userB);
+            $invitation->setAccepted($policyB->getStart());
+            $manager->persist($invitation);
 
             $connectionA = new Connection();
             $connectionA->setLinkedUser($userA);

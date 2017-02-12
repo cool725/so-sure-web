@@ -9,7 +9,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Document\User;
+use AppBundle\Document\SCode;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use AppBundle\Document\Invitation\EmailInvitation;
 
 /**
  * @Route("/ops")
@@ -61,5 +63,28 @@ class OpsController extends BaseController
     public function exceptionDeniedAction()
     {
         throw new HttpException(503);
+    }
+
+    /**
+     * @Route("/pages", name="ops_pages")
+     * @Template()
+     */
+    public function validatePagesAction()
+    {
+        if ($this->isProduction()) {
+            throw $this->createAccessDeniedException('Only for dev use');
+        }
+
+        $dm = $this->getManager();
+        $scodeRepo = $dm->getRepository(SCode::class);
+        $scode = $scodeRepo->findOneBy(['active' => true, 'type' => 'standard']);
+
+        $invitationRepo = $dm->getRepository(EmailInvitation::class);
+        $invitation = $invitationRepo->findOneBy(['accepted' => null, 'rejected' => null, 'cancelled' => null]);
+
+        return [
+            'scode' => $scode->getCode(),
+            'invitation' => $invitation,
+        ];
     }
 }

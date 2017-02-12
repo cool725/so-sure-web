@@ -714,4 +714,9 @@ abstract class BaseController extends Controller
             'form' => $form->createView()
         ];
     }
+
+    protected function isProduction()
+    {
+        return $this->getParameter('kernel.environment') == 'prod';
+    }
 }

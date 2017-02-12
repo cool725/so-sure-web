@@ -1,0 +1,20 @@
+
+<h3>Pages to manually verify when updating design</h3>
+<ul>
+    <li>
+        <a href="{{ url('homepage') }}">Home</a>        
+    </li>
+    <li>
+        <a href="{{ url('quote_make_model', {'make':'Apple','model':'iPhone+6S'}) }}">Quote</a>                
+    </li>
+    <li>
+        <a href="{{ url('scode', {'code':scode}) }}">SCode Invitiation</a> <b>(Logout before viewing)</b>            
+    </li>
+    <li>
+        <a href="{{ url('invitation', {'id':invitation.id}) }}">Email Invitiation</a> <b>(Logout before viewing)</b>            
+    </li>
+    <li>
+        <a href="{{ url('user_invalid_policy') }}">User Policy Invalid</a> <b>(Requires Login)</b>            
+    </li>
+    
+</ul>
