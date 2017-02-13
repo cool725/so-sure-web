@@ -583,6 +583,17 @@ abstract class Policy
         return false;
     }
 
+    public function hasSuspectedFraudulentClaim()
+    {
+        foreach ($this->getClaims() as $claim) {
+            if ($claim->getSuspectedFraud()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getApprovedClaims($includeSettled = true)
     {
         $claims = [];
@@ -2005,6 +2016,12 @@ abstract class Policy
         if ($this->isPolicyWithin21Days()) {
             $warnings[] = sprintf(
                 'Policy was created within the last 21 days. High risk of fraud.'
+            );
+        }
+
+        if ($this->hasSuspectedFraudulentClaim()) {
+            $warnings[] = sprintf(
+                'Policy has a suspected fraudulent claim.'
             );
         }
 

@@ -43,6 +43,9 @@
         <div class="row">
             <div class="col-md-12 text-center">
                 <h3>Policy Cancellation</h3>
+                {% if policy.hasSuspectedFraudulentClaim %}
+                    <h3>WARNING! Claim was suspected as fradulent. Choose cancellation reason carefully.</h3>
+                {% endif %}
             </div>
         </div>
         <div class="row">
@@ -75,16 +78,134 @@
                         {{ form_label(cancel_form.cancellationReason, 'Reason') }}
                         {{ form_errors(cancel_form.cancellationReason) }}
                         {{ form_widget(cancel_form.cancellationReason, { 'separator': '---Unlikely Reasons---', 'attr': {'class': 'cancellation-reason'} }) }}
+                    </div>
+                {% set no_claims_table = "<hr /><b>No Claims Cancellation/Refund Rules</b><br /><table>
+                <tr>
+                    <th width='15%'>Type</th>
+                    <th width='15%'>Cancellation Date (m)</th>
+                    <th width='15%'>Refund (m)</th>
+                    <th width='15%'>Monthly Billing</th>
+                    <th width='15%'>Cancellation Date (y)</th>
+                    <th width='15%'>Refund (y)</th>
+                </tr>
+                <tr>
+                    <td>Fraud (actual)</td>
+                    <td>immediate</td>
+                    <td>no further</td>
+                    <td>none</td>
+                    <td>immediate</td>
+                    <td>none</td>
+                </tr>
+                <tr>
+                    <td>Suspected Fraud</td>
+                    <td>immediate</td>
+                    <td>no further</td>
+                    <td>none</td>
+                    <td>immediate</td>
+                    <td>none</td>
+                </tr>
+                <tr>
+                    <td>Cooloff</td>
+                    <td>immediate</td>
+                    <td>no further</td>
+                    <td>full</td>
+                    <td>immediate</td>
+                    <td>full</td>
+                </tr>
+                <tr>
+                    <td>User Requested</td>
+                    <td>30 days</td>
+                    <td>1 more bill</td>
+                    <td>daily prorated for final month (or bill partial month during 30 days)</td>
+                    <td>30 days</td>
+                    <td>Refund from the 30 days to end of year (prorated daily basis)</td>
+                </tr>
+                <tr>
+                    <td>Dispossesion</td>
+                    <td>immediate</td>
+                    <td>no further</td>
+                    <td>daily prorated for month</td>
+                    <td>immediate</td>
+                    <td>Refund from cancellation date to end of year (prorated daily basis)</td>
+                </tr>
+                <tr>
+                    <td>Wreckage</td>
+                    <td>immediate</td>
+                    <td>no further</td>
+                    <td>daily prorated for month</td>
+                    <td>immediate</td>
+                    <td>Refund from cancellation date to end of year (prorated daily basis)</td>
+                </tr>
+            </table>
+            "%}
+                {% set claims_table = "<hr /><b>1+ Claims Cancellation/Refund Rules</b><br /><table>
+                <tr>
+                    <th width='15%'>Type</th>
+                    <th width='15%'>Cancellation Date (m)</th>
+                    <th width='15%'>Refund (m)</th>
+                    <th width='15%'>Monthly Billing</th>
+                    <th width='15%'>Cancellation Date (y)</th>
+                    <th width='15%'>Refund (y)</th>
+                </tr>
+                <tr>
+                    <td>Fraud (actual)</td>
+                    <td>immediate</td>
+                    <td>continue billing (stop 2nd fail in a row)</td>
+                    <td>none</td>
+                    <td>immediate</td>
+                    <td>none</td>
+                </tr>
+                <tr>
+                    <td>Suspected Fraud</td>
+                    <td>immediate</td>
+                    <td>continue billing (stop 2nd fail in a row)</td>
+                    <td>none</td>
+                    <td>immediate</td>
+                    <td>none</td>
+                </tr>
+                <tr>
+                    <td>Cooloff</td>
+                    <td>n/a</td>
+                    <td>n/a</td>
+                    <td>n/a</td>
+                    <td>n/a</td>
+                    <td>n/a</td>
+                </tr>
+                <tr>
+                    <td>User Requested</td>
+                    <td>30 days</td>
+                    <td>continue billing (stop 2nd fail in a row)</td>
+                    <td>none</td>
+                    <td>30 days</td>
+                    <td>none</td>
+                </tr>
+                <tr>
+                    <td>Dispossesion</td>
+                    <td>immediate</td>
+                    <td>continue billing (stop 2nd fail in a row)</td>
+                    <td>none</td>
+                    <td>immediate</td>
+                    <td>none</td>
+                </tr>
+                <tr>
+                    <td>Wreckage</td>
+                    <td>immediate</td>
+                    <td>continue billing (stop 2nd fail in a row)</td>
+                    <td>none</td>
+                    <td>immediate</td>
+                    <td>none</td>
+                </tr>
+            </table>
+            "%}
                     <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true" title="Cancellation Reasons" data-content="
             <b>Cooloff</b>: only visible if within 14 days and no pending claims<br />
             <b>User Request</b>: any other user requested reason beyond cooloff. Note this immediately cancels the policy - you probably want the scheduled termination to the left!<br />
             <b>Unpaid</b>: only visible if status is unpaid, but should only be cancelled after 30 days<br />
-            <b>Fraud (actual)</b>: should only be used in cases where it can be proven<br />
-            <b>Fraud (suspected)</b>: use with caution as likely to cause lawsuits<br />
+            <b>Fraud (actual)</b>: should only be used in cases where it can be proven.<br />
+            <b>Fraud (suspected)</b>: use with caution as likely to cause lawsuits.<br />
             <b>Dispossession</b>: only for cases where a phone has been lost but claim not approved<br />
-            <b>Wreckage</b>: only for cases where a phone is damaged beyond use but claim not approved
-            "></i>
-                    </div>
+            <b>Wreckage</b>: only for cases where a phone is damaged beyond use but claim not approved<br />
+            {% if policy.hasMonetaryClaimed(true) %}{{ claims_table }}{% else %}{{ no_claims_table }}{% endif %}"></i>
                 </div>
                 </div>
                 <div class="row">

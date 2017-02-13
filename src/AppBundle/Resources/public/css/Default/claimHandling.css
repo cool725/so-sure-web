@@ -36,3 +36,8 @@
 :target {
   font-weight: bold;
 }
+
+.popover {
+  max-width: 100%;
+  width: 100%;
+}
