@@ -297,22 +297,36 @@ blockquote {
     border: none;
 }
 
+blockquote p {
+    line-height: 1.5;
+}
+
+blockquote footer {
+    text-align: right;
+}
+
+blockquote footer img {
+    display: inline-block;
+    margin-left: 15px;
+}
+
 blockquote:before, blockquote:after {
     position: absolute;
     font-family: FontAwesome;
-    font-size: 50px;
+    font-size: 70px;
     color: #ccc;
     line-height: 1;
 }
 
 blockquote:before {
-    top: 5px; left: -15px;
+    top: 0px; left: -20px;
     content: '“';
 }
 
 blockquote footer:before {
     content: '';
 }
+
 
 /* MOVE TO components > _forms.scss */
 
