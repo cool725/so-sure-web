@@ -44,6 +44,11 @@ class SCodeController extends BaseController
         $session = $this->get('session');
         $session->set('scode', $code);
 
+        if ($scode && $this->getUser()) {
+            // Let the user just invite the person directly
+            return new RedirectResponse($this->generateUrl('user_home'));
+        }
+
         return array(
             'scode' => $scode,
         );

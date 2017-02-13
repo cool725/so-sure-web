@@ -194,3 +194,13 @@
 .user-invalid p {
   color: #fff;
 }
+
+.modal-scode {
+  background: rgba(0, 0, 0, 0.6);
+  padding-top: 10%;
+}
+
+.modal-scode-wrapper {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
