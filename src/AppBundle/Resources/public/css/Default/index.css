@@ -1,7 +1,7 @@
 /* HERO - Section Index: MOVE TO components > _hero.scss */
 
 .hero {
-    padding: 30px 20px 50px 20px;
+    padding: 30px 0;
     color: #fff;
 }
 
@@ -47,6 +47,10 @@
 }
 
 @media (min-width: 767px) {
+
+    .hero {
+        padding: 30px 20px 50px 20px;
+    }    
 
     .hero h1 {
         font-size: 46px;
