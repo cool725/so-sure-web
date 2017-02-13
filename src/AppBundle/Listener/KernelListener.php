@@ -39,6 +39,11 @@ class KernelListener
         $source = $request->query->get('utm_source');
         $medium = $request->query->get('utm_medium');
         $campaign = $request->query->get('utm_campaign');
+        $gclid = $request->query->get('gclid');
+        if ($gclid && !($source || $medium || $campaign)) {
+            $source = 'google adwords';
+        }
+
         if ($source || $medium || $campaign) {
             $session = $request->getSession();
             $session->set('utm', serialize([
