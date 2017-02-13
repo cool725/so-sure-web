@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Phone;
 
 /**
  * @group functional-net
@@ -12,6 +13,9 @@ use AppBundle\Document\Policy;
 class SCodeControllerTest extends BaseControllerTest
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
+    use \AppBundle\Tests\UserClassTrait;
+
+    protected static $phone;
 
     public function tearDown()
     {
@@ -19,6 +23,8 @@ class SCodeControllerTest extends BaseControllerTest
 
     public function testSCodeNonUser()
     {
+        $this->createSCode('testSCodeNonUser-code');
+
         $repo = self::$dm->getRepository(SCode::class);
         $scode = $repo->findOneBy(['active' => true]);
         $this->assertNotNull($scode);
@@ -29,6 +35,8 @@ class SCodeControllerTest extends BaseControllerTest
 
     public function testSCodeUser()
     {
+        $this->createSCode('testSCodeUser-code');
+
         $email = self::generateEmail('testSCodeUser', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
@@ -53,5 +61,15 @@ class SCodeControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/user/'));
+    }
+
+    private function createSCode($emailBase)
+    {
+        // ensure scode exists
+        $policy = $this->createUserPolicy(true);
+        $policy->getUser()->setEmail(self::generateEmail($emailBase, $this));
+        self::$dm->persist($policy->getUser());
+        self::$dm->persist($policy);
+        self::$dm->flush();
     }
 }
