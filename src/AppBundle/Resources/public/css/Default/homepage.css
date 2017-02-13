@@ -4,7 +4,7 @@ body {
     background: 
        linear-gradient(to right, rgba(32, 37, 50, 0.84) , 
        rgba(51, 153, 255, 0.64)), 
-       url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) no-repeat 60% 70%;
+       url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) no-repeat center;
 }
 
 
