@@ -22,6 +22,9 @@ class DownloadController extends BaseController
     public function appleAction($medium = null)
     {
         $url = $this->get('app.twig.branch')->apple($medium);
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_APP_DOWNLOAD, [
+            'Store' => 'Apple',
+        ]);
 
         return new RedirectResponse($url);
     }
@@ -33,6 +36,9 @@ class DownloadController extends BaseController
     public function googleAction($medium = null)
     {
         $url = $this->get('app.twig.branch')->google($medium);
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_APP_DOWNLOAD, [
+            'Store' => 'Google',
+        ]);
 
         return new RedirectResponse($url);
     }
