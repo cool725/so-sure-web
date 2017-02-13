@@ -55,8 +55,9 @@ a.hero-link:hover {
 }
 
 @media (max-width: 767px) {
-    .hero h1 {
-        font-size: 28px;
+
+     .hero h1 {
+        font-size: 38px;
     }
 
     .hero-link {
@@ -108,126 +109,6 @@ a.hero-link:hover {
     .how-it-works--step .img-responsive {
         max-width: 45%;
     }
-
-}
-
-
-
-/* SOSURE COMPARED: MOVE TO layouts > _includes.scss */
-
-.comparison-table {
-    background-color: #fff;
-    border-radius: 4px;
-}
-
-.comparison-table--head {
-    position: relative;
-    font-weight: bold;
-    font-size: 28px;
-    letter-spacing: 1.1px;
-    color: #fff;
-}
-
-.comparison-table--title {
-    position: absolute;
-    left: 0; right: 0; top: 0;
-    padding: 5px 0;
-    text-align: center;
-}
-
-.comparison-table--left,
-.comparison-table--right {
-    width: 50%;
-    padding: 5px 0;
-    text-align: center;   
-}
-
-.comparison-table--left {
-    background-color: #3399FF;
-}
-
-.comparison-table--right {
-    background-color: #8B97B5;     
-}
-
-.comparison-table--body {
-    padding: 15px 25px 25px;
-}
-
-.comparison-table--body a {
-    text-decoration: underline;
-}
-
-.comparison-table--body ul {
-    margin: 0 0 25px;
-}
-
-.comparison-table--body li {
-    padding: 5px 0;
-}
-
-.comparison-table--cta {
-    padding: 25px 0;
-    text-align: center;
-}
-
-.comparison-table--footer {
-    text-align: center;
-    padding: 20px 0;
-    border-bottom: 2px solid #efefef;
-}
-
-@media (min-width: 767px) {
-
-    .sosure-compared {
-        background-color: #99CCFF;
-        padding: 60px 0;
-    }
-
-    .comparison-table {
-        max-width: 80%;
-        margin: 25px auto;        
-    }
-
-    .comparison-table--left,
-    .comparison-table--title,
-    .comparison-table--right {
-        padding: 15px 0;
-    }
-
-    .comparison-table--body {
-        font-size: 17px;
-        padding: 25px 0;        
-    }    
-
-    .comparison-table--body ul,
-    .comparison-table--body h3 {
-        padding: 0 40px;
-    }
-
-    .comparison-table--body .border-right {
-        /*border-right: 2px solid #efefef;*/
-    }
-
-    .comparison-table--left {
-        border-top-left-radius: 3px;
-    }
-
-    .comparison-table--right {
-        border-top-right-radius: 3px;        
-    }    
-
-    .comparison-table--footer {
-        border: none;
-    }    
-
-}
-
-@media (min-width: 991px) {
-
-    .comparison-table {
-        max-width: 800px;    
-    }    
 
 }
 

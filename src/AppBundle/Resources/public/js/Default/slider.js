@@ -54,7 +54,7 @@ $(function(){
             e.preventDefault();
 
             // Loading Overlay
-            $('.loading-overlay').fadeIn('400', function() {
+            $('#loading-overlay-switch').fadeIn('400', function() {
                 
             });
 
@@ -69,7 +69,7 @@ $(function(){
         
         e.preventDefault();       
 
-        $('.loading-overlay').fadeIn(function() {
+        $('#loading-overlay-switch').fadeIn(function() {
 
             $('.premium-table').fadeToggle('400', function() {
                 $('.claim-options').fadeIn();
@@ -84,7 +84,7 @@ $(function(){
         
         e.preventDefault();       
 
-        $('.loading-overlay').fadeIn(function() {
+        $('#loading-overlay-switch').fadeIn(function() {
 
             $('.claim-options').fadeToggle('400', function() {
                 $('.premium-table').fadeIn();
@@ -177,9 +177,13 @@ $(function(){
                 $handle = $('.rewardslider__handle', this.$range);
                 updateHandle($handle[0], this.value);  
 
-                var save_value = yearly_high;
-                whatIf(save_value);
-                setBars(); 
+                $('#loading-overlay-init').fadeOut('slow', function() {                    
+
+                    var save_value = yearly_high;
+                    whatIf(save_value);
+                    setBars(); 
+
+                });
             },
 
             onSlide: function(position, value) {

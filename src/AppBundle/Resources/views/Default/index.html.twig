@@ -41,11 +41,11 @@
                 <div class="col-sm-6 col-md-5 col-md-offset-1">
                     <h1>
                         Better &amp; Cheaper <br>
-                        <small>Sometimes it's better to do it with friends</small>
+                        <span class="h1 text-white">Sometimes it's better to do it with friends</span>
                     </h1>
-                    <blockquote class="text-left hidden-xs">
+                    <blockquote class="text-left text-grey-blue hidden-xs">
                         <p class="lead">Every year, there are 8 million incidents of lost, stolen or damaged phones – that’s 1 every 4 seconds.</p>
-                        <footer><em>YouGov/Assurant, 2015</em></footer>
+                        <footer><em class="text-grey-blue">YouGov/Assurant, 2015</em></footer>
                     </blockquote>
                 </div>
                 <div class="col-sm-6 col-md-4 col-md-offset-1 text-left">
@@ -82,6 +82,23 @@
     {% include 'AppBundle::Default/press.html.twig' %}
 
     {% include 'AppBundle::Default/benefits.html.twig' %}
+
+    <section class="press">
+        <div class="container">
+            <div class="col-sm-3 col-md-2 col-md-offset-3">
+                <h4 class="footer-press--heading">
+                    <strong><small>IN PARTNERSHIP WITH</small></strong>
+                </h4>
+            </div>
+            <div class="col-sm-3 col-md-2">
+                <img src="{{ cdn_url }}/images/munichre-logo.png" alt="Munich RE">
+            </div>    
+            <div class="col-sm-3 col-md-2">
+                <img src="{{ cdn_url }}/images/salva-logo.png" alt="Salva">
+            </div>                        
+        </div>
+    </section>    
+
 
     {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}   
 
