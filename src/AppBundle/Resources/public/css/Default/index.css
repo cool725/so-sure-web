@@ -1,70 +1,71 @@
 /* HERO - Section Index: MOVE TO components > _hero.scss */
 
 .hero {
-    padding: 30px 20px 50px 20px;
+    padding: 30px 0;
     color: #fff;
 }
 
 .hero h1 {
     color: #fff;
     text-align: left;
-    font-size: 50px;
-    line-height: 1.2em;
+    font-size: 36px;
+    line-height: 1.14em;
     margin-top: 0;
 }
 
-.hero blockquote {
-    border: none;
-    margin-bottom: 40px;
+.hero h1 .h1-sub {
+    font-size: 26px;
 }
 
-.hero blockquote em {
-    color: #fff;
+.hero-box {
+    width: 100%;
+    text-align: center;
+    padding: 5px 25px 25px;
+    margin-bottom: 25px;
+    border: 2px solid #efefef;
+    border-radius: 4px;
 }
 
-#benefits, .social-proof {
+.hero-box li {
+    min-height: 50px;
+    padding: 3px 0;
+    margin: 0 0 20px;
+}
+
+.hero-box li img {
+    display: inline-block;
+    margin: 0 0 5px;
+}
+
+.hero-box li:last-of-type {
+    margin: 0;
+}
+
+.hero-box a {
+    display: block;
+    color: #fff;    
+}
+
+@media (min-width: 767px) {
+
+    .hero {
+        padding: 30px 20px 50px 20px;
+    }    
+
+    .hero h1 {
+        font-size: 46px;
+        line-height: 1.18em;
+    }
+
+    .hero h1 .h1-sub {
+        font-size: 36px;
+    }
+}
+
+/* Fix backgrounds */
+#benefits, 
+.social-proof {
     background: #fff;
-}
-
-.btn-dark {
-    margin-right: 20px;
-    border: 2px solid #202532;
-    background: #202532 !important;
-    color: #fff;
-}
-
-.hero-link > div {
-    margin-bottom: 20px;
-}
-
-.hero-link > img {
-    text-decoration: none;
-    opacity: 0.9;
-}
-
-.hero-link > span {
-    padding-top: 10px;
-}
-
-a.hero-link:hover {
-    text-decoration: none;
-} 
-
-.btn-dark:hover {
-    color: #fff;
-}
-
-@media (max-width: 767px) {
-
-     .hero h1 {
-        font-size: 38px;
-    }
-
-    .hero-link {
-        text-align: center;
-        margin-right: 0;
-        width: 100%;
-    }
 }
 
 /* MOVE TO components > _buttons.scss  */
@@ -296,22 +297,36 @@ blockquote {
     border: none;
 }
 
+blockquote p {
+    line-height: 1.5;
+}
+
+blockquote footer {
+    text-align: right;
+}
+
+blockquote footer img {
+    display: inline-block;
+    margin-left: 15px;
+}
+
 blockquote:before, blockquote:after {
     position: absolute;
     font-family: FontAwesome;
-    font-size: 50px;
+    font-size: 70px;
     color: #ccc;
     line-height: 1;
 }
 
 blockquote:before {
-    top: 5px; left: -15px;
+    top: 0px; left: -20px;
     content: '“';
 }
 
 blockquote footer:before {
     content: '';
 }
+
 
 /* MOVE TO components > _forms.scss */
 

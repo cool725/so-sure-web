@@ -1,32 +1,20 @@
   /* this is used on the homepage and the invalid user page, if we change the homepage we need to make sure the invalid user page still works */ 
 body {
     background: #202532;
-    background: linear-gradient(to right, rgba(32, 37, 50, 0.84) , rgba(51, 153, 255, 0.64)), url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) right -500px top -250px no-repeat;
+    background: 
+       linear-gradient(to right, rgba(32, 37, 50, 0.84) , 
+       rgba(51, 153, 255, 0.64)), 
+       url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) no-repeat center top;
 }
 
-.hero h1 {
-    margin-bottom: 30px;
-}
 
-.hero-box {
-    padding: 25px;
-    padding-bottom: 5px;
-    margin-bottom: 25px;
-    border: 2px solid #efefef;
-    border-radius: 4px;
-}
+/* Adjust Navbar */
 
-.hero-box h3 {
-    color: #fff;
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-
-.navbar-default .navbar-nav> li> a {
+.navbar-default .navbar-nav > li > a {
     color: #fff;
 }
 
-.navbar-default .navbar-nav li> a:hover {
+.navbar-default .navbar-nav li > a:hover {
     color: #fff;
     text-decoration: underline;
 }
@@ -35,23 +23,8 @@ body {
     background-color: #fff;
 }
 
-h2 {
-    font-size: 40px;
-    text-align: left;
-}
 
-h3 {
-    text-align: left;
-    font-size: 26px;
-}
-
-p {
-    font-size: 17px;
-}
-
-#how-it-works h2, #how-it-works p, #how-it-works h3 {
-    color: #fff !important;
-}
+/* Video */
 
 #play-button {
     position: absolute;
@@ -84,13 +57,15 @@ p {
 }
 
 @media (min-width: 767px) {
-    #how-it-works > .container > .row {
-        display: flex;
-        align-items: center;
-    }
 
     body {
         background: #202532;
-        background: linear-gradient(to right, rgba(32, 37, 50, 0.84) , rgba(51, 153, 255, 0.64)), url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) 100% no-repeat;
+        background: 
+           linear-gradient(to right, 
+           rgba(32, 37, 50, 0.84) , 
+           rgba(51, 153, 255, 0.64)), 
+           url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) no-repeat;
+        background-position: unset;
+        background-size: cover;
     }
 }

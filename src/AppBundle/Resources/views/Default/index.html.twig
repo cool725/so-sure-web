@@ -41,64 +41,53 @@
                 <div class="col-sm-6 col-md-5 col-md-offset-1">
                     <h1>
                         Better &amp; Cheaper <br>
-                        <span class="h1 text-white">Sometimes it's better to do it with friends</span>
+                        <span class="h1-sub">Even greater with friends</span>
                     </h1>
-                    <blockquote class="text-left text-grey-blue hidden-xs">
+                    <blockquote class="text-left text-grey hidden-xs">
                         <p class="lead">Every year, there are 8 million incidents of lost, stolen or damaged phones – that’s 1 every 4 seconds.</p>
                         <footer><em class="text-grey-blue">YouGov/Assurant, 2015</em></footer>
-                    </blockquote>
+                    </blockquote>                           
                 </div>
-                <div class="col-sm-6 col-md-4 col-md-offset-1 text-left">
-                <div class="hero-box">
-                    <h3 class"">Most popular phones</h3>
-                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i6s.make, 'model': i6s.getEncodedModel(), 'memory': i6s.memory}) }}">
-                    <div class="row">
-                        <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" height="40"/>
-                        <div class="col-sm-4 text-link dark-bg-link">From £{{ i6s.getCurrentPhonePrice().getMonthlyPremiumPrice() }}</div>
-                        </div>
-                    </a>
-                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i7.make, 'model': i7.getEncodedModel(), 'memory': i7.memory}) }}">
-                    <div class="row">
-                        <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" height="40"/>
-                        <div class="col-sm-4 text-link dark-bg-link">From £{{ i7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}</div>
-                        </div>
-                    </a>
-                    <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': s7.make, 'model': s7.getEncodedModel(), 'memory': s7.memory}) }}">
-                        <div class="row">
-                        <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" height="40"/>
-                        <div class="col-sm-4 text-link dark-bg-link">From £{{ s7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}</div>
-                        </div>
-                    </a>
-                    </div>
-                    <div class="hero-link text-center">
-                    <a class="btn btn-success btn-rounded btn-lg" data-toggle="modal" data-target="#quoteModel">
-                        Get a quote
-                    </a>
-                </div>         
+                <div class="col-sm-6 col-md-4 col-md-offset-1">
+
+                    <div class="hero-box">
+                        <h3 class="text-white text-center">Most popular phones</h3>
+
+                        <ul class="list-unstyled hero-list">
+                            <li>
+                                <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i6s.make, 'model': i6s.getEncodedModel(), 'memory': i6s.memory}) }}">
+                                    <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" height="40" />
+                                    <br class="visible-xs-inline">
+                                    From £{{ i6s.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
+                                </a>                                
+                            </li>
+                            <li>
+                                <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i7.make, 'model': i7.getEncodedModel(), 'memory': i7.memory}) }}">
+                                    <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" height="40" />
+                                    <br class="visible-xs-inline">
+                                    From £{{ i7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': s7.make, 'model': s7.getEncodedModel(), 'memory': s7.memory}) }}">
+                                    <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" height="40" />
+                                    <br class="visible-xs-inline">
+                                    From £{{ s7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
+                                </a>
+                            </li>
+                        </ul>  
+                    </div>   
+                    <div class="text-center">
+                        <a class="btn btn-success btn-rounded btn-lg" data-toggle="modal" data-target="#quoteModel">Get a quote</a>                            
+                    </div>    
+                </div>                 
             </div>
         </div>
-    </section>
+    </section>    
 
     {% include 'AppBundle::Default/press.html.twig' %}
 
     {% include 'AppBundle::Default/benefits.html.twig' %}
-
-    <section class="press">
-        <div class="container">
-            <div class="col-sm-3 col-md-2 col-md-offset-3">
-                <h4 class="footer-press--heading">
-                    <strong><small>IN PARTNERSHIP WITH</small></strong>
-                </h4>
-            </div>
-            <div class="col-sm-3 col-md-2">
-                <img src="{{ cdn_url }}/images/munichre-logo.png" alt="Munich RE">
-            </div>    
-            <div class="col-sm-3 col-md-2">
-                <img src="{{ cdn_url }}/images/salva-logo.png" alt="Salva">
-            </div>                        
-        </div>
-    </section>    
-
 
     {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}   
 
@@ -121,6 +110,22 @@
             </div>
         </div>
     </section>
+
+    <section class="press">
+        <div class="container">
+            <div class="col-sm-3 col-md-2 col-md-offset-3">
+                <h4 class="footer-press--heading">
+                    <strong><small>IN PARTNERSHIP WITH</small></strong>
+                </h4>
+            </div>
+            <div class="col-sm-3 col-md-2">
+                <img src="{{ cdn_url }}/images/munichre-logo.png" alt="Munich RE">
+            </div>    
+            <div class="col-sm-3 col-md-2">
+                <img src="{{ cdn_url }}/images/salva-logo.png" alt="Salva">
+            </div>                        
+        </div>
+    </section>        
 
     <div class="modal modal-switching fade" id="switchingModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
