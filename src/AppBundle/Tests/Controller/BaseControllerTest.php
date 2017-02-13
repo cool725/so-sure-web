@@ -121,4 +121,23 @@ class BaseControllerTest extends WebTestCase
             $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, $method));
         }
     }
+
+    protected function login($username, $password, $location = null)
+    {
+        $crawler = self::$client->request('GET', '/login');
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('_submit')->form();
+        $form['_username'] = $username;
+        $form['_password'] = $password;
+        self::$client->followRedirects();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+        self::$client->followRedirects(false);
+        if ($location) {
+            $this->assertEquals(
+                self::$client->getHistory()->current()->getUri(),
+                sprintf('http://localhost/%s', $location)
+            );
+        }
+    }
 }

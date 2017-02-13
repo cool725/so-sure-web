@@ -99,6 +99,7 @@ class UserController extends BaseController
                 }
             }
         } elseif ($scode) {
+            // @codingStandardsIgnoreStart
             $this->addFlash(
                 'success',
                 sprintf(
@@ -106,6 +107,7 @@ class UserController extends BaseController
                     $scode->getPolicy()->getUser()->__toString()
                 )
             );
+            // @codingStandardsIgnoreEnd
         }
 
         return array(
