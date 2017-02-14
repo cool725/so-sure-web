@@ -56,14 +56,12 @@ section.press {
     text-align: center;
 }
 
-.press h4 {
-    margin-top: 15px;
-}
-
 .press img {
+    display: inline-block;
     max-width: 220px;
     margin: 0 auto;
 }
+
 
 @media (min-width: 768px) {
 
@@ -71,4 +69,15 @@ section.press {
         max-width: 100%;
     }
 
+    .press h4 {
+        margin: 15px 0 0;
+    }     
+
+}
+
+@media (min-width: 1200px) {
+
+    .press h4 {
+        margin: 20px 0 0;
+    } 
 }
