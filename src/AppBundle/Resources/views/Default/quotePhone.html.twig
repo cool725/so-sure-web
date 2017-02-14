@@ -26,6 +26,7 @@
     '@AppBundle/Resources/public/css/Default/index.css'
     '@AppBundle/Resources/public/css/Default/quotePhone.css'
     '@AppBundle/Resources/public/css/Default/scrollindicator.css'
+    '@AppBundle/Resources/public/css/Default/modal.css'    
     '@AppBundle/Resources/public/css/Default/videoOverlay.css'
     '@AppBundle/Resources/public/css/Default/rewardCalculator.css'    
     %}
@@ -288,7 +289,7 @@
                     <em><small>Source - FCA report 12/2015</small></em>  
                     <blockquote>
                         <h4><strong>Great claim experience</strong></h4>
-                        <p>My so-sure claim super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this is truly a revolution!</p>
+                        <p>My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this is truly a revolution!</p>
                         <footer>
                             <em>Herve N</em>
                             <img width="52px" class="img-circle" src="{{ cdn_url }}/images/feedback/feedback-user.png">
@@ -329,99 +330,125 @@
 
     {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}  
 
-    {% include 'AppBundle::Default/modalVideo.html.twig' %}
+    {# Page Modals #}
 
-    <div class="modal fade" id="theft-and-loss" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}    
+
+    <div class="modal modal-fullscreen fade" 
+         id="policy-modal" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="So-Sure Policy Terms" 
+         aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal">
                         <i class="fa fa-times fa-lg" aria-hidden="true"></i>
                         <span class="sr-only">Close</span>
                     </button>
-                </div>
-                <div class="modal-body">  
-                    <p>In the event of theft or loss you are also covered for:</p>          
-                    <ul>
-                        <li>Unauthorised network charges (up to £1,000 including VAT)</li>
-                        <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="accidental-damage" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
-                </div>
-                <div class="modal-body">  
-                    <p>Accidental Damage:</p>
-                    <ul>
-                        <li>Including Water Damage.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="worldwide-coverage" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
-                </div>
-                <div class="modal-body">  
-                    <p>Worldwide Coverage:</p>
-                    <ul>
-                        <li>Valid for 90 days while you are traveling for leisure or business.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div> 
-
-    <div class="modal fade" id="calculation-details" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
-                </div>
-                <div class="modal-body">  
-                    <p><strong>How we calculate this:</strong></p>
-                    <p>Prices based on data available from competitor websites, last updated on 1 February 2017.  </p>
-                    <p>Networks taken as an average of O2, Vodafone, and Three.</p>
-                    <p>High Street is Car Phone Warehouse.</p>
-                </div>
-            </div>
-        </div>
-    </div>     
-
-    <div class="modal modal-policy fade" id="policy-modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
+                    <h3>So-Sure Policy Terms</h3>
                 </div>
                 <div class="modal-body">
                     {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
                 </div>
             </div>
         </div>
-    </div>       
+    </div>  
+
+    <div class="modal fade" 
+         id="theft-and-loss" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="Theft & Loss" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>Theft &amp; Loss</h3>
+                </div>
+                <div class="modal-body">
+                    <p><strong>In the event of theft or loss you are also covered for:</strong></p>
+                    <p>Unauthorised network charges (up to £1,000 including VAT)</p>
+                    <p>Accessories (e.g. headphones - up to £100 including VAT)</p>                  
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <div class="modal fade" 
+         id="accidental-damage" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="Accidental Damage" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>Accidental Damage</h3>
+                </div>
+                <div class="modal-body">
+                    <p>Including Water Damage.</p>
+                </div>
+            </div>
+        </div>
+    </div>  
+
+    <div class="modal fade" 
+         id="worldwide-coverage" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="Worldwide Coverage" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>Worldwide Coverage</h3>
+                </div>
+                <div class="modal-body">
+                    <p>Valid for 90 days while you are traveling for leisure or business.</p>           
+                </div>
+            </div>
+        </div>
+    </div>  
+
+    <div class="modal fade" 
+         id="calculation-details" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="Calculation Details" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>Calculation Details</h3>
+                </div>
+                <div class="modal-body">
+                    <p><strong>How we calculate this:</strong></p>
+                    <p>Prices based on data available from competitor websites, last updated on 1 February 2017.  </p>
+                    <p>Networks taken as an average of O2, Vodafone, and Three.</p>
+                    <p>High Street is Car Phone Warehouse.</p>          
+                </div>
+            </div>
+        </div>
+    </div>   
+
+    {# End Page Modals #}
 
 {% endblock %}
