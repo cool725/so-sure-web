@@ -19,7 +19,7 @@ class HelpController extends BaseController
      * @Route("/help/{file}", name="help", requirements={"file"=".*"})
      * @Template()
      */
-    public function allAction(Request $request, $file = null)
+    public function allAction($file = null)
     {
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3support_fs');
 
