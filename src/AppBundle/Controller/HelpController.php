@@ -39,28 +39,9 @@ class HelpController extends BaseController
         if (stripos($mimetype, 'text/html') !== false) {
             $html = $filesystem->read($file);
             $crawler = new Crawler($html);
-            $head = $crawler->filter('head');
-            $head->each(function (Crawler $crawler) {
-                foreach ($crawler as $node) {
-                    if ($node->tagName == "title") {
-                        $node->parentNode->removeChild($node);
-                    }
-                }
-            });
-
-            //throw new \Exception($head->html());
-            throw new \Exception($crawler->filterXPath('//head/*[not(self::title)]')->html());
             return [
                 'title' => $crawler->filter('head title')->text(),
-                //'head' => $crawler->filterXPath('//head/*[not(self::title)]')->html(),
-                'head' => $crawler->filter('head')->reduce(function (Crawler $node, $i) {
-                    //if (!in_array($node->nodeName(), ['meta'])) { throw new \Exception($node->nodeName()); }
-                    if ($node->nodeName() == 'title') {
-                        return false;
-                    }
-
-                    return true;
-                })->html(),
+                'head' => $crawler->filter('head')->html(),
                 'body' => $crawler->filter('body')->html(),
             ];
         } else {
