@@ -202,7 +202,8 @@ oneup_flysystem:
         s3support:
             awss3v3:
                 client: aws.s3
-                bucket: support.so-sure.com
+                bucket: help.so-sure.com
+                prefix: "%kernel.environment%"
     filesystems:
         s3admin_fs:
             adapter: s3admin
