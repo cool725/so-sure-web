@@ -126,9 +126,10 @@
 {% block stylesheets %}
 {{ parent() }}
 {% stylesheets
-'@AppBundle/Resources/public/css/User/index.css'
-'@AppBundle/Resources/public/css/Default/videoOverlay.css'
- %}
+    '@AppBundle/Resources/public/css/User/index.css'
+    '@AppBundle/Resources/public/css/Default/modal.css'
+    '@AppBundle/Resources/public/css/Default/videoOverlay.css'
+%}
 <link rel="stylesheet" href="{{ asset_url }}">
 {% endstylesheets %}
 {% endblock %}

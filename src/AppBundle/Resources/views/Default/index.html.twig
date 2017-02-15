@@ -17,6 +17,7 @@
     '@AppBundle/Resources/public/css/Default/homepage.css'
     '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
     '@AppBundle/Resources/public/css/Default/scrollindicator.css'
+    '@AppBundle/Resources/public/css/Default/modal.css'        
     '@AppBundle/Resources/public/css/Default/videoOverlay.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -125,17 +126,29 @@
                 <img src="{{ cdn_url }}/images/salva-logo.png" alt="Salva">
             </div>                        
         </div>
-    </section>        
+    </section>   
 
-    <div class="modal modal-switching fade" id="switchingModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    {# Page Modals #}         
+
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}    
+
+    <div class="modal modal-switching fade" 
+         id="switchingModal" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="Switch to so-sure" 
+         aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h2 class="modal-title">Want to switch to so-sure?</h2>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>Want to switch to so-sure?</h3>
                 </div>
-                <div class="modal-body modal-switching-body">
-                    <h4>Switching to so-sure is easy. Just follow these steps:</h4>
+                <div class="modal-body">
+                    <p><strong>Switching to so-sure is easy. Just follow these steps:</strong></p>
                     <ol>
                         <li>Contact your existing insurance provider and request to cancel your policy. Check on their website but often you can email them and, at most, give them a 30 day notice.</li>
                         <li>Download the so-sure app and purchase your new policy from so-sure.</li>
@@ -144,21 +157,31 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>      
 
-    {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
-    <div class="modal fade modal-switching" id="quoteModel" tabindex="-1" role="dialog" aria-labelledby="quoteModelLabel">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal modal-middle fade" 
+         id="quoteModel" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="quoteModelLabel" 
+         aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body">
-                {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
-            </div>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3 class="text-center">Select Make &amp; Model</h3>
+                </div>
+                <div class="modal-body">
+                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                </div>
             </div>
         </div>
-    </div>
+    </div>      
+
+    {# End Page Modals #}       
 
 {% endblock %}

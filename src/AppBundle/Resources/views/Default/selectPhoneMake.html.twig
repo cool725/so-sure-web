@@ -13,26 +13,22 @@
         <div class="col-sm-12 {{ class }}">
             <div class="device-select">
                 {{ form_start(form_phone) }}
-                <div class="input-group">
-                    <ul>
-                        <li>
-                            {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }}
-                        </li>
-                        <li>
-                            {{ form_widget(form_phone.phoneId, { 'attr': {'class': 'select-phone-dropdown select-phones'}}) }}
-                        </li>
-                        <li>
-                          <span class="input-group-btn text-center">
-                              {{ form_widget(form_phone.next, {'label': buttonText, 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
-                          </span>
-                        </li>
-                    </ul>
+
+                    <div class="form-group">
+                        {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }} 
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(form_phone.phoneId, { 'attr': {'class': 'select-phone-dropdown select-phones'}}) }}  
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(form_phone.next, {'label': buttonText, 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
+                    </div>                    
+
                     {% if type is not defined or not type  %}
                     <p class="text-center">
                         <a class="open-intercom" href="mailto:hello@wearesosure.com" class="dark-bg-link">Don't see your device? Let us know.</a>
                     </p>
                     {% endif %}                      
-                </div>
                 {{ form_end(form_phone) }}
             </div>
         </div>
