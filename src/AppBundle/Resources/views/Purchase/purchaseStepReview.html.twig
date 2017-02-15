@@ -3,6 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
+    '@AppBundle/Resources/public/css/Default/modal.css'    
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css' %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
@@ -11,6 +12,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStepReview.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -38,7 +40,7 @@
                             <li>I am a resident of the United Kingdom</li>
                             <li>
                                 I have read &amp; understood the so-sure
-                                <a data-toggle="modal" data-target="#policyModal" style="cursor: pointer;">policy document</a>
+                                <a data-toggle="modal" data-target="#policy-modal" style="cursor: pointer;">policy document</a>
                             </li>                                
                         </ol>
                         <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
@@ -63,18 +65,26 @@
 </section>
     
 
-<div class="modal modal-policy fade" id="policyModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal modal-fullscreen fade" 
+     id="policy-modal" 
+     tabindex="-1" 
+     role="dialog" 
+     aria-labelledby="So-Sure Policy Terms" 
+     aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Policy</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h3>So-Sure Policy Terms</h3>
             </div>
-            <div class="modal-body">
+            <div class="modal-body modal-policy">
                 {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
             </div>
         </div>
     </div>
-</div>
+</div>  
 
 {% endblock %}
