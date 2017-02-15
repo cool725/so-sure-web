@@ -77,7 +77,7 @@ $(function(){
 
         modal.find(h2).nextAll().not(h1).not(h2).hide();
 
-        modal.find('table').addClass('table, table-bordered table-responsive');
+        modal.find('table').addClass('table, table-bordered');
 
         h2.click(function() {
 
