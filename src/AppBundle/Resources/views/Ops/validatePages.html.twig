@@ -11,10 +11,12 @@
         <a href="{{ url('scode', {'code':scode}) }}">SCode Invitiation</a> <b>(Logout before viewing)</b>            
     </li>
     <li>
-        <a href="{{ url('invitation', {'id':invitation.id}) }}">Email Invitiation</a> <b>(Logout before viewing)</b>            
+        <a href="{{ url('invitation', {'id':invitation.id}) }}">Email Invitiation</a> <b>(Logout before viewing)</b>
     </li>
     <li>
-        <a href="{{ url('user_invalid_policy') }}">User Policy Invalid</a> <b>(Requires Login)</b>            
+        <a href="{{ url('user_invalid_policy') }}">User Policy Invalid</a> <b>(Requires Login w/invalid policy)</b>
     </li>
-    
+    <li>
+        <a href="{{ url('user_welcome') }}">User Welcome</a> <b>(Requires Login w/valid policy)</b>
+    </li>
 </ul>
