@@ -66,4 +66,13 @@ $(function(){
 
     });  
 
+    // Policy Modal
+    $('#policy-modal').on('show.bs.modal', function (event) {
+
+        var modal = $(this);
+
+        modal.find('h1').css('color','blue');
+
+    });
+
 });
