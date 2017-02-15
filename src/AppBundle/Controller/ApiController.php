@@ -194,11 +194,12 @@ class ApiController extends BaseController
             $memory = (float) $this->getRequestString($request, 'memory');
             $rooted = $this->getRequestBool($request, 'rooted');
 
-            $phones = $this->getQuotes($make, $device, true);
+            $quotes = $this->getQuotes($make, $device, true, $memory, $rooted);
+            $phones = $quotes['phones'];
+            $deviceFound = $quotes['deviceFound'];
             if (!$phones) {
                 throw new \Exception(sprintf('Unknown phone %s %s', $make, $device));
             }
-            $deviceFound = $phones[0]->getMake() != "ALL";
 
             $stats = $this->get('app.stats');
             $cognitoId = $this->getCognitoIdentityId($request);
@@ -212,64 +213,13 @@ class ApiController extends BaseController
             );
 
             $quotes = [];
-            // Memory is only an issue if there are multiple phones
-            $memoryFound = count($phones) <= 1;
             foreach ($phones as $phone) {
-                if ($memory <= $phone->getMemory()) {
-                    $memoryFound = true;
+                if ($quote = $phone->asQuoteApiArray()) {
+                    $quotes[] = $quote;
                 }
-                $currentPhonePrice = $phone->getCurrentPhonePrice();
-                if (!$currentPhonePrice) {
-                    continue;
-                }
-
-                // If there is an end date, then quote should be valid until then
-                $quoteValidTo = $currentPhonePrice->getValidTo();
-                if (!$quoteValidTo) {
-                    $quoteValidTo = new \DateTime();
-                    $quoteValidTo->add(new \DateInterval('P1D'));
-                }
-
-                $promoAddition = 0;
-                $isPromoLaunch = false;
-                // We've decided not to include the promo values in the quote as wording might be too vague
-                // but might want to have a promo in the quote in the future, so leaving code commented out
-                /*
-                $dm = $this->getManager();
-                $repo = $dm->getRepository(SalvaPhonePolicy::class);
-                $tmpPolicy = new PhonePolicy();
-                $prefix = $tmpPolicy->getPolicyNumberPrefix();
-                if ($repo->isPromoLaunch($prefix) && !$this->getRequestBool($request, 'debug')) {
-                    $promoAddition = SalvaPhonePolicy::PROMO_LAUNCH_VALUE;
-                    $isPromoLaunch = true;
-                }
-                */
-
-                $quotes[] = [
-                    'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
-                    'monthly_loss' => 0,
-                    'yearly_premium' => $currentPhonePrice->getYearlyPremiumPrice(),
-                    'yearly_loss' => 0,
-                    'phone' => $phone->toApiArray(),
-                    'connection_value' => $currentPhonePrice->getInitialConnectionValue($promoAddition),
-                    'max_connections' => $currentPhonePrice->getMaxConnections($promoAddition, $isPromoLaunch),
-                    'max_pot' => $currentPhonePrice->getMaxPot($isPromoLaunch),
-                    'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
-                ];
-            }
-
-            if (!$deviceFound || !$memoryFound) {
-                $this->unknownDevice($device, $memory);
-            }
-
-            $differentMake = false;
-            if ($deviceFound && !$phones[0]->isSameMake($make)) {
-                $differentMake = true;
-                $this->differentMake($phones[0]->getMake(), $make);
             }
 
             if ($rooted) {
-                $this->rootedDevice($device, $memory);
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
             }
 
@@ -285,9 +235,9 @@ class ApiController extends BaseController
             ];
 
             if ($this->getRequestBool($request, 'debug')) {
-                $response['memory_found'] = $memoryFound;
+                $response['memory_found'] = $quotes['memoryFound'];
                 $response['rooted'] = $rooted;
-                $response['different_make'] = $differentMake;
+                $response['different_make'] = $quotes['differentMake'];
             }
 
             return new JsonResponse($response);
@@ -754,73 +704,5 @@ class ApiController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
-    }
-
-    /**
-     * @param string $device
-     * @param float  $memory
-     *
-     * @return boolean true if unknown device notification was sent
-     */
-    private function unknownDevice($device, $memory)
-    {
-        if (in_array($device, [
-            "", "generic_x86", "generic_x86_64", "Simulator",
-            "iPad4,4", "iPad5,2", "iPad5,3", "iPad5,4", "iPad6,7", "iPad6,8", "iPad Air", "iPad Air 2"
-        ])) {
-            return false;
-        }
-
-        $body = sprintf(
-            'Unknown device queried: %s (%s GB). If device exists, memory may be higher than expected',
-            $device,
-            $memory
-        );
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Unknown Device/Memory')
-            ->setFrom('tech@so-sure.com')
-            ->setTo('analysis@so-sure.com')
-            ->setBody($body, 'text/html');
-        $this->get('mailer')->send($message);
-
-        return true;
-    }
-
-    /**
-     * @param string $dbMake
-     * @param string $phoneMake
-     */
-    private function differentMake($dbMake, $phoneMake)
-    {
-        $body = sprintf(
-            'Make in db is different than phone make. Db: %s Phone: %s',
-            $dbMake,
-            $phoneMake
-        );
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Make different in db')
-            ->setFrom('tech@so-sure.com')
-            ->setTo('tech@so-sure.com')
-            ->setBody($body, 'text/html');
-        $this->get('mailer')->send($message);
-    }
-
-    /**
-     * @param string $device
-     * @param float  $memory
-     */
-    private function rootedDevice($device, $memory)
-    {
-        $body = sprintf(
-            'Rooted device queried: %s (%s GB).',
-            $device,
-            $memory
-        );
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Rooted Device/Memory')
-            ->setFrom('tech@so-sure.com')
-            ->setTo('tech@so-sure.com')
-            ->setBody($body, 'text/html');
-        $this->get('mailer')->send($message);
     }
 }

@@ -678,6 +678,7 @@ class Phone
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
             'image_url' => $this->getImageUrl() ? $this->getImageUrl() : null,
+            'quote_url' => sprintf('https://wearesosure.com/quote/%s', $this->getId()), // TODO: migrate to store link in db and use branch
         ];
     }
 
@@ -692,6 +693,45 @@ class Phone
             'active' => $this->getActive(),
             'prices' => $this->eachApiArray($this->getPhonePrices(), $date),
         ];
+    }
+
+    public function asQuoteApiArray(User $user = null)
+    {
+        $currentPhonePrice = $phone->getCurrentPhonePrice();
+        if (!$currentPhonePrice) {
+            return null;
+        }
+
+        // If there is an end date, then quote should be valid until then
+        $quoteValidTo = $currentPhonePrice->getValidTo();
+        if (!$quoteValidTo) {
+            $quoteValidTo = new \DateTime();
+            $quoteValidTo->add(new \DateInterval('P1D'));
+        }
+
+        $promoAddition = 0;
+        $isPromoLaunch = false;
+
+        $monthlyPremium = $currentPhonePrice->getMonthlyPremiumPrice();
+        if ($user && !$user->allowedMonthlyPayments()) {
+            $monthlyPremium = null;
+        }
+        $yearlyPremium = $currentPhonePrice->getYearlyPremiumPrice();
+        if ($user && !$user->allowedYearlyPayments()) {
+            $yearlyPremium = null;
+        }
+        
+        return [
+            'monthly_premium' => $monthlyPremium,
+            'monthly_loss' => 0,
+            'yearly_premium' => $yearlyPremium,
+            'yearly_loss' => 0,
+            'phone' => $phone->toApiArray(),
+            'connection_value' => $currentPhonePrice->getInitialConnectionValue($promoAddition),
+            'max_connections' => $currentPhonePrice->getMaxConnections($promoAddition, $isPromoLaunch),
+            'max_pot' => $currentPhonePrice->getMaxPot($isPromoLaunch),
+            'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
+        ];        
     }
 
     public function toAlternativeArray()
