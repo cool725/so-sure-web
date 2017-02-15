@@ -18,102 +18,89 @@
 {% endblock %}
 
 {% block body %}
-<section class="vertical-align-wrap">
-    <div class="vertical-align-middle">
-        <div class="container checkout">
+<section id="purchase-step-address" class="checkout">
+    
+    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
 
-            {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
-            
-            <div class="row">
-                <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+    <div class="container">
+        
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
 
-                    <div class="checkout--step">
-                        {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
-                            {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
+                <h3>Billing Address</h3>
+
+                <div class="checkout--step">
+                    {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                        {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
 
 
-                            <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
-                                <div class="form-group {% if is_postback %}has-error{% endif %}">
-                                    <label class="control-label col-sm-3">Find Address</label>
-                                    <div class="col-sm-8">
-                                        <input class="typeahead form-control" type="text" placeholder="Enter Postcode" {% if not showAddress %} required="required" {% endif %}>
-                                        {% if is_postback %}
-                                            <div class="help-block with-errors">Your address is required</div>
-                                        {% endif %}
-                                    </div>                                        
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-12 text-center address-manual-cont">
-                                        <a id="address-manual" href="#" class="btn-additional"><small>Or enter address manually</small></a>
-                                    </div>                                    
-                                </div>
+                        <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
+                            <div class="form-group {% if is_postback %}has-error{% endif %}">
+                                <label class="">Find Address:</label>
+                                <input class="typeahead form-control" type="text" placeholder="Enter Postcode" {% if not showAddress %} required="required" {% endif %}>
+                                {% if is_postback %}
+                                    <div class="help-block with-errors">Your address is required</div>
+                                {% endif %}                                    
                             </div>
-
-                            <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}">
-                                <div class="form-group form-group-fix address-show-error" style="display: none;">
-                                    <small class="text-danger address-show-error-text"></small>
-                                </div>
-                                <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
-                                    {{ form_label(purchase_form.addressLine1, 'Address 1', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
-                                    <div class="col-sm-9">
-                                        {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1'}}) }}
-                                        {% if showAddress %}
-                                            <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
-                                        {% endif %}
-                                    </div>                                    
-                                </div>
-                                <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
-                                    {{ form_label(purchase_form.addressLine2, 'Address 2', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
-                                    <div class="col-sm-9">
-                                        {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2'}}) }}
-                                        {% if showAddress %}
-                                            <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
-                                        {% endif %}
-                                    </div>                                    
-                                </div>
-                                <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
-                                    {{ form_label(purchase_form.addressLine3, 'Address 3', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
-                                    <div class="col-sm-9">
-                                        {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3'}}) }}
-                                        {% if showAddress %}
-                                            <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
-                                        {% endif %}
-                                    </div>                                
-                                </div>
-                                <div class="form-group {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
-                                    {{ form_label(purchase_form.city, 'City', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
-                                    <div class="col-sm-6">
-                                        {{ form_widget(purchase_form.city, {'attr':{'class':'form-control city'}}) }}
-                                        {% if showAddress %}
-                                            <div class="help-block with-errors">{{ form_errors(purchase_form.city) }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="form-group {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
-                                    {{ form_label(purchase_form.postcode, 'Postcode', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
-                                    <div class="col-sm-6">
-                                        {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode'}}) }}
-                                        {% if showAddress %}
-                                            <div class="help-block with-errors">{{ form_errors(purchase_form.postcode) }}</div>
-                                        {% endif %}
-                                    </div>                                    
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-12 text-center">
-                                        {{ form_widget(purchase_form.next, {'label': 'Continue to Phone Details', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}        
-                                    </div>                            
-                                </div>
+                            <div class="form-group">
+                                <div class="col-sm-12 text-center address-manual-cont">
+                                    <a id="address-manual" href="#" class=""><small>Or enter address manually</small></a>
+                                </div>                                    
                             </div>
+                        </div>
+
+                        <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}">
+                            <div class="form-group form-group-fix address-show-error" style="display: none;">
+                                <small class="text-danger address-show-error-text"></small>
+                            </div>
+                            <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
+                                {{ form_label(purchase_form.addressLine1, 'Address:', { 'label_attr': {'class': ''} }) }}
+                                {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1'}}) }}
+                                {% if showAddress %}
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
+                                {% endif %}                           
+                            </div>
+                            <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
+                                {{ form_label(purchase_form.addressLine2, 'Address 2:', { 'label_attr': {'class': ''} }) }}
+                                {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2'}}) }}
+                                {% if showAddress %}
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
+                                {% endif %}                                 
+                            </div>
+                            <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
+                                {{ form_label(purchase_form.addressLine3, 'Address 3:', { 'label_attr': {'class': ''} }) }}
+                                {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3'}}) }}
+                                {% if showAddress %}
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
+                                {% endif %}                             
+                            </div>
+                            <div class="form-group {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
+                                {{ form_label(purchase_form.city, 'City:', { 'label_attr': {'class': ''} }) }}
+                                {{ form_widget(purchase_form.city, {'attr':{'class':'form-control city'}}) }}
+                                {% if showAddress %}
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.city) }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
+                                {{ form_label(purchase_form.postcode, 'Postcode:', { 'label_attr': {'class': ''} }) }}
+                                {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode'}}) }}
+                                {% if showAddress %}
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.postcode) }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group text-center">
+                                {{ form_widget(purchase_form.next, {'label': 'Continue to Phone Details', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}              
+                            </div>
+                        </div>
 
 
 
-                        {{ form_end(purchase_form) }}
-                    </div>
-                
+                    {{ form_end(purchase_form) }}
                 </div>
+            
             </div>
-                    
         </div>
+                
     </div>
 </section>   
 {% endblock %}

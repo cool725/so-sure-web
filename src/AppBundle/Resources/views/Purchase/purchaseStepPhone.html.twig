@@ -19,23 +19,24 @@
 {% endblock %}
 
 {% block body %}
-<section class="payment-container vertical-align-wrap">
-    <div class="vertical-align-middle">
-        <div class="container checkout">
+<section id="purchase-step-phone" class="checkout">
+    
+    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
 
-            {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
-            
-            <div class="row">
-                <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+    <div class="container">
+        
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">        
 
-                    <div class="checkout--step">
-                        {% if phone %}
-                        {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
-
-                            <div class="form-group">
-                                <label class="control-label col-sm-3">Your Phone</label>
-                                <div class="col-sm-8 text-left">
-                                    <span class="h4">
+                <h3>Phone Details</h3>
+                
+                <div class="checkout--step">
+                    {% if phone %}
+                            {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                                <div class="form-group">
+                                    <label class="">Your Phone:</label>
+                                    <br>
+                                    <span class="h3">
                                         <strong>
                                             {% if phone %}
                                                 {{ phone.make }} {{ phone.model }} {%    if phone.memory %}
@@ -43,76 +44,66 @@
                                                     {% endif %}
                                             {% endif %}
                                         </strong>
-                                            <button type="button" 
-                                                    class="select-phone btn-link btn-xs" data-toggle="modal" 
-                                                    data-target="#phoneModal">Edit</button>
-                                    </span>
+                                        <button type="button" 
+                                                class="select-phone btn-link btn-xs" data-toggle="modal" 
+                                                data-target="#phoneModal">Edit</button>
+                                    </span>  
+                                </div>   
+                                <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+                                    {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': ''} }) }}
+                                    {{ form_widget(purchase_form.amount) }}    
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>             
                                 </div>                                
-                            </div>
-                            <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.amount, 'Payment Options', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
-                                <div class="col-sm-8 text-left">
-                                    {{ form_widget(purchase_form.amount) }}
-                                    
-                                    <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
-                                </div>                                
-                            </div>
-                            <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.imei, 'IMEI Number', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
-                                <div class="col-sm-8">
+                                <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
+                                    {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': ''} }) }}
                                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'', 'pattern':'[-/\\s]*([0-9][-/\\s]*){15,17}', 'title': 'Enter a valid 15 or 17 digit IMEI Number'}}) }}
                                     <p class="help-block text-left">
                                         <small>Dial *#06# to show your IMEI number </small>
                                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"><i class="fa fa-question"></i></button>
                                     </p>
-                                    <p>or</p>
-                                    <a href="#" onclick="Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">Send us a screenshot of your IMEI</a>
-                                    <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                                    
-                                </div>                                
-                            </div>
-                            {% if purchase_form.serialNumber is defined %}
-                                <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
-                                    {{ form_label(purchase_form.serialNumber, 'Serial Number', { 'label_attr': {'class': 'control-label col-sm-3'} }) }}
-                                    <div class="col-sm-8">
+                                    <p class="text-center">
+                                        or <br><br>
+                                        <a href="#" class="btn btn-link btn-additional" onclick="Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">
+                                            <strong><i class="fa fa-file-image-o" aria-hidden="true"></i> Send us a screenshot of your IMEI</strong>
+                                        </a>
+                                    </p>
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                     
+                                </div>                     
+                                {% if purchase_form.serialNumber is defined %}
+                                    <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
+                                        {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': ''} }) }}
                                         {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':''}}) }}
                                         <p class="help-block text-left">
                                             <small>Go to Settings > General > About</small>
                                             <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
                                           ><i class="fa fa-question"></i></button>
                                         </p>
-                                        <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
-                                    </div>                                    
-                                </div>
-                            {% endif %}
-                            <div class="form-group">
-                                <div class="col-sm-12 text-center">
-                                    {{ form_widget(purchase_form.next, {'label': 'Continue to Purchase', 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
-                                </div>
-                            </div>
-
-                        {{ form_end(purchase_form) }}
+                                        <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>                               
+                                    </div>
+                                {% endif %}    
+                                <div class="form-group text-center">
+                                    {{ form_widget(purchase_form.next, {'label': 'Continue to Purchase', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
+                                </div>                                                                   
+                            {{ form_end(purchase_form) }}
                     {% else %}
-                        {{ form_start(purchase_no_phone_form, {'attr': {'data-toggle': 'validator', 'class': 'form-horizontal'}}) }}
-
-                            <div class="form-group">
-                                <label class="control-label col-sm-3">Your Phone</label>
-                                <div class="col-sm-8 text-left">
+                            {{ form_start(purchase_no_phone_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                                <div class="form-group">
+                                    <label class="">Your Phone:</label>
                                     <button type="button" 
-                                            class="select-phone btn-additional btn-xs" data-toggle="modal" 
-                                            data-target="#phoneModal"><strong>Select phone</strong></button>
-                                </div>                                
-                            </div>
-                        {{ form_end(purchase_no_phone_form) }}
-                        {% endif %}
-                    </div>
+                                            class="select-phone btn-additional btn-xs" 
+                                            data-toggle="modal" 
+                                            data-target="#phoneModal"><strong>Select phone</strong></button>                                       
+                                </div>
 
-              
+                            {{ form_end(purchase_no_phone_form) }}
+                    {% endif %}
                 </div>
+          
             </div>
-
         </div>
+                
     </div>
-</section>
+</section>  
 
 <div class="modal fade" id="nonAppleModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
