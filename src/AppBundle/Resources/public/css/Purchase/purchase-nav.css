@@ -27,7 +27,7 @@
 }    
 
 .purchase-nav .step-inactive {
-    background-color: #efefef;
+    background-color: #ccc;
 }    
 
 @media (min-width: 767px) {
