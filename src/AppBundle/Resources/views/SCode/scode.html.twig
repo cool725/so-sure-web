@@ -8,12 +8,15 @@
     {% stylesheets
     'bundles/app/css/Default/index.css'
     'bundles/app/css/Default/selectPhoneMake.css'
+    '@AppBundle/Resources/public/css/Default/modal.css'    
+    '@AppBundle/Resources/public/css/Default/videoOverlay.css'    
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'      
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}

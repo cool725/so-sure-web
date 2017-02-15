@@ -98,6 +98,16 @@
 }
 
 /* Variations */
-.modal-middle {
+
+.modal-middle { /* Align In the Middle */
 	padding-top: 10%;
+}
+
+/* Policy Modal */
+
+.modal-policy h3,
+.modal-policy p,
+.modal-policy ul,
+.modal-policy table, {
+	display: none !important;
 }
