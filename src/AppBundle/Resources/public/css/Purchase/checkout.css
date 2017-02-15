@@ -1,5 +1,22 @@
 /* Checkout */
 
+.checkout {
+    padding: 0 0 30px;
+}
+
+.checkout h3 {
+    display: none;
+}
+
+.checkout--step {
+    max-width: 410px;
+    margin: 0 auto;
+}
+
+.checkout--step-review {
+    line-height: 2;
+}
+
 .checkout .form-group label {
     display: block;
     text-align: left;
@@ -106,45 +123,6 @@
     color: #ff6666;
 }
 
-/*
-
-
-/* Modal */
-
-.modal-confirm {
-    background: rgba(0, 0, 0, 0.6);
-    padding-top: 10%;
-}
-
-.modal-confirm-wrapper {
-    margin-top: 40px;
-    margin-bottom: 20px;
-}
-
-.modal-summary {
-    background: rgba(0, 0, 0, 0.6);
-    padding-top: 10%;
-}
-
-.modal-summary ul {
-    list-style: none;
-}
-
-.modal-summary ul li {
-    font-weight: 900;
-}
-
-.modal-policy {
-    background: rgba(0, 0, 0, 0.6);
-    padding-top: 2%;
-    max-height: 90%;
-    overflow-y: scroll;
-}
-
-.modal-policy .modal-dialog {
-    width: 70% !important;
-}
-
 /* Twitter Typehead */
 
 .tt-menu {
@@ -180,9 +158,28 @@
         margin: 0 auto;
     }    
 
+    .checkout--step-review {
+        padding: 0 20px;
+    }
+
 }
 
 @media (min-width: 767px) {
+
+
+    .checkout {
+        padding: 0 0 100px;
+        margin-top: 5px;
+        border-top: 2px solid #3399ff;
+    }
+
+    .checkout h3 {
+        display: block;
+        padding: 0 0 10px;
+        margin-bottom: 25px;
+        color: #3399ff;
+        border-bottom: 2px solid #efefef;
+    }
 
     .checkout .form-group label {
         display: inline;
