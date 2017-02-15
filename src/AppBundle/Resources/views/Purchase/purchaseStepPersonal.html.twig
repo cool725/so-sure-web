@@ -39,8 +39,8 @@
                             <div class="help-block with-errors">{{ form_errors(purchase_form.email) }}</div>
                         </div>
                         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
-                            {{ form_label(purchase_form.name, 'Name:', { 'label_attr': {'class': ''} }) }}
-                            {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name'}}) }}
+                            {{ form_label(purchase_form.name, 'Full Name:', { 'label_attr': {'class': ''} }) }}
+                            {{ form_widget(purchase_form.name, {'attr':{'class':'form-control'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.name) }}</div>                  
                         </div>
                         <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %} text-left">
