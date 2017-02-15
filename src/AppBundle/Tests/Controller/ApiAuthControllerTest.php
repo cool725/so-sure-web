@@ -18,6 +18,7 @@ use AppBundle\Event\UserEmailEvent;
 use AppBundle\Listener\UserListener;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Classes\SoSure;
 
 /**
  * @group functional-net
@@ -3459,6 +3460,87 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => 'foo',
         ]]);
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    // GET /user/{id}/quote
+
+    /**
+     *
+     */
+    public function testUserQuote()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserQuote', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->updateUserDetails($cognitoIdentityId, $user);
+
+        $url = sprintf(
+            '/api/v1/auth/user/%s/quote?_method=GET&%s',
+            $user->getId(),
+            'make=Apple&device=iPhone%206&rooted=false'
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertTrue(count($data['quotes']) > 1);
+        // Make sure we're not returning all the quotes
+        $this->assertTrue(count($data['quotes']) < 10);
+    }
+
+    public function testUserQuoteInvalidUser()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserQuoteInvalidUser', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->updateUserDetails($cognitoIdentityId, $user);
+
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf(
+            '/api/v1/auth/user/%s/quote?_method=GET&%s',
+            $user->getId(),
+            'make=Apple&device=iPhone%206&rooted=false'
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(403);
+    }
+
+    public function testUserQuoteYearlyBilling()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserQuoteYearlyBilling', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->updateUserDetails($cognitoIdentityId, $user);
+
+        $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'city' => 'London',
+            'postcode' => SoSure::$yearlyOnlyPostcodes[0]
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->verifyResponse(200);
+
+        $url = sprintf(
+            '/api/v1/auth/user/%s/quote?_method=GET&%s',
+            $user->getId(),
+            'make=Apple&device=iPhone%206&rooted=false'
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertTrue(count($data['quotes']) > 1);
+        $this->assertNull($data['quotes'][0]['monthly_premium']);
+        $this->assertGreaterThan(0, $data['quotes'][0]['yearly_premium']);
     }
 
     // helpers

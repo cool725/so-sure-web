@@ -125,7 +125,7 @@ abstract class BaseController extends Controller
         return $phones;
     }
 
-    protected function getQuotes($make, $device, $returnAllIfNone = true)
+    protected function getQuotes($make, $device, $returnAllIfNone = true, $memory = null, $rooted = null)
     {
         // TODO: We should probably be checking make as well.  However, we need to analyize the data
         // See Phone::isSameMake()
@@ -139,7 +139,38 @@ abstract class BaseController extends Controller
             $phones = $repo->findBy(['make' => 'ALL']);
         }
 
-        return $phones;
+        $memoryFound = null;
+        if ($memory !== null) {
+            $memoryFound = false;
+            foreach ($phones as $phone) {
+                if ($memory <= $phone->getMemory()) {
+                    $memoryFound = true;
+                }
+            }
+        }
+
+        $deviceFound = count($phones) > 0 && $phones[0]->getMake() != "ALL";
+
+        if (!$deviceFound || !$memoryFound) {
+            $this->unknownDevice($device, $memory);
+        }
+
+        if ($rooted) {
+            $this->rootedDevice($device, $memory);
+        }
+
+        $differentMake = false;
+        if ($deviceFound && !$phones[0]->isSameMake($make)) {
+            $differentMake = true;
+            $this->differentMake($phones[0]->getMake(), $make);
+        }
+
+        return [
+            'phones' => $phones,
+            'deviceFound' => $deviceFound,
+            'memoryFound' => $memoryFound,
+            'differentMake' => $differentMake
+        ];
     }
 
     /**
@@ -154,7 +185,8 @@ abstract class BaseController extends Controller
      */
     protected function getPhone($make, $device, $memory)
     {
-        $phones = $this->getQuotes($make, $device, false);
+        $quotes = $this->getQuotes($make, $device, false);
+        $phones = $quotes['phones'];
         if (count($phones) == 0) {
             return null;
         }
@@ -718,5 +750,73 @@ abstract class BaseController extends Controller
     protected function isProduction()
     {
         return $this->getParameter('kernel.environment') == 'prod';
+    }
+
+    /**
+     * @param string $device
+     * @param float  $memory
+     *
+     * @return boolean true if unknown device notification was sent
+     */
+    private function unknownDevice($device, $memory)
+    {
+        if (in_array($device, [
+            "", "generic_x86", "generic_x86_64", "Simulator",
+            "iPad4,4", "iPad5,2", "iPad5,3", "iPad5,4", "iPad6,7", "iPad6,8", "iPad Air", "iPad Air 2"
+        ])) {
+            return false;
+        }
+
+        $body = sprintf(
+            'Unknown device queried: %s (%s GB). If device exists, memory may be higher than expected',
+            $device,
+            $memory
+        );
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Unknown Device/Memory')
+            ->setFrom('tech@so-sure.com')
+            ->setTo('analysis@so-sure.com')
+            ->setBody($body, 'text/html');
+        $this->get('mailer')->send($message);
+
+        return true;
+    }
+
+    /**
+     * @param string $dbMake
+     * @param string $phoneMake
+     */
+    private function differentMake($dbMake, $phoneMake)
+    {
+        $body = sprintf(
+            'Make in db is different than phone make. Db: %s Phone: %s',
+            $dbMake,
+            $phoneMake
+        );
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Make different in db')
+            ->setFrom('tech@so-sure.com')
+            ->setTo('tech@so-sure.com')
+            ->setBody($body, 'text/html');
+        $this->get('mailer')->send($message);
+    }
+
+    /**
+     * @param string $device
+     * @param float  $memory
+     */
+    private function rootedDevice($device, $memory)
+    {
+        $body = sprintf(
+            'Rooted device queried: %s (%s GB).',
+            $device,
+            $memory
+        );
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Rooted Device/Memory')
+            ->setFrom('tech@so-sure.com')
+            ->setTo('tech@so-sure.com')
+            ->setBody($body, 'text/html');
+        $this->get('mailer')->send($message);
     }
 }

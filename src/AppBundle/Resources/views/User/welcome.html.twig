@@ -48,6 +48,7 @@
                         {% else %}Unknown{% endif %}
                         and your policy is in effect from {{ policy.start|date('jS F Y') }} until {{ policy.end|date('jS F Y') }}.
                     </p>
+                    {% if policy.user.paymentMethod.cardType is defined %}
                     <p class="info text-blue">
                         {% if policy.getPremiumPlan == 'monthly'%}
                             Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) will be billed &pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} every month on the {{ policy.expectedBillingDate|date('jS') }}.
@@ -55,6 +56,7 @@
                             Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) was billed &pound;{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
                         {% endif %}
                     </p>
+                    {% endif %}
                 </div>
             </div>
         </div>

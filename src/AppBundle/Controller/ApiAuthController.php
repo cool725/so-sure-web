@@ -1386,4 +1386,78 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
+
+    /**
+     * @Route("/user/{id}/quote", name="api_auth_user_quote")
+     * @Method({"GET"})
+     */
+    public function userQuoteAction(Request $request, $id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($id);
+            if (!$user) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find user',
+                    404
+                );
+            }
+            if (!$user->hasValidBillingDetails()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_INVALID_ADDRESS,
+                    'Invalid billing address',
+                    422
+                );
+            }
+            $this->denyAccessUnlessGranted('edit', $user);
+
+            $make = $this->getRequestString($request, 'make');
+            $device = $this->getRequestString($request, 'device');
+            $memory = (float) $this->getRequestString($request, 'memory');
+            $rooted = $this->getRequestBool($request, 'rooted');
+
+            $quoteData = $this->getQuotes($make, $device, true, $memory, $rooted);
+            $phones = $quoteData['phones'];
+            $deviceFound = $quoteData['deviceFound'];
+            if (!$phones) {
+                throw new \Exception(sprintf('Unknown phone %s %s', $make, $device));
+            }
+
+            $quotes = [];
+            foreach ($phones as $phone) {
+                if ($quote = $phone->asQuoteApiArray($user)) {
+                    $quotes[] = $quote;
+                }
+            }
+
+            if ($rooted) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
+            }
+
+            $response = [
+                'quotes' => $quotes,
+                'device_found' => $deviceFound,
+            ];
+
+            if ($this->getRequestBool($request, 'debug')) {
+                $response['memory_found'] = $quoteData['memoryFound'];
+                $response['rooted'] = $rooted;
+                $response['different_make'] = $quoteData['differentMake'];
+            }
+
+            return new JsonResponse($response);
+        } catch (AccessDeniedException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api quoteAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
 }

@@ -199,10 +199,18 @@ oneup_flysystem:
                 client: aws.s3
                 bucket: admin.so-sure.com
                 prefix: "%kernel.environment%"
+        s3support:
+            awss3v3:
+                client: aws.s3
+                bucket: help.so-sure.com
+                prefix: "%kernel.environment%"
     filesystems:
         s3admin_fs:
             adapter: s3admin
             mount: s3admin_fs
+        s3support_fs:
+            adapter: s3support
+            mount: s3support_fs
 
 vich_uploader:
     db_driver: mongodb

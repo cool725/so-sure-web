@@ -28,6 +28,7 @@ class MixpanelService
     const EVENT_BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
     const EVENT_POLICY_READY = 'Policy Ready For Purchase';
     const EVENT_LOGIN = 'Login';
+    const EVENT_APP_DOWNLOAD = 'App Download';
 
     /** @var DocumentManager */
     protected $dm;
@@ -81,8 +82,9 @@ class MixpanelService
             }
         }
 
-        if ($this->requestService->isSoSureEmployee() ||
-            $this->requestService->isExcludedAnalyticsIp()) {
+        if ($this->environment == 'prod' &&
+            ($this->requestService->isSoSureEmployee() ||
+            $this->requestService->isExcludedAnalyticsIp())) {
             return false;
         }
 
