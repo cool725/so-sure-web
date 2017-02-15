@@ -44,6 +44,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 'If policy number is present, update pot value if required'
             )
             ->addOption(
+                'adjust-scheduled-payments',
+                null,
+                InputOption::VALUE_NONE,
+                'If policy number is present, adjust scheduled payments'
+            )
+            ->addOption(
                 'skip-email',
                 null,
                 InputOption::VALUE_NONE,
@@ -59,12 +65,14 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
         $updatePotValue = $input->getOption('update-pot-value');
+        $adjustScheduledPayments = $input->getOption('adjust-scheduled-payments');
         $skipEmail = true === $input->getOption('skip-email');
         $validateDate = null;
         if ($date) {
             $validateDate = new \DateTime($date);
         }
 
+        $policyService = $this->getContainer()->get('app.policy');
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $policyRepo = $dm->getRepository(Policy::class);
 
@@ -72,6 +80,18 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
+            }
+
+            if ($adjustScheduledPayments) {
+                if (!$policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate)) {
+                    if ($policyService->adjustScheduledPayments($policy)) {
+                        $lines[] = "Successfully adjusted the policy scheduled payments";
+                    } else {
+                        $lines[] = "Failed to adjust the policy scheduled payments";
+                    }
+                } else {
+                    $lines[] = "Skipped adjusting policy scheduled payments as not required";
+                }
             }
 
             $valid = $policy->isPolicyPaidToDate(true, $validateDate);
