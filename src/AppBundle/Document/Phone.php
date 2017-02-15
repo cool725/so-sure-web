@@ -678,7 +678,8 @@ class Phone
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
             'image_url' => $this->getImageUrl() ? $this->getImageUrl() : null,
-            'quote_url' => sprintf('https://wearesosure.com/quote/%s', $this->getId()), // TODO: migrate to store link in db and use branch
+            // TODO: migrate to store link in db and use branch
+            'quote_url' => sprintf('https://wearesosure.com/quote/%s', $this->getId()),
         ];
     }
 
@@ -697,7 +698,7 @@ class Phone
 
     public function asQuoteApiArray(User $user = null)
     {
-        $currentPhonePrice = $phone->getCurrentPhonePrice();
+        $currentPhonePrice = $this->getCurrentPhonePrice();
         if (!$currentPhonePrice) {
             return null;
         }
@@ -726,12 +727,12 @@ class Phone
             'monthly_loss' => 0,
             'yearly_premium' => $yearlyPremium,
             'yearly_loss' => 0,
-            'phone' => $phone->toApiArray(),
+            'phone' => $this->toApiArray(),
             'connection_value' => $currentPhonePrice->getInitialConnectionValue($promoAddition),
             'max_connections' => $currentPhonePrice->getMaxConnections($promoAddition, $isPromoLaunch),
             'max_pot' => $currentPhonePrice->getMaxPot($isPromoLaunch),
             'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
-        ];        
+        ];
     }
 
     public function toAlternativeArray()

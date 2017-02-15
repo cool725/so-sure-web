@@ -1409,17 +1409,18 @@ class ApiAuthController extends BaseController
                     ApiErrorCode::ERROR_USER_INVALID_ADDRESS,
                     'Invalid billing address',
                     422
-                );                
+                );
             }
+            $this->denyAccessUnlessGranted('edit', $user);
 
             $make = $this->getRequestString($request, 'make');
             $device = $this->getRequestString($request, 'device');
             $memory = (float) $this->getRequestString($request, 'memory');
             $rooted = $this->getRequestBool($request, 'rooted');
 
-            $quotes = $this->getQuotes($make, $device, true, $memory, $rooted);
-            $phones = $quotes['phones'];
-            $deviceFound = $quotes['deviceFound'];
+            $quoteData = $this->getQuotes($make, $device, true, $memory, $rooted);
+            $phones = $quoteData['phones'];
+            $deviceFound = $quoteData['deviceFound'];
             if (!$phones) {
                 throw new \Exception(sprintf('Unknown phone %s %s', $make, $device));
             }
@@ -1441,12 +1442,14 @@ class ApiAuthController extends BaseController
             ];
 
             if ($this->getRequestBool($request, 'debug')) {
-                $response['memory_found'] = $quotes['memoryFound'];
+                $response['memory_found'] = $quoteData['memoryFound'];
                 $response['rooted'] = $rooted;
-                $response['different_make'] = $quotes['differentMake'];
+                $response['different_make'] = $quoteData['differentMake'];
             }
 
             return new JsonResponse($response);
+        } catch (AccessDeniedException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
