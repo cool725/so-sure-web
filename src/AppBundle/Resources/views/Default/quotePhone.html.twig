@@ -16,6 +16,7 @@
     '@AppBundle/Resources/public/js/Default/index.js'
     'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/slider.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'    
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -25,6 +26,7 @@
     {% stylesheets
     '@AppBundle/Resources/public/css/Default/index.css'
     '@AppBundle/Resources/public/css/Default/quotePhone.css'
+    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'    
     '@AppBundle/Resources/public/css/Default/scrollindicator.css'
     '@AppBundle/Resources/public/css/Default/modal.css'    
     '@AppBundle/Resources/public/css/Default/videoOverlay.css'
@@ -39,7 +41,7 @@
         {{ form_start(buy_form) }}
 
         <h1 class="h2">Instant cover for your <span class="">{{ phone }}</span>
-            <small><a href="{{ path('homepage') }}#get-quote"><strong>Change</strong></a></small>
+            <small><a href="#" data-toggle="modal" data-target="#quote-model"><strong>Change</strong></a></small>
         </h1>
 
         <div class="quote">
@@ -449,6 +451,28 @@
         </div>
     </div>   
 
+
+    <div class="modal modal-middle fade" 
+         id="quote-model" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="quoteModelLabel" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3 class="text-center">Select Make &amp; Model</h3>
+                </div>
+                <div class="modal-body">
+                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                </div>
+            </div>
+        </div>
+    </div>      
     {# End Page Modals #}
 
 {% endblock %}
