@@ -520,9 +520,6 @@ class PurchaseController extends BaseController
                 JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
             );
             if ($policy->isInitialPayment()) {
-                $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PURCHASE_POLICY, [
-                    'Payment Option' => $policy->getPremiumPlan(),
-                ]);
                 return $this->redirectToRoute('user_welcome');
             } else {
                 // unpaid policy - outstanding payment
