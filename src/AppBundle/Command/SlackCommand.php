@@ -50,8 +50,9 @@ class SlackCommand extends ContainerAwareCommand
         $repo = $dm->getRepository(PhonePolicy::class);
 
         $weekText = '';
-        $start = new \DateTime('2017-01-02');
-        $initial = 86;
+        $start = new \DateTime('2016-12-05');
+        $dowOffset = 0;
+        $initial = 70;
         $growth = 9;
         $weekOffset = 17;
 
@@ -59,7 +60,7 @@ class SlackCommand extends ContainerAwareCommand
             $now = new \DateTime();
             $weeks = floor($now->diff($start)->days / 7);
             $dow = $now->diff($start)->days % 7;
-            $offset = $dow - 2 >= 0 ? $dow - 2 : 5 + $dow;
+            $offset = $dow - $dowOffset >= 0 ? $dow - $dowOffset : (7 - $dowOffset) + $dow;
             $start = clone $now;
             $start = $start->sub(new \DateInterval(sprintf('P%dD', $offset)));
             $end = clone $start;
@@ -96,7 +97,7 @@ class SlackCommand extends ContainerAwareCommand
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
-            "*%s*\nTarget: %d\nActual: %d\nRemaining: %d\nLast 24 hours: %d\n\n_policy compounding_",
+            "*%s*\nTarget: %d\nActual: %d\nRemaining: %d\nLast 24 hours: *%d*\n\n_policy compounding_",
             $weekText,
             $growthTarget,
             $total,
