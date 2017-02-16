@@ -17,16 +17,13 @@
     line-height: 2;
 }
 
-.checkout .form-group label {
-    display: block;
-    text-align: left;
-    font-weight: bold;
-    font-size: 14px;
-}
-
 .checkout .form-group .form-control {
     border: 2px solid #efefef;
     box-shadow: none;
+}
+
+.checkout .form-footer {
+    margin-top: 25px;
 }
 
 /* Radio Buttons */

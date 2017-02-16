@@ -616,9 +616,30 @@ hr.strong {
     border-color: #67A53E;
 }
 
+.btn-subtle {
+    background-color: #8B97B5;
+    border-color: #8B97B5;
+}
+
+.btn-subtle:hover,
+.btn-subtle:focus {
+    background-color: #8B97B5;
+    border-color: #8B97B5;
+    color: #fff;
+}
+
 .btn-rounded {
     border-radius: 100px;
     padding: 12px 30px;
+}
+
+.btn-rounded.btn-xs {
+    padding: 5px 15px;
+}
+
+.btn-link {
+    padding-top: 12px;
+    padding-bottom: 12px;      
 }
 
 .btn-rounded.btn-sm {
@@ -631,11 +652,46 @@ hr.strong {
     color: #3399ff; /* Bit hacky sort with addition of SASS */
 }
 
+.btn-hollow-subtle {
+    color: #8B97B5;
+}
+
+.btn-arrow-left,
+.btn-arrow-right {
+
+}
+
+.btn-arrow-left:after {
+    content: '\f053';
+    font-family: FontAwesome;
+    position: absolute;
+    /*left: 5px;  */
+}
+
+.btn-rounded.btn-arrow-left:after {
+    left: 15%;
+}
+
+.btn-arrow-right:after {
+    content: '\f054';
+    font-family: FontAwesome;
+    position: absolute;
+    /*right: 5px;  */
+}
+
+.btn-rounded.btn-arrow-right:after {
+    right: 15%;
+}
+
 @media (min-width: 379px) {
 
     .btn-hollow {
         margin-top: 0;
     }
+}
+
+.btn:focus {
+  outline: none;
 }
 
 .explainer-video-thumb {

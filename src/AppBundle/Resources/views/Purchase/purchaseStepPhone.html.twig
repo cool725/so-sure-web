@@ -6,6 +6,7 @@
     {% stylesheets
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css'
+    '@AppBundle/Resources/public/css/Default/modal.css'        
     'bundles/app/css/Default/selectPhoneMake.css' %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -27,15 +28,16 @@
         
         <div class="row">
             <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">        
-
-                <h3>Phone Details</h3>
                 
                 <div class="checkout--step">
+
+                    <h3>Phone Details</h3>
+
                     {% if phone %}
                             {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
                                 <div class="form-group">
                                     <label class="">Your Phone:</label>
-                                    <span class="h3">
+                                    <div class="h3">
                                         <strong>
                                             {% if phone %}
                                                 {{ phone.make }} {{ phone.model }} {%    if phone.memory %}
@@ -44,9 +46,9 @@
                                             {% endif %}
                                         </strong>
                                         <button type="button" 
-                                                class="select-phone btn-link btn-xs" data-toggle="modal" 
-                                                data-target="#phoneModal">Edit</button>
-                                    </span>  
+                                                class="btn btn-primary btn-rounded btn-hollow btn-xs" data-toggle="modal" 
+                                                data-target="#phoneModal">EDIT</button>
+                                    </div>  
                                 </div>   
                                 <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': ''} }) }}
@@ -60,10 +62,9 @@
                                         <small>Dial *#06# to show your IMEI number </small>
                                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"><i class="fa fa-question"></i></button>
                                     </p>
-                                    <p class="text-center">
-                                        or <br><br>
-                                        <a href="#" class="btn btn-link btn-additional" onclick="Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">
-                                            <strong><i class="fa fa-file-image-o" aria-hidden="true"></i> Send us a screenshot of your IMEI</strong>
+                                    <p>
+                                        <a href="#" class="" onclick="Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">
+                                            <i class="fa fa-file-image-o" aria-hidden="true"></i> OR SCREENSHOT OF YOUR IMEI
                                         </a>
                                     </p>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                     
@@ -80,20 +81,36 @@
                                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>                               
                                     </div>
                                 {% endif %}    
-                                <div class="form-group text-center">
-                                    {{ form_widget(purchase_form.next, {'label': 'Continue to Purchase', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
+                                <div class="form-group form-footer">
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_address') }}">BACK</a>                          
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            {{ form_widget(purchase_form.next, {'label': 'STEP 4', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-arrow-right'}}) }}  
+                                        </div>
+                                    </div>
                                 </div>                                                                   
                             {{ form_end(purchase_form) }}
                     {% else %}
                             {{ form_start(purchase_no_phone_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
                                 <div class="form-group">
                                     <label class="">Your Phone:</label>
-                                    <button type="button" 
-                                            class="select-phone btn-additional btn-xs" 
-                                            data-toggle="modal" 
-                                            data-target="#phoneModal"><strong>Select phone</strong></button>                                       
-                                </div>
+                                        <button type="button" 
+                                                class="btn btn-primary btn-rounded btn-hollow btn-block" 
+                                                data-toggle="modal" 
+                                                data-target="#phoneModal"><i class="fa fa-mobile fa-lg" aria-hidden="true"></i> SELECT PHONE</button>
 
+                                </div>
+                                <div class="form-group form-footer">
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_address') }}">Back</a>
+                                        </div>
+                                        <div class="col-sm-6 col-md-6">         
+                                        </div> 
+                                    </div>                                     
+                                </div>
                             {{ form_end(purchase_no_phone_form) }}
                     {% endif %}
                 </div>
@@ -104,7 +121,7 @@
     </div>
 </section>  
 
-<div class="modal fade" id="nonAppleModal" tabindex="-1" role="dialog">
+<div class="modal modal-middle fade" id="nonAppleModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -118,7 +135,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="appleModal" tabindex="-1" role="dialog">
+<div class="modal modal-middle fade" id="appleModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -132,19 +149,26 @@
     </div>
 </div>
 
-
-<div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal modal-middle fade" 
+     id="phoneModal" 
+     tabindex="-1" 
+     role="dialog" 
+     aria-labelledby="quoteModelLabel" 
+     aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Select your phone</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h3 class="text-center">Select Make &amp; Model</h3>
             </div>
             <div class="modal-body">
                 {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': modal_type})) }}
             </div>
         </div>
     </div>
-</div>
+</div>    
 
 {% endblock %}

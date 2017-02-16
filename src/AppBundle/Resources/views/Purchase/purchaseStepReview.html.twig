@@ -27,10 +27,10 @@
         <div class="row">
             <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">        
 
-                <h3>Review Policy</h3>
-                
                 <div class="checkout--step-review">
 
+                    <h3>Review Policy</h3>
+                    
                     <form data-action="{{ webpay_action }}" method="post" id="webpay-form" class="text-left">
                         
                         <p>Before you pay, please confirm that the following is correct:</p>
@@ -47,14 +47,21 @@
                         <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
                             <label class="checkbox-terms">
                                 <input type="checkbox" name="form_confirm" id="webpay-confirm">I confirm the above is correct</input>
-                            {% if is_postback %}<div class="help-block with-errors">You must agree to the terms</div>{% endif %}
                             </label>
+                            {% if is_postback %}<div class="help-block with-errors">You must agree to the terms</div>{% endif %}                            
                         </div>
                         <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>                        
-                        <div class="form-group text-center">
-                            <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                            <input type="submit" name="form_next" class="btn btn-success btn-rounded" value="Proceed to payment">
-                        </div>
+                        <div class="form-group form-footer">
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_phone') }}">Back</a>
+                                </div>
+                                <div class="col-xs-6 col-sm-6 col-md-6">   
+                                    <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                                    <input type="submit" name="form_next" class="btn btn-success btn-rounded btn-block btn-arrow-right" value="PAY NOW">                                      
+                                </div> 
+                            </div>                                     
+                        </div>                        
                     </form>
                 </div>  
 
