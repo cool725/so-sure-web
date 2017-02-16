@@ -188,6 +188,9 @@ $(function(){
 
             onSlide: function(position, value) {
 
+                // Set field for mixpanel
+                $('#buy_form_slider_used').val(true);
+
                 updateHandle($handle[0], this.value);   
 
                 var updated_value = $('#reward-slider').val();
