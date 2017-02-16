@@ -54,23 +54,33 @@
                             {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'(0044|[+]44|0)[\\s]*7[\\s]*[1-9]([\\s]*([0-9][\\s]*){8})', 'title': 'Enter a valid UK Mobile Number', 'placeholder':'e.g. +447700 111 222'}}) }}
                         <div class="help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>      
                         </div>
-                        <div class="form-group form-footer">
-                            <div class="row">
-                                <div class="col-xs-6 col-sm-6 col-md-6">
-                                    {% if quote_url %}
+                        {% if quote_url %}
+                            <div class="form-group form-footer">
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
                                         <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ quote_url }}">MY QUOTE</a>
-                                    {% endif %}
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
+                                        {{ form_widget(purchase_form.email) }}
+                                        {{ form_widget(purchase_form.firstName) }}
+                                        {{ form_widget(purchase_form.lastName) }}
+                                        {{ form_widget(purchase_form.next, {'label': 'NEXT STEP', 'attr': {'class': 'btn btn-success btn-rounded  btn-block btn-arrow-right'}}) }}
+                                    </div>
                                 </div>
-                                <div class="col-xs-6 col-sm-6 col-md-6">
-                                    {{ form_widget(purchase_form.email) }}
-                                    {{ form_widget(purchase_form.firstName) }}
-                                    {{ form_widget(purchase_form.lastName) }}
-                                    {{ form_widget(purchase_form.next, {'label': 'NEXT STEP', 'attr': {'class': 'btn btn-success btn-rounded  btn-block btn-arrow-right'}}) }}                                        
+                            </div>                                    
+                        {% else %}
+                            <div class="form-group form-footer">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12">
+                                        {{ form_widget(purchase_form.email) }}
+                                        {{ form_widget(purchase_form.firstName) }}
+                                        {{ form_widget(purchase_form.lastName) }}
+                                        {{ form_widget(purchase_form.next, {'label': 'NEXT STEP', 'attr': {'class': 'btn btn-success btn-rounded  btn-block btn-arrow-right'}}) }}
+                                    </div>
                                 </div>
-                            </div>      
-                        </div>
-             
-
+                            </div>
+                        {% endif %}                            
+                        
                     {{ form_end(purchase_form) }}
                 </div>
             </div>
