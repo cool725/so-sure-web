@@ -398,6 +398,16 @@ class Phone
         return $this->devices;
     }
 
+    public function getDevicesAsUpper()
+    {
+        $devices = [];
+        foreach ($this->getDevices() as $device) {
+            $devices[] = strtoupper($device);
+        }
+
+        return $devices;
+    }
+
     public function setDevices($devices)
     {
         $this->devices = $devices;

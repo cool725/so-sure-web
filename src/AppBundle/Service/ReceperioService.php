@@ -753,8 +753,9 @@ class ReceperioService extends BaseImeiService
         if ($make != 'apple') {
             if (isset($modelData['modelreference']) && $modelData['modelreference']) {
                 $device = $modelData['modelreference'];
-                if (in_array($device, $phone->getDevices()) ||
-                    in_array(strtolower($device), $phone->getDevices())) {
+                // Devices are cased as not sure what google will do in the future
+                // but recipero usually upper cases modelreference
+                if (in_array(strtoupper($device), $phone->getDevicesAsUpper())) {
                     return true;
                 } else {
                     $this->statsd->increment('recipero.makeModelMismatch');
