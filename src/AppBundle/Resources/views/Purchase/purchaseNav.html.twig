@@ -1,28 +1,19 @@
-<div class="desktop-page-title">
-    {% if phone %}
-        <h1>Insure your {{ phone }}</h1>
-    {% else %}
-        <h1>Purchase your so-sure policy</h1>
-    {% endif %}
-    <p class="lead">We just need a few details before you're covered.</p>
-</div>
-
 <div class="purchase-nav">
-    <ul>
+    <ol class="clearfix">
         <li class="{% if step == 1 %}step-active{% else %}step-inactive{% endif %}">
-            {% if step > 1%}<i class="fa fa-check text-success"></i> {% endif %}
-            <span>Add Personal Information</span>
+            <span>1. Personal</span>
         </li>
+        <li class="hidden-xs"><i class="fa fa-chevron-right {% if step == 1 %}step-active{% endif %}" aria-hidden="true"></i></li>
         <li class="{% if step == 2 %}step-active{% else %}step-inactive{% endif %}">
-            {% if step > 2%}<i class="fa fa-check text-success"></i> {% endif %}
-            <span>Add Billing Address</span>
+            <span>2. Address</span>
         </li>
+        <li class="hidden-xs"><i class="fa fa-chevron-right {% if step == 2 %}step-active{% endif %}" aria-hidden="true"></i></li>        
         <li class="{% if step == 3 %}step-active{% else %}step-inactive{% endif %}">
-            {% if step > 3%}<i class="fa fa-check text-success"></i> {% endif %}
-            <span>Add Phone Details</span>
+            <span>3. Phone</span>
         </li>
+        <li class="hidden-xs"><i class="fa fa-chevron-right {% if step == 3 %}step-active{% endif %}" aria-hidden="true"></i></li>        
         <li class="{% if step == 4 %}step-active{% else %}step-inactive{% endif %}">
-            <span>Review Policy</span>        
+            <span>4. Review</span>        
         </li>
-    </ul>
+    </ol>
 </div>

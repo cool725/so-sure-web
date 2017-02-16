@@ -3,6 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
+    '@AppBundle/Resources/public/css/Default/modal.css'    
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css' %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
@@ -11,99 +12,86 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStepReview.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block body %}
-<section class="payment-container vertical-align-wrap">
-    <div class="vertical-align-middle">
-        <div class="container checkout">
+<section id="purchase-step-review" class="checkout">
+    
+    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
 
-            {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
-            
-            <div class="row">
-                <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+    <div class="container">
+        
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">        
 
-                    <div class="checkout--step">
-                        <form data-action="{{ webpay_action }}" method="post" id="webpay-form" class="text-left">
-                            
-                            <p>Before you pay, please confirm that the following is correct:</p>
-                            <ol>
-                                <li>
-                                    My phone is in full working condition and my screen is not cracked</li>
-                                <li>I am a resident of the United Kingdom</li>
-                                <li>
-                                    I have read &amp; understood the so-sure
-                                    <a data-toggle="modal" data-target="#policyModal" style="cursor: pointer;">policy document</a>
-                                </li>                                
-                            </ol>
-                            <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
-                            <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
-                                <label class="checkbox-terms">
-                                    <input type="checkbox" name="form_confirm" id="webpay-confirm">I confirm the above is correct</input>
-                                {% if is_postback %}<div class="help-block with-errors">You must agree to the terms</div>{% endif %}
-                                </label>
-                            </div>
-                            <div class="form-group text-center">
-                                <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                <input type="submit" name="form_next" class="btn btn-primary btn-rounded" value="Proceed to payment">
-                            </div>
-                            <div class="text-center">
-                                <i class="fa fa-info-circle"></i> <i>You will be redirected to Judo Pay to complete your purchase.</i>   
-                            </div>   
-                        </form>
-                    </div>  
+                <div class="checkout--step-review">
 
-                </div>
+                    <h3>Review Policy</h3>
+                    
+                    <form data-action="{{ webpay_action }}" method="post" id="webpay-form" class="text-left">
+                        
+                        <p>Before you pay, please confirm that the following is correct:</p>
+                        <ol>
+                            <li>
+                                My phone is in full working condition and my screen is not cracked</li>
+                            <li>I am a resident of the United Kingdom</li>
+                            <li>
+                                I have read &amp; understood the so-sure
+                                <a data-toggle="modal" data-target="#policy-modal" style="cursor: pointer;">policy document</a>
+                            </li>                                
+                        </ol>
+                        <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
+                        <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
+                            <label class="checkbox-terms">
+                                <input type="checkbox" name="form_confirm" id="webpay-confirm">I confirm the above is correct</input>
+                            </label>
+                            {% if is_postback %}<div class="help-block with-errors">You must agree to the terms</div>{% endif %}                            
+                        </div>
+                        <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>                        
+                        <div class="form-group form-footer">
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_phone') }}">Back</a>
+                                </div>
+                                <div class="col-xs-6 col-sm-6 col-md-6">   
+                                    <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                                    <input type="submit" name="form_next" class="btn btn-success btn-rounded btn-block btn-arrow-right" value="PAY NOW">                                      
+                                </div> 
+                            </div>                                     
+                        </div>                        
+                    </form>
+                </div>  
+
             </div>
-
         </div>
+
     </div>
 </section>
     
 
-<div class="modal modal-summary fade" id="summaryModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal modal-fullscreen fade" 
+     id="policy-modal" 
+     tabindex="-1" 
+     role="dialog" 
+     aria-labelledby="So-Sure Policy Terms" 
+     aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Coverage Summary</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h3>So-Sure Policy Terms</h3>
             </div>
-            <div class="modal-body">
-                <h3>Your phone is covered for</h3>
-                <p>If you take reasonable care of your phone and don't knowingly put it at risk, you are covered for:</p>
-                <ul>
-                    <li>Theft</li>
-                    <li>Loss</li>
-                    <li>Accidental Damage</li>
-                    <li>Breakdown (incluing faults)</li>
-                </ul>
-                <p>In the event of theft or loss you are also covered for:</p>
-                <ul>
-                    <li>Accessories (up to £100 incl. VAT)</li>
-                    <li>Unauthorised Usage (up to £1,000 incl. VAT)</li>
-                </ul>
-                <h3>Your phone is NOT covered for</h3>
-                <p>Your excess - you need to pay a fee every time you make a successful claim. Damage and breakdown is £50. Loss and theft is £70.</p>
-                <p>More than two theft or loss claims in any policy year.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal modal-policy fade" id="policyModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Policy</h4>
-            </div>
-            <div class="modal-body">
+            <div class="modal-body modal-policy">
                 {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
             </div>
         </div>
     </div>
-</div>
+</div>  
 
 {% endblock %}

@@ -344,7 +344,7 @@ class PurchaseControllerTest extends BaseControllerTest
         }
         $form['purchase_form[imei]'] = $imei;
         $form['purchase_form[amount]'] = (float) $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
-        if ($phone->getMake() == "Appple") {
+        if ($phone->getMake() == "Apple") {
             // use a different number in case we're testing /, -, etc
             $form['purchase_form[serialNumber]'] = self::generateRandomImei();
         }

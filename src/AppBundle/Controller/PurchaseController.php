@@ -179,6 +179,7 @@ class PurchaseController extends BaseController
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,
             'phone' => $this->getSessionQuotePhone($request),
+            'quote_url' => $session ? $session->get('quote_url') : null,
         );
 
         return $data;
