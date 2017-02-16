@@ -46,6 +46,11 @@ class MixpanelService
 
     protected $environment;
 
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
+    }
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger

@@ -585,6 +585,7 @@ services:
             intercom: "@app.mixpanel"
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
+            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener
