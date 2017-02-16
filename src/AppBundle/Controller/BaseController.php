@@ -151,7 +151,7 @@ abstract class BaseController extends Controller
 
         $deviceFound = count($phones) > 0 && $phones[0]->getMake() != "ALL";
 
-        if (!$deviceFound || !$memoryFound) {
+        if (!$deviceFound || $memoryFound === false) {
             $this->unknownDevice($device, $memory);
         }
 
