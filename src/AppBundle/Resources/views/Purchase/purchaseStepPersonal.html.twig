@@ -57,7 +57,9 @@
                         <div class="form-group form-footer">
                             <div class="row">
                                 <div class="col-xs-6 col-sm-6 col-md-6">
-                                    <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="#">MY QUOTE</a>                                    
+                                    {% if quote_url %}
+                                        <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ quote_url }}">MY QUOTE</a>
+                                    {% endif %}
                                 </div>
                                 <div class="col-xs-6 col-sm-6 col-md-6">
                                     {{ form_widget(purchase_form.email) }}
