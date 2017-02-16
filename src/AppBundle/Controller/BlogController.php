@@ -18,7 +18,7 @@ class BlogController extends BaseController
      * @Route("/blog/{file}", name="blog", requirements={"file"=".*"})
      * @Template()
      */
-    public function allAction(Request $request, $file = null)
+    public function allAction($file = null)
     {
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3blog_fs');
 
