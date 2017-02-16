@@ -19,7 +19,7 @@ class HelpController extends BaseController
      * @Route("/help/{file}", name="help", requirements={"file"=".*"})
      * @Template()
      */
-    public function allAction($file = null)
+    public function allAction(Request $request, $file = null)
     {
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3support_fs');
 
@@ -35,6 +35,17 @@ class HelpController extends BaseController
         if (!$filesystem->has($file)) {
             throw $this->createNotFoundException('URL not found');
         }
+        $intercomEnabled = true;
+        $hideCookieWarning = false;
+        $hideNav = false;
+        $hideFooter = false;
+        if ($request->headers->get('X-SOSURE-APP') == "1") {
+            $intercomEnabled = false;
+            $hideCookieWarning = true;
+            $hideNav = true;
+            $hideFooter = true;
+        }
+
         $mimetype = $filesystem->getMimetype($file);
         if (stripos($mimetype, 'text/html') !== false) {
             $html = $filesystem->read($file);
@@ -43,6 +54,10 @@ class HelpController extends BaseController
                 'title' => $crawler->filter('head title')->text(),
                 'head' => $crawler->filter('head')->html(),
                 'body' => $crawler->filter('body')->html(),
+                'intercom_enabled' => $intercomEnabled,
+                'hide_cookie_warning' => $hideCookieWarning,
+                'hide_nav' => $hideNav,
+                'hide_footer' => $hideFooter,
             ];
         } else {
             return StreamedResponse::create(

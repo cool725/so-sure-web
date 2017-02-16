@@ -41,7 +41,8 @@
                     'email':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.email }}'{% endif %},
                     'name':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.name }}'{% endif %},
                     'created_at':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.created|date('U') }}'{% endif %},
-                    'quote_url': '{% if app.session.get('quote_url') %}{{ app.session.get('quote_url') }}{% endif %}'
+                    'quote_url': '{% if app.session.get('quote_url') %}{{ app.session.get('quote_url') }}{% endif %}',
+                    'enabled': {% block intercom_enabled %}true{% endblock %}
                 }{% block gtm_data %}{% endblock %}
             }];
         </script>
@@ -101,11 +102,18 @@
         {% endif %}
         
         {% block javascripts %}
-            {% javascripts
-            'components/cookieconsent/cookieconsent.min.js'
-            '@AppBundle/Resources/public/js/*' %}
-            <script src="{{ asset_url }}"></script>
-            {% endjavascripts %}
+            {% if hide_cookie_warning is defined and hide_cookie_warning %}
+                {% javascripts
+                '@AppBundle/Resources/public/js/*' %}
+                <script src="{{ asset_url }}"></script>
+                {% endjavascripts %}
+            {% else %}
+                {% javascripts
+                'components/cookieconsent/cookieconsent.min.js'
+                '@AppBundle/Resources/public/js/*' %}
+                <script src="{{ asset_url }}"></script>
+                {% endjavascripts %}
+            {% endif %}
         {% endblock %}
     </body>
 </html>
