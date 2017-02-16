@@ -3,8 +3,8 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    'components/vimeo-player-js/player.min.js'    
-    '@AppBundle/Resources/public/User/index.js' 
+    'components/vimeo-player-js/player.min.js'     
+    'bundles/app/js/User/index.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
