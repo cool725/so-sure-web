@@ -23,6 +23,7 @@ class ReceperioServiceTest extends WebTestCase
     protected static $phoneA;
     protected static $phoneB;
     protected static $phoneC;
+    protected static $phoneD;
 
     public static function setUpBeforeClass()
     {
@@ -42,6 +43,7 @@ class ReceperioServiceTest extends WebTestCase
         self::$phoneA = self::$phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneB = self::$phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
         self::$phoneC = self::$phoneRepo->findOneBy(['devices' => 'hero2lte']);
+        self::$phoneD = self::$phoneRepo->findOneBy(['devices' => 'OnePlus3']);
     }
 
     public function tearDown()
@@ -112,6 +114,13 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'GALAXY S7 EDGE', 'storage' => '', 'modelreference' => 'HERO2LTE'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
         $this->assertTrue(self::$imei->validateSamePhone(static::$phoneC, '123', $data));
+    }
+
+    public function testValidateSamePhoneAndroidMixedCase()
+    {
+        $models[] = ['name' => '3', 'storage' => '', 'modelreference' => 'ONEPLUS3'];
+        $data['makes'][] = ['make' => 'ONEPLUS', 'models' => $models];
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneD, '123', $data));
     }
 
     public function testValidateSamePhoneAndroidDifferentModel()
