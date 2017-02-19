@@ -204,8 +204,8 @@ $(function(){
 
                 // Update cashback and premium
                 function updateValues() {
-                    $('#cashback').text('£' + save_value.toFixed(2));
-                    $('#premium').text('£' + premium.toFixed(2));                  
+                    $('#cashback').text('£' + save_value);
+                    $('#premium').text('£' + premium);                  
                 }               
 
                 whatIf(save_value);                             
