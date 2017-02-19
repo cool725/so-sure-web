@@ -66,7 +66,10 @@ class KernelListener
         }
 
         // In case a session that was started in-app, is re-used in the main webbrowser
-        if ($session && $session->get('sosure-app') == "1" && stripos($request->getPathInfo(), '/help') === 0) {
+        if ($session && $session->get('sosure-app') == "1"
+            && stripos($request->getPathInfo(), '/help') !== 0
+            && stripos($request->getPathInfo(), '/_') !== 0) {
+            throw new \Exception($request->getPathInfo());
             $session->remove('sosure-app');
         }
     }

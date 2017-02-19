@@ -45,7 +45,7 @@ class HelpController extends BaseController
         if ($session && $session->get('sosure-app') == "1") {
             $isSoSureApp = true;
         }
-        if ($request->headers->get('X-SOSURE-APP') == "1") {
+        if ($request->headers->get('X-SOSURE-APP') == "1" || $request->get('X-SOSURE-APP') == "1") {
             $session->set('sosure-app', 1);
             $isSoSureApp = true;
         }
