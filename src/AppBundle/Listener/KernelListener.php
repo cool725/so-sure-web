@@ -69,7 +69,6 @@ class KernelListener
         if ($session && $session->get('sosure-app') == "1"
             && stripos($request->getPathInfo(), '/help') !== 0
             && stripos($request->getPathInfo(), '/_') !== 0) {
-            throw new \Exception($request->getPathInfo());
             $session->remove('sosure-app');
         }
     }
