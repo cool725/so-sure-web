@@ -7,3 +7,7 @@ $(function(){
        }
     });
 });
+
+$('#policy-modal').on('show.bs.modal', function (event) {
+    sosuretrack('View Full Policy');
+});
