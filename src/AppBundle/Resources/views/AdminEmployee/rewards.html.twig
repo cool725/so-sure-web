@@ -1,0 +1,105 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/AdminEmployee/rewards.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+<div class="row">
+    <div class="col-md-8">
+        <h2>Reward Bonuses</h2>
+    </div>
+    <div class="col-md-2">
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#rewardModal" style="margin-top: 20px"
+        ><i class="fa fa-plus"></i> New Bonus Type</button>        
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+    <table class="table table-stripped">
+        <tr>
+            <th>Bonus Type</th>
+            <th>Number Connections</th>
+            <th>Total</th>
+            <th></th>
+        </tr>
+        {% for reward in rewards %}
+            <tr>
+                <td>{{ reward.user.name }} ({{ reward.user.email }})</td>
+                <td>{{ reward.connections|length }}</td>
+                <td>{{ reward.potValue }}</td>
+                <td>
+                    <button type="button" class="btn btn-info" data-user-name="{{ reward.user }}" data-reward-id="{{ reward.id }}" data-toggle="modal" data-target="#connectModal"
+                    ><i class="fa fa-plus"></i> Add Bonus To User</button>                    
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    </div>
+</div>
+
+    <div class="modal fade" id="connectModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Add Bonus To User</h4>
+          </div>
+          <div class="modal-body">
+            {{ form_start(connectForm) }}
+                <div class="form-group">
+                    {{ form_label(connectForm.email, 'Email') }}
+                    {{ form_errors(connectForm.email) }}
+                    {{ form_widget(connectForm.email) }}
+                </div>                
+                <div class="form-group">
+                    {{ form_label(connectForm.amount, 'Bonus Amount') }}
+                    {{ form_errors(connectForm.amount) }}
+                    {{ form_widget(connectForm.amount) }}
+                </div>                
+                <div class="form-group">
+                    {{ form_widget(connectForm.rewardId) }}
+                    {{ form_widget(connectForm.next, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>
+            {{ form_end(connectForm) }}    
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="rewardModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Add reward bonus type</h4>
+          </div>
+          <div class="modal-body">
+            {{ form_start(rewardForm) }}
+                <div class="form-group">
+                    {{ form_label(rewardForm.name, 'Name') }}
+                    {{ form_errors(rewardForm.name) }}
+                    {{ form_widget(rewardForm.name, {'attr': {'placeholder':'Maps to first name'}}) }}
+                </div>                
+                <div class="form-group">
+                    {{ form_label(rewardForm.email, 'Email') }}
+                    {{ form_errors(rewardForm.email) }}
+                    {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net'}}) }}
+                </div>                
+                <div class="form-group">
+                    {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>
+            {{ form_end(rewardForm) }}    
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+{% endblock %}

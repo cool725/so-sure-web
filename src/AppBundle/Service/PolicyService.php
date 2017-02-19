@@ -15,6 +15,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\RewardConnection;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -816,6 +817,9 @@ class PolicyService
     {
         $cancelledUser = $policy->getUser();
         foreach ($policy->getConnections() as $networkConnection) {
+            if ($networkConnection instanceof RewardConnection) {
+                continue;
+            }
             // if that user has already claimed, there's no point in telling them that their friend cancelled,
             // as they can't do anything to improve their pot
             if ($networkConnection->getLinkedPolicy()->hasMonetaryClaimed()) {

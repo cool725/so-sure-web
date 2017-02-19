@@ -11,6 +11,8 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Reward;
+use AppBundle\Document\RewardConnection;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -803,5 +805,32 @@ class InvitationService
             }
         }
         $this->dm->flush();
+    }
+
+    public function addReward(User $sourceUser, Reward $reward, $amount)
+    {
+        if ($sourceUser->getCurrentPolicy()->hasMonetaryClaimed()) {
+            throw new \InvalidArgumentException(sprintf(
+                'Unable to add bonus. %s has a monetary claim',
+                $sourceUser->getEmail()
+            ));
+        }
+        if (count($sourceUser->getCurrentPolicy()->getNetworkClaims(true)) > 0) {
+            throw new \InvalidArgumentException(sprintf(
+                '%s has a network claim',
+                $sourceUser->getEmail()
+            ));
+        }
+        $connection = new RewardConnection();
+        $sourceUser->getCurrentPolicy()->addConnection($connection);
+        $connection->setLinkedUser($reward->getUser());
+        $connection->setPromoValue($amount);
+        $reward->addConnection($connection);
+        $reward->updatePotValue();
+        $sourceUser->getCurrentPolicy()->updatePotValue();
+        $this->dm->persist($connection);
+        $this->dm->flush();
+
+        return $connection;
     }
 }

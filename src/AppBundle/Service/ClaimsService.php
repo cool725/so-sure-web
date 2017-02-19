@@ -7,6 +7,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\User;
+use AppBundle\Document\RewardConnection;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -73,28 +74,31 @@ class ClaimsService
 
     public function processClaim(Claim $claim)
     {
-        if ($claim->getProcessed()) {
-            return;
+        if ($claim->getProcessed() || !$claim->isMonetaryClaim()) {
+            return false;
         }
 
-        if ($claim->isMonetaryClaim()) {
-            if (!$claim->getPolicy() instanceof PhonePolicy) {
-                throw new \Exception('not policy');
-            }
-            $claim->getPolicy()->updatePotValue();
-            $this->dm->flush();
-            $this->notifyMonetaryClaim($claim->getPolicy(), $claim, true);
-
-            foreach ($claim->getPolicy()->getConnections() as $networkConnection) {
-                $networkConnection->getLinkedPolicy()->updatePotValue();
-                $this->dm->flush();
-                $this->notifyMonetaryClaim($networkConnection->getLinkedPolicy(), $claim, false);
-            }
-
-            $claim->setProcessed(true);
-            $this->recordLostPhone($claim->getPolicy(), $claim);
-            $this->dm->flush();
+        if (!$claim->getPolicy() instanceof PhonePolicy) {
+            throw new \Exception('not policy');
         }
+        $claim->getPolicy()->updatePotValue();
+        $this->dm->flush();
+        $this->notifyMonetaryClaim($claim->getPolicy(), $claim, true);
+        foreach ($claim->getPolicy()->getConnections() as $networkConnection) {
+            if ($networkConnection instanceof RewardConnection) {
+                $networkConnection->clearValue();
+                continue;
+            }
+            $networkConnection->getLinkedPolicy()->updatePotValue();
+            $this->dm->flush();
+            $this->notifyMonetaryClaim($networkConnection->getLinkedPolicy(), $claim, false);
+        }
+
+        $claim->setProcessed(true);
+        $this->recordLostPhone($claim->getPolicy(), $claim);
+        $this->dm->flush();
+
+        return true;
     }
 
     public function recordLostPhone(Policy $policy, Claim $claim)

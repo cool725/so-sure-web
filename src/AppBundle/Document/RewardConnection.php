@@ -10,8 +10,7 @@ use AppBundle\Document\Invitation\Invitation;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
- * @MongoDB\Index(keys={"sourcePolicy.id"="asc", "linkedPolicy.id"="asc"}, sparse="true", unique="true")
  */
-class Connection extends BaseConnection
+class RewardConnection extends BaseConnection
 {
 }
