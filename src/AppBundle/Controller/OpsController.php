@@ -8,8 +8,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
+use AppBundle\Service\MixpanelService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use AppBundle\Document\Invitation\EmailInvitation;
 
@@ -86,5 +88,15 @@ class OpsController extends BaseController
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
         ];
+    }
+
+    /**
+     * @Route("/track/{event}", name="ops_track")
+     */
+    public function trackAction(Request $request, $event)
+    {
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, [$event => true]);
+
+        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Queued', 200);
     }
 }

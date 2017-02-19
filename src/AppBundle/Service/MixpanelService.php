@@ -29,6 +29,7 @@ class MixpanelService
     const EVENT_POLICY_READY = 'Policy Ready For Purchase';
     const EVENT_LOGIN = 'Login';
     const EVENT_APP_DOWNLOAD = 'App Download';
+    const EVENT_TEST = 'Tracking Test Event';
 
     /** @var DocumentManager */
     protected $dm;
