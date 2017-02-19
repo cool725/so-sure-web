@@ -6,8 +6,8 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    'bundles/app/css/Default/index.css'
-    'bundles/app/css/Default/selectPhoneMake.css'
+    '@AppBundle/Resources/public/css/Default/index.css'
+    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
     '@AppBundle/Resources/public/css/Default/modal.css'    
     '@AppBundle/Resources/public/css/Default/videoOverlay.css'      
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
@@ -16,6 +16,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    'components/vimeo-player-js/player.min.js'        
     '@AppBundle/Resources/public/js/Default/modalVideo.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
  %}
@@ -80,5 +81,9 @@
             </div>
         </div>
     </section>
+
+    {# Page Modals #}
+
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}        
 
     {% endblock %}

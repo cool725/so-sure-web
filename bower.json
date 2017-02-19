@@ -27,7 +27,8 @@
     "jssocials": "^1.4.0",
     "bootstrap-daterangepicker": "https://github.com/dangrossman/bootstrap-daterangepicker.git#2.1.24",
     "rangeslider.js": "^2.3.0",
-    "cookieconsent": "^3.0.4"
+    "cookieconsent": "^3.0.4",
+    "vimeo-player-js": "^2.0.1"
   },
   "install": {
     "path": "web/components",
@@ -79,7 +80,10 @@
       ],
       "cookieconsent": [
         "bower_components/cookieconsent/build/cookieconsent.min.js",
-        "bower_components/cookieconsent/build/cookieconsent.min.css"        
+        "bower_components/cookieconsent/build/cookieconsent.min.css"
+      ],
+      "vimeo-player-js": [
+        "bower_components/vimeo-player-js/dist/player.min.js"
       ]
     }
   }
