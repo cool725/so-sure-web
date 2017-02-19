@@ -45,9 +45,11 @@
                                                     {% endif %}
                                             {% endif %}
                                         </strong>
-                                        <button type="button" 
-                                                class="btn btn-primary btn-rounded btn-hollow btn-xs" data-toggle="modal" 
-                                                data-target="#phoneModal">EDIT</button>
+                                        <a href="#"   
+                                           data-toggle="modal" 
+                                           data-target="#phoneModal">
+                                           <small class="text-blue">Edit</small>
+                                        </a>
                                     </div>  
                                 </div>   
                                 <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
@@ -59,12 +61,14 @@
                                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': ''} }) }}
                                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'', 'pattern':'[-/\\s]*([0-9][-/\\s]*){15,17}', 'title': 'Enter a valid 15 or 17 digit IMEI Number'}}) }}
                                     <p class="help-block text-left">
-                                        <small>Dial *#06# to show your IMEI number </small>
-                                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"><i class="fa fa-question"></i></button>
+                                        <small>Dial *#06# to show your IMEI number.
+                                        <a href="#" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">more info</a>. 
+                                        <br>Alternatively send us a screenshot of your IMEI below.</small>
                                     </p>
-                                    <p>
-                                        <a href="#" class="" onclick="Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">
-                                            <i class="fa fa-file-image-o" aria-hidden="true"></i> OR SCREENSHOT OF YOUR IMEI
+                                    <p class="text-center">
+                                        <a href="#" class="btn btn-subtle btn-rounded btn-hollow btn-hollow-subtle btn-xs" onclick="Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">
+                                            <i class="fa fa-file-image-o" aria-hidden="true"></i>
+                                            SEND US A SCREENSHOT
                                         </a>
                                     </p>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                     
@@ -74,9 +78,8 @@
                                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': ''} }) }}
                                         {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':''}}) }}
                                         <p class="help-block text-left">
-                                            <small>Go to Settings > General > About</small>
-                                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
-                                          ><i class="fa fa-question"></i></button>
+                                            <small>Go to Settings > General > About.
+                                            <a href="#" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">more info</a></small>    
                                         </p>
                                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>                               
                                     </div>
@@ -129,7 +132,12 @@
                 <h4 class="modal-title">IMEI Number</h4>
             </div>
             <div class="modal-body">
-                <p>It's easy to find your IMEI numbr.  Just dial <a href="tel:*#06#">*#06#</a> on your mobile and your IMEI will immediately be displayed.  There is no cost to dial this number.</p>
+                <p><strong>It's easy to find your IMEI number:</strong></p>
+                <ul>
+                    <li>
+                        Just dial <a href="tel:*#06#">*#06#</a> on your mobile and your IMEI will immediately be displayed.  There is no cost to dial this number.
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -143,7 +151,16 @@
                 <h4 class="modal-title">IMEI &amp; Serial Numbers</h4>
             </div>
             <div class="modal-body">
-                <p>It's easy to find your IMEI &amp; Serial Numbers.  Open the Settings app, and navigate to General > About.  The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.</p>
+                <p><strong>It's easy to find your IMEI number:</strong></p>
+                <ul>
+                    <li>
+                        It's easy to find your IMEI &amp; Serial Numbers.  Open the Settings app, and navigate to <strong>General</strong> > <strong>About</strong>.  The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
+                    </li>
+                    <br>
+                    <li>
+                        You can also log into your iTunes account and find the IMEI &amp; Serial Numbers display on the phone information screen.
+                    </li>
+                </ul>                
             </div>
         </div>
     </div>
