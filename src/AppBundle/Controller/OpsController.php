@@ -93,7 +93,7 @@ class OpsController extends BaseController
     /**
      * @Route("/track/{event}", name="ops_track")
      */
-    public function trackAction(Request $request, $event)
+    public function trackAction($event)
     {
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, [$event => true]);
 
