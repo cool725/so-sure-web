@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "673618424b0623f872fb5f61f6fbabe1",
-    "content-hash": "c070841410f2681e36f36558e38d68ad",
+    "hash": "1527ff20b38344dde22f15bbbc8b650b",
+    "content-hash": "d836115cbf0800804a303cc0879a8fc1",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1299,30 +1299,32 @@
         },
         {
             "name": "dpn/xml-sitemap-bundle",
-            "version": "v2.0.3",
+            "version": "v2.1.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/bjo3rnf/DpnXmlSitemapBundle.git",
-                "reference": "16734ad4a7d0857103a02ee72e6d274ed49ee265"
+                "url": "https://github.com/so-sure/DpnXmlSitemapBundle.git",
+                "reference": "86b80c3ffb3a47e967b0d6dca248833dd3284145"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bjo3rnf/DpnXmlSitemapBundle/zipball/16734ad4a7d0857103a02ee72e6d274ed49ee265",
-                "reference": "16734ad4a7d0857103a02ee72e6d274ed49ee265",
+                "url": "https://api.github.com/repos/so-sure/DpnXmlSitemapBundle/zipball/86b80c3ffb3a47e967b0d6dca248833dd3284145",
+                "reference": "86b80c3ffb3a47e967b0d6dca248833dd3284145",
                 "shasum": ""
             },
             "require": {
-                "symfony/dependency-injection": "~2.3|~3.0",
-                "symfony/framework-bundle": "~2.3|~3.0",
-                "symfony/twig-bundle": "~2.3|~3.0",
-                "twig/twig": "~1.12"
+                "symfony/asset": "^2.7|^3.0",
+                "symfony/dependency-injection": "^2.7|^3.0",
+                "symfony/framework-bundle": "^2.7|^3.0",
+                "symfony/templating": "^2.7|^3.0",
+                "symfony/twig-bundle": "^2.7|^3.0"
             },
             "require-dev": {
                 "matthiasnoback/symfony-dependency-injection-test": "^0.7.4",
-                "mockery/mockery": "~0.9",
-                "symfony/browser-kit": "~2.3|~3.0",
-                "symfony/console": "~2.3|~3.0",
-                "symfony/finder": "~2.3|~3.0"
+                "mockery/mockery": "^0.9",
+                "symfony/browser-kit": "^2.7|^3.0",
+                "symfony/console": "^2.7|^3.0",
+                "symfony/finder": "^2.7|^3.0",
+                "symfony/yaml": "^2.7|^3.0"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -1335,7 +1337,6 @@
                     "Dpn\\XmlSitemapBundle\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1353,9 +1354,12 @@
             ],
             "description": "Generates XML sitemaps for your favourite search engine by extracting sitemap information out of the site's routes.",
             "keywords": [
-                "Sitemap"
+                "sitemap"
             ],
-            "time": "2015-12-01 17:53:40"
+            "support": {
+                "source": "https://github.com/so-sure/DpnXmlSitemapBundle/tree/v2.1.0.1"
+            },
+            "time": "2017-02-19 22:14:21"
         },
         {
             "name": "drewm/mailchimp-api",

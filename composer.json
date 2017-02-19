@@ -45,7 +45,7 @@
         "doctrine/mongodb-odm": "^1.1",
         "doctrine/mongodb-odm-bundle": "^3.2",
         "knplabs/knp-snappy-bundle": "^1.4",
-        "dpn/xml-sitemap-bundle": "^2.0",
+        "dpn/xml-sitemap-bundle": "2.1.0.1",
         "domnikl/statsd": "~2.0",
         "scheb/two-factor-bundle": "^2.6",
         "nexylan/slack-bundle": "^1.0",
@@ -71,6 +71,10 @@
         {
             "type": "vcs",
             "url":  "https://github.com/so-sure/Judo-PHP.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://github.com/so-sure/DpnXmlSitemapBundle.git"
         }
     ],
     "scripts": {
