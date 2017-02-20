@@ -86,6 +86,10 @@ strong {
     text-decoration: underline !important;
 }
 
+.text-shadow {
+    text-shadow: text-shadow: 0 1px 0 #000;
+}
+
 /* MOVE TO layout > _header.scss */
 
 .so-sure-logo-dark {

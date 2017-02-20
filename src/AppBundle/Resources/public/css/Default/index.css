@@ -9,8 +9,12 @@
     color: #fff;
     text-align: center;
     font-size: 36px;
-    line-height: 1.14em;
+    line-height: 1.2em;
     margin-top: 0;
+}
+
+.hero h1.text-left {
+    text-align: left;
 }
 
 .hero h1 .h1-sub {
@@ -54,7 +58,7 @@
 
     .hero h1 {
         font-size: 46px;
-        line-height: 1.18em;
+        line-height: 1.4em;
         text-align: left;
     }
 

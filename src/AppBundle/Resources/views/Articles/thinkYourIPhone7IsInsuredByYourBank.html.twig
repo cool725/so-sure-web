@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}so-sure - Think your iPhone 7 is insured by your bank?{% endblock %}
+{% block meta %}
+  <meta name="description" content=""/>
+  <meta name="keywords" content="" />
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts    
+    '@AppBundle/Resources/public/js/Default/index.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    '@AppBundle/Resources/public/css/Default/index.css'
+    '@AppBundle/Resources/public/css/Default/article.css'    
+    '@AppBundle/Resources/public/css/Default/modal.css' %}   
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    <!-- Background image https://www.pexels.com/photo/space-gray-iphone-6-193004/ -->
+
+    <section class="hero thinkYourIPhone7IsInsuredByYourBank">
+        <div class="container">
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="text-left">Think your iPhone 7 is insured by your bank? <br>Think again...</h1>
+                </div>
+            </div>
+
+        </div>
+    </section>   
+
+    <section class="article-content section--pad">
+        <div class="container">
+            
+            <div class="row">
+                <div class="col-sm-7 col-md-7">
+                    <p class="lead">Don’t worry, We are not here to scare you, we just believe customers should have complete transparency on the things that their insurance providers do and don’t do.. </p>
+                    <p class="lead">Many banks offer mobile phone insurance as part of their ‘Premium Bank Account service’. On the surface, that sounds great… However, we’ve been hearing some horror- stories about the service they provide.</p>
+                </div>
+                <div class="col-sm-5 col-md-5">
+                    <img src="{{ cdn_url }}/images/articles/bank-logos-combined.jpg" alt="Bank Logos" class="img-responsive">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="h3 text-center">Who lives without a phone for two weeks???</p>
+                    <blockquote>
+                        <p class="lead">I had my phone insured through my bank account. It had a cracked screen and when I called they told me I had to send the phone off and that I would have to wait <strong>two weeks</strong> for it to be repaired.</p>
+                    </blockquote>
+                    <p class="lead">That said, we haven’t heard any complaints from customers with NatWest cover <i class="fa fa-check text-green" aria-hidden="true"></i></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="lead">If your bank provides a sub-par mobile phone insurance service, and you are looking for cover for your phone, you might want to consider buying mobile phone insurance.</p>
+                    <p class="lead">We think people deserve better. That’s why we’ve decided to give you <strong>instant cover</strong>, <strong>next day delivery</strong>, <strong>24/7 access</strong>, <strong>better prices</strong> and also cover for <strong>theft, loss, accidental damage</strong> as well as <strong>breakdown</strong>.</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a href="{{ path('homepage') }}" class="btn btn-success btn-rounded">GET A QUOTE</a>
+                </div>
+            </div>            
+
+        </div>
+    </section>
+
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
+
+{% endblock %}

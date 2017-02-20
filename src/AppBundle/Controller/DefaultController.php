@@ -731,4 +731,5 @@ class DefaultController extends BaseController
             'is_opted_out' => $invitationService->isOptedOut($email, $cat),
         );
     }
+
 }

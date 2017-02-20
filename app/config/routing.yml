@@ -97,5 +97,4 @@ redirect_launch:
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /
-        permanent: true    
-    
+        permanent: true         
