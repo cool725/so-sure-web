@@ -82,7 +82,7 @@ abstract class Price
 
     public function getMonthlyPremiumPrice(\DateTime $date = null)
     {
-        return $this->getGwp() + $this->getIpt($date);
+        return $this->toTwoDp($this->getGwp() + $this->getIpt($date));
     }
 
     public function getYearlyPremiumPrice(\DateTime $date = null)
