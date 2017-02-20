@@ -151,6 +151,38 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-review/monthly'));
     }
+    public function testPurchasePhoneImeiSpaceNineSixtyEight()
+    {
+        $phoneRepo = static::$dm->getRepository(Phone::class);
+        $phone = $phoneRepo->findOneBy(['devices' => 'zeroflte', 'memory' => 128]);
+        //$phone = self::getRandomPhone(static::$dm);
+
+        // set phone in session
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhone', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+
+        $crawler = $this->setAddress();
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+
+        $imei = implode(' ', str_split(self::generateRandomImei(), 3));
+        $crawler = $this->setPhone($phone, $imei);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-review/monthly'));
+    }
 
     public function testPurchasePhoneImeiSpace()
     {
@@ -343,7 +375,7 @@ class PurchaseControllerTest extends BaseControllerTest
             $imei = self::generateRandomImei();
         }
         $form['purchase_form[imei]'] = $imei;
-        $form['purchase_form[amount]'] = (float) $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        $form['purchase_form[amount]'] = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
         if ($phone->getMake() == "Apple") {
             // use a different number in case we're testing /, -, etc
             $form['purchase_form[serialNumber]'] = self::generateRandomImei();
