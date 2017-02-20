@@ -212,10 +212,6 @@ $(function(){
                 setBars();
             },
 
-            onSlideEnd: function(position, value) {
-                         
-            }
-
+            onSlideEnd: function(position, value) {}
         })
-
 });
