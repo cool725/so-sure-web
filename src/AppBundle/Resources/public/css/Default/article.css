@@ -12,3 +12,9 @@
     background-position: top; 
     background-size: cover;
 }
+
+p {
+    line-height: 2;
+    font-size: 18px;
+    margin: 0 0 30px;
+}
