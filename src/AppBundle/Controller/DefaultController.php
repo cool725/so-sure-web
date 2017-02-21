@@ -396,7 +396,7 @@ class DefaultController extends BaseController
     public function thinkYourIPhone7IsInsuredByYourBank()
     {
         return array();
-    }    
+    }
 
     /**
      * @Route("/phone/{make}/{model}", name="phone_make_model")
