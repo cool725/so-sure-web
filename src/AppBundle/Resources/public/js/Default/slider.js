@@ -16,7 +16,7 @@ $(function(){
     var cashback         = $('#cashback');
     var cashback_new     = $('#cashback-with-claim');
     var cashback_text    = $('#cashback-text');
-    var premium_value  = $('.premium-value');    
+    var premium_value    = $('.premium-value');    
 
     // The Handle
     var $handle;
@@ -47,22 +47,23 @@ $(function(){
         return +(Math.round(num + "e+2")  + "e-2");
     }
 
-    function flipReset(el, feature) {
+    // TODO - Unite functions below into one
+    // function flipReset(el, feature) {
 
-        $(el).click(function(e) {
+    //     $(el).click(function(e) {
 
-            e.preventDefault();
+    //         e.preventDefault();
 
-            // Loading Overlay
-            $('#loading-overlay-switch').fadeIn('400', function() {
+    //         // Loading Overlay
+    //         $('#loading-overlay-switch').fadeIn('400', function() {
                 
-            });
+    //         });
 
-            // Reset - if neeeded
+    //         // Reset - if neeeded
 
-        });
+    //     });
 
-    }
+    // }
 
     // What if - Needs improving
     $('#what-if').click(function(e) {
@@ -108,7 +109,7 @@ $(function(){
         $('.list-group-item').each(function() {
 
             // Get data from element
-            var option = $(this).data('claim-option');
+            var option     = $(this).data('claim-option');
             var new_text   = $(this).data('cashback-text');
 
             $(this).click(function() {
@@ -200,12 +201,13 @@ $(function(){
                     save_value = maxpot_value;
                 }
 
-                var premium = roundToTwo(montly_premium - save_value);
+                var premium = roundToTwo(montly_premium - save_value); 
+                var total   = premium.toFixed(2);
 
                 // Update cashback and premium
                 function updateValues() {
                     $('#cashback').text('£' + save_value);
-                    $('#premium').text('£' + premium);                  
+                    $('#premium').text('£' + total);                  
                 }               
 
                 whatIf(save_value);                             
@@ -213,10 +215,6 @@ $(function(){
                 setBars();
             },
 
-            onSlideEnd: function(position, value) {
-                // setBars();                  
-            }
-
+            onSlideEnd: function(position, value) {}
         })
-
 });
