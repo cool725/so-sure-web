@@ -194,12 +194,9 @@ class ApiController extends BaseController
             $memory = (float) $this->getRequestString($request, 'memory');
             $rooted = $this->getRequestBool($request, 'rooted');
 
-            $quoteData = $this->getQuotes($make, $device, true, $memory, $rooted);
+            $quoteData = $this->getQuotes($make, $device, $memory, $rooted);
             $phones = $quoteData['phones'];
             $deviceFound = $quoteData['deviceFound'];
-            if (!$phones) {
-                throw new \Exception(sprintf('Unknown phone %s %s', $make, $device));
-            }
 
             $stats = $this->get('app.stats');
             $cognitoId = $this->getCognitoIdentityId($request);
@@ -212,6 +209,10 @@ class ApiController extends BaseController
                 $rooted
             );
 
+            if (!$phones || !$deviceFound) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_PHONE_UNKNOWN, 'Unknown phone', 422);
+            }
+
             $quotes = [];
             foreach ($phones as $phone) {
                 if ($quote = $phone->asQuoteApiArray()) {
@@ -220,12 +221,6 @@ class ApiController extends BaseController
             }
 
             if ($rooted) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
-            }
-
-            // Rooted is missing in the pre-launch app where, which returns the MSRP pricing data if phone not found
-            // but for newer mobile versions, we should return an unable to insure if the phone isn't found
-            if (strlen($this->getRequestString($request, 'rooted')) > 0 && !$deviceFound) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
             }
 
