@@ -2,6 +2,12 @@
   background-color: #fff;
 }
 
+.article-content p {
+    line-height: 2;
+    font-size: 18px;
+    margin: 0 0 30px;
+}
+
 /* Page Specific Backgrounds */
 
 .thinkYourIPhone7IsInsuredByYourBank {
@@ -11,10 +17,4 @@
        rgba(51, 153, 255, 0.64)), url(https://cdn.so-sure.com/images/articles/iphone7back.jpg);
     background-position: top; 
     background-size: cover;
-}
-
-p {
-    line-height: 2;
-    font-size: 18px;
-    margin: 0 0 30px;
 }
