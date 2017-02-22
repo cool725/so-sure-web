@@ -1,17 +1,13 @@
-.section-title {
-  text-align: center;
+.jobs {
+
 }
-ul.jobs {
-  font-size: 2rem;
-  list-style: none;
+
+.jobs p,
+.jobs li {
+    line-height: 1.6;
+    font-size: 18px;
 }
-.jobs li.dev:before {
-  font-family: 'FontAwesome';
-  content: '\f0ac';
-  margin: 0 5px 0 -15px;
-}
-.jobs li.growth:before {
-  font-family: 'FontAwesome';
-  content: '\f0a1';
-  margin: 0 5px 0 -15px;
+
+.jobs li {
+	margin: 0 0 10px;
 }
