@@ -680,8 +680,12 @@ class IntercomService
                 } elseif (!$user->unsubscribed_from_emails && $optedOut) {
                     // sosure user listener -> queue -> intercom update issue
                     $sosureUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->email)]);
-                    $this->updateUser($sosureUser);
-                    $output[] = sprintf("Resync intercom user for %s", $user->email);
+                    if ($sosureUser) {
+                        $this->updateUser($sosureUser);
+                        $output[] = sprintf("Resync intercom user for %s", $user->email);
+                    } else {
+                        $output[] = sprintf("Unable to find so-sure user for %s", $user->email);
+                    }
                 }
             }
             $this->dm->flush();
