@@ -125,7 +125,7 @@ abstract class BaseController extends Controller
         return $phones;
     }
 
-    protected function getQuotes($make, $device, $returnAllIfNone = true, $memory = null, $rooted = null)
+    protected function getQuotes($make, $device, $memory = null, $rooted = null)
     {
         // TODO: We should probably be checking make as well.  However, we need to analyize the data
         // See Phone::isSameMake()
@@ -134,10 +134,6 @@ abstract class BaseController extends Controller
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phones = $repo->findBy(['devices' => $device, 'active' => true]);
-        if ($returnAllIfNone &&
-            (count($phones) == 0 || $device == "")) {
-            $phones = $repo->findBy(['make' => 'ALL']);
-        }
 
         $memoryFound = null;
         if ($memory !== null) {
@@ -185,7 +181,7 @@ abstract class BaseController extends Controller
      */
     protected function getPhone($make, $device, $memory)
     {
-        $quotes = $this->getQuotes($make, $device, false);
+        $quotes = $this->getQuotes($make, $device);
         $phones = $quotes['phones'];
         if (count($phones) == 0) {
             return null;

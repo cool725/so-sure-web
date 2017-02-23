@@ -1418,11 +1418,11 @@ class ApiAuthController extends BaseController
             $memory = (float) $this->getRequestString($request, 'memory');
             $rooted = $this->getRequestBool($request, 'rooted');
 
-            $quoteData = $this->getQuotes($make, $device, true, $memory, $rooted);
+            $quoteData = $this->getQuotes($make, $device, $memory, $rooted);
             $phones = $quoteData['phones'];
             $deviceFound = $quoteData['deviceFound'];
-            if (!$phones) {
-                throw new \Exception(sprintf('Unknown phone %s %s', $make, $device));
+            if (!$phones || !$deviceFound) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_PHONE_UNKNOWN, 'Unknown phone', 422);
             }
 
             $quotes = [];
