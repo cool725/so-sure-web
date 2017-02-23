@@ -2,11 +2,6 @@ $(function(){
     var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
     var key = $('#ss-root').data('pca-key');
 
-    $('.form-control').on('change', function() {
-        $(this).parent().removeClass('has-error');
-        $(this).parent().find('.with-errors').empty();
-    });
-
     var showAddress = function(err) {
         $('.address-search').hide();
         $('.typeahead').removeAttr('required');

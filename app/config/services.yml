@@ -668,6 +668,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.purchasesteppersonaladdress:
+        class: AppBundle\Form\Type\PurchaseStepPersonalAddressType
+        arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.purchasestepaddress:
         class: AppBundle\Form\Type\PurchaseStepAddressType
         arguments: ["%form_required%"]

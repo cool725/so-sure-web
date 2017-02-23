@@ -19,6 +19,7 @@ use AppBundle\Document\Payment;
 use AppBundle\Document\User;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Form\Purchase;
+use AppBundle\Document\Form\PurchaseStepPersonalAddress;
 use AppBundle\Document\Form\PurchaseStepPersonal;
 use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
@@ -27,6 +28,7 @@ use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
+use AppBundle\Form\Type\PurchaseStepPersonalAddressType;
 use AppBundle\Form\Type\PurchaseStepPersonalType;
 use AppBundle\Form\Type\PurchaseStepAddressType;
 use AppBundle\Form\Type\PurchaseStepPhoneType;
@@ -58,7 +60,7 @@ class PurchaseController extends BaseController
      * @Route("/", name="purchase")
      * @Template
     */
-    public function purchaseStepPersonalAction(Request $request)
+    public function purchaseStepPersonalAddressAction(Request $request)
     {
         $session = $request->getSession();
         $user = $this->getUser();
@@ -78,14 +80,14 @@ class PurchaseController extends BaseController
 
         $dm = $this->getManager();
 
-        $purchase = new PurchaseStepPersonal();
+        $purchase = new PurchaseStepPersonalAddress();
         if ($user) {
             $purchase->populateFromUser($user);
         } elseif ($session->get('email')) {
             $purchase->setEmail($session->get('email'));
         }
         $purchaseForm = $this->get('form.factory')
-            ->createNamedBuilder('purchase_form', PurchaseStepPersonalType::class, $purchase)
+            ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -150,6 +152,16 @@ class PurchaseController extends BaseController
                             $user->getId()
                         ));
                     }
+                    if (!$user->hasValidBillingDetails()) {
+                        $this->get('logger')->error(sprintf(
+                            'Invalid purchase user billing details %s',
+                            json_encode($purchase->toApiArray())
+                        ));
+                        throw new \InvalidArgumentException(sprintf(
+                            'User is missing billing details (User: %s)',
+                            $user->getId()
+                        ));
+                    }
                     // Register before login, so we still have old session id before login changes it
                     if ($newUser) {
                         $this->get('app.mixpanel')->register($user);
@@ -170,7 +182,7 @@ class PurchaseController extends BaseController
                     // Regardless of existing user or new user, track receive details (so funnel works)
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS);
 
-                    return $this->redirectToRoute('purchase_step_address');
+                    return $this->redirectToRoute('purchase_step_phone');
                 }
             }
         }
@@ -179,67 +191,8 @@ class PurchaseController extends BaseController
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,
             'phone' => $this->getSessionQuotePhone($request),
-            'quote_url' => $session ? $session->get('quote_url') : null,
-        );
-
-        return $data;
-    }
-    
-    /**
-     * @Route("/step-address", name="purchase_step_address")
-     * @Template
-    */
-    public function purchaseStepAddressAction(Request $request)
-    {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('purchase');
-        } elseif ($user->hasPolicy()) {
-            $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
-
-            return $this->redirectToRoute('user_home');
-        }
-        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
-        if (!$user->hasValidDetails()) {
-            return $this->redirectToRoute('purchase_step_personal');
-        }
-
-        $dm = $this->getManager();
-
-        $purchase = new PurchaseStepAddress();
-        $purchase->populateFromUser($user);
-        $purchaseForm = $this->get('form.factory')
-            ->createNamedBuilder('purchase_form', PurchaseStepAddressType::class, $purchase)
-            ->getForm();
-
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('purchase_form')) {
-                $purchaseForm->handleRequest($request);
-                if ($purchaseForm->isValid()) {
-                    $purchase->populateUser($user);
-
-                    if (!$user->hasValidBillingDetails()) {
-                        $this->get('logger')->error(sprintf(
-                            'Invalid purchase user billing details %s',
-                            json_encode($purchase->toApiArray())
-                        ));
-                        throw new \InvalidArgumentException(sprintf(
-                            'User is missing billing details (User: %s)',
-                            $user->getId()
-                        ));
-                    }
-                    $dm->flush();
-
-                    return $this->redirectToRoute('purchase_step_phone');
-                }
-            }
-        }
-
-        $data = array(
-            'purchase_form' => $purchaseForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
-            'step' => 2,
-            'phone' => $this->getSessionQuotePhone($request),
+            'quote_url' => $session ? $session->get('quote_url') : null,
         );
 
         return $data;
@@ -261,7 +214,7 @@ class PurchaseController extends BaseController
         }
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
         if (!$user->hasValidBillingDetails()) {
-            return $this->redirectToRoute('purchase_step_address');
+            return $this->redirectToRoute('purchase_step_personal');
         }
 
         $dm = $this->getManager();
@@ -409,7 +362,7 @@ class PurchaseController extends BaseController
             'purchase_form' => $purchaseForm->createView(),
             'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
-            'step' => 3,
+            'step' => 2,
             'modal_type' => $phone ? 'purchase-change' : 'purchase-select',
         );
 
@@ -459,7 +412,7 @@ class PurchaseController extends BaseController
             'policy_key' => $this->getParameter('policy_key'),
             'webpay_action' => $webpay['post_url'],
             'webpay_reference' => $webpay['payment']->getReference(),
-            'step' => 4,
+            'step' => 3,
             'is_postback' => 'POST' === $request->getMethod(),
             'amount' => $amount,
             'period' => $period,
