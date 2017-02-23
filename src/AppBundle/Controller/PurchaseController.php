@@ -182,7 +182,7 @@ class PurchaseController extends BaseController
                     // Regardless of existing user or new user, track receive details (so funnel works)
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS);
 
-                    return $this->redirectToRoute('purchase_step_phone');
+                    return $this->redirectToRoute('purchase_step_policy');
                 }
             }
         }
@@ -199,7 +199,7 @@ class PurchaseController extends BaseController
     }
 
     /**
-     * @Route("/step-phone", name="purchase_step_phone")
+     * @Route("/step-policy", name="purchase_step_policy")
      * @Template
     */
     public function purchaseStepPhoneAction(Request $request)
@@ -386,7 +386,7 @@ class PurchaseController extends BaseController
         }
         $policy = $user->getUnInitPolicy();
         if (!$policy) {
-            return $this->redirectToRoute('purchase_step_phone');
+            return $this->redirectToRoute('purchase_step_policy');
         }
 
         $routeName = $request->get('_route');
@@ -506,7 +506,7 @@ class PurchaseController extends BaseController
             $initPolicies = $this->getUser()->getInitPolicies();
             if (count($initPolicies) > 0) {
                 $this->addFlash('warning', 'You seem to have a policy that you started creating, but is unpaid.');
-                return $this->redirectToRoute('purchase_step_phone');
+                return $this->redirectToRoute('purchase_step_policy');
             }
 
             throw new \Exception('Unable to locate reference');
@@ -524,7 +524,7 @@ class PurchaseController extends BaseController
         $this->addFlash('error', 'There was a problem processing your payment. You can try again.');
         $user = $this->getUser();
         if (!$user->hasActivePolicy()) {
-            return $this->redirectToRoute('purchase_step_phone');
+            return $this->redirectToRoute('purchase_step_policy');
         } elseif ($user->hasUnpaidPolicy()) {
             return $this->redirectToRoute('user_unpaid_policy');
         } else {

@@ -274,10 +274,15 @@ class PurchaseStepPersonalAddress
 
     public function matchesUser($user)
     {
-        return strtolower($this->getEmail()) == $user->getEmailCanonical() &&
+        //\Doctrine\Common\Util\Debug::dump($this);
+        //\Doctrine\Common\Util\Debug::dump($user);
+        $match = strtolower($this->getEmail()) == $user->getEmailCanonical() &&
             $this->getFirstName() == $user->getFirstName() &&
             $this->getLastName() == $user->getLastName() &&
             $this->getMobileNumber() == $user->getMobileNumber() &&
             $this->getBirthday()->diff($user->getBirthday())->days == 0;
+        //print $match ? 'match' : 'no match';
+
+        return $match;
     }
 }

@@ -30,7 +30,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
@@ -56,7 +56,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
     }
 
     public function testPurchaseExistingUserDiffDetails()
@@ -83,9 +83,9 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         $crawler = $this->createPurchaseUser($user, 'foo bar', new \DateTime('1980-01-01'));
-
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
+
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
     }
 
     public function testPurchaseExistingUserSameDetailsWithPartialPolicy()
@@ -114,12 +114,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
-
-        $crawler = $this->setAddress();
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
     }
 
     public function testPurchasePhone()
@@ -139,12 +134,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
-
-        $crawler = $this->setAddress();
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
         $crawler = $this->setPhone($phone);
         //print $crawler->html();
@@ -164,18 +154,13 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         $crawler = $this->createPurchase(
-            self::generateEmail('testPurchasePhone', $this),
+            self::generateEmail('testPurchasePhoneImeiSpaceNineSixtyEight', $this),
             'foo bar',
             new \DateTime('1980-01-01')
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
-
-        $crawler = $this->setAddress();
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
         $imei = implode(' ', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
@@ -195,18 +180,13 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         $crawler = $this->createPurchase(
-            self::generateEmail('testPurchasePhone', $this),
+            self::generateEmail('testPurchasePhoneImeiSpace', $this),
             'foo bar',
             new \DateTime('1980-01-01')
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
-
-        $crawler = $this->setAddress();
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
         $imei = implode(' ', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
@@ -226,18 +206,13 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         $crawler = $this->createPurchase(
-            self::generateEmail('testPurchasePhone', $this),
+            self::generateEmail('testPurchasePhoneImeiDash', $this),
             'foo bar',
             new \DateTime('1980-01-01')
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
-
-        $crawler = $this->setAddress();
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
         $imei = implode('-', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
@@ -257,18 +232,13 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         $crawler = $this->createPurchase(
-            self::generateEmail('testPurchasePhone', $this),
+            self::generateEmail('testPurchasePhoneImeiSlash', $this),
             'foo bar',
             new \DateTime('1980-01-01')
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
-
-        $crawler = $this->setAddress();
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
         $imei = implode('/', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
@@ -288,18 +258,13 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         $crawler = $this->createPurchase(
-            self::generateEmail('testPurchasePhone', $this),
+            self::generateEmail('testPurchasePhoneImeiS7', $this),
             'foo bar',
             new \DateTime('1980-01-01')
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
-
-        $crawler = $this->setAddress();
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
         $imei = sprintf('%s/71', self::generateRandomImei());
         $crawler = $this->setPhone($phone, $imei);
@@ -332,12 +297,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-address'));
-
-        $crawler = $this->setAddress();
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
         $crawler = $this->setPhone($phone);
 
@@ -369,7 +329,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     private function setPhone($phone, $imei = null)
     {
-        $crawler = self::$client->request('GET', '/purchase/step-phone');
+        $crawler = self::$client->request('GET', '/purchase/step-policy');
         $form = $crawler->selectButton('purchase_form[next]')->form();
         if (!$imei) {
             $imei = self::generateRandomImei();
@@ -380,18 +340,6 @@ class PurchaseControllerTest extends BaseControllerTest
             // use a different number in case we're testing /, -, etc
             $form['purchase_form[serialNumber]'] = self::generateRandomImei();
         }
-        $crawler = self::$client->submit($form);
-
-        return $crawler;
-    }
-
-    private function setAddress()
-    {
-        $crawler = self::$client->request('GET', '/purchase/step-address');
-        $form = $crawler->selectButton('purchase_form[next]')->form();
-        $form['purchase_form[addressLine1]'] = '123 Foo St';
-        $form['purchase_form[city]'] = 'Unknown';
-        $form['purchase_form[postcode]'] = 'BX1 1LT';
         $crawler = self::$client->submit($form);
 
         return $crawler;
@@ -411,6 +359,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $form['purchase_form[birthday][month]'] = sprintf("%d", $birthday->format('m'));
         $form['purchase_form[birthday][year]'] = $birthday->format('Y');
         $form['purchase_form[mobileNumber]'] = $mobile;
+        $form['purchase_form[addressLine1]'] = '123 Foo St';
+        $form['purchase_form[city]'] = 'Unknown';
+        $form['purchase_form[postcode]'] = 'BX1 1LT';
         $crawler = self::$client->submit($form);
 
         return $crawler;
