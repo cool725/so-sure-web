@@ -276,6 +276,7 @@ class PurchaseController extends BaseController
             ->createNamedBuilder('purchase_form', PurchaseStepPhoneType::class, $purchase)
             ->getForm();
         $webpay = null;
+        $allowPayment = true;
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
@@ -361,33 +362,36 @@ class PurchaseController extends BaseController
                         }
                     }
                     $dm->flush();
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
-                        'Device Insured' => $purchase->getPhone()->__toString(),
-                        'OS' => $purchase->getPhone()->getOs(),
-                        'Final Monthly Cost' => $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
-                    ]);
 
-                    $monthly = $this->areEqualToTwoDp(
-                        $purchase->getAmount(),
-                        $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
-                    );
-                    $yearly = $this->areEqualToTwoDp(
-                        $purchase->getAmount(),
-                        $purchase->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
-                    );
-
-                    if ($monthly || $yearly) {
-                        $webpay = $this->get('app.judopay')->webpay(
-                            $policy,
+                    if ($allowPayment) {    
+                        $monthly = $this->areEqualToTwoDp(
                             $purchase->getAmount(),
-                            $request->getClientIp(),
-                            $request->headers->get('User-Agent')
+                            $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
                         );
-                    } else {
-                        $this->addFlash(
-                            'error',
-                            "Please select the monthly or yearly option."
+                        $yearly = $this->areEqualToTwoDp(
+                            $purchase->getAmount(),
+                            $purchase->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
                         );
+    
+                        if ($monthly || $yearly) {
+                            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
+                                'Device Insured' => $purchase->getPhone()->__toString(),
+                                'OS' => $purchase->getPhone()->getOs(),
+                                'Final Monthly Cost' => $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+                            ]);
+                            $webpay = $this->get('app.judopay')->webpay(
+                                $policy,
+                                $purchase->getAmount(),
+                                $request->getClientIp(),
+                                $request->headers->get('User-Agent')
+                            );
+                            $purchase->setAgreed(true);
+                        } else {
+                            $this->addFlash(
+                                'error',
+                                "Please select the monthly or yearly option."
+                            );
+                        }
                     }
                 }
             }

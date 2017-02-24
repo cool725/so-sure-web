@@ -55,12 +55,12 @@
                                 </div>   
                                 <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': ''} }) }}
-                                    {{ form_widget(purchase_form.amount) }}    
+                                    {{ form_widget(purchase_form.amount) }}
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>             
-                                </div>                                
+                                </div>
                                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': ''} }) }}
-                                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'', 'pattern':'[-/\\s]*([0-9][-/\\s]*){15,17}', 'title': 'Enter a valid 15 or 17 digit IMEI Number'}}) }}
+                                        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'', 'pattern':'[-/\\s]*([0-9][-/\\s]*){15,17}', 'title': 'Enter a valid 15 or 17 digit IMEI Number'}}) }}
                                     <p class="help-block text-left">
                                         <small>Dial *#06# to show your IMEI number.
                                         <a href="#" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">more info</a>. 
@@ -73,7 +73,7 @@
                                         </a>
                                     </p>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                     
-                                </div>                     
+                                </div>
                                 {% if purchase_form.serialNumber is defined %}
                                     <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
                                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': ''} }) }}
@@ -101,14 +101,10 @@
                         <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
                         <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
                             <label class="checkbox-terms">
-                                {% if webpay_reference %}
-                                    {{ form_widget(purchase_form.next, {'label': 'I confirm the above is correct', 'attr': {'class': 'btn btn-link check-square-o'}}) }}
-                                {% else %}
-                                    {{ form_widget(purchase_form.next, {'label': 'I confirm the above is correct', 'attr': {'class': 'btn btn-link square-o'}}) }}
-                                {% endif %}
+                                {{ form_widget(purchase_form.agreed, {'label': 'I confirm the above is correct'}) }}
                             </label>
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.agreed) }}</div>             
                         </div>
-                    {{ form_end(purchase_form) }}
                         <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>                        
                         <div class="form-group form-footer">
                             <div class="row">
@@ -116,14 +112,15 @@
                                     <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_policy') }}">Back</a>
                                 </div>
                                 <div class="col-xs-6 col-sm-6 col-md-6">   
-                                    <form action="{{ webpay_action }}" method="post" id="webpay-form" class="text-left">
-                                        <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                        <input type="submit" name="form_next" title="{% if not webpay_reference %}You must confirm the above condition before you can pay{% endif %}" class="btn btn-success btn-rounded btn-block btn-arrow-right {% if not webpay_reference %}disabled{% endif %}" value="PAY NOW">                                      
-                                    </form>
+                                    {{ form_widget(purchase_form.next, {'label': 'PAY NOW', 'attr': {'class': 'btn btn-success btn-rounded  btn-block btn-arrow-right'}}) }}
                                 </div> 
                             </div>                                     
                         </div>  
+                    {{ form_end(purchase_form) }}
                 </div>
+                <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                    <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                </form>
           
             </div>
         </div>
