@@ -63,10 +63,13 @@
     margin-top: 2px;
 }
 
-.checkout .checkbox-terms {
-    padding: 15px 0;
-    display: block !important;
-    text-align: center !important;
+.terms-checkbox {
+    margin-top: 20px;
+}
+
+.terms-checkbox label {
+    font-size: 16px !important;
+    font-weight: bold;
 }
 
 .checkout .address-manual-cont {    

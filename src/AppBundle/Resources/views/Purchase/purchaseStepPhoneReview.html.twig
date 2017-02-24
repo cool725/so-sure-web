@@ -94,19 +94,11 @@
                                         <a data-toggle="modal" data-target="#policy-modal" style="cursor: pointer;">policy document</a>
                                     </li>                                
                                 </ol>
-                                <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
-                                <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
-                                    <label class="checkbox-terms">
-                                        {{ form_widget(purchase_form.agreed, {'label': 'I confirm the above is correct'}) }}
-                                    </label>
+                                <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>                            
+                                <div class="form-group checkbox terms-checkbox text-center {% if is_postback %}has-error{% endif %}">
+                                    {{ form_widget(purchase_form.agreed, {'label': 'I confirm the above is correct'}) }}
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.agreed) }}</div>             
-                                </div>
-                                <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>
-                                <p class="text-center"><small>
-                                    <img src="{{ cdn_url }}/images/payment/Visa.png" alt="Visa">
-                                    <img src="{{ cdn_url }}/images/payment/MasterCard.png" alt="Mastercard">
-                                    <img src="{{ cdn_url }}/images/payment/judo.png" alt="Judopay">
-                                </small></p>
+                                </div>                                
                             </div>                        
                             <div class="form-group form-footer">
                                 <div class="row">
@@ -118,6 +110,12 @@
                                     </div> 
                                 </div>                                     
                             </div>  
+                            <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>
+                                <p class="text-center"><small>
+                                    <img src="{{ cdn_url }}/images/payment/Visa.png" alt="Visa">
+                                    <img src="{{ cdn_url }}/images/payment/MasterCard.png" alt="Mastercard">
+                                    <img src="{{ cdn_url }}/images/payment/judo.png" alt="Judopay">
+                                </small></p>                            
                         {{ form_end(purchase_form) }}
                     </div>
                     <form action="{{ webpay_action }}" method="post" id="webpay-form">
