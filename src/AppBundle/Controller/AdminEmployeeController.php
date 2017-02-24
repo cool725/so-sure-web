@@ -42,6 +42,7 @@ use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
+use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
@@ -521,7 +522,13 @@ class AdminEmployeeController extends BaseController
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
-        $qb = $repo->createQueryBuilder();
+        $qb = $repo->createQueryBuilder()->sort('notificationDate', 'desc');
+
+        $form = $this->createForm(ClaimSearchType::class, null, ['method' => 'GET']);
+        $form->handleRequest($request);
+        $data = $form->get('status')->getData();
+        $qb = $qb->field('status')->in($data);
+
         $pager = $this->pager($request, $qb);
         $phoneRepo = $dm->getRepository(Phone::class);
         $phones = $phoneRepo->findActive()->getQuery()->execute();
@@ -530,6 +537,7 @@ class AdminEmployeeController extends BaseController
             'claims' => $pager->getCurrentPageResults(),
             'pager' => $pager,
             'phones' => $phones,
+            'form' => $form->createView(),
         ];
     }
 
