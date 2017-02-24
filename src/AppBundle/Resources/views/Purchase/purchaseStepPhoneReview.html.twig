@@ -191,4 +191,26 @@
     </div>
 </div>  
 
+<div class="modal modal-middle fade" 
+     id="phoneModal" 
+     tabindex="-1" 
+     role="dialog" 
+     aria-labelledby="quoteModelLabel" 
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h3 class="text-center">Select Make &amp; Model</h3>
+            </div>
+            <div class="modal-body">
+                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': 'purchase-select'})) }}
+            </div>
+        </div>
+    </div>
+</div>    
+
 {% endblock %}
