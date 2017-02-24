@@ -399,6 +399,15 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/is-insurance-with-vodafone-all-that-it-seems", name="is_insurance_with_vodafone_all_that_it_seems")
+     * @Template
+     */
+    public function isInsuranceWithVodafoneAllThatItSeems()
+    {
+        return array();
+    }
+
+    /**
      * @Route("/phone/{make}/{model}", name="phone_make_model")
      * @Template
      */
