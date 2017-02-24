@@ -28,14 +28,14 @@
     <div class="container">
         
         <div class="row">
-            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">        
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-8 col-lg-offset-2">        
                 
                 <div class="checkout--step">
 
                     <h3>Policy Details</h3>
 
-                    {% if phone %}
-                            {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                        {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                            <div class="checkout--phone-indent">
                                 <div class="form-group">
                                     <label class="">Your Phone:</label>
                                     <div class="h3">
@@ -84,39 +84,45 @@
                                         </p>
                                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>                               
                                     </div>
-                                {% endif %}    
-                                <div class="form-group form-footer">
-                                    <div class="row">
-                                        <div class="col-xs-6 col-sm-6 col-md-6">
-                                            <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_personal') }}">BACK</a>                          
-                                        </div>
-                                        <div class="col-xs-6 col-sm-6 col-md-6">
-                                            {{ form_widget(purchase_form.next, {'label': 'NEXT STEP', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-arrow-right'}}) }}  
-                                        </div>
-                                    </div>
-                                </div>                                                                   
-                            {{ form_end(purchase_form) }}
-                    {% else %}
-                            {{ form_start(purchase_no_phone_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
-                                <div class="form-group">
-                                    <label class="">Your Phone:</label>
-                                        <button type="button" 
-                                                class="btn btn-primary btn-rounded btn-hollow btn-block" 
-                                                data-toggle="modal" 
-                                                data-target="#phoneModal"><i class="fa fa-mobile fa-lg" aria-hidden="true"></i> SELECT PHONE</button>
-
+                                {% endif %}
+                            </div>
+                        <p><strong>Before you pay, please confirm that the following is correct:</strong></p>
+                        <ol>
+                            <li>
+                                My phone is in full working condition and my screen is not cracked</li>
+                                <br>
+                            <li>I am a resident of the United Kingdom</li>
+                            <br>
+                            <li>
+                                I have read &amp; understood the so-sure
+                                <a data-toggle="modal" data-target="#policy-modal" style="cursor: pointer;">policy document</a>
+                            </li>                                
+                        </ol>
+                        <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
+                        <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
+                            <label class="checkbox-terms">
+                                {% if webpay_reference %}
+                                    {{ form_widget(purchase_form.next, {'label': 'I confirm the above is correct', 'attr': {'class': 'btn btn-link check-square-o'}}) }}
+                                {% else %}
+                                    {{ form_widget(purchase_form.next, {'label': 'I confirm the above is correct', 'attr': {'class': 'btn btn-link square-o'}}) }}
+                                {% endif %}
+                            </label>
+                        </div>
+                    {{ form_end(purchase_form) }}
+                        <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>                        
+                        <div class="form-group form-footer">
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_policy') }}">Back</a>
                                 </div>
-                                <div class="form-group form-footer">
-                                    <div class="row">
-                                        <div class="col-xs-6 col-sm-6 col-md-6">
-                                            <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_personal') }}">Back</a>
-                                        </div>
-                                        <div class="col-sm-6 col-md-6">         
-                                        </div> 
-                                    </div>                                     
-                                </div>
-                            {{ form_end(purchase_no_phone_form) }}
-                    {% endif %}
+                                <div class="col-xs-6 col-sm-6 col-md-6">   
+                                    <form action="{{ webpay_action }}" method="post" id="webpay-form" class="text-left">
+                                        <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                                        <input type="submit" name="form_next" title="{% if not webpay_reference %}You must confirm the above condition before you can pay{% endif %}" class="btn btn-success btn-rounded btn-block btn-arrow-right {% if not webpay_reference %}disabled{% endif %}" value="PAY NOW">                                      
+                                    </form>
+                                </div> 
+                            </div>                                     
+                        </div>  
                 </div>
           
             </div>
@@ -167,11 +173,11 @@
     </div>
 </div>
 
-<div class="modal modal-middle fade" 
-     id="phoneModal" 
+<div class="modal modal-fullscreen fade" 
+     id="policy-modal" 
      tabindex="-1" 
      role="dialog" 
-     aria-labelledby="quoteModelLabel" 
+     aria-labelledby="So-Sure Policy Terms" 
      aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -180,13 +186,13 @@
                     <i class="fa fa-times fa-lg" aria-hidden="true"></i>
                     <span class="sr-only">Close</span>
                 </button>
-                <h3 class="text-center">Select Make &amp; Model</h3>
+                <h3>So-Sure Policy Terms</h3>
             </div>
-            <div class="modal-body">
-                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': modal_type})) }}
+            <div class="modal-body modal-policy">
+                {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
             </div>
         </div>
     </div>
-</div>    
+</div>  
 
 {% endblock %}

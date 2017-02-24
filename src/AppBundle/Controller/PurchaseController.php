@@ -79,6 +79,7 @@ class PurchaseController extends BaseController
         }
 
         $dm = $this->getManager();
+        $phone = $this->getSessionQuotePhone($request);
 
         $purchase = new PurchaseStepPersonalAddress();
         if ($user) {
@@ -182,7 +183,11 @@ class PurchaseController extends BaseController
                     // Regardless of existing user or new user, track receive details (so funnel works)
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS);
 
-                    return $this->redirectToRoute('purchase_step_policy');
+                    if ($phone) {
+                        return $this->redirectToRoute('purchase_step_policy');
+                    } else {
+                        return $this->redirectToRoute('purchase_step_phone_no_phone');
+                    }
                 }
             }
         }
@@ -190,9 +195,39 @@ class PurchaseController extends BaseController
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,
-            'phone' => $this->getSessionQuotePhone($request),
+            'phone' => $phone,
             'is_postback' => 'POST' === $request->getMethod(),
             'quote_url' => $session ? $session->get('quote_url') : null,
+        );
+
+        return $data;
+    }
+
+    /**
+     * @Route("/step-missing-phone", name="purchase_step_phone_no_phone")
+     * @Template
+    */
+    public function purchaseStepPhoneNoPhoneAction(Request $request)
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('purchase');
+        }
+        $phone = $this->getSessionQuotePhone($request);
+        if ($phone) {
+            return $this->redirectToRoute('purchase_step_policy');
+        }
+        $purchaseNoPhone = new PurchaseStepPhoneNoPhone();
+        $purchaseNoPhone->setUser($user);
+        $purchaseNoPhoneForm = $this->get('form.factory')
+            ->createNamedBuilder('purchase_no_phone_form', PurchaseStepPhoneNoPhoneType::class, $purchaseNoPhone)
+            ->getForm();
+
+        $data = array(
+            'phone' => $phone,
+            'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
+            'is_postback' => 'POST' === $request->getMethod(),
+            'step' => 2,
         );
 
         return $data;
@@ -202,7 +237,7 @@ class PurchaseController extends BaseController
      * @Route("/step-policy", name="purchase_step_policy")
      * @Template
     */
-    public function purchaseStepPhoneAction(Request $request)
+    public function purchaseStepPhoneReviewAction(Request $request)
     {
         $user = $this->getUser();
         if (!$user) {
@@ -224,9 +259,6 @@ class PurchaseController extends BaseController
         $purchase = new PurchaseStepPhone();
         $purchase->setUser($user);
 
-        $purchaseNoPhone = new PurchaseStepPhoneNoPhone();
-        $purchase->setUser($user);
-
         $policy = $user->getUnInitPolicy();
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
@@ -243,9 +275,7 @@ class PurchaseController extends BaseController
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPhoneType::class, $purchase)
             ->getForm();
-        $purchaseNoPhoneForm = $this->get('form.factory')
-            ->createNamedBuilder('purchase_no_phone_form', PurchaseStepPhoneNoPhoneType::class, $purchaseNoPhone)
-            ->getForm();
+        $webpay = null;
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
@@ -337,16 +367,22 @@ class PurchaseController extends BaseController
                         'Final Monthly Cost' => $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
                     ]);
 
-                    if ($this->areEqualToTwoDp(
+                    $monthly = $this->areEqualToTwoDp(
                         $purchase->getAmount(),
                         $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
-                    )) {
-                        return $this->redirectToRoute('purchase_step_review_monthly');
-                    } elseif ($this->areEqualToTwoDp(
+                    );
+                    $yearly = $this->areEqualToTwoDp(
                         $purchase->getAmount(),
                         $purchase->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
-                    )) {
-                        return $this->redirectToRoute('purchase_step_review_yearly');
+                    );
+
+                    if ($monthly || $yearly) {
+                        $webpay = $this->get('app.judopay')->webpay(
+                            $policy,
+                            $purchase->getAmount(),
+                            $request->getClientIp(),
+                            $request->headers->get('User-Agent')
+                        );
                     } else {
                         $this->addFlash(
                             'error',
@@ -360,64 +396,13 @@ class PurchaseController extends BaseController
         $data = array(
             'phone' => $phone,
             'purchase_form' => $purchaseForm->createView(),
-            'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 2,
-            'modal_type' => $phone ? 'purchase-change' : 'purchase-select',
-        );
-
-        return $data;
-    }
-    
-    /**
-     * @Route("/step-review/monthly", name="purchase_step_review_monthly")
-     * @Route("/step-review/yearly", name="purchase_step_review_yearly")
-     * @Template
-    */
-    public function purchaseStepReviewAction(Request $request)
-    {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('purchase');
-        } elseif ($user->hasPolicy()) {
-            $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
-
-            return $this->redirectToRoute('user_home');
-        }
-        $policy = $user->getUnInitPolicy();
-        if (!$policy) {
-            return $this->redirectToRoute('purchase_step_policy');
-        }
-
-        $routeName = $request->get('_route');
-        if ($routeName == "purchase_step_review_monthly") {
-            $amount = $policy->getPremium()->getMonthlyPremiumPrice();
-            $period = 'month';
-        } elseif ($routeName == "purchase_step_review_yearly") {
-            $amount = $policy->getPremium()->getYearlyPremiumPrice();
-            $period = 'year';
-        } else {
-            throw new \Exception('Unknown route');
-        }
-
-        $webpay = $this->get('app.judopay')->webpay(
-            $policy,
-            $amount,
-            $request->getClientIp(),
-            $request->headers->get('User-Agent')
-        );
-
-        $data = [
-            'phone' => $policy->getPhone(),
+            'webpay_action' => $webpay ? $webpay['post_url'] : null,
+            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'policy_key' => $this->getParameter('policy_key'),
-            'webpay_action' => $webpay['post_url'],
-            'webpay_reference' => $webpay['payment']->getReference(),
-            'step' => 3,
-            'is_postback' => 'POST' === $request->getMethod(),
-            'amount' => $amount,
-            'period' => $period,
-        ];
-        
+        );
+
         return $data;
     }
 

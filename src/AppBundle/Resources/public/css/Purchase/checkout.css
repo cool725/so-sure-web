@@ -26,6 +26,10 @@
     margin-top: 25px;
 }
 
+.checkout--phone-indent {
+    margin-left: 50px;
+}
+
 /* Radio Buttons */
 
 .checkout .radio {
@@ -75,6 +79,30 @@
     -webkit-border-radius: 30px;
     background: none;
     color: #202532;    
+}
+
+.checkout .square-o:before {
+content: "\f096";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+/*--adjust as necessary--*/
+    color: #000;
+    font-size: 18px;
+    padding-right: 0.5em;
+}
+
+.checkout .check-square-o:before {
+content: "\f046";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+/*--adjust as necessary--*/
+    color: #000;
+    font-size: 18px;
+    padding-right: 0.5em;
 }
 
 /* Birthday */
@@ -162,7 +190,9 @@
 }
 
 @media (min-width: 767px) {
-
+    .checkout--step {
+        max-width: 610px;
+    }
 
     .checkout {
         padding: 0 0 100px;

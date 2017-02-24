@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
+    '@AppBundle/Resources/public/css/Purchase/checkout.css'
+    '@AppBundle/Resources/public/css/Default/modal.css'        
+    'bundles/app/css/Default/selectPhoneMake.css' %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
+    '@AppBundle/Resources/public/js/Purchase/purchaseStepPhone.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<section id="purchase-step-phone" class="checkout">
+    
+    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
+
+    <div class="container">
+        
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">        
+                
+                <div class="checkout--step">
+
+                    <h3>Phone Details</h3>
+
+                        {{ form_start(purchase_no_phone_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                            <div class="form-group">
+                                <label class="">Your Phone:</label>
+                                    <button type="button" 
+                                            class="btn btn-primary btn-rounded btn-hollow btn-block" 
+                                            data-toggle="modal" 
+                                            data-target="#phoneModal"><i class="fa fa-mobile fa-lg" aria-hidden="true"></i> SELECT PHONE</button>
+
+                            </div>
+                            <div class="form-group form-footer">
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
+                                        <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_personal') }}">Back</a>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6">         
+                                    </div> 
+                                </div>                                     
+                            </div>
+                        {{ form_end(purchase_no_phone_form) }}
+                </div>
+          
+            </div>
+        </div>
+                
+    </div>
+</section>  
+
+<div class="modal modal-middle fade" 
+     id="phoneModal" 
+     tabindex="-1" 
+     role="dialog" 
+     aria-labelledby="quoteModelLabel" 
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h3 class="text-center">Select Make &amp; Model</h3>
+            </div>
+            <div class="modal-body">
+                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': 'purchase-select'})) }}
+            </div>
+        </div>
+    </div>
+</div>    
+
+{% endblock %}
