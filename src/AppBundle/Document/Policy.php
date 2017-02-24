@@ -436,7 +436,7 @@ abstract class Policy
         return $this->pendingCancellation;
     }
 
-    public function setPendingCancellation(\DateTime $pendingCancellation)
+    public function setPendingCancellation(\DateTime $pendingCancellation = null)
     {
         $this->pendingCancellation = $pendingCancellation;
     }

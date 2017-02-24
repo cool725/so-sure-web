@@ -18,8 +18,10 @@ class PendingPolicyCancellationType extends AbstractType
             ->add('pendingCancellation', DateTimeType::class, [
                 'widget' => 'single_text',
                 'html5' => false,
+                'format' => 'dd-MM-yyyy HH:mm',
                 'attr' => ['class' => 'datetimepicker30', 'placeholder' => '30 days after notice']
             ])
+            ->add('clear', SubmitType::class)
             ->add('cancel', SubmitType::class)
         ;
     }
