@@ -7,7 +7,6 @@ $(function(){
     $('#policy-modal').on('show.bs.modal', function (event) {
         sosuretrack('View Full Policy');
     });
-    alert($('#webpay-form').attr('action'));
     if ($('#webpay-form').attr('action')) {
         $('#webpay-form').submit();
     }
