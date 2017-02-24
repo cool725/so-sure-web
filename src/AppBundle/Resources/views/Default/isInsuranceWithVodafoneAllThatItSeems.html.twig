@@ -24,8 +24,6 @@
 
 {% block body %}
 
-    <!-- Background image https://www.pexels.com/photo/space-gray-iphone-6-193004/ -->
-
     <section class="hero isInsuranceWithVodafoneAllThatItSeems">
         <div class="container">
             
@@ -40,19 +38,91 @@
 
     <section class="article-content section--pad">
         <div class="container">
-
-
-            <div class="row">
-                <div class="col-md-4 col-md-offset-4">
-                    <img src="{{ cdn_url }}/images/articles/vodafone-logo.jpg" alt="Vodafone Logo" class="img-responsive">
-                </div>
-            </div>
             
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
-                    <p>While we have no doubt that Vodafone have the best intentions when it comes to their insurance offering, they are an established insurance player where delays in providing replacements phones, unfortunately, are very common. We've been hearing reports of unacceptable wait times of up to 2 weeks! In fact, one of them had this to say about his insurance experience with Vodafone.</p>
+                    <p>While we have no doubt that Vodafone have the best intentions when it comes to their insurance offering, they are an established insurance player where delays in providing replacements phones do happen. We've been hearing reports of unacceptable wait times of up to 2 weeks! In fact, one of them had this to say about his insurance experience with Vodafone.</p>
                 </div>
-            </div>
+            </div>           
+
+            {% set route = app.request.get('_route') %}
+            
+            {% if route == 'landing_voda_iphone' %}
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr class="info">
+                                    <td class="h4"><strong>Benefits</strong></td>
+                                    <td class="h4"><strong>Vodafone</strong></td>
+                                    <td class="h4"><strong>so-sure</strong></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Price</td>
+                                    <td>£12</td>
+                                    <td>£7.99</td>
+                                </tr>
+                                <tr>
+                                    <td>Next day delivery?</td>
+                                    <td>No</td>
+                                    <td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <td>Unautharised Usage?</td>
+                                    <td>No</td>
+                                    <td>Yes (up to £1,000)</td>
+                                </tr>
+                                <tr>
+                                    <td>Insure non-Vodafone phones?</td>
+                                    <td>No</td>
+                                    <td>Insure non-Vodafone phones?</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>         
+            {% elseif route == 'landing_voda_samsung' %}
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr class="info">
+                                    <td class="h4"><strong>Benefits</strong></td>
+                                    <td class="h4"><strong>Vodafone</strong></td>
+                                    <td class="h4"><strong>so-sure</strong></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Price</td>
+                                    <td>£12</td>
+                                    <td>£9.99</td>
+                                </tr>
+                                <tr>
+                                    <td>Next day delivery?</td>
+                                    <td>No</td>
+                                    <td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <td>Unautharised Usage?</td>
+                                    <td>No</td>
+                                    <td>Yes (up to £1,000)</td>
+                                </tr>
+                                <tr>
+                                    <td>Insure non-Vodafone phones?</td>
+                                    <td>No</td>
+                                    <td>Insure non-Vodafone phones?</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>    
+            {% else %}
+
+            {% endif %}
+
 
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
@@ -68,13 +138,14 @@
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <p>We believe that things like next day delivery, comprehensive cover and top customer service should come as standard. If you feel like Vodafone or another company aren’t giving you any of this then don’t hesitate to get in touch with us.</p>
+                    <p>It’s easy to switch. If you bought your policy within the last 14 days then you can cancel it for free or if not, you can just give them 30 days notice and they will cancel it for you.</p>                    
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-12 text-center">
                     <div class="h2">Demand more from your insurance</div>
-                    <a href="{{ path('homepage') }}" class="btn btn-success btn-rounded">GET A QUOTE</a>
+                    <a href="{{ path('homepage') }}" class="btn btn-success btn-rounded">MAKE THE SWITCH</a>
                 </div>
             </div>            
 
