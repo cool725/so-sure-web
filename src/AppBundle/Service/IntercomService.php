@@ -660,6 +660,7 @@ class IntercomService
 
     private function unsubscribeUsers()
     {
+        $userRepo = $this->dm->getRepository(User::class);
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $output = [];
         $page = 1;
