@@ -8,6 +8,18 @@
     margin: 0 0 30px;
 }
 
+.article-content img {
+    margin: 0 0 30px;
+}
+
+.article-content blockquote p {
+    margin: 0 0 10px;
+}
+
+.article-content .h2 {
+    margin-bottom: 30px;
+}
+
 /* Page Specific Backgrounds */
 
 .thinkYourIPhone7IsInsuredByYourBank {
