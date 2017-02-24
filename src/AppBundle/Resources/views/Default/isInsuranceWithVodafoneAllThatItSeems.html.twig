@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}so-sure - Better Phone Insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
+    <meta name="keywords" content="mobile phone insurance, social insurance"/>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts    
+    '@AppBundle/Resources/public/js/Default/index.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    '@AppBundle/Resources/public/css/Default/index.css'
+    '@AppBundle/Resources/public/css/Default/article.css'    
+    '@AppBundle/Resources/public/css/Default/modal.css' %}   
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    <!-- Background image https://www.pexels.com/photo/space-gray-iphone-6-193004/ -->
+
+    <section class="hero isInsuranceWithVodafoneAllThatItSeems">
+        <div class="container">
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="text-left">Is insurance with Vodafone all that it seems?</h1>
+                </div>
+            </div>
+
+        </div>
+    </section>   
+
+    <section class="article-content section--pad">
+        <div class="container">
+            
+            <div class="row">
+                <div class="col-sm-7 col-md-7">
+                    <p>While we have no doubt that Vodafone have the best intentions when it comes to their insurance offering the fact is they’ve kind of fallen behind the times. In fact, we’ve been hearing reports of some seriously shoddy service. In fact, one of Vodafones customers had this to say about his insurance experience.</p>
+                </div>
+                <div class="col-sm-5 col-md-5">
+                    <img src="{{ cdn_url }}/images/articles/vodafone-logo.jpg" alt="Vodafone Logo" class="img-responsive">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <blockquote>
+                        <p>Having been a loyal Vodafone customer for some time I was naturally shocked when they told me that it would take up to two weeks for my damaged phone to be replaced. Terrible service!</p>
+                        <footer>
+                            Anthony Karibian
+                        </footer>
+                    </blockquote>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <p>We believe that things like next day delivery, comprehensive cover and top customer service should come as standard. If you feel like Vodafone or another company aren’t giving you any of this then don’t hesitate to get in touch with us.</p>
+                </div>
+            </div>
+{# 
+            <div class="row">
+                <div class="col-md-12">
+                    <blockquote class="twitter-tweet tw-align-center" data-lang="en"><p lang="en" dir="ltr">Trying to go through my phone insurance to replace my screen but it&#39;s sooo much hassle 😩😩😩</p>&mdash; shan (@shaannongee) <a href="https://twitter.com/shaannongee/status/831869149257330688">February 15, 2017</a></blockquote><br>
+                    <p class="">That said, we haven’t heard any complaints from customers with NatWest cover <i class="fa fa-check text-green" aria-hidden="true"></i>.</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="">If your bank provides a sub-par mobile phone insurance service, and you are looking for cover for your phone, you might want to consider buying mobile phone insurance.</p>
+                    <p class="">We think people deserve better. That's why all our policies come with <strong>instant cover</strong>, <strong>next day delivery</strong>, <strong>24/7 access</strong>, <strong>better prices</strong> and also cover for <strong>theft, loss, accidental damage</strong> and <strong>breakdown</strong>.</p>
+                </div>
+            </div> #}
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a href="{{ path('homepage') }}" class="btn btn-success btn-rounded">GET BETTER PHONE INSURANCE</a>
+                </div>
+            </div>            
+
+        </div>
+    </section>
+
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
+
+{% endblock %}

@@ -18,3 +18,12 @@
     background-position: top; 
     background-size: cover;
 }
+
+.isInsuranceWithVodafoneAllThatItSeems {
+    background: #202532;
+    background: 
+       linear-gradient(to right, rgba(32, 37, 50, 0.84) , 
+       rgba(51, 153, 255, 0.64)), url(https://cdn.so-sure.com/images/articles/vodafone-back.jpg);
+    background-position: top; 
+    background-size: cover;  
+}
