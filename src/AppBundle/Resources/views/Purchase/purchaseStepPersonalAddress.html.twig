@@ -35,7 +35,7 @@
 
                     <h3>Personal Details</h3>
 
-                    {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': '', 'novalidate':''}}) }}
+                    {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
                     
                         <div class="form-group {% if form_errors(purchase_form.email) %}has-error{% endif %}">
                             {{ form_label(purchase_form.email, 'Email:', { 'label_attr': {'class': ''} }) }}
