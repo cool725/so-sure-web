@@ -24,8 +24,6 @@
 
 {% block body %}
 
-    <!-- Background image https://www.pexels.com/photo/space-gray-iphone-6-193004/ -->
-
     <section class="hero isInsuranceWithVodafoneAllThatItSeems">
         <div class="container">
             
@@ -52,7 +50,86 @@
                 <div class="col-md-8 col-md-offset-2">
                     <p>While we have no doubt that Vodafone have the best intentions when it comes to their insurance offering, they are an established insurance player where delays in providing replacements phones, unfortunately, are very common. We've been hearing reports of unacceptable wait times of up to 2 weeks! In fact, one of them had this to say about his insurance experience with Vodafone.</p>
                 </div>
-            </div>
+            </div>           
+
+            {% set phone_type = app.request.get('p') %}
+            
+            {% if phone_type == 'iphone' %}
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr class="info">
+                                    <td class="h4"><strong>Benefits</strong></td>
+                                    <td class="h4"><strong>Vodafone</strong></td>
+                                    <td class="h4"><strong>so-sure</strong></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Price</td>
+                                    <td>£12</td>
+                                    <td>£7.99</td>
+                                </tr>
+                                <tr>
+                                    <td>Next day delivery?</td>
+                                    <td>No</td>
+                                    <td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <td>Unautharised Usage?</td>
+                                    <td>No</td>
+                                    <td>Yes (up to £1,000)</td>
+                                </tr>
+                                <tr>
+                                    <td>Insure non-Vodafone phones?</td>
+                                    <td>No</td>
+                                    <td>Insure non-Vodafone phones?</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>         
+            {% elseif phone_type == 'samsung' %}
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr class="info">
+                                    <td class="h4"><strong>Benefits</strong></td>
+                                    <td class="h4"><strong>Vodafone</strong></td>
+                                    <td class="h4"><strong>so-sure</strong></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Price</td>
+                                    <td>£12</td>
+                                    <td>£9.99</td>
+                                </tr>
+                                <tr>
+                                    <td>Next day delivery?</td>
+                                    <td>No</td>
+                                    <td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <td>Unautharised Usage?</td>
+                                    <td>No</td>
+                                    <td>Yes (up to £1,000)</td>
+                                </tr>
+                                <tr>
+                                    <td>Insure non-Vodafone phones?</td>
+                                    <td>No</td>
+                                    <td>Insure non-Vodafone phones?</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>    
+            {% else %}
+
+            {% endif %}
+
 
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
