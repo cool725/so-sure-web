@@ -45,9 +45,9 @@
                 </div>
             </div>           
 
-            {% set phone_type = app.request.get('p') %}
+            {% set route = app.request.get('_route') %}
             
-            {% if phone_type == 'iphone' %}
+            {% if route == 'landing_voda_iphone' %}
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2">
                         <table class="table table-bordered">
@@ -83,7 +83,7 @@
                         </table>
                     </div>
                 </div>         
-            {% elseif phone_type == 'samsung' %}
+            {% elseif route == 'landing_voda_samsung' %}
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2">
                         <table class="table table-bordered">

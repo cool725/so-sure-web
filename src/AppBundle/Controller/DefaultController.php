@@ -399,8 +399,10 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/is-insurance-with-vodafone-all-that-it-seems", name="is_insurance_with_vodafone_all_that_it_seems")
-     * @Template
+     * @Route("/is-insurance-with-vodafone-all-that-it-seems", name="landing_voda")
+     * @Route("/is-iphone-insurance-with-vodafone-all-that-it-seems", name="landing_voda_iphone")
+     * @Route("/is-samsung-insurance-with-vodafone-all-that-it-seems", name="landing_voda_samsung")
+     * @Template("AppBundle::Default/isInsuranceWithVodafoneAllThatItSeems.html.twig")
      */
     public function isInsuranceWithVodafoneAllThatItSeems()
     {
