@@ -363,7 +363,7 @@ class PurchaseController extends BaseController
                     }
                     $dm->flush();
 
-                    if ($allowPayment) {    
+                    if ($allowPayment) {
                         $monthly = $this->areEqualToTwoDp(
                             $purchase->getAmount(),
                             $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
@@ -374,10 +374,11 @@ class PurchaseController extends BaseController
                         );
     
                         if ($monthly || $yearly) {
+                            $price = $purchase->getPhone()->getCurrentPhonePrice();
                             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
                                 'Device Insured' => $purchase->getPhone()->__toString(),
                                 'OS' => $purchase->getPhone()->getOs(),
-                                'Final Monthly Cost' => $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+                                'Final Monthly Cost' => $price->getMonthlyPremiumPrice()
                             ]);
                             $webpay = $this->get('app.judopay')->webpay(
                                 $policy,
