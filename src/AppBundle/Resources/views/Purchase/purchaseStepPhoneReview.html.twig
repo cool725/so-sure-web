@@ -28,13 +28,13 @@
     <div class="container">
         
         <div class="row">
-            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-8 col-lg-offset-2">        
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">        
                 
                 <div class="checkout--step">
 
                     <h3>Policy Details</h3>
 
-                        {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                        {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': '', 'novalidate':''}}) }}
                             <div class="checkout--phone-indent">
                                 <div class="form-group">
                                     <label class="">Your Phone:</label>
@@ -61,17 +61,14 @@
                                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': ''} }) }}
                                         {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'', 'pattern':'[-/\\s]*([0-9][-/\\s]*){15,17}', 'title': 'Enter a valid 15 or 17 digit IMEI Number'}}) }}
-                                    <p class="help-block text-left">
-                                        <small>Dial *#06# to show your IMEI number.
-                                        <a href="#" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">more info</a>. 
-                                        <br>Alternatively send us a screenshot of your IMEI below.</small>
-                                    </p>
-                                    <p class="text-center">
+
+                                        <p class="help-block text-left"><small>Dial *#06# to show your IMEI number.
+                                            <a href="#" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">more info</a>. 
+                                        </small></p>                                            
+                                        <p class="help-block"><small>Alternatively send us a screenshot of your IMEI below.</small></p>
                                         <a href="#" class="btn btn-subtle btn-rounded btn-hollow btn-hollow-subtle btn-xs" onclick="sosuretrack('Clicked Upload Imei');Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">
-                                            <i class="fa fa-file-image-o" aria-hidden="true"></i>
-                                            SEND US A SCREENSHOT
-                                        </a>
-                                    </p>
+                                        <i class="fa fa-file-image-o" aria-hidden="true"></i>
+                                        SEND US A SCREENSHOT</a>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                     
                                 </div>
                                 {% if purchase_form.serialNumber is defined %}
@@ -86,45 +83,49 @@
                                     </div>
                                 {% endif %}
                             </div>
-                        <p><strong>Before you pay, please confirm that the following is correct:</strong></p>
-                        <ol>
-                            <li>
-                                My phone is in full working condition and my screen is not cracked</li>
-                                <br>
-                            <li>I am a resident of the United Kingdom</li>
-                            <br>
-                            <li>
-                                I have read &amp; understood the so-sure
-                                <a data-toggle="modal" data-target="#policy-modal" style="cursor: pointer;">policy document</a>
-                            </li>                                
-                        </ol>
-                        <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
-                        <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
-                            <label class="checkbox-terms">
-                                {{ form_widget(purchase_form.agreed, {'label': 'I confirm the above is correct'}) }}
-                            </label>
-                            <div class="help-block with-errors">{{ form_errors(purchase_form.agreed) }}</div>             
-                        </div>
-                        <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>                        
-                        <div class="form-group form-footer">
-                            <div class="row">
-                                <div class="col-xs-6 col-sm-6 col-md-6">
-                                    <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_policy') }}">Back</a>
+                            <div class="review-terms">
+                                <p><strong>Before you pay, please confirm that the following is correct:</strong></p>
+                                <ol>
+                                    <li>
+                                        My phone is in full working condition and my screen is not cracked</li>
+                                    <li>I am a resident of the United Kingdom</li>
+                                    <li>
+                                        I have read &amp; understood the so-sure
+                                        <a data-toggle="modal" data-target="#policy-modal" style="cursor: pointer;">policy document</a>
+                                    </li>                                
+                                </ol>
+                                <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>
+                                <div class="form-group checkbox {% if is_postback %}has-error{% endif %}">
+                                    <label class="checkbox-terms">
+                                        {{ form_widget(purchase_form.agreed, {'label': 'I confirm the above is correct'}) }}
+                                    </label>
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.agreed) }}</div>             
                                 </div>
-                                <div class="col-xs-6 col-sm-6 col-md-6">   
-                                    {{ form_widget(purchase_form.next, {'label': 'PAY NOW', 'attr': {'class': 'btn btn-success btn-rounded  btn-block btn-arrow-right'}}) }}
-                                </div> 
-                            </div>                                     
-                        </div>  
-                    {{ form_end(purchase_form) }}
+                                <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>
+                                <p class="text-center"><small>
+                                    <img src="{{ cdn_url }}/images/payment/Visa.png" alt="Visa">
+                                    <img src="{{ cdn_url }}/images/payment/MasterCard.png" alt="Mastercard">
+                                    <img src="{{ cdn_url }}/images/payment/judo.png" alt="Judopay">
+                                </small></p>
+                            </div>                        
+                            <div class="form-group form-footer">
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
+                                        <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_policy') }}">Back</a>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-md-6">   
+                                        {{ form_widget(purchase_form.next, {'label': 'PAY NOW', 'attr': {'class': 'btn btn-success btn-rounded  btn-block btn-arrow-right'}}) }}
+                                    </div> 
+                                </div>                                     
+                            </div>  
+                        {{ form_end(purchase_form) }}
+                    </div>
+                    <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                        <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                    </form>
                 </div>
-                <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                    <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                </form>
-          
-            </div>
         </div>
-                
+
     </div>
 </section>  
 
