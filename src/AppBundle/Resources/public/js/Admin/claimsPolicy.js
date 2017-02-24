@@ -7,6 +7,14 @@ $('.confirm-cancel').on("click",function() {
     }
 });
 
+$('.confirm-pending-abort').on("click",function() {
+    return confirm('Are you sure you want to abort the policy cancellation? The policy will remain active and the user will keep being charged.');
+});
+
+$('.confirm-pending-cancel').on("click",function() {
+    return confirm('Are you sure you want to schedule this policy for cancellation?');
+});
+
 $('.confirm-imei-update').on("click",function() {
     return confirm('Are you sure you want to update this imei?  This should only be done if the phone imei was incorrectly entered or post claim once the IMEI has changed.  This will trigger a Salva Policy Update.');
 });

@@ -318,11 +318,19 @@ class AdminEmployeeController extends BaseController
             } elseif ($request->request->has('pending_cancel_form')) {
                 $pendingCancelForm->handleRequest($request);
                 if ($pendingCancelForm->isValid()) {
+                    if ($pendingCancelForm->get('clear')->isClicked()) {
+                        $policy->setPendingCancellation(null);
+                        $this->addFlash(
+                            'success',
+                            sprintf('Policy %s is no longer scheduled to be cancelled', $policy->getPolicyNumber())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'success',
+                            sprintf('Policy %s is scheduled to be cancelled', $policy->getPolicyNumber())
+                        );
+                    }
                     $dm->flush();
-                    $this->addFlash(
-                        'success',
-                        sprintf('Policy %s is scheduled to be cancelled', $policy->getPolicyNumber())
-                    );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
