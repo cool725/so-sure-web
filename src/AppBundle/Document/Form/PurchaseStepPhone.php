@@ -48,6 +48,12 @@ class PurchaseStepPhone
      */
     protected $serialNumber;
 
+    /**
+     * @var string
+     * @Assert\IsTrue(message="You must agree to our terms")
+     */
+    protected $agreed;
+
     public function getPhone()
     {
         return $this->phone;
@@ -104,6 +110,16 @@ class PurchaseStepPhone
     public function setSerialNumber($serialNumber)
     {
         $this->serialNumber = str_replace(' ', '', $serialNumber);
+    }
+    
+    public function setAgreed($agreed)
+    {
+        $this->agreed = $agreed;
+    }
+
+    public function isAgreed()
+    {
+        return $this->agreed;
     }
 
     public function toApiArray()

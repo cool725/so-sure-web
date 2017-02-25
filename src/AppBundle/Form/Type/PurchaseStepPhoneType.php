@@ -44,6 +44,7 @@ class PurchaseStepPhoneType extends AbstractType
     {
         $builder
             ->add('imei', TextType::class, ['required' => $this->required])
+            ->add('agreed', CheckboxType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
         ;
 
@@ -67,7 +68,8 @@ class PurchaseStepPhoneType extends AbstractType
                         'choices' => $choices,
                         'placeholder' => false,
                         'expanded' => 'true',
-                        'required' => $this->required
+                        'required' => $this->required,
+                        'disabled' => $purchase->isAgreed() ? true : false,
                     ]);
                 }
 

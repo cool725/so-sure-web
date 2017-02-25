@@ -14,6 +14,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStepPhone.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
@@ -31,10 +32,10 @@
                 
                 <div class="checkout--step">
 
-                    <h3>Phone Details</h3>
+                    <h3>Policy Details</h3>
 
-                    {% if phone %}
-                            {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                        {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                            <div class="checkout--phone-indent">
                                 <div class="form-group">
                                     <label class="">Your Phone:</label>
                                     <div class="h3">
@@ -54,25 +55,22 @@
                                 </div>   
                                 <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': ''} }) }}
-                                    {{ form_widget(purchase_form.amount) }}    
+                                    {{ form_widget(purchase_form.amount) }}
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>             
-                                </div>                                
+                                </div>
                                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': ''} }) }}
-                                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'', 'pattern':'[-/\\s]*([0-9][-/\\s]*){15,17}', 'title': 'Enter a valid 15 or 17 digit IMEI Number'}}) }}
-                                    <p class="help-block text-left">
-                                        <small>Dial *#06# to show your IMEI number.
-                                        <a href="#" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">more info</a>. 
-                                        <br>Alternatively send us a screenshot of your IMEI below.</small>
-                                    </p>
-                                    <p class="text-center">
+                                        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'', 'pattern':'[-/\\s]*([0-9][-/\\s]*){15,17}', 'title': 'Enter a valid 15 or 17 digit IMEI Number'}}) }}
+
+                                        <p class="help-block text-left"><small>Dial *#06# to show your IMEI number.
+                                            <a href="#" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">more info</a>. 
+                                        </small></p>                                            
+                                        <p class="help-block"><small>Alternatively send us a screenshot of your IMEI below.</small></p>
                                         <a href="#" class="btn btn-subtle btn-rounded btn-hollow btn-hollow-subtle btn-xs" onclick="sosuretrack('Clicked Upload Imei');Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">
-                                            <i class="fa fa-file-image-o" aria-hidden="true"></i>
-                                            SEND US A SCREENSHOT
-                                        </a>
-                                    </p>
+                                        <i class="fa fa-file-image-o" aria-hidden="true"></i>
+                                        SEND US A SCREENSHOT</a>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>                     
-                                </div>                     
+                                </div>
                                 {% if purchase_form.serialNumber is defined %}
                                     <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
                                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': ''} }) }}
@@ -83,44 +81,49 @@
                                         </p>
                                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>                               
                                     </div>
-                                {% endif %}    
-                                <div class="form-group form-footer">
-                                    <div class="row">
-                                        <div class="col-xs-6 col-sm-6 col-md-6">
-                                            <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_address') }}">BACK</a>                          
-                                        </div>
-                                        <div class="col-xs-6 col-sm-6 col-md-6">
-                                            {{ form_widget(purchase_form.next, {'label': 'NEXT STEP', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-arrow-right'}}) }}  
-                                        </div>
+                                {% endif %}
+                            </div>
+                            <div class="review-terms">
+                                <p><strong>Before you pay, please confirm that the following is correct:</strong></p>
+                                <ol>
+                                    <li>
+                                        My phone is in full working condition and my screen is not cracked</li>
+                                    <li>I am a resident of the United Kingdom</li>
+                                    <li>
+                                        I have read &amp; understood the so-sure
+                                        <a data-toggle="modal" data-target="#policy-modal" style="cursor: pointer;">policy document</a>
+                                    </li>                                
+                                </ol>
+                                <p>If you confirm that the above is correct and we later discover that it isn’t then you may later be denied your claim.</p>                            
+                                <div class="form-group checkbox terms-checkbox text-center {% if is_postback %}has-error{% endif %}">
+                                    {{ form_widget(purchase_form.agreed, {'label': 'I confirm the above is correct'}) }}
+                                    <div class="help-block with-errors">{{ form_errors(purchase_form.agreed) }}</div>             
+                                </div>                                
+                            </div>                        
+                            <div class="form-group form-footer">
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
+                                        <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_policy') }}">Back</a>
                                     </div>
-                                </div>                                                                   
-                            {{ form_end(purchase_form) }}
-                    {% else %}
-                            {{ form_start(purchase_no_phone_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
-                                <div class="form-group">
-                                    <label class="">Your Phone:</label>
-                                        <button type="button" 
-                                                class="btn btn-primary btn-rounded btn-hollow btn-block" 
-                                                data-toggle="modal" 
-                                                data-target="#phoneModal"><i class="fa fa-mobile fa-lg" aria-hidden="true"></i> SELECT PHONE</button>
-
-                                </div>
-                                <div class="form-group form-footer">
-                                    <div class="row">
-                                        <div class="col-xs-6 col-sm-6 col-md-6">
-                                            <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ path('purchase_step_address') }}">Back</a>
-                                        </div>
-                                        <div class="col-sm-6 col-md-6">         
-                                        </div> 
-                                    </div>                                     
-                                </div>
-                            {{ form_end(purchase_no_phone_form) }}
-                    {% endif %}
+                                    <div class="col-xs-6 col-sm-6 col-md-6">   
+                                        {{ form_widget(purchase_form.next, {'label': 'PAY NOW', 'attr': {'class': 'btn btn-success btn-rounded  btn-block btn-arrow-right'}}) }}
+                                    </div> 
+                                </div>                                     
+                            </div>  
+                            <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>
+                                <p class="text-center"><small>
+                                    <img src="{{ cdn_url }}/images/payment/Visa.png" alt="Visa">
+                                    <img src="{{ cdn_url }}/images/payment/MasterCard.png" alt="Mastercard">
+                                    <img src="{{ cdn_url }}/images/payment/judo.png" alt="Judopay">
+                                </small></p>                            
+                        {{ form_end(purchase_form) }}
+                    </div>
+                    <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                        <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                    </form>
                 </div>
-          
-            </div>
         </div>
-                
+
     </div>
 </section>  
 
@@ -166,6 +169,28 @@
     </div>
 </div>
 
+<div class="modal modal-fullscreen fade" 
+     id="policy-modal" 
+     tabindex="-1" 
+     role="dialog" 
+     aria-labelledby="So-Sure Policy Terms" 
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h3>So-Sure Policy Terms</h3>
+            </div>
+            <div class="modal-body modal-policy">
+                {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+            </div>
+        </div>
+    </div>
+</div>  
+
 <div class="modal modal-middle fade" 
      id="phoneModal" 
      tabindex="-1" 
@@ -182,7 +207,7 @@
                 <h3 class="text-center">Select Make &amp; Model</h3>
             </div>
             <div class="modal-body">
-                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': modal_type})) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': 'purchase-select'})) }}
             </div>
         </div>
     </div>

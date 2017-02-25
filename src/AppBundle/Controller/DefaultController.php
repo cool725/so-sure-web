@@ -176,7 +176,7 @@ class DefaultController extends BaseController
                         $session = $request->getSession();
                         $session->set('quote', $phone->getId());
 
-                        return $this->redirectToRoute('purchase_step_phone');
+                        return $this->redirectToRoute('purchase_step_policy');
                     } else {
                         if (!$phone) {
                             // TODO: Would be better to redirect to a make page instead
