@@ -9,6 +9,8 @@ use AppBundle\Document\File\S3File;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Classes\Salva;
+use AppBundle\Document\Connection\BaseConnection;
+use AppBundle\Document\Connection\RewardConnection;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")

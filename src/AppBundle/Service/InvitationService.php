@@ -5,14 +5,14 @@ use Psr\Log\LoggerInterface;
 
 use AppBundle\Classes\SoSure;
 
-use AppBundle\Document\Connection;
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Reward;
-use AppBundle\Document\RewardConnection;
+use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;

@@ -3,7 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Claim;
-use AppBundle\Document\Connection;
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\PolicyTerms;

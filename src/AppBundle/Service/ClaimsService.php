@@ -7,7 +7,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\User;
-use AppBundle\Document\RewardConnection;
+use AppBundle\Document\Connection\RewardConnection;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 

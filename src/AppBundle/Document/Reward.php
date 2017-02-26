@@ -7,6 +7,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Connection\BaseConnection;
 
 /**
  * @MongoDB\Document()

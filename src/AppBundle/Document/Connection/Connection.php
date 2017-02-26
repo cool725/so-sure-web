@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Document;
+namespace AppBundle\Document\Connection;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -11,6 +11,6 @@ use AppBundle\Document\Invitation\Invitation;
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
  */
-class RewardConnection extends BaseConnection
+class Connection extends BaseConnection
 {
 }

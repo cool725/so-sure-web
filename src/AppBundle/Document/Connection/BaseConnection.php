@@ -1,17 +1,23 @@
 <?php
 
-namespace AppBundle\Document;
+namespace AppBundle\Document\Connection;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
  * @Gedmo\Loggable
- * @MongoDB\InheritanceType("COLLECTION_PER_CLASS")
+ * @MongoDB\InheritanceType("SINGLE_COLLECTION")
+ * @MongoDB\DiscriminatorField("invitation_type")
+ * @MongoDB\DiscriminatorMap({"standard"="Connection", "reward"="RewardConnection"})
+ * @MongoDB\Index(keys={"sourcePolicy.id"="asc"}, sparse="true")
+ * @MongoDB\Index(keys={"linkedPolicy.id"="asc"}, sparse="true")
  */
 class BaseConnection
 {
@@ -21,19 +27,19 @@ class BaseConnection
     protected $id;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
      */
     protected $linkedUser;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
      */
     protected $sourceUser;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Policy")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
      */
     protected $sourcePolicy;
@@ -52,7 +58,7 @@ class BaseConnection
     protected $initialInvitationDate;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Policy", nullable=false)
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
      */
     protected $linkedPolicy;
@@ -93,7 +99,7 @@ class BaseConnection
     protected $initialPromoValue;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
      */
     protected $replacementUser;
