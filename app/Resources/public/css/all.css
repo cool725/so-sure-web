@@ -411,15 +411,18 @@ h4, h5, h6,
 .login #password, #fos_user_resetting_form_new_second {
     margin-top: 0px;
 }
-/*.login .btn-facebook {
-    margin-top: 60px;
-}*/
+
 .btn-facebook  {
     color: #fff !important;
     background-color: #4267B2 !important;
     padding: 15px;
     font-size: 16px;
 }
+
+.login .btn-facebook {
+    margin-top: 60px;
+}
+
 .reset-error-box {
     border: 2px solid red !important;
 }
