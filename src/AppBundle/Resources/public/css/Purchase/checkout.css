@@ -72,6 +72,29 @@
     font-weight: bold;
 }
 
+.or:before {
+  content: "";
+  position: absolute;
+  border-bottom: 2px solid #efefef;
+  margin-top: 10px;
+  margin-left: 50px;
+  width: 100px;
+}
+.or:after {
+  content: "";
+  position: absolute;
+  border-bottom: 2px solid #efefef;
+  margin-top: 10px;
+  margin-left: 50px;
+  width: 100px;
+}
+.or {
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-weight: 900;
+    font-size: 18px;
+}
+
 .checkout .address-manual-cont {    
     margin-top: 15px;
 }

@@ -51,10 +51,6 @@ class FOSUBUserProvider extends BaseClass
         $user = $this->userManager->findUserBy(array($search => $username));
         //when the user is registrating
         if (null === $user) {
-            throw new AccountNotLinkedException(sprintf(
-                "Sorry, but we're unable to find a linked account. Try logging in with your email or mobile number."
-            ));
-            /*
             $service = $response->getResourceOwner()->getName();
             $setter = 'set'.ucfirst($service);
             $setter_id = $setter.'Id';
@@ -71,7 +67,6 @@ class FOSUBUserProvider extends BaseClass
 
             $this->userManager->updateUser($user);
             return $user;
-            */
         }
 
         //if user exists - go with the HWIOAuth way
