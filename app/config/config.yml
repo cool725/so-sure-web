@@ -132,6 +132,7 @@ fos_user:
 hwi_oauth:
     connect:
         account_connector: app.user
+        confirmation: false
     firewall_names: [main]
     fosub:
         username_iterations: 30

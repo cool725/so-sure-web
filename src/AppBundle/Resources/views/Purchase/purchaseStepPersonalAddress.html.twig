@@ -34,6 +34,15 @@
                 <div class="checkout--step">
 
                     <h3>Personal Details</h3>
+                    <div class="text-center">
+                        <a href="#" onclick="fb_login();" class="btn btn-facebook" {% if app.user %}disabled{% endif %}>
+                            <i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook
+                        </a>
+                    </div>
+
+                    <div class="text-break text-grey">
+                        <div class="line"></div>OR<div class="line"></div>
+                    </div>   
 
                     {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
                     
