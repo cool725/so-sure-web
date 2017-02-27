@@ -8,11 +8,11 @@
 .purchase-nav ol {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0;
+    margin: 10px 0 25px;
 }
 
 .purchase-nav li {
-    min-width: 25%;
+    min-width: 33.3333333333%;
     font-size: 13px;
     display: block;
     float: left;    

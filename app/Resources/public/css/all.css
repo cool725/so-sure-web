@@ -411,9 +411,9 @@ h4, h5, h6,
 .login #password, #fos_user_resetting_form_new_second {
     margin-top: 0px;
 }
-.login .btn-facebook {
+/*.login .btn-facebook {
     margin-top: 60px;
-}
+}*/
 .btn-facebook  {
     color: #fff !important;
     background-color: #4267B2 !important;
