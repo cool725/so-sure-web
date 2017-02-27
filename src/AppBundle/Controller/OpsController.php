@@ -95,7 +95,7 @@ class OpsController extends BaseController
      */
     public function trackAction($event)
     {
-        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, ['type' => $event]);
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, ['Test Name' => $event]);
 
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Queued', 200);
     }
