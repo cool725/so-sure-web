@@ -42,11 +42,12 @@
         {{ form_start(buy_form) }}
 
         <h1 class="h2">
-            Instant cover for your {{ phone }}   
+            Instant cover for your {{ phone.make }} {{ phone.model }}               
             <div class="dropdown memory-dropdown-list">         
-                <a href="#" class="dropdown-toggle text-black" type="button" id="memoryDropdownList"data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    <small class="text-blue">Change</small>
+                <a href="#" class="dropdown-toggle" type="button" id="memoryDropdownList"data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    {{ phone.memory }}GB <i class="fa fa-caret-down text-grey" aria-hidden="true"></i>
                 </a>
+
                 <ul class="dropdown-menu" aria-labelledby="memoryDropdownList">
                     {% if phones | length > 1 %}    
                         {% for phone_mem in phones if phone_mem.id != phone.id %}
