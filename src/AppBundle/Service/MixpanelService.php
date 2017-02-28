@@ -5,6 +5,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 use Mixpanel;
 use UAParser\Parser;
 
