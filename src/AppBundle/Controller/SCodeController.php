@@ -49,7 +49,7 @@ class SCodeController extends BaseController
 
         if ($scode && !$isUK) {
             $this->addFlash('error', sprintf(
-                '<i class="fa fa-warning"></i> Sorry, we currently only offer policies to UK residents.'
+                '<i class="fa fa-warning"></i> Sorry, we currently only offer policies to UK residents. If you are a UK resident, you may continue below.'
             ));
         }
 
