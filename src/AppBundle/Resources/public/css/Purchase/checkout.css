@@ -200,6 +200,13 @@ content: "\f046";
     width: 100%;
 }
 
+/* intl-tel-input */
+.intl-tel-input { display: block; }
+.iti-flag {background-image: url("/components/intl-tel-input/flags.png");}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx){
+    .iti-flag{background-image:url("/components/intl-tel-input/flags@2x.png")}
+}
+
 /* Responsive */
 
 @media (min-width: 563px) {

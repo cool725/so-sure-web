@@ -1,4 +1,21 @@
 $(function(){
+    $("#purchase_form_mobileNumber").intlTelInput({
+        preferredCountries: ['gb'],
+        //onlyCountries: ['gb'],
+        initialCountry: 'gb',
+        allowDropdown: false
+    });
+    $("#purchase_form_mobileNumber").on("countrychange", function(e, countryData) {
+        setTimeout(function() {
+            var country = $("#purchase_form_mobileNumber").intlTelInput("getSelectedCountryData");
+            if (country.length == 0 || country.iso2 != 'gb') {
+                $(".mobile-err").html("<ul><li>Sorry, we currently only support UK Residents</li></ul>"); 
+            } else {
+                $(".mobile-err").html(""); 
+            }            
+        }, 1500);
+    });
+
     var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
     var key = $('#ss-root').data('pca-key');
 
