@@ -337,3 +337,53 @@ a#open-intercom.btn.btn-primary {
 #share-quote {
     margin-top: -20px;
 }
+
+.memory-dropdown-list {
+    display: inline-block !important;
+    margin: 0; padding: 0;
+    position: relative;
+}
+
+.memory-dropdown-list a:hover {
+    text-decoration: none;
+}
+
+.memory-dropdown-list li {
+    list-style: none;
+}
+
+.memory-dropdown-list ul {
+    display: none;
+    position: absolute;
+    top: 100%; 
+    z-index: 888;
+    margin: 0; padding: 0;
+    text-align: left;
+
+    background-color: #fff;
+    border: 1px solid #EFEFEF;  
+    border-radius: 2px;  
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+.memory-dropdown-list ul li {
+    /*font-size: 22px;*/
+}
+
+.memory-dropdown-list ul li:not(:last-of-type) {
+    border-bottom: 2px solid #EFEFEF;
+}
+
+.memory-dropdown-list ul li a {
+    display: block;
+    font-size: 22px;
+    padding: 10px 15px;    
+}
+
+.memory-dropdown-list ul li a:hover {
+    background-color: #efefef;
+}
+
+.memory-dropdown-list li:hover ul {
+    display: block;
+}

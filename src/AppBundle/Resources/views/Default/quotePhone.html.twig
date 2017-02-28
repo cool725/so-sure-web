@@ -41,8 +41,25 @@
     <section id="quote" class="quote-container">
         {{ form_start(buy_form) }}
 
-        <h1 class="h2">Instant cover for your <span class="">{{ phone }}</span>
-            <small><a href="#" data-toggle="modal" data-target="#quote-model"><strong>Change</strong></a></small>
+        <h1 class="h2">
+            Instant cover for your {{ phone.make }} {{ phone.model }}
+            {% if phones | length > 1 %}
+                <ul class="memory-dropdown-list">
+                    <li>
+                        <a href="#">{{ phone.memory }}GB <i class="text-grey fa fa-caret-down" aria-hidden="true"></i></a>   
+                        <ul>                 
+                            {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                <li>
+                                    <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="">{{ phone_mem.memory }}GB</a>
+                                </li>
+                            {% endfor %}          
+                        </ul>
+                    </li>
+                </ul>                        
+            {% endif %}             
+{#             <small>
+                <a href="#" data-toggle="modal" data-target="#quote-model"><strong>Change</strong></a>
+            </small> #}
         </h1>
 
         <div class="quote">
