@@ -70,6 +70,10 @@ strong {
     color: #626B78;
 }
 
+.text-black {
+    color: #202532;
+}
+
 .text-green {
     color: #80ce4d !important;
 }
@@ -273,7 +277,7 @@ h4, h5, h6,
         background-color: transparent !important;
     }
 }
-.open>.dropdown-toggle.btn-default {
+/*.open>.dropdown-toggle.btn-default {
     background-color: transparent;
     border: none;
 }
@@ -292,7 +296,7 @@ h4, h5, h6,
     color: #202532;
     white-space: nowrap;
     margin: 0 5px 5px 5px;
-}
+}*/
 
 /* TEXT LINE BREAK */
 
