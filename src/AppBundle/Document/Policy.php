@@ -11,6 +11,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Connection\BaseConnection;
 use AppBundle\Document\Connection\RewardConnection;
+use AppBundle\Document\Connection\Connection;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -534,6 +535,30 @@ abstract class Policy
     public function getConnections()
     {
         return $this->connections;
+    }
+
+    public function getStandardConnections()
+    {
+        $connections = [];
+        foreach ($this->getConnections() as $connection) {
+            if ($connection instanceof Connection) {
+                $connections[] = $connection;
+            }
+        }
+
+        return $connections;
+    }
+
+    public function getRewardConnections()
+    {
+        $connections = [];
+        foreach ($this->getConnections() as $connection) {
+            if ($connection instanceof RewardConnection) {
+                $connections[] = $connection;
+            }
+        }
+
+        return $connections;
     }
 
     public function getLastConnection()

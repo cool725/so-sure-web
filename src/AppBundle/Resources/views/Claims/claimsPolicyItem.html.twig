@@ -217,11 +217,20 @@
                         <td>{{ policy.invitations|length }}</td>
                     </tr>
                     <tr>
-                        <td>Connections</td>
+                        <td>Standard Connections</td>
                         <td>
-                          <strong>{{ policy.connections|length }}</strong>&nbsp;:&nbsp;
-                          {% for connection in policy.connections %}
+                          <strong>{{ policy.standardConnections|length }}</strong>&nbsp;:&nbsp;
+                          {% for connection in policy.standardConnections %}
                             <a href="{{ path(policy_route, {'id': connection.linkedPolicy.id }) }}">{{ connection.linkedUser.name }}</a>;
+                          {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Reward Connections</td>
+                        <td>
+                          <strong>{{ policy.rewardConnections|length }}</strong>&nbsp;:&nbsp;
+                          {% for connection in policy.rewardConnections %}
+                            {{ connection.linkedUser.name }};
                           {% endfor %}
                         </td>
                     </tr>
