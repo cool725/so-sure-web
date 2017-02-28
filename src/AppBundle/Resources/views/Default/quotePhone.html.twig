@@ -42,24 +42,22 @@
         {{ form_start(buy_form) }}
 
         <h1 class="h2">
-            Instant cover for your {{ phone.make }} {{ phone.model }}            
-            <ul class="memory-dropdown-list">
-                <li>
-                    <a href="#">{{ phone.memory }}GB <small class="text-blue">Edit</small></a>   
-                    <ul>             
-                        {% if phones | length > 1 %}    
-                            {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="">{{ phone_mem.memory }}GB</a>
-                                </li>
-                            {% endfor %}
-                        {% endif %}  
-                        <li>
-                            <a href="#" data-toggle="modal" data-target="#quote-model"><strong>Change make</strong></a>
-                        </li>          
-                    </ul>
-                </li>
-            </ul>                                   
+            Instant cover for your {{ phone }}   
+            <div class="dropdown memory-dropdown-list">         
+                <a href="#" class="dropdown-toggle text-black" type="button" id="memoryDropdownList"data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <small class="text-blue">Change</small>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="memoryDropdownList">
+                    {% if phones | length > 1 %}    
+                        {% for phone_mem in phones if phone_mem.id != phone.id %}
+                            <li>
+                                <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="">{{ phone_mem.memory }}GB</a>
+                            </li>
+                        {% endfor %}                            
+                    {% endif %}                          
+                    <li><a href="#" data-toggle="modal" data-target="#quote-model">Select Make &amp; Model</a></li>
+                </ul>                          
+            </div>
         </h1>
 
         <div class="quote">
