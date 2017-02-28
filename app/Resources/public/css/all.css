@@ -62,6 +62,10 @@ strong {
     color: #8B97B5 !important;
 }
 
+.text-light-grey {
+    color: #efefef;
+}
+
 .text-dark-grey {
     color: #626B78;
 }
