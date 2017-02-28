@@ -38,4 +38,12 @@ class MixpanelListener
             'Payment Option' => $policy->getPremiumPlan(),
         ]);
     }
+
+    public function onPolicyCancelledEvent(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_CANCEL_POLICY, [
+            'Cancellation Reason' => $policy->getCancelledReason(),
+        ]);
+    }
 }

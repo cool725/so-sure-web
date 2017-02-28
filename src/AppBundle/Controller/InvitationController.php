@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Service\MixpanelService;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -68,6 +69,16 @@ class InvitationController extends BaseController
                 return $this->redirectToRoute('invitation', ['id' => $id]);
             }
         }
+
+        if ($invitation && $request->getMethod() === "GET") {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_INVITATION_PAGE, [
+                'Invitation Method' => $invitation->getChannel(),
+            ]);
+            $this->get('app.mixpanel')->queuePersonProperties([
+                'Attribution Invitation Method' => $invitation->getChannel(),
+            ], true);
+        }
+        
         return array(
             'invitation' => $invitation,
             'form' => $declineForm->createView(),

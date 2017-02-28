@@ -131,4 +131,33 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(MixpanelService::QUEUE_TRACK, $data['action']);
         $this->assertEquals(MixpanelService::EVENT_PAYMENT, $data['event']);
     }
+
+    public function testMixpanelQueueCancelled()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testMixpanelQueueCancelled', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+
+        static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+
+        $listener = new MixpanelListener(static::$mixpanelService);
+        static::$mixpanelService->setEnvironment('prod');
+        $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
+        static::$mixpanelService->setEnvironment('test');
+
+        // Expect a user update + a policy cancel event
+        $this->assertEquals(2, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_PERSON_PROPERTIES, $data['action']);
+
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_TRACK, $data['action']);
+        $this->assertEquals(MixpanelService::EVENT_CANCEL_POLICY, $data['event']);
+    }
 }
