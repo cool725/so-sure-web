@@ -162,7 +162,7 @@ abstract class Policy
     protected $policyTerms;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\BaseConnection", cascade={"persist"})
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\BaseConnection", cascade={"persist"})
      */
     protected $connections = array();
 
