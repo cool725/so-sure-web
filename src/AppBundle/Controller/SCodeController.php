@@ -25,6 +25,11 @@ class SCodeController extends BaseController
      */
     public function scodeAction(Request $request, $code)
     {
+        $geoip = $this->get('app.geoip');
+        //$ip = "82.132.221.1";
+        $ip = $request->getClientIp();
+        $isUK = $geoip->findCountry($ip) == "GB";
+
         $scode = null;
         try {
             $dm = $this->getManager();
@@ -40,6 +45,12 @@ class SCodeController extends BaseController
             }
         } catch (\Exception $e) {
             $scode = null;
+        }
+
+        if ($scode && !$isUK) {
+            $this->addFlash('error', sprintf(
+                '<i class="fa fa-warning"></i> Sorry, we currently only offer policies to UK residents.'
+            ));
         }
 
         $session = $this->get('session');
