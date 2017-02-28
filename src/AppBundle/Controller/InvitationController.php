@@ -85,9 +85,11 @@ class InvitationController extends BaseController
         }
 
         if ($invitation && !$isUK) {
+            // @codingStandardsIgnoreStart
             $this->addFlash('error', sprintf(
                 '<i class="fa fa-warning"></i> Sorry, we currently only offer policies to UK residents. If you are a UK resident, you may continue below.'
             ));
+            // @codingStandardsIgnoreEnd
         }
 
         return array(
