@@ -10,6 +10,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SCode;
+use AppBundle\Service\MixpanelService;
 use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,7 +23,7 @@ class SCodeController extends BaseController
      * @Route("/scode/{code}", name="scode")
      * @Template
      */
-    public function scodeAction($code)
+    public function scodeAction(Request $request, $code)
     {
         $scode = null;
         try {
@@ -43,6 +44,15 @@ class SCodeController extends BaseController
 
         $session = $this->get('session');
         $session->set('scode', $code);
+
+        if ($scode && $request->getMethod() === "GET") {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_INVITATION_PAGE, [
+                'Invitation Method' => 'scode',
+            ]);
+            $this->get('app.mixpanel')->queuePersonProperties([
+                'Attribution Invitation Method' => 'scode',
+            ], true);
+        }
 
         if ($scode && $this->getUser()) {
             // Let the user just invite the person directly

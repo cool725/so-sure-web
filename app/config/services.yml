@@ -586,6 +586,7 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener

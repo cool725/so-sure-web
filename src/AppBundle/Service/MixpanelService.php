@@ -30,6 +30,8 @@ class MixpanelService
     const EVENT_LOGIN = 'Login';
     const EVENT_APP_DOWNLOAD = 'App Download';
     const EVENT_TEST = 'Tracking Test Event';
+    const EVENT_INVITATION_PAGE = 'Invitation Page';
+    const EVENT_CANCEL_POLICY = 'Cancel Policy';
 
     /** @var DocumentManager */
     protected $dm;
@@ -338,8 +340,12 @@ class MixpanelService
             }
             $userData['Number of Connections'] = count($policy->getConnections());
             $userData['Reward Pot Value'] = $policy->getPotValue();
+            $userData['Policy Status'] = $policy->getStatus();
             if ($connection = $policy->getLastConnection()) {
                 $userData['Last connection complete'] = $connection->getDate()->format(\DateTime::ATOM);
+            }
+            if ($policy->getStatus() == Policy::STATUS_CANCELLED) {
+                $userData['Cancellation Reason'] = $policy->getCancelledReason();
             }
         }
 
