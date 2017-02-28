@@ -325,9 +325,9 @@ a#open-intercom.btn.btn-primary {
 .explainer-video-view-thumb img {
     box-shadow: none;
     transition: 200ms;
-  transition-timing-function: ease-in-out;
-  -webkit-transition: 200ms;
-  -webkit-transition-timing-function: ease-in-out;
+    transition-timing-function: ease-in-out;
+    -webkit-transition: 200ms;
+    -webkit-transition-timing-function: ease-in-out;
 }
 
 .explainer-video-view-thumb:hover img {
@@ -344,7 +344,12 @@ a#open-intercom.btn.btn-primary {
     position: relative;
 }
 
-.memory-dropdown-list a:hover {
+.memory-dropdown-list a {
+    color: #202532; 
+}
+
+.memory-dropdown-list a:hover,
+.memory-dropdown-list a:focus {
     text-decoration: none;
 }
 
@@ -366,17 +371,15 @@ a#open-intercom.btn.btn-primary {
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
-.memory-dropdown-list ul li {
-    /*font-size: 22px;*/
-}
-
 .memory-dropdown-list ul li:not(:last-of-type) {
     border-bottom: 2px solid #EFEFEF;
 }
 
 .memory-dropdown-list ul li a {
     display: block;
-    font-size: 22px;
+    white-space: nowrap;
+    font-size: 16px;
+    font-weight: normal;
     padding: 10px 15px;    
 }
 
