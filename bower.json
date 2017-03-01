@@ -28,7 +28,8 @@
     "bootstrap-daterangepicker": "https://github.com/dangrossman/bootstrap-daterangepicker.git#2.1.24",
     "rangeslider.js": "^2.3.0",
     "cookieconsent": "^3.0.4",
-    "vimeo-player-js": "^2.0.1"
+    "vimeo-player-js": "^2.0.1",
+    "intl-tel-input": "^11.0.4"
   },
   "install": {
     "path": "web/components",
@@ -84,6 +85,13 @@
       ],
       "vimeo-player-js": [
         "bower_components/vimeo-player-js/dist/player.min.js"
+      ],
+      "intl-tel-input": [
+        "bower_components/intl-tel-input/build/js/intlTelInput.min.js",
+        "bower_components/intl-tel-input/build/js/utils.js",
+        "bower_components/intl-tel-input/build/css/intlTelInput.css",
+        "bower_components/intl-tel-input/build/img/flags.png",
+        "bower_components/intl-tel-input/build/img/flags@2x.png"
       ]
     }
   }

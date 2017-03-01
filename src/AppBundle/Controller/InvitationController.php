@@ -24,6 +24,11 @@ class InvitationController extends BaseController
      */
     public function invitationAction(Request $request, $id)
     {
+        $geoip = $this->get('app.geoip');
+        //$ip = "82.132.221.1";
+        $ip = $request->getClientIp();
+        $isUK = $geoip->findCountry($ip) == "GB";
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(Invitation::class);
         $invitation = $repo->find($id);
@@ -78,7 +83,15 @@ class InvitationController extends BaseController
                 'Attribution Invitation Method' => $invitation->getChannel(),
             ], true);
         }
-        
+
+        if ($invitation && !$isUK) {
+            // @codingStandardsIgnoreStart
+            $this->addFlash('error', sprintf(
+                '<i class="fa fa-warning"></i> Sorry, we currently only offer policies to UK residents. If you are a UK resident, you may continue below.'
+            ));
+            // @codingStandardsIgnoreEnd
+        }
+
         return array(
             'invitation' => $invitation,
             'form' => $declineForm->createView(),
