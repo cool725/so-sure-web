@@ -9,5 +9,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class UkMobile extends Constraint
 {
-    public $message = '"%string%" does not appear to be a valid UK Mobile Number';
+    public $message = 'Sorry, we only support UK Residents, please enter a valid UK Mobile Number.';
 }
