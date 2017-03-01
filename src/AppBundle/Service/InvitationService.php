@@ -431,6 +431,7 @@ class InvitationService
      */
     protected function sendEmail(Invitation $invitation, $type)
     {
+        $from = null;
         $to = null;
         $subject = null;
         $htmlTemplate = sprintf('AppBundle:Email:invitation/%s.html.twig', $type);
@@ -450,6 +451,7 @@ class InvitationService
             if (!$invitation instanceof EmailInvitation) {
                 return;
             }
+            $from = ['noreply@wearesosure.com' => $invitation->getInviter()->getName()];
             $to = $invitation->getEmail();
             $subject = sprintf('%s has invited you to so-sure', $invitation->getInviterName());
         } elseif ($type == self::TYPE_EMAIL_INVITE_USER) {
@@ -494,7 +496,11 @@ class InvitationService
                 $htmlTemplate,
                 ['invitation' => $invitation],
                 $textTemplate,
-                ['invitation' => $invitation]
+                ['invitation' => $invitation],
+                null,
+                null,
+                null,
+                $from
             );
             $invitation->setStatus(EmailInvitation::STATUS_SENT);
         } catch (\Exception $e) {
