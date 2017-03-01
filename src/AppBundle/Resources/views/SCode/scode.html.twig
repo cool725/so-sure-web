@@ -8,8 +8,9 @@
     {% stylesheets
     '@AppBundle/Resources/public/css/Default/index.css'
     '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'    
-    '@AppBundle/Resources/public/css/Default/videoOverlay.css'    
+    '@AppBundle/Resources/public/css/Default/scrollindicator.css'
+    '@AppBundle/Resources/public/css/Default/modal.css'        
+    '@AppBundle/Resources/public/css/Default/videoOverlay.css'     
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -17,7 +18,8 @@
     {{ parent() }}
     {% javascripts
     'components/vimeo-player-js/player.min.js'        
-    '@AppBundle/Resources/public/js/Default/modalVideo.js'  
+    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
@@ -25,49 +27,50 @@
 
 {% block body %}
 
-    <section class="popular-devices">
+    <section id="scode">
         <div class="container">
-            <div id="navchange"></div>
-            <div class="row" id="welcome">
+            <div class="row">
                 <div class="col-md-12">
                     <h1 class="text-center">
-                        {% if scode is defined and scode and scode.policy %}
+                       {% if scode is defined and scode and scode.policy %}
                             Insure your phone with {{scode.policy.user.name}}.
                         {% else %}
                             Insure your phone.
-                        {% endif %}
+                        {% endif %}   
                         <br>
-                        Get up to 80% of your money back.
+                        <span class="h2">Get up to 80% of your money back.</span>                   
                     </h1>
-                </div>
-                <p class="lead text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
+                    <p class="lead text-center" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
+                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                </div> 
             </div>
         </div>
-
-        {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
-
     </section>
 
-    {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}
+    {% include 'AppBundle::Default/press.html.twig' %}
 
-    <section class="download-now" id="download-now">
+    {% include 'AppBundle::Default/benefits.html.twig' %}
+
+    {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}   
+
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
+
+
+    <section class="press">
         <div class="container">
-            <h2>The next bit is via the app</h2>
-            <p class="lead text-center" id="hero-description">It makes sense, we are a mobile insurance provider after all!</p>
-            <div class="row download-app">
-                <div class="col-md-6 text-right">
-                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download it on the App Store"></img>
-                    </a>
-                </div>
-                <div class="col-md-6 text-left">
-                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('quotepage') }}">
-                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get it on Google Play"></img>
-                    </a>
-                </div>
+            <div class="col-sm-3 col-md-2 col-md-offset-3">
+                <h4 class="footer-press--heading">
+                    <strong><small>IN PARTNERSHIP WITH</small></strong>
+                </h4>
             </div>
+            <div class="col-sm-3 col-md-2">
+                <img src="{{ cdn_url }}/images/munichre-logo.png" alt="Munich RE">
+            </div>    
+            <div class="col-sm-3 col-md-2">
+                <img src="{{ cdn_url }}/images/salva-logo.png" alt="Salva">
+            </div>                        
         </div>
-    </section>
+    </section>   
 
     {# Page Modals #}
 
