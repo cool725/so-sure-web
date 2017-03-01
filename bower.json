@@ -91,7 +91,7 @@
         "bower_components/intl-tel-input/build/js/utils.js",
         "bower_components/intl-tel-input/build/css/intlTelInput.css",
         "bower_components/intl-tel-input/build/img/flags.png",
-        "bower_components/intl-tel-input/build/img/flags2x.png"
+        "bower_components/intl-tel-input/build/img/flags@2x.png"
       ]
     }
   }
