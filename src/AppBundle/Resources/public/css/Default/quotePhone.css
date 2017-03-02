@@ -325,9 +325,9 @@ a#open-intercom.btn.btn-primary {
 .explainer-video-view-thumb img {
     box-shadow: none;
     transition: 200ms;
-  transition-timing-function: ease-in-out;
-  -webkit-transition: 200ms;
-  -webkit-transition-timing-function: ease-in-out;
+    transition-timing-function: ease-in-out;
+    -webkit-transition: 200ms;
+    -webkit-transition-timing-function: ease-in-out;
 }
 
 .explainer-video-view-thumb:hover img {
@@ -346,3 +346,15 @@ section.phone-details {
     text-align: center;
 }
 
+.memory-dropdown-list {
+    display: inline;
+}
+
+.memory-dropdown-list a:hover,
+.memory-dropdown-list a:focus {
+    text-decoration: none;
+}
+
+.memory-dropdown {
+    min-width: 200px !important;
+}
