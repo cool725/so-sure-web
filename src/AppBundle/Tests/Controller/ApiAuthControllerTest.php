@@ -657,7 +657,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
-            'name' => "Kelvin’s iPhone5",
+            'name' => "Kelvin’|s iPhone5",
         ]]);
 
         $data = $this->verifyResponse(200);
@@ -666,7 +666,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
-        $this->assertEquals("Kelvins iPhone5", $data['phone_policy']['name']);
+        $this->assertEquals("Kelvin’s iPhone5", $data['phone_policy']['name']);
 
         // Now make sure that the policy shows up against the user
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());

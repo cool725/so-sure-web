@@ -53,7 +53,8 @@ class MailerService
         $textData = null,
         $attachmentFiles = null,
         $bcc = null,
-        $emailType = null
+        $emailType = null,
+        $from = null
     ) {
         $this->addUnsubsribeHash($to, $htmlData, $emailType);
 
@@ -66,7 +67,8 @@ class MailerService
                 $this->templating->render($htmlTemplate, $htmlData),
                 $this->templating->render($textTemplate, $textData),
                 $attachmentFiles,
-                $bcc
+                $bcc,
+                $from
             );
         } else {
             return $this->send(
@@ -75,7 +77,8 @@ class MailerService
                 $this->templating->render($htmlTemplate, $htmlData),
                 null,
                 $attachmentFiles,
-                $bcc
+                $bcc,
+                $from
             );
         }
     }
@@ -111,11 +114,14 @@ class MailerService
         }
     }
 
-    public function send($subject, $to, $htmlBody, $textBody = null, $attachmentFiles = null, $bcc = null)
+    public function send($subject, $to, $htmlBody, $textBody = null, $attachmentFiles = null, $bcc = null, $from = null)
     {
+        if (!$from) {
+            $from = [$this->defaultSenderAddress => $this->defaultSenderName];
+        }
         $message = \Swift_Message::newInstance()
             ->setSubject($subject)
-            ->setFrom([$this->defaultSenderAddress => $this->defaultSenderName])
+            ->setFrom($from)
             ->setTo($to)
             ->setBody($htmlBody, 'text/html');
 
