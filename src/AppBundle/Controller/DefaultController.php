@@ -399,24 +399,22 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/samsung-s7-insured-with-vodafone", 
-     name="samsung_s7_insured_with_vodafone")
+     * @Route("/samsung-s7-insured-with-vodafone", name="samsung_s7_insured_with_vodafone")
      * @Template
      */
     public function samsungS7InsuredWithVodafone()
     {
         return array();
-    }    
+    }
 
     /**
-     * @Route("/iphone-7-insured-with-vodafone", 
-     name="iphone_7_insured_with_vodafone")
+     * @Route("/iphone-7-insured-with-vodafone", name="iphone_7_insured_with_vodafone")
      * @Template
      */
     public function iPhone7InsuredWithVodafone()
     {
         return array();
-    }    
+    }
 
 
     /**
