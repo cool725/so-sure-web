@@ -194,6 +194,20 @@ class Phone
      */
     protected $imageUrl;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="3000")
+     * @MongoDB\Field(type="string")
+     */
+    protected $description;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="1000")
+     * @MongoDB\Field(type="string")
+     */
+    protected $funFacts;
+
     public function __construct()
     {
     }
@@ -485,6 +499,26 @@ class Phone
         $this->imageUrl = $imageUrl;
     }
 
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function getFunFacts()
+    {
+        return $this->funFacts;
+    }
+
+    public function setFunFacts($funFacts)
+    {
+        $this->funFacts = $funFacts;
+    }
+
     public function getMonthAge()
     {
         if (!$this->getReleaseDate()) {
@@ -703,6 +737,17 @@ class Phone
             'gwp' => $this->getCurrentPhonePrice()->getGwp(),
             'active' => $this->getActive(),
             'prices' => $this->eachApiArray($this->getPhonePrices(), $date),
+        ];
+    }
+
+    public function toDetailsArray()
+    {
+        return [
+            'make' => $this->getMake(),
+            'model' => $this->getModel(),
+            'memory' => $this->getMemory(),
+            'description' => $this->getDescription(),
+            'funFacts' => $this->getFunFacts(),
         ];
     }
 

@@ -337,3 +337,12 @@ a#open-intercom.btn.btn-primary {
 #share-quote {
     margin-top: -20px;
 }
+
+/* Phone Details */
+
+section.phone-details {
+    background: #ddd !important;
+    padding: 20px 0;
+    text-align: center;
+}
+
