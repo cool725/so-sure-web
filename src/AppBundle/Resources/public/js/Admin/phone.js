@@ -54,6 +54,18 @@ $('#phoneModal').on('show.bs.modal', function (event) {
   }
 });
 
+$('#detailsModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var update = button.data('update');
+  var phone = button.data('phone');
+  var modal = $(this);
+  modal.find('#details-update-form').attr("action", update);
+  if (phone) {
+    modal.find('.modal-title').text('Edit ' + phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
+    modal.find('#details-description').val(phone.description);
+    modal.find('#details-fun-facts').val(phone.funFacts);
+  }
+});
 
 $('.phone-active').click(function() {
     if (confirm('Are you sure you want to make this phone active/inactive?')) {

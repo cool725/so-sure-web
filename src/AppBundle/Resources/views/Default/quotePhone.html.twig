@@ -336,6 +336,15 @@
 
     {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}  
 
+    {% if phone.description|length > 0 %}
+    <section class="press">
+        <div class="container">
+            <h3>About the {{ phone.make }} {{ phone.model }}</h3>
+            <p>{{ phone.description }}</p>
+        </div>
+    </section>
+    {% endif %}
+
     {# Page Modals #}
 
     {% include 'AppBundle::Default/modalVideo.html.twig' %}    

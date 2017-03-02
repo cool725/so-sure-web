@@ -190,6 +190,33 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/phone/{id}/details", name="admin_phone_details")
+     * @Method({"POST"})
+     */
+    public function phoneDetailsAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        if ($phone) {
+            $phone->setDescription($request->get('description'));
+            $phone->setFunFacts($request->get('fun-facts'));
+
+            $dm->flush();
+            $this->addFlash(
+                'notice',
+                'Your changes were saved!'
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
      * @Route("/phone/{id}/active", name="admin_phone_active")
      * @Method({"POST"})
      */
