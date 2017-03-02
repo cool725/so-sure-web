@@ -58,6 +58,7 @@ use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
 use AppBundle\Exception\RedirectException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -94,16 +95,53 @@ class AdminEmployeeController extends BaseController
         $expectedClaimFrequency = $this->getParameter('expected_claim_frequency');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
+        $makes = $repo->findActiveMakes();
         $phones = $repo->createQueryBuilder();
         $phones = $phones->field('make')->notEqual('ALL');
 
-        $form = $this->createForm(PhoneSearchType::class, null, ['method' => 'GET']);
-        $form->handleRequest($request);
-        $data = $form->get('os')->getData();
+        $searchForm = $this->get('form.factory')
+            ->createNamedBuilder('email_form', PhoneSearchType::class, null, ['method' => 'GET'])
+            ->getForm();
+        $newPhoneForm = $this->get('form.factory')
+            ->createNamedBuilder('new_phone_form')
+            ->add('os', ChoiceType::class, [
+                'required' => true,
+                'choices' => Phone::$osTypes,
+            ])
+            ->add('make', TextType::class)
+            ->add('model', TextType::class)
+            ->add('add', SubmitType::class)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('new_phone_form')) {
+                $newPhoneForm->handleRequest($request);
+                if ($newPhoneForm->isValid()) {
+                    $data = $newPhoneForm->getData();
+                    $phone = new Phone();
+                    $phone->setMake($data['make']);
+                    $phone->setModel($data['model']);
+                    $phone->setOs($data['os']);
+                    $phone->setActive(false);
+                    $dm->persist($phone);
+                    $dm->flush();
+                    $this->addFlash('success', sprintf(
+                        'Added phone. %s',
+                        $phone
+                    ));
+
+                    return new RedirectResponse($this->generateUrl('admin_phones'));
+                }
+            }
+        }
+
+        $searchForm->handleRequest($request);
+        $data = $searchForm->get('os')->getData();
+
         $phones = $phones->field('os')->in($data);
-        $data = filter_var($form->get('active')->getData(), FILTER_VALIDATE_BOOLEAN);
+        $data = filter_var($searchForm->get('active')->getData(), FILTER_VALIDATE_BOOLEAN);
         $phones = $phones->field('active')->equals($data);
-        $rules = $form->get('rules')->getData();
+        $rules = $searchForm->get('rules')->getData();
         if ($rules == 'missing') {
             $phones = $phones->field('suggestedReplacement')->exists(false);
             $phones = $phones->field('replacementPrice')->lte(0);
@@ -157,8 +195,10 @@ class AdminEmployeeController extends BaseController
 
         return [
             'phones' => $pager->getCurrentPageResults(),
-            'form' => $form->createView(),
-            'pager' => $pager
+            'form' => $searchForm->createView(),
+            'pager' => $pager,
+            'new_phone' => $newPhoneForm->createView(),
+            'makes' => $makes,
         ];
     }
 

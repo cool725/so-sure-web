@@ -47,7 +47,16 @@
 {% block body %}
 <div class="container">
     <div class="bg-info" style="border-radius: 10px; padding: 10px;">
-    <h4 class="text-center"><strong>Phones</strong></h4>
+    <div class="row">
+      <div class="col-sm-10 col-offset-sm-1">
+        <h4 class="text-center"><strong>Phones</strong></h4>
+      </div>
+      <div class="col-sm-1">
+        <button class="btn btn-success pull-right"  data-toggle="modal" data-target="#newPhoneModal">
+          <i class="fa fa-plus"></i> Add upcoming phone
+        </button>
+      </div>      
+    </div>
     <div class="row">
     {{ form_start(form) }}
         <div class="form-group col-sm-8">
@@ -104,6 +113,7 @@
                             <td><a href="{{ path('quote_phone', {'id': phone.id}) }}">{{ phone }}</a>
                             {% if phone.shouldBeRetired %}<span class="text-danger"><i class="glyphicon glyphicon-time" title="{{ phone.monthAge }} months old"></i></span>{% endif %}
                             </td>
+                            {% if phone.currentPhonePrice %}
                             <td>
                               £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
                               {% if phone.previousPhonePrices | length > 0 %}
@@ -124,6 +134,13 @@
                             {% if phoneProfit is null %}unknown{% else %}{{ phoneProfit|number_format(2, '.', ',') }}{% endif %}
                             </span>
                             </td>
+                            {% else %}
+                              <td>-</td>
+                              <td>-</td>
+                              <td>-</td>
+                              <td>-</td>
+                              <td>-</td>
+                            {% endif %}
                             <td width="202px">
                               {{ this.display_actions(phone) }}
                             </td>
@@ -370,6 +387,55 @@
             <button type="submit" class="btn btn-primary">Update</button>
           </div>
         </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="newPhoneModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+        {{ form_start(new_phone) }}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">New Phone Details</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="form-group col-sm-4">
+                    {{ form_label(new_phone.make, 'Make') }}
+                </div>
+                <div class="form-group col-sm-4">
+                    {{ form_errors(new_phone.make) }}
+                    {{ form_widget(new_phone.make) }}
+                </div>
+                <div class="form-group col-sm-4">
+                    {% for make in makes %}<span class="small">{{ make }}</span> {% endfor %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-4">
+                    {{ form_label(new_phone.model, 'Model') }}
+                </div>
+                <div class="form-group col-sm-4">
+                    {{ form_errors(new_phone.model) }}
+                    {{ form_widget(new_phone.model) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-4">
+                    {{ form_label(new_phone.os, 'OS') }}
+                </div>
+                <div class="form-group col-sm-4">
+                    {{ form_errors(new_phone.os) }}
+                    {{ form_widget(new_phone.os) }}
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            {{ form_widget(new_phone.add, {'attr':{'class': 'btn btn-success'}}) }}
+          </div>
+        {{ form_end(new_phone) }}
         </div>
       </div>
     </div>

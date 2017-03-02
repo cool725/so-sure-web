@@ -279,6 +279,11 @@ class Phone
         return $this->os;
     }
 
+    public function setOs($os)
+    {
+        $this->os = $os;
+    }
+
     public function getInitialOsVersion()
     {
         return $this->initialOsVersion;
@@ -734,7 +739,7 @@ class Phone
             'model' => $this->getModel(),
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
-            'gwp' => $this->getCurrentPhonePrice()->getGwp(),
+            'gwp' => $this->getCurrentPhonePrice() ? $this->getCurrentPhonePrice()->getGwp() : null,
             'active' => $this->getActive(),
             'prices' => $this->eachApiArray($this->getPhonePrices(), $date),
         ];
