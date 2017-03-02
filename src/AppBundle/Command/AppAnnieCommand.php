@@ -57,7 +57,7 @@ class AppAnnieCommand extends ContainerAwareCommand
         $ignoreZero = $input->getOption('ignore-zero');
         $debug = $input->getOption('debug');
 
-        $date = new \DateTime('-3 day');
+        $date = new \DateTime('-4 day');
         if ($dateOption) {
             $date = new \DateTime($dateOption);
         }
