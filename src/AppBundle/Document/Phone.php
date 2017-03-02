@@ -933,6 +933,10 @@ class Phone
 
     public function getMaxComparision()
     {
+        if (!$this->getCurrentPhonePrice()) {
+            return null;
+        }
+
         $maxComparision = $this->getCurrentPhonePrice()->getYearlyPremiumPrice();
         $comparision = $this->getComparisions();
         if (count($comparision) > 0) {

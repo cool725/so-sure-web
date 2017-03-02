@@ -41,6 +41,10 @@
     <section id="quote" class="quote-container">
         {{ form_start(buy_form) }}
 
+        {% if coming_soon %}
+        <h1 class="h2">Instant cover for your <span class="">{{ phone }} is coming soon!</span>
+        </h1>
+        {% else %}
         <h1 class="h2">
             Instant cover for your              
             <div class="dropdown memory-dropdown-list">         
@@ -60,12 +64,14 @@
                 </ul>                          
             </div>
         </h1>
+        {% endif %}
 
         <div class="quote">
             
             <div class="row">
                <div class="col-xs-12 col-sm-7 col-md-7">
-                    <div class="quote-card">                
+                    <div class="quote-card">
+                        <strong>All our policies come with the following as Standard!</strong>
                         <ul class="list-unstyled">                 
                             <li class="h4">
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> 
@@ -102,12 +108,22 @@
                     </div>
 
                     <div id="mobile-price" class="quote-cost text-center">
+                      {% if coming_soon %}
+                        <span class="h1">
+                            Pricing coming soon!
+                            <strong>£4.99 - £9.99</strong>
+                            <small>per month (typical policy pricing)</small><br>
+                        </span>
+                         <span>£50 Excess (£70 for Theft &amp; Loss)</span>
+                        {{ form_widget(buy_form.buy_tablet, {'label': 'COMING SOON!', 'attr': {'class': 'btn btn-success btn-rounded btn-block disabled'}}) }}
+                      {% else %}
                         <span class="h1">
                             <strong>£{{ phone_price.monthlyPremiumPrice }}</strong>
                             <small>per month</small><br>
                         </span>
                          <span>£50 Excess (£70 for Theft &amp; Loss)</span>
                         {{ form_widget(buy_form.buy_tablet, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                      {% endif %}
                         <small><a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="text-underline">Full Terms &amp; Conditions</a></small>                         
                     </div>
 
@@ -118,32 +134,37 @@
 
                         <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div>
 
-                        <h3>Cashback</h3>          
-                        <p>Connect with friends &amp; save money, see how it works:</p> 
+                        {% if coming_soon %}
+                            <h3>Sample Cashback</h3>
+                            <p><i>(based on annual premium of £100)</i></p>
+                        {% else %}
+                            <h3>Cashback</h3>          
+                        {% endif %}
+                        <p>Connect with friends &amp; save money, see how it works:</p>
                         
                         <div class="h4 text-blue"><strong>Friends connected</strong></div>
 
-                        {% set start_friends = phone_price.maxConnections %}
+                        {% set start_friends = max_connections %}
 
                         {% set start_value = start_friends * connection_value %}
 
-                        {% if start_value > phone_price.maxPot %}
+                        {% if start_value > max_pot %}
                         
-                            {% set start_value = phone_price.maxPot %}
+                            {% set start_value = max_pot %}
                         
                         {% endif %}
 
-                        {% set start_premium = phone_price.yearlyPremiumPrice - start_value %}     
+                        {% set start_premium = annual_premium - start_value %}     
                         
                         <div class="reward-slider">                            
                             <input type="range"
                                    id="reward-slider" 
                                    min="0"
-                                   max="{{ phone_price.maxConnections }}"
+                                   max="{{ max_connections }}"
                                    value="{{ start_friends }}"
-                                   data-maxpot="{{ phone_price.maxPot }}"
+                                   data-maxpot="{{ max_pot }}"
                                    data-connection-value="{{ connection_value }}"
-                                   data-premium="{{ phone_price.yearlyPremiumPrice }}"
+                                   data-premium="{{ annual_premium }}"
                                    data-max-comparison="{{ comparision_max }}">
                         </div>
 
@@ -386,7 +407,7 @@
                     <h3>So-Sure Policy Terms</h3>
                 </div>
                 <div class="modal-body modal-policy">
-                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  max_pot })) }}
                 </div>
             </div>
         </div>

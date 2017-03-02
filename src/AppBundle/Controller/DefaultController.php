@@ -453,7 +453,6 @@ class DefaultController extends BaseController
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/quote/{make}+{model}+insurance", name="quote_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
-     * @Template
      */
     public function quotePhoneAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
@@ -619,23 +618,29 @@ class DefaultController extends BaseController
             }
         }
 
-        $maxPot = $phone->getCurrentPhonePrice()->getMaxPot();
-        $maxConnections = $phone->getCurrentPhonePrice()->getMaxConnections();
+        // if no price, will be sample policy of £100 annually
+        $maxPot = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getMaxPot() : 80;
+        $maxConnections = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getMaxConnections() : 8;
+        $annualPremium = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getYearlyPremiumPrice() : 100;
+        $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
 
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_PAGE, [
-            'Device Selected' => $phone->__toString(),
-            'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-        ]);
-        $this->get('app.mixpanel')->queuePersonProperties([
-            'First Device Selected' => $phone->__toString(),
-            'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-        ], true);
+        if ($phone->getCurrentPhonePrice()) {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_PAGE, [
+                'Device Selected' => $phone->__toString(),
+                'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            ]);
+            $this->get('app.mixpanel')->queuePersonProperties([
+                'First Device Selected' => $phone->__toString(),
+                'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            ], true);
+        }
 
-        return array(
+        $data = array(
             'phone' => $phone,
             'phone_price' => $phone->getCurrentPhonePrice(),
             'policy_key' => $this->getParameter('policy_key'),
             'connection_value' => PhonePolicy::STANDARD_VALUE,
+            'annual_premium' => $annualPremium,
             'max_connections' => $maxConnections,
             'max_pot' => $maxPot,
             'form' => $form->createView(),
@@ -647,8 +652,15 @@ class DefaultController extends BaseController
                 ['memory' => 'asc']
             ),
             'comparision' => $phone->getComparisions(),
-            'comparision_max' => $phone->getMaxComparision(),
+            'comparision_max' => $maxComparision,
+            'coming_soon' => $phone->getCurrentPhonePrice() ? false : true,
         );
+
+        //if ($phone->getCurrentPhonePrice()) {
+            return $this->render('AppBundle:Default:quotePhone.html.twig', $data);
+        //} else {
+        //    return $this->render('AppBundle:Default:quotePhoneUpcoming.html.twig', $data);
+        //}
     }
 
     /**
