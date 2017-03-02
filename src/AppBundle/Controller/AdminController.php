@@ -201,11 +201,13 @@ class AdminController extends BaseController
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $phone = $repo->find($id);
-        if ($phone) {
-            $phone->setDescription($request->get('description'));
-            $phone->setFunFacts($request->get('fun-facts'));
-
+        $editPhone = $repo->find($id);
+        if ($editPhone) {
+            $phones = $repo->findBy(['make' => $editPhone->getMake(), 'model' => $editPhone->getModel()]);
+            foreach ($phones as $phone) {
+                $phone->setDescription($request->get('description'));
+                $phone->setFunFacts($request->get('fun-facts'));
+            }
             $dm->flush();
             $this->addFlash(
                 'notice',
