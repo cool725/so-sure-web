@@ -42,21 +42,21 @@
         {{ form_start(buy_form) }}
 
         <h1 class="h2">
-            Instant cover for your {{ phone.make }} {{ phone.model }}               
+            Instant cover for your              
             <div class="dropdown memory-dropdown-list">         
                 <a href="#" class="dropdown-toggle" type="button" id="memoryDropdownList"data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    {{ phone.memory }}GB <i class="fa fa-caret-down text-grey" aria-hidden="true"></i>
+                    {{ phone }} <i class="fa fa-caret-down text-grey" aria-hidden="true"></i>
                 </a>
 
-                <ul class="dropdown-menu" aria-labelledby="memoryDropdownList">
+                <ul class="dropdown-menu memory-dropdown dropdown-menu-right" aria-labelledby="memoryDropdownList">
                     {% if phones | length > 1 %}    
                         {% for phone_mem in phones if phone_mem.id != phone.id %}
                             <li>
-                                <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="">{{ phone_mem.memory }}GB</a>
+                                <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
                             </li>
                         {% endfor %}                            
                     {% endif %}                          
-                    <li><a href="#" data-toggle="modal" data-target="#quote-model">Select Make &amp; Model</a></li>
+                    <li><a href="#" data-toggle="modal" data-target="#quote-model"> I have a different phone</a></li>
                 </ul>                          
             </div>
         </h1>

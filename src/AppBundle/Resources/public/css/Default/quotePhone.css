@@ -346,3 +346,7 @@ a#open-intercom.btn.btn-primary {
 .memory-dropdown-list a:focus {
     text-decoration: none;
 }
+
+.memory-dropdown {
+    min-width: 200px !important;
+}
