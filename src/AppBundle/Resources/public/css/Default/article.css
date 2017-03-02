@@ -2,6 +2,10 @@
   background-color: #fff;
 }
 
+.hero h1 {
+    text-align: center !important;
+}
+
 .article-content p {
     line-height: 2;
     font-size: 18px;
