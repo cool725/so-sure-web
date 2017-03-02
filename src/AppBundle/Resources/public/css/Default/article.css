@@ -5,11 +5,21 @@
 .article-content p {
     line-height: 2;
     font-size: 18px;
-    margin: 0 0 30px;
+    margin: 0 0 20px;
+}
+
+.article-content ul {
+    margin: 0 0 20px;
+}
+
+.article-content li {
+    line-height: 2;
+    font-size: 18px;    
+    
 }
 
 .article-content img {
-    margin: 0 0 30px;
+    margin: 0 0 20px;
 }
 
 .article-content blockquote p {
@@ -17,7 +27,7 @@
 }
 
 .article-content .h2 {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 /* Page Specific Backgrounds */
