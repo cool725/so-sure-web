@@ -126,13 +126,13 @@ class PurchaseControllerTest extends BaseControllerTest
             'GET',
             self::$router->generate('quote_phone', ['id' => $phone->getId()])
         );
+        $crawler = self::$client->followRedirect();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhone', $this),
             'foo bar',
             new \DateTime('1980-01-01')
         );
-
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
@@ -152,6 +152,7 @@ class PurchaseControllerTest extends BaseControllerTest
             'GET',
             self::$router->generate('quote_phone', ['id' => $phone->getId()])
         );
+        $crawler = self::$client->followRedirect();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSpaceNineSixtyEight', $this),
@@ -178,6 +179,7 @@ class PurchaseControllerTest extends BaseControllerTest
             'GET',
             self::$router->generate('quote_phone', ['id' => $phone->getId()])
         );
+        $crawler = self::$client->followRedirect();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSpace', $this),
@@ -204,6 +206,7 @@ class PurchaseControllerTest extends BaseControllerTest
             'GET',
             self::$router->generate('quote_phone', ['id' => $phone->getId()])
         );
+        $crawler = self::$client->followRedirect();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiDash', $this),
@@ -230,6 +233,7 @@ class PurchaseControllerTest extends BaseControllerTest
             'GET',
             self::$router->generate('quote_phone', ['id' => $phone->getId()])
         );
+        $crawler = self::$client->followRedirect();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSlash', $this),
@@ -256,6 +260,7 @@ class PurchaseControllerTest extends BaseControllerTest
             'GET',
             self::$router->generate('quote_phone', ['id' => $phone->getId()])
         );
+        $crawler = self::$client->followRedirect();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiS7', $this),
@@ -289,6 +294,7 @@ class PurchaseControllerTest extends BaseControllerTest
             'GET',
             self::$router->generate('quote_phone', ['id' => $phone->getId()])
         );
+        $crawler = self::$client->followRedirect();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseReviewRequiresAccept', $this),
@@ -314,6 +320,7 @@ class PurchaseControllerTest extends BaseControllerTest
             'GET',
             self::$router->generate('quote_phone', ['id' => $phone->getId()])
         );
+        $crawler = self::$client->followRedirect();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseReviewWithoutAccept', $this),

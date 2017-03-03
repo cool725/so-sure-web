@@ -501,6 +501,14 @@ class DefaultController extends BaseController
             }
         }
         if (!$phone) {
+            $this->get('logger')->info(sprintf(
+                'Failed to find phone for id: %s make: %s model: %s mem: %s',
+                $id,
+                $make,
+                $model,
+                $memory
+            ));
+
             return new RedirectResponse($this->generateUrl('homepage'));
         }
 
