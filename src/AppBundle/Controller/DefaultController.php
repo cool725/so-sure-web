@@ -381,12 +381,18 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/samsung-s7-insured-with-vodafone", name="samsung_s7_insured_with_vodafone")
-     * @Route("/google-pixel-insured-with-vodafone", name="google_pixel_insured_with_vodafone")
-     * @Route("/iphone-SE-insured-with-vodafone", name="iphone_SE_insured_with_vodafone")
-     * @Route("/iphone-6-insured-with-vodafone", name="iphone_6_insured_with_vodafone")
-     * @Route("/iphone-6s-insured-with-vodafone", name="iphone_6s_insured_with_vodafone")
-     * @Route("/iphone-7-insured-with-vodafone", name="iphone_7_insured_with_vodafone")
+     * @Route("/samsung-s7-insured-with-vodafone", 
+     name="samsung_s7_insured_with_vodafone")
+     * @Route("/google-pixel-insured-with-vodafone", 
+     name="google_pixel_insured_with_vodafone")
+     * @Route("/iphone-SE-insured-with-vodafone", 
+     name="iphone_SE_insured_with_vodafone")
+     * @Route("/iphone-6-insured-with-vodafone", 
+     name="iphone_6_insured_with_vodafone")
+     * @Route("/iphone-6s-insured-with-vodafone", 
+     name="iphone_6s_insured_with_vodafone")
+     * @Route("/iphone-7-insured-with-vodafone", 
+     name="iphone_7_insured_with_vodafone")
      * @Route("/iphone-7-plus-insured-with-vodafone", name="iphone_7_plus_insured_with_vodafone")          
      * @Template
      */
