@@ -1,4 +1,3 @@
-
 .about-section {
 	padding: 30px 20px 60px 20px;
 }
@@ -22,4 +21,9 @@
 
 .about-section .go-back {
 	margin-top: 20px;
+}
+
+/*Modal*/
+.team-member-img-modal {
+	margin: 0 auto;
 }
