@@ -387,7 +387,7 @@ class DefaultController extends BaseController
      * @Route("/iphone-6-insured-with-vodafone", name="iphone_6_insured_with_vodafone")
      * @Route("/iphone-6s-insured-with-vodafone", name="iphone_6s_insured_with_vodafone")
      * @Route("/iphone-7-insured-with-vodafone", name="iphone_7_insured_with_vodafone")
-     * @Route("/iphone-7-plus-insured-with-vodafone", name="iphone_7_plus_insured_with_vodafone")  
+     * @Route("/iphone-7-plus-insured-with-vodafone", name="iphone_7_plus_insured_with_vodafone")
      * @Template
      */
     public function insuredWithVodafone(Request $request)
@@ -405,7 +405,7 @@ class DefaultController extends BaseController
             $phonePrice = "8.49";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
                 'make' => 'Google',
-                'model' => 'Pixel', 
+                'model' => 'Pixel',
                 'memory' => '32'
             ]);
         } elseif ($request->get('_route') == "iphone_SE_insured_with_vodafone") {
@@ -421,7 +421,7 @@ class DefaultController extends BaseController
             $phonePrice = "9.99";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
                 'make' => 'Apple',
-                'model' => 'iPhone+7+Plus', 
+                'model' => 'iPhone+7+Plus',
                 'memory' => '32'
             ]);
         } elseif ($request->get('_route') == "iphone_7_insured_with_vodafone") {
@@ -445,10 +445,10 @@ class DefaultController extends BaseController
             $phonePrice = "7.99";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
                 'make' => 'Apple',
-                'model' => 'iPhone+6', 
+                'model' => 'iPhone+6',
                 'memory' => '16'
             ]);
-        }        
+        }
         return array('phone_name' => $phoneName, 'phone_price' => $phonePrice, 'quote_route' => $quoteRoute);
     }
 
