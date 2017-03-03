@@ -338,6 +338,15 @@ a#open-intercom.btn.btn-primary {
     margin-top: -20px;
 }
 
+/* Phone Details */
+
+section.phone-details {
+    background: #ddd !important;
+    padding: 20px 0;
+}
+section.phone-details h3 {
+    text-align: center;
+}
 
 .memory-dropdown-list {
     display: inline;

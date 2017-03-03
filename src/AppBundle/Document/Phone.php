@@ -195,14 +195,12 @@ class Phone
     protected $imageUrl;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="3000")
      * @MongoDB\Field(type="string")
      */
     protected $description;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="1000")
      * @MongoDB\Field(type="string")
      */

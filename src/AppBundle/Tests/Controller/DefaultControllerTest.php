@@ -131,11 +131,13 @@ class DefaultControllerTest extends BaseControllerTest
     public function testQuotePhone()
     {
         $repo = self::$dm->getRepository(Phone::class);
-        $phone = $repo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+        $phone = $repo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
 
         $crawler = self::$client->request('GET', self::$router->generate('quote_phone', [
             'id' => $phone->getId()
         ]));
+        self::verifyResponse(301);
+        $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
         $this->assertContains(
             sprintf("£%.2f", $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
