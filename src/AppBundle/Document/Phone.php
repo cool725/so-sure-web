@@ -316,6 +316,19 @@ class Phone
         return $this->ram;
     }
 
+    public function getRamDisplay()
+    {
+        $ram = $this->getRam();
+        if ($ram < 1024) {
+            return sprintf('%d MB', $ram);
+        }
+        if ($ram % 1024 == 0) {
+            return sprintf('%d GB', $ram / 1024);
+        }
+
+        return sprintf('%0.1f GB', $ram / 1024);
+    }
+
     public function getScreenPhysical()
     {
         return $this->screenPhysical;

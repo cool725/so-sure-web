@@ -347,6 +347,18 @@ section.phone-details {
 section.phone-details h3 {
     text-align: center;
 }
+section.phone-details ul {
+    text-align: center;
+    list-style-type: circle;
+}
+section.phone-details ul li {
+    display:  inline;
+    margin-right: 20px;
+}
+section.phone-details ul li:before {
+  content: '\2022';
+  margin-right: 0.5em;
+}
 
 .memory-dropdown-list {
     display: inline;
