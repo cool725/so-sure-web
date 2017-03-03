@@ -343,6 +343,8 @@ a#open-intercom.btn.btn-primary {
 section.phone-details {
     background: #ddd !important;
     padding: 20px 0;
+}
+section.phone-details h3 {
     text-align: center;
 }
 
