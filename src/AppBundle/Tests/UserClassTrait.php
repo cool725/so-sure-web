@@ -97,7 +97,7 @@ trait UserClassTrait
     public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm)
     {
         $phoneRepo = $dm->getRepository(Phone::class);
-        $phones = $phoneRepo->findAll();
+        $phones = $phoneRepo->findBy(['active' => true]);
         $phone = null;
         while ($phone == null) {
             $phone = $phones[rand(0, count($phones) - 1)];
