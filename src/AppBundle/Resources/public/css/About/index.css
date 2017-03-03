@@ -23,7 +23,19 @@
 	margin-top: 20px;
 }
 
-/*Modal*/
+.about-section .thumbnail {
+	padding: 15px 15px 4px;
+}
+
+.about-section .thumbnail:hover {
+	background-color: #efefef;
+}
+
+.about-section .thumbnail:hover a {
+	text-decoration: none;
+}
+
+/* Modal */
 .team-member-img-modal {
 	margin: 0 auto;
 }
