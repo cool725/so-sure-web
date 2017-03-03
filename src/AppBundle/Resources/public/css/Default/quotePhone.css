@@ -359,4 +359,17 @@ section.phone-details h3 {
 
 .memory-dropdown {
     min-width: 200px !important;
+    left: auto; right: auto;
+}
+
+.memory-dropdown li a {
+    font-size: 18px;
+}
+
+
+@media (min-width: 500px) {
+  .memory-dropdown {
+      /*min-width: 200px !important;*/
+      right: 0 !important;
+  } 
 }

@@ -83,39 +83,9 @@ $(function(){
 
             $(this).nextUntil(h2).slideToggle();
             $(this).toggleClass('section-open');
-        })
+        });
 
 
     });
-
-    // Bootstrap dropdown hack
-    $(document).on('shown.bs.dropdown', function () {
-      OffsetDropdown()
-
-      $(window).on('resize.bs.dropdown', function () {
-        OffsetDropdown()
-      })
-    })
-
-    $(document).on('hide.bs.dropdown', function() {
-      $(window).off('resize.bs.dropdown')
-    })
-
-    var OffsetDropdown = function() {
-      var dropdown = $('.open>.dropdown-menu')
-
-      if (dropdown.length == 0)
-        return
-
-      var rightOffset = dropdown.offset().left + dropdown.width()
-      var browserWidth = $('body').innerWidth()
-      var neededLeftOffset = dropdown.position().left - (rightOffset - browserWidth)
-
-      if (neededLeftOffset < 0) {
-        dropdown.css({ left: neededLeftOffset - 3 })
-      } else {
-        dropdown.css({ left: 0 })
-      }
-    }    
 
 });
