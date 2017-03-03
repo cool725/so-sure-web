@@ -372,24 +372,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/jobs", name="jobs", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
-     * @Template
-     */
-    public function jobsAction()
-    {
-        return array();
-    }
-
-    /**
-     * @Route("/terms", name="terms", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
-     * @Template
-     */
-    public function termsAction()
-    {
-        return array();
-    }
-
-    /**
      * @Route("/think-your-iPhone-7-is-insured-by-your-bank", name="think_your_iPhone-7_is_insured_by_your_bank")
      * @Template
      */
@@ -448,10 +430,10 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/quote/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
-     * @Route("/quote/{make}+{model}+{memory}+insurance", name="quote_make_model_memory",
+     * @Route("/phone-insurance/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
+     * @Route("/phone-insurance/{make}+{model}+{memory}GB", name="quote_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
-     * @Route("/quote/{make}+{model}+insurance", name="quote_make_model",
+     * @Route("/phone-insurance/{make}+{model}", name="quote_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      * @Template
      */
@@ -464,6 +446,18 @@ class DefaultController extends BaseController
         $decodedModel = Phone::decodeModel($model);
         if ($id) {
             $phone = $repo->find($id);
+            if ($phone->getMemory()) {
+                return $this->redirectToRoute('quote_make_model_memory', [
+                    'make' => $phone->getMake(),
+                    'model' => $phone->getEncodedModel(),
+                    'memory' => $phone->getMemory(),
+                ], 301);
+            } else {
+                return $this->redirectToRoute('quote_make_model', [
+                    'make' => $phone->getMake(),
+                    'model' => $phone->getEncodedModel(),
+                ], 301);
+            }
         } elseif ($memory) {
             $phone = $repo->findOneBy([
                 'active' => true,
