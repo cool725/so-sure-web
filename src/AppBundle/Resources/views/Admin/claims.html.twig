@@ -53,6 +53,7 @@
                         <th>Claim Status</th>
                         <th>Policy Status</th>
                         <th>Notification Date</th>
+                        <th>Approval Date</th>
                         <th>Replacement</th>
                     </tr>
                     </thead>
@@ -67,9 +68,14 @@
                             <td>{{ claim.type }}</td>
                             <td>{{ claim.status }}</td>
                             <td>{{ claim.policy.status }}</td>
-                            <td>{{ claim.notificationDate|date('d-m-Y H:i', 'Europe/London') }}</td>
+                            <td>{{ claim.notificationDate|date('d-m-Y', 'Europe/London') }}</td>
+                            <td>{% if claim.approvedDate %}
+                                    {{ claim.approvedDate|date('d-m-Y', 'Europe/London') }}</td>
+                                {% else %}
+                                    -
+                                {% endif %}
                             <td>{% if claim.replacementReceivedDate %}
-                                    {{ claim.replacementReceivedDate|date('d-m-Y H:i', 'Europe/London') }}
+                                    {{ claim.replacementReceivedDate|date('d-m-Y', 'Europe/London') }}
                                 {% else %}
                                     -
                                 {% endif %}
@@ -175,6 +181,10 @@
                 <tr>
                     <td>Recorded</td>
                     <td id='claims-detail-recorded'></td>
+                </tr>
+                <tr>
+                    <td>Approved</td>
+                    <td id='claims-detail-approved'></td>
                 </tr>
                 <tr>
                     <td>Replacement Received</td>
