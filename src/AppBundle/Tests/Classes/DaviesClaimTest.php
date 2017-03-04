@@ -25,7 +25,66 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '320160401000001',
             'Mr John Smith',
             'AB12 3CD',
-            '42461',
+            '42794',
+            '42794',
+            '42794',
+            'Damage',
+            'Cracked Screen',
+            'Work',
+            'Closed',
+            'Settled',
+            '42794',
+            'Samsung',
+            'S6',
+            '351236666677777',
+            '42794',
+            '£250.49',
+            '£5.29',
+            '£1.30',
+            '£250',
+            '£0.75',
+            '£275',
+            '£50',
+            '£220',
+            '£1.08',
+            '07123 456789',
+            '42794',
+            '42794',
+            '42794',
+            '123 The Street, Town, City, Postcode'
+        ];
+        $davies = new DaviesClaim();
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $this->assertEquals(new \DateTime('2017-02-28'), $davies->endDate);
+        $this->assertEquals(new \DateTime('2017-02-28'), $davies->startDate);
+
+        $this->assertEquals(1.08, $davies->reciperoFee);
+        $this->assertEquals(220, $davies->reserved);
+        $this->assertEquals(50, $davies->excess);
+        $this->assertEquals(275, $davies->handlingFees);
+        $this->assertEquals(0.75, $davies->transactionFees);
+        $this->assertEquals(250, $davies->phoneReplacementCost);
+        $this->assertEquals(1.3, $davies->accessories);
+        $this->assertEquals(5.29, $davies->unauthorizedCalls);
+        $this->assertEquals(250.49, $davies->incurred);
+
+        $this->assertEquals('351236666677777', $davies->replacementImei);
+        $this->assertEquals('Samsung', $davies->replacementMake);
+        $this->assertEquals('S6', $davies->replacementModel);
+        $this->assertEquals('Samsung S6', $davies->getReplacementPhoneDetails());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testFromArrayV1Expired()
+    {
+        $data = [
+            'So-Sure -Mobile',
+            '320160401000001',
+            'Mr John Smith',
+            'AB12 3CD',
+            '42794',
             '42430',
             '42794',
             'Damage',
@@ -55,23 +114,6 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         ];
         $davies = new DaviesClaim();
         $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
-        $this->assertEquals(new \DateTime('2017-02-28'), $davies->endDate);
-        $this->assertEquals(new \DateTime('2016-03-01'), $davies->startDate);
-
-        $this->assertEquals(1.08, $davies->reciperoFee);
-        $this->assertEquals(220, $davies->reserved);
-        $this->assertEquals(50, $davies->excess);
-        $this->assertEquals(275, $davies->handlingFees);
-        $this->assertEquals(0.75, $davies->transactionFees);
-        $this->assertEquals(250, $davies->phoneReplacementCost);
-        $this->assertEquals(1.3, $davies->accessories);
-        $this->assertEquals(5.29, $davies->unauthorizedCalls);
-        $this->assertEquals(250.49, $davies->incurred);
-
-        $this->assertEquals('351236666677777', $davies->replacementImei);
-        $this->assertEquals('Samsung', $davies->replacementMake);
-        $this->assertEquals('S6', $davies->replacementModel);
-        $this->assertEquals('Samsung S6', $davies->getReplacementPhoneDetails());
     }
 
     public function testFromArrayV6()
