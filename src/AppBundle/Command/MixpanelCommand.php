@@ -21,7 +21,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|test|clear|show|sync|sync-all (or blank for process)'
+                'delete|test|clear|show|sync|sync-all|data (or blank for process)'
             )
             ->addOption(
                 'email',
@@ -62,6 +62,15 @@ class MixpanelCommand extends ContainerAwareCommand
             }
             $results = $this->getMixpanel()->queueTrackWithUser($user, "button clicked", array("label" => "sign-up"));
             $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
+        } elseif ($action == 'data') {
+            $end = new \DateTime();
+            $end->sub(new \DateInterval(sprintf('P%dD', $end->format('N'))));
+            $start = clone $end;
+            $start->sub(new \DateInterval('P6D'));
+            $output->writeln(sprintf('Running from %s to %s', $start->format('Y-m-d'), $end->format('Y-m-d')));
+            $results = $this->getMixpanel()->stats($start, $end);
+            print_r($results);
+            $output->writeln('Finished');
         } elseif ($action == 'sync') {
             if (!$user) {
                 throw new \Exception('Requires user; add --email');

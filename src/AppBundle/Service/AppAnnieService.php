@@ -46,28 +46,10 @@ class AppAnnieService
             if ($start != $end) {
                 throw new \Exception('If using save, must be single day');
             }
-            
-            $repo = $this->dm->getRepository(Stats::class);
 
-            $statApple = $repo->findOneBy(['name' => Stats::INSTALL_APPLE, 'date' => $start]);
-            if (!$statApple) {
-                $statApple = new Stats();
-                $statApple->setDate($start);
-                $statApple->setName(Stats::INSTALL_APPLE);
-                $this->dm->persist($statApple);
-            }
-            $statApple->setValue($apple['downloads']);
-
-            $statGoogle = $repo->findOneBy(['name' => Stats::INSTALL_GOOGLE, 'date' => $start]);
-            if (!$statGoogle) {
-                $statGoogle = new Stats();
-                $statGoogle->setDate($start);
-                $statGoogle->setName(Stats::INSTALL_GOOGLE);
-                $this->dm->persist($statGoogle);
-            }
-            $statGoogle->setValue($google['downloads']);
-
-            $this->dm->flush();
+            $stats = $this->get('app.stats');
+            $stats->set(Stats::INSTALL_APPLE, $start, $apple['downloads']);
+            $stats->set(Stats::INSTALL_GOOGLE, $start, $google['downloads']);
         }
 
         return ['apple' => $apple, 'google' => $google];

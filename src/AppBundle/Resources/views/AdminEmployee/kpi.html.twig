@@ -34,15 +34,70 @@
                     <tr>
                     <th></th>
                     {% for week in weeks %}
-                        <td>{{ week.date|date('d M Y') }}</td>
+                        <td>{{ week.start_date|date('d M Y') }} - {{ week.end_date|date('d M Y') }}</td>
                     {% endfor %}
                     </tr>
                     </thead>
+                    {# dump(weeks) #}
                     <tbody>
                         <tr>
                             <td>Total Policies</td>
                             {% for week in weeks %}
-                                <td>{{ week['totalActivePolicies'] }}</td>
+                                <td>{{ week.data['totalActivePolicies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>New Policies</td>
+                            {% for week in weeks %}
+                                <td>{{ week.data['newPolicies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Cancellations</td>
+                            {% for week in weeks %}
+                                <td>{{ week.data['totalUserRequestedPolicies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Cooloffs</td>
+                            {% for week in weeks %}
+                                <td>{{ week.data['totalCooloffPolicies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Approved Claims</td>
+                            {% for week in weeks %}
+                                <td>{{ week['approved-claims'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Invitations</td>
+                            {% for week in weeks %}
+                                <td>{{ week.data['newInvitationPolicies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Connections</td>
+                            {% for week in weeks %}
+                                <td>{{ week.data['policyConnections']['total'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Total Site Visitors</td>
+                            {% for week in weeks %}
+                                <td>{{ week['mixpanel-total-site-visitors'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Quote Page UK</td>
+                            {% for week in weeks %}
+                                <td>{{ week['mixpanel-quotes-uk'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Receive Personal Details</td>
+                            {% for week in weeks %}
+                                <td>{{ week['mixpanel-receive-personal-details'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>

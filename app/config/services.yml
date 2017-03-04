@@ -384,6 +384,7 @@ services:
     app.stats:
         class: AppBundle\Service\StatsService
         arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
             redis:          "@snc_redis.default"
             logger:         "@logger"
 
@@ -449,6 +450,13 @@ services:
             logger:  "@logger"
             apiKey:  "%appannie_apikey%"
 
+    app.reporting:
+        class: AppBundle\Service\ReportingService
+        arguments:
+            dm:                "@doctrine_mongodb.odm.default_document_manager"
+            logger:            "@logger"
+            excludedPolicyIds: "%report_excluded_policy_ids%"
+
     app.mixpanel:
         class: AppBundle\Service\MixpanelService
         arguments:
@@ -458,6 +466,8 @@ services:
             mixpanel:       "@mixpanel"
             requestService: "@app.request"
             environment:    "%kernel.environment%"
+            apiSecret:      "%mixpanel_apisecret%"
+            stats:          "@app.stats"
 
     mixpanel:
         class:   Mixpanel
