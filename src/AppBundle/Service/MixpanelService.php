@@ -139,7 +139,7 @@ class MixpanelService
             'to_date' => $end->format('Y-m-d'),
         ]);
         $key = $data['data']['series'][0];
-        foreach($data['data']['values'] as $event => $results) {
+        foreach ($data['data']['values'] as $event => $results) {
             if ($event == self::CUSTOM_TOTAL_SITE_VISITORS) {
                 $stats['Total Visitors'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_TOTAL_SITE_VISITORS, $start, $results[$key]);

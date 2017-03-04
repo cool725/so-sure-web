@@ -21,7 +21,7 @@ class StatsService
     protected $redis;
 
     /**
-     * @param DocumentManager  $dm
+     * @param DocumentManager $dm
      * @param                 $redis
      * @param LoggerInterface $logger
      */
@@ -77,7 +77,7 @@ class StatsService
             $stat->setValue($value);
             $this->dm->persist($stat);
         } elseif ($overwrite) {
-            $stat->setValue($value);            
+            $stat->setValue($value);
         }
 
         $this->dm->flush();

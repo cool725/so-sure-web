@@ -28,7 +28,7 @@ class ReportingService
     protected $excludedPolicyIds;
 
     /**
-     * @param DocumentManager  $dm
+     * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $excludedPolicyIds
      */
@@ -242,5 +242,5 @@ class ReportingService
             'excluded_policies' => $excludedPolicies,
             'claims' => $claimsTotals,
         ];
-    }    
+    }
 }
