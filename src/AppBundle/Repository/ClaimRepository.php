@@ -44,6 +44,16 @@ class ClaimRepository extends DocumentRepository
         return $qb->getQuery()->execute();
     }
 
+    public function findApprovedClaims($start, $end)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('approvedDate')->gte($start)
+            ->field('approvedDate')->lt($end)
+        ;
+
+        return $qb->getQuery()->execute();
+    }
+
     public function findOutstanding()
     {
         $qb = $this->createQueryBuilder()
