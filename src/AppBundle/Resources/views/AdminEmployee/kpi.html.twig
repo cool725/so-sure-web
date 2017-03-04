@@ -43,43 +43,43 @@
                         <tr>
                             <td>Total Policies</td>
                             {% for week in weeks %}
-                                <td>{{ week.data['totalActivePolicies'] }}</td>
+                                <td>{{ week.total.data['newPolicies'] - week.total.data['endingEndingPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
                             <td>New Policies</td>
                             {% for week in weeks %}
-                                <td>{{ week.data['newPolicies'] }}</td>
+                                <td>{{ week.period.data['newPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
                             <td>Cancellations</td>
                             {% for week in weeks %}
-                                <td>{{ week.data['totalUserRequestedPolicies'] }}</td>
+                                <td>{{ week.period.data['endingUserRequestedPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
                             <td>Cooloffs</td>
                             {% for week in weeks %}
-                                <td>{{ week.data['totalCooloffPolicies'] }}</td>
+                                <td>{{ week.period.data['endingCooloffPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
                             <td>Approved Claims</td>
                             {% for week in weeks %}
-                                <td>{{ week['approved-claims'] }}</td>
+                                <td>{{ week.period['approvedClaims']['total'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
                             <td>Invitations</td>
                             {% for week in weeks %}
-                                <td>{{ week.data['newInvitationPolicies'] }}</td>
+                                <td>{{ week.period.data['newInvitationPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
                             <td>Connections</td>
                             {% for week in weeks %}
-                                <td>{{ week.data['policyConnections']['total'] }}</td>
+                                <td>{{ week.period['new_connections'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>

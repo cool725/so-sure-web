@@ -48,6 +48,8 @@ class ReportingService
         $claimsRepo = $this->dm->getRepository(Claim::class);
         $claims = $claimsRepo->findFNOLClaims($start, $end);
         $claimsTotals = Claim::sumClaims($claims);
+        $approvedClaims = $claimsRepo->findApprovedClaims($start, $end);
+        $approvedClaimsTotals = Claim::sumClaims($approvedClaims);
 
         $invalidPolicies = $policyRepo->getActiveInvalidPolicies();
         $invalidPoliciesIds = [];
@@ -241,6 +243,7 @@ class ReportingService
             'new_connections' => $newConnections,
             'excluded_policies' => $excludedPolicies,
             'claims' => $claimsTotals,
+            'approvedClaims' => $approvedClaimsTotals,
         ];
     }
 }

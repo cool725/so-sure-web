@@ -796,17 +796,13 @@ class AdminEmployeeController extends BaseController
                 'start_date' => clone $date,
                 'end_date' => $end,
                 'count' => $count,
-                'new-policies' => '-',
-                'cancelled-policies' => '-',
-                'cooloff-policies' => '-',
-                'approved-claims' => '-',
-                'invitations' => '-',
-                'connections' => '-',
             ];
             $start = $this->startOfDay(clone $date);
             $date = $date->add(new \DateInterval('P7D'));
             $count++;
-            $week = array_merge($week, $this->get('app.reporting')->report($start, $end));
+            $reporting = $this->get('app.reporting');
+            $week['period'] = $reporting->report($start, $end, false);
+            $week['total'] = $reporting->report(new \DateTime(SoSure::POLICY_START), $end, false);
 
             $week['total-policies'] = $policyRepo->countAllActivePolicies($date);
             $stats = $statsRepo->getStatsByRange($start, $date);

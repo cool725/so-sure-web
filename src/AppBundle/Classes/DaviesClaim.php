@@ -361,7 +361,7 @@ class DaviesClaim
                 $origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
             }
 
-            $minDate = new \DateTime('2016-01-01');
+            $minDate = new \DateTime(SoSure::POLICY_START);
             $now = new \DateTime();
 
             if ($origin < $minDate || ($origin > $now && !$skipEndCheck)) {

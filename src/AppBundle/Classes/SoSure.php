@@ -11,6 +11,7 @@ class SoSure
 
     const SOSURE_TRACKING_SESSION_NAME = 'sosure-tracking';
 
+    const POLICY_START = "2016-09-01";
     const TIMEZONE = "Europe/London";
 
     public static function hasSoSureEmail($email)
