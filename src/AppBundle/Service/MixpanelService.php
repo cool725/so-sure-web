@@ -7,6 +7,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Stats;
+use AppBundle\Document\Attribution;
 use Mixpanel;
 use UAParser\Parser;
 use Jaam\Mixpanel\DataExportApi;
@@ -21,6 +22,7 @@ class MixpanelService
     const QUEUE_PERSON_INCREMENT = 'person-increment';
     const QUEUE_TRACK = 'track';
     const QUEUE_ALIAS = 'alias';
+    const QUEUE_ATTRIBUTION = 'attribution';
 
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
@@ -127,6 +129,79 @@ class MixpanelService
         return $this->redis->lrange(self::KEY_MIXPANEL_QUEUE, 0, $max);
     }
 
+    public function attribution($userId)
+    {
+        $repo = $this->dm->getRepository(User::class);
+        $user = $repo->find($userId);
+
+        return $this->attributionByUser($user);
+    }
+
+    public function attributionByEmail($email)
+    {
+        $repo = $this->dm->getRepository(User::class);
+        $user = $repo->findOneBy(['emailCanonical' => strtolower($email)]);
+
+        return $this->attributionByUser($user);
+    }
+
+    public function attributionByUser(User $user = null)
+    {
+        $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
+        $results = $this->mixpanelData->data('engage', [
+            'where' => $search
+        ]);
+        foreach ($results['results'] as $result) {
+            $data = $result['$properties'];
+            if (strtolower($data['$email']) == $user->getEmailCanonical()) {
+                $attribution = new Attribution();
+                if (isset($data['Campaign Name'])) {
+                    $attribution->setCampaignName($data['Campaign Name']);
+                }
+                if (isset($data['Campaign Source'])) {
+                    $attribution->setCampaignSource($data['Campaign Source']);
+                }
+                if (isset($data['Campaign Medium'])) {
+                    $attribution->setCampaignMedium($data['Campaign Medium']);
+                }
+                if (isset($data['Campaign Term'])) {
+                    $attribution->setCampaignTerm($data['Campaign Term']);
+                }
+                if (isset($data['Campaign Content'])) {
+                    $attribution->setCampaignContent($data['Campaign Content']);
+                }
+                if (isset($data['Referer'])) {
+                    $attribution->setReferer($data['Referer']);
+                }
+                $user->setAttribution($attribution);
+
+                $latestAttribution = new Attribution();
+                if (isset($data['Latest Campaign Name'])) {
+                    $latestAttribution->setCampaignName($data['Latest Campaign Name']);
+                }
+                if (isset($data['Latest Campaign Source'])) {
+                    $latestAttribution->setCampaignSource($data['Latest Campaign Source']);
+                }
+                if (isset($data['Latest Campaign Medium'])) {
+                    $latestAttribution->setCampaignMedium($data['Latest Campaign Medium']);
+                }
+                if (isset($data['Latest Campaign Term'])) {
+                    $latestAttribution->setCampaignTerm($data['Latest Campaign Term']);
+                }
+                if (isset($data['Latest Campaign Content'])) {
+                    $latestAttribution->setCampaignContent($data['Latest Campaign Content']);
+                }
+                if (isset($data['Latest Referer'])) {
+                    $latestAttribution->setReferer($data['Latest Referer']);
+                }
+                $user->setLatestAttribution($latestAttribution);
+                $this->dm->flush();
+            }
+        }
+
+        return $data;
+    }
+
     public function stats($start, $end)
     {
         $stats = [];
@@ -210,6 +285,12 @@ class MixpanelService
                     }
 
                     $this->alias($data['properties']['trackingId'], $data['userId']);
+                } elseif ($action == self::QUEUE_ATTRIBUTION) {
+                    if (!isset($data['userId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->attribution($data['userId']);
                 } else {
                     throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
@@ -235,6 +316,11 @@ class MixpanelService
         }
 
         return $count;
+    }
+
+    public function queueAttribution(User $user)
+    {
+        return $this->queue(self::QUEUE_ATTRIBUTION, $user->getId(), []);
     }
 
     public function queue($action, $userId, $properties, $event = null, $retryAttempts = 0)
@@ -396,6 +482,7 @@ class MixpanelService
         }
 
         $this->queuePersonProperties($userData, false, $user);
+        $this->queueAttribution($user);
     }
 
     public function queueTrack($event, array $properties = null)

@@ -346,6 +346,14 @@
                     <td>User Status</td>
                     <td>{% if policy.user.locked %}locked{% elseif policy.user.enabled %}enabled{% else %}disabled{%endif %}</td>
                 </tr>
+                <tr>
+                    <td>Attribution</td>
+                    <td>{{ policy.user.attribution }}</td>
+                </tr>
+                <tr>
+                    <td>Latest Attribution</td>
+                    <td>{{ policy.user.latestAttribution }}</td>
+                </tr>
             </table>
         </div>
         <div role="tabpanel" class="tab-pane" id="history">

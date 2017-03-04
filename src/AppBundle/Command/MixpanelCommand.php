@@ -21,7 +21,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|test|clear|show|sync|sync-all|data (or blank for process)'
+                'delete|test|clear|show|sync|sync-all|data|attribution (or blank for process)'
             )
             ->addOption(
                 'email',
@@ -53,8 +53,9 @@ class MixpanelCommand extends ContainerAwareCommand
         $process = $input->getOption('process');
         $user = null;
         if ($email) {
-            $user = $this->getUser($email);
-            $id = $user->getId();
+            if ($user = $this->getUser($email)) {
+                $id = $user->getId();
+            }
         }
         if ($action == 'test') {
             if (!$user) {
@@ -71,6 +72,12 @@ class MixpanelCommand extends ContainerAwareCommand
             $results = $this->getMixpanel()->stats($start, $end);
             print_r($results);
             $output->writeln('Finished');
+        } elseif ($action == 'attribution') {
+            if (!$user) {
+                throw new \Exception('Requires user; add --email');
+            }
+            $results = $this->getMixpanel()->attributionByUser($user);
+            $output->writeln(sprintf('Attribution %s', json_encode($results, JSON_PRETTY_PRINT)));
         } elseif ($action == 'sync') {
             if (!$user) {
                 throw new \Exception('Requires user; add --email');
