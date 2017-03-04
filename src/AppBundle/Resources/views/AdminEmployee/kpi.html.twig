@@ -32,21 +32,31 @@
                 <table class="table table-striped">
                     <thead>
                     <tr>
-                        <th>Week Number</th>
-                        <th>Date</th>
-                        <th>Google App Installs</th>
-                        <th>Apple App Installs</th>
+                    <th></th>
+                    {% for week in weeks %}
+                        <td>{{ week.date|date('d M Y') }}</td>
+                    {% endfor %}
                     </tr>
                     </thead>
                     <tbody>
-                    {% for week in weeks %}
                         <tr>
-                            <td>{{ week.count }}</td>
-                            <td>{{ week.date|date('d M Y') }}</td>
-                            <td>{{ week['install-google'] }}</td>
-                            <td>{{ week['install-apple'] }}</td>
+                            <td>Total Policies</td>
+                            {% for week in weeks %}
+                                <td>{{ week['totalActivePolicies'] }}</td>
+                            {% endfor %}
                         </tr>
-                    {% endfor %}
+                        <tr>
+                            <td>Google App Installs</td>
+                            {% for week in weeks %}
+                                <td>{{ week['install-google'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Apple App Installs</td>
+                            {% for week in weeks %}
+                                <td>{{ week['install-apple'] }}</td>
+                            {% endfor %}
+                        </tr>
                     </tbody>
                 </table>
             </div>
