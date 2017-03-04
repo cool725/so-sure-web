@@ -981,6 +981,7 @@ class AdminEmployeeController extends BaseController
     public function kpiAction()
     {
         $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
         $statsRepo = $dm->getRepository(Stats::class);
         
         $date = new \DateTime('2016-09-12');
@@ -995,6 +996,7 @@ class AdminEmployeeController extends BaseController
             $date = $date->add(new \DateInterval('P7D'));
             $count++;
 
+            $week['totalActivePolicies'] = $policyRepo->countAllActivePolicies($date);
             $stats = $statsRepo->getStatsByRange($start, $date);
             foreach ($stats as $stat) {
                 if (!isset($week[$stat->getName()])) {
@@ -1013,7 +1015,7 @@ class AdminEmployeeController extends BaseController
         }
 
         return [
-            'weeks' => $weeks,
+            'weeks' => array_slice($weeks, -3),
         ];
     }
 }
