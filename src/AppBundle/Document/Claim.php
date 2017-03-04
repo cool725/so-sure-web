@@ -106,6 +106,13 @@ class Claim
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
+    protected $approvedDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $closedDate;
 
     /**
@@ -347,6 +354,10 @@ class Claim
             throw new \InvalidArgumentException(sprintf('Unable to use approved/declined with Warranty Types'));
         }
 
+        if ($status == self::STATUS_APPROVED && !$this->getApprovedDate()) {
+            $this->setApprovedDate(new \DateTime());
+        }
+
         $this->status = $status;
     }
 
@@ -501,6 +512,16 @@ class Claim
     public function setCreatedDate($createdDate)
     {
         $this->createdDate = $createdDate;
+    }
+
+    public function getApprovedDate()
+    {
+        return $this->approvedDate;
+    }
+
+    public function setApprovedDate($approvedDate)
+    {
+        $this->approvedDate = $approvedDate;
     }
 
     public function getClosedDate()
@@ -787,6 +808,7 @@ class Claim
             'replacementPhoneId' => $this->getReplacementPhone() ? $this->getReplacementPhone()->getId() : null,
             'replacementImei' => $this->getReplacementImei(),
             'recordedDate' => $this->getRecordedDate() ? $this->getRecordedDate()->format(\DateTime::ATOM) : null,
+            'approvedDate' => $this->getApprovedDate() ? $this->getApprovedDate()->format(\DateTime::ATOM) : null,
             'lossDate' => $this->getLossDate() ? $this->getLossDate()->format(\DateTime::ATOM) : null,
             'notificationDate' => $this->getNotificationDate() ?
                 $this->getNotificationDate()->format(\DateTime::ATOM) :

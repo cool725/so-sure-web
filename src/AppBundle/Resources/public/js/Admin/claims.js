@@ -17,6 +17,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-loss').text(claim.lossDate);
     modal.find('#claims-detail-notification').text(claim.notificationDate);
     modal.find('#claims-detail-recorded').text(claim.recordedDate);
+    modal.find('#claims-detail-approved').text(claim.approvedDate);
     modal.find('#claims-detail-replacement').text(claim.replacementReceivedDate);
     modal.find('#claims-detail-closed').text(claim.closedDate);
     modal.find('#claims-detail-excess').text(claim.excess);
@@ -42,6 +43,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-loss').text('');
     modal.find('#claims-detail-notification').text('');
     modal.find('#claims-detail-recorded').text('');
+    modal.find('#claims-detail-approved').text('');
     modal.find('#claims-detail-replacement').text('');
     modal.find('#claims-detail-closed').text('');
     modal.find('#claims-detail-excess').text('');
