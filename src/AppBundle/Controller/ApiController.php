@@ -620,6 +620,7 @@ class ApiController extends BaseController
                 $this->snsUnsubscribe('unregistered', $user->getSnsEndpoint());
             }
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
+            $this->get('app.mixpanel')->queueAttribution($user);
 
             return new JsonResponse($user->toApiArray($intercomHash, $identityId, $token));
         } catch (ValidationException $ex) {

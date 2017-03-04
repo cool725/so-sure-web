@@ -228,6 +228,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $referer;
 
     /**
+     * @MongoDB\EmbedOne(targetDocument="Attribution")
+     * @Gedmo\Versioned
+     */
+    protected $attribution;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="Attribution")
+     * @Gedmo\Versioned
+     */
+    protected $latestAttribution;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
@@ -814,6 +826,26 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setPreLaunch($preLaunch)
     {
         $this->preLaunch = $preLaunch;
+    }
+
+    public function getAttribution()
+    {
+        return $this->attribution;
+    }
+
+    public function setAttribution($attribution)
+    {
+        $this->attribution = $attribution;
+    }
+
+    public function getLatestAttribution()
+    {
+        return $this->latestAttribution;
+    }
+
+    public function setLatestAttribution($latestAttribution)
+    {
+        $this->latestAttribution = $latestAttribution;
     }
 
     public function getBirthday()
