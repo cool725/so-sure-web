@@ -6,8 +6,11 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Stats;
 use Mixpanel;
 use UAParser\Parser;
+use Jaam\Mixpanel\DataExportApi;
+use Jaam\Mixpanel\DataExportApiException;
 
 class MixpanelService
 {
@@ -33,6 +36,9 @@ class MixpanelService
     const EVENT_TEST = 'Tracking Test Event';
     const EVENT_INVITATION_PAGE = 'Invitation Page';
     const EVENT_CANCEL_POLICY = 'Cancel Policy';
+    
+    const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
+    const CUSTOM_QUOTE_PAGE_UK = '$custom_event:380020';
 
     /** @var DocumentManager */
     protected $dm;
@@ -50,6 +56,11 @@ class MixpanelService
 
     protected $environment;
 
+    protected $mixpanelData;
+
+    /** @var StatsService */
+    protected $stats;
+
     public function setEnvironment($environment)
     {
         $this->environment = $environment;
@@ -61,7 +72,9 @@ class MixpanelService
      * @param                 $redis
      * @param Mixpanel        $mixpanel
      * @param RequestService  $requestService
-     * @param                 $environment
+     * @param string          $environment
+     * @param string          $apiSecret
+     * @param StatsService    $stats
      */
     public function __construct(
         DocumentManager  $dm,
@@ -69,7 +82,9 @@ class MixpanelService
         $redis,
         Mixpanel $mixpanel,
         RequestService $requestService,
-        $environment
+        $environment,
+        $apiSecret,
+        $stats
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -77,6 +92,8 @@ class MixpanelService
         $this->mixpanel = $mixpanel;
         $this->requestService = $requestService;
         $this->environment = $environment;
+        $this->mixpanelData = new DataExportApi($apiSecret);
+        $this->stats = $stats;
     }
 
     private function canSend()
@@ -110,6 +127,34 @@ class MixpanelService
         return $this->redis->lrange(self::KEY_MIXPANEL_QUEUE, 0, $max);
     }
 
+    public function stats($start, $end)
+    {
+        $stats = [];
+        $events = [self::CUSTOM_TOTAL_SITE_VISITORS, self::CUSTOM_QUOTE_PAGE_UK, self::EVENT_RECEIVE_DETAILS];
+        $data = $this->mixpanelData->data('events', [
+            'event' => $events,
+            'type' => 'unique',
+            'unit' => 'week',
+            'from_date' => $start->format('Y-m-d'),
+            'to_date' => $end->format('Y-m-d'),
+        ]);
+        $key = $data['data']['series'][0];
+        foreach($data['data']['values'] as $event => $results) {
+            if ($event == self::CUSTOM_TOTAL_SITE_VISITORS) {
+                $stats['Total Visitors'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_TOTAL_SITE_VISITORS, $start, $results[$key]);
+            } elseif ($event == self::CUSTOM_QUOTE_PAGE_UK) {
+                $stats['Quote Page UK'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_QUOTES_UK, $start, $results[$key]);
+            } elseif ($event == self::EVENT_RECEIVE_DETAILS) {
+                $stats['Receive Personal Details'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS, $start, $results[$key]);
+            }
+        }
+
+        return $stats;
+    }
+    
     public function process($max)
     {
         $count = 0;

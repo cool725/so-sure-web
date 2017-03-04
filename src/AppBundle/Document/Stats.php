@@ -13,6 +13,9 @@ class Stats
 {
     const INSTALL_APPLE = 'install-apple';
     const INSTALL_GOOGLE = 'install-google';
+    const MIXPANEL_TOTAL_SITE_VISITORS = 'mixpanel-total-site-visitors';
+    const MIXPANEL_QUOTES_UK = 'mixpanel-quotes-uk';
+    const MIXPANEL_RECEIVE_PERSONAL_DETAILS = 'mixpanel-receive-personal-details';
 
     /**
      * @MongoDB\Id

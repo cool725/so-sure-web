@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1527ff20b38344dde22f15bbbc8b650b",
-    "content-hash": "d836115cbf0800804a303cc0879a8fc1",
+    "hash": "5b0f1d375f52e0a4a7c96c70a2e3a8e1",
+    "content-hash": "3db82f4f6779d0f10f1cf877839d90ba",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -2513,6 +2513,52 @@
                 "intercom.io"
             ],
             "time": "2016-10-17 10:22:53"
+        },
+        {
+            "name": "jaam/mixpanel-data-export-api",
+            "version": "v0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/letsjaam/mixpanel-data-export-api.git",
+                "reference": "8c1e677fef0a27a7c5c97ecf1c32f5a58a94ea1a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/letsjaam/mixpanel-data-export-api/zipball/8c1e677fef0a27a7c5c97ecf1c32f5a58a94ea1a",
+                "reference": "8c1e677fef0a27a7c5c97ecf1c32f5a58a94ea1a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "silex/silex": "^2.0"
+            },
+            "suggest": {
+                "silex/silex": "for the integration with your Silex application"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jaam\\Mixpanel\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Adam Mustill",
+                    "email": "adam@letsjaam.com"
+                }
+            ],
+            "description": "Wrapper for the Mixpanel Data Export API.",
+            "homepage": "https://github.com/letsjaam/mixpanel-data-export-api",
+            "keywords": [
+                "mixpanel"
+            ],
+            "time": "2016-12-20 17:33:46"
         },
         {
             "name": "jdorn/sql-formatter",

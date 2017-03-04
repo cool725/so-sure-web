@@ -1,7 +1,9 @@
 <?php
 namespace AppBundle\Service;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
+use AppBundle\Document\Stats;
 
 class StatsService
 {
@@ -10,17 +12,22 @@ class StatsService
     const DEVICE_FORMAT = 'stats:%s:%s:%s';
     const DEVICE_MEMORY_FORMAT = 'stats:%s:%s:%s:%s';
 
+    /** @var DocumentManager */
+    protected $dm;
+
     /** @var LoggerInterface */
     protected $logger;
 
     protected $redis;
 
     /**
+     * @param DocumentManager  $dm
      * @param                 $redis
      * @param LoggerInterface $logger
      */
-    public function __construct($redis, LoggerInterface $logger)
+    public function __construct(DocumentManager $dm, $redis, LoggerInterface $logger)
     {
+        $this->dm = $dm;
         $this->redis = $redis;
         $this->logger = $logger;
     }
@@ -57,5 +64,22 @@ class StatsService
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error in stats quote Ex: %s', $e->getMessage()));
         }
+    }
+
+    public function set($name, $date, $value, $overwrite = true)
+    {
+        $repo = $this->dm->getRepository(Stats::class);
+        $stat = $repo->findOneBy(['name' => $name, 'date' => $name]);
+        if (!$stat) {
+            $stat = new Stats();
+            $stat->setDate($date);
+            $stat->setName($name);
+            $stat->setValue($value);
+            $this->dm->persist($stat);
+        } elseif ($overwrite) {
+            $stat->setValue($value);            
+        }
+
+        $this->dm->flush();
     }
 }
