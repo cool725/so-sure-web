@@ -123,4 +123,34 @@ class Attribution
     {
         return $this->referer;
     }
+
+    public function __toString()
+    {
+        return $this->stringImplode(' / ');
+    }
+
+    public function stringImplode($glue)
+    {
+        $lines = [];
+        if (strlen($this->getCampaignName()) > 0) {
+            $lines[] = sprintf("Name: %s", $this->getCampaignName());
+        }
+        if (strlen($this->getCampaignSource()) > 0) {
+            $lines[] = sprintf("Source: %s", $this->getCampaignSource());
+        }
+        if (strlen($this->getCampaignMedium()) > 0) {
+            $lines[] = sprintf("Medium: %s", $this->getCampaignMedium());
+        }
+        if (strlen($this->getCampaignContent()) > 0) {
+            $lines[] = sprintf("Content: %s", $this->getCampaignContent());
+        }
+        if (strlen($this->getCampaignTerm()) > 0) {
+            $lines[] = sprintf("Term: %s", $this->getCampaignTerm());
+        }
+        if (strlen($this->getReferer()) > 0) {
+            $lines[] = sprintf("Referer: %s", $this->getReferer());
+        }
+
+        return implode($glue, $lines);
+    }
 }
