@@ -10,7 +10,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-        '@AppBundle/Resources/public/js/Admin/claims.js'
+        '@AppBundle/Resources/public/js/Claims/claimsModal.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}            
@@ -107,136 +107,7 @@
 
 </div>
 
-    <div class="modal fade" id="claimsModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 50%">
-        <div class="modal-content">
-        <form id="phone-alternative-form" method="post" action="{{ path('admin_claims_replacement_phone') }}">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Claim: Unknown</h4>
-          </div>
-          <div class="modal-body">
-            <h3>General</h3>
-            <table class="table table-striped">
-                <tr>
-                    <td>Policy</td>
-                    <td id='claims-detail-policy'></td>
-                </tr>
-                <tr>
-                    <td>Type</td>
-                    <td id='claims-detail-type'></td>
-                </tr>
-                <tr>
-                    <td>Status</td>
-                    <td id='claims-detail-status'></td>
-                </tr>
-                <tr>
-                    <td>Davies Status</td>
-                    <td id='claims-detail-davies-status'></td>
-                </tr>
-                <tr>
-                    <td>Description</td>
-                    <td id='claims-detail-decription'></td>
-                </tr>
-                <tr>
-                    <td>Notes</td>
-                    <td id='claims-detail-notes'></td>
-                </tr>
-            </table>
-            <h3>Replacement Phone</h3>
-            <table class="table table-striped">
-                <tr>
-                    <td>Replacement IMEI</td>
-                    <td id='claims-detail-replacement-imei'></td>
-                </tr>
-                <tr>
-                    <td>Replacement Phone Details</td>
-                    <td id='claims-detail-replacement-phone-details'></td>
-                </tr>
-                <tr>
-                    <td>Replacement Phone</td>
-                    <td>
-                            <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
-                            <input type="hidden" name="id" id="claims-detail-id"></input>
-                            <select name="phone" id="claims-detail-replacement-phone">
-                                    <option value="">-- Select a phone --</option>
-                                {% for phone in phones %}
-                                    <option value="{{ phone.id }}">{{ phone }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-success">Update Replacement Phone</button>
-                    </td>
-                </tr>
-            </table>
-            <h3>Dates</h3>
-            <table class="table table-striped">
-                <tr>
-                    <td>Loss</td>
-                    <td id='claims-detail-loss'></td>
-                </tr>
-                <tr>
-                    <td>Notification</td>
-                    <td id='claims-detail-notification'></td>
-                </tr>
-                <tr>
-                    <td>Recorded</td>
-                    <td id='claims-detail-recorded'></td>
-                </tr>
-                <tr>
-                    <td>Approved</td>
-                    <td id='claims-detail-approved'></td>
-                </tr>
-                <tr>
-                    <td>Replacement Received</td>
-                    <td id='claims-detail-replacement'></td>
-                </tr>
-                <tr>
-                    <td>Closed</td>
-                    <td id='claims-detail-closed'></td>
-                </tr>
-            </table>
-            <h3>Amounts</h3>
-            <table class="table table-striped">
-                <tr>
-                    <td>Excess</td>
-                    <td id='claims-detail-excess'></td>
-                </tr>
-                <tr>
-                    <td>Unauthorized Calls</td>
-                    <td id='claims-detail-unauthorized-calls'></td>
-                </tr>
-                <tr>
-                    <td>Accessories</td>
-                    <td id='claims-detail-accessories'></td>
-                </tr>
-                <tr>
-                    <td>Phone Replacement Cost</td>
-                    <td id='claims-detail-replacement-cost'></td>
-                </tr>
-                <tr>
-                    <td>Transaction Fees</td>
-                    <td id='claims-detail-transaction'></td>
-                </tr>
-                <tr>
-                    <td>Claim Handling Fees</td>
-                    <td id='claims-detail-handling'></td>
-                </tr>
-                <tr>
-                    <td>Reserved</td>
-                    <td id='claims-detail-reserved'></td>
-                </tr>
-                <tr>
-                    <td>Incurred</td>
-                    <td id='claims-detail-incurred'></td>
-                </tr>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </form>
-        </div>
-      </div>
-    </div>
+{% include 'AppBundle::Claims/claimsModal.html.twig' %}
+
 
 {% endblock %}

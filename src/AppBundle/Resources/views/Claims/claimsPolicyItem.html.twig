@@ -263,7 +263,11 @@
                     {% for claim in policy.claims %}
                     <tr>
                         <td style="width: 20%;">{{ claim.recordedDate|date }}</td>
-                        <td style="width: 10%;" id="claim_{{ claim.id }}">{{ claim.number }}</td>
+                        <td style="width: 10%;" id="claim_{{ claim.id }}">
+                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
+                            data-claim='{{ claim.toModalArray|json_encode }}'>
+                                {{ claim.number }}</button>
+                        </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
                         <td style="width: 10%;">£{{ claim.totalChargesWithVat|number_format(2, '.', ',') }}</td>
@@ -586,3 +590,4 @@
       </div>
     </div>
 
+{% include 'AppBundle::Claims/claimsModal.html.twig' %}
