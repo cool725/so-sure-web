@@ -179,7 +179,11 @@
                         <tr>
                             <td>Avg Yearly Premium</td>
                             <td>{% if data.newPoliciesAvgPremium is defined %}<span title="£{{ data.newPoliciesPremium }} total">£{{ data.newPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
-                            <td>{% if data.totalPoliciesAvgPremium is defined %}<span title="£{{ data.totalPoliciesPremium }} total">£{{ data.totalPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                            <td><del>{% if data.totalPoliciesAvgPremium is defined %}<span title="£{{ data.totalPoliciesPremium }} total">£{{ data.totalPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</del>
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Incorrect figure" data-content="This figure appears to be incorrect. See Clubhouse ch3122 for latest status. Workaround is to run report from 2016-09-01 to present."></i>                                                        
+                            
+                            </td>
                         </tr>
                         <!--
                         <tr>
