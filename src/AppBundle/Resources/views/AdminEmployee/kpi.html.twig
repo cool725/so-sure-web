@@ -84,9 +84,15 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Connections [KPI: 41]</td>
+                            <td>New Connections [KPI: 41]</td>
                             {% for week in weeks %}
-                                <td>{{ week.period['new_connections'] }}</td>
+                                <td>{{ week.period.data['newActiveConnections'] - week.period.data['newEndedConnections'] }} ( Active: {{ week.period.data['newActiveConnections'] }} - Ending: {{ week.period.data['newEndedConnections'] }} )</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Total Connections [KPI: 42 - just validate]</td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['totalTotalConnections'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>

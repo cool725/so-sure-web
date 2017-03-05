@@ -173,8 +173,12 @@ class ReportingService
         $data['totalActiveYearlyPolicies'] = $policyRepo->countAllActivePoliciesByInstallments(1);
 
         // For reporting, connection numbers should be seen as a 2 way connection
-        $newConnections = $connectionRepo->count($start, $end) / 2;
-        $totalConnections = $connectionRepo->count() / 2;
+        $data['newTotalConnections'] = $connectionRepo->count($start, $end, null) / 2;
+        $data['newActiveConnections'] = $connectionRepo->count($start, $end, false) / 2;
+        $data['newEndedConnections'] = $connectionRepo->count($start, $end, true) / 2;
+        $data['totalTotalConnections'] = $connectionRepo->count(null, null, null) / 2;
+        $data['totalActiveConnections'] = $connectionRepo->count(null, null, false) / 2;
+        $data['totalEndedConnections'] = $connectionRepo->count(null, null, true) / 2;
 
         $data['newInvitations'] = $invitationRepo->count(null, $start, $end);
         $data['totalInvitations'] = $invitationRepo->count();
@@ -226,7 +230,7 @@ class ReportingService
                 $data['policyConnections']['10+'] += $data['policyConnections'][$i];
             }
         }
-        $data['totalAvgConnections'] = $totalConnections / $data['policyConnections']['total'];
+        $data['totalAvgConnections'] = $data['totalTotalConnections'] / $data['policyConnections']['total'];
 
         $weighted = 0;
         for ($i = 0; $i < 10; $i++) {
@@ -239,8 +243,6 @@ class ReportingService
             'start' => $start,
             'end' => $end,
             'data' => $data,
-            'total_connections' => $totalConnections,
-            'new_connections' => $newConnections,
             'excluded_policies' => $excludedPolicies,
             'claims' => $claimsTotals,
             'approvedClaims' => $approvedClaimsTotals,
