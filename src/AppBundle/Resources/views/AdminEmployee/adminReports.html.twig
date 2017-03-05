@@ -223,15 +223,37 @@
                             <td>£{{ data.totalPromoPot|number_format(2, '.', ',') }}</td>
                         </tr>
                         <tr>
-                            <td>Connection Links
+                            <td>Total Connection Links
         <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
            title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
                             </td>
-                            <td>{{ new_connections }}
+                            <td>{{ data['newTotalConnections'] }}
         <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
            title="Details" data-content="New connections made across all policies during period"></i>                            
                             </td>
-                            <td>{{ total_connections }}</td>
+                            <td>{{ data['totalTotalConnections'] }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 30px">Active Connection Links
+        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
+                            </td>
+                            <td>{{ data['newActiveConnections'] }}
+        <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Details" data-content="New connections made across all policies during period"></i>                            
+                            </td>
+                            <td>{{ data['totalActiveConnections'] }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 30px">Ended/Cancelled Connection Links
+        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
+                            </td>
+                            <td>{{ data['newEndedConnections'] }}
+        <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Details" data-content="New connections made across all policies during period"></i>                            
+                            </td>
+                            <td>{{ data['totalEndedConnections'] }}</td>
                         </tr>
                         <tr>
                             <td>Invitations</td>
