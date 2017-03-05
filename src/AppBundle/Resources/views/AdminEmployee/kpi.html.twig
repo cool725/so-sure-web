@@ -41,61 +41,68 @@
                     {# dump(weeks) #}
                     <tbody>
                         <tr>
-                            <td>Total Policies</td>
+                            <td>Avg Policy Price [KPI: 14]</td>
+                            {% for week in weeks %}
+                                <td>£{{ (week.total.data['newPoliciesAvgPremium'] / 52) |number_format(2, '.', ',') }}
+                                ({{ week.total.data['newPoliciesAvgPremium'] }} / 52)</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Total Policies [KPI: 17]</td>
                             {% for week in weeks %}
                                 <td>{{ week.total.data['newPolicies'] - week.total.data['endingEndingPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>New Policies</td>
+                            <td>New Policies [KPI: 21]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Cancellations</td>
+                            <td>Cancellations  [KPI: 29]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingUserRequestedPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Cooloffs</td>
+                            <td>Cooloffs [KPI: 30]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingCooloffPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Approved Claims</td>
+                            <td>Approved Claims [KPI: 34]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period['approvedClaims']['total'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Invitations</td>
+                            <td>Invitations [KPI: 40]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newInvitationPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Connections</td>
+                            <td>Connections [KPI: 41]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period['new_connections'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total Site Visitors</td>
+                            <td>Total Site Visitors [KPI: 144]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-total-site-visitors'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Quote Page UK</td>
+                            <td>Quote Page UK [KPI: 145]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-quotes-uk'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Receive Personal Details</td>
+                            <td>Receive Personal Details [KPI: 146]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-receive-personal-details'] }}</td>
                             {% endfor %}
