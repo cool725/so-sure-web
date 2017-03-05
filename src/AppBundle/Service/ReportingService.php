@@ -39,8 +39,13 @@ class ReportingService
         $this->excludedPolicyIds = $excludedPolicyIds;
     }
 
-    public function report($start, $end, $excludePolicies = true)
+    public function report($start, $end, $isKpi = false)
     {
+        $totalEnd = null;
+        if ($isKpi) {
+            $totalEnd = $end;
+        }
+
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $connectionRepo = $this->dm->getRepository(Connection::class);
         $invitationRepo = $this->dm->getRepository(Invitation::class);
@@ -61,7 +66,7 @@ class ReportingService
 
         $excludedPolicyIds = [];
         $excludedPolicies = [];
-        if ($excludePolicies) {
+        if (!$isKpi) {
             foreach ($this->excludedPolicyIds as $excludedPolicyId) {
                 $excludedPolicyIds[] = new \MongoId($excludedPolicyId);
                 $policy = $policyRepo->find($excludedPolicyId);
@@ -176,12 +181,12 @@ class ReportingService
         $data['newTotalConnections'] = $connectionRepo->count($start, $end, null) / 2;
         $data['newActiveConnections'] = $connectionRepo->count($start, $end, false) / 2;
         $data['newEndedConnections'] = $connectionRepo->count($start, $end, true) / 2;
-        $data['totalTotalConnections'] = $connectionRepo->count(null, null, null) / 2;
-        $data['totalActiveConnections'] = $connectionRepo->count(null, null, false) / 2;
-        $data['totalEndedConnections'] = $connectionRepo->count(null, null, true) / 2;
+        $data['totalTotalConnections'] = $connectionRepo->count(null, $totalEnd, null) / 2;
+        $data['totalActiveConnections'] = $connectionRepo->count(null, $totalEnd, false) / 2;
+        $data['totalEndedConnections'] = $connectionRepo->count(null, $totalEnd, true) / 2;
 
         $data['newInvitations'] = $invitationRepo->count(null, $start, $end);
-        $data['totalInvitations'] = $invitationRepo->count();
+        $data['totalInvitations'] = $invitationRepo->count(null, null, $totalEnd);
 
         $data['newDirectInvitations'] = $invitationRepo->count($newDirectPolicies, $start, $end);
         $data['totalDirectInvitations'] = $invitationRepo->count($totalDirectPolicies);
