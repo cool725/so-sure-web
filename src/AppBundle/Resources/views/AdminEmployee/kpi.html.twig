@@ -92,7 +92,7 @@
                         <tr>
                             <td>Total Connections [KPI: 42 - just validate]</td>
                             {% for week in weeks %}
-                                <td>{{ week.period.data['totalTotalConnections'] }}</td>
+                                <td><del>{{ week.period.data['totalActiveConnections'] }}</del></td>
                             {% endfor %}
                         </tr>
                         <tr>
