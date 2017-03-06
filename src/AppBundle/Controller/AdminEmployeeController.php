@@ -801,8 +801,8 @@ class AdminEmployeeController extends BaseController
             $date = $date->add(new \DateInterval('P7D'));
             $count++;
             $reporting = $this->get('app.reporting');
-            $week['period'] = $reporting->report($start, $end, false);
-            $week['total'] = $reporting->report(new \DateTime(SoSure::POLICY_START), $end, false);
+            $week['period'] = $reporting->report($start, $end, true);
+            $week['total'] = $reporting->report(new \DateTime(SoSure::POLICY_START), $end, true);
 
             $week['total-policies'] = $policyRepo->countAllActivePolicies($date);
             $stats = $statsRepo->getStatsByRange($start, $date);
