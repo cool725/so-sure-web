@@ -92,7 +92,7 @@
                         <tr>
                             <td>Total Connections [KPI: 42 - just validate]</td>
                             {% for week in weeks %}
-                                <td><del>{{ week.period.data['totalActiveConnections'] }}</del></td>
+                                <td>{{ week.period.data['totalActiveConnections'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
@@ -114,15 +114,15 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Google App Installs</td>
+                            <td>Apple App Installs [KPI: 161]</td>
                             {% for week in weeks %}
-                                <td>{{ week['install-google'] }}</td>
+                                <td>{{ week['install-apple'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Apple App Installs</td>
+                            <td>Google App Installs [KPI: 162]</td>
                             {% for week in weeks %}
-                                <td>{{ week['install-apple'] }}</td>
+                                <td>{{ week['install-google'] }}</td>
                             {% endfor %}
                         </tr>
                     </tbody>
