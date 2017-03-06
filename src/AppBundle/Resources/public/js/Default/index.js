@@ -1,4 +1,9 @@
 $(function(){
+    if(window.location.href.indexOf('#quote') != -1) {
+        $('#quoteModel').modal('show');
+        sosuretrack('Get A Quote Link', function() {
+        });
+    }
 
     $.fn.extend({
         toggleText: function(a, b){
