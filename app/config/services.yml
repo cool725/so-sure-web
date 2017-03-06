@@ -449,6 +449,7 @@ services:
             dm:      "@doctrine_mongodb.odm.default_document_manager"
             logger:  "@logger"
             apiKey:  "%appannie_apikey%"
+            stats:   "@app.stats"
 
     app.reporting:
         class: AppBundle\Service\ReportingService

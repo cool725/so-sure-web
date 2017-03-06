@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\Stats;
 use AppBundle\Document\DateTrait;
+use AppBundle\Service\StatsService;
 use GuzzleHttp\Client;
 
 class AppAnnieService
@@ -19,21 +20,27 @@ class AppAnnieService
 
     protected $apiKey;
 
+    /** @var StatsService */
+    protected $stats;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $apiKey
+     * @param StatsService    $stats
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        $apiKey
+        $apiKey,
+        $stats
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->apiKey = $apiKey;
+        $this->stats = $stats;
     }
-    
+
     public function run(\DateTime $start, \DateTime $end = null, $save = true, $ignoreZero = false)
     {
         $start = $this->startOfDay($start);
@@ -47,9 +54,8 @@ class AppAnnieService
                 throw new \Exception('If using save, must be single day');
             }
 
-            $stats = $this->get('app.stats');
-            $stats->set(Stats::INSTALL_APPLE, $start, $apple['downloads']);
-            $stats->set(Stats::INSTALL_GOOGLE, $start, $google['downloads']);
+            $this->stats->set(Stats::INSTALL_APPLE, $start, $apple['downloads']);
+            $this->stats->set(Stats::INSTALL_GOOGLE, $start, $google['downloads']);
         }
 
         return ['apple' => $apple, 'google' => $google];
