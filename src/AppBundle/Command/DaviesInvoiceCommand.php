@@ -52,7 +52,7 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
         $skipEmail = true === $input->getOption('skip-email');
         $emailAddress = [
             'accounts.payable@davies-group.com',
-            'Debbie.Moores@davies-group.com',
+            'laura.harvey@davies-group.com',
             'patrick@so-sure.com',
             'dylan@so-sure.com'
         ];

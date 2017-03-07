@@ -29,7 +29,7 @@ class DaviesBreakdownCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $emailAddresses = ['patrick@so-sure.com','Debbie.Moores@davies-group.com','dylan@so-sure.com'];
+        $emailAddresses = ['patrick@so-sure.com','laura.harvey@davies-group.com','dylan@so-sure.com'];
         $now = new \DateTime();
         $filename = sprintf("so-sure-policy-breakdown-%s.pdf", $now->format('Y-m-d'));
         $tmpFile = sprintf(
