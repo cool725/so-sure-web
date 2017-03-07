@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+        '@AppBundle/Resources/public/css/About/index.css'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<section class="about-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="section-title">Theft</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p>Nearly 300,000 mobile phones are stolen every year. That kind of number makes us sad (what kind of person steals a phone!?) - phones are an essential part of all of our lives as we depend on them to do just about everything. Taking a phone away from somebody robs them of the ability to contact their close family and friends while also making it harder for them to do everyday things such as paying bills, getting the bus or finding their way around town. </p>
+                <p>Thankfully, when bad stuff like this happens you can be sure that we’ve got you covered. so-sure covers your phone for theft at home and abroad (up to 90 days coverage).</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% include 'AppBundle::Default/footerCta.html.twig' %}
+
+{% include 'AppBundle::Default/modalQuote.html.twig' %}    
+
+{% endblock %}

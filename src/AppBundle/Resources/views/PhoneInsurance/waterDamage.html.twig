@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+        '@AppBundle/Resources/public/css/About/index.css'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<section class="about-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="section-title">Water Damage</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p>One of the most common claims, water damage is when your phone has been submerged in water and has been left unusable as a result. It’s a really common thing to do so don’t feel like a massive doofus if you do end up doing it. </p>
+                <p>However, if you do end up dunking your phone in a pint or the bath then don’t fear, because the infamous ‘rice trick’ can actually work. Our founder, Dylan even managed to revive his beloved phone via granular intervention!</p>
+                <p>Fortunately, so-sure covers you for water damage.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% include 'AppBundle::Default/footerCta.html.twig' %}
+
+{% include 'AppBundle::Default/modalQuote.html.twig' %}    
+
+{% endblock %}
