@@ -304,6 +304,11 @@ abstract class Policy
         return $this->id;
     }
 
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
     /**
      * Although rare, payments can include refunds
      */
