@@ -479,6 +479,12 @@ class MixpanelService
             if ($policy->getStatus() == Policy::STATUS_CANCELLED) {
                 $userData['Cancellation Reason'] = $policy->getCancelledReason();
             }
+            if ($policy->getStart()) {
+                $diff = $policy->getStart()->getTimestamp() - $policy->getUser()->getCreated()->getTimestamp();
+                $userData['Minutes to Final Purchase'] = round($diff / 60);
+            }
+            $diff = $policy->getCreated()->getTimestamp() - $policy->getUser()->getCreated()->getTimestamp();
+            $userData['Minutes to Start Purchase'] = round($diff / 60);
         }
 
         $this->queuePersonProperties($userData, false, $user);
