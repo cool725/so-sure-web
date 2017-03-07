@@ -46,7 +46,8 @@ class PhoneInsuranceController extends BaseController
     use PhoneTrait;
 
     /**
-     * @Route("/water-damage", name="phone_insurance_water_damage", options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
+     * @Route("/water-damage", name="phone_insurance_water_damage",
+     *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
     public function waterDamageAction()
@@ -73,7 +74,8 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/cracked-screen", name="phone_insurance_cracked_screen", options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
+     * @Route("/cracked-screen", name="phone_insurance_cracked_screen",
+     *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
     public function crackedScreenAction()
@@ -82,7 +84,8 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/broken-phone", name="phone_insurance_broken_phone", options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
+     * @Route("/broken-phone", name="phone_insurance_broken_phone",
+     *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
     public function brokenPhoneAction()
