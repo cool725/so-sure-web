@@ -33,17 +33,25 @@ $(function(){
     // });
 
     var rewardPot = $('#reward-pot-chart');
-    var maxConnections = $(rewardPot).data('max-connections');
-    var connections = $(rewardPot).data('connections'); 
-    var invites =  $(rewardPot).data('invites');
+    var potValue  = $(rewardPot).data('pot-value');
+    var maxPot    = $(rewardPot).data('max-pot');
+    var percent   = Math.round((potValue / maxPot) * 100);
+    var potDisp   = Math.round(potValue);
 
-    console.log(maxConnections, connections, invites);
+    // console.log(percent);
 
-    
+    // $(rewardPot).circliful({
+    //     percent: percent,
+    //     backgroundColor: '#efefef',
+    //     foregroundColor: '#3399ff',
+    //     backgroundBorderWidth: 10,
+    //     foregroundBorderWidth: 10,
 
-    $(rewardPot).circliful({
-        // percent: 
-    });
+    //     fontColor: '#3399ff',
+    //     replacePercentageByText: '£'+potDisp,
+    //     textAdditionalCss: 'font-weight: bold; font-family: "Avenir LT Std 85 Heavy";',
+    //     // text: 'of a maximum of £'+maxPot
+    // });
 
     $('.btn-clipboard').tooltip({'title':'Copied', 'trigger': 'manual'});
     var clipboard = new Clipboard('.btn-clipboard');
