@@ -70,6 +70,9 @@ $(function(){
         
         e.preventDefault();       
 
+        // Set field for mixpanel
+        $('#buy_form_claim_used').val(true);
+
         $('#loading-overlay-switch').fadeIn(function() {
 
             $('.premium-table').fadeToggle('400', function() {
