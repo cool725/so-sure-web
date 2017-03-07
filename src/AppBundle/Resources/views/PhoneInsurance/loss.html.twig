@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+        '@AppBundle/Resources/public/css/About/index.css'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<section class="about-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="section-title">Loss</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p>We love our phones here at so-sure and it really bums us out when we end up losing them. Losing your phone can totally feel like the end of the world - sometimes things get so bad that you start feeling like Leo before he won an Oscar. </p>
+                <p class="text-center"><img src="https://img.buzzfeed.com/buzzfeed-static/static/2014-02/enhanced/webdr02/3/9/anigif_enhanced-buzz-26673-1391438581-11.gif?no-auto" /></p>
+                <h2>Look after it with so-sure</h2>
+                <p>We don’t mean to blow our own trumpets here but we do protect you against pretty much anything bad that’s going to happen to your phone. We do it for cheaper than anyone else and we replace your phone within days, not weeks. </p>
+                <p>Waiting around for a replacement phone is no fun. so-sure get your phone back to you as soon as possible so that you can start getting back to enjoying your life.</p>
+                <p>However, if you are careless enough to leave your pride and joy uninsured, then follow this quick and easy guide to keeping your phone.</p>
+                <h2>Don’t bring your phone to stupid places</h2>
+                <p>More claims for lost mobile phones are made during July and August than at any other time of year. We think that this may have something to do with the fact that this coincides with festival season. </p>
+                <p>Bringing your brand new smartphone to a festival or big gig means that you must have a fairly large appetite for destruction. There are so many bad things that can happen to a phone in this environment. You could cake it in mud, someone could stamp on it or you could accidentally leave it ‘by that burrito stall somewhere near Shangri-la’. </p>
+                <p>Our top tip is to buy a ‘burner’ - a slightly outdated phone that is <a href="http://www.mirror.co.uk/news/weird-news/man-tries-destroy-indestructible-nokia-6266371" target="_blank">built like a tank</a> and has a battery life that lasts for seemingly forever. If something happens to this phone, you will still have your nice shiny one waiting for you when you get back home.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% include 'AppBundle::Default/footerCta.html.twig' %}
+
+{% include 'AppBundle::Default/modalQuote.html.twig' %}    
+
+{% endblock %}
