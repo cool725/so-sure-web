@@ -95,23 +95,7 @@
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
-
-    <section class="footer-cta brand-gradient">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 text-left">
-                    <h2>Ready for better phone insurance?</h2>
-                    <p class="lead">You can't always have better in life, but you can have better phone insurance.</p>
-                </div>
-                <div class="col-lg-2 text-center">
-                    <a class="btn btn-primary" id="get-quote-btn" data-toggle="modal" data-target="#quoteModel">Get a quote</a>
-                </div>
-                <div class="col-lg-2 text-center">
-                    <a class="btn btn-info" id="open-intercom">Chat with us <i class="fa fa-comments"></i></a>
-                </div>
-            </div>
-        </div>
-    </section>
+    {% include 'AppBundle::Default/footerCta.html.twig' %}
 
     <section class="press">
         <div class="container">
@@ -160,28 +144,7 @@
         </div>
     </div>      
 
-
-    <div class="modal modal-middle fade" 
-         id="quoteModel" 
-         tabindex="-1" 
-         role="dialog" 
-         aria-labelledby="quoteModelLabel" 
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h3 class="text-center">Select Make &amp; Model</h3>
-                </div>
-                <div class="modal-body">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
-                </div>
-            </div>
-        </div>
-    </div>      
+    {% include 'AppBundle::Default/modalQuote.html.twig' %}    
 
     {# End Page Modals #}       
 
