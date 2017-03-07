@@ -40,7 +40,7 @@
     <section class="hero" id="get-quote">
         <div class="container">
             <div class="row">
-                <div class="col-sm-7 col-md-6 col-lg-6">
+                <div class="col-sm-6 col-md-6 col-lg-6">
                     <h1>
                         Better &amp; Cheaper <br>
                         <span class="h1-sub">Even greater with friends</span>
@@ -50,30 +50,30 @@
                         <footer><em class="text-grey-blue">YouGov/Assurant, 2015</em></footer>
                     </blockquote>                           
                 </div>
-                <div class="col-xs-10 col-xs-offset-1 col-sm-5 col-sm-offset-0 col-md-5 col-md-offset-1 col-lg-5 col-lg-offset-1">
+                <div class="col-sm-6 col-md-5 col-md-offset-1 col-lg-5 col-lg-offset-1">
 
                     <div class="hero-box">
-                        <h3 class="text-white text-center">Most popular phones</h3>
+                        <h2 class="text-white text-center">Most popular phones</h2>
 
                         <ul class="list-unstyled hero-list">
                             <li>
                                 <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i6s.make, 'model': i6s.getEncodedModel(), 'memory': i6s.memory}) }}">
-                                    <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" height="40" />
-                                    <br class="visible-xs-inline">
+                                    <img class="" src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" width="180" />
+                                    <br class="hidden-md hidden-lg">
                                     From £{{ i6s.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
                                 </a>                                
                             </li>
                             <li>
                                 <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i7.make, 'model': i7.getEncodedModel(), 'memory': i7.memory}) }}">
-                                    <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" height="40" />
-                                    <br class="visible-xs-inline">
+                                    <img class="" src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" width="180"  />
+                                    <br class="hidden-md hidden-lg">
                                     From £{{ i7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
                                 </a>
                             </li>
                             <li>
                                 <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': s7.make, 'model': s7.getEncodedModel(), 'memory': s7.memory}) }}">
-                                    <img class="col-sm-8" src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" height="40" />
-                                    <br class="visible-xs-inline">
+                                    <img class="" src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" width="180" />
+                                    <br class="hidden-md hidden-lg">
                                     From £{{ s7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
                                 </a>
                             </li>
