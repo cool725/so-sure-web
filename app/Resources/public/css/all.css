@@ -700,6 +700,17 @@ hr.strong {
     right: 15%;
 }
 
+.btn-play-right:after {
+    content: '\f04b';
+    font-family: FontAwesome;
+    position: absolute;
+    /*right: 5px;  */
+}
+
+.btn-rounded.btn-play-right:after {
+    right: 15%;
+}
+
 @media (min-width: 379px) {
 
     .btn-hollow {
