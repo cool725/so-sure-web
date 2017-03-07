@@ -44,7 +44,7 @@ strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/*Quick helpers*/
+/* Quick helpers */
 
 .error-text {
     color: #FF6666;
@@ -96,6 +96,16 @@ strong {
 
 .text-shadow {
     text-shadow: text-shadow: 0 1px 0 #000;
+}
+
+@media (min-width: 340px) {
+
+    .box-border-grey { /* TODO // Refactor on quote page */
+        padding: 15px;      
+        margin-bottom: 25px;
+        border: 2px solid #efefef;
+        border-radius: 4px;          
+    } 
 }
 
 /* MOVE TO layout > _header.scss */
