@@ -1,4 +1,68 @@
-.reward-pot {
+body {
+    background-image: linear-gradient(258deg, #00ccff, #3399ff);
+}
+
+/* Adjust Navbar */
+
+.navbar-default {
+    margin-bottom: 40px;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #fff;
+}
+
+.navbar-default .navbar-nav li > a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #fff;
+}
+
+/* Header Area */
+
+.user-homepage--header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.user-img {
+    display: block;
+    border: 4px solid #fff;
+    margin: 0 auto;
+}
+
+@media (min-width: 767px) {
+
+    /* Header Area */
+
+    .user-homepage--header {
+        text-align: left;
+    }
+
+    .user-img {
+        display: inline-block;
+        float: left;
+        margin: 0 15px 0 0;
+    }  
+
+}
+
+/* User Nav */
+
+.user-homepage--nav {
+    background-color: #efefef;
+}
+
+/* Content */
+
+.user-homepage--content {
+    background-color: #fff;
+}
+
+/*.reward-pot {
   min-height: 750px;
   padding-top: 100px;
   padding-bottom: 150px;
@@ -203,4 +267,4 @@
 .modal-scode-wrapper {
     margin-top: 40px;
     margin-bottom: 20px;
-}
+}*/
