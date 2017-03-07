@@ -205,11 +205,13 @@ class PhoneInsuranceController extends BaseController
             ->createNamedBuilder('buy_form')
             ->add('buy_tablet', SubmitType::class)
             ->add('slider_used', HiddenType::class)
+            ->add('claim_used', HiddenType::class)
             ->getForm();
         $buyBannerForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form_banner')
             ->add('buy', SubmitType::class)
             ->add('slider_used', HiddenType::class)
+            ->add('claim_used', HiddenType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -265,6 +267,9 @@ class PhoneInsuranceController extends BaseController
                     if ($buyForm->getData()['slider_used']) {
                         $properties['Played with Slider'] = true;
                     }
+                    if ($buyForm->getData()['claim_used']) {
+                        $properties['Played with Claims'] = true;
+                    }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     return $this->redirectToRoute('purchase');
@@ -276,6 +281,9 @@ class PhoneInsuranceController extends BaseController
                     $properties['Location'] = 'banner';
                     if ($buyBannerForm->getData()['slider_used']) {
                         $properties['Played with Slider'] = true;
+                    }
+                    if ($buyForm->getData()['claim_used']) {
+                        $properties['Played with Claims'] = true;
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
