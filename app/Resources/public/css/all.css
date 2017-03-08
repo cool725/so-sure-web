@@ -98,11 +98,18 @@ strong {
     text-shadow: text-shadow: 0 1px 0 #000;
 }
 
+/* Borders */
+
+.box-border-grey {
+    position: relative;
+}
+
 @media (min-width: 340px) {
 
     .box-border-grey { /* TODO // Refactor on quote page */
         padding: 15px;      
         margin-bottom: 25px;
+        background-color: #fff;
         border: 2px solid #efefef;
         border-radius: 4px;          
     } 

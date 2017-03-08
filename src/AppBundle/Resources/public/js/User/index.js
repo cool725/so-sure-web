@@ -11,21 +11,30 @@ $(function(){
     $(rewardPot).circleProgress({
         value: total,
         size: 180,
-        // startAngle: 1
+        startAngle: -1.5,
         lineCap: 'round',
         emptyFill: '#efefef',
-        fill: '#3399ff'
+        fill: '#3399ff',
     });
 
     // Connection bonus chart
-    // $(rewardPot).circleProgress({
-    //     value: total,
-    //     size: 180,
-    //     // startAngle: 1
-    //     lineCap: 'round',
-    //     emptyFill: '#efefef',
-    //     fill: '#3399ff'
-    // });
+    var connectionChart = $('#connection-bonus-chart');
+    var totalBonusDays  = $(connectionChart).data('bonus-days-total');
+    var bonusDaysLeft   = $(connectionChart).data('bonus-days-remaining');
+
+    var totalBonus = Math.round((bonusDaysLeft / totalBonusDays) * 100);
+    var bonus = totalBonus / 100; 
+
+    console.log(bonus);
+
+    $(connectionChart).circleProgress({
+        value: bonus,
+        size: 180,
+        startAngle: -1.5,
+        lineCap: 'round',
+        emptyFill: '#efefef',
+        fill: '#ff6666',
+    });
 
     // Copy to clipboard
     $('.btn-clipboard').tooltip({'title':'Copied', 'trigger': 'manual'});
