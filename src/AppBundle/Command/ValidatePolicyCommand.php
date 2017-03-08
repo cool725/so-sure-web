@@ -131,10 +131,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
             }
             if ($policy->hasMonetaryClaimed()) {
+                // @codingStandardsIgnoreStart
                 $lines[] = sprintf(
                     'WARNING!! - Policy %s has had a prior successful claim and extra care should be used to avoid cancellation',
                     $policy->getPolicyNumber()
                 );
+                // @codingStandardsIgnoreEnd
             }
         } else {
             $policies = $policyRepo->findAll();
@@ -187,10 +189,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     );
                 }
                 if ($warnClaim && $policy->hasMonetaryClaimed()) {
+                    // @codingStandardsIgnoreStart
                     $lines[] = sprintf(
                         'WARNING!! - Policy %s has had a prior successful claim and extra care should be used to avoid cancellation',
                         $policy->getPolicyNumber()
                     );
+                    // @codingStandardsIgnoreEnd
                 }
             }
 
