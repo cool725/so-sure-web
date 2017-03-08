@@ -71,7 +71,10 @@
       "jssocials": [
         "bower_components/jssocials/dist/jssocials.min.js",
         "bower_components/jssocials/dist/jssocials.css",
-        "bower_components/jssocials/dist/jssocials-theme-flat.css"
+        "bower_components/jssocials/dist/jssocials-theme-flat.css",
+        "bower_components/jssocials/dist/jssocials-theme-minima.css",
+        "bower_components/jssocials/dist/jssocials-theme-plain.css",
+        "bower_components/jssocials/dist/jssocials-theme-classic.css"
       ],
       "bootstrap-daterangepicker": [
         "bower_components/bootstrap-daterangepicker/daterangepicker.js",

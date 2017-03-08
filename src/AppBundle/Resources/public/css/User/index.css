@@ -82,6 +82,18 @@ body {
     margin-left: -90px;
 }
 
+/* Coffee Card */
+.coffee-card {
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.coffee-stamp {
+    display: inline-block;
+    width: 70px; height: 70px;
+    background-color: #efefef;
+}
+
 /* PUT SOMEWHERE ELSE EVENTUALLY */
 .scroll {
     white-space: nowrap;
