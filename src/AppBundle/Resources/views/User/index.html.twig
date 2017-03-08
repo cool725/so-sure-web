@@ -14,7 +14,8 @@
     {{ parent() }}
     {% stylesheets
     'components/jssocials/jssocials.css'
-    'components/jssocials/jssocials-theme-flat.css'
+    '@AppBundle/Resources/public/css/Default/modal.css'        
+    'components/jssocials/jssocials-theme-minima.css'
     '@AppBundle/Resources/public/css/User/index.css'
     '@AppBundle/Resources/public/css/User/trust.css' %}
     <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
@@ -32,11 +33,11 @@
         </div>
     </section>
 
-    <section class="user-homepage--nav scroll">
+    <section class="user-homepage--nav">
         <div class="container">
             <nav id="user-homepage--nav">
                 <ul class="nav nav-pills scroll">
-                    <li role="presentation" class="active"><a href="#">User Home</a></li>
+                    <li role="presentation" class="active"><a href="#">Home</a></li>
                     <li role="presentation"><a href="#">Personal Info</a></li>
                     <li role="presentation"><a href="#">Payment Details</a></li>
                 </ul>
@@ -45,11 +46,7 @@
     </section>
 
     <section class="user-homepage--content section--pad">
-        <div class="container">
-
-   {#      <p class="text-right">
-            Have an <button type="button" class="btn btn-link" data-toggle="modal" data-target="#scodeModal" style="padding: 0; font-size: 16px;">invitation code</button> from a friend?
-        </p> #}            
+        <div class="container">          
             
             <div class="row">
                 <div class="col-sm-7 col-sm-push-5 col-md-8 col-md-push-4">
@@ -68,9 +65,81 @@
                         {{ form_errors(invitation_form) }}
                         {{ form_end(invitation_form) }}                        
                     {% endif %}
-                    <div class="box-border-grey text-center">
+                    <div class="box-border-grey coffee-card text-center">
                         <h4><strong>My Connections</strong></h4>
+                        <ul class="list-inline">
+                            <li><img src="http://www.placecage.com/70/70" alt="Nic Cage" class="img-circle"></li>
+                            <li><img src="http://www.fillmurray.com/70/70" alt="Bill Murray" class="img-circle"></li>
+                            <li><img src="http://www.stevensegallery.com/70/70" alt="Steven Segal" class="img-circle"></li>
+                            <li><a href="#" id="connect-with">
+                                <span class="fa-stack fa-lg">
+                                  <i class="fa fa-circle fa-stack-2x"></i>
+                                  <i class="fa fa-plus fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a></li>
+                        </ul>
                     </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="box-border-grey text-center">
+                                <h4><strong>
+                                    {% if scode %}
+                                        {{ scode.policy.user }} has invited you!
+                                    {% else %}
+                                        Already recevied an invite?
+                                    {% endif %}                                         
+                                </strong></h4>
+                                <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
+                                <form id="scode-form">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" placeholder="Enter code" id="scode-form-code" value="{% if scode %}{{ scode.code }}{% endif %}">
+                                        <div class="help-block with-errors" id="scode-form-code-err"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-success btn-rounded" id="scode-form-submit" data-token="{{ csrf_token('default') }}">Connect</button>
+                                    </div>
+                                </form>                                               
+                            </div>                             
+                        </div>
+                        {# {% if policy.standardSCode.shareLink %} #}
+                        <div class="col-md-6" >   
+                            <div id="connect-with-box" class="box-border-grey text-center">                         
+                                <h4><strong>Share your invite code</strong></h4>
+                                <form class="form-inline">
+
+                                    <div class="input-group">
+                                        <input id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.code }}">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-primary btn-clipboard" 
+                                                    data-clipboard-text="{{ policy.standardSCode.shareLink }}" 
+                                                    data-toggle="tooltip" 
+                                                    data-placement="right"
+                                                    data-share-text="Hey, I've just joined so-sure – better insurance that is up to 80% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: {{ policy.standardSCode.shareLink }}. Add my code after you pay: {{ policy.standardSCode.code }}">
+                                                <i class="fa fa-clipboard"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </form>
+                                <div id="share"></div>  
+
+                                <div class="text-break text-grey">
+                                    <div class="line"></div>OR<div class="line"></div>
+                                </div>   
+                                <h4><strong>Email an invite!</strong></h4>
+                                <p><small>Just enter their email below and we'll do the rest. Alternatively, open up our app and you can invite them however you'd like.</small></p>
+                                {{ form_start(email_form, {'attr': {'class': ''}}) }}
+                                <div class="form-group">
+                                    {{ form_errors(email_form.email) }}
+                                    {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
+                                </div>
+                                {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}&nbsp;
+                                {{ form_end(email_form) }}                                                       
+                            </div>                  
+                        </div>
+                        {# {% endif %}  #}
+                    </div>
+ 
                 </div>
                 <div class="col-sm-5 col-sm-pull-7 col-md-4 col-md-pull-8">
                     <div class="box-border-grey text-center">
@@ -105,7 +174,7 @@
     
     {# Page Modals #}
 
-    <div class="modal fade" 
+{#     <div class="modal modal-middle fade" 
          id="scodeModal" 
          tabindex="-1" 
          role="dialog" 
@@ -119,28 +188,17 @@
                         <span class="sr-only">Close</span>
                     </button>
                     <h3 class="text-center">
-                        {% if scode %}
-                            {{ scode.policy.user }} has invited you!
-                        {% else %}
-                            Already recevied an invite?
-                        {% endif %}                        
+               
                     </h3>
                 </div>
                 <div class="modal-body">
-                    <p>Enter the unique 8-digit code below and we'll connect you.</p>
-                    <form id="scode-form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Enter code" id="scode-form-code" value="{% if scode %}{{ scode.code }}{% endif %}">
-                            <div class="help-block with-errors" id="scode-form-code-err"></div>
-                        </div>
-                        <div class="form-group">
-                            <button type="button" class="btn btn-success btn-rounded" id="scode-form-submit" data-token="{{ csrf_token('default') }}">Submit</button>
-                        </div>
-                    </form>                    
+
+
+
                 </div>
             </div>
         </div>
-    </div>  
+    </div> #}  
 
     {# End Page Modals #}
 

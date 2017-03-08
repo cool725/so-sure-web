@@ -36,6 +36,18 @@ $(function(){
         fill: '#ff6666',
     });
 
+    // Connect with
+    $('#connect-with').click(function(event) {
+
+        event.preventDefault();
+
+        $('html, body').animate({
+            scrollTop: $('#connect-with-box').offset().top - 100
+        }, 1500);
+
+        $('#connect-with-box').addClass('box-border--highlight');
+    });    
+
     // Copy to clipboard
     $('.btn-clipboard').tooltip({'title':'Copied', 'trigger': 'manual'});
     var clipboard = new Clipboard('.btn-clipboard');
