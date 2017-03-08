@@ -32,10 +32,14 @@
         </div>
     </section>
 
-    <section class="user-homepage--nav">
+    <section class="user-homepage--nav scroll">
         <div class="container">
             <nav id="user-homepage--nav">
-                Nav 
+                <ul class="nav nav-pills scroll">
+                    <li role="presentation" class="active"><a href="#">User Home</a></li>
+                    <li role="presentation"><a href="#">Personal Info</a></li>
+                    <li role="presentation"><a href="#">Payment Details</a></li>
+                </ul>
             </nav>  
         </div>
     </section>
@@ -71,12 +75,26 @@
                 <div class="col-sm-5 col-sm-pull-7 col-md-4 col-md-pull-8">
                     <div class="box-border-grey text-center">
                         <h4><strong>My Reward Pot</strong></h4>
-                        <div id="reward-pot-chart"
+                        <div id="reward-pot-chart" class="circle-chart-container" 
                              data-pot-value="{{ policy.potValue }}"
-                             data-max-pot="{{ policy.maxPot }}"></div>
+                             data-max-pot="{{ policy.maxPot }}">
+                             <div class="circle-chart--value">
+                                 <span class="h2 text-blue">£{{ policy.potValue }}</span><br>
+                                 <small>of a max. £{{ policy.maxPot }}</small>
+                             </div>
+                        </div>
                     </div>
                     <div class="box-border-grey text-center">
                         <h4><strong>Connection Bonus</strong></h4>
+                        <div id="connection-bonus-chart" class="circle-chart-container" 
+                             data-bonus-days-total="60"
+                             data-bonus-days-remaining="11">
+                             <div class="circle-chart--value">
+                                 <span class="h2 text-red">11</span><br>
+                                 <small class="text-red">days left!</small>
+                             </div>
+                        </div>     
+                        <p><small>Each connection made is worth £10 in the first 2 months and £2 thereafter.</small></p>                   
                     </div>
                 </div>
             </div>

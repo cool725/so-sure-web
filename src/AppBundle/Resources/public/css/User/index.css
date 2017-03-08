@@ -62,6 +62,46 @@ body {
     background-color: #fff;
 }
 
+/* Reward Pot */
+.circle-chart-container {
+    width: 180px; height: 180px;
+    position: relative;
+    margin: 0 auto 15px;
+}
+
+.circle-chart-container canvas {
+    position: absolute;
+    left: 50%; 
+    margin-left: -90px;
+}
+
+.circle-chart--value {
+    width: 180px;
+    position: absolute;
+    left: 50%; top: 65px;
+    margin-left: -90px;
+}
+
+/* PUT SOMEWHERE ELSE EVENTUALLY */
+.scroll {
+    white-space: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar; 
+}
+
+.nav-pills>li>a {
+    border-radius: 0;
+    font-size: 14px
+}
+
+.nav-pills>li.active>a, 
+.nav-pills>li.active>a:hover, 
+.nav-pills>li.active>a:focus {
+    background-color: transparent;
+    color: #626b78;
+}
+
 /*.reward-pot {
   min-height: 750px;
   padding-top: 100px;
