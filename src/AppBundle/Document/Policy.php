@@ -1489,7 +1489,7 @@ abstract class Policy
 
     public function validateRefundAmountIsInstallmentPrice($payment)
     {
-        if ($payment->getAmount() != $this->getPremiumInstallmentPrice()) {
+        if (!$this->areEqualToTwoDp($payment->getAmount(), $this->getPremiumInstallmentPrice())) {
             throw new \InvalidArgumentException(sprintf(
                 'Failed to validate [policy %s] refund amount (%f) does not match premium price (%f)',
                 $this->getPolicyNumber(),

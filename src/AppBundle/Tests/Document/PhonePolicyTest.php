@@ -941,6 +941,36 @@ class PhonePolicyTest extends WebTestCase
         }
     }
 
+    public function testValidateRefundAmountIsInstallmentPrice()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(self::generateEmail('testCancelPolicyCancelsScheduledPayments', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        // not using policy service here, so simulate what's done there
+        $policy->setPremiumInstallments(12);
+
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
+        $policy->addPayment($payment);
+
+        static::$dm->persist($policy);
+        static::$dm->persist($user);
+        static::$dm->flush();
+
+        $this->assertTrue($policy->validateRefundAmountIsInstallmentPrice($payment));
+        $payment->setAmount($payment->getAmount() + 0.0001);
+        $this->assertTrue($policy->validateRefundAmountIsInstallmentPrice($payment));
+    }
+
     public function testGetPremiumPaidNotPolicy()
     {
         $policy = new SalvaPhonePolicy();
