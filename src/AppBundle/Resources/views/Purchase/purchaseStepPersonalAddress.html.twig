@@ -32,6 +32,17 @@
 
         <div class="row">
             <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+                    
+                {% if phone %}
+                    <h4 class="text-center alert alert-info">
+                        Insurance for your
+                        {{ phone.make }} {{ phone.model }} {%    
+                        if phone.memory %}
+                            {{ phone.memory }}GB
+                        {% endif %}
+                        - £7.99 a month
+                    </h4>                
+                {% endif %}                        
 
                 <div class="checkout--step">
 
