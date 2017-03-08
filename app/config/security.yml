@@ -57,6 +57,7 @@ security:
                 secret:   '%secret%'
                 lifetime: 43200 # 12 hours in seconds
                 path:     /
+            switch_user: { role: ROLE_ADMIN, parameter: _impersonate }
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }

@@ -34,9 +34,14 @@
                     {% else %}
                         <li class=""><a href="{{ path('user_home') }}">Your Account</a></li>
                     {% endif %}
-                        <li><a href="{{ path('fos_user_security_logout') }}">Logout</a></li>
+
+                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        <li><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></li>
                     {% else %}
-                        <li><a href="{{ path('fos_user_security_login') }}">Login</a></li>
+                        <li><a href="{{ path('fos_user_security_logout') }}">Logout</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="{{ path('fos_user_security_login') }}">Login</a></li>
                 {% endif %}
             </ul>
         </div>

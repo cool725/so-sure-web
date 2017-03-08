@@ -18,7 +18,11 @@
                 </tr>
                 <tr>
                     <td>Name</td>
-                    <td>{{ user.name }}</td>
+                    <td>{{ user.name }}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('user_home', {'id': user.id, '_impersonate': user.username}) }}">Login as user</a>
+                        {% endif %}
+                    </td>
                     <td></td>
                 </tr>
                 <tr>
