@@ -210,7 +210,11 @@ abstract class Payment
     {
         if ($this->getSource() == self::SOURCE_WEB) {
             return "Web";
-        } elseif (in_array($this->getSource(), [self::SOURCE_MOBILE, self::SOURCE_ANDROID_PAY, self::SOURCE_APPLE_PAY])) {
+        } elseif (in_array($this->getSource(), [
+                self::SOURCE_MOBILE,
+                self::SOURCE_ANDROID_PAY,
+                self::SOURCE_APPLE_PAY
+            ])) {
             return "Mobile";
         } else {
             if ($this->getSource()) {
