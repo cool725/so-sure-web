@@ -360,6 +360,22 @@ abstract class Policy
         });
     }
 
+    public function getFirstSuccessfulPaymentCredit()
+    {
+        $payments = $this->getSuccessfulPaymentCredits();
+        if (count($payments) == 0) {
+            return null;
+        }
+
+        // sort older to more recent
+        usort($payments, function ($a, $b) {
+            return $a->getDate() > $b->getDate();
+        });
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $payments[0];
+    }
+
     public function getLastSuccessfulPaymentCredit()
     {
         $payments = $this->getSuccessfulPaymentCredits();

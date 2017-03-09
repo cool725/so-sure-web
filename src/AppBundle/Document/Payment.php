@@ -206,6 +206,21 @@ abstract class Payment
         return $this->source;
     }
 
+    public function getSourceForClaims()
+    {
+        if ($this->getSource() == self::SOURCE_WEB) {
+            return "Web";
+        } elseif (in_array($this->getSource(), [self::SOURCE_MOBILE, self::SOURCE_ANDROID_PAY, self::SOURCE_APPLE_PAY])) {
+            return "Mobile";
+        } else {
+            if ($this->getSource()) {
+                return sprintf("Unknown - please ask [Notes: %s]", $this->getSource());
+            } else {
+                return sprintf("Unknown - please ask");
+            }
+        }
+    }
+
     public function setSource($source)
     {
         $this->source = $source;
