@@ -16,6 +16,7 @@ class RateLimitService
 {
     const KEY_FORMAT = 'rate:%s:%s';
     const USER_KEY_FORMAT = 'rate:%s:%s:%s';
+    const REPLAY_KEY_FORMAT = 'replay:%s';
 
     const DEVICE_TYPE_ADDRESS = 'address'; // 5p / query
     const DEVICE_TYPE_IMEI = 'imei'; // 2p / query
@@ -35,6 +36,7 @@ class RateLimitService
         self::DEVICE_TYPE_RESET => 3600, // 1 hour
         self::DEVICE_TYPE_TOKEN => 600, // 10 minutes
         self::DEVICE_TYPE_USER_LOGIN => 3600, // 10 minutes
+        'replay' => 60, // 1 minute
     ];
 
     public static $maxRequests = [
@@ -253,6 +255,32 @@ class RateLimitService
             $this->logger->warning(sprintf('Rate limit exceeded for %s (%s)', $type, $ip));
             return false;
         }
+
+        return true;
+    }
+
+    /**
+     * Is the call allowed
+     *
+     * @param string  $cognitoId
+     * @param Request $request
+     *
+     * @return boolean
+     */
+    public function replay($cognitoId, $request)
+    {
+        $replayKey = sprintf(self::REPLAY_KEY_FORMAT, $cognitoId);
+
+        $body = json_encode(json_decode($request->getContent(), true)['body']);
+        $contents = sprintf('%s%s', $request->getUri(), $body);
+        $shaContents = sha1($contents);
+        $this->logger->debug(sprintf('Replay Check %s -> sha1(%s)', $replayKey, $contents));
+        if ($this->redis->hexists($replayKey, $shaContents)) {
+            return false;
+        }
+
+        $this->redis->hset($replayKey, $shaContents, 1);
+        $this->redis->expire($replayKey, self::$cacheTimes['replay']);
 
         return true;
     }
