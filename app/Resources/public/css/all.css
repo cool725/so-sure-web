@@ -837,3 +837,7 @@ a#get-quote-btn.btn.btn-primary {
 .faster-claims-table td {
     padding: 20px !important;
 }
+
+ul.lead li {
+    padding: 10px;
+}
