@@ -33,6 +33,14 @@ class ClaimTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new \DateTime(), $claim->getApprovedDate());
     }
 
+    public function testSetStatusSettled()
+    {
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_EXTENDED_WARRANTY);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $this->assertEquals(new \DateTime(), $claim->getApprovedDate());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
