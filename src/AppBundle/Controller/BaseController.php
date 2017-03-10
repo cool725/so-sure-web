@@ -34,6 +34,16 @@ abstract class BaseController extends Controller
 {
     use PhoneTrait;
 
+    public function guardReplay($request)
+    {
+        $data = json_decode($request->getContent(), true);
+        $data['reply_prevention_url'] = $request->getUri();
+        arsort($data);
+        $cache = json_encode($data);
+        getCognitoIdentityId
+        return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, sprintf("%s => %s", $cache, sha1($cache)), 500);
+    }
+
     public function isDataStringPresent($data, $field)
     {
         return strlen($this->getDataString($data, $field)) > 0;
@@ -74,6 +84,18 @@ abstract class BaseController extends Controller
     protected function getRequestBool($request, $field)
     {
         return filter_var($this->getRequestString($request, $field), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
+
+    protected function findRewardUser($email)
+    {
+        $dm = $this->getManager();
+        $userRepo = $dm->getRepository(User::class);
+        $rewardRepo = $dm->getRepository(Reward::class);
+        if ($rewardUser = $userRepo->findOneBy(['emailCanonical' => $email])) {
+            return $rewardRepo->findOneBy(['user' => $rewardUser]);
+        }
+
+        return null;
     }
 
     protected function getManager()

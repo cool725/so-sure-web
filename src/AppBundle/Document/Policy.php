@@ -69,6 +69,8 @@ abstract class Policy
     const PROMO_LAUNCH_FREE_NOV = 'launch-free-nov';
     // Free month (refund) for Dec 2016
     const PROMO_FREE_DEC_2016 = 'free-dec-2016';
+    // £5 for policies purchased feb 2016-apr 2017 when login to app
+    const PROMO_APP_MARCH_2017 = 'app-download-mar-2017';
 
     public static $riskLevels = [
         self::RISK_CONNECTED_POT_ZERO => self::RISK_LEVEL_HIGH,
