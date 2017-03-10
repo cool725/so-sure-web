@@ -98,6 +98,10 @@ strong {
     text-shadow: text-shadow: 0 1px 0 #000;
 }
 
+.background-white {
+    background-color: #fff;
+}
+
 /* MOVE TO layout > _header.scss */
 
 .so-sure-logo-dark {
@@ -145,7 +149,6 @@ h4, h5, h6,
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;    
     color: #202532;
 }
-
 
 
 /* Global Tools */
