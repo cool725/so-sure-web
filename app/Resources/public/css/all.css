@@ -833,3 +833,7 @@ a#get-quote-btn.btn.btn-primary {
         display: table-cell;
     }
 }
+
+.faster-claims-table td {
+    padding: 20px !important;
+}
