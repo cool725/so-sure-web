@@ -29,7 +29,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Invoice;
-use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Stats;
 use AppBundle\Document\ImeiTrait;
@@ -716,7 +716,7 @@ class AdminEmployeeController extends BaseController
     private function getConnectionData()
     {
         $dm = $this->getManager();
-        $repo = $dm->getRepository(Connection::class);
+        $repo = $dm->getRepository(StandardConnection::class);
         $connections = $repo->findAll();
         $data = [];
         foreach ($connections as $connection) {

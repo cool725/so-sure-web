@@ -9,7 +9,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
-use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
@@ -264,7 +264,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $invitation->setAccepted($policyB->getStart());
             $manager->persist($invitation);
 
-            $connectionA = new Connection();
+            $connectionA = new StandardConnection();
             $connectionA->setLinkedUser($userA);
             $connectionA->setLinkedPolicy($policyA);
             $connectionA->setValue($policyB->getAllowedConnectionValue());
@@ -272,7 +272,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $connectionA->setPromoValue($policyB->getAllowedPromoConnectionValue());
             }
 
-            $connectionB = new Connection();
+            $connectionB = new StandardConnection();
             $connectionB->setLinkedUser($userB);
             $connectionB->setLinkedPolicy($policyB);
             $connectionB->setValue($policyA->getAllowedConnectionValue());

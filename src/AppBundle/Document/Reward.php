@@ -29,7 +29,7 @@ class Reward
     protected $user;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Connection")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\StandardConnection")
      */
     protected $connections = array();
 

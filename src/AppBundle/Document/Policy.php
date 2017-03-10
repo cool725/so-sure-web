@@ -11,7 +11,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Connection\BaseConnection;
 use AppBundle\Document\Connection\RewardConnection;
-use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -541,7 +541,7 @@ abstract class Policy
     {
         $connections = [];
         foreach ($this->getConnections() as $connection) {
-            if ($connection instanceof Connection) {
+            if ($connection instanceof StandardConnection) {
                 $connections[] = $connection;
             }
         }

@@ -4,7 +4,7 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
-use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\User;

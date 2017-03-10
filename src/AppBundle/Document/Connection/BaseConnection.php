@@ -15,7 +15,7 @@ use AppBundle\Document\Policy;
  * @Gedmo\Loggable
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("invitation_type")
- * @MongoDB\DiscriminatorMap({"standard"="Connection", "reward"="RewardConnection"})
+ * @MongoDB\DiscriminatorMap({"standard"="StandardConnection", "reward"="RewardConnection"})
  * @MongoDB\Index(keys={"sourcePolicy.id"="asc"}, sparse="true")
  * @MongoDB\Index(keys={"linkedPolicy.id"="asc"}, sparse="true")
  */

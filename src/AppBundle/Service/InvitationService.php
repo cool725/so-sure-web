@@ -5,7 +5,7 @@ use Psr\Log\LoggerInterface;
 
 use AppBundle\Classes\SoSure;
 
-use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
@@ -209,7 +209,7 @@ class InvitationService
         $this->validatePolicy($policy);
         $this->validateSoSurePolicyEmail($policy, $email);
 
-        $connectionRepo = $this->dm->getRepository(Connection::class);
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($connectionRepo->isConnectedByEmail($policy, $email)) {
             throw new ConnectedInvitationException('You are already connected');
         }
@@ -291,7 +291,7 @@ class InvitationService
         $mobile = $this->normalizeUkMobile($mobile);
         $this->validatePolicy($policy);
 
-        $connectionRepo = $this->dm->getRepository(Connection::class);
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($connectionRepo->isConnectedBySms($policy, $mobile)) {
             throw new ConnectedInvitationException('You are already connected');
         }
@@ -594,7 +594,7 @@ class InvitationService
 
         // The invitation should never be sent in the first place, but in case
         // there was perhaps an email update in the meantime
-        $connectionRepo = $this->dm->getRepository(Connection::class);
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($invitation instanceof EmailInvitation) {
             if ($connectionRepo->isConnectedByEmail($invitation->getPolicy(), $invitation->getEmail())) {
                 throw new ConnectedInvitationException('You are already connected');
@@ -668,7 +668,7 @@ class InvitationService
             $promoConnectionValue = $replacementConnection->getInitialPromoValue();
             $replacementConnection->setReplacementUser($linkedUser);
         }
-        $connection = new Connection();
+        $connection = new StandardConnection();
         $connection->setLinkedUser($linkedUser);
         $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);

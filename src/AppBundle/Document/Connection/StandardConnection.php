@@ -11,6 +11,6 @@ use AppBundle\Document\Invitation\Invitation;
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
  */
-class Connection extends BaseConnection
+class StandardConnection extends BaseConnection
 {
 }
