@@ -1,10 +1,11 @@
   /* this is used on the homepage and the invalid user page, if we change the homepage we need to make sure the invalid user page still works */ 
 body {
-    background: #202532;
-    background: 
+    background: #3399ff;
+    background: linear-gradient(to top, rgba(3, 189, 254, 0.55), #4481eb);    
+/*    background: 
        linear-gradient(to right, rgba(32, 37, 50, 0.84) , 
        rgba(51, 153, 255, 0.64)), 
-       url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) no-repeat center top;
+       url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) no-repeat center top;*/
 }
 
 /* Adjust Navbar */
@@ -24,7 +25,7 @@ body {
 
 @media (min-width: 767px) {
 
-    body {
+/*    body {
         background: #202532;
         background: 
            linear-gradient(to right, 
@@ -33,5 +34,5 @@ body {
            url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) no-repeat;
         background-position: unset;
         background-size: cover;
-    }
+    }*/
 }
