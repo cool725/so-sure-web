@@ -122,6 +122,10 @@ class ApiAuthController extends BaseController
             if ($action == 'accept' && !isset($data['policy_id'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->replay($this->getCognitoIdentityId($request), $request)) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Duplicate request', 500);
+            }
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(Invitation::class);

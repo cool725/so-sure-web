@@ -1247,4 +1247,32 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals(1, $identityLog->getUuid());
         $this->assertNotNull($identityLog->getPhone());
     }
+
+    public function testReplay()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/test/replay', array('data' => [
+            'foo' => 'bar'
+        ]));
+        $data = $this->verifyResponse(200);
+
+        // replay fail
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/test/replay', array('data' => [
+            'foo' => 'bar'
+        ]));
+        $data = $this->verifyResponse(500);
+
+        // different url should not trigger replay
+        $url = '/api/v1/test/replay?foo=bar';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array('data' => [
+            'foo' => 'bar'
+        ]));
+        $data = $this->verifyResponse(200);
+
+        // different contents should not trigger replay
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/test/replay', array('data' => [
+            'bar' => 'foo'
+        ]));
+        $data = $this->verifyResponse(200);
+    }
 }

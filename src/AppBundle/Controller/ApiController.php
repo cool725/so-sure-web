@@ -183,6 +183,22 @@ class ApiController extends BaseController
     }
 
     /**
+     * This is purely for testing; it does not have an api gateway route defined
+     *
+     * @Route("/test/replay", name="api_test_replay")
+     * @Method({"POST"})
+     */
+    public function testReplayAction(Request $request)
+    {
+        $rateLimit = $this->get('app.ratelimit');
+        if (!$rateLimit->replay($this->getCognitoIdentityId($request), $request)) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Replay', 500);
+        }
+
+        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+    }
+
+    /**
      * @Route("/quote", name="api_quote")
      * @Method({"GET"})
      */
