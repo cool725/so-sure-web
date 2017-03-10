@@ -1,6 +1,6 @@
   /* this is used on the homepage and the invalid user page, if we change the homepage we need to make sure the invalid user page still works */ 
 body {
-    background: #3399ff;
+    background: rgba(3, 189, 254, 0.55);
     background: linear-gradient(to top, rgba(3, 189, 254, 0.55), #4481eb);    
 /*    background: 
        linear-gradient(to right, rgba(32, 37, 50, 0.84) , 

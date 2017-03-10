@@ -40,43 +40,44 @@
     <section class="hero" id="get-quote">
         <div class="container">
             <div class="row">
-                <div class="col-sm-6 col-md-6 col-lg-6">
+                <div class="col-md-7">
                     <h1>
                         Insure. Save. Together.
                     </h1>
                     <p class="lead">Up to 40% cheaper than traditional insurers, faster claims &amp; cashback. Finally, mobile phone insurance that’s worthwhile</p>
-                    <p><a class="btn btn-success btn-rounded btn-lg" data-toggle="modal" data-target="#quoteModel">Get a quote</a></p>  
+                    <ul class="list-inline hero-list-inline text-center hidden-xs">
+                        <li>
+                            <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i6s.make, 'model': i6s.getEncodedModel(), 'memory': i6s.memory}) }}">
+                                <img class="" src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" width="180" />
+                                <br>
+                                Insure from £{{ i6s.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
+                            </a>                                
+                        </li>
+                        <li>
+                            <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i7.make, 'model': i7.getEncodedModel(), 'memory': i7.memory}) }}">
+                                <img class="" src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" width="180"  />
+                                <br>
+                                Insure from £{{ i7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': s7.make, 'model': s7.getEncodedModel(), 'memory': s7.memory}) }}">
+                                <img class="" src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" width="180" />
+                                <br>
+                                Insure from £{{ s7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
+                            </a>
+                        </li>
+                    </ul> 
+                    <p class="text-center"><a class="btn btn-success btn-rounded btn-lg" data-toggle="modal" data-target="#quoteModel">Get a quote</a></p>                                                                 
                 </div>
-                <div class="col-sm-6 col-md-5 col-md-offset-1 col-lg-5 col-lg-offset-1">
-
-                    <div class="hero-box">
-                        <h2 class="text-white text-center">Most popular phones</h2>
-
-                        <ul class="list-unstyled hero-list">
-                            <li>
-                                <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i6s.make, 'model': i6s.getEncodedModel(), 'memory': i6s.memory}) }}">
-                                    <img class="" src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" width="180" />
-                                    <br class="hidden-md hidden-lg">
-                                    From £{{ i6s.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
-                                </a>                                
-                            </li>
-                            <li>
-                                <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i7.make, 'model': i7.getEncodedModel(), 'memory': i7.memory}) }}">
-                                    <img class="" src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" width="180"  />
-                                    <br class="hidden-md hidden-lg">
-                                    From £{{ i7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
-                                </a>
-                            </li>
-                            <li>
-                                <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': s7.make, 'model': s7.getEncodedModel(), 'memory': s7.memory}) }}">
-                                    <img class="" src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" width="180" />
-                                    <br class="hidden-md hidden-lg">
-                                    From £{{ s7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
-                                </a>
-                            </li>
-                        </ul>  
-                    </div>     
+                <div class="col-md-5">
+                        <img src="{{ cdn_url }}/images/home/illustrations/pngs/slide3-min.png" class="hero-img" width="300px;"> 
                 </div>                 
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                      
+                </div>
             </div>
         </div>
     </section>    
@@ -95,16 +96,16 @@
                 <div class="col-md-8">
                     <h2>Why did we create so-sure?</h2>
                     <p class="h3">Traditional insurance is rubbish</p>
-                    <ul class="lead">
-                        <li>Too expensive</li>
-                        <li>Don’t payout when you claim</li>
+                    <ul class="lead list-unstyled">
+                        <li><i class="fa fa-minus-circle text-red" aria-hidden="true"></i> Too expensive</li>
+                        <li><i class="fa fa-minus-circle text-red" aria-hidden="true"></i> Doesn’t payout when you claim</li>
                     </ul>
                     <p class="h3">We are changing that, starting with mobile phone insurance</p>
-                    <ul class="lead">
-                        <li>Up to 40% cheaper than mobile operators</li>
-                        <li>Phone in your hand the next working day when you claim</li>
-                        <li>Get cashback when you and your friends don’t claim</li>
-                        <li>We don’t hide behind SMALL PRINT or painful process </li>
+                    <ul class="lead list-unstyled">
+                        <li><i class="fa fa-check-circle text-green" aria-hidden="true"></i> Up to 40% cheaper than mobile operators</li>
+                        <li><i class="fa fa-check-circle text-green" aria-hidden="true"></i> Phone in your hand the next working day when you claim</li>
+                        <li><i class="fa fa-check-circle text-green" aria-hidden="true"></i> Get cashback when you and your friends don’t claim</li>
+                        <li><i class="fa fa-check-circle text-green" aria-hidden="true"></i> We don’t hide behind SMALL PRINT or painful process </li>
                     </ul>
                 </div>
             </div>
@@ -116,14 +117,14 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-white">
-                    <h2 class="text-white">Cheaper &amp; get Cashback</h2>
+                    <h2 class="text-white">Save Money! Now &amp; Later</h2>
                     <p class="text-white h3">Up to 40% cheaper than mobile operators</p>
                     <p class="lead">And you can get up to 80% cashback every year if you and your friends don’t claim.</p>
                     <ul>
                         <li>Connect to friends/family and each receive up to £10 in your individual Reward Pots.</li>
                         <li>At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you.</li>
                     </ul>
-                    <p class="text-white h3">More details in the video.</p>         
+                    <p class="text-white h3">Watch the video to find out more!</p>         
                 </div>
                 <div class="col-md-6">
                     <div class="explainer-video-thumb">
