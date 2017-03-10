@@ -25,7 +25,7 @@ $(function(){
     var totalBonus = Math.round((bonusDaysLeft / totalBonusDays) * 100);
     var bonus = totalBonus / 100; 
 
-    console.log(bonus);
+    // console.log(bonus);
 
     $(connectionChart).circleProgress({
         value: bonus,
@@ -48,14 +48,14 @@ $(function(){
         $('#connect-with-box').addClass('box-border--highlight');
     });    
 
-    // Copy to clipboard
-    $('.btn-clipboard').tooltip({'title':'Copied', 'trigger': 'manual'});
+    // Copy button on scode
     var clipboard = new Clipboard('.btn-clipboard');
+    $('.btn-clipboard').tooltip({'title':'Copied', 'trigger':'manual'});
 
     clipboard.on('success', function(e) {
         $('.btn-clipboard').tooltip('show');
         setTimeout(function() { $('.btn-clipboard').tooltip('hide'); }, 1500);
-    });
+    });    
 
     // Share buttons
     $("#share").jsSocials({

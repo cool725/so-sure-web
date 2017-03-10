@@ -90,13 +90,15 @@
                                     <div class="input-group">
                                         <input id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.code }}">
                                         <span class="input-group-btn">
-                                            <button class="btn btn-primary btn-clipboard" 
-                                                    data-clipboard-text="{{ policy.standardSCode.shareLink }}" 
+                                            <a class="btn btn-default btn-clipboard"
+                                                    data-clipboard-text="{{ policy.standardSCode.shareLink }}"
+                                                    data-clipboard-target="#scode"
+                                                    data-share-text="Hey, I've just joined so-sure – better insurance that is up to 80% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: {{ policy.standardSCode.shareLink }}. Add my code after you pay: {{ policy.standardSCode.code }}"
                                                     data-toggle="tooltip" 
-                                                    data-placement="right"
-                                                    data-share-text="Hey, I've just joined so-sure – better insurance that is up to 80% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: {{ policy.standardSCode.shareLink }}. Add my code after you pay: {{ policy.standardSCode.code }}">
+                                                    data-placement="bottom"     
+                                                    >
                                                 <i class="fa fa-clipboard"></i>
-                                            </button>
+                                            </a>
                                         </span>
                                     </div>
                                 </form>
