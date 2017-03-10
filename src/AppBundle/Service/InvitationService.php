@@ -584,6 +584,10 @@ class InvitationService
             throw new ProcessedException("Invitation has already been processed");
         }
 
+        if (!$this->rateLimit->replayData($invitation->getId(), $inviteePolicy->getId())) {
+            throw new ProcessedException("Invitation is processing");
+        }
+
         $inviterPolicy = $invitation->getPolicy();
 
         $this->validateSoSurePolicyEmail($inviterPolicy, $inviteePolicy->getUser()->getEmail());

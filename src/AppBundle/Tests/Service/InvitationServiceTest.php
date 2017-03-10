@@ -275,7 +275,7 @@ class InvitationServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \MongoDuplicateKeyException
+     * @expectedException AppBundle\Exception\ProcessedException
      */
     public function testConcurrentAccept()
     {
