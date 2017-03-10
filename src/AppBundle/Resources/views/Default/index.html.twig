@@ -85,120 +85,18 @@
     {% include 'AppBundle::Default/press.html.twig' %}
 
     {# {% include 'AppBundle::Default/benefits.html.twig' %} #}
-    <section class="section--pad background-white">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <p class="text-center"><img src="{{ cdn_url }}/images/about/team/dylan_bio.jpg" alt="Dylan CEO" class="img-circle" width="300px;">
-                        <br><br><strong>Dylan Bourguignon - CEO</strong>
-                    </p>
-                </div>
-                <div class="col-md-8">
-                    <h2>Why did we create so-sure?</h2>
-                    <p class="h3">Traditional insurance is rubbish</p>
-                    <ul class="lead list-unstyled">
-                        <li><i class="fa fa-minus-circle text-red" aria-hidden="true"></i> Too expensive</li>
-                        <li><i class="fa fa-minus-circle text-red" aria-hidden="true"></i> Doesn’t payout when you claim</li>
-                    </ul>
-                    <p class="h3">We are changing that, starting with mobile phone insurance</p>
-                    <ul class="lead list-unstyled">
-                        <li><i class="fa fa-check-circle text-green" aria-hidden="true"></i> Up to 40% cheaper than mobile operators</li>
-                        <li><i class="fa fa-check-circle text-green" aria-hidden="true"></i> Phone in your hand the next working day when you claim</li>
-                        <li><i class="fa fa-check-circle text-green" aria-hidden="true"></i> Get cashback when you and your friends don’t claim</li>
-                        <li><i class="fa fa-check-circle text-green" aria-hidden="true"></i> We don’t hide behind SMALL PRINT or painful process </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
+    {% include 'AppBundle::Default/whySoSure.html.twig' %}
 
     {# {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}    #}
-    <section id="how-it-works" class="section--pad alt-brand-gradient">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 text-white">
-                    <h2 class="text-white">Save Money! Now &amp; Later</h2>
-                    <p class="text-white h3">Up to 40% cheaper than mobile operators</p>
-                    <p class="lead">And you can get up to 80% cashback every year if you and your friends don’t claim.</p>
-                    <ul>
-                        <li>Connect to friends/family and each receive up to £10 in your individual Reward Pots.</li>
-                        <li>At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you.</li>
-                    </ul>
-                    <p class="text-white h3">Watch the video to find out more!</p>         
-                </div>
-                <div class="col-md-6">
-                    <div class="explainer-video-thumb">
-                        <a class="explainer-video-view-thumb" data-toggle="modal" data-target="#modal-fullscreen">
-                            <img src="{{ cdn_url }}/images/home/explainer-video/explainer-video-frame-2.png" class="img-responsive">
-                            
-                            <svg id="play-button" width="80px" height="80px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <defs></defs>
-                                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                    <g id="Artboard">
-                                        <circle id="play-bg" fill="#202532" cx="100" cy="100" r="100"></circle>
-                                        <polygon id="Triangle" fill="#FFFFFF" points="149 100 69 145 69 55"></polygon>
-                                    </g>
-                                </g>
-                            </svg>
-                        </a>
-                    </div>                
-                </div>
-            </div>
-        </div>
-    </section>
+    {% include 'AppBundle::Default/saveMoney.html.twig' %}
 
-    <section class="section--pad background-white">
-        <div class="container text-center">
-            <h2 class="text-center">Faster claims, Better cover</h2>
-            <table class="table table-striped table-bordered table-responsive">
-                <thead>
-                    <tr class="info">
-                        <td width="50%"><strong>so-sure</strong></td>
-                        <td width="50%"><strong>Competition</strong></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Claims speed: Next working day</td>
-                        <td>4-18 days on average*</td>
-                    </tr>
-                    <tr>
-                        <td>Immediate cover</td>
-                        <td>Can be up to 14 days before cover starts</td>
-                    </tr>
-                    <tr>
-                        <td>Insure phones up to 3 years old</td>
-                        <td>Most require purchase within 30 days</td>
-                    </tr>
-                    <tr>
-                        <td>Terms &amp; Conditions in plain English</td>
-                        <td>Do you have a law degree to understand them?</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><small>*FCA report Dec 2015</small></p>
-        </div>
-    </section>
+    {% include 'AppBundle::Default/fasterClaims.html.twig' %}
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
     {% include 'AppBundle::Default/footerCta.html.twig' %}
 
-    <section class="press">
-        <div class="container">
-            <div class="col-sm-3 col-md-2 col-md-offset-3">
-                <h4 class="footer-press--heading">
-                    <strong><small>IN PARTNERSHIP WITH</small></strong>
-                </h4>
-            </div>
-            <div class="col-sm-3 col-md-2">
-                <img src="{{ cdn_url }}/images/munichre-logo.png" alt="Munich RE">
-            </div>    
-            <div class="col-sm-3 col-md-2">
-                <img src="{{ cdn_url }}/images/salva-logo.png" alt="Salva">
-            </div>                        
-        </div>
-    </section>   
+    {% include 'AppBundle::Default/partnership.html.twig' %}
 
     {# Page Modals #}         
 

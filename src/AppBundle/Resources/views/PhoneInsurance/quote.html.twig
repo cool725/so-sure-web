@@ -280,7 +280,7 @@
     {{ form_end(buy_form) }}
     </section>
 
-    {% include 'AppBundle::Default/press.html.twig' %}
+    {% include 'AppBundle::Default/press.html.twig' with { 'press_background': '#ddd !important' } %}
 
     {# <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">
@@ -302,6 +302,7 @@
         </div>
     </section> #}
 
+    {#
     <section class="section--pad">
         <div class="container">
             <div class="row">
@@ -355,24 +356,15 @@
             </div>
         </div>
     </section>
+    #}
+    
+    {% include 'AppBundle::Default/fasterClaims.html.twig' %}
 
-    <section class="press">
-        <div class="container">
-            <div class="col-sm-3 col-md-2 col-md-offset-3">
-                <h4 class="footer-press--heading">
-                    <strong><small>IN PARTNERSHIP WITH</small></strong>
-                </h4>
-            </div>
-            <div class="col-sm-3 col-md-2">
-                <img src="{{ cdn_url }}/images/munichre-logo.png" alt="Munich RE">
-            </div>    
-            <div class="col-sm-3 col-md-2">
-                <img src="{{ cdn_url }}/images/salva-logo.png" alt="Salva">
-            </div>                        
-        </div>
-    </section>    
+    {% include 'AppBundle::Default/saveMoney.html.twig' %}
+    
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
-    {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}  
+    {% include 'AppBundle::Default/whySoSure.html.twig' %}
 
     <section class="phone-details">
         <div class="container">
@@ -391,6 +383,8 @@
             {% endif %}
         </div>
     </section>
+
+    {% include 'AppBundle::Default/partnership.html.twig' %}
 
     {# Page Modals #}
 
