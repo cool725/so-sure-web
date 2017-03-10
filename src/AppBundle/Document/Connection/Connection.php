@@ -1,17 +1,23 @@
 <?php
 
-namespace AppBundle\Document;
+namespace AppBundle\Document\Connection;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
  * @Gedmo\Loggable
- * @MongoDB\Index(keys={"sourcePolicy.id"="asc","linkedPolicy.id"="asc"}, sparse="true", unique="true")
+ * @MongoDB\InheritanceType("SINGLE_COLLECTION")
+ * @MongoDB\DiscriminatorField("type")
+ * @MongoDB\DiscriminatorMap({"standard"="StandardConnection", "reward"="RewardConnection"})
+ * @MongoDB\Index(keys={"sourcePolicy.id"="asc"}, sparse="true")
+ * @MongoDB\Index(keys={"linkedPolicy.id"="asc"}, sparse="true")
  */
 class Connection
 {
@@ -21,19 +27,19 @@ class Connection
     protected $id;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
      */
     protected $linkedUser;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
      */
     protected $sourceUser;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Policy")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
      */
     protected $sourcePolicy;
@@ -52,7 +58,7 @@ class Connection
     protected $initialInvitationDate;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Policy")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
      */
     protected $linkedPolicy;
@@ -93,7 +99,7 @@ class Connection
     protected $initialPromoValue;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
      */
     protected $replacementUser;
@@ -270,7 +276,9 @@ class Connection
         $claimDates = [];
         if ($claims) {
             foreach ($claims as $claim) {
-                if ($claim->getPolicy()->getId() == $this->getLinkedPolicy()->getId() && $claim->getClosedDate()) {
+                if ($this->getLinkedPolicy() &&
+                    $claim->getPolicy()->getId() == $this->getLinkedPolicy()->getId() &&
+                    $claim->getClosedDate()) {
                     $claimDates[] =  $claim->getClosedDate()->format(\DateTime::ATOM);
                 }
             }

@@ -3,7 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Claim;
-use AppBundle\Document\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\PolicyTerms;
@@ -27,7 +27,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testConnection()
     {
-        $connection = new Connection();
+        $connection = new StandardConnection();
         $this->assertEquals(0, $connection->getValue());
         $this->assertEquals(0, $connection->getTotalValue());
 
@@ -42,7 +42,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testConnectionApi()
     {
-        $connection = new Connection();
+        $connection = new StandardConnection();
         $api = $connection->toApiArray([]);
         $this->assertNull($api['name']);
         $this->assertNull($api['image_url']);
@@ -61,7 +61,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $user->setEmail('foo@bar.com');
         $user->setFirstName('Foo');
         $user->setLastName('Bar');
-        $connection = new Connection();
+        $connection = new StandardConnection();
         $connection->setLinkedUser($user);
         $api = $connection->toApiArray([]);
         $this->assertEquals('Foo Bar', $api['name']);

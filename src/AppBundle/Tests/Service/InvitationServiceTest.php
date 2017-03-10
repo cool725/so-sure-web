@@ -275,7 +275,7 @@ class InvitationServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \MongoDuplicateKeyException
+     * @expectedException AppBundle\Exception\ProcessedException
      */
     public function testConcurrentAccept()
     {
@@ -1546,6 +1546,22 @@ class InvitationServiceTest extends WebTestCase
 
         $updatedOpenInvitaiton = $repo->find($openInvitation->getId());
         $this->assertTrue($updatedOpenInvitaiton->isRejected());
+    }
+
+    public function testAddReward()
+    {
+        $policy = $this->createAndLink(static::generateEmail('testAddReward-A', $this), new \DateTime());
+        $this->createAndLink(
+            static::generateEmail('testAddReward-B', $this),
+            new \DateTime(),
+            static::generateEmail('testAddReward-A', $this),
+            $policy
+        );
+
+        $reward = $this->createReward(static::generateEmail('testAddReward-R', $this));
+        $connection = static::$invitationService->addReward($policy->getUser(), $reward, 10);
+        $this->assertEquals(20, $policy->getPotValue());
+        $this->assertEquals(2, count($policy->getConnections()));
     }
 
     private function createAndLink($email, $date, $inviteeEmail = null, $policy = null, $phone = null)

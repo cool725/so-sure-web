@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Reward;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\LostPhone;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -24,6 +25,7 @@ class ClaimsServiceTest extends WebTestCase
     protected static $lostPhoneRepo;
     protected static $userManager;
     protected static $claimsService;
+    protected static $invitationService;
 
     public static function setUpBeforeClass()
     {
@@ -42,6 +44,7 @@ class ClaimsServiceTest extends WebTestCase
          self::$userManager = self::$container->get('fos_user.user_manager');
          self::$policyService = self::$container->get('app.policy');
          self::$claimsService = self::$container->get('app.claims');
+         self::$invitationService = self::$container->get('app.invitation');
     }
 
     public function tearDown()
@@ -103,5 +106,66 @@ class ClaimsServiceTest extends WebTestCase
         $this->assertTrue(static::$claimsService->addClaim($policyA, $claimB));
         // not allowed for diff policy
         $this->assertFalse(static::$claimsService->addClaim($policyB, $claimB));
+    }
+
+    public function testProcessClaimProcessed()
+    {
+        $claim = new Claim();
+        $claim->setProcessed(true);
+        $this->assertFalse(static::$claimsService->processClaim($claim));
+    }
+
+    public function testProcessClaimNonMonetary()
+    {
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setType(Claim::TYPE_THEFT);
+        $this->assertFalse(static::$claimsService->processClaim($claim));
+    }
+
+    public function testProcessClaimRewardConnection()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessClaimRewardConnection', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $this->assertEquals(0, $policy->getPotValue());
+
+        $reward = $this->createReward(static::generateEmail('testProcessClaimRewardConnection-R', $this));
+        $connection = static::$invitationService->addReward($user, $reward, 10);
+        $this->assertEquals(10, $connection->getPromoValue());
+        $this->assertEquals(10, $policy->getPotValue());
+
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $claim->setNumber(rand(1, 999999));
+        $policy->addClaim($claim);
+        $this->assertTrue(static::$claimsService->processClaim($claim));
+        $this->assertEquals(0, $connection->getPromoValue());
+        $this->assertEquals(0, $policy->getPotValue());
+        $this->assertTrue($claim->getProcessed());
+    }
+
+    public function testProcessClaimRewards()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessClaimRewards', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+
+        $reward1 = $this->createReward(static::generateEmail('testProcessClaimRewards1', $this));
+        $connection = static::$invitationService->addReward($user, $reward1, 10);
+        $this->assertEquals(10, $connection->getPromoValue());
+
+        $reward2 = $this->createReward(static::generateEmail('testProcessClaimRewards2', $this));
+        $connection = static::$invitationService->addReward($user, $reward2, 10);
+        $this->assertEquals(10, $connection->getPromoValue());
     }
 }

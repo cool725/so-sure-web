@@ -269,10 +269,16 @@ class RateLimitService
      */
     public function replay($cognitoId, $request)
     {
-        $replayKey = sprintf(self::REPLAY_KEY_FORMAT, $cognitoId);
-
         $body = json_encode(json_decode($request->getContent(), true)['body']);
         $contents = sprintf('%s%s', $request->getUri(), $body);
+
+        return $this->replayData($cognitoId, $contents);
+    }
+
+    public function replayData($id, $contents)
+    {
+        $replayKey = sprintf(self::REPLAY_KEY_FORMAT, $id);
+
         $shaContents = sha1($contents);
         $this->logger->debug(sprintf('Replay Check %s -> sha1(%s)', $replayKey, $contents));
         if ($this->redis->hexists($replayKey, $shaContents)) {

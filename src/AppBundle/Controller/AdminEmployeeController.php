@@ -27,8 +27,10 @@ use AppBundle\Document\SoSurePayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Reward;
 use AppBundle\Document\Invoice;
-use AppBundle\Document\Connection;
+use AppBundle\Document\Connection\StandardConnection;
+use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Stats;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\OptOut\OptOut;
@@ -60,6 +62,8 @@ use AppBundle\Exception\RedirectException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Pagerfanta\Pagerfanta;
@@ -712,7 +716,7 @@ class AdminEmployeeController extends BaseController
     private function getConnectionData()
     {
         $dm = $this->getManager();
-        $repo = $dm->getRepository(Connection::class);
+        $repo = $dm->getRepository(StandardConnection::class);
         $connections = $repo->findAll();
         $data = [];
         foreach ($connections as $connection) {
@@ -741,6 +745,101 @@ class AdminEmployeeController extends BaseController
         }
 
         return $data;
+    }
+
+    /**
+     * @Route("/rewards", name="admin_rewards")
+     * @Template
+     */
+    public function rewardsAction(Request $request)
+    {
+        $connectForm = $this->get('form.factory')
+            ->createNamedBuilder('connectForm')
+            ->add('email', EmailType::class)
+            ->add('amount', TextType::class)
+            ->add('rewardId', HiddenType::class)
+            ->add('next', SubmitType::class)
+            ->getForm();
+
+        $rewardForm = $this->get('form.factory')
+            ->createNamedBuilder('rewardForm')
+            ->add('name', TextType::class)
+            ->add('email', EmailType::class)
+            ->add('next', SubmitType::class)
+            ->getForm();
+
+        $dm = $this->getManager();
+        $rewardRepo = $dm->getRepository(Reward::class);
+        $userRepo = $dm->getRepository(User::class);
+        $rewards = $rewardRepo->findAll();
+
+        try {
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('connectForm')) {
+                    $connectForm->handleRequest($request);
+                    if ($connectForm->isValid()) {
+                        if ($sourceUser = $userRepo->findOneBy([
+                                'emailCanonical' => strtolower($connectForm->getData()['email'])
+                            ])) {
+                            $reward = $rewardRepo->find($connectForm->getData()['rewardId']);
+                            $invitationService = $this->get('app.invitation');
+                            $invitationService->addReward(
+                                $sourceUser,
+                                $reward,
+                                $this->toTwoDp($connectForm->getData()['amount'])
+                            );
+                            $this->addFlash('success', sprintf(
+                                'Added reward connection'
+                            ));
+    
+                            return new RedirectResponse($this->generateUrl('admin_rewards'));
+                        } else {
+                            throw new \InvalidArgumentException(sprintf(
+                                'Unable to add reward bonus. %s does not exist as a user',
+                                $connectForm->getData()['email']
+                            ));
+                        }
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add reward connection. %s',
+                            (string) $emailForm->getErrors()
+                        ));
+                    }
+                } elseif ($request->request->has('rewardForm')) {
+                    $rewardForm->handleRequest($request);
+                    if ($rewardForm->isValid()) {
+                        $userManager = $this->get('fos_user.user_manager');
+                        $user = $userManager->createUser();
+                        $user->setEnabled(true);
+                        $user->setEmail($this->getDataString($rewardForm->getData(), 'email'));
+                        $user->setFirstName($this->getDataString($rewardForm->getData(), 'name'));
+                        $reward = new Reward();
+                        $reward->setUser($user);
+                        $dm->persist($user);
+                        $dm->persist($reward);
+                        $dm->flush();
+                        $this->addFlash('success', sprintf(
+                            'Added reward'
+                        ));
+    
+                        return new RedirectResponse($this->generateUrl('admin_rewards'));
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add reward. %s',
+                            (string) $emailForm->getErrors()
+                        ));
+                    }
+                }
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return [
+            'rewards' => $rewards,
+            'connectForm' => $connectForm->createView(),
+            'rewardForm' => $rewardForm->createView(),
+        ];
     }
 
     /**

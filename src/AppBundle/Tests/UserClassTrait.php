@@ -12,6 +12,7 @@ use AppBundle\Document\GocardlessPayment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\SoSurePayment;
 use AppBundle\Document\ImeiTrait;
+use AppBundle\Document\Reward;
 use AppBundle\Classes\Salva;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -313,5 +314,21 @@ trait UserClassTrait
                 'sourceIp' => '62.253.24.189',
             ))
         );
+    }
+
+    protected static function createReward($email)
+    {
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar'
+        );
+        $reward = new Reward();
+        $reward->setUser($user);
+        static::$dm->persist($user);
+        static::$dm->persist($reward);
+        static::$dm->flush();
+
+        return $reward;
     }
 }

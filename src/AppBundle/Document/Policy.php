@@ -9,6 +9,9 @@ use AppBundle\Document\File\S3File;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Classes\Salva;
+use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Connection\RewardConnection;
+use AppBundle\Document\Connection\StandardConnection;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -160,7 +163,7 @@ abstract class Policy
     protected $policyTerms;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection", cascade={"persist"})
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\Connection", cascade={"persist"})
      */
     protected $connections = array();
 
@@ -532,6 +535,30 @@ abstract class Policy
     public function getConnections()
     {
         return $this->connections;
+    }
+
+    public function getStandardConnections()
+    {
+        $connections = [];
+        foreach ($this->getConnections() as $connection) {
+            if ($connection instanceof StandardConnection) {
+                $connections[] = $connection;
+            }
+        }
+
+        return $connections;
+    }
+
+    public function getRewardConnections()
+    {
+        $connections = [];
+        foreach ($this->getConnections() as $connection) {
+            if ($connection instanceof RewardConnection) {
+                $connections[] = $connection;
+            }
+        }
+
+        return $connections;
     }
 
     public function getLastConnection()
@@ -1591,11 +1618,11 @@ abstract class Policy
     public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)
     {
         foreach ($this->getConnections() as $connection) {
-            if ($connection->getReplacementUser()) {
+            if ($connection->getReplacementUser() || $connection instanceof RewardConnection) {
                 continue;
             }
             $policy = $connection->getLinkedPolicy();
-            if (!$policy) {
+            if (!$policy && !$connection instanceof RewardConnection) {
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
             if ($policy->isCancelled() && $policy->hasEndedInLast30Days($date)) {
@@ -1635,6 +1662,9 @@ abstract class Policy
     {
         $claims = [];
         foreach ($this->getConnections() as $connection) {
+            if ($connection instanceof RewardConnection) {
+                continue;
+            }
             $policy = $connection->getLinkedPolicy();
             if (!$policy) {
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
@@ -1653,6 +1683,9 @@ abstract class Policy
     {
         $policies = [];
         foreach ($this->getConnections() as $connection) {
+            if ($connection instanceof RewardConnection) {
+                continue;
+            }
             $policy = $connection->getLinkedPolicy();
             if (!$policy) {
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
@@ -1801,6 +1834,9 @@ abstract class Policy
         // zero out the connection value for connections bound to this policy
         foreach ($this->getConnections() as $networkConnection) {
             $networkConnection->clearValue();
+            if ($networkConnection instanceof RewardConnection) {
+                continue;
+            }
             foreach ($networkConnection->getLinkedPolicy()->getConnections() as $otherConnection) {
                 if ($otherConnection->getLinkedPolicy()->getId() == $this->getId()) {
                     $otherConnection->clearValue();

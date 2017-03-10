@@ -5,12 +5,14 @@ use Psr\Log\LoggerInterface;
 
 use AppBundle\Classes\SoSure;
 
-use AppBundle\Document\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Reward;
+use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -207,7 +209,7 @@ class InvitationService
         $this->validatePolicy($policy);
         $this->validateSoSurePolicyEmail($policy, $email);
 
-        $connectionRepo = $this->dm->getRepository(Connection::class);
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($connectionRepo->isConnectedByEmail($policy, $email)) {
             throw new ConnectedInvitationException('You are already connected');
         }
@@ -289,7 +291,7 @@ class InvitationService
         $mobile = $this->normalizeUkMobile($mobile);
         $this->validatePolicy($policy);
 
-        $connectionRepo = $this->dm->getRepository(Connection::class);
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($connectionRepo->isConnectedBySms($policy, $mobile)) {
             throw new ConnectedInvitationException('You are already connected');
         }
@@ -582,6 +584,10 @@ class InvitationService
             throw new ProcessedException("Invitation has already been processed");
         }
 
+        if (!$this->rateLimit->replayData($invitation->getId(), $inviteePolicy->getId())) {
+            throw new ProcessedException("Invitation is processing");
+        }
+
         $inviterPolicy = $invitation->getPolicy();
 
         $this->validateSoSurePolicyEmail($inviterPolicy, $inviteePolicy->getUser()->getEmail());
@@ -592,7 +598,7 @@ class InvitationService
 
         // The invitation should never be sent in the first place, but in case
         // there was perhaps an email update in the meantime
-        $connectionRepo = $this->dm->getRepository(Connection::class);
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($invitation instanceof EmailInvitation) {
             if ($connectionRepo->isConnectedByEmail($invitation->getPolicy(), $invitation->getEmail())) {
                 throw new ConnectedInvitationException('You are already connected');
@@ -666,7 +672,7 @@ class InvitationService
             $promoConnectionValue = $replacementConnection->getInitialPromoValue();
             $replacementConnection->setReplacementUser($linkedUser);
         }
-        $connection = new Connection();
+        $connection = new StandardConnection();
         $connection->setLinkedUser($linkedUser);
         $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);
@@ -803,5 +809,32 @@ class InvitationService
             }
         }
         $this->dm->flush();
+    }
+
+    public function addReward(User $sourceUser, Reward $reward, $amount)
+    {
+        if ($sourceUser->getCurrentPolicy()->hasMonetaryClaimed()) {
+            throw new \InvalidArgumentException(sprintf(
+                'Unable to add bonus. %s has a monetary claim',
+                $sourceUser->getEmail()
+            ));
+        }
+        if (count($sourceUser->getCurrentPolicy()->getNetworkClaims(true)) > 0) {
+            throw new \InvalidArgumentException(sprintf(
+                '%s has a network claim',
+                $sourceUser->getEmail()
+            ));
+        }
+        $connection = new RewardConnection();
+        $sourceUser->getCurrentPolicy()->addConnection($connection);
+        $connection->setLinkedUser($reward->getUser());
+        $connection->setPromoValue($amount);
+        $reward->addConnection($connection);
+        $reward->updatePotValue();
+        $sourceUser->getCurrentPolicy()->updatePotValue();
+        $this->dm->persist($connection);
+        $this->dm->flush();
+
+        return $connection;
     }
 }

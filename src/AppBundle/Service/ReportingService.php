@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
@@ -47,7 +47,7 @@ class ReportingService
         }
 
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $connectionRepo = $this->dm->getRepository(Connection::class);
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         $invitationRepo = $this->dm->getRepository(Invitation::class);
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         $claimsRepo = $this->dm->getRepository(Claim::class);

@@ -4,7 +4,7 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
-use AppBundle\Document\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
@@ -227,7 +227,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA->setStart(new \DateTime("2016-01-01"));
         $policyA->setPotValue(0);
 
-        $connectionA = new Connection();
+        $connectionA = new StandardConnection();
         $policyA->addConnection($connectionA);
 
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_HIGH, $policyA->getRisk());
@@ -359,7 +359,7 @@ class PhonePolicyTest extends WebTestCase
 
     protected function createLinkedConnections($policyA, $policyB, $valueA, $valueB)
     {
-        $connectionA = new Connection();
+        $connectionA = new StandardConnection();
         $connectionA->setValue($valueA);
         if ($valueA > 10) {
             $connectionA->setValue(10);
@@ -369,7 +369,7 @@ class PhonePolicyTest extends WebTestCase
         $connectionA->setLinkedPolicy($policyB);
         $policyA->addConnection($connectionA);
 
-        $connectionB = new Connection();
+        $connectionB = new StandardConnection();
         $connectionB->setValue($valueB);
         if ($valueB > 10) {
             $connectionB->setValue(10);
@@ -947,7 +947,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
-        $user->setEmail(self::generateEmail('testCancelPolicyCancelsScheduledPayments', $this));
+        $user->setEmail(self::generateEmail('testValidateRefundAmountIsInstallmentPrice', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));

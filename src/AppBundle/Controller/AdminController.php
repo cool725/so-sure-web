@@ -28,7 +28,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Invoice;
-use AppBundle\Document\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Stats;
 use AppBundle\Document\OptOut\OptOut;
 use AppBundle\Document\OptOut\EmailOptOut;
