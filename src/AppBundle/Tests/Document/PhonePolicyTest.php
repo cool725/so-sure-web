@@ -947,7 +947,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
-        $user->setEmail(self::generateEmail('testCancelPolicyCancelsScheduledPayments', $this));
+        $user->setEmail(self::generateEmail('testValidateRefundAmountIsInstallmentPrice', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));

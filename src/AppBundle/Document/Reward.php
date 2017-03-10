@@ -7,7 +7,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\Invitation\Invitation;
-use AppBundle\Document\Connection\BaseConnection;
+use AppBundle\Document\Connection\Connection;
 
 /**
  * @MongoDB\Document()
@@ -68,7 +68,7 @@ class Reward
         return $this->connections;
     }
 
-    public function addConnection(BaseConnection $connection)
+    public function addConnection(Connection $connection)
     {
         $this->connections[] = $connection;
     }

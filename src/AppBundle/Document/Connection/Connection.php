@@ -19,7 +19,7 @@ use AppBundle\Document\Policy;
  * @MongoDB\Index(keys={"sourcePolicy.id"="asc"}, sparse="true")
  * @MongoDB\Index(keys={"linkedPolicy.id"="asc"}, sparse="true")
  */
-class BaseConnection
+class Connection
 {
     /**
      * @MongoDB\Id(strategy="auto")

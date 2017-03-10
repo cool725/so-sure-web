@@ -9,7 +9,7 @@ use AppBundle\Document\File\S3File;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Classes\Salva;
-use AppBundle\Document\Connection\BaseConnection;
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Connection\StandardConnection;
 
@@ -163,7 +163,7 @@ abstract class Policy
     protected $policyTerms;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\BaseConnection", cascade={"persist"})
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\Connection", cascade={"persist"})
      */
     protected $connections = array();
 
@@ -525,7 +525,7 @@ abstract class Policy
         $this->gocardlessSubscription = $gocardlessSubscription;
     }
 
-    public function addConnection(BaseConnection $connection)
+    public function addConnection(Connection $connection)
     {
         $connection->setSourcePolicy($this);
         $connection->setSourceUser($this->getUser());
