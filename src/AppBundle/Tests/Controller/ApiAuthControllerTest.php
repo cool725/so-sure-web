@@ -392,6 +392,13 @@ class ApiAuthControllerTest extends BaseControllerTest
             'policy_id' => $inviteePolicyData['id']
         ]);
         $data = $this->verifyResponse(200);
+
+        // replay should fail
+        $crawler = static::postRequest(self::$client, $inviteeCognitoIdentityId, $url, [
+            'action' => 'accept',
+            'policy_id' => $inviteePolicyData['id']
+        ]);
+        $data = $this->verifyResponse(500);
     }
 
     public function testInvitationValidation()
