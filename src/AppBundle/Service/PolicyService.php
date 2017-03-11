@@ -822,7 +822,8 @@ class PolicyService
             }
             // if that user has already claimed, there's no point in telling them that their friend cancelled,
             // as they can't do anything to improve their pot
-            if ($networkConnection->getLinkedPolicy()->hasMonetaryClaimed()) {
+            if ($networkConnection->getLinkedPolicy() &&
+                $networkConnection->getLinkedPolicy()->hasMonetaryClaimed()) {
                 continue;
             }
             $this->mailer->sendTemplate(

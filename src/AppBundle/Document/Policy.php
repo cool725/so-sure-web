@@ -1663,10 +1663,7 @@ abstract class Policy
     public function getNetworkClaims($monitaryOnly = false, $includeOpen = false)
     {
         $claims = [];
-        foreach ($this->getConnections() as $connection) {
-            if ($connection instanceof RewardConnection) {
-                continue;
-            }
+        foreach ($this->getStandardConnections() as $connection) {
             $policy = $connection->getLinkedPolicy();
             if (!$policy) {
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
