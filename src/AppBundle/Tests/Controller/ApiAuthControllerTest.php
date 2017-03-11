@@ -12,6 +12,7 @@ use AppBundle\Document\LostPhone;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Reward;
 use AppBundle\Document\MultiPay;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Event\UserEmailEvent;
@@ -58,6 +59,18 @@ class ApiAuthControllerTest extends BaseControllerTest
             'foobar@auth-api.so-sure.com',
             'barfoo'
         );
+
+        $user = self::createUser(
+            self::$userManager,
+            'bonus@so-sure.net',
+            'foo'
+        );
+        $user->setFirstName('so-sure');
+        $user->setLastName('Rewards');
+        $reward = new Reward();
+        $reward->setUser($user);
+        static::$dm->persist($reward);
+        static::$dm->flush();
     }
 
     // address
@@ -2765,6 +2778,67 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(self::$testUser->getEmailCanonical(), $data['email']);
     }
 
+    public function testGetCurrentUserPromoAppMarch2017PreFeb()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testGetCurrentUserPromoAppMarch2017PreFeb', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id'], null, new \DateTime('2017-01-29'));
+
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(null, $data['policies'][0]['promo_code']);
+    }
+
+    public function testGetCurrentUserPromoAppMarch2017Mar()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testGetCurrentUserPromoAppMarch2017Mar', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id'], null, new \DateTime('2017-03-01'));
+
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(Policy::PROMO_APP_MARCH_2017, $data['policies'][0]['promo_code']);
+        $this->assertEquals('so-sure Rewards', $data['policies'][0]['connections'][0]['name']);
+    }
+
+    public function testGetCurrentUserPromoAppMarch2017Apr()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testGetCurrentUserPromoAppMarch2017Apr', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id'], null, new \DateTime('2017-04-01'));
+
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(null, $data['policies'][0]['promo_code']);
+    }
+
     public function testGetCurrentUserWithCancelledUserDeclinedPolicy()
     {
         $user = self::createUser(
@@ -3609,7 +3683,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->verifyResponse(200);
     }
 
-    protected function payPolicy($user, $policyId, $amount = null)
+    protected function payPolicy($user, $policyId, $amount = null, $date = null)
     {
         // Reload user to get address
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
@@ -3647,7 +3721,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             $policy->addPayment($payment);
             $user->addPolicy($policy);
 
-            static::$policyService->create($policy);
+            static::$policyService->create($policy, $date);
             $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
             $dm->flush();
             $this->assertNotNull($payment->getId());

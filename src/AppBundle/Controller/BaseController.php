@@ -16,6 +16,7 @@ use AppBundle\Document\Sns;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\Reward;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Classes\ApiErrorCode;
@@ -33,16 +34,6 @@ use AppBundle\Validator\Constraints\AgeValidator;
 abstract class BaseController extends Controller
 {
     use PhoneTrait;
-
-    public function guardReplay($request)
-    {
-        $data = json_decode($request->getContent(), true);
-        $data['reply_prevention_url'] = $request->getUri();
-        arsort($data);
-        $cache = json_encode($data);
-        getCognitoIdentityId
-        return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, sprintf("%s => %s", $cache, sha1($cache)), 500);
-    }
 
     public function isDataStringPresent($data, $field)
     {

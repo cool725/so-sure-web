@@ -1089,6 +1089,7 @@ class ApiAuthController extends BaseController
                         $invitationService->addReward($user, $reward, 5);
                         $policy->setPromoCode(Policy::PROMO_APP_MARCH_2017);
                         $this->getManager()->flush();
+                        $user = $this->getUser();
                     }
                 }
             }
