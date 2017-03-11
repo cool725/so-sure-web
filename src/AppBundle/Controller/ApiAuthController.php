@@ -1080,6 +1080,20 @@ class ApiAuthController extends BaseController
             $this->get('statsd')->endTiming("api.getCurrentUser");
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
+            if ($policy = $user->getCurrentPolicy()) {
+                if ($policy->getStart() > new \DateTime('2017-02-01') &&
+                    $policy->getStart() < new \DateTime('2017-04-01') &&
+                    !$policy->getPromoCode()) {
+                    if ($reward = $this->findRewardUser('bonus@so-sure.net')) {
+                        $invitationService = $this->get('app.invitation');
+                        $invitationService->addReward($user, $reward, 5);
+                        $policy->setPromoCode(Policy::PROMO_APP_MARCH_2017);
+                        $this->getManager()->flush();
+                        $user = $this->getUser();
+                    }
+                }
+            }
+
             $response = $user->toApiArray($intercomHash);
             $this->get('logger')->info(sprintf('getCurrentUserAction Resp %s', json_encode($response)));
 

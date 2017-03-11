@@ -16,6 +16,7 @@ use AppBundle\Document\Sns;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\Reward;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Classes\ApiErrorCode;
@@ -74,6 +75,18 @@ abstract class BaseController extends Controller
     protected function getRequestBool($request, $field)
     {
         return filter_var($this->getRequestString($request, $field), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
+
+    protected function findRewardUser($email)
+    {
+        $dm = $this->getManager();
+        $userRepo = $dm->getRepository(User::class);
+        $rewardRepo = $dm->getRepository(Reward::class);
+        if ($rewardUser = $userRepo->findOneBy(['emailCanonical' => $email])) {
+            return $rewardRepo->findOneBy(['user' => $rewardUser]);
+        }
+
+        return null;
     }
 
     protected function getManager()
