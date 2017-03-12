@@ -18,6 +18,7 @@ use AppBundle\Classes\Salva;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Faker;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 // @codingStandardsIgnoreFile
 class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
@@ -163,6 +164,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setImei($this->generateRandomImei());
         $policy->init($user, $latestTerms);
         $policy->createAddSCode($count);
+        $router = $this->container->get('router');
+        $shareUrl = $router->generate(
+            'scode',
+            ['code' => $policy->getStandardSCode()->getCode()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $policy->getStandardSCode()->setShareLink($shareUrl);
 
         $claimStatus = null;
         $claimType = null;
