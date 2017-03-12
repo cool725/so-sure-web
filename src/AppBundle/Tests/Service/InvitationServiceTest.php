@@ -574,81 +574,6 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof SmsInvitation);
     }
 
-    public function testEmailInvitationReinvite()
-    {
-        $this->removeAllEmailInvitations();
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('user5', $this),
-            'bar'
-        );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
-
-        $userInvitee = static::createUser(
-            static::$userManager,
-            static::generateEmail('invite5', $this),
-            'bar'
-        );
-        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite5', $this));
-        $this->assertTrue($invitation instanceof EmailInvitation);
-        
-        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
-        $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
-        $future->add(new \DateInterval('P3D'));
-        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
-
-        // allow reinvitation
-        $this->expectInvitationEvent(InvitationEvent::EVENT_REINVITED, 'onInvitationReinvitedEvent');
-
-        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
-        self::$invitationService->reinvite($invitation);
-
-        $this->assertEquals(1, $invitation->getReinvitedCount());
-        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
-    }
-
-    public function testEmailInvitationReinviteOptOut()
-    {
-        $this->removeAllEmailInvitations();
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('EmailInvitationReinviteOptOut-user', $this),
-            'bar'
-        );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
-
-        $userInvitee = static::createUser(
-            static::$userManager,
-            static::generateEmail('EmailInvitationReinviteOptOut-invite', $this),
-            'bar'
-        );
-        $invitation = self::$invitationService->inviteByEmail(
-            $policy,
-            static::generateEmail('EmailInvitationReinviteOptOut-invite', $this)
-        );
-        $this->assertTrue($invitation instanceof EmailInvitation);
-
-        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
-        $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
-        $future->add(new \DateInterval('P3D'));
-        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
-
-        $optOut = new EmailOptOut();
-        $optOut->setEmail(static::generateEmail('EmailInvitationReinviteOptOut-invite', $this));
-        $optOut->setCategory(SmsOptOut::OPTOUT_CAT_INVITATIONS);
-        static::$dm->persist($optOut);
-        static::$dm->flush();
-
-        // allow reinvitation
-        $invitation->setNextReinvited(new \DateTime('2016-01-01'));
-        self::$invitationService->reinvite($invitation);
-
-        $this->assertEquals(EmailInvitation::STATUS_SKIPPED, $invitation->getStatus());
-        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
-    }
-
     /**
      * @expectedException \Exception
      */
@@ -696,43 +621,6 @@ class InvitationServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException AppBundle\Exception\ProcessedException
-     */
-    public function testEmailReinviteProcessed()
-    {
-        $this->removeAllEmailInvitations();
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('user-processed', $this),
-            'bar'
-        );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
-
-        $userInvitee = static::createUser(
-            static::$userManager,
-            static::generateEmail('invite-processed', $this),
-            'bar'
-        );
-        $invitation = self::$invitationService->inviteByEmail(
-            $policy,
-            static::generateEmail('invite-processed', $this)
-        );
-        $this->assertTrue($invitation instanceof EmailInvitation);
-
-        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
-        $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
-        $future->add(new \DateInterval('P3D'));
-        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
-        
-        $invitation->setAccepted(new \DateTime());
-        static::$dm->flush();
-        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
-
-        self::$invitationService->reinvite($invitation);
-    }
-
-    /**
      * @expectedException AppBundle\Exception\RateLimitException
      */
     public function testEmailReinviteRateLimited()
@@ -756,60 +644,6 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof EmailInvitation);
 
         self::$invitationService->reinvite($invitation);
-    }
-
-    public function testEmailInvitationCancel()
-    {
-        $this->removeAllEmailInvitations();
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('user6', $this),
-            'bar'
-        );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
-        $this->assertTrue($policy->isPolicy());
-
-        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite6', $this));
-        $this->assertTrue($invitation instanceof EmailInvitation);
-
-        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
-        $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
-        $future->add(new \DateInterval('P3D'));
-        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
-
-        self::$invitationService->cancel($invitation, Policy::CANCELLED_ACTUAL_FRAUD);
-
-        $this->assertTrue($invitation->isCancelled());
-        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
-    }
-
-    public function testEmailInvitationReject()
-    {
-        $this->removeAllEmailInvitations();
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('user7', $this),
-            'bar'
-        );
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
-        $this->assertTrue($policy->isPolicy());
-
-        $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite7', $this));
-        $this->assertTrue($invitation instanceof EmailInvitation);
-
-        $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
-        $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
-        $future->add(new \DateInterval('P3D'));
-        $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
-
-        $this->expectInvitationEvent(InvitationEvent::EVENT_REJECTED, 'onInvitationRejectedEvent');
-
-        self::$invitationService->reject($invitation);
-
-        $this->assertTrue($invitation->isRejected());
-        $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
     }
 
     public function testEmailInvitationAccept()
