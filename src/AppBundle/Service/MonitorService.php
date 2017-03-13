@@ -8,9 +8,13 @@ use AppBundle\Exception\MonitorException;
 use AppBundle\Document\Policy;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Claim;
+use AppBundle\Document\File\DaviesFile;
+use AppBundle\Document\DateTrait;
 
 class MonitorService
 {
+    use DateTrait;
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -85,6 +89,25 @@ class MonitorService
             throw new \Exception(sprintf(
                 'Claim %s is settled, but has not been processed (e.g. pot updated)',
                 $claim->getNumber()
+            ));
+        }
+    }
+
+    public function daviesImport()
+    {
+        $fileRepo = $this->dm->getRepository(DaviesFile::class);
+        $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
+        $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
+        if (!$successFile) {
+            throw new \Exception('Unable to find any successful imports');
+        }
+
+        $now = $this->startOfDay(new \DateTime());
+        $diff = $now->diff($successFile->getDate());
+        if ($diff->days >= 1) {
+            throw new \Exception(sprintf(
+                'Last successful import on %s',
+                $successFile->getDate()->format(\DateTime::ATOM)
             ));
         }
     }
