@@ -143,7 +143,6 @@ h1, h2, h3,
     color: #202532;
 }
 
-
 h4, h5, h6,
 .h4, .h5, .h6 {
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;    
@@ -838,9 +837,17 @@ a#get-quote-btn.btn.btn-primary {
     padding: 20px !important;
 }
 
-ul.lead li {
-    padding: 10px;
+ul.lead {
+    padding-left: 20px;
 }
+
+ul.lead li {
+    padding: 10px 0;
+}
+
+
+
+/*
 
 .lead {
     font-size: 18px;
@@ -849,4 +856,4 @@ ul.lead li {
   .lead {
     font-size: 21px;
   }
-}
+}*/
