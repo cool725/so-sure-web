@@ -606,6 +606,11 @@ class MixpanelService
         if ($event == self::EVENT_LOGIN) {
             $this->queuePersonIncrement("Number Of Logins", 1);
         }
+        if ($event == self::EVENT_TEST &&
+            isset($properties['Test Name']) &&
+            $properties['Test Name'] == "Watch Video") {
+            $this->queuePersonProperties(['Watch Video' => true], false, $user);
+        }
     }
 
     public function register(User $user = null, $trackingId = null)
