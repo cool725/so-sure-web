@@ -844,16 +844,3 @@ ul.lead {
 ul.lead li {
     padding: 10px 0;
 }
-
-
-
-/*
-
-.lead {
-    font-size: 18px;
-}
-@media (min-width: 768px) {
-  .lead {
-    font-size: 21px;
-  }
-}*/
