@@ -149,6 +149,19 @@ h4, h5, h6,
     color: #202532;
 }
 
+/*.list-fa {
+    padding-left: 30px;
+    margin-bottom: 20px;
+}
+
+.list-fa li {
+    position: relative;
+}
+
+.list-fa li .fa-lg {
+    position: absolute;
+    left: -30px; top: 4px;
+}*/
 
 /* Global Tools */
 

@@ -86,7 +86,7 @@
                             <li class="h4">
                                 <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> 
                                 <span class="visible-xs-inline">
-                                    <a id="cashback-link" href="#mobile-price"><span class="text-dark-grey text-underline">Up to 80% cashback every year</span></a>
+                                    <a id="cashback-link" href="#cover-price"><span class="text-dark-grey text-underline">Up to 80% cashback every year</span></a>
                                 </span>
                                 <span class="hidden-xs">
                                     <span class="text-dark-grey">Up to 80% cashback every year</span>
@@ -115,7 +115,7 @@
                         </ul>          
                     </div>
 
-                    <div id="mobile-price" class="quote-cost text-center">
+                    <div id="cover-price" class="quote-cost text-center">
                         {% if coming_soon %}
                             <span class="h1">
                                 Pricing coming soon!
@@ -125,7 +125,7 @@
                             <span>£50 Excess (£70 for Theft &amp; Loss)</span>
                             {{ form_widget(buy_form.buy_tablet, {'label': 'COMING SOON!', 'attr': {'class': 'btn btn-success btn-rounded btn-block disabled'}}) }}
                         {% else %}
-                            <p>If your phone were to be stolen, it would cost <strong>£{{ phone.initialPrice }}</strong> 😧 <br>Get peace of mind for:</p>
+                            <p>If your phone is stolen/lost, replacing it costs <strong>£{{ phone.initialPrice }}</strong> 😧 <br>Get peace of mind for:</p>
                             <span class="h1">
                                 <strong>£{{ phone_price.monthlyPremiumPrice }}</strong>
                                 <small>per month</small><br>
