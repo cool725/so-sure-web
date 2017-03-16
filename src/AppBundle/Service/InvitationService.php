@@ -35,6 +35,8 @@ use AppBundle\Exception\ConnectedInvitationException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use GuzzleHttp\Client;
+use GuzzleHttp\TransferStats;
 
 class InvitationService
 {
@@ -359,6 +361,9 @@ class InvitationService
     {
         $this->validatePolicy($policy);
 
+        // check scode for url and resolve
+        $scode = $this->resolveSCode($scode);
+
         $repo = $this->dm->getRepository(SCode::class);
         $scodeObj = $repo->findOneBy(['code' => $scode]);
         if (!$scodeObj) {
@@ -382,6 +387,35 @@ class InvitationService
         }
 
         return $this->inviteByEmail($policy, $user->getEmail(), $user->getName());
+    }
+
+    public function resolveSCode($scode)
+    {
+        if (strlen($scode) <= 8) {
+            return $scode;
+        }
+
+        if (stripos($scode, "http") === false) {
+            $url = sprintf("http://%s", $scode);
+        } else {
+            $url = $scode;
+        }
+
+        try {
+            $client = new Client();
+            $res = $client->request('GET', $url, [
+                'on_stats' => function (TransferStats $stats) use (&$url) {
+                    $url = $stats->getEffectiveUri();
+                }
+            ]);
+            $parts = explode('/', parse_url($url, PHP_URL_PATH));
+
+            return $parts[count($parts) - 1];
+        } catch (\Exception $e) {
+            $this->logger->warning(sprintf('Failed to resolve scode %s', $scode), ['exception' => $e]);
+        }
+
+        return $scode;
     }
 
     /**

@@ -9,6 +9,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
+use AppBundle\Document\CurrencyTrait;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
@@ -21,6 +22,8 @@ use AppBundle\Document\Policy;
  */
 class Connection
 {
+    use CurrencyTrait;
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -290,6 +293,7 @@ class Connection
             'claim_dates' => $claimDates,
             'id' => $this->getId(),
             'image_url' => $this->getLinkedUser() ? $this->getLinkedUser()->getImageUrl() : null,
+            'value' => $this->toTwoDp($this->getTotalValue()),
         ];
     }
 }
