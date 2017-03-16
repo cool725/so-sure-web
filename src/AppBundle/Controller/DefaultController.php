@@ -207,8 +207,19 @@ class DefaultController extends BaseController
         return [
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
+            'searchPhones' => $this->getPhonesSearchArray(),
             'type' => $type,
         ];
+    }
+
+    /**
+     * @Route("/search-phone", name="search_phone_data")
+     */
+    public function searchPhoneAction()
+    {
+        return new JsonResponse(
+            $this->getPhonesSearchArray()
+        );
     }
 
     /**

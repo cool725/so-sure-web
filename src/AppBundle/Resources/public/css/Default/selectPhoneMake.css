@@ -118,3 +118,69 @@
   }
 }
 
+/* Twitter Typehead */
+
+.tt-menu {
+    background-color: white;
+    border: 2px solid #efefef;
+    margin-top: -2px;
+    overflow-y: scroll;
+    max-height: 176px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.tt-suggestion {
+    padding-bottom: 2px;
+    padding-left: 2px;
+    text-align: left;
+    color: #000;
+}
+
+.tt-suggestion:hover {
+    background-color: #F5F5F5;
+}
+
+.twitter-typeahead, .tt-hint, .tt-input, .tt-menu {
+    width: 100%;
+}
+
+.search-phone-text {
+    background-color: #fff;
+    background-color: #fff;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAAJ1BMVEVmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmaP/QSjAAAADHRSTlMAAgMJC0uWpKa6wMxMdjkoAAAANUlEQVR4AeXJyQEAERAAsNl7Hf3X6xt0QL6JpZWq30pdvdadme+0PMdzvHm8YThHcT1H7K0BtOMDniZhWOgAAAAASUVORK5CYII=);
+    -webkit-background-size: 13px 13px;
+    background-size: 15px;
+    background-repeat: no-repeat;
+    background-position: 98%;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 30px;
+    -moz-border-radius: 30px;
+    -webkit-border-radius: 30px;
+    padding: 10px 30px;
+    border: 2px solid #efefef;
+    color: #202532;
+    box-shadow: none;
+    width: 320px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    font-size: 14px;
+    left: auto !important;
+}
+
+.device-search {
+    display: inline !important;
+}
+.device-select {
+    display: none !important;
+}
+@media (max-width: 992px) {
+    .device-search {
+        display: none !important;
+    }
+    .device-select {
+        display: inline !important;
+    }
+}

@@ -3,6 +3,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    'components/typeahead.js/typeahead.bundle.min.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}

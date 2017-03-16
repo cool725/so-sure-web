@@ -1,4 +1,4 @@
-<div id="select-phone-data" data-phones='{{ phones|json_encode|raw }}'>
+<div id="select-phone-data" data-phones='{{ phones|json_encode|raw }}' data-search-phones='{{ searchPhones|json_encode|raw }}'>
     {% if type is defined and type == 'purchase-select' %}
         {% set buttonText = 'Select Phone' %}
         {% set class = "device-select-block" %}
@@ -11,9 +11,14 @@
     {% endif %}
     <div class="row" id="select-phone">
         <div class="col-sm-12 {{ class }}">
+            <div class="device-search">
+                <form method="get" id="search-phone-form">
+                    <input type="text" class="search-phone-text" id="search-phone" placeholder="Find your phone by make and model" />
+                    <button type="submit" class="btn btn-success btn-rounded">Quote me</button>
+                </form>
+            </div>
             <div class="device-select">
                 {{ form_start(form_phone) }}
-
                     <div class="form-group">
                         {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }} 
                     </div>
