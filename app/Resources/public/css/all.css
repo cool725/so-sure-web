@@ -782,3 +782,15 @@ ul.lead li {
 .cc-compliance {
     align-self: flex-start;
 }
+
+.cc-btn { 
+    margin-top: 5px;
+}
+
+@media (min-width: 767px) {
+
+    .cc-btn { 
+        margin-top: 0;
+    }
+
+}
