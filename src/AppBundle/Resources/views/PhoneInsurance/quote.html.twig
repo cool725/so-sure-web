@@ -48,14 +48,14 @@
         {{ form_start(buy_form) }}
 
         {% if coming_soon %}
-        <h1 class="h2">Instant cover for your <span class="">{{ phone }} is coming soon!</span>
+        <h1 class="h2 te">Instant cover for your <span class="text-white">{{ phone }} is coming soon!</span>
         </h1>
         {% else %}
         <h1 class="h2">
             Instant cover for your              
             <div class="dropdown memory-dropdown-list">         
-                <a href="#" class="dropdown-toggle" type="button" id="memoryDropdownList"data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    {{ phone }} <i class="fa fa-caret-down text-grey" aria-hidden="true"></i>
+                <a href="#" class="dropdown-toggle text-white" type="button" id="memoryDropdownList"data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    {{ phone }} <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </a>
 
                 <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
@@ -292,7 +292,7 @@
     {{ form_end(buy_form) }}
     </section>
 
-    {% include 'AppBundle::Default/press.html.twig' with { 'press_background': '#ddd !important' } %}
+    {% include 'AppBundle::Default/press.html.twig' %}
 
     <section id="quote-banner" class="banner-sticky banner-sticky-hide">
         <div class="container">

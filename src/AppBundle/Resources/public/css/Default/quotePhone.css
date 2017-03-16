@@ -1,10 +1,38 @@
+body {
+    background: #4481eb;
+    background: linear-gradient(294deg, rgba(3, 189, 254, 0.55), #4481eb);    
+/*    background: 
+       linear-gradient(to right, rgba(32, 37, 50, 0.84) , 
+       rgba(51, 153, 255, 0.64)), 
+       url(https://cdn.so-sure.com/images/home/background/background-concert.jpg) no-repeat center top;*/
+}
+
+/* Adjust Navbar */
+
+.navbar-default .navbar-nav > li > a {
+    color: #fff;
+}
+
+.navbar-default .navbar-nav li > a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #fff;
+}
+
+
 /* QUOTE CARD */
 
 .quote-container {
     padding: 0 15px;
 }
 
-.quote h1,
+.quote-container h1 {
+    color: #fff;
+}
+
 .quote .h3,
 .quote .h4 {
     line-height: 1.25;
@@ -33,6 +61,7 @@
     max-width: 400px;
     margin: 0 auto 25px;
     position: relative;
+    background-color: #fff;
 }
 
 .quote-card > h3 {

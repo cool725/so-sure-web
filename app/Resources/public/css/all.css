@@ -34,6 +34,10 @@ html {
   height: 100%;
 }
 
+html, body {
+    overflow: auto;
+}
+
 body {
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
     line-height: 1.42857143;
