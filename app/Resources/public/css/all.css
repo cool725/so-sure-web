@@ -67,7 +67,7 @@ strong {
 }
 
 .text-light-grey {
-    color: #efefef;
+    color: #efefef !important;
 }
 
 .text-dark-grey {
