@@ -1,4 +1,4 @@
-<div id="select-phone-data" data-phones='{{ phones|json_encode|raw }}' data-search-phones='{{ searchPhones|json_encode|raw }}'>
+<div id="select-phone-data" data-phones='{{ phones|json_encode|raw }}'>
     {% if type is defined and type == 'purchase-select' %}
         {% set buttonText = 'Select Phone' %}
         {% set class = "device-select-block" %}
