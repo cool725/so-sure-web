@@ -11,7 +11,7 @@ window.addEventListener("load", function(){
                 "text": "#efefef"
             }
         },
-        "theme": "Mono",
+        "theme": "Corporate",
         "position": "top",
         "static": true,
         "content": {
