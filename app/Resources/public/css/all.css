@@ -143,13 +143,25 @@ h1, h2, h3,
     color: #202532;
 }
 
-
 h4, h5, h6,
 .h4, .h5, .h6 {
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;    
     color: #202532;
 }
 
+/*.list-fa {
+    padding-left: 30px;
+    margin-bottom: 20px;
+}
+
+.list-fa li {
+    position: relative;
+}
+
+.list-fa li .fa-lg {
+    position: absolute;
+    left: -30px; top: 4px;
+}*/
 
 /* Global Tools */
 
@@ -761,17 +773,12 @@ a#get-quote-btn.btn.btn-primary {
     padding: 20px !important;
 }
 
-ul.lead li {
-    padding: 10px;
+ul.lead {
+    padding-left: 20px;
 }
 
-.lead {
-    font-size: 18px;
-}
-@media (min-width: 768px) {
-  .lead {
-    font-size: 21px;
-  }
+ul.lead li {
+    padding: 10px 0;
 }
 
 /* Cookie */

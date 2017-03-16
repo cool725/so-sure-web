@@ -48,6 +48,7 @@
 .quote-card li {
     padding: 4px 0;
     color: #626B78;
+    position: relative;
 }
 
 .quote-card li.h4:first-of-type {
@@ -60,7 +61,7 @@
 
 .quote-card .fa-lg {
     position: absolute;
-    left: 0;
+    left: -30px; top: 4px;
 }
 
 .quote-card p.h4 {
