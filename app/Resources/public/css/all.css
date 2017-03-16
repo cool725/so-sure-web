@@ -44,7 +44,7 @@ strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/*Quick helpers*/
+/* Quick helpers */
 
 .error-text {
     color: #FF6666;
@@ -165,23 +165,6 @@ h4, h5, h6,
 
 /* Global Tools */
 
-/* centered columns styles */
-.row-centered {
-    text-align:center;
-}
-.col-centered {
-    display:inline-block;
-    float:none;
-    /* reset the text-align */
-    text-align:left;
-    /* inline-block space fix */
-    margin-right:-4px;
-}
-
-.text-block {
-  padding: 60px 20px 60px 20px;
-}
-
 
 /* App Badges classes for stand alone section -  LEGACY??? Remove  */
 
@@ -232,8 +215,6 @@ h4, h5, h6,
     border-color: #202352 !important;
     color: #202352 !important;
 }
-
-
 
 .navbar-toggle {
     background-color: transparent;
@@ -292,26 +273,6 @@ h4, h5, h6,
         background-color: transparent !important;
     }
 }
-/*.open>.dropdown-toggle.btn-default {
-    background-color: transparent;
-    border: none;
-}
-.open>.dropdown-toggle.btn-default:hover, .open>.dropdown-toggle.btn-default:focus, .open>.dropdown-toggle.btn-default:active {
-    border: 2px solid !important;
-    border-color: #202532 !important;
-    color: #202532;
-    background-color: transparent;
-}
-.dropdown-menu>li>a {
-    display: block;
-    padding: 10px 10px;
-    clear: both;
-    font-weight: normal;
-    line-height: 1.42857143;
-    color: #202532;
-    white-space: nowrap;
-    margin: 0 5px 5px 5px;
-}*/
 
 /* TEXT LINE BREAK */
 
@@ -470,6 +431,7 @@ h4, h5, h6,
     height: 250px;
   }
 }
+
 /* Download Now */
 
 .download-now {
@@ -483,11 +445,6 @@ h4, h5, h6,
 }
 
 /* Benefits */
-
-/*.benefits {
-        padding: 100px 20px 60px 20px;
-    text-align: center;
-}*/
 
 .benefits img {
     height: 150px;
@@ -567,7 +524,6 @@ h4, h5, h6,
 
 }
 
-
 .loading-overlay {
     width: 100%; height: 100%;
     position: absolute;
@@ -605,34 +561,6 @@ background: rgba(51, 153, 255, 1);
     background: -ms-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
     background: linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
     filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1);
-}
-
-/* MOVE TO components > _hero.scss */
-/* this is used on the homepage and the invalid user page, if we change the homepage we need to make sure the invalid user page still works */
-.background-image-light {
-    /*background-image: url('https://cdn.so-sure.com/images/home/background/background-light.png');*/
-    background-size: cover;
-    /*background-color: #202532;*/
-    background-position: center;
-}
-
-.brand-dark-background {
-  background: #202532;
-}
-
-div.col-sm-7.five-three {
-width: 60% !important;
-}
-
-div.col-sm-5.five-two {
-  width: 40% !important;
-}
-
-hr.strong {
-    width: 100%;
-    color: black;
-    height: 1px;
-    background-color:black;
 }
 
 /* MOVE TO components > _buttons.scss */
@@ -686,11 +614,6 @@ hr.strong {
 
 .btn-hollow-subtle {
     color: #8B97B5;
-}
-
-.btn-arrow-left,
-.btn-arrow-right {
-
 }
 
 .btn-arrow-left:after {
@@ -856,4 +779,25 @@ ul.lead {
 
 ul.lead li {
     padding: 10px 0;
+}
+
+/* Cookie */
+.cc-message {
+    padding-right: 15px;
+}
+
+.cc-compliance {
+    align-self: flex-start;
+}
+
+.cc-btn { 
+    margin-top: 5px;
+}
+
+@media (min-width: 767px) {
+
+    .cc-btn { 
+        margin-top: 0;
+    }
+
 }
