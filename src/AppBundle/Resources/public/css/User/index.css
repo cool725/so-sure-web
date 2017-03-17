@@ -89,9 +89,10 @@ body {
 }
 
 .coffee-stamp {
-    display: inline-block;
+/*    display: inline-block;
     width: 70px; height: 70px;
-    background-color: #efefef;
+    background-color: #8B97B5;*/
+    margin-bottom: 15px;
 }
 
 /* PUT SOMEWHERE ELSE EVENTUALLY */
