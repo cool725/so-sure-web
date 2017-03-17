@@ -38,8 +38,8 @@
             <nav id="user-homepage--nav">
                 <ul class="nav nav-pills scroll">
                     <li role="presentation" class="active"><a href="#">Home</a></li>
-                    <li role="presentation"><a href="#">Personal Info</a></li>
-                    <li role="presentation"><a href="#">Payment Details</a></li>
+                    {# <li role="presentation"><a href="#">Personal Info</a></li> #}
+                    {# <li role="presentation"><a href="#">Payment Details</a></li> #}
                 </ul>
             </nav>  
         </div>
@@ -65,19 +65,21 @@
                         {{ form_errors(invitation_form) }}
                         {{ form_end(invitation_form) }}                        
                     {% endif %}
-                    <div class="box-border-grey coffee-card text-center">
+                    <div class="box-border-grey coffee-card">
                         <h4><strong>My Connections</strong></h4>
                         <ul class="list-inline">
-                            <li><img src="http://www.placecage.com/70/70" alt="Nic Cage" class="img-circle"></li>
-                            <li><img src="http://www.fillmurray.com/70/70" alt="Bill Murray" class="img-circle"></li>
-                            <li><img src="http://www.stevensegallery.com/70/70" alt="Steven Segal" class="img-circle"></li>
-                            <li><a href="#" id="connect-with">
-                                <span class="fa-stack fa-lg">
-                                  <i class="fa fa-circle fa-stack-2x"></i>
-                                  <i class="fa fa-plus fa-stack-1x fa-inverse"></i>
-                                </span>
-                            </a></li>
+                            <li>
+                                {# We could use something like this?  #}
+                                <img src="http://placehold.it/70x70/626B78/ffffff/?text=NW" alt="Name" class="img-circle coffee-stamp">
+                            </li>
+                            <li>
+                                <img src="http://placehold.it/70x70/626B78/ffffff/?text=PM" alt="Name" class="img-circle coffee-stamp">
+                            </li>    
+                            <li>
+                                <img src="http://placehold.it/70x70/626B78/ffffff/?text=TE" alt="Name" class="img-circle coffee-stamp">
+                            </li>                            
                         </ul>
+                        <a href="#" id="connect-with" class="btn btn-primary btn-rounded"><i class="fa fa-plus fa-lg"></i> New connection</a>
                     </div>
 
                     <div class="row">
