@@ -38,15 +38,12 @@ use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Service\MixpanelService;
 
-/**
- * @Route("/phone-insurance")
- */
 class PhoneInsuranceController extends BaseController
 {
     use PhoneTrait;
 
     /**
-     * @Route("/water-damage", name="phone_insurance_water_damage",
+     * @Route("/phone-insurance/water-damage", name="phone_insurance_water_damage",
      *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
@@ -56,7 +53,8 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/theft", name="phone_insurance_theft", options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
+     * @Route("/phone-insurance/theft", name="phone_insurance_theft",
+     *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
     public function theftAction()
@@ -65,7 +63,8 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/loss", name="phone_insurance_loss", options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
+     * @Route("/phone-insurance/loss", name="phone_insurance_loss",
+     *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
     public function lossAction()
@@ -74,7 +73,7 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/cracked-screen", name="phone_insurance_cracked_screen",
+     * @Route("/phone-insurance/cracked-screen", name="phone_insurance_cracked_screen",
      *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
@@ -84,7 +83,7 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/broken-phone", name="phone_insurance_broken_phone",
+     * @Route("/phone-insurance/broken-phone", name="phone_insurance_broken_phone",
      *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
@@ -94,10 +93,14 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
-     * @Route("/{make}+{model}+{memory}GB", name="quote_make_model_memory",
+     * @Route("/phone-insurance/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
+     * @Route("/phone-insurance/{make}+{model}+{memory}GB", name="quote_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
-     * @Route("/{make}+{model}", name="quote_make_model",
+     * @Route("/phone-insurance/{make}+{model}", name="quote_make_model",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/insure/{make}+{model}+{memory}GB", name="insure_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     * @Route("/insure/{make}+{model}", name="insure_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
