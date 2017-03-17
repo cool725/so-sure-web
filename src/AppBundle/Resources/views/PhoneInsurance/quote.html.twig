@@ -48,11 +48,11 @@
         {{ form_start(buy_form) }}
 
         {% if coming_soon %}
-        <h1 class="h2 te">Instant cover for your <span class="text-white">{{ phone }} is coming soon!</span>
+        <h1 class="h2">Better cover for your <span class="text-white">{{ phone }} is coming soon!</span>
         </h1>
         {% else %}
         <h1 class="h2">
-            Instant cover for your              
+            Comprehensive cover for your              
             <div class="dropdown memory-dropdown-list">         
                 <a href="#" class="dropdown-toggle text-white" type="button" id="memoryDropdownList"data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     {{ phone }} <i class="fa fa-caret-down" aria-hidden="true"></i>
@@ -73,6 +73,49 @@
         {% endif %}
 
         <div class="quote">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="cover-price" class="quote-cost text-center">
+                        <div class="text-center h4">If your phone is stolen/lost, replacing it costs <strong>£{{ phone.initialPrice }}</strong> 😧 Get peace of mind for:</div>
+                        <div class="row">
+                            {% if coming_soon %}
+                                <div class="col-sm-6">
+                                    <div class="h1 price">
+                                        Pricing coming soon!
+                                        <strong>£4.99 - £9.99</strong>
+                                        <small>per month (typical policy pricing)</small><br>
+                                    </div>
+                                    <span>£50 Excess (£70 for Theft &amp; Loss)</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ form_widget(buy_form.buy_tablet, {'label': 'COMING SOON!', 'attr': {'class': 'btn btn-success btn-rounded btn-block disabled'}}) }}
+                                </div>
+                            {% else %}
+                                <div class="col-sm-6">                                
+                                    <div class="h1 price">
+                                        <strong>£{{ phone_price.monthlyPremiumPrice }}</strong>
+                                        <small>per month</small><br>
+                                    </div>
+                                    <span>£50 Excess (£70 for Theft &amp; Loss)</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ form_widget(buy_form.buy_tablet, {'label': 'BUY NOW', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
+                                    <ul class="list-inline">
+                                        <li>
+                                            <small><a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">Full Terms &amp; Conditions</a></small> 
+                                        </li>
+                                        <li><span class="text-grey">|</span></li>
+                                        <li>
+                                            <small><a href="#" data-event-url="mailto:?subject=Instant%20cover%20for%20your%20{{ phone|url_encode }}&body=Hi%2C%0A%0ACheck%20out%20this%20great%20phone%20insurance%20quote%20from%20so-sure%20that%20includes%20cover%20for%20theft%2C%20loss%2C%20accidental%20damage%20and%20breakdown%20as%20standard.%0A%0A{{ app.request.uri|url_encode }}%0A%0ADemand%20better%20insurance!" class="sosure-track" data-event="share-quote"><i class="fa fa-envelope" aria-hidden="true"></i> Email this quote</a></small>
+                                        </li>
+                                    </ul>                                    
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="row">
                <div class="col-xs-12 col-sm-7 col-md-7">
@@ -115,7 +158,7 @@
                         </ul>          
                     </div>
 
-                    <div id="cover-price" class="quote-cost text-center">
+         {#            <div id="cover-price" class="quote-cost text-center">
                         {% if coming_soon %}
                             <span class="h1">
                                 Pricing coming soon!
@@ -142,7 +185,7 @@
                                 <small><a href="#" data-event-url="mailto:?subject=Instant%20cover%20for%20your%20{{ phone|url_encode }}&body=Hi%2C%0A%0ACheck%20out%20this%20great%20phone%20insurance%20quote%20from%20so-sure%20that%20includes%20cover%20for%20theft%2C%20loss%2C%20accidental%20damage%20and%20breakdown%20as%20standard.%0A%0A{{ app.request.uri|url_encode }}%0A%0ADemand%20better%20insurance!" class="sosure-track" data-event="share-quote"><i class="fa fa-envelope" aria-hidden="true"></i> Email this quote</a></small>
                             </li>
                         </ul>
-                    </div>
+                    </div> #}
                 </div>    
 
                 <div class="col-xs-12 col-sm-5 col-md-5">

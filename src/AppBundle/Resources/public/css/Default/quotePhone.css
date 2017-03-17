@@ -57,6 +57,10 @@ body {
     font-size: 22px;
 }
 
+.quote-cost .price {
+    margin: 10px 0 0; 
+}
+
 .quote-card {
     max-width: 400px;
     margin: 0 auto 25px;
