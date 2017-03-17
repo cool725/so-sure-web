@@ -62,6 +62,10 @@ strong {
     color: #CCC !important;
 }
 
+.text-light-blue {
+    color: #D6EBFF !important;
+}
+
 .text-grey-blue {
     color: #8B97B5 !important;
 }
@@ -789,12 +793,26 @@ a#get-quote-btn.btn.btn-primary {
     padding: 20px !important;
 }
 
-ul.lead {
-    padding-left: 20px;
-}
-
 ul.lead li {
     padding: 10px 0;
+}
+
+/* Fa list */
+.fa-list-bullet {
+    padding-left: 30px;
+    margin: 15px 0;
+}
+
+.fa-list-bullet li {
+    position: relative;
+    padding-left: 10px;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.fa-list-bullet .fa {
+    position: absolute;
+    right: 100%;
 }
 
 /* Cookie */
@@ -814,6 +832,10 @@ ul.lead li {
 
     .cc-btn { 
         margin-top: 0;
+    }
+
+    .fa-list-bullet li {
+        font-size: 22px;
     }
 
 }
