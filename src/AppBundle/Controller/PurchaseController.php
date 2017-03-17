@@ -56,6 +56,9 @@ class PurchaseController extends BaseController
     use CurrencyTrait;
 
     /**
+     * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
+     *   as these will impact Adwords
+     *
      * @Route("/step-personal", name="purchase_step_personal")
      * @Route("/", name="purchase")
      * @Template
@@ -234,6 +237,9 @@ class PurchaseController extends BaseController
     }
 
     /**
+     * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
+     *   as these will impact Adwords
+     *
      * @Route("/step-policy", name="purchase_step_policy")
      * @Template
     */
