@@ -106,6 +106,18 @@ strong {
     background-color: #fff;
 }
 
+.center-xs {
+    text-align: center;
+}
+
+@media (min-width: 767px) {
+
+  .center-xs {
+      text-align: inherit;
+  }
+  
+}
+
 /* MOVE TO layout > _header.scss */
 
 .so-sure-logo-dark {
@@ -785,6 +797,7 @@ ul.lead li {
     padding: 10px 0;
 }
 
+<<<<<<< HEAD
 /* Cookie */
 .cc-message {
     padding-right: 15px;
