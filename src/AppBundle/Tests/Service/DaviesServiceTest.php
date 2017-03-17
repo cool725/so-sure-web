@@ -10,6 +10,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Address;
 use AppBundle\Document\User;
 use AppBundle\Document\Charge;
+use AppBundle\Document\DateTrait;
 
 use AppBundle\Classes\DaviesClaim;
 
@@ -20,6 +21,8 @@ class DaviesServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
+    use DateTrait;
+
     protected static $container;
     protected static $dm;
     protected static $daviesService;
@@ -469,5 +472,106 @@ class DaviesServiceTest extends WebTestCase
             }
         }
         $this->assertTrue($foundMatch);
+    }
+
+    public function testValidateClaimDetailsReceivedDate()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setApprovedDate(new \DateTime('2016-01-02'));
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+        $daviesClaim->phoneReplacementCost = 1.07;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/delayed replacement date/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertTrue($foundMatch);
+    }
+
+    public function testPostValidateClaimDetailsReceivedDate()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setApprovedDate(new \DateTime('2016-01-02'));
+        $claim->setReplacementReceivedDate(new \DateTime('2016-01-01'));
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+
+        self::$daviesService->postValidateClaimDetails($claim, $daviesClaim);
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/has an approved date/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertTrue($foundMatch);
+    }
+
+    public function testSaveClaimsReplacementDate()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setNumber(1);
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
+        static::$daviesService->saveClaim($daviesClaim, $claim);
+        $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
+    }
+
+    public function testSaveClaimsYesterday()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setNumber(1);
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        static::$daviesService->saveClaim($daviesClaim, $claim);
+        $now = new \DateTime();
+        $yesterday = $this->subBusinessDays($now, 1);
+        $this->assertEquals($yesterday, $claim->getApprovedDate());
     }
 }

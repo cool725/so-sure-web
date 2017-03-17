@@ -354,10 +354,6 @@ class Claim
             throw new \InvalidArgumentException(sprintf('Unable to use approved/declined with Warranty Types'));
         }
 
-        if (in_array($status, [self::STATUS_APPROVED, self::STATUS_SETTLED]) && !$this->getApprovedDate()) {
-            $this->setApprovedDate(new \DateTime());
-        }
-
         $this->status = $status;
     }
 
