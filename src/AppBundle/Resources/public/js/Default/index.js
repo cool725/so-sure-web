@@ -51,7 +51,9 @@ $(function(){
     var quoteBox = $('#quote');
     var quoteBoxHeight = quoteBox.height();
 
-    $(window).scroll(function(event) {
+    $(window).scroll(function() {
+
+        console.log('Scrolling');
 
         if (quoteBox.length) {
 

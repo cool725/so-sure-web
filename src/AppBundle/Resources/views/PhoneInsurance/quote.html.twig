@@ -159,35 +159,6 @@
                             </li>                                                                                                     
                         </ul>          
                     </div>
-
-         {#            <div id="cover-price" class="quote-cost text-center">
-                        {% if coming_soon %}
-                            <span class="h1">
-                                Pricing coming soon!
-                                <strong>£4.99 - £9.99</strong>
-                                <small>per month (typical policy pricing)</small><br>
-                            </span>
-                            <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                            {{ form_widget(buy_form.buy_tablet, {'label': 'Coming Soon!', 'attr': {'class': 'btn btn-success btn-rounded btn-block disabled'}}) }}
-                        {% else %}
-                            <p>If your phone is stolen/lost, replacing it costs <strong>£{{ phone.initialPrice }}</strong> 😧 <br>Get peace of mind for:</p>
-                            <span class="h1">
-                                <strong>£{{ phone_price.monthlyPremiumPrice }}</strong>
-                                <small>per month</small><br>
-                            </span>
-                            <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                            {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                        {% endif %}
-                        <ul class="list-inline">
-                            <li>
-                                <small><a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">Full Terms &amp; Conditions</a></small> 
-                            </li>
-                            <li><span class="text-grey">|</span></li>
-                            <li>
-                                <small><a href="#" data-event-url="mailto:?subject=Instant%20cover%20for%20your%20{{ phone|url_encode }}&body=Hi%2C%0A%0ACheck%20out%20this%20great%20phone%20insurance%20quote%20from%20so-sure%20that%20includes%20cover%20for%20theft%2C%20loss%2C%20accidental%20damage%20and%20breakdown%20as%20standard.%0A%0A{{ app.request.uri|url_encode }}%0A%0ADemand%20better%20insurance!" class="sosure-track" data-event="share-quote"><i class="fa fa-envelope" aria-hidden="true"></i> Email this quote</a></small>
-                            </li>
-                        </ul>
-                    </div> #}
                 </div>    
 
                 <div class="col-xs-12 col-sm-5 col-md-5">
@@ -333,7 +304,7 @@
             </div>
         </div>
     
-    {{ form_end(buy_form) }}
+        {{ form_end(buy_form) }}
     </section>
 
     {% include 'AppBundle::Default/press.html.twig' %}
