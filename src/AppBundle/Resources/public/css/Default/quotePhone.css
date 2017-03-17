@@ -47,18 +47,17 @@ body {
 .quote-cost {
     margin: 0 -15px 25px;
     padding: 25px 15px;
-    background-color: #efefef;
+    background-color: #fff;
 }
 
 .quote-cost .btn-block {
     width: 80%;
     margin: 10px auto;
-    font-weight: bold;
     font-size: 22px;
 }
 
 .quote-cost .price {
-    margin: 10px 0 0; 
+    margin: 20px 0 0; 
 }
 
 .quote-card {
@@ -172,9 +171,8 @@ body {
     }
 
     .quote-cost {
-        padding: 25px;
+        padding: 15px;
         margin: 0 0 25px;
-        background-color: #efefef;
         border-radius: 4px;
     }    
 
