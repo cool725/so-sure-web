@@ -30,7 +30,6 @@ class ClaimTest extends \PHPUnit_Framework_TestCase
         $claim = new Claim();
         $claim->setType(Claim::TYPE_EXTENDED_WARRANTY);
         $claim->setStatus(Claim::STATUS_APPROVED);
-        $this->assertEquals(new \DateTime(), $claim->getApprovedDate());
     }
 
     public function testSetStatusSettled()
@@ -38,7 +37,6 @@ class ClaimTest extends \PHPUnit_Framework_TestCase
         $claim = new Claim();
         $claim->setType(Claim::TYPE_EXTENDED_WARRANTY);
         $claim->setStatus(Claim::STATUS_SETTLED);
-        $this->assertEquals(new \DateTime(), $claim->getApprovedDate());
     }
 
     /**

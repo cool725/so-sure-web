@@ -79,4 +79,17 @@ trait DateTrait
 
         return $businessDays;
     }
+
+    public function subBusinessDays($date, $days)
+    {
+        $businessDays = clone $date;
+        while ($days > 0) {
+            $businessDays->sub(new \DateInterval('P1D'));
+            if (!in_array((int) $businessDays->format('w'), [0, 6])) {
+                $days--;
+            }
+        }
+
+        return $businessDays;
+    }
 }

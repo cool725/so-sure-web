@@ -296,59 +296,7 @@ class DaviesService
         $success = true;
         foreach ($daviesClaims as $daviesClaim) {
             try {
-                $repo = $this->dm->getRepository(Claim::class);
-                $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
-                if (!$claim) {
-                    throw new \Exception(sprintf('Unable to locate claim %s in db', $daviesClaim->claimNumber));
-                }
-
-                $this->validateClaimDetails($claim, $daviesClaim);
-
-                if ($claim->getType() != $daviesClaim->getClaimType()) {
-                    throw new \Exception(sprintf('Claims type does not match for claim %s', $daviesClaim->claimNumber));
-                }
-                if ($daviesClaim->getClaimStatus()) {
-                    $claim->setStatus($daviesClaim->getClaimStatus());
-                } elseif ($daviesClaim->replacementImei && $claim->getStatus() == Claim::STATUS_INREVIEW) {
-                    // If there's a replacement IMEI, the claim has definitely been approved
-                    $claim->setStatus(Claim::STATUS_APPROVED);
-                }
-
-                $claim->setDaviesStatus($daviesClaim->status);
-
-                $claim->setExcess($daviesClaim->excess);
-                $claim->setIncurred($daviesClaim->incurred);
-                $claim->setClaimHandlingFees($daviesClaim->handlingFees);
-                $claim->setReservedValue($daviesClaim->reserved);
-
-                $claim->setAccessories($daviesClaim->accessories);
-                $claim->setUnauthorizedCalls($daviesClaim->unauthorizedCalls);
-                $claim->setPhoneReplacementCost($daviesClaim->phoneReplacementCost);
-                $claim->setTransactionFees($daviesClaim->transactionFees);
-
-                // Probably not going to be returned, but maybe one day will be able to map Davies/Brighstar data
-                if ($replacementPhone = $this->getReplacementPhone($daviesClaim)) {
-                    $claim->setReplacementPhone($replacementPhone);
-                }
-
-                $claim->setReplacementImei($daviesClaim->replacementImei);
-                $claim->setReplacementReceivedDate($daviesClaim->replacementReceivedDate);
-                $claim->setReplacementPhoneDetails($daviesClaim->getReplacementPhoneDetails());
-
-                $claim->setDescription($daviesClaim->lossDescription);
-                $claim->setLocation($daviesClaim->location);
-
-                $claim->setClosedDate($daviesClaim->dateClosed);
-                $claim->setCreatedDate($daviesClaim->dateCreated);
-                $claim->setNotificationDate($daviesClaim->notificationDate);
-                $claim->setLossDate($daviesClaim->lossDate);
-
-                $claim->setShippingAddress($daviesClaim->shippingAddress);
-
-                $this->updatePolicy($claim, $daviesClaim);
-                $this->dm->flush();
-
-                $this->claimsService->processClaim($claim);
+                $this->saveClaim($daviesClaim);
             } catch (\Exception $e) {
                 $success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
@@ -357,6 +305,81 @@ class DaviesService
         }
 
         return $success;
+    }
+
+    public function saveClaim($daviesClaim, $claim = null)
+    {
+        if (!$claim) {
+            $repo = $this->dm->getRepository(Claim::class);
+            $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
+        }
+
+        if (!$claim) {
+            throw new \Exception(sprintf('Unable to locate claim %s in db', $daviesClaim->claimNumber));
+        }
+
+        $this->validateClaimDetails($claim, $daviesClaim);
+
+        if ($claim->getType() != $daviesClaim->getClaimType()) {
+            throw new \Exception(sprintf('Claims type does not match for claim %s', $daviesClaim->claimNumber));
+        }
+        if ($daviesClaim->getClaimStatus()) {
+            $claim->setStatus($daviesClaim->getClaimStatus());
+        } elseif ($daviesClaim->replacementImei && $claim->getStatus() == Claim::STATUS_INREVIEW) {
+            // If there's a replacement IMEI, the claim has definitely been approved
+            $claim->setStatus(Claim::STATUS_APPROVED);
+        }
+
+        $claim->setDaviesStatus($daviesClaim->status);
+
+        $claim->setExcess($daviesClaim->excess);
+        $claim->setIncurred($daviesClaim->incurred);
+        $claim->setClaimHandlingFees($daviesClaim->handlingFees);
+        $claim->setReservedValue($daviesClaim->reserved);
+
+        $claim->setAccessories($daviesClaim->accessories);
+        $claim->setUnauthorizedCalls($daviesClaim->unauthorizedCalls);
+        $claim->setPhoneReplacementCost($daviesClaim->phoneReplacementCost);
+        $claim->setTransactionFees($daviesClaim->transactionFees);
+
+        // Probably not going to be returned, but maybe one day will be able to map Davies/Brighstar data
+        if ($replacementPhone = $this->getReplacementPhone($daviesClaim)) {
+            $claim->setReplacementPhone($replacementPhone);
+        }
+
+        if (in_array($claim->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SETTLED])
+            && !$claim->getApprovedDate()) {
+            // for claims without replacement date, the replacement should have occurred yesterday
+            // for cases where its been forgotten, the business day should be 1 day prior to the received date
+            $yesterday = new \DateTime();
+            if ($daviesClaim->replacementReceivedDate) {
+                $yesterday = clone $daviesClaim->replacementReceivedDate;
+            }
+            $yesterday = $this->subBusinessDays($yesterday, 1);
+
+            $claim->setApprovedDate($yesterday);
+        }
+
+        $claim->setReplacementImei($daviesClaim->replacementImei);
+        $claim->setReplacementReceivedDate($daviesClaim->replacementReceivedDate);
+        $claim->setReplacementPhoneDetails($daviesClaim->getReplacementPhoneDetails());
+
+        $claim->setDescription($daviesClaim->lossDescription);
+        $claim->setLocation($daviesClaim->location);
+
+        $claim->setClosedDate($daviesClaim->dateClosed);
+        $claim->setCreatedDate($daviesClaim->dateCreated);
+        $claim->setNotificationDate($daviesClaim->notificationDate);
+        $claim->setLossDate($daviesClaim->lossDate);
+
+        $claim->setShippingAddress($daviesClaim->shippingAddress);
+
+        $this->updatePolicy($claim, $daviesClaim);
+        $this->dm->flush();
+
+        $this->postValidateClaimDetails($claim, $daviesClaim);
+
+        $this->claimsService->processClaim($claim);
     }
 
     public function validateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
@@ -446,6 +469,39 @@ class DaviesService
                 $daviesClaim->claimNumber,
                 $claim->totalChargesWithVat(),
                 $daviesClaim->reciperoFee
+            );
+            $this->logger->warning($msg);
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        }
+
+        if (!$claim->getReplacementReceivedDate() && $daviesClaim->replacementReceivedDate) {
+            // We should be notified the next day when a replacement device is delivered
+            // so we can follow up with our customer. Unlikely to occur.
+            $ago = new \DateTime();
+            $ago = $this->subBusinessDays($ago, 1);
+
+            if ($daviesClaim->replacementReceivedDate < $ago) {
+                $msg = sprintf(
+                    'Claim %s has a delayed replacement date (%s) which is more than 1 business day ago (%s)',
+                    $daviesClaim->claimNumber,
+                    $daviesClaim->replacementReceivedDate->format(\DateTime::ATOM),
+                    $ago->format(\DateTime::ATOM)
+                );
+                $this->logger->warning($msg);
+                $this->errors[$daviesClaim->claimNumber][] = $msg;
+            }
+        }
+    }
+
+    public function postValidateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
+    {
+        if ($claim->getApprovedDate() && $claim->getReplacementReceivedDate() &&
+            $claim->getApprovedDate() > $claim->getReplacementReceivedDate()) {
+            $msg = sprintf(
+                'Claim %s has an approved date (%s) more recent than the received date (%s)',
+                $daviesClaim->claimNumber,
+                $claim->getApprovedDate()->format(\DateTime::ATOM),
+                $claim->getReplacementReceivedDate()->format(\DateTime::ATOM)
             );
             $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
