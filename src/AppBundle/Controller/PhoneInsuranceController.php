@@ -53,7 +53,8 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/phone-insurance/theft", name="phone_insurance_theft", options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
+     * @Route("/phone-insurance/theft", name="phone_insurance_theft",
+     *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
     public function theftAction()
@@ -62,7 +63,8 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/phone-insurance/loss", name="phone_insurance_loss", options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
+     * @Route("/phone-insurance/loss", name="phone_insurance_loss",
+     *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
      * @Template()
      */
     public function lossAction()
