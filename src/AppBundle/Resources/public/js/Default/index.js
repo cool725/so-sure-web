@@ -51,13 +51,11 @@ $(function(){
     var quoteBox = $('#quote');
     var quoteBoxHeight = quoteBox.height();
 
-    $(window).scroll(function() {
-
-        console.log('Scrolling');
+    $(document).scroll(function() {
 
         if (quoteBox.length) {
 
-            var quoteBoxBottom = quoteBox.offset().top;
+            var quoteBoxBottom = quoteBox.offset().top - quoteBoxHeight + 200;
 
             if ($(window).scrollTop() > quoteBoxBottom + quoteBoxHeight) {
 

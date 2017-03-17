@@ -31,7 +31,7 @@
 /* MOVE TO common > _global.scss */
 
 html {
-  height: 100%;
+  /*height: 100%;*/
 }
 
 html, body {
@@ -42,7 +42,7 @@ body {
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
     line-height: 1.42857143;
     background-color: #ffffff;
-    height: 100%;
+    /*height: 100%;*/
 }
 strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
