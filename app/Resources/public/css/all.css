@@ -482,18 +482,6 @@ h4, h5, h6,
     padding: 40px 15px;
 }
 
-.section--pad:first-of-type {
-    padding-top: 0;
-}
-
-@media (min-width: 991px) {
-
-    .section--pad {
-        padding: 60px 15px;
-    }
-
-}
-
 .align-middle {
     background-size: 100% auto;
     height: 100%;
