@@ -1,6 +1,8 @@
 {% set include_emoji = 1 %}
 {% extends 'base.html.twig' %}
 
+{% set white_logo = true %}
+
 {% block title %}so-sure -
     {{ phone }}{% endblock %}
 {% block meta %}
@@ -52,7 +54,7 @@
         </h1>
         {% else %}
         <h1 class="h2">
-            Comprehensive cover for your              
+            Insurance for your              
             <div class="dropdown memory-dropdown-list">         
                 <a href="#" class="dropdown-toggle text-white" type="button" id="memoryDropdownList"data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     {{ phone }} <i class="fa fa-caret-down" aria-hidden="true"></i>
