@@ -106,6 +106,18 @@ strong {
     background-color: #fff;
 }
 
+.center-xs {
+    text-align: center;
+}
+
+@media (min-width: 767px) {
+
+  .center-xs {
+      text-align: inherit;
+  }
+  
+}
+
 /* MOVE TO layout > _header.scss */
 
 .so-sure-logo-dark {
@@ -843,14 +855,15 @@ a#get-quote-btn.btn.btn-primary {
 }
 
 ul.lead li {
-    padding: 10px;
+    padding: 10px 0;
 }
 
-.lead {
+/*.lead {
     font-size: 18px;
 }
+
 @media (min-width: 768px) {
   .lead {
     font-size: 21px;
   }
-}
+}*/

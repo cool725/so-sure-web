@@ -7,18 +7,14 @@
 
 .hero h1 {
     color: #fff;
-    text-align: center;
-    font-size: 36px;
+    font-size: 32px;
     line-height: 1.2em;
     margin-top: 0;
 }
 
-.hero h1.text-left {
-    text-align: left;
-}
-
 .hero h1 .h1-sub {
     font-size: 26px;
+    display: block;
 }
 
 .hero-box {
@@ -84,7 +80,7 @@
     .hero h1 {
         font-size: 46px;
         line-height: 1.4em;
-        text-align: left;
+        /*text-align: left;*/
     }
 
     .hero h1 .h1-sub {
