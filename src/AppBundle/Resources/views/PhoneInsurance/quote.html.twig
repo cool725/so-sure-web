@@ -35,6 +35,7 @@
     {% stylesheets
     '@AppBundle/Resources/public/css/Default/index.css'
     '@AppBundle/Resources/public/css/Default/quotePhone.css'
+    '@AppBundle/Resources/public/css/Default/bannerSticky.css'    
     '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'    
     '@AppBundle/Resources/public/css/Default/scrollindicator.css'
     '@AppBundle/Resources/public/css/Default/modal.css'    
@@ -309,7 +310,11 @@
 
     {% include 'AppBundle::Default/press.html.twig' %}
 
-    <section id="quote-banner" class="banner-sticky banner-sticky-hide">
+    <section id="quote-banner" 
+             class="banner-sticky banner-sticky-hide"
+             data-sticky-trigger="quote"
+             data-sticky-offset="200"
+             >
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-8">

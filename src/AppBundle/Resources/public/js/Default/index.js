@@ -48,22 +48,23 @@ $(function(){
 
     // Sticky Banner - For quotes TODO make modular
 
-    var quoteBox = $('#quote');
-    var quoteBoxHeight = quoteBox.height();
+    var stickyTrigger = $('.banner-sticky').data('sticky-trigger');
+    var triggerHeight = $('#'+stickyTrigger).height();
+    var triggerOffset = $('.banner-sticky').data('sticky-offset');
 
     $(document).scroll(function() {
 
-        if (quoteBox.length) {
+        if (stickyTrigger.length) {
 
-            var quoteBoxBottom = quoteBox.offset().top - quoteBoxHeight + 200;
+            var triggerBottom = $('#'+stickyTrigger).offset().top - triggerHeight + triggerOffset;
 
-            if ($(window).scrollTop() > quoteBoxBottom + quoteBoxHeight) {
+            if ($(window).scrollTop() > triggerBottom + triggerHeight) {
 
-                $('#quote-banner').fadeIn();                
+                $('.banner-sticky').fadeIn();                
 
             } else {
 
-                $('#quote-banner').fadeOut();                
+                $('.banner-sticky').fadeOut();                
 
             }
             
