@@ -4,6 +4,8 @@
 {% endif %}
 {% extends 'base.html.twig' %}
 
+{% set white_logo = true %}
+
 {% block title %}so-sure - Welcome to Social Insurance{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
@@ -44,54 +46,26 @@
     <section class="hero" id="get-quote">
         <div class="container">
             <div class="row">
-                <div class="col-md-7">
-                    <h1>
-                        We have redesigned insurance to serve you
-                    </h1>
-                    <p class="lead">Up to 40% cheaper than traditional insurers, faster claims &amp; cashback. Finally, mobile phone insurance that’s worthwhile</p>
-                    <ul class="list-inline hero-list-inline text-center hidden-xs">
-                        <li>
-                            <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i6s.make, 'model': i6s.getEncodedModel(), 'memory': i6s.memory}) }}">
-                                <img class="" src="{{ cdn_url }}/images/home/phone-logos/iphone_6s_logo_light.svg" width="180" />
-                                <br>
-                                Insure from £{{ i6s.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
-                            </a>                                
-                        </li>
-                        <li>
-                            <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': i7.make, 'model': i7.getEncodedModel(), 'memory': i7.memory}) }}">
-                                <img class="" src="{{ cdn_url }}/images/home/phone-logos/apple_iphone_7_logo_light.svg" width="180"  />
-                                <br>
-                                Insure from £{{ i7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
-                            </a>
-                        </li>
-                        <li>
-                            <a class="hero-link" href="{{ path('quote_make_model_memory', {'make': s7.make, 'model': s7.getEncodedModel(), 'memory': s7.memory}) }}">
-                                <img class="" src="{{ cdn_url }}/images/home/phone-logos/samsung_galaxy_s7_logo_light.svg" width="180" />
-                                <br>
-                                Insure from £{{ s7.getCurrentPhonePrice().getMonthlyPremiumPrice() }}
-                            </a>
-                        </li>
-                    </ul> 
-                    <p class="text-center"><a class="btn btn-success btn-rounded btn-lg" data-toggle="modal" data-target="#quoteModel">Get a quote</a></p>                                                                 
-                </div>
-                <div class="col-md-5">
-                        <img src="{{ cdn_url }}/images/home/illustrations/pngs/slide3-min.png" class="hero-img" width="300px;"> 
-                </div>                 
-            </div>
-            <div class="row">
                 <div class="col-md-12">
-                      
+                    <h1>The insurance revolution is here</h1>
+                    <h3 class="text-light-blue">Mobile phone insurance is finally worthwhile</h3>
+                    <ul class="list-unstyled fa-list-bullet">
+                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Up to 40% cheaper than traditional insurers</li>
+                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Faster claims</li>
+                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Cashback</li> 
+                    </ul>
+                    <div class="center-xs ">
+                        <a class="btn btn-success btn-rounded btn-lg" data-toggle="modal" data-target="#quoteModel">Get a quote</a>
+                    </div>
                 </div>
-            </div>
+            </div>            
         </div>
     </section>    
 
     {% include 'AppBundle::Default/press.html.twig' %}
 
-    {# {% include 'AppBundle::Default/benefits.html.twig' %} #}
     {% include 'AppBundle::Default/whySoSure.html.twig' %}
 
-    {# {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}    #}
     {% include 'AppBundle::Default/saveMoney.html.twig' %}
 
     {% include 'AppBundle::Default/fasterClaims.html.twig' %}

@@ -194,6 +194,9 @@ class UserController extends BaseController
     }
 
     /**
+     * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
+     *   as these will impact Adwords
+     *
      * @Route("/welcome", name="user_welcome")
      * @Template
      */
