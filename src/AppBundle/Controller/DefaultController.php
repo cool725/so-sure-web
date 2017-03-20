@@ -207,7 +207,6 @@ class DefaultController extends BaseController
         return [
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
-            'searchPhones' => $this->getPhonesSearchArray(),
             'type' => $type,
         ];
     }
