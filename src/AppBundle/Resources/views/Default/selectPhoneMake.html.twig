@@ -9,7 +9,18 @@
         {% set buttonText = 'Quote me' %}
         {% set class = "text-center" %}
     {% endif %}
-    <div class="row" id="select-phone">
+
+    <form method="get" id="search-phone-form">
+        <input type="text" class="search-phone-text" id="search-phone" placeholder="Find your phone by make and model..." />
+        <button type="submit" class="btn btn-success btn-rounded btn-get-quote">Quote me</button>
+    </form>    
+
+    <div id="loading-search-phone" class="text-center">
+        <small>loading...</small>
+    </div>
+
+
+{#     <div class="row" id="select-phone">
         <div class="col-sm-12 {{ class }}">
             <div class="device-search">
                 <form method="get" id="search-phone-form">
@@ -37,5 +48,5 @@
                 {{ form_end(form_phone) }}
             </div>
         </div>
-    </div>
+    </div> #}
 </div>  

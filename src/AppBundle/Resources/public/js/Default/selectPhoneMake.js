@@ -49,25 +49,37 @@ $(function(){
             $('form[name="launch_phone"]').submit()
         }
     });
+
+    // Twitter Typeahead
     
     var searchPhones = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      prefetch: { 'url': '/search-phone' },
-      identify: function(obj) { return obj.id; }
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        prefetch: { 'url': '/search-phone' },
+        identify: function(obj) { return obj.id; }
     });
 
-    $("#search-phone").typeahead({
-      highlight: true,
-      minLength: 1,
-      hint: true,
-    }, {
-      name: 'searchPhones',
-      source: searchPhones,
-      display: 'name',
-      limit: 30
+
+    $('#search-phone').typeahead({
+        highlight: true,
+        minLength: 1,
+        hint: true,
+    }, 
+    {
+        name: 'searchPhones',
+        source: searchPhones,
+        display: 'name',
+        limit: 30,
     });
+
+
+    // Stop the content flash when rendering the input
+    $('#loading-search-phone').fadeOut('fast', function() {
+        $('#search-phone-form').fadeIn();
+    });
+
     $('#search-phone').bind('typeahead:select', function(ev, suggestion) {
         $('#search-phone-form').attr('action', '/quote/' + suggestion.id);
     });
+
 });
