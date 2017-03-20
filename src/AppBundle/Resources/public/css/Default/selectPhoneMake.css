@@ -1,7 +1,14 @@
 /* Hide form on load whilst rendering */
 #search-phone-form {
     display: none;
-    margin-bottom: 25px;
+    /*margin-bottom: 25px;*/
+}
+
+.select-phone-box {
+    text-align: center;
+    padding: 15px;
+    background-color: #efefef;
+    margin-bottom: 15px;
 }
 
 /* Dropdown styling */
