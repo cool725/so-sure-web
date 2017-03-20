@@ -474,12 +474,9 @@ h4, h5, h6,
 
 
 /* Section Tools: MOVE TO common > _global.scss */
-.section {
-    position: relative;
-}
 
 .section--pad {
-    padding: 40px 15px;
+    padding: 10px 0 30px;
 }
 
 .align-middle {
