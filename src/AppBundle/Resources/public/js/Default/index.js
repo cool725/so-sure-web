@@ -12,12 +12,12 @@ $(function(){
         }
     });  
 
-    $("#get-quote-btn").click(function(event) {
+    $('#get-quote-btn').click(function(event) {
 
         event.preventDefault();
 
         $('html, body').animate({
-            scrollTop: $("#get-quote").offset().top
+            scrollTop: $('#get-quote').offset().top
         }, 1500);
     });      
 
