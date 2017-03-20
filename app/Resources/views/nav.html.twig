@@ -23,7 +23,7 @@
                 {% if app.user is null or not app.user %}
                     <li><a class="nav-item" href="{{ path('homepage') }}?quote=1">Get a quote</a></li>
                 {% endif %}
-                <li><a class="nav-item" href="{{ path('blog') }}">Blog</a></li>
+                <li><a class="nav-item" href="{{ path('blog') }}?link=nav">Blog</a></li>
                 {% if app.user is not null and app.user %}
                     {% if is_granted('ROLE_ADMIN') %}
                         <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
