@@ -822,5 +822,9 @@ ul.lead li {
     .fa-list-bullet li {
         font-size: 22px;
     }
+}
 
+/* Hide the ProdPad Got Feedback button floating at bottom of page */
+#pp-cfp-trigger {
+    display: none !important;
 }
