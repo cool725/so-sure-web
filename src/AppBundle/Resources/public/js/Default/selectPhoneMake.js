@@ -51,6 +51,11 @@ $(function(){
     });
 
     // Twitter Typeahead
+    function preventDefault(e) {
+        e.preventDefault();
+    }
+
+    $('#search-phone-form').bind('submit', preventDefault);
     
     var searchPhones = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
@@ -76,6 +81,10 @@ $(function(){
     // Stop the content flash when rendering the input
     $('#loading-search-phone').fadeOut('fast', function() {
         $('#search-phone-form').fadeIn();
+    });
+
+    $('#search-phone').bind('typeahead:selected', function(ev, suggestion) {
+        $('#search-phone-form').unbind('submit', preventDefault);
     });
 
     $('#search-phone').bind('typeahead:select', function(ev, suggestion) {
