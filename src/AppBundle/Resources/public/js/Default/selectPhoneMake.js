@@ -88,7 +88,7 @@ $(function(){
     });
 
     $('#search-phone').bind('typeahead:select', function(ev, suggestion) {
-        $('#search-phone-form').attr('action', '/quote/' + suggestion.id);
+        $('#search-phone-form').attr('action', '/phone-insurance/' + suggestion.id);
     });
 
 });
