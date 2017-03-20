@@ -186,7 +186,7 @@ body {
     position: fixed;
     top: 0; left: 0;
     padding: 15px 0;
-    z-index: 8888;
+    z-index: 1020;
     background-color: rgba(32, 37, 50, 0.95);
     text-align: center;
 }
