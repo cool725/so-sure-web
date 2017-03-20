@@ -26,9 +26,9 @@
     <section class="user-homepage--header">
         <div class="container">
             <div class="col-md-12">
-                <img src="http://www.placecage.com/100/100" alt="{{ policy.user.firstname }}" class="img-circle user-img">
+                <img src="{{ policy.user.getImageUrlFallback }}" alt="{{ policy.user.firstname }}" class="img-circle user-img">
                 <h2 class="h2 text-white">Welcome back, {{ policy.user.firstname }}!</h2>
-                <span class="text-white"><em>Phone model</em></span>
+                <span class="text-white">Your <em>{{ policy.phone }}</em> is insured from {{ policy.start|date('d M Y') }} to {{ policy.end|date('d M Y') }}</span>
             </div>
         </div>
     </section>
@@ -68,16 +68,11 @@
                     <div class="box-border-grey coffee-card">
                         <h4><strong>My Connections</strong></h4>
                         <ul class="list-inline">
+                            {% for connection in policy.standardConnections %}
                             <li>
-                                {# We could use something like this?  #}
-                                <img src="http://placehold.it/70x70/626B78/ffffff/?text=NW" alt="Name" class="img-circle coffee-stamp">
+                                <img src="{{ connection.linkedUser.getImageUrlFallback }}" title="{{ connection.linkedUser.name }} – Connected on {{ connection.date|date('d M') }} (£{{ connection.value|number_format(2, '.', ',')  }})" alt="{{ connection.linkedUser.name }}" class="img-circle coffee-stamp">
                             </li>
-                            <li>
-                                <img src="http://placehold.it/70x70/626B78/ffffff/?text=PM" alt="Name" class="img-circle coffee-stamp">
-                            </li>    
-                            <li>
-                                <img src="http://placehold.it/70x70/626B78/ffffff/?text=TE" alt="Name" class="img-circle coffee-stamp">
-                            </li>                            
+                            {% endfor %}
                         </ul>
                         <a href="#" id="connect-with" class="btn btn-primary btn-rounded"><i class="fa fa-plus fa-lg"></i> New connection</a>
                     </div>
@@ -149,26 +144,44 @@
                     <div class="box-border-grey text-center">
                         <h4><strong>My Reward Pot</strong></h4>
                         <div id="reward-pot-chart" class="circle-chart-container" 
-                             data-pot-value="{{ policy.potValue }}"
-                             data-max-pot="{{ policy.maxPot }}">
+                             data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
+                             data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
                              <div class="circle-chart--value">
-                                 <span class="h2 text-blue">£{{ policy.potValue }}</span><br>
-                                 <small>of a max. £{{ policy.maxPot }}</small>
+                                 <span class="h2 text-blue">£{{ policy.potValue|number_format(2, '.', ',') }}</span><br>
+                                 <small>of a max. £{{ policy.maxPot|number_format(2, '.', ',') }}</small>
                              </div>
                         </div>
                     </div>
+                    {% if policy.getCurrentConnectionValues %}
+                        {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 84600) | number_format(0, '.', ',') %}
+                        {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 84600) | number_format(0, '.', ',') %}
                     <div class="box-border-grey text-center">
                         <h4><strong>Connection Bonus</strong></h4>
                         <div id="connection-bonus-chart" class="circle-chart-container" 
-                             data-bonus-days-total="60"
-                             data-bonus-days-remaining="11">
+                             data-bonus-days-total="{{ days_total }}"
+                             data-bonus-days-remaining="{{ days_left }}">
                              <div class="circle-chart--value">
-                                 <span class="h2 text-red">11</span><br>
+                                 <span class="h2 text-red">{{ days_left }}</span><br>
                                  <small class="text-red">days left!</small>
                              </div>
-                        </div>     
-                        <p><small>Each connection made is worth £10 in the first 2 months and £2 thereafter.</small></p>                   
+                        </div>
+                        {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
+                        <p>
+                            <small>{{ policy.getCurrentConnectionValues['teaser'] }}</small>
+                        </p>
+                        {% endif %}
+                        
+                        <p>
+                            <small>
+                                {% if policy.getCurrentConnectionValues['description']|length > 0 %}
+                                    {{ policy.getCurrentConnectionValues['description'] }}
+                                {% else %}
+                                    Each connection made is worth £10 in the first 2 months and £2 thereafter.
+                                {% endif %}
+                            </small>
+                        </p>                        
                     </div>
+                    {% endif %}
                 </div>
             </div>
 

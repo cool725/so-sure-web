@@ -1867,7 +1867,20 @@ abstract class Policy
         return $this->areEqualToFourDp($this->getPotValue(), $this->getMaxPot());
     }
 
-    public function getConnectionValues()
+    public function getCurrentConnectionValues()
+    {
+        $now = new \DateTime();
+        $now = $now->format('U');
+        foreach($this->getConnectionValues('U') as $connectionValue) {
+            if ($now >= $connectionValue['start_date'] && $now <= $connectionValue['end_date']) {
+                return $connectionValue;
+            }
+        }
+
+        return null;
+    }
+
+    public function getConnectionValues($format = \DateTime::ATOM)
     {
         $connectionValues = [];
         if (!$this->isPolicy() || !$this->getStart()) {
@@ -1886,9 +1899,9 @@ abstract class Policy
         $afterSecondCliffDate = $this->addOneSecond($secondCliffDate);
 
         $connectionValues[] = [
-            'start_date' => $startDate ? $startDate->format(\DateTime::ATOM) : null,
+            'start_date' => $startDate ? $startDate->format($format) : null,
             'end_date' => $firstCliffDate ?
-                $firstCliffDate->format(\DateTime::ATOM) :
+                $firstCliffDate->format($format) :
                 null,
             'value' => $this->getTotalConnectionValue($startDate),
             'teaser' => 'until the Ideal Connection Time expires',
@@ -1899,10 +1912,10 @@ abstract class Policy
 
         $connectionValues[] = [
             'start_date' => $firstCliffDate ?
-                $firstCliffDate->format(\DateTime::ATOM) :
+                $firstCliffDate->format($format) :
                 null,
             'end_date' => $secondCliffDate ?
-                $secondCliffDate->format(\DateTime::ATOM) :
+                $secondCliffDate->format($format) :
                 null,
             'value' => $this->getTotalConnectionValue($afterFirstCliffDate),
             'teaser' => 'until your Connection Bonus is reduced',
@@ -1917,9 +1930,9 @@ abstract class Policy
 
         $connectionValues[] = [
             'start_date' => $secondCliffDate ?
-                $secondCliffDate->format(\DateTime::ATOM) :
+                $secondCliffDate->format($format) :
                 null,
-            'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
+            'end_date' => $this->getEnd() ? $this->getEnd()->format($format) : null,
             'value' => $this->getTotalConnectionValue($afterSecondCliffDate),
             'teaser' => '',
             'description' => '',

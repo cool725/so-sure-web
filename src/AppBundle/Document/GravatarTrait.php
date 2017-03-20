@@ -12,4 +12,14 @@ trait GravatarTrait
             $size
         );
     }
+
+    public function gravatarImageFallback($email, $size, $fallback)
+    {
+        return sprintf(
+            'https://www.gravatar.com/avatar/%s?s=%d&d=%s',
+            md5(strtolower(trim($email))),
+            $size,
+            urlencode($fallback)
+        );
+    }
 }
