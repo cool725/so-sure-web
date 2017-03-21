@@ -86,6 +86,19 @@ h3 {
     margin-left: -90px;
 }
 
+.circle-chart--full {
+    width: 180px;
+    position: absolute;
+    left: 50%; top: 35px;
+    margin-left: -90px;
+}
+
+.circle-chart--full-value {
+    width: 150px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
 /* Coffee Card */
 .coffee-card {
     padding-left: 25px;
