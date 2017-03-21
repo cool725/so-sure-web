@@ -77,9 +77,12 @@
                             </li>
                             {% endfor %}
                         </ul>
-                        <a href="#" id="connect-with" class="btn btn-primary btn-rounded"><i class="fa fa-plus fa-lg"></i> New connection</a>
+                        {% if policy.canInvite %}
+                            <a href="#" id="connect-with" class="btn btn-primary btn-rounded"><i class="fa fa-plus fa-lg"></i> New connection</a>
+                        {% endif %}
                     </div>
 
+                    {% if policy.canInvite %}
                     <div class="row">
                         {# {% if policy.standardSCode.shareLink %} #}
                         <div class="col-md-6" >   
@@ -141,7 +144,7 @@
                             </div>                             
                         </div>                        
                     </div>
- 
+                    {% endif %}
                 </div>
                 <div class="col-sm-5 col-sm-pull-7 col-md-4 col-md-pull-8">
                     <div class="box-border-grey text-center">
@@ -156,8 +159,8 @@
                         </div>
                     </div>
                     {% if policy.getCurrentConnectionValues %}
-                        {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 84600) | number_format(0, '.', ',') %}
-                        {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 84600) | number_format(0, '.', ',') %}
+                        {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
+                        {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
                     <div class="box-border-grey text-center">
                         <h4><strong>Connection Bonus</strong></h4>
                         <div id="connection-bonus-chart" class="circle-chart-container" 

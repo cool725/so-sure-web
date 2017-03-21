@@ -1871,7 +1871,7 @@ abstract class Policy
     {
         $now = new \DateTime();
         $now = $now->format('U');
-        foreach($this->getConnectionValues('U') as $connectionValue) {
+        foreach ($this->getConnectionValues('U') as $connectionValue) {
             if ($now >= $connectionValue['start_date'] && $now <= $connectionValue['end_date']) {
                 return $connectionValue;
             }
@@ -1998,6 +1998,18 @@ abstract class Policy
         }
 
         return $diff;
+    }
+
+    public function canInvite()
+    {
+        if ($this->isPotCompletelyFilled()) {
+            return false;
+        }
+        if ($this->hasMonetaryClaimed()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function hasCorrectPolicyStatus(\DateTime $date = null)
