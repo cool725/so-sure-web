@@ -11,13 +11,16 @@
 
             </button>
             <a class="navbar-brand" href="/">
+
                 {% if white_logo is defined %}
                     <div class="so-sure-logo-light"></div>
                 {% else %}
                     <div class="so-sure-logo-dark"></div>
                 {% endif %}
-            </a>
-        </div>
+
+              </a>
+            </div>
+
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 {% if app.user is null or not app.user %}
