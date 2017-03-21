@@ -15,6 +15,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
+use AppBundle\Form\Type\SCodeInvitationType;
 use AppBundle\Form\Type\InvitationType;
 use AppBundle\Document\Invitation\EmailInvitation;
 
@@ -58,8 +59,6 @@ class UserController extends BaseController
         $scode = null;
         $session = $request->getSession();
         if ($code = $session->get('scode')) {
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(SCode::class);
             $scode = $repo->findOneBy(['code' => $code]);
         }
 
@@ -76,6 +75,9 @@ class UserController extends BaseController
             ->getForm();
         $invitationForm = $this->get('form.factory')
             ->createNamedBuilder('invitation', InvitationType::class, $user)
+            ->getForm();
+        $scodeForm = $this->get('form.factory')
+            ->createNamedBuilder('scode', SCodeInvitationType::class, ['scode' => $scode ? $scode->getCode() : null])
             ->getForm();
 
         if ($request->request->has('email')) {
@@ -114,12 +116,99 @@ class UserController extends BaseController
                     }
                 }
             }
+        } elseif ($request->request->has('scode')) {
+            $scodeForm->handleRequest($request);
+            if ($scodeForm->isSubmitted() && $scodeForm->isValid()) {
+                if ($session = $this->get('session')) {
+                    $session->remove('scode');
+                }
+
+                $code = $scodeForm->getData()['scode'];
+                $scode = $repo->findOneBy(['code' => $code]);
+                if (!$scode || !SCode::isValidSCode($scode->getCode())) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("SCode %s is missing or been withdrawn", $code)
+                    );
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                }
+
+                $policy = $this->getUser()->getCurrentPolicy();
+                try {
+                    $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
+                    $message = sprintf(
+                        '%s has been invited',
+                        $invitation->getInvitee()->getName()
+                    );
+
+                    $this->addFlash('success', $message);
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                } catch (DuplicateInvitationException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("SCode %s has already been used by you", $code)
+                    );
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                } catch (ConnectedInvitationException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("You're already connected")
+                    );
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                } catch (OptOutException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("Sorry, but your friend has opted out of any more invitations")
+                    );
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                } catch (InvalidPolicyException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("Please make sure your policy is paid to date before connecting")
+                    );
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                } catch (SelfInviteException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("You cannot invite yourself")
+                    );
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                } catch (FullPotException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("You or your friend has a full pot!")
+                    );
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                } catch (ClaimException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("You or your friend has a claim.")
+                    );
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                } catch (NotFoundHttpException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("Not able to find this scode")
+                    );
+
+                    return new RedirectResponse($this->generateUrl('user_home'));
+                }
+            }
         } elseif ($scode) {
             // @codingStandardsIgnoreStart
             $this->addFlash(
                 'success',
                 sprintf(
-                    '%s has invited you to connect. <a href="#" data-toggle="modal" data-target="#scodeModal">Connect here!</a>',
+                    '%s has invited you to connect. <a href="#" id="scode-link">Connect here!</a>',
                     $scode->getPolicy()->getUser()->__toString()
                 )
             );
@@ -130,6 +219,7 @@ class UserController extends BaseController
             'policy' => $user->getCurrentPolicy(),
             'email_form' => $emailInvitationForm->createView(),
             'invitation_form' => $invitationForm->createView(),
+            'scode_form' => $scodeForm->createView(),
             'scode' => $scode,
         );
     }
@@ -307,101 +397,6 @@ class UserController extends BaseController
         $fb->post(sprintf('/me/%s:trust', $fbNamespace), [ 'profile' => $id ]);
 
         return new RedirectResponse($this->generateUrl('user_home'));
-    }
-
-    /**
-     * @Route("/scode/{code}", name="user_scode")
-     * @Method({"POST"})
-     */
-    public function scodeAction(Request $request, $code)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_NOT_FOUND,
-                'Please reload this page and try again',
-                404
-            );
-        }
-
-        if ($session = $this->get('session')) {
-            $session->remove('scode');
-        }
-
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(SCode::class);
-        $scode = $repo->findOneBy(['code' => $code]);
-        if (!$scode || !SCode::isValidSCode($scode->getCode())) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_NOT_FOUND,
-                'SCode is missing or been withdrawn',
-                404
-            );
-        }
-
-        $policy = $this->getUser()->getCurrentPolicy();
-        try {
-            $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
-            $message = sprintf(
-                '%s has been invited',
-                $invitation->getInvitee()->getName()
-            );
-
-            $this->addFlash('success', $message);
-
-            return $this->getSuccessJsonResponse($message);
-        } catch (DuplicateInvitationException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_INVITATION_DUPLICATE,
-                'Looks like you alredy entered this code',
-                422
-            );
-        } catch (ConnectedInvitationException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_INVITATION_CONNECTED,
-                'Looks like you are already connected',
-                422
-            );
-        } catch (OptOutException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_INVITATION_OPTOUT,
-                'Sorry, but that person does not want to connect anymore',
-                422
-            );
-        } catch (InvalidPolicyException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
-                'Please make sure your policy is paid before connecting',
-                422
-            );
-        } catch (SelfInviteException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_INVITATION_SELF_INVITATION,
-                'Sorry, you can not connect with yourself',
-                422
-            );
-        } catch (FullPotException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_INVITATION_MAXPOT,
-                'Sorry, but either you or your connection has a full pot and can not connect anymore',
-                422
-            );
-        } catch (ClaimException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
-                'Sorry, but you are unable to connect with this user right now',
-                422
-            );
-        } catch (NotFoundHttpException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_NOT_FOUND,
-                'Unable to find policy/code',
-                404
-            );
-        } catch (\Exception $e) {
-            $this->get('logger')->error('Error in api newInvitation.', ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
     }
 
     /**

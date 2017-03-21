@@ -196,6 +196,58 @@ class UserControllerTest extends BaseControllerTest
         $this->validateRewardPot($crawler, 10);
     }
 
+    public function testUserSCode()
+    {
+        $email = self::generateEmail('testUserSCode-inviter', $this);
+        $inviteeEmail = self::generateEmail('testUserSCode-invitee', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $invitee = self::createUser(
+            self::$userManager,
+            $inviteeEmail,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $inviteePolicy = self::initPolicy($invitee, self::$dm, $phone, null, true, true);
+        $inviteePolicy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+        $this->assertTrue($inviteePolicy->getUser()->hasActivePolicy());
+
+        $this->login($email, $password, 'user/');
+
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', sprintf('/scode/%s', $inviteePolicy->getStandardSCode()->getCode()));
+        self::verifyResponse(200);
+        self::$client->followRedirects(false);
+
+        $form = $crawler->selectButton('scode[submit]')->form();
+        $this->assertEquals($inviteePolicy->getStandardSCode()->getCode(), $form['scode[scode]']->getValue());
+        $crawler = self::$client->submit($form);
+
+        $this->login($inviteeEmail, $password, 'user/');
+        $crawler = self::$client->request('GET', '/user/');
+        $form = $crawler->selectButton('Accept')->form();
+        $crawler = self::$client->submit($form);
+
+        $crawler = self::$client->request('GET', '/user/');
+        $this->validateRewardPot($crawler, 10);
+    }
+
     private function validateInviteAllowed($crawler, $allowed)
     {
         $count = 0;

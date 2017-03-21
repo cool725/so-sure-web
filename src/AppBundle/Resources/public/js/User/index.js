@@ -48,6 +48,18 @@ $(function(){
         $('#connect-with-box').addClass('box-border--highlight');
     });    
 
+    // Connect with
+    $('#scode-link').click(function(event) {
+
+        event.preventDefault();
+
+        $('html, body').animate({
+            scrollTop: $('#scode-box').offset().top - 100
+        }, 1500);
+
+        $('#scode-box').addClass('box-border--highlight');
+    });    
+    
     // Copy button on scode
     var clipboard = new Clipboard('.btn-clipboard');
     $('.btn-clipboard').tooltip({'title':'Copied', 'trigger':'manual'});
@@ -64,31 +76,5 @@ $(function(){
         text: $('.btn-clipboard').data('share-text'),
         shareIn: 'popup',
         showCount: false,
-    });
-
-    // Scode form
-    $('#scode-form-submit').click(function() {
-        var url = '/user/scode/' + $('#scode-form-code').val();
-        var token = $(this).data('token');
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: { token: token }
-        }).done(function(result) {
-            console.log(result);
-            if (result.code == 0) {
-                window.location = window.location;
-            } else if (typeof result.description !== 'undefined') {
-                $('#scode-form-code-err').text(result.description);
-            } else {
-                $('#scode-form-code-err').text('Unknown error, please try again');
-            }
-        }).fail(function(result) {
-            if (typeof result.responseJSON !== 'undefined') {
-                $('#scode-form-code-err').text(result.responseJSON.description);
-            } else {
-                $('#scode-form-code-err').text('Unknown error, please try again');
-            }
-        });
     });
 });

@@ -125,7 +125,7 @@
                         </div>
                         {# {% endif %}  #}
                         <div class="col-md-6">
-                            <div class="box-border-grey text-center">
+                            <div id="scode-box" class="box-border-grey text-center">
                                 <h4><strong>
                                     {% if scode %}
                                         {{ scode.policy.user }} has invited you!
@@ -134,15 +134,16 @@
                                     {% endif %}                                         
                                 </strong></h4>
                                 <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
-                                <form id="scode-form">
+                                {{ form_start(scode_form, {'attr': {'class': ''}}) }}
                                     <div class="form-group">
-                                        <input type="text" class="form-control" placeholder="Enter code" id="scode-form-code" value="{% if scode %}{{ scode.code }}{% endif %}">
+                                        {{ form_errors(scode_form.scode) }}
+                                        {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
                                         <div class="help-block with-errors" id="scode-form-code-err"></div>
                                     </div>
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-success btn-rounded" id="scode-form-submit" data-token="{{ csrf_token('default') }}">Connect</button>
+                                        {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
                                     </div>
-                                </form>                                               
+                                {{ form_end(scode_form) }}
                             </div>                             
                         </div>                        
                     </div>
