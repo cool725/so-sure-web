@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% set white_logo = true %}
+
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
@@ -33,74 +35,87 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container user-info">
-        <h1 class="text-center">Welcome to so-sure {{ policy.user.firstname }}</h1>
-        <p class="text-center">You'll receive a confirmation email with full details of your policy shortly, but here's a summary:
-        </p>
 
-        <div class="col-md-6">
-            <div class="small-card">
-                <div class="row">
-                    <h4>Cover</h4>
-                    <p class="title">Your {{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB) is now insured!</p>
-                    <p class="subtitle">Your policy number is {{ policy.policyNumber }}</p>
-                    <p class="subtitle">Your phone is now protected against Theft, Loss, Accidental Damage and Breakdown.</p>
-                    <p class="actions">
-                        <a data-toggle="modal" data-target="#policyModal" class="btn btn-success btn-rounded">Policy Details</a>
-                    </p>
+    <section class="user-welcome--info">
+        <div class="container">
+            <h1 class="text-center text-white">Welcome to so-sure {{ policy.user.firstname }}</h1>
+            <p class="lead text-center text-white">You'll receive a confirmation email with full details of your policy shortly, but here's a summary:</p>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="box-border-grey">
+                        <h3>Cover</h3>
+                        <ul class="list-unstyled lead">
+                            <li>Your <strong>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</strong> is now insured!</li>
+                            <li>Your policy number is <strong>{{ policy.policyNumber }}</strong></li>
+                            <li>Your phone is now protected against Theft, Loss, Accidental Damage and Breakdown 😄</li>
+                            <li><a data-toggle="modal" data-target="#policyModal" class="btn btn-primary btn-rounded">Policy Details</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="box-border-grey">
+                        <h3>Cost</h3>
+                        <ul class="list-inline">
+                            <li>
+                                You have chosen to pay
+                                &pound;{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month 
+                                {% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }} for your policy
+                                {% else %}Unknown{% endif %}
+                                and your policy is in effect from {{ policy.start|date('jS F Y') }} until {{ policy.end|date('jS F Y') }}.                                
+                            </li>
+                            {% if policy.user.paymentMethod.cardType is defined %}
+                            <li>
+                                {% if policy.getPremiumPlan == 'monthly'%}
+                                    Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) will be billed &pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} every month on the {{ policy.expectedBillingDate|date('jS') }}.
+                                {% elseif policy.getPremiumPlan == 'yearly' %}
+                                    Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) was billed &pound;{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
+                                {% endif %}                                
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="small-card">
-                <div class="row">
-                    <h4>Cost</h4>
-                    <p class="title">
-                        You have chosen to pay
-                        &pound;{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month 
-                        {% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }} for your policy
-                        {% else %}Unknown{% endif %}
-                        and your policy is in effect from {{ policy.start|date('jS F Y') }} until {{ policy.end|date('jS F Y') }}.
-                    </p>
-                    {% if policy.user.paymentMethod.cardType is defined %}
-                    <p class="info text-blue">
-                        {% if policy.getPremiumPlan == 'monthly'%}
-                            Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) will be billed &pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} every month on the {{ policy.expectedBillingDate|date('jS') }}.
-                        {% elseif policy.getPremiumPlan == 'yearly' %}
-                            Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) was billed &pound;{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
-                        {% endif %}
-                    </p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
+    </section>
 
-    <section class="start-saving section--pad alt-brand-gradient">
+    <section class="start-saving section--pad background-white">
         <div class="row">
             <h2 class="text-center">Together we're better.<br/>Start Sharing&nbsp;&nbsp;<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>&nbsp;&nbsp;Start Saving</h2>
         </div>
     </section>
 
-    <section id="download-apps" class="download-apps section--pad">
+    <section class="user-welcome--steps">
         <div class="container">
             <div class="row">
-                <div class="col-md-6">
-                    <h3><span class="badge">1</span> Want an extra £5 to get you started? 💷</h3>
-                    <p class="lead">Our app makes inviting your friends a breeze. Try it out and we'll add £5 to your reward pot! Yes, if you download the app, login, and invite your trusted friends, we'll add an extra £5 to your reward pot....but hurry as the offer expires on 1st April 2017</p>
-                    {% if policy.phone.isITunes %}
-                    <div class="download-btn center">
-                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
-                        </a>
+                <div class="col-sm-6">
+                    <div class="box-border-grey">
+                        <h4>1. Want an extra £5 to get you started? 💷</h4>
+                        <p class="lead">Our app makes inviting your friends a breeze. Try it out and we'll add £5 to your reward pot! Yes, if you download the app, login, and invite your trusted friends, we'll add an extra £5 to your reward pot....but hurry as the offer expires on 1st April 2017</p>
+                        {% if policy.phone.isITunes %}
+                        <div class="download-btn center">
+                            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
+                            </a>
+                        </div>
+                        {% endif %}
+                        {% if policy.phone.isGooglePlay %}
+                        <div class="download-btn center">
+                            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
+                            </a>
+                        </div>
+                        {% endif %}                        
                     </div>
-                    {% endif %}
-                    {% if policy.phone.isGooglePlay %}
-                    <div class="download-btn center">
-                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
-                        </a>
-                    </div>
-                    {% endif %}
                 </div>
+                <div class="col-sm-6">
+                    <div class="box-border-grey">
+                        <h3>2. Sign up friends &amp; connect for up to 80% cash back</h3>
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </section>
+
+
                  <div class="col-md-6">
                         <h3 class="text-center"><span class="badge">2</span> Sign up friends &amp; connect for up to 80% cash back</h3>
                         <p class="lead text-center">Watch our video below to learn more. 📺👀</p>
