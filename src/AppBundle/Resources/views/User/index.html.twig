@@ -54,6 +54,7 @@
             <div class="row">
                 <div class="col-sm-7 col-sm-push-5 col-md-8 col-md-push-4">
                     {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
+                    <div class="box-border-grey">
                         <h4><strong>Invitations</strong></h4>
                         {{ form_start(invitation_form, {'attr': { 'class': 'form-inline'}}) }}
                             <ul>
@@ -66,7 +67,8 @@
                                 {% endfor %}
                             </ul>
                         {{ form_errors(invitation_form) }}
-                        {{ form_end(invitation_form) }}                        
+                        {{ form_end(invitation_form) }}
+                    </div>
                     {% endif %}
                     <div class="box-border-grey coffee-card">
                         <h4><strong>My Connections</strong></h4>
