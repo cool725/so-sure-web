@@ -476,7 +476,7 @@ h4, h5, h6,
 /* Section Tools: MOVE TO common > _global.scss */
 
 .section--pad {
-    padding: 10px 0 30px;
+    padding: 40px 0;
 }
 
 .align-middle {
@@ -499,6 +499,10 @@ h4, h5, h6,
     .align-middle {
         min-height: 450px;
     }
+
+    .section--pad {
+        padding: 60px 0;
+    }    
     
 }
 
@@ -652,6 +656,10 @@ background: rgba(51, 153, 255, 1);
 
 .btn-rounded.btn-play-right:after {
     right: 15%;
+}
+
+.btn-white {
+    color: #fff;
 }
 
 @media (min-width: 379px) {

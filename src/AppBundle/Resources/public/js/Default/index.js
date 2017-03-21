@@ -47,12 +47,12 @@ $(function(){
     });
 
 
-    $("#get-started").click(function(event) {
+    $('#find-out-more').click(function(event) {
 
         event.preventDefault();
 
         $('html, body').animate({
-            scrollTop: $("#download-now").offset().top
+            scrollTop: $('#why-so-sure').offset().top
         }, 1500);
     });
 
