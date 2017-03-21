@@ -127,6 +127,22 @@ h3 {
     margin-bottom: 30px;
 }
 
+/* Invalid Page */
+
+.user-invalid {
+    margin-bottom: 40px;
+}
+
+@media (min-width: 767px) {
+
+    .user-invalid {
+        margin-bottom: 200px;
+    }
+
+}
+
+
+
 /*.reward-pot {
   min-height: 750px;
   padding-top: 100px;

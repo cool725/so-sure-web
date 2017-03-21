@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% set white_logo = true %}
+
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
@@ -26,11 +28,11 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h1>Oops! Looks like you haven't purchased a policy with us yet...</h1>
-                <p class="lead">Select your phone below and follow the steps to get your phone covered with us.</p>
+                <h1 class="text-white h2">Oops! Looks like you haven't purchased a policy with us yet...</h1>
+                <p class="lead text-light-blue">Select your phone below and follow the steps to get your phone covered with us.</p>
             </div>
             <div class="col-md-12">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
             </div>
         </div>
     </div>
