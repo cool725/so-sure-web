@@ -212,6 +212,16 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/search-phone", name="search_phone_data")
+     */
+    public function searchPhoneAction()
+    {
+        return new JsonResponse(
+            $this->getPhonesSearchArray()
+        );
+    }
+
+    /**
      * @Route("/login-redirect", name="login_redirect")
      */
     public function loginRedirectAction()

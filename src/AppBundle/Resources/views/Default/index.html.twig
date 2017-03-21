@@ -33,7 +33,8 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    'components/vimeo-player-js/player.min.js'        
+    'components/vimeo-player-js/player.min.js'
+    'components/typeahead.js/typeahead.bundle.min.js'
     '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
@@ -46,7 +47,7 @@
     <section class="hero" id="get-quote">
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12">                    
                     <h1>The insurance revolution is here</h1>
                     <h3 class="text-light-blue">Mobile phone insurance is finally worthwhile</h3>
                     <ul class="list-unstyled fa-list-bullet">
@@ -54,11 +55,10 @@
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Faster claims</li>
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Cashback</li> 
                     </ul>
-                    <div class="center-xs ">
-                        <a class="btn btn-success btn-rounded btn-lg" data-toggle="modal" data-target="#quoteModel">Get a quote</a>
-                    </div>
-                </div>
-            </div>            
+                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                </div>              
+            </div>    
+
         </div>
     </section>    
 
@@ -72,7 +72,23 @@
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
-    {% include 'AppBundle::Default/footerCta.html.twig' %}
+    <section class="footer-cta brand-gradient">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 text-left">
+                    <h2>Ready for better phone insurance?</h2>
+                    <p class="lead">You can't always have better in life, but you can have better phone insurance.</p>
+                </div>
+                <div class="col-lg-2 text-center">
+                    <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
+                </div>
+                <div class="col-lg-2 text-center">
+                    <a class="btn btn-info" id="open-intercom">Chat with us <i class="fa fa-comments"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
     {% include 'AppBundle::Default/partnership.html.twig' %}
 
@@ -80,34 +96,7 @@
 
     {% include 'AppBundle::Default/modalVideo.html.twig' %}    
 
-    <div class="modal modal-switching fade" 
-         id="switchingModal" 
-         tabindex="-1" 
-         role="dialog" 
-         aria-labelledby="Switch to so-sure" 
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h3>Want to switch to so-sure?</h3>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Switching to so-sure is easy. Just follow these steps:</strong></p>
-                    <ol>
-                        <li>Contact your existing insurance provider and request to cancel your policy. Check on their website but often you can email them and, at most, give them a 30 day notice.</li>
-                        <li>Download the so-sure app and purchase your new policy from so-sure.</li>
-                    </ol>
-                    <p class="text-center"><button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Got it!</button></p>
-                </div>
-            </div>
-        </div>
-    </div>      
-
-    {% include 'AppBundle::Default/modalQuote.html.twig' %}    
+    {# {% include 'AppBundle::Default/modalQuote.html.twig' %}     #}
 
     {# End Page Modals #}       
 

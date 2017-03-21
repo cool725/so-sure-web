@@ -138,6 +138,20 @@ abstract class BaseController extends Controller
         return $phones;
     }
 
+    protected function getPhonesSearchArray()
+    {
+        $makes = [];
+        $phones = [];
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $items = $repo->findActive()->getQuery()->execute();
+        foreach ($items as $phone) {
+            $phones[] = ['id' => $phone->getId(), 'name' => $phone->__toString()];
+        }
+
+        return $phones;
+    }
+
     protected function getQuotes($make, $device, $memory = null, $rooted = null)
     {
         // TODO: We should probably be checking make as well.  However, we need to analyize the data
