@@ -330,6 +330,7 @@ class UserController extends BaseController
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'user' => $user,
+            'policy' => $user->getCurrentPolicy(),
         ];
 
         return $data;

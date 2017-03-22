@@ -13,9 +13,9 @@
         <div class="container">
             <nav id="user-homepage--nav">
                 <ul class="nav nav-pills scroll">
-                    <li role="presentation" class="active"><a href="#">Home</a></li>
+                    <li role="presentation" class="{% if app.request.get('_route') == 'user_home' %}active{% endif %}"><a href="{{ path('user_home') }}">Home</a></li>
                     {# <li role="presentation"><a href="#">Personal Info</a></li> #}
-                    {# <li role="presentation"><a href="#">Payment Details</a></li> #}
+                    <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' %}active{% endif %}"><a href="{{ path('user_card_details') }}">Payment Details</a></li>
                 </ul>
             </nav>  
         </div>

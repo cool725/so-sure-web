@@ -58,7 +58,7 @@
         <!-- End Google Tag Manager -->
 
         {% if environment != 'prod' and app.request.get('hide_env') != '1' %}
-            <div style="background-color: red; text-align: center; color: white;"><strong>{{ environment }}</strong></div>
+            <div style="background-color: red; text-align: center; color: white;"><strong>{{ environment }}</strong> <a href="{{ path('ops_pages') }}"><i class="fa fa-wrench"></i></a></div>
         {% endif %}
 
         {% block nav %}
