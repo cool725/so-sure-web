@@ -2158,7 +2158,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->validatePremium(false, new \DateTime("2016-10-01"));
     }
 
-    public function testValidatePremium()
+    public function testValidatePremiumTenPercent()
     {
         $user = new User();
         $user->setEmail(self::generateEmail('validate-premium', $this));
@@ -2170,6 +2170,20 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNotEquals($premium, $policy->getPremium());
         $this->assertEquals(0.095, $premium->getIptRate());
         $this->assertEquals(0.1, $policy->getPremium()->getIptRate());
+    }
+
+    public function testValidatePremiumTwelvePercent()
+    {
+        $user = new User();
+        $user->setEmail(self::generateEmail('testValidatePremiumTwelvePercent', $this));
+        self::$dm->persist($user);
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone, new \DateTime('2017-01-01'));
+        $premium = $policy->getPremium();
+        $policy->validatePremium(true, new \DateTime("2017-06-01"));
+        $this->assertNotEquals($premium, $policy->getPremium());
+        $this->assertEquals(0.1, $premium->getIptRate());
+        $this->assertEquals(0.12, $policy->getPremium()->getIptRate());
     }
 
     public function testLeadSource()

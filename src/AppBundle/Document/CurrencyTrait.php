@@ -21,8 +21,10 @@ trait CurrencyTrait
 
         if ($date < new \DateTime('2016-10-01')) {
             return 0.095;
-        } else {
+        } elseif ($date < new \DateTime('2017-06-01')) {
             return 0.1;
+        } else {
+            return 0.12;
         }
     }
 
