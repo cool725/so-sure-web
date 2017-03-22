@@ -110,6 +110,29 @@ strong {
     background-color: #fff;
 }
 
+
+/* Borders */
+
+.box-border-grey {
+    position: relative;
+}
+
+@media (min-width: 340px) {
+
+    .box-border-grey { /* TODO // Refactor on quote page */
+        padding: 15px;      
+        margin-bottom: 25px;
+        background-color: #fff;
+        border: 2px solid #efefef;
+        border-radius: 4px;          
+    } 
+
+    .box-border--highlight {
+        border-color: #02C9FF;
+    }
+
+}
+
 .center-xs {
     text-align: center;
 }
@@ -120,6 +143,7 @@ strong {
       text-align: inherit;
   }
   
+
 }
 
 /* MOVE TO layout > _header.scss */
@@ -306,7 +330,7 @@ h4, h5, h6,
     border-bottom: 2px solid #efefef;
     display: inline-block;
     margin: -2px 10px 0;
-    width: 42%;
+    width: 35%;
     vertical-align: middle;
 }
 

@@ -23,14 +23,16 @@
     "datatables.net": "^1.10.12",
     "datatables.net-bs": "^1.10.12",
     "typeahead.js": "^0.11.1",
-    "clipboard": "^1.5.15",
+    "clipboard": "^1.6.1",
     "jssocials": "^1.4.0",
     "bootstrap-daterangepicker": "https://github.com/dangrossman/bootstrap-daterangepicker.git#2.1.24",
     "rangeslider.js": "^2.3.0",
     "cookieconsent": "^3.0.4",
     "vimeo-player-js": "^2.0.1",
     "intl-tel-input": "^11.0.4",
+    "jquery-circle-progress": "^1.2.1"
     "jquery-validation": "jquery.validate#^1.13.0"
+
   },
   "install": {
     "path": "web/components",
@@ -71,7 +73,10 @@
       "jssocials": [
         "bower_components/jssocials/dist/jssocials.min.js",
         "bower_components/jssocials/dist/jssocials.css",
-        "bower_components/jssocials/dist/jssocials-theme-flat.css"
+        "bower_components/jssocials/dist/jssocials-theme-flat.css",
+        "bower_components/jssocials/dist/jssocials-theme-minima.css",
+        "bower_components/jssocials/dist/jssocials-theme-plain.css",
+        "bower_components/jssocials/dist/jssocials-theme-classic.css"
       ],
       "bootstrap-daterangepicker": [
         "bower_components/bootstrap-daterangepicker/daterangepicker.js",
@@ -93,6 +98,9 @@
         "bower_components/intl-tel-input/build/css/intlTelInput.css",
         "bower_components/intl-tel-input/build/img/flags.png",
         "bower_components/intl-tel-input/build/img/flags@2x.png"
+      ],
+      "jquery-circle-progress": [
+        "bower_components/jquery-circle-progress/dist/circle-progress.min.js"
       ]
     }
   }

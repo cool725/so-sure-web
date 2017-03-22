@@ -938,6 +938,24 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->gravatarImage($this->getEmail(), $size);
     }
 
+    public function getImageUrlFallback($size = 100)
+    {
+        if ($this->getFacebookId()) {
+            return sprintf(
+                'https://graph.facebook.com/%s/picture?width=%d&height=%d',
+                $this->getFacebookId(),
+                $size,
+                $size
+            );
+        }
+
+        return $this->gravatarImageFallback(
+            $this->getEmail(),
+            $size,
+            sprintf('https://cdn.so-sure.com/images/alpha/%s.png', strtolower($this->getFirstName()[0]))
+        );
+    }
+
     public function hasValidDetails()
     {
         // TODO: Improve validation
