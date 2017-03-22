@@ -13,6 +13,9 @@
     <form method="get" id="search-phone-form">
         <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" />
         <button type="submit" class="btn btn-success btn-rounded btn-get-quote">Quote me</button>
+        {% if type == 'homepage' %}
+            <a id="find-out-more" href="#" class="btn btn-link btn-white text-underline">LEARN MORE</a>
+        {% endif %}  
     </form>    
 
     <div id="loading-search-phone" class="text-center">
