@@ -786,7 +786,8 @@ a#get-quote-btn.btn.btn-primary {
     padding: 20px !important;
 }
 
-ul.lead li {
+ul.lead li,
+ul li.h3 {
     padding: 10px 0;
 }
 

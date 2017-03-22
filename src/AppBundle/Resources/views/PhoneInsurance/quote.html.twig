@@ -167,7 +167,12 @@
 
                         <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div>
 
-                        <h3>Get cashback by connecting to friends</h3>          
+                        {% if coming_soon %}
+                            <h3>Sample cashback by connecting to friends</h3>
+                        {% else %}
+                            <h3>Get cashback by connecting to friends</h3>                            
+                        {% endif %}
+
                         
                         <div class="h4 text-grey-blue"><strong>Friends connected</strong></div>
 
