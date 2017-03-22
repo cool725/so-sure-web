@@ -28,10 +28,10 @@
 {% block body %}
 
 {% if phone %}
-    <section id="quote-banner" 
-             class="banner-sticky banner-sticky-hide"
+    <section class="banner-sticky banner-sticky-hide"
              data-sticky-trigger="purchase-step-personal"
-             data-sticky-offset="-20"
+             data-sticky-offset="150"
+             data-sticky-static="true"
              >
         <div class="container">
             <div class="row">
@@ -46,13 +46,20 @@
             </div>
         </div>
     </section>
-{% endif %}
+{% endif %}  
 
 <section id="purchase-step-personal" class="checkout">
-    
+
     {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
 
     <div class="container">
+
+        <h2 class="text-center text-blue">Insurance for your
+            <span class="text-nowrap">{{ phone.make }} {{ phone.model }} {%    
+            if phone.memory %}
+                {{ phone.memory }}GB</span>
+            {% endif %}
+            - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h2>        
 
         <div class="row">
             <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">                                      

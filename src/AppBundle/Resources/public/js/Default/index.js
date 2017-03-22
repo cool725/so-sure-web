@@ -48,9 +48,11 @@ $(function(){
 
     // Sticky Banner - For quotes TODO make modular
 
-    var stickyTrigger = $('.banner-sticky').data('sticky-trigger');
+    var stickyBanner  = $('.banner-sticky');
+    var stickyTrigger = $(stickyBanner).data('sticky-trigger');
+    var stickyStatic  = $(stickyBanner).data('sticky-static');    
     var triggerHeight = $('#'+stickyTrigger).height();
-    var triggerOffset = $('.banner-sticky').data('sticky-offset');
+    var triggerOffset = $(stickyBanner).data('sticky-offset');
 
     $(document).scroll(function() {
 
@@ -68,7 +70,7 @@ $(function(){
 
             }
             
-        }   
+        }
 
     });  
 
