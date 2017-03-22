@@ -23,14 +23,6 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/');
         self::verifyResponse(200);
-        $form = $crawler->selectButton('launch_phone[next]')->form();
-        $values = [];
-        foreach ($form->all() as $field) {
-            if ($field instanceof ChoiceFormField && $field->getName() == 'launch_phone[make]') {
-                $values = $field->availableOptionValues();
-            }
-        }
-        $this->assertGreaterThan(10, count($values));
     }
 
     public function testIndexRedirect()
@@ -54,18 +46,6 @@ class DefaultControllerTest extends BaseControllerTest
             'REMOTE_ADDR' => '70.248.28.23',
             'HTTP_User-Agent' => "twitterbot"
         ]);
-        self::verifyResponse(200);
-    }
-
-    public function testIndexInvalid()
-    {
-        $crawler = self::$client->request('GET', '/');
-        self::verifyResponse(200);
-
-        $form = $crawler->selectButton('Quote me')->form();
-        $form['launch_phone[make]'] = '';
-        $form['launch_phone[phoneId]'] = '';
-        $crawler = self::$client->submit($form);
         self::verifyResponse(200);
     }
 
