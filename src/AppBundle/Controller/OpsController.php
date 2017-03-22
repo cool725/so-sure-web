@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Policy;
 use AppBundle\Service\MixpanelService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -84,9 +85,17 @@ class OpsController extends BaseController
         $invitationRepo = $dm->getRepository(EmailInvitation::class);
         $invitation = $invitationRepo->findOneBy(['accepted' => null, 'rejected' => null, 'cancelled' => null]);
 
+        $policyRepo = $dm->getRepository(Policy::class);
+        $unpaidPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID]);
+        $validPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_ACTIVE]);
+        $cancelledPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_CANCELLED]);
+
         return [
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
+            'unpaid_policy' => $unpaidPolicy,
+            'valid_policy' => $validPolicy,
+            'cancelled_policy' => $cancelledPolicy,
         ];
     }
 
