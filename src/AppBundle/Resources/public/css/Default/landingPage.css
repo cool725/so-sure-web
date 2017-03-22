@@ -9,7 +9,7 @@ body {
 }
 
 header {
-	padding-bottom: 30px;
+	padding-bottom: 20px;
 }
 
 main {
@@ -23,4 +23,85 @@ footer {
 
 footer small {
 	font-size: 11px;
+}
+
+h1 {
+	font-size: 24px;
+	line-height: 1.4;
+	margin-bottom: 20px;
+}
+
+/* Steps */
+
+.step {
+	background-color: #fff;
+	text-align: center;
+	position: relative;
+}
+
+.step-blue {
+	background-color: #3399ff;
+	color: #fff;
+}
+
+.step-blue h2 {
+	color: #fff;
+}
+
+.step-inner {
+	padding: 25px 25px 25px;
+}
+
+.step:first-of-type .step-inner {
+	padding-top: 15px;
+}
+
+.step:after {
+	width: 0; height: 0;
+	content: '';
+	position: absolute;
+	z-index: 100;
+	top: 100%;
+	left: 0; right: 0;
+	margin: 0 auto;
+    border-top: solid 15px #fff;
+    border-left: solid 20px transparent;
+    border-right: solid 20px transparent;	
+}
+
+.step-blue:after {
+	border-top-color: #3399ff;
+}
+
+.step:last-of-type:after {
+	border: none;
+}
+
+.step:last-of-type {
+	margin-bottom: 25px;
+}
+
+@media (min-width: 767px) {
+
+	h1 {
+		font-size: 36px;
+	}
+	
+	.step {
+		min-height: 400px;
+	}
+
+	.step:after {
+		left: 100%; top: 50%;
+		margin-top: -25px;
+	    border-bottom: solid 25px transparent;
+	    border-top: solid 25px transparent;	    
+	    border-left: solid 20px #fff;
+	    border-right: none;		
+	}
+
+	.step-blue:after {
+		border-left-color: #3399ff;
+	}	
+
 }

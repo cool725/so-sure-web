@@ -35,24 +35,49 @@
 {% block body %}
     <main>
         <div class="container">
-            <h1 class="text-center text-white h2">Cheap {{ phone }} Insurance £{{ phone_price.monthlyPremiumPrice }} per month</h1>
+            <h1 class="text-center text-white">Cheap {{ phone.make }} {{ phone.model }} Insurance 
+                <span class="text-nowrap">only £{{ phone_price.monthlyPremiumPrice }} per month</span> 😌</h1>
             <div class="row">
                 
-                <div class="col-md-4">
-                    <div class="step">
-                        <h2>1. Step</h2>
+                <div class="col-sm-4 step">
+                    <div class="step-inner">
+                        <h2 class="h1">Join</h2>
+                        <ul class="list-unstyled">
+                            <li>List item</li>
+                            <li>-</li>
+                            <li>List item</li>
+                            <li>-</li>
+                            <li>List item</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="step">
-                        <h2>2. Step</h2>
+                <div class="col-sm-4 step step-blue">
+                    <div class="step-inner">
+                        <h2 class="h1">Refer</h2>
+                        <ul class="list-unstyled">
+                            <li>List item</li>
+                            <li>-</li>
+                            <li>List item</li>
+                            <li>-</li>
+                            <li>List item</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="step">
-                        <h2>3. Step</h2>
+                <div class="col-sm-4 step">
+                    <div class="step-inner">
+                        <h2 class="h1">Save</h2>
+                        <ul class="list-unstyled">
+                            <li>List item</li>
+                            <li>-</li>
+                            <li>List item</li>
+                            <li>-</li>
+                            <li>List item</li>
+                        </ul>
+                        {{ form_start(buy_form_banner) }}
+                            {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
+                        {{ form_end(buy_form_banner)}}                        
                     </div>
-                </div>
+                </div>                                                
 
             </div>
         </div>
