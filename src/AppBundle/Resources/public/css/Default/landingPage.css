@@ -1,0 +1,26 @@
+html, body {
+	height: 100%;
+}
+
+body {
+	display: flex;
+	min-height: 100vh;
+	flex-direction: column;
+}
+
+header {
+	padding-bottom: 30px;
+}
+
+main {
+	flex: 1;
+}
+
+footer {
+	text-align: center;
+	color: #fff;
+}
+
+footer small {
+	font-size: 11px;
+}

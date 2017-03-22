@@ -336,10 +336,16 @@ class PhoneInsuranceController extends BaseController
             'coming_soon' => $phone->getCurrentPhonePrice() ? false : true,
         );
 
-        //if ($phone->getCurrentPhonePrice()) {
+        if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
+            return $this->render('AppBundle:PhoneInsurance:insuranceLanding.html.twig', $data);
+        } else {
             return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
-        //} else {
-        //    return $this->render('AppBundle:Default:quotePhoneUpcoming.html.twig', $data);
-        //}
+        }
+
+        // //if ($phone->getCurrentPhonePrice()) {
+        //     return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
+        // //} else {
+        // //    return $this->render('AppBundle:Default:quotePhoneUpcoming.html.twig', $data);
+        // //}
     }
 }

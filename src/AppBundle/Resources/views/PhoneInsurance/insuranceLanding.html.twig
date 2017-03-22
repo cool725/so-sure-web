@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block meta %}
+    <link rel="canonical" href="{{ url('insure_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+        '@AppBundle/Resources/public/css/Default/homepage.css'
+        '@AppBundle/Resources/public/css/Default/landingPage.css'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block nav %}
+    <header>
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/"><div class="so-sure-logo-light"></div></a>
+                </div>
+            </div>  
+        </nav>    
+    </header>
+{% endblock %}
+
+{% block body %}
+    <main>
+        <div class="container">
+            <h1 class="text-center text-white h2">Cheap {{ phone }} Insurance £{{ phone_price.monthlyPremiumPrice }} per month</h1>
+            <div class="row">
+                
+                <div class="col-md-4">
+                    <div class="step">
+                        <h2>1. Step</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step">
+                        <h2>2. Step</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step">
+                        <h2>3. Step</h2>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block footer %}
+    {# To overide base.html.twig #}
+    <footer>
+        <div class="container">
+            <p><small>&copy; {{ "now"|date("Y") }} so-sure ltd. We are a company registered in England &amp; Wales (No. 09365669) and our registered address is Runway East, 10 Finsbury Square, London EC2A 1AF.</small></p>
+        </div>
+    </footer>
+{% endblock %}
