@@ -28,9 +28,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <h1 class="text-white h2">Unpaid Policy</h1>
-                    <p class="lead text-light-blue">Select your phone below and follow the steps to get your phone covered with us.</p>
                     {% if webpay_action and webpay_reference and amount > 0 %}
-                    <p class="lead text-white">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
+                    <p class="lead text-light-blue">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
                     <form action="{{ webpay_action }}" method="post" id="webpay-form">
                         <div class="row">
                             <div class="form-group col-sm-12">
