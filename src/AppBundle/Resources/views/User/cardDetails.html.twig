@@ -1,26 +1,40 @@
 {% extends 'base.html.twig' %}
 
+{% set white_logo = true %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    '@AppBundle/Resources/public/css/Default/modal.css'        
+    '@AppBundle/Resources/public/css/User/index.css'
+    '@AppBundle/Resources/public/css/User/trust.css' %}
+    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+{% endblock %}
+
 {% block body %}
-  <div class="login">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8 col-md-offset-2">
-                <h2>Update your card details</h2>
-                <p>Your current card is: {{ user.paymentMethod }}</p>
-                {% if webpay_action and webpay_reference %}
-                <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                    <div class="row">
-                        <div class="form-group col-sm-12 text-center">
-                            <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                            <input type="submit" class="btn btn-primary btn-rounded" value="Update your card details">
-                        </div>
-                    </div>
-                </form>
-              {% elseif amount == 0 %}
-                <p>Your policy is paid to date.</p>
-              {% endif %}
+  {% include 'AppBundle:User:userNav.html.twig' %}
+
+    <section class="user-homepage--content section--pad">
+        <div class="container">          
+            
+            <div class="row">
+                  <div class="col-md-8 col-md-offset-2">
+                      <h2>Update your card details</h2>
+                      <p>Your current card is: {{ user.paymentMethod }}</p>
+                      {% if webpay_action and webpay_reference %}
+                      <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                          <div class="row">
+                              <div class="form-group col-sm-12 text-center">
+                                  <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                                  <input type="submit" class="btn btn-primary btn-rounded" value="Update your card details">
+                              </div>
+                          </div>
+                      </form>
+                    {% elseif amount == 0 %}
+                      <p>Your policy is paid to date.</p>
+                    {% endif %}
+                  </div>
             </div>
         </div>
-    </div>
-  </div>
+  </section>
 {% endblock %}
