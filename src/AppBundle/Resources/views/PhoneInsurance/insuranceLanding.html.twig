@@ -38,27 +38,26 @@
 {% block body %}
     <main>
         <div class="container">
-            <h1 class="text-center text-white">Cheap {{ phone.make }} {{ phone.model }} Insurance </h1>
-            {# <h2 class="text-center text-light-blue"><span class="text-nowrap">only £{{ phone_price.monthlyPremiumPrice }} per month</span> 😌</h2> #}
+            <h1 class="text-center text-white">Cheap {{ phone }} Insurance </h1>
+            <h2 class="text-center text-light-blue hidden-md hidden-lg"><span class="text-nowrap">only £{{ phone_price.monthlyPremiumPrice }} per month</span> 😌</h2>
             <div class="row steps--shadow">
                 
                 <div class="col-md-4 step">
                     <div class="step-inner">
-                        <h2 class="h1 ">1. Insure</h2>
-                        <ul class="list-unstyled landing-list landing-list--bullet">
-                            <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> Cover starts immediately after you buy.</li>
-                            <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> Next working day replacement or repair.</li>
-                            <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> Get protected for loss, theft, accidental damage &amp; out of warranty breakdown.</li>
-                            <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> 24/7 live support.</li>
+                        <h2 class="h1"><span class="text-grey-blue">1</span> Insure</h2>
+                        <ul class="list-unstyled landing-list">
+                            <li>Cover starts immediately after you buy.</li>
+                            <li>Get protected for loss, theft, accidental damage &amp; out of warranty breakdown.</li>
+                            <li>24/7 live support with next working day replacement or repair.</li>
                         </ul>
-                        <div class="text-center text-blue h1">
+                        <div class="text-center h1">
                             £{{ phone_price.monthlyPremiumPrice }} <small>per month</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 step step-blue">
                     <div class="step-inner">
-                        <h2 class="h1">2. Refer</h2>
+                        <h2 class="h1"><span class="text-light-blue">2</span> Refer</h2>
                         <ul class="list-unstyled landing-list">
                             <li>Connect to friends/family and <strong class="text-white">each receive up to £10</strong> in your individual Reward Pots.</li>
                             <li>Refer up to <strong class="text-white">{{ max_connections }}</strong> people and you’ll get a maximum of <strong class="text-white">£{{ max_pot }}</strong>.</li>
@@ -68,18 +67,15 @@
                 </div>
                 <div class="col-md-4 step">
                     <div class="step-inner">
-                        <h2 class="h1">3. Save</h2>
+                        <h2 class="h1"><span class="text-grey-blue">3</span> Save</h2>
                         <ul class="list-unstyled landing-list">
                             <li>Get rewarded with up to 80% of your premium when you and your friends don’t claim.</li>
                             <li>You can get this money back every year to spend as cash or put towards next years premium.</li>
-                            <li><strong>Either way we’re 40% cheaper than traditional insurers</strong>.</li>
-                            <li class="hidden-md hidden-lg">
-                                
-                            </li>
+                            <li>Either way we’re 40% cheaper than traditional insurers.</li>
                         </ul>
                         {{ form_start(buy_form_banner, { 'attr': {'class':'text-center'}}) }}
-                            {{ form_widget(buy_form_banner.buy, {'label': ' Get Started Today', 'attr': {'class': 'btn btn-success btn-rounded btn-lg'}}) }}
-                            <p><br><a href="#"><small>Full Terms &amp; Conditions</small></a></p> 
+                            {{ form_widget(buy_form_banner.buy, {'label': ' Get Started Today', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-lg'}}) }}
+                            <a target="_blank" href="/about/social-insurance/terms" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
                         {{ form_end(buy_form_banner)}}
                     </div>
                 </div>                                                

@@ -61,7 +61,6 @@ h2 {
 
 .step {
 	background-color: #fff;
-	text-align: center;
 	position: relative;
 }
 
@@ -100,12 +99,13 @@ h2 {
 }
 
 /* Press */
+
 section.press {
 	background-color: transparent !important;
 }
 
 section.press h4 small {
-	color: #fff;
+	color: #d6ebff;
 }
 
 @media (min-width: 767px) {
