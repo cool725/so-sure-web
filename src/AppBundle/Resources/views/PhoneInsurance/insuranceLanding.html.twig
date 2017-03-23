@@ -39,7 +39,7 @@
     <main>
         <div class="container">
             <h1 class="text-center text-white">Cheap {{ phone.make }} {{ phone.model }} Insurance </h1>
-            <h2 class="text-center text-light-blue"><span class="text-nowrap">only £{{ phone_price.monthlyPremiumPrice }} per month</span> 😌</h2>
+            {# <h2 class="text-center text-light-blue"><span class="text-nowrap">only £{{ phone_price.monthlyPremiumPrice }} per month</span> 😌</h2> #}
             <div class="row steps--shadow">
                 
                 <div class="col-md-4 step">
@@ -51,7 +51,9 @@
                             <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> Get protected for loss, theft, accidental damage &amp; out of warranty breakdown.</li>
                             <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> 24/7 live support.</li>
                         </ul>
-                        <h2 class="text-center">£{{ phone_price.monthlyPremiumPrice }} <small>per month</small></h2>
+                        <div class="text-center text-blue h1">
+                            £{{ phone_price.monthlyPremiumPrice }} <small>per month</small>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4 step step-blue">
