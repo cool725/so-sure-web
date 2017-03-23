@@ -58,26 +58,29 @@ $(function(){
 
     // Sticky Banner - For quotes TODO make modular
 
-    var quoteBox = $('#quote');
-    var quoteBoxHeight = quoteBox.height();
+    var stickyBanner  = $('.banner-sticky');
+    var stickyTrigger = $(stickyBanner).data('sticky-trigger');
+    var stickyStatic  = $(stickyBanner).data('sticky-static');    
+    var triggerHeight = $('#'+stickyTrigger).height();
+    var triggerOffset = $(stickyBanner).data('sticky-offset');
 
     $(document).scroll(function() {
 
-        if (quoteBox.length) {
+        if (stickyTrigger.length) {
 
-            var quoteBoxBottom = quoteBox.offset().top - quoteBoxHeight + 200;
+            var triggerBottom = $('#'+stickyTrigger).offset().top - triggerHeight + triggerOffset;
 
-            if ($(window).scrollTop() > quoteBoxBottom + quoteBoxHeight) {
+            if ($(window).scrollTop() > triggerBottom + triggerHeight) {
 
-                $('#quote-banner').fadeIn();                
+                $('.banner-sticky').fadeIn();                
 
             } else {
 
-                $('#quote-banner').fadeOut();                
+                $('.banner-sticky').fadeOut();                
 
             }
             
-        }   
+        }
 
     });  
 
