@@ -40,33 +40,27 @@
         <div class="container">
             <h1 class="text-center text-white">Cheap {{ phone.make }} {{ phone.model }} Insurance </h1>
             <h2 class="text-center text-light-blue"><span class="text-nowrap">only £{{ phone_price.monthlyPremiumPrice }} per month</span> 😌</h2>
-            <div class="row">
+            <div class="row steps--shadow">
                 
                 <div class="col-md-4 step">
                     <div class="step-inner">
-                        <h2 class="h1">1. Insure</h2>
-                        <ul class="list-unstyled landing-list">
-                            <li>Your phone will be covered straight away</li>
-                            <li class="bullet">-</li>
-                            <li>Next day replacement or repair</li>
-                            <li class="bullet">-</li>
-                            <li>Protection against loss, theft, accidental damage and breakdown</li>
-                            <li class="bullet">-</li>
-                            <li>24/7 call centre</li>
-                            <li class="bullet">-</li>
-                            <li>Money back when you don’t claim</li>                            
+                        <h2 class="h1 ">1. Insure</h2>
+                        <ul class="list-unstyled landing-list landing-list--bullet">
+                            <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> Cover starts immediately after you buy.</li>
+                            <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> Next working day replacement or repair.</li>
+                            <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> Get protected for loss, theft, accidental damage &amp; out of warranty breakdown.</li>
+                            <li><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> 24/7 live support.</li>
                         </ul>
+                        <h2 class="text-center">£{{ phone_price.monthlyPremiumPrice }} <small>per month</small></h2>
                     </div>
                 </div>
                 <div class="col-md-4 step step-blue">
                     <div class="step-inner">
                         <h2 class="h1">2. Refer</h2>
                         <ul class="list-unstyled landing-list">
-                            <li>Refer someone and you’ll both get up to £10</li>
-                            <li class="bullet">-</li>
-                            <li>Refer up to 9 people and you’ll get a maximum of £{{ max_pot }}</li>
-                            <li class="bullet">-</li>
-                            <li>How many people you refer is up to you, you’ll still get up £10 for each connection you make</li>
+                            <li>Connect to friends/family and <strong class="text-white">each receive up to £10</strong> in your individual Reward Pots.</li>
+                            <li>Refer up to <strong class="text-white">{{ max_connections }}</strong> people and you’ll get a maximum of <strong class="text-white">£{{ max_pot }}</strong>.</li>
+                            <li>How many people you refer is up to you, you’ll still get up £10 for each connection you make.</li>
                         </ul>
                     </div>
                 </div>
@@ -74,22 +68,25 @@
                     <div class="step-inner">
                         <h2 class="h1">3. Save</h2>
                         <ul class="list-unstyled landing-list">
-                            <li>Get rewarded with up to 80% of your premium when you and your friends don’t claim</li>
-                            <li class="bullet">-</li>
-                            <li>You can get this money back every year to spend as cash or put towards your insurance</li>
-                            <li class="bullet">-</li>
-                            <li>You’re saving money anyway as we’re 40% cheaper than traditional insurers</li>
+                            <li>Get rewarded with up to 80% of your premium when you and your friends don’t claim.</li>
+                            <li>You can get this money back every year to spend as cash or put towards next years premium.</li>
+                            <li><strong>Either way we’re 40% cheaper than traditional insurers</strong>.</li>
+                            <li class="hidden-md hidden-lg">
+                                
+                            </li>
                         </ul>
-                        {{ form_start(buy_form_banner) }}
-                            {{ form_widget(buy_form_banner.buy, {'label': '📲 Get Started', 'attr': {'class': 'btn btn-success btn-rounded btn-lg'}}) }}
+                        {{ form_start(buy_form_banner, { 'attr': {'class':'text-center'}}) }}
+                            {{ form_widget(buy_form_banner.buy, {'label': ' Get Started Today', 'attr': {'class': 'btn btn-success btn-rounded btn-lg'}}) }}
+                            <p><br><a href="#"><small>Full Terms &amp; Conditions</small></a></p> 
                         {{ form_end(buy_form_banner)}}
-                        <br>
-                        <a href="#"><small>Full Terms &amp; Conditions</small></a>                        
                     </div>
                 </div>                                                
 
             </div>
         </div>
+
+        {% include 'AppBundle::Default/press.html.twig' %}
+              
     </main>
 {% endblock %}
 
