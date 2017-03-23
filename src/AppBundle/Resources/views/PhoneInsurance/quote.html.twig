@@ -22,6 +22,7 @@
     {% javascripts
     'components/vimeo-player-js/player.min.js'        
     '@AppBundle/Resources/public/js/Default/modalVideo.js'    
+    'components/typeahead.js/typeahead.bundle.min.js'    
     '@AppBundle/Resources/public/js/Default/index.js'
     'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/slider.js'
@@ -80,7 +81,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div id="cover-price" class="quote-cost text-center">
-                        {# <div class="text-center h4">If your phone is stolen/lost, replacing it costs <strong>£{{ phone.initialPrice }}</strong> 😧 Get peace of mind for:</div> #}
+                        <div class="text-center h4">If your phone is stolen/lost, replacing it costs <strong>£{{ phone.initialPrice }}</strong> 😧 Get peace of mind for:</div>
                         <div class="row">
                             {% if coming_soon %}
                                 <div class="col-sm-6">
@@ -125,17 +126,17 @@
                     <div class="quote-card">
                         <h3>so-sure proudly offers</h3>
                         <ul class="list-unstyled">                              
-                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Next working day replacement or repair</li>
+                            <li class="h4 text-underline"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Next working day replacement or repair</li>
                             <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>24/7 live support</li>       
-                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Insure used phones (&lt; 4 years old)</li>
-                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Cover starts when you buy </li>             
+                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Insure used phones (up to 3 years old)</li>
+                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> Cover starts when you buy your policy</li>             
                             <li class="h4">
                                 <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> 
                                 <span class="visible-xs-inline">
                                     <a id="cashback-link" href="#cashback-card"><span class="text-dark-grey text-underline">Up to 80% cashback every year</span></a>
                                 </span>
                                 <span class="hidden-xs">
-                                    <span class="text-dark-grey">Up to 80% cashback every year</span>
+                                    <span class="text-dark-grey text-underline">Up to 80% cashback every year</span>
                                 </span>                                
                             </li>
                             <br>
@@ -157,8 +158,8 @@
                             </li>      
                             <li class="h4">
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide coverage <a href="#" data-toggle="modal" data-target="#worldwide-coverage"><i class="fa fa-info-circle"></i></a>
-                            </li>                                                                                                     
-                        </ul>          
+                            </li>                                 
+                        </ul>        
                     </div>
                 </div>    
 
@@ -168,12 +169,12 @@
                         <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div>
 
                         {% if coming_soon %}
-                            <h3>Sample Cashback</h3>
+                            <h3>Get cashback by connecting to friends</h3>
                             <p><i>(based on annual premium of £100)</i></p>
                         {% else %}
-                            <h3>Cashback</h3>          
+                            <h3>Get cashback by connecting to friends</h3>                            
                         {% endif %}
-                        <p>Connect with friends &amp; save money, see how it works:</p>
+
                         
                         <div class="h4 text-grey-blue"><strong>Friends connected</strong></div>
 
@@ -483,7 +484,7 @@
     </div>   
 
 
-    <div class="modal modal-middle fade" 
+    <div class="modal fade" 
          id="quote-model" 
          tabindex="-1" 
          role="dialog" 
@@ -496,9 +497,9 @@
                         <i class="fa fa-times fa-lg" aria-hidden="true"></i>
                         <span class="sr-only">Close</span>
                     </button>
-                    <h3 class="text-center">Select Make &amp; Model</h3>
+                    <h3 class="text-center">Select a different phone</h3>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body text-center">
                     {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
                 </div>
             </div>

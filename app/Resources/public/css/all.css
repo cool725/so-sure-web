@@ -110,6 +110,29 @@ strong {
     background-color: #fff;
 }
 
+
+/* Borders */
+
+.box-border-grey {
+    position: relative;
+}
+
+@media (min-width: 340px) {
+
+    .box-border-grey { /* TODO // Refactor on quote page */
+        padding: 15px;      
+        margin-bottom: 25px;
+        background-color: #fff;
+        border: 2px solid #efefef;
+        border-radius: 4px;          
+    } 
+
+    .box-border--highlight {
+        border-color: #02C9FF;
+    }
+
+}
+
 .center-xs {
     text-align: center;
 }
@@ -120,6 +143,7 @@ strong {
       text-align: inherit;
   }
   
+
 }
 
 /* MOVE TO layout > _header.scss */
@@ -306,7 +330,7 @@ h4, h5, h6,
     border-bottom: 2px solid #efefef;
     display: inline-block;
     margin: -2px 10px 0;
-    width: 42%;
+    width: 35%;
     vertical-align: middle;
 }
 
@@ -476,7 +500,7 @@ h4, h5, h6,
 /* Section Tools: MOVE TO common > _global.scss */
 
 .section--pad {
-    padding: 10px 0 30px;
+    padding: 40px 0;
 }
 
 .align-middle {
@@ -499,6 +523,10 @@ h4, h5, h6,
     .align-middle {
         min-height: 450px;
     }
+
+    .section--pad {
+        padding: 60px 0;
+    }    
     
 }
 
@@ -654,6 +682,10 @@ background: rgba(51, 153, 255, 1);
     right: 15%;
 }
 
+.btn-white {
+    color: #fff;
+}
+
 @media (min-width: 379px) {
 
     .btn-hollow {
@@ -778,7 +810,8 @@ a#get-quote-btn.btn.btn-primary {
     padding: 20px !important;
 }
 
-ul.lead li {
+ul.lead li,
+ul li.h3 {
     padding: 10px 0;
 }
 
@@ -822,5 +855,9 @@ ul.lead li {
     .fa-list-bullet li {
         font-size: 22px;
     }
+}
 
+/* Hide the ProdPad Got Feedback button floating at bottom of page */
+#pp-cfp-trigger {
+    display: none !important;
 }

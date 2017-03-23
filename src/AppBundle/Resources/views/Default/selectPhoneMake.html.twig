@@ -9,11 +9,30 @@
         {% set buttonText = 'Quote me' %}
         {% set class = "text-center" %}
     {% endif %}
-    <div class="row" id="select-phone">
+
+    <form method="get" id="search-phone-form">
+        <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" />
+        <button type="submit" class="btn btn-success btn-rounded btn-get-quote">Quote me</button>
+        {% if type == 'homepage' %}
+            <a id="find-out-more" href="#" class="btn btn-link btn-white text-underline">LEARN MORE</a>
+        {% endif %}  
+    </form>    
+
+    <div id="loading-search-phone" class="text-center">
+        <p><small>loading...</small></p>
+    </div>
+
+
+{#     <div class="row" id="select-phone">
         <div class="col-sm-12 {{ class }}">
+            <div class="device-search">
+                <form method="get" id="search-phone-form">
+                    <input type="text" class="search-phone-text" id="search-phone" placeholder="Find your phone by make and model" />
+                    <button type="submit" class="btn btn-success btn-rounded">Quote me</button>
+                </form>
+            </div>
             <div class="device-select">
                 {{ form_start(form_phone) }}
-
                     <div class="form-group">
                         {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }} 
                     </div>
@@ -32,5 +51,5 @@
                 {{ form_end(form_phone) }}
             </div>
         </div>
-    </div>
+    </div> #}
 </div>  

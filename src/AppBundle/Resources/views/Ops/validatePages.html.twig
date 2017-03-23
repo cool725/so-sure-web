@@ -1,5 +1,5 @@
-
 <h3>Pages to manually verify when updating design</h3>
+<h4>Any login status</h4>
 <ul>
     <li>
         <a href="{{ url('homepage') }}">Home</a>        
@@ -8,15 +8,32 @@
         <a href="{{ url('quote_make_model', {'make':'Apple','model':'iPhone+6S'}) }}">Quote</a>                
     </li>
     <li>
-        <a href="{{ url('scode', {'code':scode}) }}">SCode Invitiation</a> <b>(Logout before viewing)</b>            
+        <a href="{{ url('phone_insurance_water_damage') }}">SEO Phone Pages (several other similiar)
+    </li>
+</ul>
+
+<h4>Logged out status</h4>
+<ul>
+    <li>
+        <a href="{{ url('scode', {'code':scode}) }}">SCode Invitiation</a>
     </li>
     <li>
-        <a href="{{ url('invitation', {'id':invitation.id}) }}">Email Invitiation</a> <b>(Logout before viewing)</b>
+        <a href="{{ url('invitation', {'id':invitation.id}) }}">Email Invitiation</a>
+    </li>
+</ul>
+
+<h4>Admin login status</h4>
+<ul>
+    <li>
+        <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_policy.user.email }}">User Policy Invalid</a> <b>(auto impersonate {{ cancelled_policy.user.email }}</b>
     </li>
     <li>
-        <a href="{{ url('user_invalid_policy') }}">User Policy Invalid</a> <b>(Requires Login w/invalid policy)</b>
+        <a href="{{ url('user_home') }}?_impersonate={{ valid_policy.user.email }}">User Home</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
     </li>
     <li>
-        <a href="{{ url('user_welcome') }}">User Welcome</a> <b>(Requires Login w/valid policy)</b>
+        <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">User Welcome</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
+    </li>
+    <li>
+        <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
     </li>
 </ul>

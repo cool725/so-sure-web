@@ -1,7 +1,7 @@
 /* HERO - Section Index: MOVE TO components > _hero.scss */
 
 .hero {
-    padding: 30px 0;
+    padding: 30px 0 80px;
     color: #fff;
 }
 
@@ -20,68 +20,13 @@
     width: 100%;
     text-align: center;
     padding: 15px 5px;
+    border: 2px solid #efefef;
     margin-bottom: 25px;
     border-radius: 4px;
 }
 
-.hero-box li {
-    min-height: 50px;
-    padding: 3px 0;
-    margin: 0 0 20px;
-}
-
-.hero-list-inline {
-    margin-top: 25px;
-}
-
-.hero-list-inline img {
-    display: inline-block;
-    margin: 0 0 8px 0;
-}
-
-.hero-box li:first-of-type {
-    margin-top: 20px;
-}
-
-.hero-box li:last-of-type {
-    margin: 0;
-}
-
-.hero-list-inline > li {
-    padding-right: 15px;
-}
-
-.hero-list-inline a {
-    display: block;
-    color: #fff;   
-    font-weight: bold; 
-    opacity: 0.85;
-}
-
-.hero-list-inline:hover,
-.hero-list-inline a:hover {
-    text-decoration: none;
-    opacity: 1;
-}
-
-.hero-img {
-    margin: 0 auto;
-    display: block;
-}
-
-@media (min-width: 767px) {
-
-    .hero {
-        padding: 70px 0;
-    }    
-
-    .hero h1 {
-        font-size: 42px;
-    }
-
-    .hero h3 {
-        font-size: 30px;
-    }
+.hero-box h3 {
+    margin: inherit;
 }
 
 /* Fix backgrounds */
@@ -132,6 +77,14 @@
     .how-it-works--step .img-responsive {
         max-width: 45%;
     }
+
+    .hero h1 {
+        font-size: 42px;
+    }
+
+    .hero h3 {
+        font-size: 30px;
+    }    
 
 }
 
