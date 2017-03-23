@@ -54,12 +54,14 @@
 
     <div class="container">
 
+        {% if phone %}
         <h2 class="text-center text-blue">Insurance for your
             <span class="text-nowrap">{{ phone.make }} {{ phone.model }} {%    
             if phone.memory %}
                 {{ phone.memory }}GB</span>
             {% endif %}
-            - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h2>        
+            - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h2>
+        {% endif %}
 
         <div class="row">
             <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">                                      
