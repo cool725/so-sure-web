@@ -181,7 +181,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
-    protected $mobileVerified;
+    protected $mobileNumberVerified;
 
     /**
      * @Assert\Type("bool")
@@ -656,14 +656,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->facebookId;
     }
 
-    public function getMobileVerified()
+    public function getMobileNumberVerified()
     {
-        return $this->mobileVerified;
+        return $this->mobileNumberVerified;
     }
 
-    public function setMobileVerified($mobileVerified)
+    public function setMobileNumberVerified($mobileNumberVerified)
     {
-        $this->mobileVerified = $mobileVerified;
+        $this->mobileNumberVerified = $mobileNumberVerified;
     }
 
     public function getEmailVerified()
@@ -766,6 +766,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setLatestMobileIdentityLog($identityLog)
     {
         $this->latestMobileIdentityLog = $identityLog;
+
+        if ($policy = $this->getCurrentPolicy()) {
+            if ($policy instanceof PhonePolicy) {
+                $policy->setPhoneVerified($identityLog->isSamePhone($policy->getPhone()));
+            }
+        }
     }
 
     public function getPaymentMethod()

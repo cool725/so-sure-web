@@ -1248,6 +1248,36 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertNotNull($identityLog->getPhone());
     }
 
+    public function testVersionDeviceUserPolicy()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testVersionDeviceUserPolicy', $this),
+            'foo'
+        );
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf(
+            '/api/v1/version?platform=ios&version=0.0.1&device=%s&memory=%d&uuid=1&_method=GET',
+            $phone->getDevices()[0],
+            $phone->getMemory()
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
+            'token' => $user->getToken()
+        ));
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $this->assertTrue($updatedUser->getCurrentPolicy()->getPhoneVerified());
+    }
+
     public function testReplay()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();

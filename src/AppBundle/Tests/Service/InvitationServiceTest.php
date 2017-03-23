@@ -1403,8 +1403,16 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals('a', static::$invitationService->resolveSCode('a'));
         $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode('abcdefgh'));
 
-        $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode('https://goo.gl/wSZGbc'));
-        $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode('goo.gl/wSZGbc'));
+        $this->assertEquals(
+            'abcdefgh',
+            static::$invitationService->resolveSCode('https://goo.gl/wSZGbc'),
+            'If error, try clearing cache.'
+        );
+        $this->assertEquals(
+            'abcdefgh',
+            static::$invitationService->resolveSCode('goo.gl/wSZGbc'),
+            'If error, try clearing cache.'
+        );
 
         $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode(
             'https://sosure.test-app.link/GQnmCNBSwB'
