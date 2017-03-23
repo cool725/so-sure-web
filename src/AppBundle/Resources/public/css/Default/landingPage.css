@@ -22,13 +22,31 @@ footer small {
 }
 
 h1 {
-	font-size: 24px;
+	font-size: 27px;
 	line-height: 1.4;
+}
+
+h2 {
+	font-size: 24px;
 	margin-bottom: 20px;
 }
 
-li {
+.landing-list {
+	margin-top: 20px;
+}
+
+.landing-list li {
 	font-size: 18px;
+	line-height: 1.5;
+	text-align: left;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	/*padding: 0 20px;*/
+}
+
+.bullet {
+	/*text-align: center;*/
+	display: none;
 }
 
 /* Steps */
@@ -49,7 +67,7 @@ li {
 }
 
 .step-inner {
-	padding: 25px 25px 25px;
+	padding: 15px 25px;
 }
 
 .step:first-of-type .step-inner {
@@ -81,18 +99,19 @@ li {
 	margin-bottom: 25px;
 }
 
-@media (min-width: 767px) {
-
-	header {
-		padding-bottom: 20px;
-	}
+@media (min-width: 992px) {
 	
 	h1 {
 		font-size: 36px;
 	}
+
+	h2 {
+		font-size: 30px;
+	}
 	
 	.step {
-		min-height: 400px;
+		min-height: 520px;
+		/*text-align: left;*/
 	}
 
 	.step:after {
@@ -106,6 +125,10 @@ li {
 
 	.step-blue:after {
 		border-left-color: #3399ff;
+	}	
+
+	.step:first-of-type .step-inner {
+		padding-top: 25px;
 	}	
 
 }
