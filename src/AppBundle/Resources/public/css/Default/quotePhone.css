@@ -194,103 +194,6 @@ body {
 
 /* Email Modal */
 
-.modal-buy {
-  background: rgba(0, 0, 0, 0.6);
-  padding-top: 10%;
-}
-
-#download-now #lead_form_email {
-  padding: 10px 15px 10px 15px;
-  width: 400px;
-  margin-bottom: 0;
-  margin-top: 15px;
-  border-radius: 25px;
-  border: 2px solid #efefef;
-}
-
-#download-now #lead_form_save {
-  padding: 12px 30px;
-  border-radius: 30px;
-  -moz-border-radius: 30px;
-  -webkit-border-radius: 30px;
-}
-@media (min-width: 992px) {
-  #download-now img {
-    width: 30%;
-  }
-}
-@media (max-width: 543px) {
-    #download-now #lead_form_save {
-      margin-top: 15px;
-      margin-left: 0px;
-      width: 250px;
-    }
-    #download-now #lead_form_email {
-      width: 250px;
-    }
-}
-@media (max-width: 992px) {
-  #download-now .text-left {
-    text-align: center !important
-  }
-  #download-now .text-right {
-    text-align: center !important
-  }
-  #download-now img {
-    padding-top: 10px;
-  }
-}
-
-.memory-select-text {
-  font-size: 13px;
-  margin-bottom: 10px;
-}
-
-.memory-select-text .btn-link {
-  border: 1px solid #3399ff;
-  border-radius: 30px;
-  font-size: 13px;
-}
-
-a#help-centre.btn.btn-info {
-  padding: 12px 30px;
-  border: 2px solid #fff;
-  background: none !important;
-  border-radius: 30px;
-  -moz-border-radius: 30px;
-  -webkit-border-radius: 30px;
-  background: none;
-  color: #fff;
-  width: 175px;
-}
-
-a#open-intercom.btn.btn-primary {
-  padding: 12px 30px;
-  border: 2px solid #202532;
-  background: #202532 !important;
-  border-radius: 30px;
-  -moz-border-radius: 30px;
-  -webkit-border-radius: 30px;
-  background: none;
-  color: #fff;
-  width: 175px;
-}
-
-@media (max-width: 992px) {
-  a#help-centre.btn.btn-info {
-    margin-top: 10px;
-  }
-
-  a#open-intercom.btn.btn-primary {
-    margin-top: 10px;
-  }
-
-}
-
-#how-it-works h2, #how-it-works p, #how-it-works h3 {
-    color: #fff !important;
-}
-
 #play-button {
     position: absolute;
     top: calc(50% - 40px);
@@ -371,4 +274,6 @@ section.phone-details ul li:before {
       /*min-width: 200px !important;*/
       right: 0 !important;
   } 
+} content: '\2022';
+  margin-right: 0.5em;
 }

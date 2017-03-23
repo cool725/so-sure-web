@@ -14,42 +14,18 @@
         <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" />
         <button type="submit" class="btn btn-success btn-rounded btn-get-quote">Quote me</button>
         {% if type == 'homepage' %}
-            <a id="find-out-more" href="#" class="btn btn-link btn-white text-underline">LEARN MORE</a>
+            <a id="find-out-more" href="#" class="btn btn-link btn-white"><i class="fa fa-graduation-cap" aria-hidden="true"></i> LEARN MORE</a>
         {% endif %}  
+
+        {% if type is not defined or not type  %}
+        <p class="text-center">
+            <a href="mailto:hello@wearesosure.com" class="btn btn-info" id="open-intercom"><i class="fa fa-comments"></i> Don't see your device? Let us know.</a>
+        </p>
+        {% endif %}                 
     </form>    
 
     <div id="loading-search-phone" class="text-center">
         <p><small>loading...</small></p>
     </div>
 
-
-{#     <div class="row" id="select-phone">
-        <div class="col-sm-12 {{ class }}">
-            <div class="device-search">
-                <form method="get" id="search-phone-form">
-                    <input type="text" class="search-phone-text" id="search-phone" placeholder="Find your phone by make and model" />
-                    <button type="submit" class="btn btn-success btn-rounded">Quote me</button>
-                </form>
-            </div>
-            <div class="device-select">
-                {{ form_start(form_phone) }}
-                    <div class="form-group">
-                        {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }} 
-                    </div>
-                    <div class="form-group">
-                        {{ form_widget(form_phone.phoneId, { 'attr': {'class': 'select-phone-dropdown select-phones'}}) }}  
-                    </div>
-                    <div class="form-group">
-                        {{ form_widget(form_phone.next, {'label': buttonText, 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
-                    </div>                    
-
-                    {% if type is not defined or not type  %}
-                    <p class="text-center">
-                        <a class="open-intercom" href="mailto:hello@wearesosure.com" class="dark-bg-link">Don't see your device? Let us know.</a>
-                    </p>
-                    {% endif %}                      
-                {{ form_end(form_phone) }}
-            </div>
-        </div>
-    </div> #}
 </div>  
