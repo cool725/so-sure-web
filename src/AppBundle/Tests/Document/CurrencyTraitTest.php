@@ -32,4 +32,12 @@ class CurrencyTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->areEqualToFourDp(15.0253, 15.0254));
         $this->assertFalse($this->areEqualToFourDp(null, 1));
     }
+
+    public function testCurrentIptRate()
+    {
+        $this->assertEquals('0.095', $this->getCurrentIptRate(new \DateTime('2016-09-30 23:59')));
+        $this->assertEquals('0.1', $this->getCurrentIptRate(new \DateTime('2016-10-01')));
+        $this->assertEquals('0.1', $this->getCurrentIptRate(new \DateTime('2017-05-31 23:59')));
+        $this->assertEquals('0.12', $this->getCurrentIptRate(new \DateTime('2017-06-01')));
+    }
 }
