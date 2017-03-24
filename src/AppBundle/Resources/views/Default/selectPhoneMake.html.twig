@@ -16,13 +16,10 @@
         {% if type == 'homepage' %}
             <a id="find-out-more" href="#" class="btn btn-link btn-white"><i class="fa fa-graduation-cap" aria-hidden="true"></i> LEARN MORE</a>
         {% endif %}  
-
-        {% if type is not defined or not type  %}
-        <p class="text-center">
-            <a href="mailto:hello@wearesosure.com" class="btn btn-info" id="open-intercom"><i class="fa fa-comments"></i> Don't see your device? Let us know.</a>
-        </p>
-        {% endif %}                 
     </form>    
+    {% if type is not defined or not type  %}
+        <p><a href="mailto:hello@wearesosure.com" class="btn btn-link" id="open-intercom"><i class="fa fa-comments"></i> Don't see your device? Let us know.</a></p>
+    {% endif %}                     
 
     <div id="loading-search-phone" class="text-center">
         <p><small>loading...</small></p>
