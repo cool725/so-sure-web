@@ -112,7 +112,7 @@ section.press h4 small {
 @media (min-width: 767px) {
 
 	.steps--shadow {
-		box-shadow: 0 2px 14px 0 rgba(51, 153, 255, 0.8);
+		box-shadow: 0 2px 14px 0 rgba(0, 0, 0, 0.1);
 	}	
 
 }
