@@ -305,7 +305,11 @@ class PhoneInsuranceController extends BaseController
         $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
 
         if ($phone->getCurrentPhonePrice()) {
-            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_PAGE, [
+            $event = MixpanelService::EVENT_QUOTE_PAGE;
+            if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
+                $event = MixpanelService::EVENT_LANDING_PAGE;
+            }
+            $this->get('app.mixpanel')->queueTrackWithUtm($event, [
                 'Device Selected' => $phone->__toString(),
                 'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
             ]);
