@@ -77,6 +77,17 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->addConnections($manager, $user, [$networkUser], 1);
 
         $manager->flush();
+
+        $policyRepo = $manager->getRepository(Policy::class);
+        if (!$policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID])) {
+            throw new \Exception('missing unpaid policy');
+        }
+
+        $policyRepo = $manager->getRepository(Policy::class);
+        $policy = $policyRepo->findOneBy(['status' => Policy::STATUS_ACTIVE]);
+        $policyService = $this->container->get('app.policy');
+        $policyService->cancel($policy, Policy::CANCELLED_ACTUAL_FRAUD, false);
+        $manager->flush();
     }
 
     private function newUsers($manager)
@@ -224,6 +235,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $manager->persist($policy);
         $policy->create(-5000 + $count, null, $startDate);
+        $now = new \DateTime();
         $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
 
         $policyService = $this->container->get('app.policy');
@@ -241,6 +253,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $manager->persist($invitation);
 
+        if ($policy->isPolicyPaidToDate(false, $now)) {
+            $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+        } else {
+            $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
+        }
     }
 
     private function addConnections($manager, $userA, $users, $connections = null)

@@ -37,6 +37,7 @@
     {% stylesheets
     '@AppBundle/Resources/public/css/Default/index.css'
     '@AppBundle/Resources/public/css/Default/quotePhone.css'
+    '@AppBundle/Resources/public/css/Default/bannerSticky.css'    
     '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'    
     '@AppBundle/Resources/public/css/Default/scrollindicator.css'
     '@AppBundle/Resources/public/css/Default/modal.css'    
@@ -126,17 +127,17 @@
                     <div class="quote-card">
                         <h3>so-sure proudly offers</h3>
                         <ul class="list-unstyled">                              
-                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Next working day replacement or repair</li>
+                            <li class="h4 text-underline"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Next working day replacement or repair</li>
                             <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>24/7 live support</li>       
-                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Insure used phones (&lt; 4 years old)</li>
-                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Cover starts when you buy </li>             
+                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Insure used phones (up to 3 years old)</li>
+                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> Cover starts when you buy your policy</li>             
                             <li class="h4">
                                 <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> 
                                 <span class="visible-xs-inline">
                                     <a id="cashback-link" href="#cashback-card"><span class="text-dark-grey text-underline">Up to 80% cashback every year</span></a>
                                 </span>
                                 <span class="hidden-xs">
-                                    <span class="text-dark-grey">Up to 80% cashback every year</span>
+                                    <span class="text-dark-grey text-underline">Up to 80% cashback every year</span>
                                 </span>                                
                             </li>
                             <br>
@@ -158,8 +159,8 @@
                             </li>      
                             <li class="h4">
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide coverage <a href="#" data-toggle="modal" data-target="#worldwide-coverage"><i class="fa fa-info-circle"></i></a>
-                            </li>                                                                                                     
-                        </ul>          
+                            </li>                                 
+                        </ul>        
                     </div>
                 </div>    
 
@@ -169,12 +170,12 @@
                         <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div>
 
                         {% if coming_soon %}
-                            <h3>Sample Cashback</h3>
+                            <h3>Get cashback by connecting to friends</h3>
                             <p><i>(based on annual premium of £100)</i></p>
                         {% else %}
-                            <h3>Cashback</h3>          
+                            <h3>Get cashback by connecting to friends</h3>                            
                         {% endif %}
-                        <p>Connect with friends &amp; save money, see how it works:</p>
+
                         
                         <div class="h4 text-grey-blue"><strong>Friends connected</strong></div>
 
@@ -311,7 +312,12 @@
 
     {% include 'AppBundle::Default/press.html.twig' %}
 
-    <section id="quote-banner" class="banner-sticky banner-sticky-hide">
+    <section id="quote-banner" 
+             class="banner-sticky banner-sticky-hide"
+             data-sticky-trigger="quote"
+             data-sticky-offset="200"
+             data-sticky-static="true"
+             >
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-8">

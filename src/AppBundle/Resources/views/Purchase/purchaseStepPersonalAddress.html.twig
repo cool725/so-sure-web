@@ -5,6 +5,7 @@
     {{ parent() }}
     {% stylesheets
     'components/bootstrap-daterangepicker/daterangepicker.css'
+    '@AppBundle/Resources/public/css/Default/bannerSticky.css'       
     'components/intl-tel-input/intlTelInput.css'
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css'%}
@@ -18,31 +19,52 @@
     'components/bootstrap-daterangepicker/daterangepicker.js'
     'components/typeahead.js/typeahead.bundle.min.js'
     'components/intl-tel-input/intlTelInput.min.js'
+    '@AppBundle/Resources/public/js/Default/index.js'    
     '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStepAddress.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block body %}
+
+{% if phone %}
+    <section class="banner-sticky banner-sticky-hide"
+             data-sticky-trigger="purchase-step-personal"
+             data-sticky-offset="150"
+             data-sticky-static="true"
+             >
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center">Insurance for your
+                    {{ phone.make }} {{ phone.model }} {%    
+                    if phone.memory %}
+                        {{ phone.memory }}GB
+                    {% endif %}
+                    - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h3>                    
+                </div>
+            </div>
+        </div>
+    </section>
+{% endif %}  
+
 <section id="purchase-step-personal" class="checkout">
-    
+
     {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
 
     <div class="container">
 
+        {% if phone %}
+        <h2 class="text-center text-blue">Insurance for your
+            <span class="text-nowrap">{{ phone.make }} {{ phone.model }} {%    
+            if phone.memory %}
+                {{ phone.memory }}GB</span>
+            {% endif %}
+            - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h2>
+        {% endif %}
+
         <div class="row">
-            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
-                    
-                {% if phone %}
-                    <h4 class="text-center alert alert-info">
-                        Insurance for your
-                        {{ phone.make }} {{ phone.model }} {%    
-                        if phone.memory %}
-                            {{ phone.memory }}GB
-                        {% endif %}
-                        - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
-                    </h4>                
-                {% endif %}                        
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">                                      
 
                 <div class="checkout--step">
 

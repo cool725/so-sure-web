@@ -500,7 +500,7 @@ h4, h5, h6,
 /* Section Tools: MOVE TO common > _global.scss */
 
 .section--pad {
-    padding: 10px 0 30px;
+    padding: 40px 0;
 }
 
 .align-middle {
@@ -523,6 +523,10 @@ h4, h5, h6,
     .align-middle {
         min-height: 450px;
     }
+
+    .section--pad {
+        padding: 60px 0;
+    }    
     
 }
 
@@ -678,6 +682,10 @@ background: rgba(51, 153, 255, 1);
     right: 15%;
 }
 
+.btn-white {
+    color: #fff;
+}
+
 @media (min-width: 379px) {
 
     .btn-hollow {
@@ -802,7 +810,8 @@ a#get-quote-btn.btn.btn-primary {
     padding: 20px !important;
 }
 
-ul.lead li {
+ul.lead li,
+ul li.h3 {
     padding: 10px 0;
 }
 

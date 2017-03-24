@@ -52,13 +52,12 @@
                     <h3 class="text-light-blue">Mobile phone insurance is finally worthwhile</h3>
                     <ul class="list-unstyled fa-list-bullet">
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Up to 40% cheaper than traditional insurers</li>
-                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Faster claims</li>
-                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Cashback</li> 
+                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Next working day replacement or repair</li>
+                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Get cashback when no claims</li>
                     </ul>
-                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
                 </div>              
             </div>    
-
         </div>
     </section>    
 

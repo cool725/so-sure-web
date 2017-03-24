@@ -25,28 +25,7 @@
 
 {% block body %}
 
-    <section class="user-homepage--header">
-        <div class="container">
-            <div class="col-md-12">
-                <img src="{{ policy.user.getImageUrlFallback }}" alt="{{ policy.user.firstname }}" class="img-circle user-img">
-                <h2 class="h2 text-white">Welcome back, {{ policy.user.firstname }}!</h2>
-                <span class="text-white"><em>Policy:</em> {{ policy.policyNumber }} ({{ policy.start|date('d M Y') }} - {{ policy.end|date('d M Y') }})</span>
-                <br /><span class="text-white"><em>Phone:</em> {{ policy.phone }}</span>
-            </div>
-        </div>
-    </section>
-
-    <section class="user-homepage--nav">
-        <div class="container">
-            <nav id="user-homepage--nav">
-                <ul class="nav nav-pills scroll">
-                    <li role="presentation" class="active"><a href="#">Home</a></li>
-                    {# <li role="presentation"><a href="#">Personal Info</a></li> #}
-                    {# <li role="presentation"><a href="#">Payment Details</a></li> #}
-                </ul>
-            </nav>  
-        </div>
-    </section>
+    {% include 'AppBundle:User:userNav.html.twig' %}
 
     <section class="user-homepage--content section--pad">
         <div class="container">          

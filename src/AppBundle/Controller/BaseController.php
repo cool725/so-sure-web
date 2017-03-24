@@ -152,7 +152,7 @@ abstract class BaseController extends Controller
         return $phones;
     }
 
-    protected function getQuotes($make, $device, $memory = null, $rooted = null)
+    protected function getQuotes($make, $device, $memory = null, $rooted = null, $ignoreMake = false)
     {
         // TODO: We should probably be checking make as well.  However, we need to analyize the data
         // See Phone::isSameMake()
@@ -185,7 +185,9 @@ abstract class BaseController extends Controller
         $differentMake = false;
         if ($deviceFound && !$phones[0]->isSameMake($make)) {
             $differentMake = true;
-            $this->differentMake($phones[0]->getMake(), $make);
+            if (!$ignoreMake) {
+                $this->differentMake($phones[0]->getMake(), $make);
+            }
         }
 
         return [
@@ -206,9 +208,9 @@ abstract class BaseController extends Controller
      *
      * @return Phone|null
      */
-    protected function getPhone($make, $device, $memory)
+    protected function getPhone($make, $device, $memory, $ignoreMake = false)
     {
-        $quotes = $this->getQuotes($make, $device);
+        $quotes = $this->getQuotes($make, $device, null, null, $ignoreMake);
         $phones = $quotes['phones'];
         if (count($phones) == 0) {
             return null;
@@ -454,7 +456,7 @@ abstract class BaseController extends Controller
             $identityLog->setVersion(isset($additional['version']) ? $additional['version'] : null);
             $identityLog->setUuid(isset($additional['uuid']) ? $additional['uuid'] : null);
             if (isset($additional['device']) && isset($additional['memory'])) {
-                $identityLog->setPhone($this->getPhone(null, $additional['device'], $additional['memory']));
+                $identityLog->setPhone($this->getPhone(null, $additional['device'], $additional['memory'], true));
             }
         }
 
