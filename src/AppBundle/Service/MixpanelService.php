@@ -26,6 +26,7 @@ class MixpanelService
 
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
+    const EVENT_LANDING_PAGE = 'Landing Page';
     const EVENT_RECEIVE_DETAILS = 'Receive Personal Details';
     const EVENT_PURCHASE_POLICY = 'Purchase Policy';
     const EVENT_PAYMENT = 'Payment';

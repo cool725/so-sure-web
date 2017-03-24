@@ -51,7 +51,7 @@
 /* PRESS - Ext Banner: MOVE TO layouts > _footer.scss */
 
 section.press {
-    background: #fff !important;
+    background: #fff;
     padding: 20px 0;
     text-align: center;
 }
@@ -78,6 +78,5 @@ section.press {
 @media (min-width: 1200px) {
 
     .press h4 {
-        // margin: 20px 0 0;
     } 
 }
