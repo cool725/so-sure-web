@@ -39,12 +39,12 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h4 class="text-center">Insurance for your
+                    <h3 class="text-center">Insurance for your
                     {{ phone.make }} {{ phone.model }} {%    
                     if phone.memory %}
                         {{ phone.memory }}GB
                     {% endif %}
-                    - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h4>                    
+                    - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h3>                    
                 </div>
             </div>
         </div>
@@ -63,11 +63,11 @@
             if phone.memory %}
                 {{ phone.memory }}GB</span>
             {% endif %}
-            - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h2>
+            <span class="text-nowrap">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</span></h2>
             <p class="text-center">
                 <a href="#"   
                    data-toggle="modal" 
-                   data-target="#phoneModal">
+                   data-target="#quoteModel">
                    <small class="text-blue text-underline">Not the right phone? Select a new phone.</small>
                 </a>                
             </p>
