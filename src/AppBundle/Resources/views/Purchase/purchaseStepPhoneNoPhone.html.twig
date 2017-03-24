@@ -6,7 +6,7 @@
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css'
     '@AppBundle/Resources/public/css/Default/modal.css'        
-    'bundles/app/css/Default/selectPhoneMake.css' %}
+    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css' %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -61,7 +61,7 @@
     </div>
 </section>  
 
-<div class="modal modal-middle fade" 
+<div class="modal fade" 
      id="phoneModal" 
      tabindex="-1" 
      role="dialog" 
@@ -76,7 +76,7 @@
                 </button>
                 <h3 class="text-center">Select Make &amp; Model</h3>
             </div>
-            <div class="modal-body">
+            <div class="modal-body text-center">
                 {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': 'purchase-select'})) }}
             </div>
         </div>

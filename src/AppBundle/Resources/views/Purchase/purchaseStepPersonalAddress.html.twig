@@ -7,6 +7,8 @@
     'components/bootstrap-daterangepicker/daterangepicker.css'
     '@AppBundle/Resources/public/css/Default/bannerSticky.css'       
     'components/intl-tel-input/intlTelInput.css'
+    '@AppBundle/Resources/public/css/Default/modal.css'    
+    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css'%}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
@@ -19,6 +21,7 @@
     'components/bootstrap-daterangepicker/daterangepicker.js'
     'components/typeahead.js/typeahead.bundle.min.js'
     'components/intl-tel-input/intlTelInput.min.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Default/index.js'    
     '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStepAddress.js' %}
@@ -36,12 +39,12 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h3 class="text-center">Insurance for your
+                    <h4 class="text-center">Insurance for your
                     {{ phone.make }} {{ phone.model }} {%    
                     if phone.memory %}
                         {{ phone.memory }}GB
                     {% endif %}
-                    - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h3>                    
+                    - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h4>                    
                 </div>
             </div>
         </div>
@@ -55,12 +58,19 @@
     <div class="container">
 
         {% if phone %}
-        <h2 class="text-center text-blue">Insurance for your
+        <h2 class="text-center h3">Insurance for your
             <span class="text-nowrap">{{ phone.make }} {{ phone.model }} {%    
             if phone.memory %}
                 {{ phone.memory }}GB</span>
             {% endif %}
             - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h2>
+            <p class="text-center">
+                <a href="#"   
+                   data-toggle="modal" 
+                   data-target="#phoneModal">
+                   <small class="text-blue text-underline">Not the right phone? Select a new phone.</small>
+                </a>                
+            </p>
         {% endif %}
 
         <div class="row">
@@ -181,5 +191,28 @@
             </div>
         </div>
     </div>
-</section>      
+</section>   
+
+<div class="modal fade" 
+     id="phoneModal" 
+     tabindex="-1" 
+     role="dialog" 
+     aria-labelledby="quoteModelLabel" 
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h3 class="text-center">Select Make &amp; Model</h3>
+            </div>
+            <div class="modal-body text-center">
+                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': 'purchase-select'})) }}
+            </div>
+        </div>
+    </div>
+</div>    
+
 {% endblock %}
