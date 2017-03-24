@@ -683,7 +683,7 @@ background: rgba(51, 153, 255, 1);
 }
 
 .btn-white {
-    color: #fff;
+    color: #fff !important;
 }
 
 @media (min-width: 379px) {
