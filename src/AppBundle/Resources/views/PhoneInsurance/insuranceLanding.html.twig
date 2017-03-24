@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set include_emoji = 1 %}
+
+{% block meta %}
+    <link rel="canonical" href="{{ url('insure_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+        '@AppBundle/Resources/public/css/Default/modal.css'    
+        '@AppBundle/Resources/public/css/Default/homepage.css'
+        '@AppBundle/Resources/public/css/Default/landingPage.css'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts 
+        '@AppBundle/Resources/public/js/Default/index.js'
+    %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block nav %}
+    {# To overide base.html.twig #}
+    <header>
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/"><div class="so-sure-logo-light"></div></a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="{{ path('fos_user_security_login') }}">Login</a></li>
+                    </ul>
+                </div>                
+            </div>  
+        </nav>    
+    </header>
+{% endblock %}
+
+{% block body %}
+    <main>
+        <div class="container">
+            <h1 class="text-center text-white">Cheap {{ phone }} Insurance </h1>
+            <h2 class="text-center text-light-blue hidden-md hidden-lg"><span class="text-nowrap">only £{{ phone_price.monthlyPremiumPrice }} per month</span></h2>
+            <div class="row steps--shadow">
+                
+                <div class="col-md-4 step">
+                    <div class="step-inner">
+                        <h2 class="h1"><span class="text-grey-blue">1</span> Insure</h2>
+                        <ul class="list-unstyled landing-list">
+                            <li>Cover starts immediately after you buy.</li>
+                            <li>Get protected for loss, theft, accidental damage &amp; out of warranty breakdown.</li>
+                            <li>24/7 live support with next working day replacement or repair.</li>
+                        </ul>
+                        <div class="">
+                            All this for only: <br><br>
+                            <span class="h2">£{{ phone_price.monthlyPremiumPrice }} <small>per month</small></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 step step-blue">
+                    <div class="step-inner">
+                        <h2 class="h1"><span class="text-light-blue">2</span> Refer</h2>
+                        <ul class="list-unstyled landing-list">
+                            <li>Connect to friends/family and <strong class="text-white">each receive up to £10</strong> in your individual Reward Pots.</li>
+                            <li>Refer up to <strong class="text-white">{{ max_connections }}</strong> people and you’ll get a maximum of <strong class="text-white">£{{ max_pot }}</strong> in your Reward Pot.</li>
+                            <li>How many people you refer is up to you, you’ll still get up £10 for each connection you make.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4 step">
+                    <div class="step-inner">
+                        <h2 class="h1"><span class="text-grey-blue">3</span> Save</h2>
+                        <ul class="list-unstyled landing-list">
+                            <li>Get your reward pot back at the end of your policy year if you and your friend's don't claim.</li>
+                            <li>Enjoy massive savings off of your next year's policy, or get cash back to spend how you want. Every year!</li>
+                            <li class="text-blue">Either way we’re still 40% cheaper than traditional insurers.</li>
+                        </ul>
+                        {{ form_start(buy_form_banner, { 'attr': {'class':'text-center'}}) }}
+                            {{ form_widget(buy_form_banner.buy, {'label': ' Get Started Today', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-lg'}}) }}
+                            <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
+                        {{ form_end(buy_form_banner)}}
+                    </div>
+                </div>                                                
+
+            </div>
+        </div>
+
+        {% include 'AppBundle::Default/press.html.twig' %}
+              
+    </main>
+
+
+    <div class="modal modal-fullscreen fade" 
+         id="policy-modal" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="So-Sure Policy Terms" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>So-Sure Policy Terms</h3>
+                </div>
+                <div class="modal-body modal-policy">
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  max_pot })) }}
+                </div>
+            </div>
+        </div>
+    </div>      
+{% endblock %}
+
+{% block footer %}
+    {# To overide base.html.twig #}
+    <footer>
+        <div class="container">
+            <p><small>&copy; {{ "now"|date("Y") }} so-sure ltd. We are a company registered in England &amp; Wales (No. 09365669) and our registered address is Runway East, 10 Finsbury Square, London EC2A 1AF.</small></p>
+            <p><small>so-sure is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is <a href="https://register.fca.org.uk/ShPo_FirmDetailsPage?id=001b000003MOOUGAA5">744729</a>. We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling.</small></p>
+        </div>
+    </footer>
+{% endblock %}
