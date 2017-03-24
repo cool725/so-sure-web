@@ -21,14 +21,14 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    'components/vimeo-player-js/player.min.js'        
-    '@AppBundle/Resources/public/js/Default/modalVideo.js'    
-    'components/typeahead.js/typeahead.bundle.min.js'    
+    'components/vimeo-player-js/player.min.js'            
+    'components/typeahead.js/typeahead.bundle.min.js'
+    'components/rangeslider.js/rangeslider.min.js'    
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'        
     '@AppBundle/Resources/public/js/Default/index.js'
-    'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/slider.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'    
- %}
+    '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
@@ -348,7 +348,7 @@
     <section class="phone-details">
         <div class="container">
             <h3>About the {{ phone.make }} {{ phone.model }}</h3>
-            <ul>
+            <ul class="list-inline">
                 <li>Camera: {{ phone.camera }} MP</li>
                 <li>Size: {{ phone.getScreenPhysicalInch }}"</li>
                 <li>Screen Resolution: {{ phone.getScreenResolution }}</li>

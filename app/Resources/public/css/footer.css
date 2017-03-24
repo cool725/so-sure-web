@@ -43,10 +43,6 @@
 
 }
 
-/* In Partnership - Ext Banner: MOVE TO layouts > _footer.scss */
-.in-partnership {
-    text-align: center;
-}
 
 /* PRESS - Ext Banner: MOVE TO layouts > _footer.scss */
 
@@ -62,6 +58,9 @@ section.press {
     margin: 0 auto;
 }
 
+.patnership {
+    background-color: #efefef;
+}
 
 @media (min-width: 768px) {
 
