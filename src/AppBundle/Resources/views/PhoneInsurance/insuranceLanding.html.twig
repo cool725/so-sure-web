@@ -10,6 +10,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
+        '@AppBundle/Resources/public/css/Default/modal.css'    
         '@AppBundle/Resources/public/css/Default/homepage.css'
         '@AppBundle/Resources/public/css/Default/landingPage.css'
     %}
@@ -19,7 +20,9 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts %}
+    {% javascripts 
+        '@AppBundle/Resources/public/js/Default/index.js'
+    %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
@@ -82,7 +85,7 @@
                         </ul>
                         {{ form_start(buy_form_banner, { 'attr': {'class':'text-center'}}) }}
                             {{ form_widget(buy_form_banner.buy, {'label': ' Get Started Today', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-lg'}}) }}
-                            <a target="_blank" href="/about/social-insurance/terms" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
+                            <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
                         {{ form_end(buy_form_banner)}}
                     </div>
                 </div>                                                
@@ -93,6 +96,29 @@
         {% include 'AppBundle::Default/press.html.twig' %}
               
     </main>
+
+
+    <div class="modal modal-fullscreen fade" 
+         id="policy-modal" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="So-Sure Policy Terms" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>So-Sure Policy Terms</h3>
+                </div>
+                <div class="modal-body modal-policy">
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  max_pot })) }}
+                </div>
+            </div>
+        </div>
+    </div>      
 {% endblock %}
 
 {% block footer %}
@@ -100,6 +126,7 @@
     <footer>
         <div class="container">
             <p><small>&copy; {{ "now"|date("Y") }} so-sure ltd. We are a company registered in England &amp; Wales (No. 09365669) and our registered address is Runway East, 10 Finsbury Square, London EC2A 1AF.</small></p>
+            <p><small>so-sure is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is 744729. We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling.</small></p>
         </div>
     </footer>
 {% endblock %}
