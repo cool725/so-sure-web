@@ -24,12 +24,18 @@
 {% endblock %}
 
 {% block nav %}
+    {# To overide base.html.twig #}
     <header>
         <nav class="navbar navbar-default">
             <div class="container">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="/"><div class="so-sure-logo-light"></div></a>
                 </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="{{ path('fos_user_security_login') }}">Login</a></li>
+                    </ul>
+                </div>                
             </div>  
         </nav>    
     </header>
@@ -50,8 +56,9 @@
                             <li>Get protected for loss, theft, accidental damage &amp; out of warranty breakdown.</li>
                             <li>24/7 live support with next working day replacement or repair.</li>
                         </ul>
-                        <div class="text-center h1">
-                            £{{ phone_price.monthlyPremiumPrice }} <small>per month</small>
+                        <div class="">
+                            All this for only: <br><br>
+                            <span class="h2">£{{ phone_price.monthlyPremiumPrice }} <small>per month</small></span>
                         </div>
                     </div>
                 </div>
@@ -71,7 +78,7 @@
                         <ul class="list-unstyled landing-list">
                             <li>Get rewarded with up to 80% of your premium when you and your friends don’t claim.</li>
                             <li>You can get this money back every year to spend as cash or put towards next years premium.</li>
-                            <li>Either way we’re 40% cheaper than traditional insurers.</li>
+                            <li class="text-blue">Either way we’re still 40% cheaper than traditional insurers.</li>
                         </ul>
                         {{ form_start(buy_form_banner, { 'attr': {'class':'text-center'}}) }}
                             {{ form_widget(buy_form_banner.buy, {'label': ' Get Started Today', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-lg'}}) }}

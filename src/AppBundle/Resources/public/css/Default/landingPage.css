@@ -134,6 +134,7 @@ section.press h4 small {
 	.step:after {
 		left: 100%; top: 50%;
 		margin-top: -25px;
+		/*left: 100%; top: 25px;		*/
 	    border-bottom: solid 25px transparent;
 	    border-top: solid 25px transparent;	    
 	    border-left: solid 20px #fff;
