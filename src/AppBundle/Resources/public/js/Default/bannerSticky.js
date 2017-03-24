@@ -8,7 +8,7 @@ var triggerOffset = $(stickyBanner).data('sticky-offset');
 
 $(document).scroll(function() {
 
-    if (stickyTrigger.length) {
+    if (typeof stickyTrigger !== 'undefined' && stickyTrigger.length) {
 
         var triggerBottom = $('#'+stickyTrigger).offset().top - triggerHeight + triggerOffset;
 
