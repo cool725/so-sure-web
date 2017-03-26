@@ -30,6 +30,13 @@ class PhonePolicy extends Policy
     protected $phone;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $phoneVerified;
+
+    /**
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -85,6 +92,19 @@ class PhonePolicy extends Policy
         }
 
         $this->setPremium($phone->getCurrentPhonePrice($date)->createPremium($date));
+    }
+
+    public function getPhoneVerified()
+    {
+        return $this->phoneVerified;
+    }
+
+    public function setPhoneVerified($phoneVerified)
+    {
+        // If a phone is verified successfully at any point in time, then the verified flag should remain set
+        if ($this->getPhoneVerified() !== true) {
+            $this->phoneVerified = $phoneVerified;
+        }
     }
 
     public function getImei()

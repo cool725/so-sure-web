@@ -181,4 +181,13 @@ class IdentityLog
     {
         return $this->getCognitoId() !== null || $this->getIp() !== null;
     }
+
+    public function isSamePhone(Phone $phone = null)
+    {
+        if ($this->getPhone() && $phone) {
+            return $this->getPhone()->getId() == $phone->getId();
+        }
+
+        return null;
+    }
 }
