@@ -2366,4 +2366,25 @@ class PhonePolicyTest extends WebTestCase
         $claim3->setType(Claim::TYPE_THEFT);
         $policy->addClaim($claim3);
     }
+
+    public function testSetPhoneVerified()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhoneVerified(null);
+        $this->assertNull($policy->getPhoneVerified());
+        $policy->setPhoneVerified(false);
+        $this->assertFalse($policy->getPhoneVerified());
+        $policy->setPhoneVerified(true);
+        $this->assertTrue($policy->getPhoneVerified());
+        $policy->setPhoneVerified(false);
+        $this->assertTrue($policy->getPhoneVerified());
+        $policy->setPhoneVerified(null);
+        $this->assertTrue($policy->getPhoneVerified());
+
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhoneVerified(true);
+        $this->assertTrue($policy->getPhoneVerified());
+        $policy->setPhoneVerified(false);
+        $this->assertTrue($policy->getPhoneVerified());
+    }
 }
