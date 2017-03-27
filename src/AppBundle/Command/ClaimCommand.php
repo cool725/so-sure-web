@@ -38,7 +38,10 @@ class ClaimCommand extends ContainerAwareCommand
         if ($claimsService->processClaim($claim)) {
             $output->writeln(sprintf('Successfully processed claim %s', $claimNumber));
         } else {
-            $output->writeln(sprintf('Unable to process claim %s. Possibly already processed or not settled.', $claimNumber));
+            $output->writeln(sprintf(
+                'Unable to process claim %s. Possibly already processed or not settled.',
+                $claimNumber
+            ));
         }
     }
 
