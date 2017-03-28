@@ -184,7 +184,12 @@ class PurchaseController extends BaseController
 
                     // Track after login, so we populate user
                     // Regardless of existing user or new user, track receive details (so funnel works)
-                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS);
+                    $data = null;
+                    if ($user->getFacebookId()) {
+                        $data = [];
+                        $data['Facebook'] = true;
+                    }
+                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
                     if ($phone) {
                         return $this->redirectToRoute('purchase_step_policy');

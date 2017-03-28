@@ -374,6 +374,11 @@ class Phone
         return $this->id;
     }
 
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
     public function getMake()
     {
         return $this->make;

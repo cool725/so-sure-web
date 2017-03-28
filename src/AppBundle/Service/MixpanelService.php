@@ -456,6 +456,9 @@ class MixpanelService
         if ($user->getBillingAddress()) {
             $userData['Billing Address'] = $user->getBillingAddress()->__toString();
         }
+        if ($user->getFacebookId()) {
+            $userData['Facebook'] = true;
+        }
         if ($policy = $user->getCurrentPolicy()) {
             if ($phone = $policy->getPhone()) {
                 $userData['Device Insured'] = $phone->__toString();
