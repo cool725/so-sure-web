@@ -484,7 +484,10 @@ class IntercomService
             $this->client->leads->deleteLead($id);
             $this->logger->info(sprintf('Deleted intercom lead %s', $id));
         } catch (\Exception $e) {
-            $this->logger->info(sprintf('Failed to deleted intercom lead %s. Already deleted?', $id), ['exception' => $e]);
+            $this->logger->info(
+                sprintf('Failed to deleted intercom lead %s. Already deleted?', $id),
+                ['exception' => $e]
+            );
         }
     }
 
@@ -508,7 +511,10 @@ class IntercomService
             $this->client->users->deleteUser($id);
             $this->logger->info(sprintf('Deleted intercom user %s', $id));
         } catch (\Exception $e) {
-            $this->logger->info(sprintf('Failed to deleted intercom lead %s. Already deleted?', $id), ['exception' => $e]);
+            $this->logger->info(
+                sprintf('Failed to deleted intercom lead %s. Already deleted?', $id),
+                ['exception' => $e]
+            );
         }
     }
 
