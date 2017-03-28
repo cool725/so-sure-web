@@ -33,29 +33,20 @@ h2 {
 }
 
 .landing-list {
-
+	padding-left: 20px;	
 }
 
-.landing-list--bullet {
-	padding-left: 18px;
+.list-unstyled.landing-list {
+	margin: 0;
+	padding: 0;
 }
 
 .landing-list li {
-	font-size: 18px;
+	font-size: 17px;
 	line-height: 1.5;
 	text-align: left;
 	padding-top: 10px;
 	padding-bottom: 10px;
-}
-
-.landing-list--bullet li {
-	position: relative;
-	padding-left: 10px;
-}
-
-.landing-list--bullet li .fa {
-	position: absolute;
-	right: 100%; top: 13px;
 }
 
 /* Steps */
@@ -128,7 +119,7 @@ section.press h4 small {
 	}
 	
 	.step {
-		min-height: 545px;
+		min-height: 550px;
 		text-align: left;
 	}
 
@@ -151,7 +142,7 @@ section.press h4 small {
 @media (min-width: 1200px) {
 
 	.step {
-		min-height: 500px;
+		min-height: 525px;
 	}
 
 }
