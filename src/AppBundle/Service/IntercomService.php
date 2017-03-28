@@ -478,6 +478,16 @@ class IntercomService
         return $lead;
     }
 
+    private function deleteLead($id)
+    {
+        try {
+            $this->client->leads->deleteLead($id);
+            $this->logger->info(sprintf('Deleted intercom lead %s', $id));
+        } catch (\Exception $e) {
+            $this->logger->info(sprintf('Failed to deleted intercom lead %s. Already deleted?', $id), ['exception' => $e]);
+        }
+    }
+
     private function getUser($id)
     {
         if (!$id) {
@@ -490,6 +500,16 @@ class IntercomService
         }
 
         return $user;
+    }
+
+    private function deleteUser($id)
+    {
+        try {
+            $this->client->users->deleteUser($id);
+            $this->logger->info(sprintf('Deleted intercom user %s', $id));
+        } catch (\Exception $e) {
+            $this->logger->info(sprintf('Failed to deleted intercom lead %s. Already deleted?', $id), ['exception' => $e]);
+        }
     }
 
     private function getClaim($id)
@@ -626,23 +646,23 @@ class IntercomService
         return $this->redis->lrange(self::KEY_INTERCOM_QUEUE, 0, $max);
     }
     
-    public function unsubscribes()
+    public function maintenance()
     {
-        return array_merge($this->unsubscribeLeads(), $this->unsubscribeUsers());
+        return array_merge($this->leadsMaintenance(), $this->usersMaintenance());
     }
 
-    private function unsubscribeLeads()
+    private function leadsMaintenance()
     {
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $output = [];
         $page = 1;
         $pages = 1;
+        $now = new \DateTime();
         while ($page <= $pages) {
             $output[] = sprintf('Checking Leads - page %d', $page);
             $resp = $this->client->leads->getLeads(['page' => $page]);
             $page++;
             $pages = $resp->pages->total_pages;
-            
             foreach ($resp->contacts as $lead) {
                 $optedOut = $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
                     $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
@@ -651,6 +671,29 @@ class IntercomService
                     $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
                     $output[] = sprintf("Added optout for %s", $lead->email);
                 }
+
+                if ($lead->last_request_at) {
+                    $lastSeen = \DateTime::createFromFormat('U', $lead->last_request_at);
+                } elseif ($lead->updated_at) {
+                    $lastSeen = \DateTime::createFromFormat('U', $lead->updated_at);
+                } elseif ($lead->created_at) {
+                    $lastSeen = \DateTime::createFromFormat('U', $lead->created_at);
+                } else {
+                    $this->logger->warning(sprintf('For lead, unable to determine last seen %s', json_encode($lead)));
+                }
+
+                if ($lastSeen) {
+                    $age = $now->diff($lastSeen);
+                    // Lead w/o email, clear out after 1 week not seen
+                    if (!$lead->email && $age->days >= 7) {
+                        $output[] = sprintf('Deleting lead %s age: %d', $lead->id, $age->days);
+                        $this->deleteLead($lead->id);
+                    } elseif ($lead->email && $age->days >= 28) {
+                        // Lead w/email, clear out after 4 weeks not seen
+                        $output[] = sprintf('Deleting lead %s email: %s age: %d', $lead->id, $lead->email, $age->days);
+                        $this->deleteLead($lead->id);
+                    }
+                }
             }
             $this->dm->flush();
         }
@@ -658,13 +701,14 @@ class IntercomService
         return $output;
     }
 
-    private function unsubscribeUsers()
+    private function usersMaintenance()
     {
         $userRepo = $this->dm->getRepository(User::class);
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $output = [];
         $page = 1;
         $pages = 1;
+        $now = new \DateTime();
         while ($page <= $pages) {
             $output[] = sprintf('Checking Users - page %d', $page);
             $resp = $this->client->users->getUsers(['page' => $page]);
@@ -687,6 +731,26 @@ class IntercomService
                     } else {
                         $output[] = sprintf("Unable to find so-sure user for %s", $user->email);
                     }
+                }
+
+                if ($user->last_request_at) {
+                    $lastSeen = \DateTime::createFromFormat('U', $user->last_request_at);
+                } elseif ($user->updated_at) {
+                    $lastSeen = \DateTime::createFromFormat('U', $user->updated_at);
+                } elseif ($user->created_at) {
+                    $lastSeen = \DateTime::createFromFormat('U', $user->created_at);
+                } else {
+                    $this->logger->warning(sprintf('For user, unable to determine last seen %s', json_encode($lead)));
+                }
+
+                if ($lastSeen) {
+                    $age = $now->diff($lastSeen);
+                    // User w/o email, clear out after 8 weeks not seen
+                    if (!$user->email && $age->days >= 56) {
+                        $output[] = sprintf('Deleting user %s age: %d', $user->id, $age->days);
+                        $this->deleteUser($user->id);
+                    }
+                    // TODO: User cancelled, archive messages and clear out after 2 weeks not seen
                 }
             }
             $this->dm->flush();
