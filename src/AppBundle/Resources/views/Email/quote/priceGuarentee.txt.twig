@@ -1,0 +1,17 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your guarenteed price for {{ phone }}
+
+**
+------------------------------------------------------------
+You recently visited the so-sure and requested a guarenteed price for insurance on your {{ phone }}.
+
+Your quote price of £{{ phone.currentPhonePrice.monthlyPremiumPrice }} is guarenteed for the next 7 days.
+
+so-sure covers you for Loss, Theft, Accidental Damage, and Out of Warranty Breakdown.
+
+so-sure provides Next working day replacement or repair, 24/7 live support, & Up to 80% cashback every year!
+
+If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
+
+{% endblock body %}
