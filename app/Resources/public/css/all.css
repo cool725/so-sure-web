@@ -861,3 +861,16 @@ ul li.h3 {
 #pp-cfp-trigger {
     display: none !important;
 }
+
+
+/* Panels Collapse */
+
+.panel-default > .panel-heading {
+    background-color: #202532;
+}
+
+.panel-title {
+    font-weight: bold !important;
+    font-size: 22px;
+    color: #fff;  
+}
