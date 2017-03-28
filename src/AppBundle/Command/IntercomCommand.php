@@ -63,10 +63,10 @@ class IntercomCommand extends ContainerAwareCommand
                 'Resync regardless of deletion (will undelete if deleted) - requires email'
             )
             ->addOption(
-                'unsubscribes',
+                'maintenance',
                 null,
                 InputOption::VALUE_NONE,
-                'Check for unsubscriptions'
+                'Check for unsubscriptions & clear out old lead/users'
             )
             ->addOption(
                 'pending-invites',
@@ -86,7 +86,7 @@ class IntercomCommand extends ContainerAwareCommand
         $requeue = $input->getOption('requeue');
         $convertLead = $input->getOption('convert-lead');
         $undelete = true === $input->getOption('undelete');
-        $unsubscribes = true === $input->getOption('unsubscribes');
+        $maintenance = true === $input->getOption('maintenance');
         $pendingInvites = true === $input->getOption('pending-invites');
 
         $intercom = $this->getContainer()->get('app.intercom');
@@ -121,9 +121,9 @@ class IntercomCommand extends ContainerAwareCommand
                 $count++;
             }
             $output->writeln(sprintf("Queued %d Users", $count));
-        } elseif ($unsubscribes) {
-            $output->writeln(implode(PHP_EOL, $intercom->unsubscribes()));
-            $output->writeln(sprintf("Rechecked unsubscribes"));
+        } elseif ($maintenance) {
+            $output->writeln(implode(PHP_EOL, $intercom->maintenance()));
+            $output->writeln(sprintf("Finished running maintenance"));
         } elseif ($pendingInvites) {
             $count = 0;
             foreach ($this->getPendingInvites() as $invitation) {
