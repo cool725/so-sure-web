@@ -96,7 +96,7 @@ class UserControllerTest extends BaseControllerTest
         );
         $cliffDate = new \DateTime();
         $cliffDate = $cliffDate->sub(new \DateInterval('P60D'));
-        $cliffDate = $cliffDate->sub(new \DateInterval('PT2S'));
+        $cliffDate = $cliffDate->sub(new \DateInterval('PT1H'));
         $policy = self::initPolicy($user, self::$dm, $phone, $cliffDate, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         self::$dm->flush();
