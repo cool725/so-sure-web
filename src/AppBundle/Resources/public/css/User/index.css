@@ -30,11 +30,15 @@ h3 {
 
 .user-homepage--header {
     text-align: center;
-    /*margin-bottom: 25px;*/
     padding-bottom: 45px;
 }
 
+.user-homepage--header h2 {
+    margin-top: 20px;
+}
+
 .user-img {
+    width: 140px; height: 140px;
     display: block;
     border: 4px solid #fff;
     margin: 0 auto;
@@ -46,6 +50,10 @@ h3 {
 
     .user-homepage--header {
         text-align: left;
+    }
+
+    .user-homepage--header h2 {
+        margin-top: 5px;
     }
 
     .user-img {
@@ -111,6 +119,7 @@ h3 {
 /*    display: inline-block;
     width: 70px; height: 70px;
     background-color: #8B97B5;*/
+    width: 70px; height: 70px;
     margin-bottom: 15px;
 }
 

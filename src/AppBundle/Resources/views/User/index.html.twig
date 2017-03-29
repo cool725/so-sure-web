@@ -57,15 +57,20 @@
                                 <img src="{{ connection.linkedUser.getImageUrlFallback }}" title="{{ connection.linkedUser.name }} – Connected on {{ connection.date|date('d M') }} (£{{ connection.value|number_format(2, '.', ',')  }})" alt="{{ connection.linkedUser.name }}" class="img-circle coffee-stamp">
                             </li>
                             {% endfor %}
+                            {% if policy.canInvite %}
+                            <li>
+                                <a href="#" id="connect-with"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp"></a>
+                            </li>
+                            {% endif %}
                         </ul>
-                        {% if policy.canInvite %}
+                       {#  {% if policy.canInvite %}
                             <a href="#" id="connect-with" class="btn btn-primary btn-rounded"><i class="fa fa-plus fa-lg"></i> New connection</a>
-                        {% endif %}
+                        {% endif %} #}
                     </div>
 
                     {% if policy.canInvite %}
                     <div class="row">
-                        {# {% if policy.standardSCode.shareLink %} #}
+                        {% if policy.standardSCode.shareLink %}
                         <div class="col-md-6" >   
                             <div id="connect-with-box" class="box-border-grey text-center">                         
                                 <h4><strong>Share your invite code</strong></h4>
@@ -102,7 +107,7 @@
                                 {{ form_end(email_form) }}                                                       
                             </div>                  
                         </div>
-                        {# {% endif %}  #}
+                        {% endif %} 
                         <div class="col-md-6">
                             <div id="scode-box" class="box-border-grey text-center">
                                 <h4><strong>
