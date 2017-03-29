@@ -35,7 +35,9 @@ html {
 }
 
 html, body {
-    overflow: auto;
+    overflow-y: scroll;
+    overflow-x: hidden; 
+    -webkit-overflow-scrolling: touch;
 }
 
 body {
