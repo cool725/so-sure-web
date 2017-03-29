@@ -466,14 +466,24 @@ class PurchaseController extends BaseController
 
             return $this->redirectToRoute('user_card_details');
         } else {
-            $judo->add(
-                $policy,
-                $request->get('ReceiptId'),
-                null,
-                $request->get('CardToken'),
-                Payment::SOURCE_WEB,
-                JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
-            );
+            try {
+                $judo->add(
+                    $policy,
+                    $request->get('ReceiptId'),
+                    null,
+                    $request->get('CardToken'),
+                    Payment::SOURCE_WEB,
+                    JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
+                );
+            } catch (\DomainException $e) {
+                if (!$policy->isValidPolicy()) {
+                    throw $e;
+                }
+                $this->get('logger')->warning(sprintf(
+                    'Duplicate re-use of judo receipt. Possible refresh issue, so ignoring and continuing',
+                    ['exception' => $e]
+                ));
+            }
             if ($policy->isInitialPayment()) {
                 return $this->redirectToRoute('user_welcome');
             } else {
