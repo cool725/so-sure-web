@@ -866,18 +866,18 @@ ul li.h3 {
 /* Panels Collapse */
 
 .panel-default > .panel-heading {
-    background-color: #3399ff;
+    background-color: #efefef;
 }
 
 .panel-default > .panel-heading h4 {
     cursor: pointer;
     line-height: 1.5;
-    color: #fff;
+    /*color: #fff;*/
 }
 
 .panel-default > .panel-heading:hover,
 .panel-default > .panel-heading:focus {
-    background-color: #626B78;
+    background-color: #ddd;
 }
 
 /* Video Embed */
