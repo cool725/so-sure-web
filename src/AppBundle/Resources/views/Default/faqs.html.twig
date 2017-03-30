@@ -2,39 +2,248 @@
     <div class="container">
         <h2 class="text-center">FAQs</h2>
         <div class="row">
-            <div class="col-md-8 col-md-offset-2">
+            <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 
                 <div class="panel-group" id="faq-accordion" role="tablist" aria-multiselectable="true">
                     
                     <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOne">
+                        <div class="panel-heading" id="headingOne" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    What happens when?
-                                </a>
+                                How does the Reward Pot work?
                             </h4>
                         </div>
                         <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                             <div class="panel-body">
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                <p>Simplest way to explain the Reward Pot is a “group no claims bonus”. We give you the chance to connect with friends and family. For each one that buys insurance with us and connects with you, we'll add up to £10 to both you and your friend/family member’s Reward Pots. Your Reward Pot for the  {{ phone }} can reach up to £{{ max_pot }} (e.g. 80% of your annual policy price). If neither you nor your friends/family claim in the year, we will payout to you the value in the Reward Pot. Click here to explore our calculator that can show you all the various scenarios.</p>
+
+                                <p>We recommend watching this short video which explains it further.</p>                         
+                                <div class="embed-container">
+                                    <iframe src="https://player.vimeo.com/video/185840373" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>    
+                                </div>       
                             </div>
                         </div>
                     </div>
 
                     <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingTwo">
+                        <div class="panel-heading" id="headingTwo" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                                    Some other question
-                                </a>
+                                What happens to my Reward Pot, if one person in my group claims?
                             </h4>
                         </div>
                         <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                             <div class="panel-body">
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                <p>We’ve created a calculator to illustrate this. Click here to explore various scenarios.</p>
+                                <div class="col-sm-8 col-md-6">
+                                    <div id="cashback-card" class="quote-card">
+
+                                        {# <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div> #}
+
+                                        {% if coming_soon %}
+                                            <h3>Get cashback by connecting to friends</h3>
+                                            <p><i>(based on annual premium of £100)</i></p>
+                                        {% else %}
+                                            <h3>Get cashback by connecting to friends</h3>                            
+                                        {% endif %}
+
+                                        
+                                        <div class="h4 text-grey-blue"><strong>Friends connected</strong></div>
+
+                                        {% set start_friends = max_connections %}
+
+                                        {% set start_value = start_friends * connection_value %}
+
+                                        {% if start_value > max_pot %}
+                                        
+                                            {% set start_value = max_pot %}
+                                        
+                                        {% endif %}
+
+                                        {% set start_premium = annual_premium - start_value %}     
+                                        
+                                        <div class="reward-slider">                            
+                                            <input type="range"
+                                                   id="reward-slider" 
+                                                   min="0"
+                                                   max="{{ max_connections }}"
+                                                   value="{{ start_friends }}"
+                                                   data-maxpot="{{ max_pot }}"
+                                                   data-connection-value="{{ connection_value }}"
+                                                   data-premium="{{ annual_premium }}"
+                                                   data-max-comparison="{{ comparision_max }}">
+                                        </div>
+
+
+                                        <div class="reward-total">
+                                            <div class="cashback-value">
+                                                <strong id="cashback">£{{ start_value }}</strong>
+                                                <strong id="cashback-with-claim"></strong>
+                                            </div>
+                                            <small id="cashback-text">Cashback if no one claims</small>
+                                        </div>      
+
+                                        <div class="premium-and-claims">                  
+                                            <div id="loading-overlay-switch" class="loading-overlay"></div>
+
+                                            <div class="premium-table">
+                                                <div class="h4 text-grey-blue"><strong>Effective annual premium</strong></div>
+                                                <table width="100%">
+                                                    <tr>
+                                                        <td width="45%">
+                                                            <img src="../images/logo/so-sure-logo-dark.svg" alt="so-sure" width="80px">
+                                                        </td>
+                                                        <td width="33%">
+                                                            <div class="bar bar-us"><div></div></div>
+                                                        </td>
+                                                        <td width="22%" align="right">
+                                                            <strong>
+                                                                <small id="premium" class="premium-value text-blue">
+                                                                    £{{ start_premium|number_format(2, '.', ',') }}
+                                                                </small>
+                                                            </strong>
+                                                        </td>
+                                                    </tr>
+                                                    {% for name, value in comparision %}
+                                                    <tr>
+                                                        <td><small>{{ name }}</small></td>
+                                                        <td>
+                                                            <div class="bar"><div></div></div> 
+                                                        </td>
+                                                        <td align="right">
+                                                            <strong><small class="premium-value">£{{ value|number_format(2, '.', ',') }}</small></strong>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </table>
+                                                
+                                                {% if comparision | length > 0 %}
+                                                    <div class="text-right">
+                                                         <a href="#" data-toggle="modal" data-target="#calculation-details"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
+                                                    </div>
+                                                {% endif %}
+
+                                                <div class="text-center h5">
+                                                    <a id="what-if" href="#" data-toggle-text="Return to annual premium"><strong class="text-underline">What happens when someone claims?</strong></a>
+                                                </div>                             
+                                            </div>
+
+                                            <div class="claim-options">
+                                                <div class="h4 text-blue"><strong>What if</strong></div>
+
+
+                                                <div class="list-group claim-options-list"
+                                                     data-cashback-target="#cashback-text">
+                                                    <button 
+                                                        type="button" 
+                                                        class="list-group-item active"
+                                                        data-claim-option="0"
+                                                        data-cashback-text="Cashback if no one claims">
+                                                        No claim
+                                                    </button>
+                                                    <button 
+                                                        type="button" 
+                                                        class="list-group-item"
+                                                        data-claim-option="1"
+                                                        data-cashback-text="Cashback if I make a claim">
+                                                        I make a claim
+                                                    </button>
+                                                    <button 
+                                                        type="button" 
+                                                        class="list-group-item"
+                                                        data-claim-option="2"
+                                                        data-cashback-text="Cashback if 1 claim in my network">
+                                                        1 claim in my network
+                                                    </button>
+                                                    <button 
+                                                        type="button" 
+                                                        class="list-group-item"
+                                                        data-claim-option="3"
+                                                        data-cashback-text="Cashback if 2+ claims in my network">
+                                                        2+ claims in my network
+                                                    </button>
+                                                </div>      
+
+                                                <div class="text-center h5">
+                                                    <a id="what-if-return" href="#"><strong class="text-underline">Return to premium comparison</strong></a>
+                                                </div> 
+                                            </div>       
+                                        </div>
+                                        <div class="text-center">
+                                            <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-play-right" href="#" data-toggle="modal" data-target="#modal-fullscreen"><small class="text-underline">Video of how it works</i></small></a>
+                                        </div>                                         
+                                    </div>
+                                </div>                                
                             </div>
                         </div>
-                    </div>            
+                    </div>  
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="headingThree" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            <h4 class="panel-title">
+                                Is there a minimum or maximum size of my Reward Pot group?
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                            <div class="panel-body">
+                                <p>There is no minimum size of your Reward Pot group: you can decide not to connect to anyone and still enjoy the benefits of a fully insured phone, but then you won’t get up to 80% of your money back at the end of the year. The {{ phone }} is limited to a maximum of {{ max_connections }} Reward Pot connections. If you have {{ max_connections }} connections and none of you claim, you can get  back at the end of your policy year, every year you have a so-sure policy.</p>         
+                            </div>
+                        </div>
+                    </div>    
+
+{#                     <div class="panel panel-default">
+                        <div class="panel-heading" id="headingFour" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                            <h4 class="panel-title">
+                                What are your policy terms and conditions?
+                            </h4>
+                        </div>
+                        <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+                            <div class="panel-body">
+                                <p>Click here to view the full terms &amp; conditions of the policy.</p>        
+                            </div>
+                        </div>
+                    </div> 
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="headingFive" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                            <h4 class="panel-title">
+                                What is covered and what is not covered by the policy?
+                            </h4>
+                        </div>
+                        <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+                            <div class="panel-body">
+                                <p>We believe that trust starts with transparency. Many other providers think it is alright to hide behind their Terms and Conditions. We don’t. So please find below the headlines.</p>
+                                <h4>What is covered? </h4>
+                                <ul>
+                                    <li>Theft of your mobile phone</li>
+                                    <li>Accidental Damage to your mobile phone</li>
+                                    <li>Breakdown (including faults) of your mobile phone</li>
+                                    <li>Loss of your mobile phone</li>
+                                    <li>up to £1,000 of unauthorised network changes related to approved loss or theft claim, as long as your network was notified within 24hrs of the loss or theft</li>
+                                    <li>Accessory claims (up to £100 including VAT) related to approved loss or theft claim</li>
+                                    <li>We aim to replace or repair your phone the next working day. </li>
+                                </ul>
+                                <h4>What is not covered?</h4>
+                                <ul>
+                                    <li>Excess: You need to pay a contribution every time you make a successful claim. Excess amount is £50 except for loss and theft where the excess is £70.</li>
+                                    <li>More than two claims for loss and/or theft in any year.</li>
+                                    <li>Theft, loss, accidental damage or breakdown where you have knowingly put your mobile phone at risk and/or you have not taken care of it. It might sound vague but we just ask you to use common sense. If in doubt for loss or theft, just ask yourself “Would I leave a pile of £500 in cash there and expect to find it when I return?” If the answer is no, then you should not leave your phone there either. Of course, we will take in consideration the specifics of your situation; after all, we are here to have your back if a misfortune happens.</li>
+                                </ul>
+                                <p>For further details on all of the above, please refer to the full policy terms and conditions</p>
+                            </div>
+                        </div>
+                    </div> 
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="headingSix" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
+                            <h4 class="panel-title">
+                                Do you have a phone number?
+                            </h4>
+                        </div>
+                        <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+                            <div class="panel-body">
+                                <p>Our claims team can be reached 24/7 on 0344 856 0852. If you wish to inquire about anything else, email us on support@wearesosure.com providing your contact details and someone from the team will call you back.</p>        
+                            </div>
+                        </div>
+                    </div>    #}                                                                                       
 
                 </div>
 
