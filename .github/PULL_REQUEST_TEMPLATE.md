@@ -1,14 +1,22 @@
-Please ensure each section has one and only one box ticketed.
+
+
+### Please ensure each section has one and only one box ticked
 
 Dev Approval
 * [ ] Ready to be released
 
 Product Approval
 * [ ] Marta
-* [ ] Not required as technical change
+* [ ] Not required (technical/business change) 
 
-Complaince Approval
+Compliance Approval
+* [ ] Dylan
 * [ ] Patrick
-* [ ] Not required as technical change
+* [ ] Not required (copy hasn't changed)
+
+Business Approval
+* [ ] Dylan
+* [ ] Patrick 
+* [X] Not required (no impact to process/underwriting/claims)
 
 
