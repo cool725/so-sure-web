@@ -57,11 +57,34 @@ $(function(){
 
     $('#search-phone-form').bind('submit', preventDefault);
     
+    function mySort(a, b) {
+        if (a < b) {
+            return -1;
+        } else if (a > b) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     var searchPhones = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         prefetch: { 'url': '/search-phone' },
-        identify: function(obj) { return obj.id; }
+        identify: function(obj) { return obj.id; },
+        sorter: function(a, b) {
+            var rxA = /(.*)\(([0-9]+)\s?GB\)/g;
+            var rxB = /(.*)\(([0-9]+)\s?GB\)/g;
+            var arrA = rxA.exec(a.name);
+            var arrB = rxB.exec(b.name);
+            if (arrA === null || arrB === null) {
+                return mySort(a.name, b.name);
+            } else if (arrA[1] == arrB[1]) {
+                return mySort(parseInt(arrA[2]), parseInt(arrB[2]));
+            } else {
+                return mySort(arrA[1], arrB[1]);
+            }
+        }
     });
 
 
