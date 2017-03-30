@@ -5,6 +5,9 @@
             <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 
                 <div class="panel-group" id="faq-accordion" role="tablist" aria-multiselectable="true">
+
+                    <h3>Reward Pot</h3>
+
                     <div class="panel panel-default">
                         <div class="panel-heading" id="headingOne" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                             <h4 class="panel-title">
@@ -33,147 +36,14 @@
                             <div class="panel-body">
                                 <p>We’ve created a calculator to illustrate this. Click here to explore various scenarios.</p>
                                 <div class="col-sm-8 col-md-6">
-                                    <div id="cashback-card" class="quote-card">
-
-                                        {# <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div> #}
-
-                                        {% if coming_soon %}
-                                            <h3>Get cashback by connecting to friends</h3>
-                                            <p><i>(based on annual premium of £100)</i></p>
-                                        {% else %}
-                                            <h3>Get cashback by connecting to friends</h3>                            
-                                        {% endif %}
-
-                                        
-                                        <div class="h4 text-grey-blue"><strong>Friends connected</strong></div>
-
-                                        {% set start_friends = max_connections %}
-
-                                        {% set start_value = start_friends * connection_value %}
-
-                                        {% if start_value > max_pot %}
-                                        
-                                            {% set start_value = max_pot %}
-                                        
-                                        {% endif %}
-
-                                        {% set start_premium = annual_premium - start_value %}     
-                                        
-                                        <div class="reward-slider">                            
-                                            <input type="range"
-                                                   id="reward-slider" 
-                                                   min="0"
-                                                   max="{{ max_connections }}"
-                                                   value="{{ start_friends }}"
-                                                   data-maxpot="{{ max_pot }}"
-                                                   data-connection-value="{{ connection_value }}"
-                                                   data-premium="{{ annual_premium }}"
-                                                   data-max-comparison="{{ comparision_max }}">
-                                        </div>
-
-
-                                        <div class="reward-total">
-                                            <div class="cashback-value">
-                                                <strong id="cashback">£{{ start_value }}</strong>
-                                                <strong id="cashback-with-claim"></strong>
-                                            </div>
-                                            <small id="cashback-text">Cashback if no one claims</small>
-                                        </div>      
-
-                                        <div class="premium-and-claims">                  
-                                            <div id="loading-overlay-switch" class="loading-overlay"></div>
-
-                                            <div class="premium-table">
-                                                <div class="h4 text-grey-blue"><strong>Effective annual premium</strong></div>
-                                                <table width="100%">
-                                                    <tr>
-                                                        <td width="45%">
-                                                            <img src="../images/logo/so-sure-logo-dark.svg" alt="so-sure" width="80px">
-                                                        </td>
-                                                        <td width="33%">
-                                                            <div class="bar bar-us"><div></div></div>
-                                                        </td>
-                                                        <td width="22%" align="right">
-                                                            <strong>
-                                                                <small id="premium" class="premium-value text-blue">
-                                                                    £{{ start_premium|number_format(2, '.', ',') }}
-                                                                </small>
-                                                            </strong>
-                                                        </td>
-                                                    </tr>
-                                                    {% for name, value in comparision %}
-                                                    <tr>
-                                                        <td><small>{{ name }}</small></td>
-                                                        <td>
-                                                            <div class="bar"><div></div></div> 
-                                                        </td>
-                                                        <td align="right">
-                                                            <strong><small class="premium-value">£{{ value|number_format(2, '.', ',') }}</small></strong>
-                                                        </td>
-                                                    </tr>
-                                                    {% endfor %}
-                                                </table>
-                                                
-                                                {% if comparision | length > 0 %}
-                                                    <div class="text-right">
-                                                         <a href="#" data-toggle="modal" data-target="#calculation-details"><small><em class="text-underline text-dark-grey">Calculation details</em></small></a>
-                                                    </div>
-                                                {% endif %}
-
-                                                <div class="text-center h5">
-                                                    <a id="what-if" href="#" data-toggle-text="Return to annual premium"><strong class="text-underline">What happens when someone claims?</strong></a>
-                                                </div>                             
-                                            </div>
-
-                                            <div class="claim-options">
-                                                <div class="h4 text-blue"><strong>What if</strong></div>
-
-
-                                                <div class="list-group claim-options-list"
-                                                     data-cashback-target="#cashback-text">
-                                                    <button 
-                                                        type="button" 
-                                                        class="list-group-item active"
-                                                        data-claim-option="0"
-                                                        data-cashback-text="Cashback if no one claims">
-                                                        No claim
-                                                    </button>
-                                                    <button 
-                                                        type="button" 
-                                                        class="list-group-item"
-                                                        data-claim-option="1"
-                                                        data-cashback-text="Cashback if I make a claim">
-                                                        I make a claim
-                                                    </button>
-                                                    <button 
-                                                        type="button" 
-                                                        class="list-group-item"
-                                                        data-claim-option="2"
-                                                        data-cashback-text="Cashback if 1 claim in my network">
-                                                        1 claim in my network
-                                                    </button>
-                                                    <button 
-                                                        type="button" 
-                                                        class="list-group-item"
-                                                        data-claim-option="3"
-                                                        data-cashback-text="Cashback if 2+ claims in my network">
-                                                        2+ claims in my network
-                                                    </button>
-                                                </div>      
-
-                                                <div class="text-center h5">
-                                                    <a id="what-if-return" href="#"><strong class="text-underline">Return to premium comparison</strong></a>
-                                                </div> 
-                                            </div>       
-                                        </div>
-                                        <div class="text-center">
-                                            <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-play-right" href="#" data-toggle="modal" data-target="#modal-fullscreen"><small class="text-underline">Video of how it works</i></small></a>
-                                        </div>                                         
-                                    </div>
+                                                 
                                 </div>                                
                             </div>
                         </div>
                     </div>  
+
+
+                    <h3>Policy Info</h3>
 
                     <div class="panel panel-default">
                         <div class="panel-heading" id="headingThree" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
