@@ -77,4 +77,38 @@ $(function(){
         shareIn: 'popup',
         showCount: false,
     });
+
+    // Rollover control
+    // var connection = $('.coffee-stamp');
+    // var claim      = $('.coffee-stamp').data('has-claim');
+
+    $('.coffee-stamp').each(function(){
+
+        var hasClaim = $(this).data('has-claim');
+
+        if(hasClaim == true) {
+            
+            console.log('Claims');
+            $(this).popover('hide');
+        
+        } else {
+
+            console.log('No Claims');
+            $(this).popover();
+
+        }
+
+    });
+
+
+    // if ($('.coffee-stamp').each().data('has-claim', 'false')) {
+
+    //     console.log('No claims');
+
+    // } else {
+
+    //     console.log('Claimed');
+    
+    // }
+
 });

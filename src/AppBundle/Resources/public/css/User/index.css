@@ -116,11 +116,19 @@ h3 {
 }
 
 .coffee-stamp {
-/*    display: inline-block;
-    width: 70px; height: 70px;
-    background-color: #8B97B5;*/
+    display: inline-block;
     width: 70px; height: 70px;
     margin-bottom: 15px;
+
+    cursor: pointer;
+}
+
+.coffee-stamp-add {
+    display: inline-block;
+    width: 70px; height: 70px;
+    margin-bottom: 15px;
+
+    cursor: pointer;
 }
 
 /* PUT SOMEWHERE ELSE EVENTUALLY */

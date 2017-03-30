@@ -8,7 +8,7 @@
     'components/clipboard/clipboard.min.js'
     'components/jssocials/jssocials.min.js'
     'components/jquery-circle-progress/circle-progress.min.js'
-    'bundles/app/js/User/index.js' %}
+    '@AppBundle/Resources/public/js/User/index.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
@@ -54,18 +54,23 @@
                         <ul class="list-inline">
                             {% for connection in policy.standardConnections %}
                             <li>
-                                <img src="{{ connection.linkedUser.getImageUrlFallback }}" title="{{ connection.linkedUser.name }} – Connected on {{ connection.date|date('d M') }} (£{{ connection.value|number_format(2, '.', ',')  }})" alt="{{ connection.linkedUser.name }}" class="img-circle coffee-stamp">
+                                <img src="{{ connection.linkedUser.getImageUrlFallback }}" 
+                                title="{{ connection.linkedUser.name }}" 
+                                alt="{{ connection.linkedUser.name }}" class="img-circle coffee-stamp" 
+                                data-has-claim="true"
+                                data-container="body" 
+                                data-toggle="popover" 
+                                data-trigger="hover"
+                                data-placement="top" 
+                                data-content="Connected on {{ connection.date|date('dS M') }} (£{{ connection.value|number_format(2, '.', ',')  }})">
                             </li>
                             {% endfor %}
                             {% if policy.canInvite %}
                             <li>
-                                <a href="#" id="connect-with"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp"></a>
+                                <a href="#" id="connect-with"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
                             </li>
                             {% endif %}
                         </ul>
-                       {#  {% if policy.canInvite %}
-                            <a href="#" id="connect-with" class="btn btn-primary btn-rounded"><i class="fa fa-plus fa-lg"></i> New connection</a>
-                        {% endif %} #}
                     </div>
 
                     {% if policy.canInvite %}
