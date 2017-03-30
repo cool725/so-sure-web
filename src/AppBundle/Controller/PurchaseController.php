@@ -47,6 +47,7 @@ use AppBundle\Exception\InvalidImeiException;
 use AppBundle\Exception\ImeiBlacklistedException;
 use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\RateLimitException;
+use AppBundle\Exception\ProcessedException;
 
 /**
  * @Route("/purchase")
@@ -475,8 +476,8 @@ class PurchaseController extends BaseController
                     Payment::SOURCE_WEB,
                     JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
                 );
-            } catch (\DomainException $e) {
-                if (!$policy->isValidPolicy()) {
+            } catch (ProcessedException $e) {
+                if (!$policy->isValidPolicy($policy->getPolicyPrefix($this->getParameter('kernel.environment')))) {
                     throw $e;
                 }
                 $this->get('logger')->warning(sprintf(

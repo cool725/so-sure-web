@@ -24,6 +24,7 @@ use AppBundle\Event\PaymentEvent;
 
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\PaymentDeclinedException;
+use AppBundle\Exception\ProcessedException;
 
 class JudopayService
 {
@@ -383,7 +384,7 @@ class JudopayService
         $repo = $this->dm->getRepository(JudoPayment::class);
         $exists = $repo->findOneBy(['receipt' => $transactionDetails["receiptId"]]);
         if ($exists) {
-            throw new \DomainException(sprintf(
+            throw new ProcessedException(sprintf(
                 "Receipt %s has already been used to pay for a policy",
                 $transactionDetails['receiptId']
             ));
