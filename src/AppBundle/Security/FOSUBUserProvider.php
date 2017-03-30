@@ -61,8 +61,8 @@ class FOSUBUserProvider extends BaseClass
             $user->$setter_token($this->getLongLivedAccessToken($response));
 
             $user->setEmail($response->getEmail());
-            $user->setFirstName($response->getFirstName());
-            $user->setLastName($response->getLastName());
+            $user->setFirstName(explode(' ', $response->getFirstName())[0]);
+            $user->setLastName(explode(' ', $response->getLastName())[0]);
             $user->setEnabled(true);
 
             $this->userManager->updateUser($user);
