@@ -56,4 +56,13 @@ $(function(){
         }, 1500);
     });
 
+    $('#faq-calculator').click(function(event) {
+
+        event.preventDefault();
+
+        $('html, body').animate({
+            scrollTop: $('#cashback-card').offset().top
+        }, 1500);
+    });    
+
 });
