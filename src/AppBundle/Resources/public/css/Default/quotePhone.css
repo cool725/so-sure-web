@@ -193,10 +193,10 @@ body {
 }
 
 /* Email Modal */
-.input-group .form-control {
+.input-group .form-control.input-lg {
     border: 2px solid #efefef;
-    border-top-left-radius: 2px !important;
-    border-bottom-left-radius: 2px !important;
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
     box-shadow: none;
 }
 
