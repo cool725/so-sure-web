@@ -65,4 +65,12 @@ $(function(){
         }, 1500);
     });    
 
+    $('.panel-heading').click(function(event) {
+        
+        event.preventDefault();
+
+        $(this).toggleClass('panel-open');
+        $('.panel-open').not(this).removeClass('panel-open');
+    });
+
 });

@@ -867,6 +867,8 @@ ul li.h3 {
 
 .panel-default > .panel-heading {
     background-color: #efefef;
+    position: relative;
+    padding-right: 15px;
 }
 
 .panel-default > .panel-heading h4 {
@@ -879,6 +881,29 @@ ul li.h3 {
 .panel-default > .panel-heading:focus {
     background-color: #ddd;
 }
+
+.panel-heading:after {
+    font-family: FontAwesome;
+    content: '\f054';        
+    position: absolute;
+    top: 10px; right: 10px;
+}
+
+.panel-heading.panel-open:after {
+    content: '\f078';
+}
+
+/*.panel-heading.collapsed .accordion-toggle:after {
+    font-family: FontAwesome;
+    content: '\f054';    
+    content: '\f078';    
+    position: absolute;
+    top: 10px; right: 10px;
+}
+
+.panel-heading .accordion-toggle:after {
+    content: '\f078';
+}*/
 
 /* Video Embed */
 .embed-container { 
