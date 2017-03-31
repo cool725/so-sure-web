@@ -47,6 +47,7 @@ use AppBundle\Exception\InvalidImeiException;
 use AppBundle\Exception\ImeiBlacklistedException;
 use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\RateLimitException;
+use AppBundle\Exception\ProcessedException;
 
 /**
  * @Route("/purchase")
@@ -466,14 +467,24 @@ class PurchaseController extends BaseController
 
             return $this->redirectToRoute('user_card_details');
         } else {
-            $judo->add(
-                $policy,
-                $request->get('ReceiptId'),
-                null,
-                $request->get('CardToken'),
-                Payment::SOURCE_WEB,
-                JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
-            );
+            try {
+                $judo->add(
+                    $policy,
+                    $request->get('ReceiptId'),
+                    null,
+                    $request->get('CardToken'),
+                    Payment::SOURCE_WEB,
+                    JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
+                );
+            } catch (ProcessedException $e) {
+                if (!$policy->isValidPolicy($policy->getPolicyPrefix($this->getParameter('kernel.environment')))) {
+                    throw $e;
+                }
+                $this->get('logger')->warning(sprintf(
+                    'Duplicate re-use of judo receipt. Possible refresh issue, so ignoring and continuing',
+                    ['exception' => $e]
+                ));
+            }
             if ($policy->isInitialPayment()) {
                 return $this->redirectToRoute('user_welcome');
             } else {
