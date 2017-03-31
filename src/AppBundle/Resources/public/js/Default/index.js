@@ -65,6 +65,7 @@ $(function(){
         }, 1500);
     });    
 
+    // Collapse Panels - FAQs
     $('.panel-heading').click(function(event) {
         
         event.preventDefault();
@@ -72,5 +73,9 @@ $(function(){
         $(this).toggleClass('panel-open');
         $('.panel-open').not(this).removeClass('panel-open');
     });
+
+    $('#myCollapsible').on('show.bs.collapse', function () {
+        // do something…
+    })
 
 });
