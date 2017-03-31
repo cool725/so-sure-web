@@ -53,19 +53,25 @@
                 
                 <div class="col-md-4 step">
                     <div class="step-inner">
-                        <h2 class="h1"><span class="text-grey-blue">1</span> Insure</h2>
+                        <h2 class="h1"><span class="text-grey-blue">1</span> Insure 📱</h2>
                         <ul class="list-unstyled landing-list">
                             <li>24/7 live support with next working day replacement or repair.</li>
                             <li>Get protected for loss, theft, accidental damage &amp; out of warranty breakdown.</li>
                             <li>You're covered from the moment you purchase your policy.</li>
                             <li>All this for:</li>
                         </ul>
-                        <span class="h2">£{{ phone_price.monthlyPremiumPrice }} <small>per month</small></span>
+                        <div class="h2">£{{ phone_price.monthlyPremiumPrice }} <small>per month</small></div>
+                        <div class="visible-xs-block">
+                            {{ form_start(buy_form_banner, { 'attr': {'class':'text-center'}}) }}
+                                {{ form_widget(buy_form_banner.buy, {'label': ' Get it now', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-lg'}}) }}
+                                <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
+                            {{ form_end(buy_form_banner)}}                            
+                        </div>                        
                     </div>
                 </div>
                 <div class="col-md-4 step step-blue">
                     <div class="step-inner">
-                        <h2 class="h1"><span class="text-light-blue">2</span> Refer</h2>
+                        <h2 class="h1"><span class="text-light-blue">2</span> Refer 👪</h2>
                         <ul class="list-unstyled landing-list">
                             <li>Connect to friends/family and <strong class="text-white">each receive up to £10</strong> in your individual Reward Pots.</li>
                             <li>Connect up to <strong class="text-white">{{ max_connections }}</strong> people and you’ll get a maximum of <strong class="text-white">£{{ max_pot }}</strong> in your Reward Pot.</li>
@@ -75,16 +81,23 @@
                 </div>
                 <div class="col-md-4 step">
                     <div class="step-inner">
-                        <h2 class="h1"><span class="text-grey-blue">3</span> Save</h2>
+                        <h2 class="h1"><span class="text-grey-blue">3</span> Save 💰</h2>
                         <ul class="list-unstyled landing-list">
-                            <li>Get your reward pot back at the end of your policy year if you and your friend's don't claim.</li>
-                            <li>Enjoy massive savings off of your next year's policy, or get cash back to spend how you want. Every year!</li>
-                            <li><strong>Either way we’re still up to 40% cheaper than traditional insurers.</strong></li>
+                            <li>Your reward pot is paid out to you at the end of your policy year when you and your friend's don't claim.</li>
+                            <li>You choose how your reward pot is paid to you:
+                            </li>
                         </ul>
-                        {{ form_start(buy_form_banner, { 'attr': {'class':'text-center'}}) }}
-                            {{ form_widget(buy_form_banner.buy, {'label': ' Get it now', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-lg'}}) }}
+                        <ul class="landing-list">
+                            <li>Enjoy massive savings off your next year's policy, or</li>
+                            <li>get cash back to spend how you want.</li>
+                        </ul>         
+                        <ul class="list-unstyled landing-list">
+                            <li>Every year you and your friends don’t claim, your reward pot is paid to you.</li>
+                        </ul>                                       
+                        {{ form_start(buy_form, { 'attr': {'class':'text-center'}}) }}
+                            {{ form_widget(buy_form.buy_tablet, {'label': ' Get it now', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-lg'}}) }}
                             <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
-                        {{ form_end(buy_form_banner)}}
+                        {{ form_end(buy_form)}}
                     </div>
                 </div>                                                
 
