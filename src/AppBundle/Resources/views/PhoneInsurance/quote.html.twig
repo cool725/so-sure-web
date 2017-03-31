@@ -37,12 +37,12 @@
     {% stylesheets
     '@AppBundle/Resources/public/css/Default/index.css'
     '@AppBundle/Resources/public/css/Default/quotePhone.css'
-    '@AppBundle/Resources/public/css/Default/bannerSticky.css'    
     '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'    
     '@AppBundle/Resources/public/css/Default/scrollindicator.css'
     '@AppBundle/Resources/public/css/Default/modal.css'    
     '@AppBundle/Resources/public/css/Default/videoOverlay.css'
     '@AppBundle/Resources/public/css/Default/rewardCalculator.css'    
+    '@AppBundle/Resources/public/css/Default/bannerSticky.css'        
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -355,11 +355,13 @@
             </div>
         </div>
     </section>
-    
+
     {% include 'AppBundle::Default/fasterClaims.html.twig' %}
 
     {% include 'AppBundle::Default/saveMoney.html.twig' %}
     
+    {% include 'AppBundle::Default/faqs.html.twig' %}
+        
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
     {% include 'AppBundle::Default/whySoSure.html.twig' %}
