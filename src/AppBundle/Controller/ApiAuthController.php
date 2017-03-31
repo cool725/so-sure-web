@@ -706,7 +706,7 @@ class ApiAuthController extends BaseController
                 'Invalid premium paid',
                 422
             );
-        } catch (\DomainException $e) {
+        } catch (ProcessedException $e) {
             $this->get('logger')->error(sprintf(
                 'Duplicate receipt id %s.',
                 $this->getDataString($judoData, 'receipt_id')
