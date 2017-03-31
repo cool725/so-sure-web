@@ -234,29 +234,27 @@ class PhoneInsuranceController extends BaseController
             } elseif ($request->request->has('lead_form')) {
                 $leadForm->handleRequest($request);
                 if ($leadForm->isValid()) {
-                    $userRepo = $dm->getRepository(User::class);
-                    $user = $userRepo->findOneBy(['emailCanonical' => strtolower($lead->getEmail())]);
-                    if (!$user) {
-                        $userManager = $this->get('fos_user.user_manager');
-                        $user = $userManager->createUser();
-                        $user->setEnabled(true);
-                        $user->setEmail($lead->getEmail());
-                        $dm->persist($user);
+                    $leadRepo = $dm->getRepository(Lead::class);
+                    $existingLead = $leadRepo->findOneBy(['email' => strtolower($lead->getEmail())]);
+                    if (!$existingLead) {
+                        $dm->persist($lead);
                         $dm->flush();
-
-                        $this->get('fos_user.security.login_manager')->loginUser(
-                            $this->getParameter('fos_user.firewall_name'),
-                            $user
-                        );
-                    } elseif (!$this->getUser()) {
-                        // @codingStandardsIgnoreStart
-                        $this->addFlash('warning', sprintf(
-                            "Looks like you already have an account. Please login below to continue with your purchase.  You may need to use the email login and forgot password link."
-                        ));
-                        // @codingStandardsIgnoreEnd
                     }
+                    $sevenDays = new \DateTime();
+                    $sevenDays = $sevenDays->add(new \DateInterval('P7D'));
+                    $mailer = $this->get('app.mailer');
+                    $mailer->sendTemplate(
+                        sprintf('Your saved so-sure quote for %s', $phone),
+                        $lead->getEmail(),
+                        'AppBundle:Email:quote/priceGuarentee.html.twig',
+                        ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')],
+                        'AppBundle:Email:quote/priceGuarentee.txt.twig',
+                        ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')]
+                    );
 
-                    return $this->redirectToRoute('purchase');
+                    $this->addFlash('success', sprintf(
+                        "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
+                    ));
                 } else {
                     $this->addFlash('error', sprintf(
                         "Sorry, didn't quite catch that email.  Please try again."
