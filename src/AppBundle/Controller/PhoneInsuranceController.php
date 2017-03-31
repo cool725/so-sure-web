@@ -242,7 +242,7 @@ class PhoneInsuranceController extends BaseController
                     }
                     $mailer = $this->get('app.mailer');
                     $mailer->sendTemplate(
-                        sprintf('Your guarenteed price for insurance on your %s', $phone),
+                        sprintf('Your saved so-sure quote for %s', $phone),
                         $lead->getEmail(),
                         'AppBundle:Email:quote/priceGuarentee.html.twig',
                         ['phone' => $phone],
