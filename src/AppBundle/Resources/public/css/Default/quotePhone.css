@@ -193,6 +193,12 @@ body {
 }
 
 /* Email Modal */
+.input-group .form-control {
+    border: 2px solid #efefef;
+    border-top-left-radius: 2px !important;
+    border-bottom-left-radius: 2px !important;
+    box-shadow: none;
+}
 
 #play-button {
     position: absolute;

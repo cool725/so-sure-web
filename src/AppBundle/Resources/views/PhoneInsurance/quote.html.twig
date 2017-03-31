@@ -118,26 +118,27 @@
                     </div>
                 </div>
             </div>
-            
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="quote-cost text-center">
-                        {{ form_start(lead_form) }}
-                        <div class="text-center h4">Guarentee this price for the next 7 days!</div>
+                    <div class="quote-card">
                         <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group {% if form_errors(lead_form.email) %}has-error{% endif %}">
-                                        {{ form_label(lead_form.email, 'Your email:', { 'label_attr': {'class': ''} }) }}
-                                        {{ form_widget(lead_form.email, {'attr':{'class':'form-control', 'placeholder': 'e.g. jane.smith@gmail.com'}}) }}
-                                        <div class="help-block with-errors">{{ form_errors(lead_form.email) }}</div>
-                                    </div>
-                                </div>
-                                <div  class="col-sm-6">
-                                    {{ form_widget(lead_form.save, {'label': 'Guarentee Price', 'attr': {'class': 'btn btn-success btn-rounded btn-block'}}) }}
-                                </div>
+                            <div class="col-sm-6 col-md-7">
+                                <h4><strong class="text-dark-grey">Guarentee this price for the next 7 days</strong></h4>
+                            </div>
+                            <div class="col-sm-6 col-md-5">
+                                {{ form_start(lead_form) }}
+                                <div class="input-group {% if form_errors(lead_form.email) %}has-error{% endif %}">
+                                    {{ form_label(lead_form.email, 'Your email:', { 'label_attr': {'class': 'sr-only'} }) }}
+                                    {{ form_widget(lead_form.email, {'attr':{'class':'form-control input-lg', 'placeholder': 'Enter email to save quote'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(lead_form.email) }}</div>
+                                    <span class="input-group-btn">
+                                        {{ form_widget(lead_form.save, {'label': 'Send', 'attr': {'class': 'btn btn-primary btn-lg'}}) }}
+                                    </span>
+                                </div><!-- /input-group -->   
+                                {{ form_end(lead_form) }}                             
+                            </div>
                         </div>
-                        {{ form_end(lead_form) }}
                     </div>
                 </div>
             </div>
