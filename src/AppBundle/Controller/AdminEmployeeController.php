@@ -14,6 +14,8 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Address;
+use AppBundle\Document\Company;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
@@ -839,6 +841,109 @@ class AdminEmployeeController extends BaseController
             'rewards' => $rewards,
             'connectForm' => $connectForm->createView(),
             'rewardForm' => $rewardForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/company", name="admin_company")
+     * @Template
+     */
+    public function companyAction(Request $request)
+    {
+        $belongForm = $this->get('form.factory')
+            ->createNamedBuilder('belongForm')
+            ->add('email', EmailType::class)
+            ->add('companyId', HiddenType::class)
+            ->add('next', SubmitType::class)
+            ->getForm();
+
+        $companyForm = $this->get('form.factory')
+            ->createNamedBuilder('companyForm')
+            ->add('name', TextType::class)
+            ->add('address1', TextType::class)
+            ->add('address2', TextType::class)
+            ->add('address3', TextType::class)
+            ->add('city', TextType::class)
+            ->add('postcode', TextType::class)
+            ->add('next', SubmitType::class)
+            ->getForm();
+
+        $dm = $this->getManager();
+        $companyRepo = $dm->getRepository(Company::class);
+        $userRepo = $dm->getRepository(User::class);
+        $companies = $companyRepo->findAll();
+
+        try {
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('belongForm')) {
+                    $belongForm->handleRequest($request);
+                    if ($belongForm->isValid()) {
+                        if ($user = $userRepo->findOneBy([
+                                'emailCanonical' => strtolower($belongForm->getData()['email'])
+                            ])) {
+                            $company = $companyRepo->find($belongForm->getData()['companyId']);
+                            if (!$company) {
+                                throw new \InvalidArgumentException(sprintf(
+                                    'Unable to add user to company. Company is missing',
+                                    $belongForm->getData()['email']
+                                ));
+                            }
+                            $company->addUser($user);
+                            $dm->flush();
+                            $this->addFlash('success', sprintf(
+                                'Added %s to %s',
+                                $user->getName(),
+                                $company->getName()
+                            ));
+
+                            return new RedirectResponse($this->generateUrl('admin_company'));
+                        } else {
+                            throw new \InvalidArgumentException(sprintf(
+                                'Unable to add user to company. %s does not exist as a user',
+                                $belongForm->getData()['email']
+                            ));
+                        }
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add user to company. %s',
+                            (string) $emailForm->getErrors()
+                        ));
+                    }
+                } elseif ($request->request->has('companyForm')) {
+                    $companyForm->handleRequest($request);
+                    if ($companyForm->isValid()) {
+                        $company = new Company();
+                        $company->setName($this->getDataString($companyForm->getData(), 'name'));
+                        $address = new Address();
+                        $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
+                        $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
+                        $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
+                        $address->setCity($this->getDataString($companyForm->getData(), 'city'));
+                        $address->setPostcode($this->getDataString($companyForm->getData(), 'postcode'));
+                        $company->setAddress($address);
+                        $dm->persist($company);
+                        $dm->flush();
+                        $this->addFlash('success', sprintf(
+                            'Added company'
+                        ));
+
+                        return new RedirectResponse($this->generateUrl('admin_company'));
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add company. %s',
+                            (string) $emailForm->getErrors()
+                        ));
+                    }
+                }
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return [
+            'companies' => $companies,
+            'belongForm' => $belongForm->createView(),
+            'companyForm' => $companyForm->createView(),
         ];
     }
 

@@ -7,6 +7,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Company;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Service\SalvaExportService;
@@ -78,6 +79,28 @@ class SalvaExportServiceTest extends WebTestCase
 
         $xml = static::$salva->createXml($policy);
         $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
+        $this->assertGreaterThan(0, stripos($xml, $user->getId()));
+    }
+
+    public function testCreateXmlCompany()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreateXmlCompany', $this),
+            'bar'
+        );
+        $company = new Company();
+        $company->setName('foo');
+        $company->addUser($user);
+        self::$dm->persist($company);
+        self::$dm->flush();
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy);
+
+        $xml = static::$salva->createXml($policy);
+        $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
+        $this->assertGreaterThan(0, stripos($xml, $company->getId()));
     }
 
     public function testNonProdInvalidPolicyQueue()
