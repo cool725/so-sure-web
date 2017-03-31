@@ -240,18 +240,20 @@ class PhoneInsuranceController extends BaseController
                         $dm->persist($lead);
                         $dm->flush();
                     }
+                    $sevenDays = new \DateTime();
+                    $sevenDays = $sevenDays->add(new \DateInterval('P7D'));
                     $mailer = $this->get('app.mailer');
                     $mailer->sendTemplate(
                         sprintf('Your saved so-sure quote for %s', $phone),
                         $lead->getEmail(),
                         'AppBundle:Email:quote/priceGuarentee.html.twig',
-                        ['phone' => $phone],
+                        ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')],
                         'AppBundle:Email:quote/priceGuarentee.txt.twig',
-                        ['phone' => $phone]
+                        ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')]
                     );
 
                     $this->addFlash('success', sprintf(
-                        "Thanks! Your quote is guarenteed now and we'll send you an email confirmation."
+                        "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
                     ));
                 } else {
                     $this->addFlash('error', sprintf(

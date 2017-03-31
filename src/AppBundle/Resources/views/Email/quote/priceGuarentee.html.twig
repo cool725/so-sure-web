@@ -11,17 +11,16 @@
 		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 				You recently visited the so-sure and requested a guaranteed price for insurance on your {{ phone }}.
 				<br><br>
-				Your quote price of £{{ phone.currentPhonePrice.monthlyPremiumPrice }} is guaranteed until {# {{ date }} #}
+				Your quote price of £{{ phone.currentPhonePrice.monthlyPremiumPrice }} is guaranteed until {{ sevenDays|date('d MM Y', 'Europe/London') }}.
 				<br><br>
 				so-sure covers you for Loss, Theft, Accidental Damage, and Out of Warranty Breakdown.
 				<br><br>
-				Next working day replacement or repair, 24/7 live support, & Up to 80% cashback every year!
-				<br><br>
-			    View your quote (button)
+				Next working day replacement or repair, 24/7 live support, & Up to 80% cashback every year.
 				<br><br>
 				If you have any questions, please don't hesitate to
 				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
 		   </div>
 		</div>
 	{{ macros.end_table() }}
+    {{ macros.email_button_table(quoteUrl, "View your quote", "View your quote")}}
 {% endblock %}
