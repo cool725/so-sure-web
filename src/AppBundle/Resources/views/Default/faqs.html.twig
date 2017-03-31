@@ -5,58 +5,188 @@
             <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 
                 <div class="panel-group" id="faq-accordion" role="tablist" aria-multiselectable="true">
-
-                    <h3>Reward Pot</h3>
-
+                    {# Policy #}
+                    <h3>Policy</h3>
                     <div class="panel panel-default">
-                        <div class="panel-heading" id="headingOne" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <div class="panel-heading" 
+                             id="policyOne" 
+                             role="button" 
+                             data-toggle="collapse" 
+                             data-parent="#faq-accordion" 
+                             href="#collapseOne" 
+                             aria-expanded="true" 
+                             aria-controls="collapseOne">
                             <h4 class="panel-title">
-                                How does the Reward Pot work?
+                                What are your policy terms and conditions?
                             </h4>
                         </div>
-                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policyOne">
                             <div class="panel-body">
-                                <p>Simplest way to explain the Reward Pot is a “group no claims bonus”. We give you the chance to connect with friends and family. For each one that buys insurance with us and connects with you, we'll add up to £10 to both you and your friend/family member’s Reward Pots. Your Reward Pot for the  {{ phone }} can reach up to £{{ max_pot }} (e.g. 80% of your annual policy price). If neither you nor your friends/family claim in the year, we will payout to you the value in the Reward Pot. Click here to explore our calculator that can show you all the various scenarios.</p>
-
-                                <p>We recommend watching this short video which explains it further.</p>                         
-                                <div class="embed-container">
-                                    <iframe src="https://player.vimeo.com/video/185840373" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>    
-                                </div>       
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="panel panel-default">
-                        <div class="panel-heading" id="headingTwo" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                            <h4 class="panel-title">
-                                What happens to my Reward Pot, if one person in my group claims?
-                            </h4>
-                        </div>
-                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                            <div class="panel-body">
-                                <p>We’ve created a calculator to illustrate this. Click here to explore various scenarios.</p>
-                                <div class="col-sm-8 col-md-6">
-                                                 
-                                </div>                                
+                                Click <a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="text-underline">here</a> to view the full terms &amp; conditions of the policy.                    
                             </div>
                         </div>
                     </div>  
-
-
-                    <h3>Policy Info</h3>
-
                     <div class="panel panel-default">
-                        <div class="panel-heading" id="headingThree" role="button" data-toggle="collapse" data-parent="#faq-accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                        <div class="panel-heading" 
+                             id="policyTwo" 
+                             role="button" 
+                             data-toggle="collapse" 
+                             data-parent="#faq-accordion" 
+                             href="#collapseTwo" 
+                             aria-expanded="true" 
+                             aria-controls="collapseTwo">
                             <h4 class="panel-title">
-                                Is there a minimum or maximum size of my Reward Pot group?
+                                What is covered and what is not covered by the policy?
                             </h4>
                         </div>
-                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policyTwo">
                             <div class="panel-body">
-                                <p>There is no minimum size of your Reward Pot group: you can decide not to connect to anyone and still enjoy the benefits of a fully insured phone, but then you won’t get up to 80% of your money back at the end of the year. The {{ phone }} is limited to a maximum of {{ max_connections }} Reward Pot connections. If you have {{ max_connections }} connections and none of you claim, you can get  back at the end of your policy year, every year you have a so-sure policy.</p>         
+                                We believe that trust starts by us being clear with you about what is covered and what is not covered under your policy. If you have a valid claim we will pay and will not try to hide behind the small print unlike some of our competitors would do.
+                                <h4 class="text-underline">What is covered?</h4>
+                                <ul>
+                                    <li>Theft of your mobile phone</li>
+                                    <li>Accidental Damage to your mobile phone</li>
+                                    <li>Outside of warranty breakdown (including faults) of your mobile phone</li>
+                                    <li>Loss of your mobile phone</li>
+                                    <li>up to £1,000 of unauthorised network changes related to approved loss or theft claim, as long as your network was notified within 24hrs of the loss or theft</li>
+                                    <li>Accessory claims (up to £100 including VAT) related to approved loss or theft claim</li>
+                                    <li>We aim to replace or repair your phone the next working day.</li>
+                                </ul>
+                                <h4 class="text-underline">What is not covered?</h4>
+                                <ul>
+                                    <li>Excess: You need to pay a contribution every time you make a successful claim. Excess amount is £50 except for loss and theft where the excess is £70.</li>
+                                    <li>You are limited to us paying two valid claims for loss and/or theft in any one policy year</li>
+                                    <li>Theft, loss, accidental damage or breakdown where you have knowingly put your mobile phone at risk and/or you have not taken care of it.  What we mean here is you must take care of your property and we ask you to use common sense in taking care of it. If in doubt ask yourself “Would I have left a pile of £500 in cash there and expect to find it when I return?” If the answer is no, then you should not leave your phone there either. Of course, we will take in consideration the specifics of your situation as, after all, we are here to have your back if a misfortune happens.</li>
+                                </ul>
+                                For further details on all of the above, please refer to the full <a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="text-underline">policy terms and conditions</a>
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="panel panel-default">
+                        <div class="panel-heading" 
+                             id="policyThree" 
+                             role="button" 
+                             data-toggle="collapse" 
+                             data-parent="#faq-accordion" 
+                             href="#collapseThree" 
+                             aria-expanded="true" 
+                             aria-controls="collapseThree">
+                            <h4 class="panel-title">
+                                Do you have a phone number?
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policyThree">
+                            <div class="panel-body">
+                                Our claims team can be reached 24/7 on <a href="tel:0344 856 0852">0344 856 0852</a>. If you wish to inquire about anything else, email us on <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> providing your contact details and someone from the team will call you back.                   
                             </div>
                         </div>
                     </div>    
+                    <div class="panel panel-default">
+                        <div class="panel-heading" 
+                             id="policyFour" 
+                             role="button" 
+                             data-toggle="collapse" 
+                             data-parent="#faq-accordion" 
+                             href="#collapseFour" 
+                             aria-expanded="true" 
+                             aria-controls="collapseFour">
+                            <h4 class="panel-title">
+                                How much is excess?
+                            </h4>
+                        </div>
+                        <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policyFour">
+                            <div class="panel-body">
+                                Our excess is as follows:
+                                <ul>
+                                   <li>- £50 for Accidental Damage and Breakdown</li>
+                                   <li>- £70 for Theft and Loss</li>
+                               </ul>               
+                            </div>
+                        </div>
+                    </div>      
+                    <div class="panel panel-default">
+                        <div class="panel-heading" 
+                             id="policyFive" 
+                             role="button" 
+                             data-toggle="collapse" 
+                             data-parent="#faq-accordion" 
+                             href="#collapseFive" 
+                             aria-expanded="true" 
+                             aria-controls="collapseFive">
+                            <h4 class="panel-title">
+                                Do you cover tablets/gadgets/watches?
+                            </h4>
+                        </div>
+                        <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policyFive">
+                            <div class="panel-body">
+                                Sorry, we only insure mobile phones at the moment. But watch this space.              
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" 
+                             id="policySix" 
+                             role="button" 
+                             data-toggle="collapse" 
+                             data-parent="#faq-accordion" 
+                             href="#collapseSix" 
+                             aria-expanded="true" 
+                             aria-controls="collapseSix">
+                            <h4 class="panel-title">
+                                I bought a used phone / I was given a phone. Are you able to insure it?
+                            </h4>
+                        </div>
+                        <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policySix">
+                            <div class="panel-body">
+                                Yes we are able to insure second-hand phones provided they are in full working condition, without any damage, and less than 3 years old.              
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" 
+                             id="policySeven" 
+                             role="button" 
+                             data-toggle="collapse" 
+                             data-parent="#faq-accordion" 
+                             href="#collapseSeven" 
+                             aria-expanded="true" 
+                             aria-controls="collapseSeven">
+                            <h4 class="panel-title">
+                                Do you have a discount for annual payments?
+                            </h4>
+                        </div>
+                        <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policySeven">
+                            <div class="panel-body">
+                                Our Reward Pot allow us to give you the best possible pricing, so we do not provide annual discounts.             
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" 
+                             id="policyEight" 
+                             role="button" 
+                             data-toggle="collapse" 
+                             data-parent="#faq-accordion" 
+                             href="#collapseEight" 
+                             aria-expanded="true" 
+                             aria-controls="collapseEight">
+                            <h4 class="panel-title">
+                                I'm paying monthly. How and when will I be charged?
+                            </h4>
+                        </div>
+                        <div id="collapseEight" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policyEight">
+                            <div class="panel-body">
+                                We will automatically bill you every month using the same credit/debit card you purchased the policy with. We use the same day of the month as when you purchased your policy, i.e. 16th of every month (except for the 29th, 30th, or 31st, where we will bill you on the 28th).   
+                            </div>
+                        </div>
+                    </div>                                                                                                                                                        
+                    {# End Policy #}
+                    {# Reward Pot #}
+
+                    {# End Reward Pot #}
+                    {# Claims #}
+
+                    {# End Claims #}                    
                 </div>
 
             </div>
