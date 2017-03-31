@@ -1,6 +1,5 @@
 function sosuretrack(name, callback) {
     var url = '/ops/track/' + name;
-    // console.log(name);
     $.get(url, callback);
 }
 
@@ -8,13 +7,11 @@ $(function(){
     $('.sosure-track').on('click', function(event) {
         event.preventDefault();
         var name = $(this).data('event');
-        var url = $(this).data('event-url');
-        if ($(this).data('event-url')) {    
-            sosuretrack(name, function() {
+        var url = $(this).data('event-url'); 
+        sosuretrack(name, function() {
+            if (url) {   
                 window.location = url;
-            });
-        } else {
-            sosuretrack(name);
-        }
+            }
+        });
     })
 });
