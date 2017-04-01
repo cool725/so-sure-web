@@ -14,7 +14,12 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
  * make sure to update getType() if adding
- * @MongoDB\DiscriminatorMap({"judo"="JudoPayment","gocardless"="GocardlessPayment","sosure"="SoSurePayment"})
+ * @MongoDB\DiscriminatorMap({
+ *      "judo"="JudoPayment",
+ *      "gocardless"="GocardlessPayment",
+ *      "sosure"="SoSurePayment",
+ *      "bacs"="BacsPayment"
+ * })
  * @Gedmo\Loggable
  */
 abstract class Payment
@@ -29,6 +34,7 @@ abstract class Payment
     const SOURCE_APPLE_PAY = 'apple-pay';
     const SOURCE_ANDROID_PAY = 'android-pay';
     const SOURCE_SOSURE = 'sosure';
+    const SOURCE_BACS = 'bacs';
 
     /**
      * @MongoDB\Id
@@ -41,6 +47,8 @@ abstract class Payment
             return 'judo';
         } elseif ($this instanceof SoSurePayment) {
             return 'sosure';
+        } elseif ($this instanceof BacsPayment) {
+            return 'bacs';
         } else {
             return null;
         }
@@ -147,7 +155,16 @@ abstract class Payment
     protected $notes;
 
     /**
-     * @Assert\Choice({"mobile", "web", "web-api", "token", "apple-pay", "android-pay", "sosure"}, strict=true)
+     * @Assert\Choice({
+     *      "mobile",
+     *      "web",
+     *      "web-api",
+     *      "token",
+     *      "apple-pay",
+     *      "android-pay",
+     *      "sosure",
+     *      "bacs"
+     * }, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -216,6 +233,8 @@ abstract class Payment
                 self::SOURCE_APPLE_PAY
             ])) {
             return "Mobile";
+        } elseif ($this->getSource() == self::SOURCE_BACS) {
+            return "Bacs";
         } else {
             if ($this->getSource()) {
                 return sprintf("Unknown - please ask [Notes: %s]", $this->getSource());
@@ -265,10 +284,7 @@ abstract class Payment
         $this->success = $success;
     }
 
-    public function isSuccess()
-    {
-        return $this->success;
-    }
+    public abstract function isSuccess();
 
     public function calculateSplit()
     {

@@ -30,7 +30,7 @@
                     <td>{{ user.email }} </td>
                     <td>
                         {{ form_start(reset_form) }}
-                        {{ form_widget(reset_form.reset, {'label': 'Sent reset email', 'attr': {'class': 'btn btn-danger'}}) }}
+                        {{ form_widget(reset_form.reset, {'label': 'Send reset email', 'attr': {'class': 'btn btn-danger'}}) }}
                     </td>
                 </tr>
                 <tr>
@@ -61,8 +61,9 @@
                                     {{ policy.policyNumber }}
                                 </a> ({{ policy.status }})
                             {% else %}
-                                {{ policy.id }} (In progress)
+                                <a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.id }} (In progress)</a>
                             {% endif %}
+                            <br />
                         {% endfor %}
                         {% if user.allPolicies|length == 0 %}
                             No policies

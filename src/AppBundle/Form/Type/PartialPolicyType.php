@@ -23,7 +23,7 @@ class PartialPolicyType extends AbstractType
                     }
             ])
             ->add('imei', TextType::class)
-            ->add('serialNumber', TextType::class)
+            ->add('serialNumber', TextType::class, ['required' => false])
             ->add('add', SubmitType::class)
         ;
     }
