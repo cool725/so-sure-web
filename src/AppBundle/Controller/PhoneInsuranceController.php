@@ -251,6 +251,10 @@ class PhoneInsuranceController extends BaseController
                         'AppBundle:Email:quote/priceGuarentee.txt.twig',
                         ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')]
                     );
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
+                    $this->get('app.mixpanel')->queuePersonProperties([
+                        '$email' => $lead->getEmail()
+                    ], true);
 
                     $this->addFlash('success', sprintf(
                         "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
@@ -302,7 +306,8 @@ class PhoneInsuranceController extends BaseController
         $annualPremium = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getYearlyPremiumPrice() : 100;
         $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
 
-        if ($phone->getCurrentPhonePrice()) {
+        // only need to run this once - if its a post, then ignore
+        if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
             $event = MixpanelService::EVENT_QUOTE_PAGE;
             if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
                 $event = MixpanelService::EVENT_LANDING_PAGE;
