@@ -39,7 +39,8 @@ class MixpanelService
     const EVENT_TEST = 'Tracking Test Event';
     const EVENT_INVITATION_PAGE = 'Invitation Page';
     const EVENT_CANCEL_POLICY = 'Cancel Policy';
-    
+    const EVENT_LEAD_CAPTURE = 'Lead Capture';
+
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:380020';
 
