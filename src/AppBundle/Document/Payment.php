@@ -284,7 +284,7 @@ abstract class Payment
         $this->success = $success;
     }
 
-    public abstract function isSuccess();
+    abstract public function isSuccess();
 
     public function calculateSplit()
     {

@@ -467,11 +467,11 @@ class AdminEmployeeController extends BaseController
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
                     $policy->addPayment($bacsPayment);
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            'Added Payment'
-                        );
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Added Payment'
+                    );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
