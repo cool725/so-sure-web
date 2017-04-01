@@ -11,6 +11,13 @@ parameters:
     ses_mailer_password:   ~
     ses_mailer_encryption: ~
 
+    sparkpost_mailer_transport:  smtp
+    sparkpost_mailer_host:       smtp.sparkpostmail.com
+    sparkpost_mailer_port:       587
+    sparkpost_mailer_user:       SMTP_Injection
+    sparkpost_mailer_password:   ~
+    sparkpost_mailer_encryption: tls
+
     blue_mailer_transport:  smtp
     blue_mailer_host:       127.0.0.1
     blue_mailer_port:       25
