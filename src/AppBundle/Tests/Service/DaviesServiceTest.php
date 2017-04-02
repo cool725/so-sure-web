@@ -381,7 +381,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
-        $daviesClaim->incurred = 0.68;
+        $daviesClaim->incurred = 6.68;
         $daviesClaim->unauthorizedCalls = 1.01;
         $daviesClaim->accessories = 1.03;
         $daviesClaim->phoneReplacementCost = 1.07;
