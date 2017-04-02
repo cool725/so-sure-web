@@ -132,8 +132,9 @@ class DaviesClaim
             return null;
         }
 
+        // phone replacement cost now excludes excess
         $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost +
-            $this->transactionFees + $this->handlingFees + $this->reciperoFee - $this->excess;
+            $this->transactionFees + $this->handlingFees + $this->reciperoFee;
 
         return $this->toTwoDp($total);
     }
