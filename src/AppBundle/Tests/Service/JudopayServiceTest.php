@@ -225,10 +225,16 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
+        static::$policyService->setEnvironment('prod');
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
+        static::$policyService->setEnvironment('test');
 
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy->getStatus());
+        $this->assertGreaterThan(5, strlen($updatedPolicy->getPolicyNumber()));
     }
 
     public function testJudoCommission()
@@ -245,7 +251,9 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
+        static::$policyService->setEnvironment('prod');
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
+        static::$policyService->setEnvironment('test');
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
@@ -265,7 +273,9 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
+        static::$policyService->setEnvironment('prod');
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
+        static::$policyService->setEnvironment('test');
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
@@ -302,7 +312,9 @@ class JudopayServiceTest extends WebTestCase
             '12/20',
             '452'
         );
+        static::$policyService->setEnvironment('prod');
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
+        static::$policyService->setEnvironment('test');
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
