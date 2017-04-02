@@ -62,6 +62,7 @@ use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
+use AppBundle\Form\Type\UserDetailType;
 use AppBundle\Exception\RedirectException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -515,6 +516,9 @@ class AdminEmployeeController extends BaseController
             ->createNamedBuilder('reset_form')
             ->add('reset', SubmitType::class)
             ->getForm();
+        $userDetailForm = $this->get('form.factory')
+            ->createNamedBuilder('user_detail_form', UserDetailType::class, $user)
+            ->getForm();
 
         $policyData = new SalvaPhonePolicy();
         $policyForm = $this->get('form.factory')
@@ -554,7 +558,7 @@ class AdminEmployeeController extends BaseController
                             'Imei is invalid, lost, or duplicate'
                         );
 
-                        return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
+                        return $this->redirectToRoute('admin_user', ['id' => $id]);
                     }
 
                     // TODO: run checkmend
@@ -575,7 +579,18 @@ class AdminEmployeeController extends BaseController
                         'Partial policy was added'
                     );
 
-                    return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
+            } elseif ($request->request->has('user_detail_form')) {
+                $userDetailForm->handleRequest($request);
+                if ($userDetailForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Update User'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
             }
         }
@@ -584,6 +599,7 @@ class AdminEmployeeController extends BaseController
             'user' => $user,
             'reset_form' => $resetForm->createView(),
             'policy_form' => $policyForm->createView(),
+            'user_detail_form' => $userDetailForm->createView(),
         ];
     }
 
