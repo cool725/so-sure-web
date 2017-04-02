@@ -294,6 +294,16 @@ class DaviesService
     public function saveClaims($key, array $daviesClaims)
     {
         $success = true;
+        $claims = [];
+        foreach ($daviesClaims as $daviesClaim) {
+            if (isset($claims[$daviesClaim->policyNumber]) && $claims[$daviesClaim->policyNumber]) {
+                throw new \Exception(sprintf(
+                    'There are multiple open claims against policy %s',
+                    $daviesClaim->policyNumber
+                ));
+            }
+            $claims[$daviesClaim->policyNumber] = $daviesClaim->isOpen();
+        }
         foreach ($daviesClaims as $daviesClaim) {
             try {
                 $this->saveClaim($daviesClaim);
@@ -537,21 +547,25 @@ class DaviesService
     public function updatePolicy(Claim $claim, DaviesClaim $daviesClaim)
     {
         $policy = $claim->getPolicy();
-        // We've replaced their phone with a new imei number
-        if ($claim->getReplacementImei() &&
-            $claim->getReplacementImei() != $policy->getImei()) {
-            // Imei has changed, but we can't change their policy premium, which is fixed
-            $policy->setImei($claim->getReplacementImei());
-            // If phone has been updated (unlikely at the moment)
-            if ($claim->getReplacementPhone()) {
-                $policy->setPhone($claim->getReplacementPhone());
+        // Closed claims should not replace the imei as if there are multiple claims
+        // for a policy it will trigger a salva policy update
+        if ($claim->isOpen()) {
+            // We've replaced their phone with a new imei number
+            if ($claim->getReplacementImei() &&
+                $claim->getReplacementImei() != $policy->getImei()) {
+                // Imei has changed, but we can't change their policy premium, which is fixed
+                $policy->setImei($claim->getReplacementImei());
+                // If phone has been updated (unlikely at the moment)
+                if ($claim->getReplacementPhone()) {
+                    $policy->setPhone($claim->getReplacementPhone());
+                }
+                $this->mailer->sendTemplate(
+                    sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
+                    'tech@so-sure.com',
+                    'AppBundle:Email:davies/checkPhone.html.twig',
+                    ['policy' => $policy, 'daviesClaim' => $daviesClaim]
+                );
             }
-            $this->mailer->sendTemplate(
-                sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
-                'tech@so-sure.com',
-                'AppBundle:Email:davies/checkPhone.html.twig',
-                ['policy' => $policy, 'daviesClaim' => $daviesClaim]
-            );
         }
 
         if ($claim->getReplacementImei() && !$claim->getReplacementReceivedDate()) {
