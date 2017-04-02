@@ -27,23 +27,23 @@ class UserDetailType extends AbstractType
         $hasActivePolicy = $builder->getData()->hasActivePolicy();
         $builder
             ->add('birthday', DateType::class, [
-                    'attr' => [
-                        'readonly' => $hasActivePolicy,
-                        'disabled' => $hasActivePolicy
-                    ],
-                  'years' => $years,
+                'attr' => [
+                    'readonly' => $hasActivePolicy,
+                    'disabled' => $hasActivePolicy
+                ],
+                'years' => $years,
             ])
             ->add('mobileNumber', TextType::class, [
-                    'attr' => [
-                        'readonly' => $hasActivePolicy,
-                        'disabled' => $hasActivePolicy
-                    ]
+                'attr' => [
+                    'readonly' => $hasActivePolicy,
+                    'disabled' => $hasActivePolicy
+                ]
             ])
             ->add('update', SubmitType::class, [
-                    'attr' => [
-                        'readonly' => $hasActivePolicy,
-                        'disabled' => $hasActivePolicy
-                    ]
+                'attr' => [
+                    'readonly' => $hasActivePolicy,
+                    'disabled' => $hasActivePolicy
+                ]
             ])
         ;
     }
