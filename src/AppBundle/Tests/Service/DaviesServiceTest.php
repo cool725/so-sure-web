@@ -81,6 +81,7 @@ class DaviesServiceTest extends WebTestCase
         $claimB = new Claim();
         $claimB->setReplacementPhone(self::$phoneB);
         $claimB->setReplacementImei($imeiNew);
+        $claimB->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claimB);
 
         $daviesB = new DaviesClaim();
