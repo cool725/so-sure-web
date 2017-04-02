@@ -214,8 +214,7 @@ class JudopayService
 
             $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $source, $deviceDna, $date);
 
-            $this->policyService->create($policy, $date);
-            $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+            $this->policyService->create($policy, $date, true);
             $this->dm->flush();
         } else {
             // Existing policy - add payment + prevent duplicate billing
@@ -1095,8 +1094,7 @@ class JudopayService
 
         $this->tokenPay($policy, $amount);
 
-        $this->policyService->create($policy, $date);
-        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $this->policyService->create($policy, $date, true);
         $this->dm->flush();
 
         $this->statsd->endTiming("judopay.multipay");
