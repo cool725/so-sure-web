@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
+use AppBundle\Document\BacsPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
@@ -891,5 +892,36 @@ class PolicyServiceTest extends WebTestCase
         $policyRepo = $dm->getRepository(Policy::class);
         $updatedPolicy = $policyRepo->find($policyExpire->getId());
         $this->assertEquals(Policy::STATUS_CANCELLED, $updatedPolicy->getStatus());
+    }
+
+    public function testCreatePolicyBacs()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePolicyBacs', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm)
+        );
+
+        $bacs = new BacsPayment();
+        $bacs->setAmount($policy->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $policy->addPayment($bacs);
+        static::$dm->flush();
+
+        static::$policyService->setDispatcher(null);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, null, true);
+        static::$policyService->setEnvironment('test');
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(0, count($updatedPolicy->getScheduledPayments()));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertEquals(Policy::PLAN_YEARLY, $policy->getPremiumPlan());
     }
 }

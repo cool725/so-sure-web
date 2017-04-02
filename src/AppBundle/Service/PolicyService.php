@@ -327,7 +327,7 @@ class PolicyService
         }
     }
 
-    public function create(Policy $policy, \DateTime $date = null)
+    public function create(Policy $policy, \DateTime $date = null, $setActive = false)
     {
         $this->statsd->startTiming("policy.create");
         $user = $policy->getUser();
@@ -377,6 +377,9 @@ class PolicyService
             $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
         }
 
+        if ($setActive) {
+            $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        }
         $this->statsd->endTiming("policy.create");
 
         return true;

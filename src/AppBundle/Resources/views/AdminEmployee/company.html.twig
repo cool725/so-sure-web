@@ -25,13 +25,16 @@
     <table class="table table-stripped">
         <tr>
             <th>Name</th>
-            <th>Number Employees</th>
+            <th>Employees</th>
             <th></th>
         </tr>
         {% for company in companies %}
             <tr>
                 <td>{{ company.name }}</td>
-                <td>{{ company.users|length }}</td>
+                <td>{% for user in company.users %}
+                    <a href="{{ path('admin_user', {'id': user.id })}}">{{ user.email }}</a>
+                    {% endfor %}
+                </td>
                 <td>
                     <button type="button" class="btn btn-info" data-company-name="{{ company.name }}" data-company-id="{{ company.id }}" data-toggle="modal" data-target="#belongModal"
                     ><i class="fa fa-plus"></i> Add User To Company</button>                    

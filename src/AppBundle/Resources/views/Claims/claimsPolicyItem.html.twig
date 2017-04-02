@@ -457,7 +457,7 @@
                             {{ policy.user.facebookId }}
                       {% else %}
                           Not present
-                      {% endif %}  
+                      {% endif %}
                       {{ form_start(facebook_form, {'attr': {'class': 'form-inline'}}) }}
                       {{ form_widget(facebook_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-danger confirm-facebook-clear'}}) }}
                       {{ form_end(facebook_form) }}
@@ -481,6 +481,13 @@
                                 {{ key }} - {{ value|json_encode }}
                             </ul>
                         {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Record BACS Payment</td>
+                    <td>
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bacsModal"
+                            >Record BACS Payment</button>
                     </td>
                 </tr>
             </table>
@@ -516,6 +523,8 @@
                                 <i class="fa fa-credit-card" title="JudoPay"></i>
                             {% elseif payment.type == 'sosure' %}
                                 <i class="fa fa-smile-o"" title="so-sure Credit/Debit"></i>
+                            {% elseif payment.type == 'bacs' %}
+                                <i class="fa fa-bank"" title="BACS"></i>
                             {% else %}
                                 <i class="fa fa-question" title="Type: {{ payment.type }}"></i>
                             {% endif %}
@@ -531,6 +540,8 @@
                                 <i class="fa fa-android" title="Android Payment"></i>
                             {% elseif payment.source == 'sosure' %}
                                 <i class="fa fa-exchange" title="so-sure Auto Payment (not scheduled)"></i>
+                            {% elseif payment.source == 'bacs' %}
+                                <i class="fa fa-bank" title="BACS"></i>
                             {% else %}
                                 <i class="fa fa-question" title="Source: {{ payment.source }}"></i>
                             {% endif %}
@@ -616,3 +627,45 @@
     </div>
 
 {% include 'AppBundle::Claims/claimsModal.html.twig' %}
+
+    <div class="modal fade" id="bacsModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+            {{ form_start(bacs_form )}}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Record Bacs Payment</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">                    
+                    <div class="form-group">
+                        {{ form_label(bacs_form.date) }}
+                        {{ form_errors(bacs_form.date) }}
+                        {{ form_widget(bacs_form.date) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(bacs_form.amount) }}
+                        {{ form_errors(bacs_form.amount) }}
+                        {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(bacs_form.reference) }}
+                        {{ form_errors(bacs_form.reference) }}
+                        {{ form_widget(bacs_form.reference) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(bacs_form.notes) }}
+                        {{ form_errors(bacs_form.notes) }}
+                        {{ form_widget(bacs_form.notes, {'attr': {'placeholder': 'Total amount of bacs transfer'}}) }}
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+                {{ form_widget(bacs_form.save, {'label': 'Save Payment', 'attr': {'class': 'btn btn-success'}}) }}
+          </div>
+            {{ form_end(bacs_form )}}
+        </div>
+      </div>
+    </div>

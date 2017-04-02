@@ -14,6 +14,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
+use AppBundle\Document\BacsPayment;
 use AppBundle\Document\Address;
 use AppBundle\Document\Company;
 use AppBundle\Document\Charge;
@@ -45,6 +46,7 @@ use AppBundle\Document\File\BarclaysFile;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Form\Type\CancelPolicyType;
+use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Form\Type\PhoneType;
@@ -336,6 +338,10 @@ class AdminEmployeeController extends BaseController
         $phoneForm = $this->get('form.factory')
             ->createNamedBuilder('phone_form', PhoneType::class, $policy)
             ->getForm();
+        $bacsPayment = new BacsPayment();
+        $bacsForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_form', BacsType::class, $bacsPayment)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -457,6 +463,18 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('bacs_form')) {
+                $bacsForm->handleRequest($request);
+                if ($bacsForm->isValid()) {
+                    $policy->addPayment($bacsPayment);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Added Payment'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -471,6 +489,7 @@ class AdminEmployeeController extends BaseController
             'phone_form' => $phoneForm->createView(),
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
+            'bacs_form' => $bacsForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -878,31 +897,35 @@ class AdminEmployeeController extends BaseController
                 if ($request->request->has('belongForm')) {
                     $belongForm->handleRequest($request);
                     if ($belongForm->isValid()) {
-                        if ($user = $userRepo->findOneBy([
-                                'emailCanonical' => strtolower($belongForm->getData()['email'])
-                            ])) {
-                            $company = $companyRepo->find($belongForm->getData()['companyId']);
-                            if (!$company) {
-                                throw new \InvalidArgumentException(sprintf(
-                                    'Unable to add user to company. Company is missing',
-                                    $belongForm->getData()['email']
-                                ));
-                            }
-                            $company->addUser($user);
-                            $dm->flush();
-                            $this->addFlash('success', sprintf(
-                                'Added %s to %s',
-                                $user->getName(),
-                                $company->getName()
-                            ));
-
-                            return new RedirectResponse($this->generateUrl('admin_company'));
-                        } else {
+                        $user = $userRepo->findOneBy([
+                            'emailCanonical' => strtolower($belongForm->getData()['email'])
+                        ]);
+                        if (!$user) {
+                            $userManager = $this->get('fos_user.user_manager');
+                            $user = $userManager->createUser();
+                            $user->setEnabled(true);
+                            $user->setEmail($this->getDataString($belongForm->getData(), 'email'));
+                            $dm->persist($user);
+                        }
+                        $company = $companyRepo->find($belongForm->getData()['companyId']);
+                        if (!$company) {
                             throw new \InvalidArgumentException(sprintf(
-                                'Unable to add user to company. %s does not exist as a user',
+                                'Unable to add user to company. Company is missing',
                                 $belongForm->getData()['email']
                             ));
                         }
+                        $company->addUser($user);
+                        if (!$user->getBillingAddress()) {
+                            $user->setBillingAddress($company->getAddress());
+                        }
+                        $dm->flush();
+                        $this->addFlash('success', sprintf(
+                            'Added %s to %s',
+                            $user->getName(),
+                            $company->getName()
+                        ));
+
+                        return new RedirectResponse($this->generateUrl('admin_company'));
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add user to company. %s',
