@@ -1234,9 +1234,6 @@ abstract class Policy
     public function getPremiumPaid($payments = null)
     {
         $paid = 0;
-        if (!$this->isPolicy()) {
-            return 0;
-        }
         if ($payments === null) {
             $payments = $this->getPayments();
         }

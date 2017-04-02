@@ -490,6 +490,15 @@
                             >Record BACS Payment</button>
                     </td>
                 </tr>
+                <tr>
+                    <td>Create Policy</td>
+                    <td>Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
+                    <br>(not necessarily bacs)<br>
+                        {{ form_start(create_form)}}
+                        {{ form_widget(create_form.create, {'attr': {'class': 'btn btn-danger'}})}}
+                        {{ form_end(create_form)}}
+                    </td>
+                </tr>
             </table>
         </div>
       {% endif %}
@@ -645,7 +654,7 @@
                         {{ form_widget(bacs_form.date) }}
                     </div>
                     <div class="form-group">
-                        {{ form_label(bacs_form.amount) }}
+                        {{ form_label(bacs_form.amount) }} (£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }})
                         {{ form_errors(bacs_form.amount) }}
                         {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
                     </div>

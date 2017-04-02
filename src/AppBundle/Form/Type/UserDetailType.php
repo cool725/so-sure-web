@@ -26,6 +26,18 @@ class UserDetailType extends AbstractType
 
         $hasActivePolicy = $builder->getData()->hasActivePolicy();
         $builder
+            ->add('firstName', TextType::class, [
+                'attr' => [
+                    'readonly' => $hasActivePolicy,
+                    'disabled' => $hasActivePolicy
+                ]
+            ])
+            ->add('lastName', TextType::class, [
+                'attr' => [
+                    'readonly' => $hasActivePolicy,
+                    'disabled' => $hasActivePolicy
+                ]
+            ])
             ->add('birthday', DateType::class, [
                 'attr' => [
                     'readonly' => $hasActivePolicy,

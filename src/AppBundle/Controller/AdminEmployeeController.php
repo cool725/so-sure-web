@@ -343,6 +343,10 @@ class AdminEmployeeController extends BaseController
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacsPayment)
             ->getForm();
+        $createForm = $this->get('form.factory')
+            ->createNamedBuilder('create_form')
+            ->add('create', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -476,6 +480,17 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('create_form')) {
+                $createForm->handleRequest($request);
+                if ($createForm->isValid()) {
+                    $policyService->create($policy, null, true);
+                    $this->addFlash(
+                        'success',
+                        'Created Policy'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -491,6 +506,7 @@ class AdminEmployeeController extends BaseController
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
             'bacs_form' => $bacsForm->createView(),
+            'create_form' => $createForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

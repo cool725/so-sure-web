@@ -17,6 +17,14 @@
                     <td></td>
                 </tr>
                 <tr>
+                    <td>Email</td>
+                    <td>{{ user.email }} </td>
+                    <td>
+                        {{ form_start(reset_form) }}
+                        {{ form_widget(reset_form.reset, {'label': 'Send reset email', 'attr': {'class': 'btn btn-danger'}}) }}
+                    </td>
+                </tr>
+                <tr>
                     <td>Name</td>
                     <td>{{ user.name }}
                         {% if is_granted('ROLE_ADMIN') %}
@@ -24,14 +32,8 @@
                         {% endif %}
                     </td>
                     <td>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Email</td>
-                    <td>{{ user.email }} </td>
-                    <td>
-                        {{ form_start(reset_form) }}
-                        {{ form_widget(reset_form.reset, {'label': 'Send reset email', 'attr': {'class': 'btn btn-danger'}}) }}
+                            <button type="button" class="btn btn-info {% if user.hasActivePolicy %}disabled{% endif %}" data-toggle="modal" data-target="#userDetailModal"
+                               {% if user.hasActivePolicy %}title="Active policy - no changes allowed" disabled{% endif %} ><i class="fa fa-edit"></i> Edit User Details</button>                        
                     </td>
                 </tr>
                 <tr>
@@ -149,7 +151,17 @@
           </div>
           <div class="modal-body">
             <div class="row">
-                <div class="col-md-12">                    
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(user_detail_form.firstName) }}
+                        {{ form_errors(user_detail_form.firstName) }}
+                        {{ form_widget(user_detail_form.firstName) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(user_detail_form.lastName) }}
+                        {{ form_errors(user_detail_form.lastName) }}
+                        {{ form_widget(user_detail_form.lastName) }}
+                    </div>
                     <div class="form-group">
                         {{ form_label(user_detail_form.birthday) }}
                         {{ form_errors(user_detail_form.birthday) }}
