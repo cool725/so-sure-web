@@ -309,6 +309,7 @@ class AdminEmployeeController extends BaseController
         $policyService = $this->get('app.policy');
         $fraudService = $this->get('app.fraud');
         $imeiService = $this->get('app.imei');
+        $invitationService = $this->get('app.invitation');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
@@ -346,6 +347,11 @@ class AdminEmployeeController extends BaseController
         $createForm = $this->get('form.factory')
             ->createNamedBuilder('create_form')
             ->add('create', SubmitType::class)
+            ->getForm();
+        $connectForm = $this->get('form.factory')
+            ->createNamedBuilder('connect_form')
+            ->add('email', EmailType::class)
+            ->add('connect', SubmitType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -491,6 +497,28 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('connect_form')) {
+                $connectForm->handleRequest($request);
+                if ($connectForm->isValid()) {
+                    $invitation = $invitationService->inviteByEmail(
+                        $policy,
+                        $connectForm->getData()['email'],
+                        null,
+                        true
+                    );
+                    $invitationService->accept(
+                        $invitation,
+                        $invitation->getInvitee()->getCurrentPolicy(),
+                        null,
+                        true
+                    );
+                    $this->addFlash(
+                        'success',
+                        'Connected Users'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -507,6 +535,7 @@ class AdminEmployeeController extends BaseController
             'receperio_form' => $receperioForm->createView(),
             'bacs_form' => $bacsForm->createView(),
             'create_form' => $createForm->createView(),
+            'connect_form' => $connectForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

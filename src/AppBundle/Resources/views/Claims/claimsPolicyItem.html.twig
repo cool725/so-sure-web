@@ -499,6 +499,16 @@
                         {{ form_end(create_form)}}
                     </td>
                 </tr>
+                <tr>
+                    <td>Connect Users</td>
+                    <td>
+                        {{ form_start(connect_form)}}
+                        {{ form_widget(connect_form.email, {'attr': {'placeholder':'Email'}})}}
+                        {{ form_widget(connect_form.connect, {'attr': {'class': 'btn btn-danger'}})}}<br>
+                        <i>Email must exist and have a valid policy.</i>
+                        {{ form_end(connect_form)}}
+                    </td>
+                </tr>
             </table>
         </div>
       {% endif %}
