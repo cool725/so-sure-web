@@ -37,63 +37,69 @@ $(function(){
     });
 
     // Connect with
-    $('#connect-with').click(function(event) {
+    // $('#connect-with').click(function(event) {
 
-        event.preventDefault();
+    //     event.preventDefault();
 
-        $('html, body').animate({
-            scrollTop: $('#connect-with-box').offset().top - 100
-        }, 1500);
+    //     $('html, body').animate({
+    //         scrollTop: $('#connect-with-box').offset().top - 100
+    //     }, 1500);
 
-        $('#connect-with-box').addClass('box-border--highlight');
-    });    
+    //     $('#connect-with-box').addClass('box-border--highlight');
+    // });    
 
     // Connect with
-    $('#scode-link').click(function(event) {
+    // $('#scode-link').click(function(event) {
 
-        event.preventDefault();
+    //     event.preventDefault();
 
-        $('html, body').animate({
-            scrollTop: $('#scode-box').offset().top - 100
-        }, 1500);
+    //     $('html, body').animate({
+    //         scrollTop: $('#scode-box').offset().top - 100
+    //     }, 1500);
 
-        $('#scode-box').addClass('box-border--highlight');
-    });    
+    //     $('#scode-box').addClass('box-border--highlight');
+    // });    
     
     // Copy button on scode
-    var clipboard = new Clipboard('.btn-clipboard');
-    $('.btn-clipboard').tooltip({'title':'Copied', 'trigger':'manual'});
+    var clipboard = new Clipboard('.btn-copy');
 
-    clipboard.on('success', function(e) {
-        $('.btn-clipboard').tooltip('show');
-        setTimeout(function() { $('.btn-clipboard').tooltip('hide'); }, 1500);
-    });    
+    $('.btn-copy').tooltip({
+        'title':'Copied', 
+        'trigger':'manual'
+    });
+
+    $('.btn-copy').click(function(e) {
+        e.preventDefault();
+    });
+
+    clipboard.on('success', function(event) {
+        console.log(event);
+        $('.btn-copy').tooltip('show');
+        setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);        
+    });
 
     // Share buttons
     $("#share").jsSocials({
-        shares: ["twitter", "facebook"],
-        url: $('.btn-clipboard').data('clipboard-text'),
-        text: $('.btn-clipboard').data('share-text'),
+        shares: ["twitter", "facebook", "whatsapp", "messenger", "googleplus"],
+        url: $('#modal-connect').data('share-link'),
+        text: $('#modal-connect').data('share-text'),
         shareIn: 'popup',
+        showLabel: false,
         showCount: false,
     });
 
     // Rollover control
-    // var connection = $('.coffee-stamp');
-    // var claim      = $('.coffee-stamp').data('has-claim');
 
     $('.coffee-stamp').each(function(){
 
         var hasClaim = $(this).data('has-claim');
 
         if(hasClaim == true) {
-            
-            console.log('Claims');
+        
             $(this).popover('hide');
         
         } else {
 
-            console.log('No Claims');
             $(this).popover();
 
         }
