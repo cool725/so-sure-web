@@ -97,7 +97,7 @@ $(function(){
         name: 'searchPhones',
         source: searchPhones,
         display: 'name',
-        limit: 30,
+        limit: 100,
     });
 
 
