@@ -16,7 +16,7 @@
     {{ parent() }}
     {% stylesheets
     'components/jssocials/jssocials.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'        
+    '@AppBundle/Resources/public/css/Default/modal.css'
     'components/jssocials/jssocials-theme-minima.css'
     '@AppBundle/Resources/public/css/User/index.css'
     '@AppBundle/Resources/public/css/User/trust.css' %}
@@ -28,20 +28,24 @@
     {% include 'AppBundle:User:userNav.html.twig' %}
 
     <section class="user-homepage--content section--pad">
-        <div class="container">          
-            
+        <div class="container">
+
             <div class="row">
                 <div class="col-sm-7 col-sm-push-5 col-md-8 col-md-push-4">
                     {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
-                    <div class="box-border-grey">
-                        <h4><strong>Invitations</strong></h4>
+                    <h3 class="text-grey-blue">Received Invitaitons</h3>
+                    <div class="bottom-border-grey">
                         {{ form_start(invitation_form, {'attr': { 'class': 'form-inline'}}) }}
-                            <ul>
+                            <ul class="list-unstyled invite-list">
                                 {% for invitation in policy.user.unprocessedReceivedInvitations %}
-                                <li>
-                                    {{ invitation.inviter.name }}
-                                    {{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-primary'}}) }}
-                                    {{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-danger'}}) }}                                    
+                                <li class="clearfix">
+                                    <img src="http://placehold.it/70x70" class="img-circle pull-left" alt="">
+                                    <h4 class="h4 pull-left">{{ invitation.inviter.name }}<br>
+                                    <small>Date</small></h4>
+                                    <ul class="list-inline pull-right">
+                                        <li>{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-danger btn-rounded btn-xs'}}) }}</li>
+                                        <li>{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-success btn-rounded btn-xs'}}) }}</li>
+                                    </ul>
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -49,19 +53,19 @@
                         {{ form_end(invitation_form) }}
                     </div>
                     {% endif %}
-                    <div class="box-border-grey coffee-card">
-                        <h4><strong>My Connections</strong></h4>
+                    <div class="coffee-card bottom-border-grey">
+                        <h3 class="text-grey-blue">My Connections</h3>                        
                         <ul class="list-inline">
                             {% for connection in policy.standardConnections %}
                             <li>
-                                <img src="{{ connection.linkedUser.getImageUrlFallback }}" 
-                                title="{{ connection.linkedUser.name }}" 
-                                alt="{{ connection.linkedUser.name }}" class="img-circle coffee-stamp" 
+                                <img src="{{ connection.linkedUser.getImageUrlFallback }}"
+                                title="{{ connection.linkedUser.name }}"
+                                alt="{{ connection.linkedUser.name }}" class="img-circle coffee-stamp"
                                 data-has-claim="false"
-                                data-container="body" 
-                                data-toggle="popover" 
+                                data-container="body"
+                                data-toggle="popover"
                                 data-trigger="hover"
-                                data-placement="top" 
+                                data-placement="top"
                                 data-content="Connected on {{ connection.date|date('dS M') }} (£{{ connection.value|number_format(2, '.', ',')  }})">
                             </li>
                             {% endfor %}
@@ -76,8 +80,8 @@
                     {% if policy.canInvite %}
                     <div class="row">
                         {% if policy.standardSCode.shareLink %}
-                        <div class="col-md-6" >   
-                            <div id="connect-with-box" class="box-border-grey text-center">                         
+                        <div class="col-md-6" >
+                            <div id="connect-with-box" class="box-border-grey text-center">
                                 <h4><strong>Share your invite code</strong></h4>
                                 <form class="form-inline">
 
@@ -88,19 +92,19 @@
                                                     data-clipboard-text="{{ policy.standardSCode.shareLink }}"
                                                     data-clipboard-target="#scode"
                                                     data-share-text="Hey, I've just joined so-sure – better insurance that is up to 80% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: {{ policy.standardSCode.shareLink }}. Add my code after you pay: {{ policy.standardSCode.code }}"
-                                                    data-toggle="tooltip" 
-                                                    data-placement="bottom"     
+                                                    data-toggle="tooltip"
+                                                    data-placement="bottom"
                                                     >
                                                 <i class="fa fa-clipboard"></i>
                                             </a>
                                         </span>
                                     </div>
                                 </form>
-                                <div id="share"></div>  
+                                <div id="share"></div>
 
                                 <div class="text-break text-grey">
                                     <div class="line"></div>OR<div class="line"></div>
-                                </div>   
+                                </div>
                                 <h4><strong>Email an invite!</strong></h4>
                                 <p><small>Just enter their email below and we'll do the rest. Alternatively, open up our app and you can invite them however you'd like.</small></p>
                                 {{ form_start(email_form, {'attr': {'class': ''}}) }}
@@ -109,10 +113,10 @@
                                     {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
                                 </div>
                                 {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}&nbsp;
-                                {{ form_end(email_form) }}                                                       
-                            </div>                  
+                                {{ form_end(email_form) }}
+                            </div>
                         </div>
-                        {% endif %} 
+                        {% endif %}
                         <div class="col-md-6">
                             <div id="scode-box" class="box-border-grey text-center">
                                 <h4><strong>
@@ -120,7 +124,7 @@
                                         {{ scode.policy.user }} has invited you!
                                     {% else %}
                                         Already recevied an invite?
-                                    {% endif %}                                         
+                                    {% endif %}
                                 </strong></h4>
                                 <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
                                 {{ form_start(scode_form, {'attr': {'class': ''}}) }}
@@ -133,15 +137,15 @@
                                         {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
                                     </div>
                                 {{ form_end(scode_form) }}
-                            </div>                             
-                        </div>                        
+                            </div>
+                        </div>
                     </div>
                     {% endif %}
                 </div>
                 <div class="col-sm-5 col-sm-pull-7 col-md-4 col-md-pull-8">
                     <div class="box-border-grey text-center">
                         <h4><strong>My Reward Pot</strong></h4>
-                        <div id="reward-pot-chart" class="circle-chart-container" 
+                        <div id="reward-pot-chart" class="circle-chart-container"
                              data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
                              data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
                              <div class="circle-chart--value">
@@ -155,7 +159,7 @@
                         {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
                     <div class="box-border-grey text-center">
                         <h4><strong>Connection Bonus</strong></h4>
-                        <div id="connection-bonus-chart" class="circle-chart-container" 
+                        <div id="connection-bonus-chart" class="circle-chart-container"
                              data-bonus-days-total="{{ days_total }}"
                              data-bonus-days-remaining="{{ days_left }}">
                              <div class="{% if policy.getCurrentConnectionValues['teaser']|length > 0 %}circle-chart--full{% else %}circle-chart--value{% endif %}">
@@ -165,7 +169,7 @@
                                  <small class="circle-chart--full-value">{{ policy.getCurrentConnectionValues['teaser'] }}</small>
                                 {% endif %}
                              </div>
-                        </div>                        
+                        </div>
                         <p>
                             <small>
                                 {% if policy.getCurrentConnectionValues['description']|length > 0 %}
@@ -174,7 +178,7 @@
                                     Each connection made is worth £10 in the first 2 months and £2 thereafter.
                                 {% endif %}
                             </small>
-                        </p>                        
+                        </p>
                     </div>
                     {% endif %}
                 </div>
@@ -182,15 +186,15 @@
 
         </div>
     </section>
-    
-    
+
+
     {# Page Modals #}
 
-{#     <div class="modal modal-middle fade" 
-         id="scodeModal" 
-         tabindex="-1" 
-         role="dialog" 
-         aria-labelledby="scodeModal" 
+{#     <div class="modal modal-middle fade"
+         id="scodeModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="scodeModal"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -200,7 +204,7 @@
                         <span class="sr-only">Close</span>
                     </button>
                     <h3 class="text-center">
-               
+
                     </h3>
                 </div>
                 <div class="modal-body">
@@ -210,10 +214,10 @@
                 </div>
             </div>
         </div>
-    </div> #}  
+    </div> #}
 
     {# End Page Modals #}
 
-    
+
 
 {% endblock %}

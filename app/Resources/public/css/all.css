@@ -119,6 +119,12 @@ strong {
     position: relative;
 }
 
+/*.bottom-border-grey {
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #efefef;
+}*/
+
 @media (min-width: 340px) {
 
     .box-border-grey { /* TODO // Refactor on quote page */
