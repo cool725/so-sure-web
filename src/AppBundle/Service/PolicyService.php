@@ -352,7 +352,11 @@ class PolicyService
             $this->generateScheduledPayments($policy, $date);
 
             if ($prefix) {
-                $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), $prefix, $date);
+                $policy->create(
+                    $this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID),
+                    $prefix,
+                    $date
+                );
             } else {
                 $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE), null, $date);
             }
