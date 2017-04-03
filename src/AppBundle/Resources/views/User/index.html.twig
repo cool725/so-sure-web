@@ -116,6 +116,7 @@
                         </p>
                     </div>
                     {% endif %}
+                    {% if policy.canInvite %}
                     <div id="scode-box" class="box-border-grey text-center">
                         <h4><strong>
                             {% if scode %}
@@ -137,7 +138,8 @@
                                 <div class="help-block with-errors" id="scode-form-code-err"></div>
                             </div>
                         {{ form_end(scode_form) }}
-                    </div>                    
+                    </div>    
+                    {% endif %}                
                 </div>
             </div>
 
