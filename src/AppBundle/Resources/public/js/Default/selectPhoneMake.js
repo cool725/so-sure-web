@@ -87,6 +87,23 @@ $(function(){
         }
     });
 
+    var delayTimer;
+    function sendSearch(page) {
+        clearTimeout(delayTimer);
+        delayTimer = setTimeout(function() {
+            dataLayer.push({
+              event: 'Search',
+                'GAPage':page
+            });
+            //console.log(page);
+        }, 1000);
+    }
+
+    function searchPhonesWithGa(q, sync) {
+        var page = '/search?q=' + q;
+        sendSearch(page);
+        searchPhones.search(q, sync);
+    }
 
     $('#search-phone').typeahead({
         highlight: true,
@@ -94,8 +111,8 @@ $(function(){
         hint: true,
     }, 
     {
-        name: 'searchPhones',
-        source: searchPhones,
+        name: 'searchPhonesWithGa',
+        source: searchPhonesWithGa,
         display: 'name',
         limit: 100,
     });
