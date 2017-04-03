@@ -93,7 +93,7 @@
                         {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
                         {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
                     <div class="box-border-grey text-center">
-                        <h4><strong>Connection bonus</strong></h4>
+                        <h4><strong>Connection Bonus</strong></h4>
                         <div id="connection-bonus-chart" class="circle-chart-container"
                              data-bonus-days-total="{{ days_total }}"
                              data-bonus-days-remaining="{{ days_left }}">
