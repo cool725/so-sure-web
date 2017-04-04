@@ -91,19 +91,7 @@ $(function(){
     // Rollover control
 
     $('.coffee-stamp').each(function(){
-
-        var hasClaim = $(this).data('has-claim');
-
-        if(hasClaim == true) {
-        
-            $(this).popover('hide');
-        
-        } else {
-
-            $(this).popover();
-
-        }
-
+        $(this).popover();
     });
 
 
