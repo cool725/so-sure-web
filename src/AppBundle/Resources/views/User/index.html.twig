@@ -78,6 +78,30 @@
                     </div>
                 </div>
                 <div class="col-sm-5 col-sm-pull-7 col-md-4 col-md-pull-8">
+                    {% if policy.canInvite %}
+                    <div id="scode-box" class="box-border-grey text-center">
+                        <h4><strong>
+                            {% if scode %}
+                                {{ scode.policy.user }} has invited you!
+                            {% else %}
+                                Already recevied an invite?
+                            {% endif %}
+                        </strong></h4>
+                        <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
+                        {{ form_start(scode_form, {'attr': {'class': ''}}) }}
+                            <div class="form-group">
+                                {{ form_errors(scode_form.scode) }}
+                                <div class="input-group">         
+                                    {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
+                                    <span class="input-group-btn">
+                                        {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
+                                    </span>
+                                </div>
+                                <div class="help-block with-errors" id="scode-form-code-err"></div>
+                            </div>
+                        {{ form_end(scode_form) }}
+                    </div>    
+                    {% endif %}                      
                     <div class="box-border-grey text-center">
                         <h4><strong>Reward Pot</strong></h4>
                         <div id="reward-pot-chart" class="circle-chart-container"
@@ -115,31 +139,7 @@
                             </small>
                         </p>
                     </div>
-                    {% endif %}
-                    {% if policy.canInvite %}
-                    <div id="scode-box" class="box-border-grey text-center">
-                        <h4><strong>
-                            {% if scode %}
-                                {{ scode.policy.user }} has invited you!
-                            {% else %}
-                                Already recevied an invite?
-                            {% endif %}
-                        </strong></h4>
-                        <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
-                        {{ form_start(scode_form, {'attr': {'class': ''}}) }}
-                            <div class="form-group">
-                                {{ form_errors(scode_form.scode) }}
-                                <div class="input-group">         
-                                    {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                    <span class="input-group-btn">
-                                        {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
-                                    </span>
-                                </div>
-                                <div class="help-block with-errors" id="scode-form-code-err"></div>
-                            </div>
-                        {{ form_end(scode_form) }}
-                    </div>    
-                    {% endif %}                
+                    {% endif %}              
                 </div>
             </div>
 
