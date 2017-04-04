@@ -126,7 +126,7 @@
 	content: '\f054';
 	font-family: FontAwesome;
 	position: absolute;
-	right: 15px;
+	right: 15px; top: 10px;
 }
 
 .modal-policy h2.section-open:after {
