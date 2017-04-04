@@ -139,11 +139,12 @@
 
 .modal-policy p {
 	font-size: 14px;
+	padding: 0 15px;
 }
 
 .modal-policy ul {
 	font-size: 14px;
-	padding: 5px 15px;
+	padding: 5px 15px 5px 25px;
 }
 
 .modal-policy table {
