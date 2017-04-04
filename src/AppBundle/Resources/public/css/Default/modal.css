@@ -109,29 +109,28 @@
 }
 
 .modal-policy h2 {
-	margin: 0;
-	padding: 15px 0;
-	color: #3399ff;	
-	/*border: 2px solid #efefef;*/
-	/*border-top: 0;*/
-	font-size: 18px;
+	margin: 0 0 15px;
+	padding: 10px 30px 10px 15px;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+
+	background-color: #efefef;
+	
+	font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 16px;
 	cursor: pointer;
 	position: relative;
 }
 
-.modal-policy h2:first-of-type {
-	/*border-top: 2px solid #efefef;*/
-}
-
 .modal-policy h2:after {
-	content: '\f067';
+	content: '\f054';
 	font-family: FontAwesome;
 	position: absolute;
-	right: 0;
+	right: 15px;
 }
 
 .modal-policy h2.section-open:after {
-	content: '\f068';
+	content: '\f078';
 }
 
 .modal-policy h3 {
