@@ -7,6 +7,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Company;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Service\SalvaExportService;
@@ -78,6 +79,28 @@ class SalvaExportServiceTest extends WebTestCase
 
         $xml = static::$salva->createXml($policy);
         $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
+        $this->assertGreaterThan(0, stripos($xml, $user->getId()));
+    }
+
+    public function testCreateXmlCompany()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreateXmlCompany', $this),
+            'bar'
+        );
+        $company = new Company();
+        $company->setName('foo');
+        $company->addUser($user);
+        self::$dm->persist($company);
+        self::$dm->flush();
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy);
+
+        $xml = static::$salva->createXml($policy);
+        $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
+        $this->assertGreaterThan(0, stripos($xml, $company->getId()));
     }
 
     public function testNonProdInvalidPolicyQueue()
@@ -200,6 +223,22 @@ class SalvaExportServiceTest extends WebTestCase
         $this->validateStaticPolicyData($data, $updatedPolicy);
     }
 
+    public function testBasicExportCompanyPolicies()
+    {
+        $policy = $this->createPolicy('testBasicExportCompanyPolicies', new \DateTime('2016-01-01'), true, 'foo');
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+
+        $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
+        $this->assertEquals(1, count($lines));
+        $data = explode('","', trim($lines[0], '"'));
+
+        $this->validatePolicyData($data, $updatedPolicy, 1, Policy::STATUS_ACTIVE, 0);
+        $this->validatePolicyPayments($data, $updatedPolicy, 1);
+        $this->validateFullYearPolicyAmounts($data, $updatedPolicy);
+        $this->validateStaticPolicyData($data, $updatedPolicy);
+    }
+
     private function validatePolicyData(
         $data,
         $policy,
@@ -302,7 +341,15 @@ class SalvaExportServiceTest extends WebTestCase
     private function validateStaticPolicyData($data, $policy)
     {
         // All of this data should be static
-        $this->assertEquals($policy->getUser()->getId(), $data[5], json_encode($data));
+        if ($policy->getCompany()) {
+            $this->assertEquals($policy->getCompany()->getId(), $data[5], json_encode($data));
+            $this->assertEquals('', $data[6], json_encode($data));
+            $this->assertEquals($policy->getCompany()->getName(), $data[7], json_encode($data));
+        } else {
+            $this->assertEquals($policy->getUser()->getId(), $data[5], json_encode($data));
+            $this->assertEquals($policy->getUser()->getFirstName(), $data[6], json_encode($data));
+            $this->assertEquals($policy->getUser()->getLastName(), $data[7], json_encode($data));
+        }
         $this->assertEquals($policy->getPhone()->getMake(), $data[8], json_encode($data));
         $this->assertEquals($policy->getPhone()->getModel(), $data[9], json_encode($data));
         $this->assertEquals($policy->getPhone()->getMemory(), $data[10], json_encode($data));
@@ -312,13 +359,20 @@ class SalvaExportServiceTest extends WebTestCase
         $this->assertEquals($policy->getPremiumInstallmentPrice(), $data[14], json_encode($data));
     }
 
-    private function createPolicy($emailName, $date, $monthly = true)
+    private function createPolicy($emailName, $date, $monthly = true, $companyName = null)
     {
         $user = static::createUser(
             static::$userManager,
             static::generateEmail($emailName, $this),
             'bar'
         );
+        if ($companyName) {
+            $company = new Company();
+            $company->setName($companyName);
+            $company->addUser($user);
+            static::$dm->persist($company);
+            static::$dm->flush();
+        }
 
         $policy = static::initPolicy($user, static::$dm, static::$phone, $date, true, false, $monthly);
 

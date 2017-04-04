@@ -6,8 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Lead;
+use AppBundle\Document\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+use AppBundle\Classes\Salva;
 
 /**
  * @group functional-net
@@ -335,6 +337,108 @@ class PurchaseControllerTest extends BaseControllerTest
 
         self::verifyResponse(200);
         $this->verifyPurchaseNotReady($crawler);
+    }
+
+    public function testPayCC()
+    {
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $email = self::generateEmail('testPayCC', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone($dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            $dm
+        );
+        $policy = self::initPolicy($user, $dm, $phone);
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setReference($policy->getId());
+        $payment->setUser($user);
+        $policy->addPayment($payment);
+        $dm->flush();
+
+        $response = static::runJudoPayPayment(
+            self::$container->get('app.judopay'),
+            $user,
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice()
+        );
+
+        $this->login($email, $password, 'purchase/step-policy');
+
+        $crawler = self::$client->request('POST', '/purchase/cc/success', [
+            'Reference' => $policy->getId(),
+            'ReceiptId' => $response['receiptId'],
+            'CardToken' => $response['consumer']['consumerToken']
+        ]);
+
+        self::verifyResponse(302);
+        $redirectUrl = self::$router->generate('user_welcome');
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $crawler = self::$client->followRedirect();
+        self::verifyResponse(200);
+    }
+
+    public function testPayCCRetry()
+    {
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $email = self::generateEmail('testPayCCRetry', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone($dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            $dm
+        );
+        $policy = self::initPolicy($user, $dm, $phone);
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setReference($policy->getId());
+        $payment->setUser($user);
+        $policy->addPayment($payment);
+        $dm->flush();
+
+        $response = static::runJudoPayPayment(
+            self::$container->get('app.judopay'),
+            $user,
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice()
+        );
+
+        $this->login($email, $password, 'purchase/step-policy');
+
+        $crawler = self::$client->request('POST', '/purchase/cc/success', [
+            'Reference' => $policy->getId(),
+            'ReceiptId' => $response['receiptId'],
+            'CardToken' => $response['consumer']['consumerToken']
+        ]);
+
+        self::verifyResponse(302);
+        $redirectUrl = self::$router->generate('user_welcome');
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $crawler = self::$client->followRedirect();
+        self::verifyResponse(200);
+
+        $crawler = self::$client->request('POST', '/purchase/cc/success', [
+            'Reference' => $policy->getId(),
+            'ReceiptId' => $response['receiptId'],
+            'CardToken' => $response['consumer']['consumerToken']
+        ]);
+
+        self::verifyResponse(302);
+        // TODO: Current user welcome will only be displayed if one payment has been made,
+        // but should check the actual paid amount on policy as well in the future
+        $redirectUrl = self::$router->generate('user_welcome');
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $crawler = self::$client->followRedirect();
+        self::verifyResponse(200);
     }
 
     private function createPurchaseUser($user, $name, $birthday)

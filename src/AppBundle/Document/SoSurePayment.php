@@ -30,4 +30,9 @@ class SoSurePayment extends Payment
 
         return $sosurePayment;
     }
+
+    public function isSuccess()
+    {
+        return $this->success;
+    }
 }

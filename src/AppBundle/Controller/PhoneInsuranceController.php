@@ -234,29 +234,31 @@ class PhoneInsuranceController extends BaseController
             } elseif ($request->request->has('lead_form')) {
                 $leadForm->handleRequest($request);
                 if ($leadForm->isValid()) {
-                    $userRepo = $dm->getRepository(User::class);
-                    $user = $userRepo->findOneBy(['emailCanonical' => strtolower($lead->getEmail())]);
-                    if (!$user) {
-                        $userManager = $this->get('fos_user.user_manager');
-                        $user = $userManager->createUser();
-                        $user->setEnabled(true);
-                        $user->setEmail($lead->getEmail());
-                        $dm->persist($user);
+                    $leadRepo = $dm->getRepository(Lead::class);
+                    $existingLead = $leadRepo->findOneBy(['email' => strtolower($lead->getEmail())]);
+                    if (!$existingLead) {
+                        $dm->persist($lead);
                         $dm->flush();
-
-                        $this->get('fos_user.security.login_manager')->loginUser(
-                            $this->getParameter('fos_user.firewall_name'),
-                            $user
-                        );
-                    } elseif (!$this->getUser()) {
-                        // @codingStandardsIgnoreStart
-                        $this->addFlash('warning', sprintf(
-                            "Looks like you already have an account. Please login below to continue with your purchase.  You may need to use the email login and forgot password link."
-                        ));
-                        // @codingStandardsIgnoreEnd
                     }
+                    $sevenDays = new \DateTime();
+                    $sevenDays = $sevenDays->add(new \DateInterval('P7D'));
+                    $mailer = $this->get('app.mailer');
+                    $mailer->sendTemplate(
+                        sprintf('Your saved so-sure quote for %s', $phone),
+                        $lead->getEmail(),
+                        'AppBundle:Email:quote/priceGuarentee.html.twig',
+                        ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')],
+                        'AppBundle:Email:quote/priceGuarentee.txt.twig',
+                        ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')]
+                    );
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
+                    $this->get('app.mixpanel')->queuePersonProperties([
+                        '$email' => $lead->getEmail()
+                    ], true);
 
-                    return $this->redirectToRoute('purchase');
+                    $this->addFlash('success', sprintf(
+                        "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
+                    ));
                 } else {
                     $this->addFlash('error', sprintf(
                         "Sorry, didn't quite catch that email.  Please try again."
@@ -304,7 +306,8 @@ class PhoneInsuranceController extends BaseController
         $annualPremium = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getYearlyPremiumPrice() : 100;
         $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
 
-        if ($phone->getCurrentPhonePrice()) {
+        // only need to run this once - if its a post, then ignore
+        if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
             $event = MixpanelService::EVENT_QUOTE_PAGE;
             if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
                 $event = MixpanelService::EVENT_LANDING_PAGE;
@@ -341,8 +344,8 @@ class PhoneInsuranceController extends BaseController
         );
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            return $this->render('AppBundle:PhoneInsurance:insuranceLanding.html.twig', $data);
-            // return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
+            //return $this->render('AppBundle:PhoneInsurance:insuranceLanding.html.twig', $data);
+            return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
         } else {
             return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
         }

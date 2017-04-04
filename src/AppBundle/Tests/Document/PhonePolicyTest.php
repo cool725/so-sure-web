@@ -971,21 +971,6 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->validateRefundAmountIsInstallmentPrice($payment));
     }
 
-    public function testGetPremiumPaidNotPolicy()
-    {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPhone(static::$phone);
-
-        $payment = new JudoPayment();
-        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $policy->addPayment($payment);
-
-        $this->assertEquals(0, $policy->getPremiumPaid());
-    }
-
     public function testGetPremiumPaidFailedPayment()
     {
         $policy = new SalvaPhonePolicy();

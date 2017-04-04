@@ -327,56 +327,71 @@ class PolicyService
         }
     }
 
-    public function create(Policy $policy, \DateTime $date = null)
+    public function create(Policy $policy, \DateTime $date = null, $setActive = false)
     {
         $this->statsd->startTiming("policy.create");
-        $user = $policy->getUser();
+        try {
+            $user = $policy->getUser();
 
-        $prefix = $policy->getPolicyPrefix($this->environment);
-        if ($policy->isValidPolicy($prefix)) {
-            return false;
+            $prefix = $policy->getPolicyPrefix($this->environment);
+            if ($policy->isValidPolicy($prefix)) {
+                $this->logger->warning(sprintf('Policy %s is valid, but attempted to re-create', $policy->getId()));
+
+                return false;
+            }
+
+            if (count($policy->getScheduledPayments()) > 0) {
+                throw new \Exception(sprintf('Policy %s is not valid, yet has scheduled payments', $policy->getId()));
+            }
+
+            // If policy hasn't yet been assigned a payer, default to the policy user
+            if (!$policy->getPayer()) {
+                $user->addPayerPolicy($policy);
+            }
+
+            $this->generateScheduledPayments($policy, $date);
+
+            if ($prefix) {
+                $policy->create(
+                    $this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID),
+                    $prefix,
+                    $date
+                );
+            } else {
+                $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE), null, $date);
+            }
+
+            $this->setPromoCode($policy);
+
+            $scode = $this->uniqueSCode($policy);
+            $shortLink = $this->branch->generateSCode($scode->getCode());
+            // branch is preferred, but can fallback to old website version if branch is down
+            if (!$shortLink) {
+                $link = $this->router->generate(
+                    'scode',
+                    ['code' => $scode->getCode()],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+                $shortLink = $this->shortLink->addShortLink($link);
+            }
+            $scode->setShareLink($shortLink);
+            $this->dm->flush();
+
+            $this->queueMessage($policy);
+
+            // Primarily used to allow tests to avoid triggering policy events
+            if ($this->dispatcher) {
+                $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
+            }
+
+            if ($setActive) {
+                $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+                $this->dm->flush();
+            }
+        } catch (\Exception $e) {
+            $this->logger->error(sprint('Error creating policy %s', $policy->getId()), ['exception' => $e]);
+            throw $e;
         }
-
-        if (count($policy->getScheduledPayments()) > 0) {
-            throw new \Exception(sprintf('Policy %s is not valid, yet has scheduled payments', $policy->getId()));
-        }
-
-        // If policy hasn't yet been assigned a payer, default to the policy user
-        if (!$policy->getPayer()) {
-            $user->addPayerPolicy($policy);
-        }
-
-        $this->generateScheduledPayments($policy, $date);
-
-        if ($prefix) {
-            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID), $prefix, $date);
-        } else {
-            $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE), null, $date);
-        }
-
-        $this->setPromoCode($policy);
-
-        $scode = $this->uniqueSCode($policy);
-        $shortLink = $this->branch->generateSCode($scode->getCode());
-        // branch is preferred, but can fallback to old website version if branch is down
-        if (!$shortLink) {
-            $link = $this->router->generate(
-                'scode',
-                ['code' => $scode->getCode()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            );
-            $shortLink = $this->shortLink->addShortLink($link);
-        }
-        $scode->setShareLink($shortLink);
-        $this->dm->flush();
-
-        $this->queueMessage($policy);
-
-        // Primarily used to allow tests to avoid triggering policy events
-        if ($this->dispatcher) {
-            $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
-        }
-
         $this->statsd->endTiming("policy.create");
 
         return true;

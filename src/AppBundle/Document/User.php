@@ -198,6 +198,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $emailVerified;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="Company", inversedBy="user")
+     * @Gedmo\Versioned
+     */
+    protected $company;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user")
      */
     protected $policies;
@@ -389,6 +395,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setPolicyAddress(Address $policyAddress)
     {
         $this->policyAddress = $policyAddress;
+    }
+
+    public function getCompany()
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company)
+    {
+        $this->company = $company;
     }
 
     public function addPolicy(Policy $policy)
