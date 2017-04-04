@@ -30,11 +30,15 @@ h3 {
 
 .user-homepage--header {
     text-align: center;
-    /*margin-bottom: 25px;*/
     padding-bottom: 45px;
 }
 
+.user-homepage--header h2 {
+    margin-top: 20px;
+}
+
 .user-img {
+    width: 140px; height: 140px;
     display: block;
     border: 4px solid #fff;
     margin: 0 auto;
@@ -46,6 +50,10 @@ h3 {
 
     .user-homepage--header {
         text-align: left;
+    }
+
+    .user-homepage--header h2 {
+        margin-top: 5px;
     }
 
     .user-img {
@@ -68,7 +76,12 @@ h3 {
     background-color: #fff;
 }
 
+.user-homepage--section {
+    margin-bottom: 25px;
+}
+
 /* Reward Pot */
+
 .circle-chart-container {
     width: 180px; height: 180px;
     position: relative;
@@ -102,19 +115,25 @@ h3 {
 }
 
 /* Coffee Card */
-.coffee-card {
-    padding-left: 25px;
-    padding-right: 25px;
-}
 
 .coffee-stamp {
-/*    display: inline-block;
+    display: inline-block;
     width: 70px; height: 70px;
-    background-color: #8B97B5;*/
     margin-bottom: 15px;
+
+    cursor: pointer;
+}
+
+.coffee-stamp-add {
+    display: inline-block;
+    width: 70px; height: 70px;
+    margin-bottom: 15px;
+
+    cursor: pointer;
 }
 
 /* PUT SOMEWHERE ELSE EVENTUALLY */
+
 .scroll {
     white-space: nowrap;
     overflow-x: auto;
@@ -122,14 +141,14 @@ h3 {
     -ms-overflow-style: -ms-autohiding-scrollbar; 
 }
 
-.nav-pills>li>a {
+.nav-pills > li > a {
     border-radius: 0;
     font-size: 14px
 }
 
-.nav-pills>li.active>a, 
-.nav-pills>li.active>a:hover, 
-.nav-pills>li.active>a:focus {
+.nav-pills > li.active > a, 
+.nav-pills > li.active > a:hover, 
+.nav-pills > li.active > a:focus {
     background-color: transparent;
     color: #626b78;
 }
@@ -154,211 +173,42 @@ h3 {
 
 }
 
+/* Invites */
 
+.invite-list {  }
 
-/*.reward-pot {
-  min-height: 750px;
-  padding-top: 100px;
-  padding-bottom: 150px;
-}
-.reward-pot h1 {
-  padding-bottom: 20px;
-}
-.reward-pot .btn-primary {
-      padding: 7.25px 25px;
-      border-radius: 4px !important;
-      -moz-border-radius: 30px;
-      -webkit-border-radius: 30px;
-      width: 100px;
-}
-.reward-pot #email_email {
-  padding: 5px 15px 5px 15px;
-  width: 300px;
-  margin-bottom: 0;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-  border: 2px solid #3399ff;
-}
-.reward-pot .panel-default {
-    border: 2px solid #efefef;
-    padding: 5px 8px 0px;
-    margin: 0 -1px 39px 0;
-    position: relative;
-    background: white;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
-    text-align: center;
-    height: 550px;
-    margin-top: 20px;
-}
-.reward-pot .panel-heading {
-  color: #202532;
-  border-bottom: 2px solid #202532;
-  background: #fff;
+.invite-list > li {  
+    padding: 5px 0 10px;
+    margin: 5px 0;
+    border-bottom: 1px solid #efefef;
 }
 
-@media (max-width:992px) {
-    .reward-pot .btn-primary {
-        width: 200px;
-    }
-    .reward-pot #email_email {
-      width: 200px;
-    }
-  }
-.doughnut-outer {
-    width: 500px;
-    height: 300px;
-    text-align: center;
-}
-.doughnut-inner {
-   margin-top: -170px;
-   margin-bottom: 100px;
-}
-.doughnut-inner span {
-    font-size: 12px;
-}
-@media (max-width: 767px) {
-  .doughnut-inner {
-    margin-top: -180px;
-  }
-}
-@media (max-width: 543px) {
-  .doughnut-inner {
-    margin-top: -180px;
-  }
+.invite-list li:first-of-type {
+    margin-top: 0;
 }
 
-.user-info {
-  margin-bottom: 20px;
+.invite-list li:last-of-type {
+    margin-bottom: 0;
+    border: none;
 }
 
-.user-info .small-card {
-  margin: 25px auto;
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  height: 310px;
+.invite-list li img {   
+    margin-right: 15px;
 }
 
-@media (max-width:992px) {
-  .user-info .small-card {
-    height: 100%;
-  }
+.invite-list li > ul {
+
 }
 
-.user-info .small-card h4 {
-  color: inherit;
+@media (min-width: 767px) {
+
+    .invite-list li > ul {
+        margin-top: 20px;
+    }    
+
 }
 
-.user-info .small-card .title {
-  font-size: 22px;
+/* Invite Modal */
+.modal-body {
+    padding-bottom: 30px;
 }
-
-.user-info .small-card .subtitle {
-  font-size: 18px;
-}
-
-.user-info .small-card .actions {
-  margin: 16px 0 0 0;
-  text-align: center;
-}
-
-.user-info .small-card .actions a {
-  margin: 10px 10px;
-}
-
-.user-info .small-card .info {
-  margin-top: 56px;
-  margin-bottom: 15px;
-}
-
-@media (max-width:992px) {
-  .user-info .small-card .info {
-    margin-top: 36px;
-  }
-}
-
-.start-saving {
-  padding: 10px 15px;
-}
-
-.start-saving h2 {
-  color: #fff;
-}
-
-.download-apps .download-btn {
-  width: 40%;
-  display: inline-block;
-}
-
-.download-apps .download-btn.left {
-  margin: 60px 4% 20px 5%;
-}
-
-.download-apps .download-btn.right {
-  margin: 60px 5% 20px 4%;
-}
-
-.download-apps .download-btn.center {
-  margin: 60px 30% 20px 30%;
-}
-
-.download-apps .download-btn img {
-  width: 100%;
-  margin: 0;
-}
-
-@media (max-width:992px) {
-  .download-apps .download-btn.left {
-    margin: 20px 4% 20px 5%;
-  }
-  .download-apps .download-btn.right {
-    margin: 20px 5% 20px 4%;
-  }
-  .download-apps .download-btn.center {
-    margin: 20px 30% 20px 30%;
-  }
-}
-
-.download-apps .badge {
-  padding: 7px 10px 3px 10px;
-  font-size: 24px;
-  border-radius: 16px;
-  background-color: #80CE4D;
-}
-
-.go-to-account {
-  padding: 20px 15px 40px 15px;
-  text-align: center;
-}
-
-.go-to-account .account-btn {
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.user-invalid {
-  padding-top: 100px;
-  padding-bottom: 150px;
-  text-align: center;
-}
-
-.user-invalid h1 {
-  color: #fff;
-}
-
-.user-invalid p {
-  color: #fff;
-}
-
-.modal-scode {
-  background: rgba(0, 0, 0, 0.6);
-  padding-top: 10%;
-}
-
-.modal-scode-wrapper {
-    margin-top: 40px;
-    margin-bottom: 20px;
-}*/
