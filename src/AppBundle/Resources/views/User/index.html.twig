@@ -33,13 +33,13 @@
             <div class="row">
                 <div class="col-sm-7 col-sm-push-5 col-md-8 col-md-push-4">
                     {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
-                    <h3 class="text-grey-blue">Received invitaitons</h3>
+                    <h3 class="text-grey-blue">Received invitations</h3>
                     <div class="user-homepage--section">
                         {{ form_start(invitation_form, {'attr': { 'class': 'form-inline'}}) }}
                             <ul class="list-unstyled invite-list">
                                 {% for invitation in policy.user.unprocessedReceivedInvitations %}
                                 <li class="clearfix">
-                                    <img src="http://placehold.it/70x70" class="img-circle pull-left" alt="">
+                                    <img src="{{ invitation.inviter.getImageUrlFallback }}" class="img-circle pull-left" alt="">
                                     <h4 class="h4 pull-left">{{ invitation.inviter.name }}<br>
                                     <small>Date</small></h4>
                                     <ul class="list-inline pull-right">
@@ -61,12 +61,16 @@
                                 <img src="{{ connection.linkedUser.getImageUrlFallback }}"
                                 title="{{ connection.linkedUser.name }}"
                                 alt="{{ connection.linkedUser.name }}" class="img-circle coffee-stamp"
-                                data-has-claim="false" {# Needs hooking up #}
                                 data-container="body"
                                 data-toggle="popover"
                                 data-trigger="hover"
                                 data-placement="top"
-                                data-content="Connected on {{ connection.date|date('dS M') }} (£{{ connection.value|number_format(2, '.', ',')  }})">
+                                data-content="Connected on {{ connection.date|date('dS M') }}
+                                    {# If policy has claimed, pot should be 0, so don't display connection values as confusing #}
+                                    {% if not policy.hasMonetaryClaimed %}
+                                        (£{{ connection.value|number_format(2, '.', ',')  }})
+                                    {% endif %}
+                                    ">
                             </li>
                             {% endfor %}
                             {% if policy.canInvite %}
