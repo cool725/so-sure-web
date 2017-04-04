@@ -869,3 +869,63 @@ ul li.h3 {
 #pp-cfp-trigger {
     display: none !important;
 }
+
+
+/* Panels Collapse */
+
+.panel-default > .panel-heading {
+    background-color: #efefef;
+    position: relative;
+    padding-right: 25px;
+}
+
+.panel-default > .panel-heading h4 {
+    cursor: pointer;
+    line-height: 1.5;
+    /*color: #fff;*/
+}
+
+.panel-default > .panel-heading:hover,
+.panel-default > .panel-heading:focus {
+    background-color: #ddd;
+}
+
+.panel-heading:after {
+    font-family: FontAwesome;
+    content: '\f054';        
+    position: absolute;
+    top: 10px; right: 10px;
+}
+
+.panel-heading.panel-open:after {
+    content: '\f078';
+}
+
+/*.panel-heading.collapsed .accordion-toggle:after {
+    font-family: FontAwesome;
+    content: '\f054';    
+    content: '\f078';    
+    position: absolute;
+    top: 10px; right: 10px;
+}
+
+.panel-heading .accordion-toggle:after {
+    content: '\f078';
+}*/
+
+/* Video Embed */
+.embed-container { 
+    position: relative; 
+    padding-bottom: 56.25%; 
+    height: 0; 
+    overflow: hidden; 
+    max-width: 100%; 
+} 
+
+.embed-container iframe, 
+.embed-container object, 
+.embed-container embed { 
+    position: absolute; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+}

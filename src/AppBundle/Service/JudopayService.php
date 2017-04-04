@@ -24,6 +24,7 @@ use AppBundle\Event\PaymentEvent;
 
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\PaymentDeclinedException;
+use AppBundle\Exception\ProcessedException;
 
 class JudopayService
 {
@@ -213,8 +214,7 @@ class JudopayService
 
             $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $source, $deviceDna, $date);
 
-            $this->policyService->create($policy, $date);
-            $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+            $this->policyService->create($policy, $date, true);
             $this->dm->flush();
         } else {
             // Existing policy - add payment + prevent duplicate billing
@@ -383,7 +383,7 @@ class JudopayService
         $repo = $this->dm->getRepository(JudoPayment::class);
         $exists = $repo->findOneBy(['receipt' => $transactionDetails["receiptId"]]);
         if ($exists) {
-            throw new \DomainException(sprintf(
+            throw new ProcessedException(sprintf(
                 "Receipt %s has already been used to pay for a policy",
                 $transactionDetails['receiptId']
             ));
@@ -1094,8 +1094,7 @@ class JudopayService
 
         $this->tokenPay($policy, $amount);
 
-        $this->policyService->create($policy, $date);
-        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $this->policyService->create($policy, $date, true);
         $this->dm->flush();
 
         $this->statsd->endTiming("judopay.multipay");

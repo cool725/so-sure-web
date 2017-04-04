@@ -81,6 +81,7 @@ class DaviesServiceTest extends WebTestCase
         $claimB = new Claim();
         $claimB->setReplacementPhone(self::$phoneB);
         $claimB->setReplacementImei($imeiNew);
+        $claimB->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claimB);
 
         $daviesB = new DaviesClaim();
@@ -90,6 +91,78 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->updatePolicy($claimB, $daviesB);
         $this->assertEquals($imeiNew, $policy->getImei());
         $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+    }
+
+    public function testUpdatePolicyManyClaims()
+    {
+        $imeiOriginal = self::generateRandomImei();
+        $imeiOld = self::generateRandomImei();
+        $imeiNew = self::generateRandomImei();
+
+        $policy = new PhonePolicy();
+        $policy->setId('1');
+        $policy->setImei($imeiOriginal);
+        $policy->setPhone(self::$phoneA);
+
+        $claim = new Claim();
+        $claim->setReplacementPhone(self::$phoneA);
+        $claim->setReplacementImei($imeiOld);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+
+        $davies = new DaviesClaim();
+
+        self::$daviesService->updatePolicy($claim, $davies);
+        $this->assertEquals($imeiOld, $policy->getImei());
+        $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
+
+        $claim->setStatus(Claim::STATUS_SETTLED);
+
+        $claimB = new Claim();
+        $claimB->setReplacementPhone(self::$phoneB);
+        $claimB->setReplacementImei($imeiNew);
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claimB);
+
+        $daviesB = new DaviesClaim();
+        $daviesB->replacementMake = 'Apple';
+        $daviesB->replacementModel = 'iPhone 4';
+
+        self::$daviesService->updatePolicy($claimB, $daviesB);
+        $this->assertEquals($imeiNew, $policy->getImei());
+        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+
+        // Rerunning old settled claim should keep the newer imei
+        $this->assertEquals(Claim::STATUS_SETTLED, $claim->getStatus());
+        self::$daviesService->updatePolicy($claim, $davies);
+        $this->assertEquals($imeiNew, $policy->getImei());
+        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+    }
+
+    public function testSaveClaimsClosed()
+    {
+        $davies = new DaviesClaim();
+        $davies->policyNumber = '1';
+        $davies->status = 'Closed';
+
+        $daviesOpen = new DaviesClaim();
+        $daviesOpen->policyNumber = '1';
+        $daviesOpen->status = 'Open';
+
+        self::$daviesService->saveClaims(1, [$davies, $davies]);
+        self::$daviesService->saveClaims(1, [$davies, $daviesOpen]);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testSaveClaimsOpen()
+    {
+        $daviesOpen = new DaviesClaim();
+        $daviesOpen->policyNumber = '1';
+        $daviesOpen->status = 'Open';
+
+        self::$daviesService->saveClaims(1, [$daviesOpen, $daviesOpen]);
     }
 
     /**
@@ -381,7 +454,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
-        $daviesClaim->incurred = 0.68;
+        $daviesClaim->incurred = 6.68;
         $daviesClaim->unauthorizedCalls = 1.01;
         $daviesClaim->accessories = 1.03;
         $daviesClaim->phoneReplacementCost = 1.07;

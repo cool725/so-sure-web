@@ -608,7 +608,7 @@ class InvitationService
         }
     }
 
-    public function accept(Invitation $invitation, Policy $inviteePolicy, \DateTime $date = null)
+    public function accept(Invitation $invitation, Policy $inviteePolicy, \DateTime $date = null, $skipSend = false)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -665,8 +665,10 @@ class InvitationService
         $this->dm->flush();
 
         // Notify inviter of acceptance
-        $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
-        $this->sendPush($invitation, PushService::MESSAGE_CONNECTED);
+        if (!$skipSend) {
+            $this->sendEmail($invitation, self::TYPE_EMAIL_ACCEPT);
+            $this->sendPush($invitation, PushService::MESSAGE_CONNECTED);
+        }
         $this->sendEvent($invitation, InvitationEvent::EVENT_ACCEPTED);
 
         $now = new \DateTime();

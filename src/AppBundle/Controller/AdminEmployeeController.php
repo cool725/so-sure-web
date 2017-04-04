@@ -14,6 +14,9 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
+use AppBundle\Document\BacsPayment;
+use AppBundle\Document\Address;
+use AppBundle\Document\Company;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
@@ -43,6 +46,7 @@ use AppBundle\Document\File\BarclaysFile;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Form\Type\CancelPolicyType;
+use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Form\Type\PhoneType;
@@ -58,6 +62,7 @@ use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
+use AppBundle\Form\Type\UserDetailType;
 use AppBundle\Exception\RedirectException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -304,6 +309,7 @@ class AdminEmployeeController extends BaseController
         $policyService = $this->get('app.policy');
         $fraudService = $this->get('app.fraud');
         $imeiService = $this->get('app.imei');
+        $invitationService = $this->get('app.invitation');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
@@ -333,6 +339,21 @@ class AdminEmployeeController extends BaseController
             ->getForm();
         $phoneForm = $this->get('form.factory')
             ->createNamedBuilder('phone_form', PhoneType::class, $policy)
+            ->getForm();
+        $bacsPayment = new BacsPayment();
+        $bacsPayment->setDate(new \DateTime());
+        $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+        $bacsForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_form', BacsType::class, $bacsPayment)
+            ->getForm();
+        $createForm = $this->get('form.factory')
+            ->createNamedBuilder('create_form')
+            ->add('create', SubmitType::class)
+            ->getForm();
+        $connectForm = $this->get('form.factory')
+            ->createNamedBuilder('connect_form')
+            ->add('email', EmailType::class)
+            ->add('connect', SubmitType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -455,6 +476,51 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('bacs_form')) {
+                $bacsForm->handleRequest($request);
+                if ($bacsForm->isValid()) {
+                    $policy->addPayment($bacsPayment);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Added Payment'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('create_form')) {
+                $createForm->handleRequest($request);
+                if ($createForm->isValid()) {
+                    $policyService->create($policy, null, true);
+                    $this->addFlash(
+                        'success',
+                        'Created Policy'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('connect_form')) {
+                $connectForm->handleRequest($request);
+                if ($connectForm->isValid()) {
+                    $invitation = $invitationService->inviteByEmail(
+                        $policy,
+                        $connectForm->getData()['email'],
+                        null,
+                        true
+                    );
+                    $invitationService->accept(
+                        $invitation,
+                        $invitation->getInvitee()->getCurrentPolicy(),
+                        null,
+                        true
+                    );
+                    $this->addFlash(
+                        'success',
+                        'Connected Users'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -469,6 +535,9 @@ class AdminEmployeeController extends BaseController
             'phone_form' => $phoneForm->createView(),
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
+            'bacs_form' => $bacsForm->createView(),
+            'create_form' => $createForm->createView(),
+            'connect_form' => $connectForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -493,6 +562,9 @@ class AdminEmployeeController extends BaseController
         $resetForm = $this->get('form.factory')
             ->createNamedBuilder('reset_form')
             ->add('reset', SubmitType::class)
+            ->getForm();
+        $userDetailForm = $this->get('form.factory')
+            ->createNamedBuilder('user_detail_form', UserDetailType::class, $user)
             ->getForm();
 
         $policyData = new SalvaPhonePolicy();
@@ -533,17 +605,21 @@ class AdminEmployeeController extends BaseController
                             'Imei is invalid, lost, or duplicate'
                         );
 
-                        return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
+                        return $this->redirectToRoute('admin_user', ['id' => $id]);
                     }
 
-                    // TODO: run checkmend
                     // TODO: Ensure address is present
                     $policyService = $this->get('app.policy');
+                    $serialNumber = $policyData->getSerialNumber();
+                    // For phones without a serial number, run check on imei
+                    if (!$serialNumber) {
+                        $serialNumber = $policyData->getImei();
+                    }
                     $newPolicy = $policyService->init(
                         $user,
                         $policyData->getPhone(),
                         $policyData->getImei(),
-                        $policyData->getSerialNumber()
+                        $serialNumber
                     );
 
                     $dm->persist($newPolicy);
@@ -554,7 +630,18 @@ class AdminEmployeeController extends BaseController
                         'Partial policy was added'
                     );
 
-                    return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
+            } elseif ($request->request->has('user_detail_form')) {
+                $userDetailForm->handleRequest($request);
+                if ($userDetailForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Update User'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
             }
         }
@@ -563,6 +650,7 @@ class AdminEmployeeController extends BaseController
             'user' => $user,
             'reset_form' => $resetForm->createView(),
             'policy_form' => $policyForm->createView(),
+            'user_detail_form' => $userDetailForm->createView(),
         ];
     }
 
@@ -839,6 +927,113 @@ class AdminEmployeeController extends BaseController
             'rewards' => $rewards,
             'connectForm' => $connectForm->createView(),
             'rewardForm' => $rewardForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/company", name="admin_company")
+     * @Template
+     */
+    public function companyAction(Request $request)
+    {
+        $belongForm = $this->get('form.factory')
+            ->createNamedBuilder('belongForm')
+            ->add('email', EmailType::class)
+            ->add('companyId', HiddenType::class)
+            ->add('next', SubmitType::class)
+            ->getForm();
+
+        $companyForm = $this->get('form.factory')
+            ->createNamedBuilder('companyForm')
+            ->add('name', TextType::class)
+            ->add('address1', TextType::class)
+            ->add('address2', TextType::class, ['required' => false])
+            ->add('address3', TextType::class, ['required' => false])
+            ->add('city', TextType::class)
+            ->add('postcode', TextType::class)
+            ->add('next', SubmitType::class)
+            ->getForm();
+
+        $dm = $this->getManager();
+        $companyRepo = $dm->getRepository(Company::class);
+        $userRepo = $dm->getRepository(User::class);
+        $companies = $companyRepo->findAll();
+
+        try {
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('belongForm')) {
+                    $belongForm->handleRequest($request);
+                    if ($belongForm->isValid()) {
+                        $user = $userRepo->findOneBy([
+                            'emailCanonical' => strtolower($belongForm->getData()['email'])
+                        ]);
+                        if (!$user) {
+                            $userManager = $this->get('fos_user.user_manager');
+                            $user = $userManager->createUser();
+                            $user->setEnabled(true);
+                            $user->setEmail($this->getDataString($belongForm->getData(), 'email'));
+                            $dm->persist($user);
+                        }
+                        $company = $companyRepo->find($belongForm->getData()['companyId']);
+                        if (!$company) {
+                            throw new \InvalidArgumentException(sprintf(
+                                'Unable to add user to company. Company is missing',
+                                $belongForm->getData()['email']
+                            ));
+                        }
+                        $company->addUser($user);
+                        if (!$user->getBillingAddress()) {
+                            $user->setBillingAddress($company->getAddress());
+                        }
+                        $dm->flush();
+                        $this->addFlash('success', sprintf(
+                            'Added %s to %s',
+                            $user->getName(),
+                            $company->getName()
+                        ));
+
+                        return new RedirectResponse($this->generateUrl('admin_company'));
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add user to company. %s',
+                            (string) $emailForm->getErrors()
+                        ));
+                    }
+                } elseif ($request->request->has('companyForm')) {
+                    $companyForm->handleRequest($request);
+                    if ($companyForm->isValid()) {
+                        $company = new Company();
+                        $company->setName($this->getDataString($companyForm->getData(), 'name'));
+                        $address = new Address();
+                        $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
+                        $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
+                        $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
+                        $address->setCity($this->getDataString($companyForm->getData(), 'city'));
+                        $address->setPostcode($this->getDataString($companyForm->getData(), 'postcode'));
+                        $company->setAddress($address);
+                        $dm->persist($company);
+                        $dm->flush();
+                        $this->addFlash('success', sprintf(
+                            'Added company'
+                        ));
+
+                        return new RedirectResponse($this->generateUrl('admin_company'));
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add company. %s',
+                            (string) $emailForm->getErrors()
+                        ));
+                    }
+                }
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return [
+            'companies' => $companies,
+            'belongForm' => $belongForm->createView(),
+            'companyForm' => $companyForm->createView(),
         ];
     }
 

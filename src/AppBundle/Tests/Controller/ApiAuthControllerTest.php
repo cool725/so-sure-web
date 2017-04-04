@@ -3728,8 +3728,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             $policy->addPayment($payment);
             $user->addPolicy($policy);
 
-            static::$policyService->create($policy, $date);
-            $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+            static::$policyService->create($policy, $date, true);
             $dm->flush();
             $this->assertNotNull($payment->getId());
         }

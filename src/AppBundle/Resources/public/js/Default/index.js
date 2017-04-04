@@ -56,4 +56,26 @@ $(function(){
         }, 1500);
     });
 
+    $('#faq-calculator').click(function(event) {
+
+        event.preventDefault();
+
+        $('html, body').animate({
+            scrollTop: $('#cashback-card').offset().top
+        }, 1500);
+    });    
+
+    // Collapse Panels - FAQs
+    $('.panel-heading').click(function(event) {
+        
+        event.preventDefault();
+
+        $(this).toggleClass('panel-open');
+        $('.panel-open').not(this).removeClass('panel-open');
+    });
+
+    $('#myCollapsible').on('show.bs.collapse', function () {
+        // do something…
+    })
+
 });

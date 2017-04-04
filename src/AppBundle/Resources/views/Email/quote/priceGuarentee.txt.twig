@@ -1,0 +1,20 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your saved so-sure quote for {{ phone }}
+
+**
+------------------------------------------------------------
+You recently visited the so-sure and requested a guaranteed price for insurance on your {{ phone }}.
+
+Your quote price of £{{ phone.currentPhonePrice.monthlyPremiumPrice }} is guaranteed until {{ sevenDays|date('d-m-Y', 'Europe/London') }}.
+
+so-sure covers you for Loss, Theft, Accidental Damage, and Out of Warranty Breakdown.
+
+Next working day replacement or repair, 24/7 live support, & Up to 80% cashback every year.
+
+View your quote here:
+{{ quoteUrl }}
+
+If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
+
+{% endblock body %}

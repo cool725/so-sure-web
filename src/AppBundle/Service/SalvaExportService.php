@@ -137,9 +137,9 @@ class SalvaExportService
                 $this->adjustDate($policy->getSalvaStartDate($version)),
                 $this->adjustDate($policy->getStaticEnd()),
                 $terminationDate ? $this->adjustDate($terminationDate) : '',
-                $policy->getUser()->getId(), // 5
-                $policy->getUser()->getFirstName(),
-                $policy->getUser()->getLastName(),
+                $policy->getCompany() ? $policy->getCompany()->getId() : $policy->getUser()->getId(), // 5
+                $policy->getCompany() ? '' : $policy->getUser()->getFirstName(),
+                $policy->getCompany() ? $policy->getCompany()->getName() : $policy->getUser()->getLastName(),
                 $policy->getPhone()->getMake(),
                 $policy->getPhone()->getModel(),
                 $policy->getPhone()->getMemory(), // 10
@@ -780,7 +780,7 @@ class SalvaExportService
 
         $policyCustomers = $dom->createElement('ns2:policyCustomers');
         $policy->appendChild($policyCustomers);
-        $policyCustomers->appendChild($this->createCustomer($dom, $phonePolicy->getUser(), 'policyholder'));
+        $policyCustomers->appendChild($this->createCustomer($dom, $phonePolicy, 'policyholder'));
 
         $insuredObjects = $dom->createElement('ns2:insuredObjects');
         $policy->appendChild($insuredObjects);
@@ -790,7 +790,7 @@ class SalvaExportService
 
         $objectCustomers = $dom->createElement('ns2:objectCustomers');
         $insuredObject->appendChild($objectCustomers);
-        $objectCustomers->appendChild($this->createCustomer($dom, $phonePolicy->getUser(), 'insured_person'));
+        $objectCustomers->appendChild($this->createCustomer($dom, $phonePolicy, 'insured_person'));
 
         $objectFields = $dom->createElement('ns2:objectFields');
         $insuredObject->appendChild($objectFields);
@@ -832,16 +832,26 @@ class SalvaExportService
         return $objectField;
     }
 
-    private function createCustomer($dom, User $user, $role)
+    private function createCustomer($dom, Policy $policy, $role)
     {
         $customer = $dom->createElement('ns2:customer');
         $customer->setAttribute('ns2:role', $role);
 
-        $customer->appendChild($dom->createElement('ns2:code', $user->getId()));
-        $customer->appendChild($dom->createElement('ns2:name', $user->getLastName()));
-        $customer->appendChild($dom->createElement('ns2:firstName', $user->getFirstName()));
-        $customer->appendChild($dom->createElement('ns2:countryCode', 'GB'));
-        $customer->appendChild($dom->createElement('ns2:personTypeCode', 'private'));
+        $company = $policy->getCompany();
+        $user = $policy->getUser();
+
+        if ($company) {
+            $customer->appendChild($dom->createElement('ns2:code', $company->getId()));
+            $customer->appendChild($dom->createElement('ns2:name', $company->getName()));
+            $customer->appendChild($dom->createElement('ns2:countryCode', 'GB'));
+            $customer->appendChild($dom->createElement('ns2:personTypeCode', 'corporate'));
+        } else {
+            $customer->appendChild($dom->createElement('ns2:code', $user->getId()));
+            $customer->appendChild($dom->createElement('ns2:name', $user->getLastName()));
+            $customer->appendChild($dom->createElement('ns2:firstName', $user->getFirstName()));
+            $customer->appendChild($dom->createElement('ns2:countryCode', 'GB'));
+            $customer->appendChild($dom->createElement('ns2:personTypeCode', 'private'));
+        }
 
         return $customer;
     }

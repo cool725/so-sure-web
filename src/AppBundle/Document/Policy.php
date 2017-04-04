@@ -100,6 +100,12 @@ abstract class Policy
     protected $user;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="Company", inversedBy="policies")
+     * @Gedmo\Versioned
+     */
+    protected $company;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="payerPolicies")
      * @Gedmo\Versioned
      */
@@ -420,6 +426,16 @@ abstract class Policy
     public function getPayer()
     {
         return $this->payer;
+    }
+
+    public function getCompany()
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company)
+    {
+        $this->company = $company;
     }
 
     public function setPayer(User $user)
@@ -919,6 +935,9 @@ abstract class Policy
     public function init(User $user, PolicyDocument $terms)
     {
         $user->addPolicy($this);
+        if ($company = $user->getCompany()) {
+            $company->addPolicy($this);
+        }
         $this->setPolicyTerms($terms);
     }
 
@@ -1215,9 +1234,6 @@ abstract class Policy
     public function getPremiumPaid($payments = null)
     {
         $paid = 0;
-        if (!$this->isPolicy()) {
-            return 0;
-        }
         if ($payments === null) {
             $payments = $this->getPayments();
         }

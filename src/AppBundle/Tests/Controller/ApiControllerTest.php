@@ -867,6 +867,28 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals('Bar-foo', $user->getLastName());
     }
 
+    public function testUserSpaceInName()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+
+        $birthday = new \DateTime('1980-01-01');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => static::generateEmail('testUserSpaceInName', $this),
+            'birthday' => $birthday->format(\DateTime::ATOM),
+            'first_name' => 'foo bar',
+            'last_name' => 'barfoo foofoo',
+        ));
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->findOneBy(['email' => static::generateEmail('testUserSpaceInName', $this)]);
+        $this->assertTrue($user !== null);
+        $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
+        $this->assertEquals('Foobar', $user->getFirstName());
+        $this->assertEquals('Barfoofoofoo', $user->getLastName());
+    }
+
     public function testUserCreateBadReferer()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();

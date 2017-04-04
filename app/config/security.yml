@@ -67,6 +67,7 @@ security:
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%sosure_rwe_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%sosure_patrick_ip%" ] }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "127.0.0.1" ] }
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
