@@ -80,6 +80,11 @@
                             {% endif %}
                         </ul>
                     </div>
+                    <div class="user-homepage--section">
+                        <h3 class="text-grey-blue">Add Connections</h3>
+                        <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. Click 'Add connection' to get started.</p>
+                        <p class="text-center"><a href="#" class="btn btn-primary btn-rounded" data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
+                    </div>
                 </div>
                 <div class="col-sm-5 col-sm-pull-7 col-md-4 col-md-pull-8">
                     {% if policy.canInvite %}
@@ -88,7 +93,7 @@
                             {% if scode %}
                                 {{ scode.policy.user }} has invited you!
                             {% else %}
-                                Already recevied an invite?
+                                Already received an invite?
                             {% endif %}
                         </strong></h4>
                         <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
