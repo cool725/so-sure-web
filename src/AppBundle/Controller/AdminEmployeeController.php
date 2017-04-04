@@ -341,6 +341,8 @@ class AdminEmployeeController extends BaseController
             ->createNamedBuilder('phone_form', PhoneType::class, $policy)
             ->getForm();
         $bacsPayment = new BacsPayment();
+        $bacsPayment->setDate(new \DateTime());
+        $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacsPayment)
             ->getForm();
@@ -606,14 +608,18 @@ class AdminEmployeeController extends BaseController
                         return $this->redirectToRoute('admin_user', ['id' => $id]);
                     }
 
-                    // TODO: run checkmend
                     // TODO: Ensure address is present
                     $policyService = $this->get('app.policy');
+                    $serialNumber = $policyData->getSerialNumber();
+                    // For phones without a serial number, run check on imei
+                    if (!$serialNumber) {
+                        $serialNumber = $policyData->getImei();
+                    }
                     $newPolicy = $policyService->init(
                         $user,
                         $policyData->getPhone(),
                         $policyData->getImei(),
-                        $policyData->getSerialNumber()
+                        $serialNumber
                     );
 
                     $dm->persist($newPolicy);
@@ -941,8 +947,8 @@ class AdminEmployeeController extends BaseController
             ->createNamedBuilder('companyForm')
             ->add('name', TextType::class)
             ->add('address1', TextType::class)
-            ->add('address2', TextType::class)
-            ->add('address3', TextType::class)
+            ->add('address2', TextType::class, ['required' => false])
+            ->add('address3', TextType::class, ['required' => false])
             ->add('city', TextType::class)
             ->add('postcode', TextType::class)
             ->add('next', SubmitType::class)

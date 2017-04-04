@@ -15,8 +15,11 @@ class BacsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $now = new \DateTime();
+        $year = $now->format('Y');
+        $years = [$year, $year - 1];
         $builder
-            ->add('date', DateType::class, ['required' => true])
+            ->add('date', DateType::class, ['required' => true, 'years' => $years])
             ->add('amount', TextType::class, ['required' => true])
             ->add('notes', TextType::class, ['required' => true])
             ->add('reference', TextType::class, ['required' => true])
