@@ -67,7 +67,7 @@
                                 data-placement="top"
                                 data-content="Connected on {{ connection.date|date('dS M') }}
                                     {# If policy has claimed, pot should be 0, so don't display connection values as confusing #}
-                                    {% if not policy.hasMonetaryClaimed %}
+                                    {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
                                         (£{{ connection.value|number_format(2, '.', ',')  }})
                                     {% endif %}
                                     ">
