@@ -3,6 +3,11 @@ function sosuretrack(name, callback) {
     $.get(url, callback);
 }
 
+function sosuretrackinvite(name, callback) {
+    var url = '/ops/track/invite/' + name;
+    $.get(url, callback);
+}
+
 $(function(){
     $('.sosure-track').on('click', function(event) {
         event.preventDefault();

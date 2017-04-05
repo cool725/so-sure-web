@@ -86,6 +86,12 @@ $(function(){
         shareIn: 'popup',
         showLabel: false,
         showCount: false,
+        on: {
+            click: function(e) {
+                console.log(this.share);
+                sosuretrackinvite(this.share);
+            }
+        }
     });
 
     // Rollover control
