@@ -5,12 +5,14 @@ namespace AppBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\EmbeddedDocument
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
  * @MongoDB\DiscriminatorMap({"phone"="AppBundle\Document\PhonePremium"})
+ * @Gedmo\Loggable
  */
 abstract class Premium
 {
@@ -19,18 +21,21 @@ abstract class Premium
     /**
      * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
      */
     protected $gwp;
 
     /**
      * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
      */
     protected $ipt;
 
     /**
      * @Assert\Range(min=0,max=1)
      * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
      */
     protected $iptRate;
 
