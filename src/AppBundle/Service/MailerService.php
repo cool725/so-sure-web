@@ -58,6 +58,15 @@ class MailerService
     ) {
         $this->addUnsubsribeHash($to, $htmlData, $emailType);
 
+        // base campaign on template name
+        // AppBundle:Email:quote/priceGuarentee.html.twig
+        $campaign = $htmlTemplate;
+        if (stripos($campaign, ':')) {
+            $campaignItems = explode(':', $campaign);
+            $campaign = $campaignItems[count($campaignItems) - 1];
+        }
+        $campaign = explode('.', $campaign)[0];
+
         if ($textTemplate && $textData) {
             $this->addUnsubsribeHash($to, $textData);
 
@@ -68,7 +77,8 @@ class MailerService
                 $this->templating->render($textTemplate, $textData),
                 $attachmentFiles,
                 $bcc,
-                $from
+                $from,
+                $campaign
             );
         } else {
             return $this->send(
@@ -78,7 +88,8 @@ class MailerService
                 null,
                 $attachmentFiles,
                 $bcc,
-                $from
+                $from,
+                $campaign
             );
         }
     }
@@ -114,7 +125,7 @@ class MailerService
         }
     }
 
-    public function send($subject, $to, $htmlBody, $textBody = null, $attachmentFiles = null, $bcc = null, $from = null)
+    public function send($subject, $to, $htmlBody, $textBody = null, $attachmentFiles = null, $bcc = null, $from = null, $campaign = null)
     {
         if (!$from) {
             $from = [$this->defaultSenderAddress => $this->defaultSenderName];
@@ -124,6 +135,14 @@ class MailerService
             ->setFrom($from)
             ->setTo($to)
             ->setBody($htmlBody, 'text/html');
+
+        if ($campaign) {
+            $headers = $message->getHeaders();
+            $headers->addTextHeader(
+                'X-MSYS-API',
+                sprintf('{"campaign_id": "%s"}', substr($campaign, 0, 63))
+            );
+        }
 
         if ($bcc) {
             $message->setBcc($bcc);
