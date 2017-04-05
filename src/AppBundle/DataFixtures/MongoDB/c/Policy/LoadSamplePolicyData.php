@@ -13,6 +13,7 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
+use AppBundle\Document\SCode;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\Salva;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -75,6 +76,27 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->persist($user);
         $this->newPolicy($manager, $user, $count++, true);
         $this->addConnections($manager, $user, [$networkUser], 1);
+
+        // Users for iOS Testing
+        $userInviter = $this->newUser('ios-testing+inviter@so-sure.com', true);
+        $userInviter->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $userInviter->setEnabled(true);
+        $manager->persist($userInviter);
+        $this->newPolicy($manager, $userInviter, $count++, false);
+
+        $userInvitee = $this->newUser('ios-testing+invitee@so-sure.com', true);
+        $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $userInvitee->setEnabled(true);
+        $manager->persist($userInvitee);
+        $this->newPolicy($manager, $userInvitee, $count++, false);
+
+        $user = $this->newUser('ios-testing+scode@so-sure.com', true);
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $this->newPolicy($manager, $user, $count++, false, null, 'IOS-TEST');
+
+        $this->invite($manager, $userInviter, $userInvitee);
 
         $manager->flush();
 
@@ -161,7 +183,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $phone;
     }
 
-    private function newPolicy($manager, $user, $count, $claim = null, $promo = null)
+    private function newPolicy($manager, $user, $count, $claim = null, $promo = null, $code = null)
     {
         $phone = $this->getRandomPhone($manager);
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
@@ -174,7 +196,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setPhone($phone);
         $policy->setImei($this->generateRandomImei());
         $policy->init($user, $latestTerms);
-        $policy->createAddSCode($count);
+        if (!$code) {
+            $policy->createAddSCode($count);
+        } else {
+            $scode = new SCode();
+            $scode->setCode($code);
+            $scode->setType(SCode::TYPE_STANDARD);
+            $policy->addSCode($scode);
+        }
         $router = $this->container->get('router');
         $shareUrl = $router->generate(
             'scode',
@@ -260,6 +289,20 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
     }
 
+    private function invite($manager, $userA, $userB)
+    {
+        $policyA = $userA->getPolicies()[0];
+        $policyB = $userB->getPolicies()[0];
+
+        $invitation = new EmailInvitation();
+        $invitation->setInviter($userA);
+        $invitation->setPolicy($policyA);
+        $invitation->setEmail($userB->getEmail());
+        $invitation->setInvitee($userB);
+        $invitation->setAccepted($policyB->getStart());
+        $manager->persist($invitation);        
+    }
+
     private function addConnections($manager, $userA, $users, $connections = null)
     {
         $policyA = $userA->getPolicies()[0];
@@ -281,13 +324,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 }
             }
 
-            $invitation = new EmailInvitation();
-            $invitation->setInviter($userA);
-            $invitation->setPolicy($policyA);
-            $invitation->setEmail($userB->getEmail());
-            $invitation->setInvitee($userB);
-            $invitation->setAccepted($policyB->getStart());
-            $manager->persist($invitation);
+            $this->invite($manager, $userA, $userB);
 
             $connectionA = new StandardConnection();
             $connectionA->setLinkedUser($userA);
