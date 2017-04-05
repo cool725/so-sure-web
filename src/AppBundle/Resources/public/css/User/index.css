@@ -192,10 +192,7 @@ h3 {
     border: none;
 }
 
-.invite-list li img {  
-    display: inline-block;
-    width: 70px; height: 70px;
-    margin-bottom: 15px;
+.invite-list li img {   
     margin-right: 15px;
 }
 
@@ -214,14 +211,4 @@ h3 {
 /* Invite Modal */
 .modal-body {
     padding-bottom: 30px;
-}
-
-@media (min-width: 767px) {
-
-
-    .jssocials-share-whatsapp,
-    .jssocials-share-messenger {
-        display: none;
-    }
-
 }
