@@ -125,8 +125,16 @@ class MailerService
         }
     }
 
-    public function send($subject, $to, $htmlBody, $textBody = null, $attachmentFiles = null, $bcc = null, $from = null, $campaign = null)
-    {
+    public function send(
+        $subject,
+        $to,
+        $htmlBody,
+        $textBody = null,
+        $attachmentFiles = null,
+        $bcc = null,
+        $from = null,
+        $campaign = null
+    ) {
         if (!$from) {
             $from = [$this->defaultSenderAddress => $this->defaultSenderName];
         }
