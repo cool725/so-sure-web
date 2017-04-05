@@ -533,7 +533,7 @@ class PurchaseController extends BaseController
             throw new \Exception('Unable to locate payment');
         }
 
-        if ($payment->getUser()->getId() != $this->getUser()->getId()) {
+        if (!$this->getUser() || $payment->getUser()->getId() != $this->getUser()->getId()) {
             throw new AccessDeniedException('Unknown user');
         }
 
