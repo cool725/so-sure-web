@@ -389,7 +389,7 @@ class PolicyService
                 $this->dm->flush();
             }
         } catch (\Exception $e) {
-            $this->logger->error(sprint('Error creating policy %s', $policy->getId()), ['exception' => $e]);
+            $this->logger->error(sprintf('Error creating policy %s', $policy->getId()), ['exception' => $e]);
             throw $e;
         }
         $this->statsd->endTiming("policy.create");
