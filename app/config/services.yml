@@ -439,9 +439,10 @@ services:
     app.monitor:
         class: AppBundle\Service\MonitorService
         arguments:
-            dm:      "@doctrine_mongodb.odm.default_document_manager"
-            logger:  "@logger"
-            redis:   "@snc_redis.default"
+            dm:       "@doctrine_mongodb.odm.default_document_manager"
+            logger:   "@logger"
+            redis:    "@snc_redis.default"
+            intercom: "@app.intercom"
 
     app.annie:
         class: AppBundle\Service\AppAnnieService

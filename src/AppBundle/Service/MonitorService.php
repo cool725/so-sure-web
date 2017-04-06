@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Claim;
 use AppBundle\Document\File\DaviesFile;
@@ -23,19 +24,24 @@ class MonitorService
 
     protected $redis;
 
+    protected $intercom;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param                 $redis
+     * @param                 $intercom
      */
     public function __construct(
         DocumentManager  $dm,
         LoggerInterface $logger,
-        $redis
+        $redis,
+        $intercom
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->redis = $redis;
+        $this->intercom = $intercom;
     }
 
     public function run($name)
@@ -109,6 +115,33 @@ class MonitorService
                 'Last successful import on %s',
                 $successFile->getDate()->format(\DateTime::ATOM)
             ));
+        }
+    }
+
+    /**
+     * Around 5 Apr 2017, a user who purchase a policy (company policy - setup in backend)
+     * failed to have a policy premium > 0 (e.g. it was 0) and hence received an email
+     * about not purchasing the policy.
+     *
+     * Monitor should find policies that have been recently created and validate that intercom
+     * has a > 0 premium to ensure this behaviour doesn't occur again
+     */
+    public function intercomPolicyPremium()
+    {
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $twoDays = new \DateTime();
+        $twoDays = $twoDays->sub(new \DateInterval('P2D'));
+        $newPolicies = $repo->findAllNewPolicies(null, $twoDays);
+        $errors = [];
+        foreach ($newPolicies as $newPolicy) {
+            $intercomUser = $this->intercom->getIntercomUser($newPolicy->getUser());
+            if ($intercomUser->custom_attributes->Premium <= 0) {
+                $errors[] = sprintf('%s has a 0 premium, yet has a policy', $newPolicy->getUser()->getEmail());
+            }
+        }
+
+        if ($errors) {
+            throw new \Exception(json_encode($errors));
         }
     }
 }

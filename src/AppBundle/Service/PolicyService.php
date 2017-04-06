@@ -381,12 +381,14 @@ class PolicyService
 
             $this->queueMessage($policy);
 
-            $this->dispatchEvent(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
-
             if ($setActive) {
                 $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
                 $this->dm->flush();
             }
+
+            // Dispatch should be last as there may be events that assume the policy is active
+            // (e.g. intercom)
+            $this->dispatchEvent(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error creating policy %s', $policy->getId()), ['exception' => $e]);
             throw $e;
