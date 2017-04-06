@@ -531,6 +531,7 @@ class AdminEmployeeController extends BaseController
                 $imeiUploadForm->handleRequest($request);
                 if ($imeiUploadForm->isSubmitted() && $imeiUploadForm->isValid()) {
                     $dm = $this->getManager();
+                    $imeiUploadFile->setPolicy($policy);
                     $imeiUploadFile->setBucket('policy.so-sure.com');
                     $imeiUploadFile->setKeyFormat(sprintf(
                         '%s/%s/imei/',
