@@ -282,7 +282,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
         $manager->persist($policy);
-        $policy->create(-5000 + $count, null, $startDate);
+        $env = $this->container->getParameter('kernel.environment');
+        $policy->create(-5000 + $count, strtoupper($env), $startDate);
         $now = new \DateTime();
         $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
 
