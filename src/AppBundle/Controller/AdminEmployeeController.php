@@ -533,11 +533,7 @@ class AdminEmployeeController extends BaseController
                     $dm = $this->getManager();
                     $imeiUploadFile->setPolicy($policy);
                     $imeiUploadFile->setBucket('policy.so-sure.com');
-                    $imeiUploadFile->setKeyFormat(sprintf(
-                        '%s/%s/imei/',
-                        $this->getParameter('kernel.environment'),
-                        $policy->getId()
-                    ) . '%s');
+                    $imeiUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     $policy->addPolicyFile($imeiUploadFile);
                     $dm->persist($imeiUploadFile);
