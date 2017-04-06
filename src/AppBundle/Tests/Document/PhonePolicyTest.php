@@ -9,6 +9,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Reward;
 use AppBundle\Document\SCode;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
@@ -30,6 +31,8 @@ class PhonePolicyTest extends WebTestCase
     protected static $container;
     protected static $dm;
     protected static $phone;
+    protected static $invitationService;
+    protected static $userManager;
 
     public static function setUpBeforeClass()
     {
@@ -45,6 +48,8 @@ class PhonePolicyTest extends WebTestCase
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+        self::$invitationService = self::$container->get('app.invitation');
+        self::$userManager = self::$container->get('fos_user.user_manager');
     }
 
     public function setUp()
@@ -318,6 +323,23 @@ class PhonePolicyTest extends WebTestCase
         $policyClaim->addClaim($claim);
 
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_LOW, $policyConnected->getRisk(new \DateTime("2016-02-20")));
+    }
+
+    public function testGetRiskPolicyRewardConnection()
+    {
+        $reward = $this->createReward(static::generateEmail('testGetRiskPolicyRewardConnection', $this));
+
+        $policy = static::createUserPolicy(true);
+        $policy->setStart(new \DateTime());
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+
+        $connection = static::$invitationService->addReward($policy->getUser(), $reward, 10);
+        $this->assertEquals(10, $connection->getPromoValue());
+
+        $policy->updatePotValue();
+
+        $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_HIGH, $policy->getRisk());
     }
 
     /**

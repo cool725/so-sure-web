@@ -1353,13 +1353,14 @@ abstract class Policy
             return self::RISK_PENDING_CANCELLATION_POLICY;
         }
 
-        if (count($this->getConnections()) > 0) {
+        if (count($this->getStandardConnections()) > 0) {
             // Connected and value of their pot is zero
             if ($this->hasMonetaryClaimed(true)) {
                 // a self claim can be before the pot is adjusted.  also a pot zero is not always due to a self claim
                 return self::RISK_CONNECTED_SELF_CLAIM;
                 // return self::RISK_LEVEL_HIGH;
-            } elseif ($this->areEqualToFourDp($this->getPotValue(), 0)) {
+            } elseif ($this->areEqualToFourDp($this->getPotValue() - $this->getPromoPotValue(), 0)) {
+                // need to exclude the promo portion of the pot value as entire pot may just be a promo
                 return self::RISK_CONNECTED_POT_ZERO;
             }
 

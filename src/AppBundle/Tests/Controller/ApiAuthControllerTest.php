@@ -36,6 +36,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     protected static $testUser2;
     protected static $testUser3;
     protected static $testUserDisabled;
+    protected static $reward;
 
     public function tearDown()
     {
@@ -67,9 +68,9 @@ class ApiAuthControllerTest extends BaseControllerTest
         );
         $user->setFirstName('so-sure');
         $user->setLastName('Rewards');
-        $reward = new Reward();
-        $reward->setUser($user);
-        static::$dm->persist($reward);
+        self::$reward = new Reward();
+        self::$reward->setUser($user);
+        static::$dm->persist(self::$reward);
         static::$dm->flush();
     }
 
