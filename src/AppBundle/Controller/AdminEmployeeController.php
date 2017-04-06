@@ -531,6 +531,8 @@ class AdminEmployeeController extends BaseController
                 $imeiUploadForm->handleRequest($request);
                 if ($imeiUploadForm->isSubmitted() && $imeiUploadForm->isValid()) {
                     $dm = $this->getManager();
+                    // we're assuming that a manaual check is done to verify
+                    $policy->setPhoneVerified(true);
                     $imeiUploadFile->setPolicy($policy);
                     $imeiUploadFile->setBucket('policy.so-sure.com');
                     $imeiUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
