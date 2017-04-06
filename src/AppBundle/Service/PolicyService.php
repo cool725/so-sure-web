@@ -856,18 +856,23 @@ class PolicyService
     {
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllActivePolicies(null);
-        $data = [];
+        $phones = [];
+        $makes = [];
         foreach ($policies as $policy) {
-            if (!isset($data[$policy->getPhone()->getId()])) {
-                $data[$policy->getPhone()->getId()] = [
+            if (!isset($phones[$policy->getPhone()->getId()])) {
+                $phones[$policy->getPhone()->getId()] = [
                     'phone' => $policy->getPhone()->__toString(),
                     'count' => 0,
                 ];
             }
-            $data[$policy->getPhone()->getId()]['count']++;
+            if (!isset($makes[$policy->getPhone()->getMake()])) {
+                $makes[$policy->getPhone()->getMake()] = 0;
+            }
+            $phones[$policy->getPhone()->getId()]['count']++;
+            $makes[$policy->getPhone()->getMake()]++;
         }
 
-        usort($data, function ($a, $b) {
+        usort($phones, function ($a, $b) {
             if ($a['count'] == $b['count']) {
                 return strcmp($a['phone'], $b['phone']);
             }
@@ -875,7 +880,9 @@ class PolicyService
             return $a['count'] < $b['count'];
         });
 
-        return ['total' => count($policies), 'data' => $data];
+        arsort($makes);
+
+        return ['total' => count($policies), 'phones' => $phones, 'makes' => $makes];
     }
 
     public function getBreakdownPdf($file = null)
