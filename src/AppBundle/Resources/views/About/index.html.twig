@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block body %}
-<section class="about-section">
+<section class="about-section section--pad">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -23,19 +23,23 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <h3>The company</h3>
-                <p><a href="{{ path('about_are_we_regulated_within_the_uk') }}">Are we regulated within the UK?</a></p>
-                <p><a href="{{ path('about_how_secure_is_so_sure') }}">How secure is so-sure?</a></p>
+                <h3>Who are we</h3>
+                <ul class="list-unstyled">
+                    <li><a href="{{ path('about_the_team') }}">The team</a></li>
+                    <li><a href="{{ path('jobs') }}">Jobs</a></li>
+                    <li><a href="{{ path('about_how_to_contact_so_sure') }}">How to contact so-sure?</a></li>
+                    <li><a href="{{ path('about_our_mission') }}">Our mission</a></li>
+                    <li><a href="{{ path('about_why_we_re_better') }}">Why we're better</a></li>
+                    <li><a href="{{ path('about_what_is_social_insurance') }}">What is Social Insurance?</a></li>
+                </ul>
             </div>
             <div class="col-md-6">
-                <h3>Who are we</h3>
-                <p><a href="{{ path('about_the_team') }}">The team</a></p>
-                <p><a href="{{ path('jobs') }}">Jobs</a></p>
-                <p><a href="{{ path('about_how_to_contact_so_sure') }}">How to contact so-sure?</a></p>
-                <p><a href="{{ path('about_our_mission') }}">Our mission</a></p>
-                <p><a href="{{ path('about_why_we_re_better') }}">Why we're better</a></p>
-                <p><a href="{{ path('about_what_is_social_insurance') }}">What is Social Insurance?</a></p>
-            </div>
+                <h3>The company</h3>
+                <ul class="list-unstyled">
+                    <li><a href="{{ path('about_are_we_regulated_within_the_uk') }}">Are we regulated within the UK?</a></li>
+                    <li><a href="{{ path('about_how_secure_is_so_sure') }}">How secure is so-sure?</a></li>
+                </ul>
+            </div>            
         </div>
     </div>
 </section>
