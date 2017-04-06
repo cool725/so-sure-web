@@ -44,6 +44,7 @@ use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\File\BarclaysFile;
 use AppBundle\Document\File\LloydsFile;
+use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\BacsType;
@@ -61,6 +62,7 @@ use AppBundle\Form\Type\JudoFileType;
 use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\LloydsFileType;
+use AppBundle\Form\Type\ImeiUploadFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
 use AppBundle\Form\Type\UserDetailType;
 use AppBundle\Exception\RedirectException;
@@ -355,6 +357,10 @@ class AdminEmployeeController extends BaseController
             ->add('email', EmailType::class)
             ->add('connect', SubmitType::class)
             ->getForm();
+        $imeiUploadFile = new ImeiUploadFile();
+        $imeiUploadForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_upload', ImeiUploadFileType::class, $imeiUploadFile)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -521,6 +527,23 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('imei_upload')) {
+                $imeiUploadForm->handleRequest($request);
+                if ($imeiUploadForm->isSubmitted() && $imeiUploadForm->isValid()) {
+                    $dm = $this->getManager();
+                    $imeiUploadFile->setBucket('policy.so-sure.com');
+                    $imeiUploadFile->setKeyFormat(sprintf(
+                        '%s/%s/imei/',
+                        $this->getParameter('kernel.environment'),
+                        $policy->getId()
+                    ) . '%s');
+
+                    $policy->addPolicyFile($imeiUploadFile);
+                    $dm->persist($imeiUploadFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -538,6 +561,7 @@ class AdminEmployeeController extends BaseController
             'bacs_form' => $bacsForm->createView(),
             'create_form' => $createForm->createView(),
             'connect_form' => $connectForm->createView(),
+            'imei_upload_form' => $imeiUploadForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

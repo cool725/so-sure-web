@@ -20,7 +20,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "policySchedule"="PolicyScheduleFile",
  *      "policyTerms"="PolicyTermsFile",
  *      "invoice"="InvoiceFile",
- *      "davies"="DaviesFile"
+ *      "davies"="DaviesFile",
+ *      "imeiUpload"="ImeiUploadFile"
  * })
  * @Gedmo\Loggable
  */
