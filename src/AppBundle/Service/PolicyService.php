@@ -324,6 +324,8 @@ class PolicyService
     {
         if ($this->dispatcher) {
             $this->dispatcher->dispatch($eventType, $event);
+        } else {
+            $this->logger->warning('Dispatcher is disabled for Policy Service');
         }
     }
 
@@ -379,10 +381,7 @@ class PolicyService
 
             $this->queueMessage($policy);
 
-            // Primarily used to allow tests to avoid triggering policy events
-            if ($this->dispatcher) {
-                $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
-            }
+            $this->dispatchEvent(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
 
             if ($setActive) {
                 $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
@@ -736,10 +735,7 @@ class PolicyService
             $this->networkCancelledPolicyEmails($policy);
         }
 
-        // Primarily used to allow tests to avoid triggering policy events
-        if ($this->dispatcher) {
-            $this->dispatcher->dispatch(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
-        }
+        $this->dispatchEvent(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
     }
 
     /**
