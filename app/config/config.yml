@@ -210,6 +210,11 @@ oneup_flysystem:
                 client: aws.s3
                 bucket: blog.so-sure.com
                 prefix: "%kernel.environment%"
+        s3policy:
+            awss3v3:
+                client: aws.s3
+                bucket: policy.so-sure.com
+                prefix: "%kernel.environment%"
     filesystems:
         s3admin_fs:
             adapter: s3admin
@@ -220,6 +225,9 @@ oneup_flysystem:
         s3blog_fs:
             adapter: s3blog
             mount: s3blog_fs
+        s3policy_fs:
+            adapter: s3policy
+            mount: s3policy_fs
 
 vich_uploader:
     db_driver: mongodb
@@ -230,6 +238,14 @@ vich_uploader:
                 service: vich_uploader.namer_property
                 options: { property: 's3FileName'}
             upload_destination: s3admin_fs
+            inject_on_load:     false
+            delete_on_update:   true
+            delete_on_remove:   true
+        policyS3Mapping:
+            namer:
+                service: vich_uploader.namer_property
+                options: { property: 's3FileName'}
+            upload_destination: s3policy_fs
             inject_on_load:     false
             delete_on_update:   true
             delete_on_remove:   true
