@@ -1359,11 +1359,11 @@ abstract class Policy
                 // a self claim can be before the pot is adjusted.  also a pot zero is not always due to a self claim
                 return self::RISK_CONNECTED_SELF_CLAIM;
                 // return self::RISK_LEVEL_HIGH;
-            } elseif ($this->areEqualToFourDp($this->getPotValue() - $this->getPromoPotValue(), 0)) {
-                // need to exclude the promo portion of the pot value as entire pot may just be a promo
+            } elseif ($this->areEqualToFourDp($this->getPotValue(), 0) ||
+                $this->areEqualToFourDp($this->getPotValue() - $this->getPromoPotValue(), 0)) {
+                // pot is empty, or pot is entirely made up of promo values
                 return self::RISK_CONNECTED_POT_ZERO;
             }
-
             if ($this->hasNetworkClaim(true, true)) {
                 // Connected and value of their pot is £10 following a claim in the past month
                 if ($this->hasNetworkClaimedInLast30Days($date, true)) {

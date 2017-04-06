@@ -325,7 +325,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_LOW, $policyConnected->getRisk(new \DateTime("2016-02-20")));
     }
 
-    public function testGetRiskPolicyRewardConnection()
+    public function testGetRiskReasonPolicyRewardConnection()
     {
         $reward = $this->createReward(static::generateEmail('testGetRiskPolicyRewardConnection', $this));
 
@@ -335,11 +335,30 @@ class PhonePolicyTest extends WebTestCase
         static::$dm->persist($policy->getUser());
 
         $connection = static::$invitationService->addReward($policy->getUser(), $reward, 10);
+        $this->assertEquals(10, $policy->getPotValue());
         $this->assertEquals(10, $connection->getPromoValue());
 
-        $policy->updatePotValue();
+        $this->assertEquals(SalvaPhonePolicy::RISK_NOT_CONNECTED_NEW_POLICY, $policy->getRiskReason());
+    }
 
-        $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_HIGH, $policy->getRisk());
+    public function testGetRiskReasonPolicyPromoOnlyConnection()
+    {
+        $policyConnected = static::createUserPolicy(true);
+        $policyConnected->setStart(new \DateTime("2016-01-01"));
+
+        $policyClaim = static::createUserPolicy(true);
+        $policyClaim->setStart(new \DateTime("2016-01-01"));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 0, 0);
+        $connectionA->setPromoValue(10);
+        $connectionB->setPromoValue(10);
+        $policyClaim->updatePotValue();
+        $policyConnected->updatePotValue();
+        $this->assertEquals(10, $policyClaim->getPotValue());
+        $this->assertEquals(10, $policyClaim->getPromoPotValue());
+        $this->assertEquals(0, $connectionA->getValue());
+        $this->assertEquals(10, $connectionA->getPromoValue());
+
+        $this->assertEquals(SalvaPhonePolicy::RISK_CONNECTED_POT_ZERO, $policyConnected->getRiskReason());
     }
 
     /**
