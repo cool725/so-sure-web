@@ -134,6 +134,26 @@ class IntercomService
         }
     }
 
+    public function getIntercomUser(User $user)
+    {
+        if (!$user->getIntercomId()) {
+            return null;
+        }
+
+        try {
+            $resp = $this->client->users->getUser($user->getIntercomId());
+            $this->logger->info(sprintf('getUser %s %s', $user->getEmail(), json_encode($resp)));
+
+            return $resp;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            if ($e->getResponse()->getStatusCode() == "404") {
+                return null;
+            }
+
+            throw $e;
+        }
+    }
+
     private function userExists(User $user)
     {
         if (!$user->getIntercomId()) {
