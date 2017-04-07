@@ -43,6 +43,7 @@ class MixpanelService
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:380020';
+    const CUSTOM_LANDING_PAGE_UK = '$custom_event:443514';
 
     /** @var DocumentManager */
     protected $dm;
@@ -207,7 +208,14 @@ class MixpanelService
     public function stats($start, $end)
     {
         $stats = [];
-        $events = [self::CUSTOM_TOTAL_SITE_VISITORS, self::CUSTOM_QUOTE_PAGE_UK, self::EVENT_RECEIVE_DETAILS];
+        $events = [
+            self::CUSTOM_TOTAL_SITE_VISITORS,
+            self::CUSTOM_QUOTE_PAGE_UK,
+            self::CUSTOM_LANDING_PAGE_UK,
+            self::EVENT_BUY_BUTTON_CLICKED,
+            self::EVENT_RECEIVE_DETAILS,
+            self::EVENT_INVITE
+        ];
         $data = $this->mixpanelData->data('events', [
             'event' => $events,
             'type' => 'unique',
@@ -223,9 +231,18 @@ class MixpanelService
             } elseif ($event == self::CUSTOM_QUOTE_PAGE_UK) {
                 $stats['Quote Page UK'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_QUOTES_UK, $start, $results[$key]);
+            } elseif ($event == self::CUSTOM_LANDING_PAGE_UK) {
+                $stats['Landing Page UK'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_LANDING_UK, $start, $results[$key]);
+            } elseif ($event == self::EVENT_BUY_BUTTON_CLICKED) {
+                $stats['Click Buy Now Button'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_CLICK_BUY_NOW, $start, $results[$key]);
             } elseif ($event == self::EVENT_RECEIVE_DETAILS) {
                 $stats['Receive Personal Details'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS, $start, $results[$key]);
+            } elseif ($event == self::EVENT_INVITE) {
+                $stats['Invite someone'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_INVITE_SOMEONE, $start, $results[$key]);
             }
         }
 
