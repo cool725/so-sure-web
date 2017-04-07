@@ -164,6 +164,8 @@ class ReportingService
             $data['newSCodePoliciesPremium'];
         if ($data['newPolicies'] != 0) {
             $data['newPoliciesAvgPremium'] = $this->toTwoDp($data['newPoliciesPremium'] / $data['newPolicies']);
+        } else {
+            $data['newPoliciesAvgPremium'] = null;
         }
 
         $data['totalActivePolicies'] = $policyRepo->countAllActivePolicies();
@@ -172,6 +174,8 @@ class ReportingService
             $data['totalSCodePoliciesPremium'];
         if ($data['totalPolicies'] != 0) {
             $data['totalPoliciesAvgPremium'] = $this->toTwoDp($data['totalPoliciesPremium'] / $data['totalPolicies']);
+        } else {
+            $data['totalPoliciesAvgPremium'] = null;
         }
 
         $data['totalActiveMonthlyPolicies'] = $policyRepo->countAllActivePoliciesByInstallments(12);
@@ -235,13 +239,21 @@ class ReportingService
                 $data['policyConnections']['10+'] += $data['policyConnections'][$i];
             }
         }
-        $data['totalAvgConnections'] = $data['totalTotalConnections'] / $data['policyConnections']['total'];
+        if ($data['policyConnections']['total'] != 0) {
+            $data['totalAvgConnections'] = $data['totalTotalConnections'] / $data['policyConnections']['total'];
+        } else {
+            $data['totalAvgConnections'] = null;
+        }
 
         $weighted = 0;
         for ($i = 0; $i < 10; $i++) {
             $weighted += $i * $data['policyConnections'][$i];
         }
-        $data['totalWeightedAvgConnections'] = $weighted / $data['policyConnections']['total'];
+        if ($data['policyConnections']['total'] != 0) {
+            $data['totalWeightedAvgConnections'] = $weighted / $data['policyConnections']['total'];
+        } else {
+            $data['totalWeightedAvgConnections'] = null;
+        }
         $data['totalAvgHoursToConnect'] = $connectionRepo->avgHoursToConnect();
 
         return [

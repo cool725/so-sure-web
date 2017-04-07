@@ -60,67 +60,91 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Cancellations  [KPI: 29]</td>
+                            <td>Cancellations - User Requested [KPI: 30]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingUserRequestedPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Cooloffs [KPI: 30]</td>
+                            <td>Cancellations - Unpaid [KPI: 31]</td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['endingUnpaidPolicies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Cooloffs [KPI: 32]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingCooloffPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Approved Claims [KPI: 34]</td>
+                            <td>Approved Claims [KPI: 36]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period['approvedClaims']['total'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Invitations [KPI: 40]</td>
+                            <td># Invitations - Email [KPI: 42]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newInvitationPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>New Connections [KPI: 41]</td>
+                            <td># Invitations - SCode [KPI: 43]</td>
+                            {% for week in weeks %}
+                                <td>{% if week['mixpanel-invite-someone'] is defined %}{{ week['mixpanel-invite-someone'] }}{% else %}unknown - see mixpanel{% endif %}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td># Connections [KPI: 44]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newActiveConnections'] - week.period.data['newEndedConnections'] }} ( Active: {{ week.period.data['newActiveConnections'] }} - Ending: {{ week.period.data['newEndedConnections'] }} )</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total Connections [KPI: 42 - just validate]</td>
+                            <td>Total Connections [KPI: 45 - just validate]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['totalActiveConnections'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total Site Visitors [KPI: 144]</td>
+                            <td>Total Site Visitors [KPI: 157]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-total-site-visitors'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Quote Page UK [KPI: 145]</td>
+                            <td>Quote Page UK [KPI: 158]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-quotes-uk'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Receive Personal Details [KPI: 146]</td>
+                            <td>Landing Page UK [KPI: 159]</td>
+                            {% for week in weeks %}
+                                <td>{% if week['mixpanel-landing-uk'] is defined %}{{ week['mixpanel-landing-uk'] }}{% else %}unknown - see mixpanel{% endif %}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Click Buy Now [KPI: 160]</td>
+                            {% for week in weeks %}
+                                <td>{% if week['mixpanel-click-buy-now'] is defined %}{{ week['mixpanel-click-buy-now'] }}{% else %}unknown - see mixpanel{% endif %}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Receive Personal Details [KPI: 161]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-receive-personal-details'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Apple App Installs [KPI: 161]</td>
+                            <td>Apple App Installs [KPI: 192]</td>
                             {% for week in weeks %}
                                 <td>{{ week['install-apple'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Google App Installs [KPI: 162]</td>
+                            <td>Google App Installs [KPI: 192]</td>
                             {% for week in weeks %}
                                 <td>{{ week['install-google'] }}</td>
                             {% endfor %}
