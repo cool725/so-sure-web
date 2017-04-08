@@ -240,7 +240,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $output->writeln('Finished');
     }
 
-    private function header($policy, $policies, &$lines)
+    private function header($policy, &$policies, &$lines)
     {
         if (!isset($policies[$policy->getId()])) {
             $lines[] = '';
