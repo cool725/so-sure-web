@@ -7,7 +7,6 @@ use AppBundle\Document\Stats;
 use AppBundle\Document\DateTrait;
 use AppBundle\Service\StatsService;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 
 class SixpackService
 {
@@ -50,7 +49,7 @@ class SixpackService
             $data = [
                 'experiment' => $experiment,
                 'client_id' => $this->requestService->getUser() ?
-                    $this->requestService->getUser()->getId() :
+                    $this->requestService->getUser()->get() :
                     $this->requestService->getTrackingId(),
                 'traffic_fraction' => $trafficFraction,
             ];
@@ -78,13 +77,13 @@ class SixpackService
         return $alternatives[0];
     }
 
-    public function convert($experiment, $requireParticipating = true)
+    public function convert($experiment)
     {
         try {
             $data = [
                 'experiment' => $experiment,
                 'client_id' => $this->requestService->getUser() ?
-                    $this->requestService->getUser()->getId() :
+                    $this->requestService->getUser()->get() :
                     $this->requestService->getTrackingId(),
             ];
             $query = http_build_query($data);
@@ -101,20 +100,10 @@ class SixpackService
             $data = json_decode($body, true);
     
             return $data['alternative']['name'];
-        } catch (ClientException $e) {
-            $res = $e->getResponse();
-            $body = (string) $res->getBody();
-            $data = json_decode($body, true);
-            // {"status": "failed", "message": "this client was not participating"}
-            if (!$requireParticipating && stripos($data['message'], 'not participating') !== false) {
-                $this->logger->info(sprintf('Did not particiapte exp %s', $experiment), ['exception' => $e]);
-            } else {
-                $this->logger->error(sprintf('Failed converting exp %s', $experiment), ['exception' => $e]);
-            }
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Failed converting exp %s', $experiment), ['exception' => $e]);
+            $this->logger->error(sprintf('Failed exp %s', $experiment), ['exception' => $e]);
         }
 
-        return null;
+        return $alternatives[0];
     }
 }
