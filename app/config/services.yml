@@ -471,6 +471,14 @@ services:
             apiSecret:      "%mixpanel_apisecret%"
             stats:          "@app.stats"
 
+    app.sixpack:
+        class: AppBundle\Service\SixpackService
+        arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
+            logger:         "@logger"
+            url:            "%sixpack_url%"
+            requestService: "@app.request"
+
     mixpanel:
         class:   Mixpanel
         factory: ['Mixpanel', getInstance]

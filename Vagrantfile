@@ -107,6 +107,8 @@ Vagrant.configure("2") do |config|
     dev1604_config.vm.box = "geerlingguy/ubuntu1604"
     dev1604_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
     dev1604_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
+    dev1604_config.vm.network "forwarded_port", guest: 5000, host: 5000 # sixpack
+    dev1604_config.vm.network "forwarded_port", guest: 5001, host: 5001 # sixpack-web
     dev1604_config.vm.network "private_network", ip: "10.0.4.2"
     #dev1604_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
     dev1604_config.vm.synced_folder ".", "/vagrant", nfs: true, mount_options: ['actimeo=1']
