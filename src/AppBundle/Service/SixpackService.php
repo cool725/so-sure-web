@@ -64,7 +64,9 @@ class SixpackService
             $body = (string) $res->getBody();
             $this->logger->info(sprintf('Sixpack participate response: %s', $body));
     
+            // @codingStandardsIgnoreStart
             // {"status": "ok", "alternative": {"name": "red"}, "experiment": {"name": "button_color"}, "client_id": "12345678-1234-5678-1234-567812345678"}
+            // @codingStandardsIgnoreEnd
             $data = json_decode($body, true);
     
             return $data['alternative']['name'];
@@ -92,7 +94,9 @@ class SixpackService
             $body = (string) $res->getBody();
             $this->logger->info(sprintf('Sixpack convert response: %s', $body));
     
+            // @codingStandardsIgnoreStart
             // {"status": "ok", "alternative": {"name": "red"}, "experiment": {"name": "button_color"}, "conversion": {"kpi": null, "value": null}, "client_id": "12345678-1234-5678-1234-567812345678"}
+            // @codingStandardsIgnoreEnd
             $data = json_decode($body, true);
     
             return $data['alternative']['name'];
