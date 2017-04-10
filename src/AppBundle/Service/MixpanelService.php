@@ -42,7 +42,7 @@ class MixpanelService
     const EVENT_LEAD_CAPTURE = 'Lead Capture';
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
-    const CUSTOM_QUOTE_PAGE_UK = '$custom_event:380020';
+    const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';
     const CUSTOM_LANDING_PAGE_UK = '$custom_event:443514';
 
     /** @var DocumentManager */
