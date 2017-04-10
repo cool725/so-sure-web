@@ -35,13 +35,37 @@
                 <table class="table table-striped">
                     <thead>
                     <tr>
+                        <th>Make</th>
+                        <th>Total</th>
+                        <th>%</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item, value in data.makes %}
+                        <tr>
+                            <td>{{ item }}</td>
+                            <td>{{ value }}</td>
+                            <td>{{ (100 * value / data.total) | number_format(1, '.', ',') }}%</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
                         <th>Phone</th>
                         <th>Total</th>
                         <th>%</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for item in data.data %}
+                    {% for item in data.phones %}
                         <tr>
                             <td>{{ item.phone }}</td>
                             <td>{{ item.count }}</td>

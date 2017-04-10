@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\SoSure;
 
 class BICommand extends ContainerAwareCommand
@@ -24,7 +25,7 @@ class BICommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->exportUsers();
+        $this->exportPolicies();
         $this->exportClaims();
     }
 
@@ -53,26 +54,27 @@ class BICommand extends ContainerAwareCommand
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
     }
 
-    private function exportUsers()
+    private function exportPolicies()
     {
-        $repo = $this->getManager()->getRepository(User::class);
-        $users = $repo->findAll();
+        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $policies = $repo->findAllActivePolicies(null);
         $lines = [];
         $lines[] = implode(',', [
-            '"Age"',
-            '"Postcode"',
+            '"Policy Number"',
+            '"Age of Policy Holder"',
+            '"Postcode of Policy Holder"',
             '"Policy Start Date"',
         ]);
-        foreach ($users as $user) {
-            if ($user->hasValidPolicy()) {
-                $lines[] = implode(',', [
-                   sprintf('"%d"', $user->getAge()),
-                   sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
-                   sprintf('"%s"', $user->getCurrentPolicy()->getStart()->format('Y-m-d')),
-                ]);
-            }
+        foreach ($policies as $policy) {
+            $user = $policy->getUser();
+            $lines[] = implode(',', [
+               sprintf('"%s"', $policy->getPolicyNumber()),
+               sprintf('"%d"', $user->getAge()),
+               sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
+               sprintf('"%s"', $user->getCurrentPolicy()->getStart()->format('Y-m-d')),
+            ]);
         }
-        $this->uploadS3(implode(PHP_EOL, $lines), 'users.csv');
+        $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
     }
     
     private function getManager()

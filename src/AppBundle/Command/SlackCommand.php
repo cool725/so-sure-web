@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\PhonePolicy;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SlackCommand extends ContainerAwareCommand
 {
@@ -18,11 +19,18 @@ class SlackCommand extends ContainerAwareCommand
             ->setName('sosure:slack')
             ->setDescription('Send message to slack')
             ->addOption(
-                'channel',
+                'policy-channel',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Channel to post to',
                 '#general'
+            )
+            ->addOption(
+                'unpaid-channel',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Channel to post to',
+                '#customer-contact'
             )
             ->addOption(
                 'weeks',
@@ -42,10 +50,54 @@ class SlackCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $channel = $input->getOption('channel');
+        $policyChannel = $input->getOption('policy-channel');
+        $unpaidChannel = $input->getOption('unpaid-channel');
         $weeks = $input->getOption('weeks');
         $skipSlack = $input->getOption('skip-slack');
 
+        $text = $this->policies($policyChannel, $weeks, $skipSlack);
+        $output->writeln($text);
+
+        $lines = $this->unpaid($unpaidChannel, $skipSlack);
+        foreach ($lines as $line) {
+            $output->writeln($line);
+        }
+    }
+
+    private function unpaid($channel, $skipSlack)
+    {
+        $router = $this->getContainer()->get('router');
+        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $repo = $dm->getRepository(PhonePolicy::class);
+        $policies = $repo->getUnpaidPolicies();
+
+        $lines = [];
+        $now = new \DateTime();
+        foreach ($policies as $policy) {
+            $diff = $now->diff($policy->getPolicyExpirationDate());
+            if (!in_array($diff->days, [7, 14])) {
+                continue;
+            }
+            // @codingStandardsIgnoreStart
+            $text = sprintf(
+                "*Policy <%s|%s> is scheduled to be cancelled in %d days*",
+                $router->generate('admin_policy', ['id' => $policy->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                $policy->getPolicyNumber(),
+                $diff->days
+            );
+            $lines[] = $text;
+
+            // @codingStandardsIgnoreEnd
+            if (!$skipSlack) {
+                $this->send($text, $channel);
+            }
+        }
+
+        return $lines;
+    }
+
+    private function policies($channel, $weeks, $skipSlack)
+    {
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
 
@@ -106,11 +158,15 @@ class SlackCommand extends ContainerAwareCommand
         );
         // @codingStandardsIgnoreEnd
 
-        $output->writeln($text);
-        if ($skipSlack) {
-            return;
+        if (!$skipSlack) {
+            $this->send($text, $channel);
         }
 
+        return $text;
+    }
+
+    private function send($text, $channel)
+    {
         $slack = $this->getContainer()->get('nexy_slack.client');
         $message = $slack->createMessage();
         $message

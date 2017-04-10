@@ -109,12 +109,19 @@ $(function(){
         highlight: true,
         minLength: 1,
         hint: true,
-    }, 
+    },
     {
         name: 'searchPhonesWithGa',
         source: searchPhonesWithGa,
         display: 'name',
         limit: 100,
+        templates: {
+            notFound: [
+              '<div class="empty-message">',
+                'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a id="open-intercom" href="#">ask us</a>',
+              '</div>'
+            ].join('\n')
+        }
     });
 
 

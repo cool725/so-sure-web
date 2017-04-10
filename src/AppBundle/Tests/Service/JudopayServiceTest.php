@@ -86,9 +86,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         $this->assertEquals($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(), $payment->getAmount());
@@ -100,8 +100,8 @@ class JudopayServiceTest extends WebTestCase
         $tokens = $user->getPaymentMethod()->getCardTokens();
         $this->assertEquals(1, count($tokens));
         $data = json_decode($tokens['token']);
-        $this->assertEquals('3436', $data->cardLastfour);
-        $this->assertEquals('1220', $data->endDate);
+        $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $data->cardLastfour);
+        $this->assertEquals(str_replace('/', '', self::$JUDO_TEST_CARD_EXP), $data->endDate);
     }
 
     public function testJudoReceiptYearly()
@@ -120,9 +120,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         $this->assertEquals($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(), $payment->getAmount());
@@ -147,9 +147,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             '1.01',
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         // should be allowed
@@ -171,9 +171,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             '1.01',
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         try {
             $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
@@ -221,9 +221,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         static::$policyService->setEnvironment('prod');
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
@@ -247,9 +247,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         static::$policyService->setEnvironment('prod');
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
@@ -308,9 +308,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         static::$policyService->setEnvironment('prod');
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
@@ -337,9 +337,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452',
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN,
             $policy->getId()
         );
         if (!isset($details['cardDetails']) || $details['result'] != JudoPayment::RESULT_SUCCESS) {
@@ -376,9 +376,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452',
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN,
             $policy->getId()
         );
         if (!isset($details['cardDetails']) || $details['result'] != JudoPayment::RESULT_SUCCESS) {
@@ -420,9 +420,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452',
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN,
             $policy->getId()
         );
         if (!isset($details['cardDetails']) || $details['result'] != JudoPayment::RESULT_SUCCESS) {
@@ -473,9 +473,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452',
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN,
             $policy->getId()
         );
         if (!isset($details['cardDetails']) || $details['result'] != JudoPayment::RESULT_SUCCESS) {
@@ -525,9 +525,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
             throw new \Exception('Payment failed');
@@ -547,7 +547,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
         $this->assertEquals(11, count($policy->getScheduledPayments()));
-        $this->assertEquals(3436, $policy->getPayments()[0]->getCardLastFour());
+        $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $policy->getPayments()[0]->getCardLastFour());
 
         $scheduledPayment = $policy->getNextScheduledPayment();
         $payment = new JudoPayment();
@@ -615,9 +615,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
             throw new \Exception('Payment failed');
@@ -692,9 +692,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
             throw new \Exception('Payment failed');

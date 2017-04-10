@@ -42,7 +42,8 @@ class MixpanelService
     const EVENT_LEAD_CAPTURE = 'Lead Capture';
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
-    const CUSTOM_QUOTE_PAGE_UK = '$custom_event:380020';
+    const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';
+    const CUSTOM_LANDING_PAGE_UK = '$custom_event:443514';
 
     /** @var DocumentManager */
     protected $dm;
@@ -158,19 +159,19 @@ class MixpanelService
             if (strtolower($data['$email']) == $user->getEmailCanonical()) {
                 $attribution = new Attribution();
                 if (isset($data['Campaign Name'])) {
-                    $attribution->setCampaignName($data['Campaign Name']);
+                    $attribution->setCampaignName(urldecode($data['Campaign Name']));
                 }
                 if (isset($data['Campaign Source'])) {
-                    $attribution->setCampaignSource($data['Campaign Source']);
+                    $attribution->setCampaignSource(urldecode($data['Campaign Source']));
                 }
                 if (isset($data['Campaign Medium'])) {
-                    $attribution->setCampaignMedium($data['Campaign Medium']);
+                    $attribution->setCampaignMedium(urldecode($data['Campaign Medium']));
                 }
                 if (isset($data['Campaign Term'])) {
-                    $attribution->setCampaignTerm($data['Campaign Term']);
+                    $attribution->setCampaignTerm(urldecode($data['Campaign Term']));
                 }
                 if (isset($data['Campaign Content'])) {
-                    $attribution->setCampaignContent($data['Campaign Content']);
+                    $attribution->setCampaignContent(urldecode($data['Campaign Content']));
                 }
                 if (isset($data['Referer'])) {
                     $attribution->setReferer($data['Referer']);
@@ -179,19 +180,19 @@ class MixpanelService
 
                 $latestAttribution = new Attribution();
                 if (isset($data['Latest Campaign Name'])) {
-                    $latestAttribution->setCampaignName($data['Latest Campaign Name']);
+                    $latestAttribution->setCampaignName(urldecode($data['Latest Campaign Name']));
                 }
                 if (isset($data['Latest Campaign Source'])) {
-                    $latestAttribution->setCampaignSource($data['Latest Campaign Source']);
+                    $latestAttribution->setCampaignSource(urldecode($data['Latest Campaign Source']));
                 }
                 if (isset($data['Latest Campaign Medium'])) {
-                    $latestAttribution->setCampaignMedium($data['Latest Campaign Medium']);
+                    $latestAttribution->setCampaignMedium(urldecode($data['Latest Campaign Medium']));
                 }
                 if (isset($data['Latest Campaign Term'])) {
-                    $latestAttribution->setCampaignTerm($data['Latest Campaign Term']);
+                    $latestAttribution->setCampaignTerm(urldecode($data['Latest Campaign Term']));
                 }
                 if (isset($data['Latest Campaign Content'])) {
-                    $latestAttribution->setCampaignContent($data['Latest Campaign Content']);
+                    $latestAttribution->setCampaignContent(urldecode($data['Latest Campaign Content']));
                 }
                 if (isset($data['Latest Referer'])) {
                     $latestAttribution->setReferer($data['Latest Referer']);
@@ -207,7 +208,14 @@ class MixpanelService
     public function stats($start, $end)
     {
         $stats = [];
-        $events = [self::CUSTOM_TOTAL_SITE_VISITORS, self::CUSTOM_QUOTE_PAGE_UK, self::EVENT_RECEIVE_DETAILS];
+        $events = [
+            self::CUSTOM_TOTAL_SITE_VISITORS,
+            self::CUSTOM_QUOTE_PAGE_UK,
+            self::CUSTOM_LANDING_PAGE_UK,
+            self::EVENT_BUY_BUTTON_CLICKED,
+            self::EVENT_RECEIVE_DETAILS,
+            self::EVENT_INVITE
+        ];
         $data = $this->mixpanelData->data('events', [
             'event' => $events,
             'type' => 'unique',
@@ -223,9 +231,18 @@ class MixpanelService
             } elseif ($event == self::CUSTOM_QUOTE_PAGE_UK) {
                 $stats['Quote Page UK'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_QUOTES_UK, $start, $results[$key]);
+            } elseif ($event == self::CUSTOM_LANDING_PAGE_UK) {
+                $stats['Landing Page UK'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_LANDING_UK, $start, $results[$key]);
+            } elseif ($event == self::EVENT_BUY_BUTTON_CLICKED) {
+                $stats['Click Buy Now Button'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_CLICK_BUY_NOW, $start, $results[$key]);
             } elseif ($event == self::EVENT_RECEIVE_DETAILS) {
                 $stats['Receive Personal Details'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS, $start, $results[$key]);
+            } elseif ($event == self::EVENT_INVITE) {
+                $stats['Invite someone'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_INVITE_SOMEONE, $start, $results[$key]);
             }
         }
 

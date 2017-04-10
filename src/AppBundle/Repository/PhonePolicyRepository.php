@@ -241,4 +241,17 @@ class PhonePolicyRepository extends PolicyRepository
 
         return $qb->getQuery()->execute();
     }
+
+    public function getUnpaidPolicies()
+    {
+        $policy = new PhonePolicy();
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_UNPAID
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+
+        return $qb->getQuery()->execute();
+    }
 }

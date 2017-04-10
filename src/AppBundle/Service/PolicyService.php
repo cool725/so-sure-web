@@ -324,6 +324,8 @@ class PolicyService
     {
         if ($this->dispatcher) {
             $this->dispatcher->dispatch($eventType, $event);
+        } else {
+            $this->logger->warning('Dispatcher is disabled for Policy Service');
         }
     }
 
@@ -379,15 +381,14 @@ class PolicyService
 
             $this->queueMessage($policy);
 
-            // Primarily used to allow tests to avoid triggering policy events
-            if ($this->dispatcher) {
-                $this->dispatcher->dispatch(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
-            }
-
             if ($setActive) {
                 $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
                 $this->dm->flush();
             }
+
+            // Dispatch should be last as there may be events that assume the policy is active
+            // (e.g. intercom)
+            $this->dispatchEvent(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error creating policy %s', $policy->getId()), ['exception' => $e]);
             throw $e;
@@ -736,10 +737,7 @@ class PolicyService
             $this->networkCancelledPolicyEmails($policy);
         }
 
-        // Primarily used to allow tests to avoid triggering policy events
-        if ($this->dispatcher) {
-            $this->dispatcher->dispatch(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
-        }
+        $this->dispatchEvent(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
     }
 
     /**
@@ -856,18 +854,23 @@ class PolicyService
     {
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllActivePolicies(null);
-        $data = [];
+        $phones = [];
+        $makes = [];
         foreach ($policies as $policy) {
-            if (!isset($data[$policy->getPhone()->getId()])) {
-                $data[$policy->getPhone()->getId()] = [
+            if (!isset($phones[$policy->getPhone()->getId()])) {
+                $phones[$policy->getPhone()->getId()] = [
                     'phone' => $policy->getPhone()->__toString(),
                     'count' => 0,
                 ];
             }
-            $data[$policy->getPhone()->getId()]['count']++;
+            if (!isset($makes[$policy->getPhone()->getMake()])) {
+                $makes[$policy->getPhone()->getMake()] = 0;
+            }
+            $phones[$policy->getPhone()->getId()]['count']++;
+            $makes[$policy->getPhone()->getMake()]++;
         }
 
-        usort($data, function ($a, $b) {
+        usort($phones, function ($a, $b) {
             if ($a['count'] == $b['count']) {
                 return strcmp($a['phone'], $b['phone']);
             }
@@ -875,7 +878,9 @@ class PolicyService
             return $a['count'] < $b['count'];
         });
 
-        return ['total' => count($policies), 'data' => $data];
+        arsort($makes);
+
+        return ['total' => count($policies), 'phones' => $phones, 'makes' => $makes];
     }
 
     public function getBreakdownPdf($file = null)

@@ -18,12 +18,29 @@
                 <table class="table table-striped">
                     <thead>
                     <tr>
+                        <th>Make</th>
+                        <th>%</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item, value in data.makes %}
+                        <tr>
+                            <td>{{ item }}</td>
+                            <td>{{ (100 * value / data.total) | number_format(1, '.', ',') }}%</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
                         <th>Phone</th>
                         <th>%</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for item in data.data %}
+                    {% for item in data.phones %}
                         <tr>
                             <td>{{ item.phone }}</td>
                             <td>{{ (100 * item.count / data.total) | number_format(1, '.', ',') }}%</td>
