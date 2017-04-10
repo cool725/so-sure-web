@@ -8,7 +8,7 @@
     'components/clipboard/clipboard.min.js'
     'components/jssocials/jssocials.min.js'
     'components/jquery-circle-progress/circle-progress.min.js'
-    'bundles/app/js/User/index.js' %}
+    '@AppBundle/Resources/public/js/User/index.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
@@ -16,8 +16,8 @@
     {{ parent() }}
     {% stylesheets
     'components/jssocials/jssocials.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'        
-    'components/jssocials/jssocials-theme-minima.css'
+    'components/jssocials/jssocials-theme-flat.css'    
+    '@AppBundle/Resources/public/css/Default/modal.css'
     '@AppBundle/Resources/public/css/User/index.css'
     '@AppBundle/Resources/public/css/User/trust.css' %}
     <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
@@ -28,20 +28,24 @@
     {% include 'AppBundle:User:userNav.html.twig' %}
 
     <section class="user-homepage--content section--pad">
-        <div class="container">          
-            
+        <div class="container">
+
             <div class="row">
                 <div class="col-sm-7 col-sm-push-5 col-md-8 col-md-push-4">
                     {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
-                    <div class="box-border-grey">
-                        <h4><strong>Invitations</strong></h4>
+                    <h3 class="text-grey-blue">Received invitations</h3>
+                    <div class="user-homepage--section">
                         {{ form_start(invitation_form, {'attr': { 'class': 'form-inline'}}) }}
-                            <ul>
+                            <ul class="list-unstyled invite-list">
                                 {% for invitation in policy.user.unprocessedReceivedInvitations %}
-                                <li>
-                                    {{ invitation.inviter.name }}
-                                    {{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-primary'}}) }}
-                                    {{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-danger'}}) }}                                    
+                                <li class="clearfix">
+                                    <img src="{{ invitation.inviter.getImageUrlFallback }}" class="img-circle pull-left" alt="">
+                                    <h4 class="h4 pull-left">{{ invitation.inviter.name }}<br>
+                                    <small>Received on {{ invitation.created|date('d M Y H:i', 'Europe/London')  }}</small></h4>
+                                    <ul class="list-inline pull-right">
+                                        <li>{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-danger btn-rounded btn-xs'}}) }}</li>
+                                        <li>{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-success btn-rounded btn-xs'}}) }}</li>
+                                    </ul>
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -49,89 +53,72 @@
                         {{ form_end(invitation_form) }}
                     </div>
                     {% endif %}
-                    <div class="box-border-grey coffee-card">
-                        <h4><strong>My Connections</strong></h4>
+                    <div class="user-homepage--section">
+                        <h3 class="text-grey-blue">Connections</h3>                        
                         <ul class="list-inline">
                             {% for connection in policy.standardConnections %}
                             <li>
-                                <img src="{{ connection.linkedUser.getImageUrlFallback }}" title="{{ connection.linkedUser.name }} – Connected on {{ connection.date|date('d M') }} (£{{ connection.value|number_format(2, '.', ',')  }})" alt="{{ connection.linkedUser.name }}" class="img-circle coffee-stamp">
+                                <img src="{{ connection.linkedUser.getImageUrlFallback }}"
+                                title="{{ connection.linkedUser.name }}"
+                                alt="{{ connection.linkedUser.name }}" 
+                                class="
+                                {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}           img-circle coffee-stamp
+                                {% else %}
+                                            img-circle coffee-stamp user-has-claimed
+                                {% endif %}"
+                                data-container="body"
+                                data-toggle="popover"
+                                data-trigger="hover"
+                                data-placement="top"
+                                data-content="Connected on {{ connection.date|date('dS M') }}
+                                    {# If policy has claimed, pot should be 0, so don't display connection values as confusing #}
+                                    {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                                        (£{{ connection.value|number_format(2, '.', ',')  }})
+                                    {% endif %}
+                                    ">
                             </li>
                             {% endfor %}
+                            {% if policy.canInvite %}
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#inviteModal"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
+                            </li>
+                            {% endif %}
                         </ul>
-                        {% if policy.canInvite %}
-                            <a href="#" id="connect-with" class="btn btn-primary btn-rounded"><i class="fa fa-plus fa-lg"></i> New connection</a>
-                        {% endif %}
                     </div>
-
-                    {% if policy.canInvite %}
-                    <div class="row">
-                        {# {% if policy.standardSCode.shareLink %} #}
-                        <div class="col-md-6" >   
-                            <div id="connect-with-box" class="box-border-grey text-center">                         
-                                <h4><strong>Share your invite code</strong></h4>
-                                <form class="form-inline">
-
-                                    <div class="input-group">
-                                        <input id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.code }}">
-                                        <span class="input-group-btn">
-                                            <a class="btn btn-default btn-clipboard"
-                                                    data-clipboard-text="{{ policy.standardSCode.shareLink }}"
-                                                    data-clipboard-target="#scode"
-                                                    data-share-text="Hey, I've just joined so-sure – better insurance that is up to 80% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: {{ policy.standardSCode.shareLink }}. Add my code after you pay: {{ policy.standardSCode.code }}"
-                                                    data-toggle="tooltip" 
-                                                    data-placement="bottom"     
-                                                    >
-                                                <i class="fa fa-clipboard"></i>
-                                            </a>
-                                        </span>
-                                    </div>
-                                </form>
-                                <div id="share"></div>  
-
-                                <div class="text-break text-grey">
-                                    <div class="line"></div>OR<div class="line"></div>
-                                </div>   
-                                <h4><strong>Email an invite!</strong></h4>
-                                <p><small>Just enter their email below and we'll do the rest. Alternatively, open up our app and you can invite them however you'd like.</small></p>
-                                {{ form_start(email_form, {'attr': {'class': ''}}) }}
-                                <div class="form-group">
-                                    {{ form_errors(email_form.email) }}
-                                    {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
-                                </div>
-                                {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}&nbsp;
-                                {{ form_end(email_form) }}                                                       
-                            </div>                  
-                        </div>
-                        {# {% endif %}  #}
-                        <div class="col-md-6">
-                            <div id="scode-box" class="box-border-grey text-center">
-                                <h4><strong>
-                                    {% if scode %}
-                                        {{ scode.policy.user }} has invited you!
-                                    {% else %}
-                                        Already recevied an invite?
-                                    {% endif %}                                         
-                                </strong></h4>
-                                <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
-                                {{ form_start(scode_form, {'attr': {'class': ''}}) }}
-                                    <div class="form-group">
-                                        {{ form_errors(scode_form.scode) }}
-                                        {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                        <div class="help-block with-errors" id="scode-form-code-err"></div>
-                                    </div>
-                                    <div class="form-group">
-                                        {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-rounded'}}) }}
-                                    </div>
-                                {{ form_end(scode_form) }}
-                            </div>                             
-                        </div>                        
+                    <div class="user-homepage--section">
+                        <h3 class="text-grey-blue">Add Connections</h3>
+                        <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. Click 'Add connection' to get started.</p>
+                        <p class="text-center"><a href="#" class="btn btn-primary btn-rounded" data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
                     </div>
-                    {% endif %}
                 </div>
                 <div class="col-sm-5 col-sm-pull-7 col-md-4 col-md-pull-8">
+                    {% if policy.canInvite %}
+                    <div id="scode-box" class="box-border-grey text-center">
+                        <h4><strong>
+                            {% if scode %}
+                                {{ scode.policy.user }} has invited you!
+                            {% else %}
+                                Already received an invite?
+                            {% endif %}
+                        </strong></h4>
+                        <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
+                        {{ form_start(scode_form, {'attr': {'class': ''}}) }}
+                            <div class="form-group">
+                                {{ form_errors(scode_form.scode) }}
+                                <div class="input-group">         
+                                    {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
+                                    <span class="input-group-btn">
+                                        {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
+                                    </span>
+                                </div>
+                                <div class="help-block with-errors" id="scode-form-code-err"></div>
+                            </div>
+                        {{ form_end(scode_form) }}
+                    </div>    
+                    {% endif %}                      
                     <div class="box-border-grey text-center">
-                        <h4><strong>My Reward Pot</strong></h4>
-                        <div id="reward-pot-chart" class="circle-chart-container" 
+                        <h4><strong>Reward Pot</strong></h4>
+                        <div id="reward-pot-chart" class="circle-chart-container"
                              data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
                              data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
                              <div class="circle-chart--value">
@@ -145,7 +132,7 @@
                         {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
                     <div class="box-border-grey text-center">
                         <h4><strong>Connection Bonus</strong></h4>
-                        <div id="connection-bonus-chart" class="circle-chart-container" 
+                        <div id="connection-bonus-chart" class="circle-chart-container"
                              data-bonus-days-total="{{ days_total }}"
                              data-bonus-days-remaining="{{ days_left }}">
                              <div class="{% if policy.getCurrentConnectionValues['teaser']|length > 0 %}circle-chart--full{% else %}circle-chart--value{% endif %}">
@@ -155,7 +142,7 @@
                                  <small class="circle-chart--full-value">{{ policy.getCurrentConnectionValues['teaser'] }}</small>
                                 {% endif %}
                              </div>
-                        </div>                        
+                        </div>
                         <p>
                             <small>
                                 {% if policy.getCurrentConnectionValues['description']|length > 0 %}
@@ -164,23 +151,23 @@
                                     Each connection made is worth £10 in the first 2 months and £2 thereafter.
                                 {% endif %}
                             </small>
-                        </p>                        
+                        </p>
                     </div>
-                    {% endif %}
+                    {% endif %}              
                 </div>
             </div>
 
         </div>
     </section>
-    
-    
+
+
     {# Page Modals #}
 
-{#     <div class="modal modal-middle fade" 
-         id="scodeModal" 
-         tabindex="-1" 
-         role="dialog" 
-         aria-labelledby="scodeModal" 
+    <div class="modal fade"
+         id="inviteModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="inviteModal"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -190,20 +177,60 @@
                         <span class="sr-only">Close</span>
                     </button>
                     <h3 class="text-center">
-               
+                        Invite friends
                     </h3>
                 </div>
-                <div class="modal-body">
-
-
-
+                <div id="modal-connect"
+                     class="modal-body text-center"
+                     data-share-link="{{ policy.standardSCode.shareLink }}"
+                     data-share-text="Hey, I've just joined so-sure – better insurance that is up to 80% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: {{ policy.standardSCode.shareLink }}. Add my code after you pay: {{ policy.standardSCode.code }}">
+                    <h4>Invite via:</h4>   
+                    <div id="share"></div>  
+                    <div class="text-break text-grey">
+                        <div class="line"></div>OR<div class="line"></div>
+                    </div>   
+                    <div class="row">                    
+                        <form class="col-sm-8 col-sm-offset-2">
+                            <div class="form-group">
+                                <label for="scode" class="h4">Share this link:</label>
+                                <div class="input-group">                            
+                                    <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary btn-copy"
+                                                data-clipboard-target="#scode"
+                                                data-toggle="tooltip"
+                                                data-placement="bottom"
+                                                >Copy</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="text-break text-grey">
+                        <div class="line"></div>OR<div class="line"></div>
+                    </div>        
+                    <h4>Email an invite:</h4>            
+                    <p><small>Just enter their email below and we'll do the rest..</small></p>
+                    <div class="row">
+                        {{ form_start(email_form, {'attr': {'class': 'col-sm-8 col-sm-offset-2'}}) }}
+                            <div class="form-group">
+                                {{ form_errors(email_form.email) }}
+                                <div class="input-group">         
+                                    {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
+                                    <span class="input-group-btn">
+                                        {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-success'}}) }}                                
+                                    </span>
+                                </div>
+                            </div>
+                        {{ form_end(email_form) }}               
+                    </div>                
                 </div>
             </div>
         </div>
-    </div> #}  
+    </div>
 
     {# End Page Modals #}
 
-    
+
 
 {% endblock %}

@@ -116,20 +116,18 @@ h3 {
 
 /* Coffee Card */
 
-.coffee-stamp {
+.coffee-stamp,
+.invite-list li img,
+.coffee-stamp-add {
     display: inline-block;
-    width: 70px; height: 70px;
+    width: 68px; height: 68px;
     margin-bottom: 15px;
-
+    border: 2px solid transparent;
     cursor: pointer;
 }
 
-.coffee-stamp-add {
-    display: inline-block;
-    width: 70px; height: 70px;
-    margin-bottom: 15px;
-
-    cursor: pointer;
+.user-has-claimed {
+    border-color: #FF6666;
 }
 
 /* PUT SOMEWHERE ELSE EVENTUALLY */
@@ -192,7 +190,7 @@ h3 {
     border: none;
 }
 
-.invite-list li img {   
+.invite-list li img {  
     margin-right: 15px;
 }
 
@@ -212,3 +210,14 @@ h3 {
 .modal-body {
     padding-bottom: 30px;
 }
+
+@media (min-width: 767px) {
+
+
+    .jssocials-share-whatsapp,
+    .jssocials-share-messenger {
+        display: none;
+    }
+
+}
+
