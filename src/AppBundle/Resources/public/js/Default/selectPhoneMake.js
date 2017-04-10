@@ -117,10 +117,15 @@ $(function(){
         limit: 100,
     });
 
-
     // Stop the content flash when rendering the input
     $('#loading-search-phone').fadeOut('fast', function() {
+        
         $('#search-phone-form').fadeIn();
+        
+        if(window.location.href.indexOf('?quote=1') != -1) {
+            $('#search-phone').focus();
+            sosuretrack('url_quote_one');
+        }            
     });
 
     $('#search-phone').bind('typeahead:selected', function(ev, suggestion) {
