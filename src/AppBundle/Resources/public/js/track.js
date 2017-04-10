@@ -1,7 +1,7 @@
 function sosuretrack(name, callback) {
     var url = '/ops/track/' + name;
     $.get(url, callback);
-    console.log(url);
+    // console.log(url);
 }
 
 $(function(){
