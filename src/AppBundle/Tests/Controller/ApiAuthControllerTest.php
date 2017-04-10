@@ -1469,9 +1469,9 @@ class ApiAuthControllerTest extends BaseControllerTest
             $user,
             $data['id'],
             '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
@@ -1557,9 +1557,9 @@ class ApiAuthControllerTest extends BaseControllerTest
             $user,
             $data['id'],
             '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
@@ -1602,9 +1602,9 @@ class ApiAuthControllerTest extends BaseControllerTest
             $userA,
             $dataA['id'],
             '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $dataA['id']);
@@ -1679,9 +1679,9 @@ class ApiAuthControllerTest extends BaseControllerTest
             $user,
             $data['id'],
             '1.01',
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
@@ -1709,9 +1709,9 @@ class ApiAuthControllerTest extends BaseControllerTest
             $user,
             $data['id'],
             '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
@@ -1755,9 +1755,9 @@ class ApiAuthControllerTest extends BaseControllerTest
             $user,
             $data['id'],
             '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
@@ -1786,9 +1786,9 @@ class ApiAuthControllerTest extends BaseControllerTest
             $user,
             $data['id'] + rand(1, 999999),
             '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
@@ -3419,9 +3419,9 @@ class ApiAuthControllerTest extends BaseControllerTest
         $details = $judopay->testRegisterDetails(
             $user,
             rand(1, 999999),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
 
         $url = sprintf("/api/v1/auth/user/%s/payment", $user->getId());
@@ -3435,14 +3435,14 @@ class ApiAuthControllerTest extends BaseControllerTest
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         $updatedUser = $repo->find($user->getId());
-        $this->assertEquals('3436', $updatedUser->getPaymentMethod()->getCardLastFour());
+        $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $updatedUser->getPaymentMethod()->getCardLastFour());
 
         $details = $judopay->testRegisterDetails(
             $user,
             rand(1, 999999),
-            '4921 8100 0000 5462',
-            '12/20',
-            '441'
+            self::$JUDO_TEST_CARD2_NUM,
+            self::$JUDO_TEST_CARD2_EXP,
+            self::$JUDO_TEST_CARD2_PIN
         );
 
         $url = sprintf("/api/v1/auth/user/%s/payment", $user->getId());
@@ -3456,7 +3456,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         $updatedUser = $repo->find($user->getId());
-        $this->assertEquals('5462', $updatedUser->getPaymentMethod()->getCardLastFour());
+        $this->assertEquals(self::$JUDO_TEST_CARD2_LAST_FOUR, $updatedUser->getPaymentMethod()->getCardLastFour());
     }
 
     public function testUpdateUserPaymentJudopayFail()
@@ -3519,9 +3519,9 @@ class ApiAuthControllerTest extends BaseControllerTest
         $details = $judopay->testRegisterDetails(
             $userA,
             rand(1, 999999),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
 
         $url = sprintf("/api/v1/auth/user/%s/payment", $userB->getId());
@@ -3707,9 +3707,9 @@ class ApiAuthControllerTest extends BaseControllerTest
                 $user,
                 $policyId,
                 $amount,
-                '4976 0000 0000 3436',
-                '12/20',
-                '452'
+                self::$JUDO_TEST_CARD_NUM,
+                self::$JUDO_TEST_CARD_EXP,
+                self::$JUDO_TEST_CARD_PIN
             );
 
             $cognitoIdentityId = $this->getAuthUser($user);

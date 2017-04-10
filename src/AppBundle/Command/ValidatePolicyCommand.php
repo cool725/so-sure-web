@@ -61,6 +61,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $lines = [];
+        $policies = [];
         $date = $input->getOption('date');
         $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
@@ -82,20 +83,21 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
 
+            $this->header($policy, [], $lines);
             if ($adjustScheduledPayments) {
                 if (!$policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate)) {
                     if ($policyService->adjustScheduledPayments($policy)) {
-                        $lines[] = "Successfully adjusted the policy scheduled payments";
+                        $lines[] = "Successfully adjusted the scheduled payments";
                     } else {
-                        $lines[] = "Failed to adjust the policy scheduled payments";
+                        $lines[] = "Failed to adjust the scheduled payments";
                     }
                 } else {
-                    $lines[] = "Skipped adjusting policy scheduled payments as not required";
+                    $lines[] = "Skipped adjusting scheduled payments as not required";
                 }
             }
 
             $valid = $policy->isPolicyPaidToDate(true, $validateDate);
-            $lines[] = sprintf('Policy %s %s paid to date', $policyNumber, $valid ? 'is' : 'is NOT');
+            $lines[] = sprintf('%spaid to date', $valid ? '' : 'NOT ');
             if (!$valid) {
                 $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
             }
@@ -107,9 +109,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             $valid = $policy->isPotValueCorrect();
             $lines[] = sprintf(
-                'Policy %s %s the correct pot value',
-                $policyNumber,
-                $valid ? 'has' : 'does NOT have'
+                '%s pot value',
+                $valid ? 'correct' : 'INCORRECT'
             );
             if (!$valid) {
                 $lines[] = $this->failurePotValueMessage($policy);
@@ -123,9 +124,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             $valid = $policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate);
             $lines[] = sprintf(
-                'Policy %s %s correct scheduled payments (likely incorrect if within 2 weeks of cancellation date)',
-                $policyNumber,
-                $valid ? 'has' : 'does NOT have'
+                '%s scheduled payments (likely incorrect if within 2 weeks of cancellation date)',
+                $valid ? 'correct ' : 'INCORRECT'
             );
             if (!$valid) {
                 $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
@@ -133,8 +133,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             if ($policy->hasMonetaryClaimed()) {
                 // @codingStandardsIgnoreStart
                 $lines[] = sprintf(
-                    'WARNING!! - Policy %s has had a prior successful claim and extra care should be used to avoid cancellation',
-                    $policy->getPolicyNumber()
+                    'WARNING!! - Prior successful claim (extra care should be used to avoid cancellation)'
                 );
                 // @codingStandardsIgnoreEnd
             }
@@ -153,13 +152,17 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
                 $warnClaim = false;
                 if ($policy->isPolicyPaidToDate(true, $validateDate) === false) {
+                    $this->header($policy, $policies, $lines);
                     $warnClaim = true;
+                    $lines[] = "Not Paid To Date";
                     $lines[] = sprintf(
-                        'Policy %s is not paid to date. Next attempt on %s. If unpaid, policy will be cancelled on %s',
-                        $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
+                        'Next attempt: %s.',
                         $policy->getNextScheduledPayment() ?
                             $policy->getNextScheduledPayment()->getScheduled()->format(\DateTime::ATOM) :
-                            'unknown',
+                            'unknown'
+                    );
+                    $lines[] = sprintf(
+                        'Cancellation date: %s',
                         $policy->getPolicyExpirationDate() ?
                             $policy->getPolicyExpirationDate()->format(\DateTime::ATOM) :
                             'unknown'
@@ -167,31 +170,35 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
                 }
                 if ($policy->isPotValueCorrect() === false) {
-                    $lines[] = sprintf('Policy %s has incorrect pot value', $policy->getPolicyNumber());
+                    $this->header($policy, $policies, $lines);
                     $lines[] = $this->failurePotValueMessage($policy);
                 }
                 if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate) === false) {
+                    $this->header($policy, $policies, $lines);
                     $warnClaim = true;
                     $lines[] = sprintf(
-                        'Policy %s has incorrect scheduled payments (likely if within 2 weeks of cancellation date)',
+                        'Incorrect scheduled payments (likely if within 2 weeks of cancellation date)',
                         $policy->getPolicyNumber()
                     );
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
                 }
                 if ($policy->hasCorrectPolicyStatus($validateDate) === false) {
+                    $this->header($policy, $policies, $lines);
                     $warnClaim = true;
                     $lines[] = $this->failureStatusMessage($policy, $prefix, $validateDate);
                 }
                 if ($warnClaim && $policy->hasOpenClaim()) {
+                    $this->header($policy, $policies, $lines);
                     $lines[] = sprintf(
-                        'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
+                        'WARNING!! - Open claim (resolved prior to cancellation)',
                         $policy->getPolicyNumber()
                     );
                 }
                 if ($warnClaim && $policy->hasMonetaryClaimed()) {
+                    $this->header($policy, $policies, $lines);
                     // @codingStandardsIgnoreStart
                     $lines[] = sprintf(
-                        'WARNING!! - Policy %s has had a prior successful claim and extra care should be used to avoid cancellation',
+                        'WARNING!! - Prior successful claim (extra care should be used to avoid cancellation)',
                         $policy->getPolicyNumber()
                     );
                     // @codingStandardsIgnoreEnd
@@ -233,10 +240,20 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $output->writeln('Finished');
     }
 
+    private function header($policy, &$policies, &$lines)
+    {
+        if (!isset($policies[$policy->getId()])) {
+            $lines[] = '';
+            $lines[] = $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId();
+            $lines[] = '---';
+            $policies[$policy->getId()] = true;
+        }
+    }
+
     private function failureStatusMessage($policy, $prefix, $date)
     {
         return sprintf(
-            'Policy %s has unexpected status %s',
+            'Unexpected status %s',
             $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
             $policy->getStatus()
         );
@@ -247,8 +264,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $totalPaid = $policy->getTotalSuccessfulPayments($date);
         $expectedPaid = $policy->getTotalExpectedPaidToDate($date);
         return sprintf(
-            'Policy %s Paid £%0.2f Expected £%0.2f',
-            $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
+            'Paid £%0.2f Expected £%0.2f',
             $totalPaid,
             $expectedPaid
         );
@@ -257,8 +273,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
     private function failurePotValueMessage($policy)
     {
         return sprintf(
-            'Policy %s Pot Value £%0.2f Expected £%0.2f Promo Pot Value £%0.2f Expected £%0.2f',
-            $policy->getPolicyNumber(),
+            'Pot Value £%0.2f Expected £%0.2f Promo Pot Value £%0.2f Expected £%0.2f',
             $policy->getPotValue(),
             $policy->calculatePotValue(),
             $policy->getPromoPotValue(),
@@ -272,8 +287,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
 
         return sprintf(
-            'Policy %s Total Premium £%0.2f Payments Made £%0.2f Scheduled Payments £%0.2f',
-            $policy->getPolicyNumber(),
+            'Total Premium £%0.2f Payments Made £%0.2f Scheduled Payments £%0.2f',
             $policy->getYearlyPremiumPrice(),
             $policy->getTotalSuccessfulPayments($date),
             $totalScheduledPayments

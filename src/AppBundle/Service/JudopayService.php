@@ -275,7 +275,6 @@ class JudopayService
 
     public function testPayDetails(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
     {
-        $payment = $this->apiClient->getModel('CardPayment');
         $data = array(
             'judoId' => $this->judoId,
             'yourConsumerReference' => $user->getId(),
@@ -291,8 +290,28 @@ class JudopayService
             $data['yourPaymentMetaData'] = ['policy_id' => $policyId];
         }
 
-        $payment->setAttributeValues($data);
-        $details = $payment->create();
+        // simple way of cloning an array
+        $dataCopy = json_decode(json_encode($data), true);
+
+        if (!$data) {
+            throw new \Exception('Missing data array');
+        }
+
+        try {
+            $payment = $this->apiClient->getModel('CardPayment');
+            $payment->setAttributeValues($data);
+            $details = $payment->create();
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending test payment: %s', json_encode($dataCopy)),
+                ['exception' => $e]
+            );
+
+            // retry
+            $payment = $this->apiClient->getModel('CardPayment');
+            $payment->setAttributeValues($dataCopy);
+            $details = $payment->create();
+        }
 
         return $details;
     }

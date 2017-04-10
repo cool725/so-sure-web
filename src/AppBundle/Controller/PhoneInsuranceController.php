@@ -37,6 +37,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Service\MixpanelService;
+use AppBundle\Service\SixpackService;
 
 class PhoneInsuranceController extends BaseController
 {
@@ -114,6 +115,8 @@ class PhoneInsuranceController extends BaseController
         $phone = null;
         $decodedModel = Phone::decodeModel($model);
         if ($id) {
+            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_AA, false);
+
             $phone = $repo->find($id);
             if ($phone->getMemory()) {
                 return $this->redirectToRoute('quote_make_model_memory', [

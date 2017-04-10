@@ -37,6 +37,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Service\MixpanelService;
+use AppBundle\Service\SixpackService;
 
 class DefaultController extends BaseController
 {
@@ -48,6 +49,7 @@ class DefaultController extends BaseController
      */
     public function indexAction(Request $request)
     {
+        $sixpack = $this->get('app.sixpack')->participate(SixpackService::EXPERIMENT_HOMEPAGE_AA, ['a', 'alt-a']);
         $geoip = $this->get('app.geoip');
         //$ip = "72.229.28.185";
         $ip = $request->getClientIp();

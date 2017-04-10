@@ -20,6 +20,16 @@ trait UserClassTrait
 {
     use ImeiTrait;
 
+    public static $JUDO_TEST_CARD_NUM = '4921 8100 0000 5462';
+    public static $JUDO_TEST_CARD_LAST_FOUR = '5462';
+    public static $JUDO_TEST_CARD_EXP = '12/20';
+    public static $JUDO_TEST_CARD_PIN = '441';
+
+    public static $JUDO_TEST_CARD2_NUM = '4976 0000 0000 3436';
+    public static $JUDO_TEST_CARD2_LAST_FOUR = '3436';
+    public static $JUDO_TEST_CARD2_EXP = '12/20';
+    public static $JUDO_TEST_CARD2_PIN = '452';
+
     public static function generateEmail($name, $caller)
     {
         return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
@@ -206,9 +216,9 @@ trait UserClassTrait
             $user,
             $policy->getId(),
             $amount,
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
         );
     }
 
