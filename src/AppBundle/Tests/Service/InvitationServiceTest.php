@@ -862,6 +862,50 @@ class InvitationServiceTest extends WebTestCase
         $this->assertNotEquals(Lead::LEAD_SOURCE_SCODE, $inviteePolicy->getLeadSource());
     }
 
+    public function testFacebookInvitation()
+    {
+        $inviterUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFacebookInvitation-inviter', $this),
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
+
+        $inviteeUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFacebookInvitation-invitee', $this),
+            'bar'
+        );
+        $inviteeUser->setFacebookId(rand(1, 999999));
+        static::$dm->persist($inviteeUser);
+        static::$dm->flush();
+        $inviteePolicy = static::initPolicy($inviteeUser, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteByFacebookId(
+            $inviterPolicy,
+            $inviteeUser->getFacebookId()
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function testFacebookInvitationNoFacebook()
+    {
+        $inviterUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFacebookInvitationNoFacebook', $this),
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteByFacebookId(
+            $inviterPolicy,
+            -1
+        );
+    }
+
     /**
      * @expectedException AppBundle\Exception\FullPotException
      */
