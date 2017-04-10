@@ -119,6 +119,7 @@
                 </div>
             </div>
 
+            {% if feature_enabled('quote-lead') %}
             <div class="row">
                 <div class="col-md-12">
                     <div class="quote-card">
@@ -142,6 +143,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
 
             <div class="row">
                <div class="col-xs-12 col-sm-7 col-md-7">
