@@ -124,7 +124,7 @@ $(function(){
         
         if(window.location.href.indexOf('?quote=1') != -1) {
             $('#search-phone').focus();
-            sosuretrack('url_quote_one');
+            sosuretrack('Get A Quote Link');
         }            
     });
 
