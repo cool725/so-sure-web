@@ -19,6 +19,8 @@ $(function(){
         $('html, body').animate({
             scrollTop: $('#get-quote').offset().top
         }, 1500);
+
+        $('#search-phone').focus();
     });      
 
     $('#phone_phone').change(function() {
