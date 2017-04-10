@@ -479,6 +479,20 @@ services:
             url:            "%sixpack_url%"
             requestService: "@app.request"
 
+    app.feature:
+        class: AppBundle\Service\FeatureService
+        arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
+            logger:         "@logger"
+
+    app.twig.feature:
+        class: AppBundle\Service\FeatureTwigExtension
+        arguments:
+            featureService: "@app.feature"
+        public: false
+        tags:
+            - { name: twig.extension }
+
     mixpanel:
         class:   Mixpanel
         factory: ['Mixpanel', getInstance]
