@@ -109,18 +109,30 @@ $(function(){
         highlight: true,
         minLength: 1,
         hint: true,
-    }, 
+    },
     {
         name: 'searchPhonesWithGa',
         source: searchPhonesWithGa,
         display: 'name',
         limit: 100,
+        templates: {
+            notFound: [
+              '<div class="empty-message">',
+                'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a id="open-intercom" href="#">ask us</a>',
+              '</div>'
+            ].join('\n')
+        }
     });
-
 
     // Stop the content flash when rendering the input
     $('#loading-search-phone').fadeOut('fast', function() {
+        
         $('#search-phone-form').fadeIn();
+        
+        if(window.location.href.indexOf('?quote=1') != -1) {
+            $('#search-phone').focus();
+            sosuretrack('Get A Quote Link');
+        }            
     });
 
     $('#search-phone').bind('typeahead:selected', function(ev, suggestion) {

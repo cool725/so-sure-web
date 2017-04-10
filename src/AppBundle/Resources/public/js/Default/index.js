@@ -1,11 +1,5 @@
 $(function(){
 
-    if(window.location.href.indexOf('?quote=1') != -1) {
-        $('#quoteModel').modal('show');
-        sosuretrack('Get A Quote Link', function() {
-        });
-    }
-
     $.fn.extend({
         toggleText: function(a, b){
             return this.text(this.text() == b ? a : b);
@@ -19,6 +13,8 @@ $(function(){
         $('html, body').animate({
             scrollTop: $('#get-quote').offset().top
         }, 1500);
+
+        $('#search-phone').focus();
     });      
 
     $('#phone_phone').change(function() {

@@ -28,6 +28,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Invoice;
+use AppBundle\Document\Feature;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Stats;
 use AppBundle\Document\OptOut\OptOut;
@@ -667,5 +668,54 @@ class AdminController extends BaseController
         return [
             'invoices' => $invoices,
         ];
+    }
+
+    /**
+     * @Route("/feature-flags", name="admin_feature_flags")
+     * @Template
+     */
+    public function featureFlagsAction()
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Feature::class);
+        $features = $repo->findAll();
+        $form = $this->get('form.factory')
+            ->createNamedBuilder('feature_form')->add('disable', SubmitType::class)
+            ->getForm();
+
+        return [
+            'features' => $features,
+        ];
+    }
+
+    /**
+     * @Route("/feature-flags/{id}/active", name="admin_feature_flags_active")
+     * @Method({"POST"})
+     */
+    public function featureFlagsActiveAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Feature::class);
+        $feature = $repo->find($id);
+        if ($feature) {
+            if ($feature->isEnabled()) {
+                $feature->setEnabled(false);
+                $message = sprintf('Feature %s is now disabled', $feature->getName());
+            } else {
+                $feature->setEnabled(true);
+                $message = sprintf('Feature %s is now active', $feature->getName());
+            }
+            $dm->flush();
+            $this->addFlash(
+                'notice',
+                $message
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_feature_flags'));
     }
 }

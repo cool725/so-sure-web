@@ -27,3 +27,4 @@ echo "Reloading db for $ENV environment"
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/a
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/b --append
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/c --append
+sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/d --append
