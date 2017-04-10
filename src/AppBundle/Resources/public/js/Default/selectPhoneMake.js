@@ -118,7 +118,7 @@ $(function(){
         templates: {
             notFound: [
               '<div class="empty-message">',
-                'We coulnd\x27t find that phone. Try searching for just the make (e.g. iPhone 7), or <a id="open-intercom" href="#">ask us</a>',
+                'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a id="open-intercom" href="#">ask us</a>',
               '</div>'
             ].join('\n')
         }
