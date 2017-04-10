@@ -60,7 +60,12 @@
                             <li>
                                 <img src="{{ connection.linkedUser.getImageUrlFallback }}"
                                 title="{{ connection.linkedUser.name }}"
-                                alt="{{ connection.linkedUser.name }}" class="img-circle coffee-stamp"
+                                alt="{{ connection.linkedUser.name }}" 
+                                class="
+                                {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}           img-circle coffee-stamp
+                                {% else %}
+                                            img-circle coffee-stamp user-has-claimed
+                                {% endif %}"
                                 data-container="body"
                                 data-toggle="popover"
                                 data-trigger="hover"

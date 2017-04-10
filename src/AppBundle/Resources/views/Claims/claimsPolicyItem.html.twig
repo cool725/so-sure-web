@@ -271,6 +271,15 @@
                       <td>{{ fraud.network_cancellations }}</td>
                     </tr>
                 </table>
+                <h3>Files</h3>
+                <table class="table table-striped">
+                    {% for file in policy.policyFiles %}
+                    <tr>
+                        <td>{{ file.fileType }}</td>
+                        <td><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </table>
         </div>
         <div role="tabpanel" class="tab-pane" id="claims">
             {% if policy.claims|length > 0 %}
@@ -507,6 +516,22 @@
                         {{ form_widget(connect_form.connect, {'attr': {'class': 'btn btn-danger'}})}}<br>
                         <i>Email must exist and have a valid policy.</i>
                         {{ form_end(connect_form)}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Imei Screenshot Upload</td>
+                    <td>
+                        {{ form_start(imei_upload_form)}}
+                        <div class="form-group">
+                            {{ form_label(imei_upload_form.file, 'File') }}
+                            {{ form_errors(imei_upload_form.file) }}
+                            {{ form_widget(imei_upload_form.file) }}
+                        </div>                
+                        <div class="form-group">
+                            {{ form_widget(imei_upload_form.upload, {'attr': {'class': 'btn btn-success'}})}}<br>
+                            <strong>Please verify that imei matches prior to uploading</strong>
+                        </div>
+                        {{ form_end(imei_upload_form)}}
                     </td>
                 </tr>
             </table>

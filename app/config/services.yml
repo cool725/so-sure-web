@@ -439,9 +439,10 @@ services:
     app.monitor:
         class: AppBundle\Service\MonitorService
         arguments:
-            dm:      "@doctrine_mongodb.odm.default_document_manager"
-            logger:  "@logger"
-            redis:   "@snc_redis.default"
+            dm:       "@doctrine_mongodb.odm.default_document_manager"
+            logger:   "@logger"
+            redis:    "@snc_redis.default"
+            intercom: "@app.intercom"
 
     app.annie:
         class: AppBundle\Service\AppAnnieService
@@ -469,6 +470,28 @@ services:
             environment:    "%kernel.environment%"
             apiSecret:      "%mixpanel_apisecret%"
             stats:          "@app.stats"
+
+    app.sixpack:
+        class: AppBundle\Service\SixpackService
+        arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
+            logger:         "@logger"
+            url:            "%sixpack_url%"
+            requestService: "@app.request"
+
+    app.feature:
+        class: AppBundle\Service\FeatureService
+        arguments:
+            dm:             "@doctrine_mongodb.odm.default_document_manager"
+            logger:         "@logger"
+
+    app.twig.feature:
+        class: AppBundle\Service\FeatureTwigExtension
+        arguments:
+            featureService: "@app.feature"
+        public: false
+        tags:
+            - { name: twig.extension }
 
     mixpanel:
         class:   Mixpanel

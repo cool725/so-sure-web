@@ -119,6 +119,7 @@
                 </div>
             </div>
 
+            {% if feature_enabled('quote-lead') %}
             <div class="row">
                 <div class="col-md-12">
                     <div class="quote-card">
@@ -142,6 +143,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
 
             <div class="row">
                <div class="col-xs-12 col-sm-7 col-md-7">
@@ -149,8 +151,12 @@
                         <h3>so-sure proudly offers</h3>
                         <ul class="list-unstyled">                              
                             <li class="h4 text-underline"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Next working day replacement or repair</li>
-                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>24/7 live support</li>       
-                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Insure used phones (up to 3 years old)</li>
+                            <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>24/7 live support</li>
+                            {% if phone.monthAge > 36 %}
+                                <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Insure used phones (up to 3 years old)</li>
+                            {% else %}
+                                <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Insure used phones</li>
+                            {% endif %}
                             <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> Cover starts when you buy your policy</li>             
                             <li class="h4">
                                 <i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i> 

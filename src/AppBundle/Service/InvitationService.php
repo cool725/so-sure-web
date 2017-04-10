@@ -457,6 +457,8 @@ class InvitationService
         // Primarily used to allow tests to avoid triggering policy events
         if ($this->dispatcher) {
             $this->dispatcher->dispatch($eventType, new InvitationEvent($invitation));
+        } else {
+            $this->logger->warning('Dispatcher is disabled for Invitation Service');
         }
     }
 

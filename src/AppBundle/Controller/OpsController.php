@@ -111,7 +111,7 @@ class OpsController extends BaseController
                 'Shared Bundle' => $event
             ]);
         } else {
-            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, ['Test Name' => $event]); 
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, ['Test Name' => $event]);
         }
 
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Queued', 200);

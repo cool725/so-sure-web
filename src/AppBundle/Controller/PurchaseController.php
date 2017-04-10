@@ -118,8 +118,12 @@ class PurchaseController extends BaseController
                             $existingUser->clearBillingAddress();
                             $user = $existingUser;
                         } else {
-                            $this->get('logger')->warning(sprintf(
-                                '%s received a already have account error and was taken to the login page',
+                            $this->get('app.mixpanel')->queueTrack(
+                                MixpanelService::EVENT_TEST,
+                                ['Test Name' => 'Purchase Login Redirect']
+                            );
+                            $this->get('logger')->info(sprintf(
+                                '%s received an already have account error and was taken to the login page',
                                 $purchase->getEmail()
                             ));
                             // @codingStandardsIgnoreStart
@@ -529,7 +533,7 @@ class PurchaseController extends BaseController
             throw new \Exception('Unable to locate payment');
         }
 
-        if ($payment->getUser()->getId() != $this->getUser()->getId()) {
+        if (!$this->getUser() || $payment->getUser()->getId() != $this->getUser()->getId()) {
             throw new AccessDeniedException('Unknown user');
         }
 

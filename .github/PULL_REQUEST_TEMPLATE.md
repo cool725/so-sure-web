@@ -1,6 +1,6 @@
 
 
-### Please ensure each section has one and only one box ticked
+### Tick box after approval. Only one box per section is necessary.
 
 Dev Approval
 * [ ] Ready to be released

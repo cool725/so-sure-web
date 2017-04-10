@@ -275,7 +275,6 @@ class JudopayService
 
     public function testPayDetails(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
     {
-        $payment = $this->apiClient->getModel('CardPayment');
         $data = array(
             'judoId' => $this->judoId,
             'yourConsumerReference' => $user->getId(),
@@ -291,8 +290,28 @@ class JudopayService
             $data['yourPaymentMetaData'] = ['policy_id' => $policyId];
         }
 
-        $payment->setAttributeValues($data);
-        $details = $payment->create();
+        // simple way of cloning an array
+        $dataCopy = json_decode(json_encode($data), true);
+
+        if (!$data) {
+            throw new \Exception('Missing data array');
+        }
+
+        try {
+            $payment = $this->apiClient->getModel('CardPayment');
+            $payment->setAttributeValues($data);
+            $details = $payment->create();
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending test payment: %s', json_encode($dataCopy)),
+                ['exception' => $e]
+            );
+
+            // retry
+            $payment = $this->apiClient->getModel('CardPayment');
+            $payment->setAttributeValues($dataCopy);
+            $details = $payment->create();
+        }
 
         return $details;
     }
@@ -1008,6 +1027,8 @@ class JudopayService
         $numRefunds = 0;
         $declined = 0;
         $numDeclined = 0;
+        $failed = 0;
+        $numFailed = 0;
         $total = 0;
         $maxDate = null;
         if (($handle = fopen($filename, 'r')) !== false) {
@@ -1030,6 +1051,9 @@ class JudopayService
                     } elseif ($line['TransactionResult'] == "Card Declined") {
                         $declined += $line['Net'];
                         $numDeclined++;
+                    } elseif ($line['TransactionResult'] == "Failed") {
+                        $failed += $line['Net'];
+                        $numFailed++;
                     } else {
                         throw new \Exception(sprintf('Unknown Transaction Result: %s', $line['TransactionResult']));
                     }
@@ -1056,6 +1080,8 @@ class JudopayService
             'date' => $maxDate,
             'declined' => $this->toTwoDp($declined),
             'numDeclined' => $numDeclined,
+            'failed' => $this->toTwoDp($failed),
+            'numFailed' => $numFailed,
             'data' => $lines,
         ];
 
@@ -1066,6 +1092,8 @@ class JudopayService
         $judoFile->addMetadata('numRefunds', $data['numRefunds']);
         $judoFile->addMetadata('declined', $data['declined']);
         $judoFile->addMetadata('numDeclined', $data['numDeclined']);
+        $judoFile->addMetadata('failed', $data['failed']);
+        $judoFile->addMetadata('numFailed', $data['numFailed']);
         $judoFile->setDate($data['date']);
 
         return $data;
