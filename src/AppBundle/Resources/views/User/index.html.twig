@@ -41,7 +41,7 @@
                                 <li class="clearfix">
                                     <img src="{{ invitation.inviter.getImageUrlFallback }}" class="img-circle pull-left" alt="">
                                     <h4 class="h4 pull-left">{{ invitation.inviter.name }}<br>
-                                    <small>Date</small></h4>
+                                    <small>Received on {{ invitation.created|date('d M Y H:i', 'Europe/London')  }}</small></h4>
                                     <ul class="list-inline pull-right">
                                         <li>{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-danger btn-rounded btn-xs'}}) }}</li>
                                         <li>{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-success btn-rounded btn-xs'}}) }}</li>
