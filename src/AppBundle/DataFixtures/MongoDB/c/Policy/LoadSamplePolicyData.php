@@ -107,7 +107,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $policyRepo = $manager->getRepository(Policy::class);
-        $policy = $policyRepo->findOneBy(['status' => Policy::STATUS_ACTIVE]);
+        $policy = $policyRepo->findOneBy(['status' => Policy::STATUS_ACTIVE, 'claims' => null]);
         $policyService = $this->container->get('app.policy');
         $policyService->cancel($policy, Policy::CANCELLED_ACTUAL_FRAUD, false);
         $manager->flush();
