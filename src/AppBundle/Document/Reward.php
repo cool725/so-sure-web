@@ -29,7 +29,13 @@ class Reward
     protected $user;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\StandardConnection")
+     * @MongoDB\ReferenceOne(targetDocument="SCode")
+     * @Gedmo\Versioned
+     */
+    protected $scode;
+
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\RewardConnection")
      */
     protected $connections = array();
 
@@ -38,6 +44,13 @@ class Reward
      * @Gedmo\Versioned
      */
     protected $potValue;
+
+    /**
+     * @Assert\Range(min=0,max=200)
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $defaultValue;
 
     public function __construct()
     {
@@ -63,6 +76,16 @@ class Reward
         $this->user = $user;
     }
 
+    public function getSCode()
+    {
+        return $this->scode;
+    }
+
+    public function setSCode($scode)
+    {
+        $this->scode = $scode;
+    }
+
     public function getConnections()
     {
         return $this->connections;
@@ -81,6 +104,16 @@ class Reward
     public function setPotValue($potValue)
     {
         $this->potValue = $potValue;
+    }
+
+    public function getDefaultValue()
+    {
+        return $this->toTwoDp($this->defaultValue);
+    }
+
+    public function setDefaultValue($defaultValue)
+    {
+        $this->defaultValue = $defaultValue;
     }
 
     public function updatePotValue()

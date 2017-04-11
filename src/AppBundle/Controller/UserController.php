@@ -138,11 +138,16 @@ class UserController extends BaseController
                 $policy = $this->getUser()->getCurrentPolicy();
                 try {
                     $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
-                    $message = sprintf(
-                        '%s has been invited',
-                        $invitation->getInvitee()->getName()
-                    );
-
+                    if ($invitation) {
+                        $message = sprintf(
+                            '%s has been invited',
+                            $invitation->getInvitee()->getName()
+                        );
+                    } else {
+                        $message = sprintf(
+                            'Your bonus has been added'
+                        );
+                    }
                     $this->addFlash('success', $message);
 
                     return new RedirectResponse($this->generateUrl('user_home'));
@@ -204,16 +209,25 @@ class UserController extends BaseController
                     return new RedirectResponse($this->generateUrl('user_home'));
                 }
             }
-        } elseif ($scode && $scode->isStandard()) {
-            // @codingStandardsIgnoreStart
-            $this->addFlash(
-                'success',
-                sprintf(
-                    '%s has invited you to connect. <a href="#" id="scode-link">Connect here!</a>',
-                    $scode->getPolicy()->getUser()->__toString()
-                )
-            );
-            // @codingStandardsIgnoreEnd
+        } elseif ($scode) {
+            if ($scode->isStandard()) {
+                $this->addFlash(
+                    'success',
+                    sprintf(
+                        '%s has invited you to connect. <a href="#" id="scode-link">Connect here!</a>',
+                        $scode->getUser()->getName()
+                    )
+                );
+            } elseif ($scode->isReward()) {
+                $this->addFlash(
+                    'success',
+                    sprintf(
+                        'Get your £%0.2f reward bonus from %s. <a href="#" id="scode-link">Connect here!</a>',
+                        $scode->getReward()->getDefaultValue(),
+                        $scode->getUser()->getName()
+                    )
+                );
+            }
         }
 
         return array(

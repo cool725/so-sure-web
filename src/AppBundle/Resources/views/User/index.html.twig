@@ -95,7 +95,7 @@
                     {% if policy.canInvite %}
                     <div id="scode-box" class="box-border-grey text-center">
                         <h4><strong>
-                            {% if scode and scode.isStandard %}
+                            {% if scode and scode.standard %}
                                 {{ scode.policy.user }} has invited you!
                             {% else %}
                                 Already received an invite?

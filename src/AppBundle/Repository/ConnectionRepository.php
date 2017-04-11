@@ -10,6 +10,29 @@ class ConnectionRepository extends BaseDocumentRepository
 {
     use PhoneTrait;
 
+    public function isConnectedByUser(Policy $policy, $user)
+    {
+        $connectionSourceLinks = $this->createQueryBuilder()
+            ->field('sourcePolicy')->references($policy)
+            ->field('linkedUser')->references($user)
+            ->getQuery()
+            ->execute();
+        if (count($connectionSourceLinks) > 0) {
+            return true;
+        }
+
+        $connectionLinkSources = $this->createQueryBuilder()
+            ->field('linkedPolicy')->references($policy)
+            ->field('sourceUser')->references($policy)
+            ->getQuery()
+            ->execute();
+        if (count($connectionLinkSources) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function isConnectedByEmail(Policy $policy, $email)
     {
         $connectionSourceLinks = $this->createQueryBuilder()
