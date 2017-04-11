@@ -11,3 +11,38 @@
     // Important!
     display: none;
 }
+
+// Fa list
+.fa-list-bullet {
+    padding-left: 30px;
+    margin: 15px 0;
+}
+
+.fa-list-bullet li {
+    position: relative;
+    padding-left: 10px;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.fa-list-bullet .fa {
+    position: absolute;
+    right: 100%; top: 2px;
+}
+
+// Video Embed
+.embed-container { 
+    position: relative; 
+    padding-bottom: 56.25%; 
+    height: 0; 
+    overflow: hidden; 
+    max-width: 100%; 
+} 
+
+.embed-container iframe, 
+.embed-container object, 
+.embed-container embed { 
+    position: absolute; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+}

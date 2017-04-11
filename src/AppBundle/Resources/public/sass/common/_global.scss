@@ -108,6 +108,17 @@ h5, h6, .h5, .h6 {
 			@include border-radius(4px);
 		}
 
+	    .box-border--highlight {
+	        border-color: $blue;
+	    }		
+
 	}
 
 
+
+// Fixes (Overide external plugins etc)
+
+	/* Hide the ProdPad Got Feedback button floating at bottom of page */
+	#pp-cfp-trigger {
+	    display: none !important;
+	}

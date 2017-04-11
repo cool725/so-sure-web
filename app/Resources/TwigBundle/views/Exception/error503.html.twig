@@ -2,6 +2,14 @@
 
 {% block title %}so-sure - Server Error{% endblock %}
 
+{% block stylesheets %}
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/error.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}          
+
 {% block body %}
 <section class="error-page">
     <div class="container">

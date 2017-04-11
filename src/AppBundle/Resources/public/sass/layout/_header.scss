@@ -83,6 +83,19 @@
 }
 
 // Cookie Consent
+/* Cookie */
+.cc-message {
+    padding-right: 15px;
+}
+
+.cc-compliance {
+    align-self: flex-start;
+}
+
+.cc-btn { 
+    margin-top: 5px;
+}
+
 .cc-window {
     flex-direction: row !important;
     justify-content: space-between !important;
@@ -95,4 +108,12 @@
 
 .cc-floating.cc-theme-classic {
     border-radius: 0;
+}
+
+@include breakpoint(tablet) {
+
+    .cc-btn { 
+        margin-top: 0;
+    }
+
 }

@@ -597,7 +597,7 @@ background: rgba(51, 153, 255, 1);
 
 /* MOVE TO components > _buttons.scss */
 
-.btn-success {
+/*.btn-success {
     background-color: #80CE4D;
     border-color: #80CE4D;
 }
@@ -606,7 +606,7 @@ background: rgba(51, 153, 255, 1);
 .btn-success:focus {
     background-color: #67A53E;
     border-color: #67A53E;
-}
+}*/
 
 /*.btn-subtle {
     background-color: #8B97B5;
@@ -788,7 +788,7 @@ a#get-quote-btn.btn.btn-primary {
   }
 }
 */
-.error-page {
+/*.error-page {
   padding-top: 100px;
   padding-bottom: 150px;
   text-align: center;
@@ -797,10 +797,10 @@ a#get-quote-btn.btn.btn-primary {
 .error-page img {
   width: 10%;
   margin: 20px 0 30px 0;
-}
+}*/
 
 /*Responsive table hack firefox*/
-@-moz-document url-prefix() {
+/*@-moz-document url-prefix() {
     fieldset {
         display: table-cell;
     }
@@ -809,14 +809,14 @@ a#get-quote-btn.btn.btn-primary {
 .faster-claims-table td {
     padding: 20px !important;
 }
-
-ul.lead li,
+*/
+/*ul.lead li,
 ul li.h3 {
     padding: 10px 0;
 }
-
+*/
 /* Fa list */
-.fa-list-bullet {
+/*.fa-list-bullet {
     padding-left: 30px;
     margin: 15px 0;
 }
@@ -831,10 +831,10 @@ ul li.h3 {
 .fa-list-bullet .fa {
     position: absolute;
     right: 100%; top: 2px;
-}
+}*/
 
 /* Cookie */
-.cc-message {
+./*cc-message {
     padding-right: 15px;
 }
 
@@ -856,15 +856,15 @@ ul li.h3 {
         font-size: 22px;
     }
 }
-
+*/
 /* Hide the ProdPad Got Feedback button floating at bottom of page */
-#pp-cfp-trigger {
+/*#pp-cfp-trigger {
     display: none !important;
-}
+}*/
 
 
 /* Panels Collapse */
-
+/*
 .panel-default > .panel-heading {
     background-color: #efefef;
     position: relative;
@@ -874,7 +874,6 @@ ul li.h3 {
 .panel-default > .panel-heading h4 {
     cursor: pointer;
     line-height: 1.5;
-    /*color: #fff;*/
 }
 
 .panel-default > .panel-heading:hover,
@@ -891,7 +890,7 @@ ul li.h3 {
 
 .panel-heading.panel-open:after {
     content: '\f078';
-}
+}*/
 
 /*.panel-heading.collapsed .accordion-toggle:after {
     font-family: FontAwesome;
@@ -906,7 +905,7 @@ ul li.h3 {
 }*/
 
 /* Video Embed */
-.embed-container { 
+/*.embed-container { 
     position: relative; 
     padding-bottom: 56.25%; 
     height: 0; 
@@ -920,4 +919,4 @@ ul li.h3 {
     position: absolute; 
     top: 0; left: 0; 
     width: 100%; height: 100%; 
-}
+}*/
