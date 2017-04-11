@@ -1,5 +1,5 @@
 /* MOVE TO common > _variable.scss */
-
+/*
 @charset "UTF-8";
 @font-face {
     font-family: 'Avenir LT Std 45 Book';
@@ -26,14 +26,11 @@
     src: local('/fonts/Avenir LT Std 35 Light'), url('/fonts/AvenirLTStd-Light.woff') format('woff');
 }
 
-
+*/
 
 /* MOVE TO common > _global.scss */
 
-html {
-  /*height: 100%;*/
-}
-
+/*
 html, body {
     overflow-y: scroll;
     overflow-x: hidden; 
@@ -44,43 +41,42 @@ body {
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
     line-height: 1.42857143;
     background-color: #ffffff;
-    /*height: 100%;*/
 }
 strong {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
+}*/
 
 /* Quick helpers */
 
-.error-text {
+/*.error-text {
     color: #FF6666;
 }
 
 .text-blue {
     color: #3399FF !important;
-}
+}*/
 
-.text-grey {
+/*.text-grey {
     color: #CCC !important;
-}
+}*/
 
-.text-light-blue {
+/*.text-light-blue {
     color: #D6EBFF !important;
 }
 
 .text-grey-blue {
     color: #8B97B5 !important;
 }
-
-.text-light-grey {
+*/
+/*.text-light-grey {
     color: #efefef !important;
-}
+}*/
 
-.text-dark-grey {
+/*.text-dark-grey {
     color: #626B78;
-}
+}*/
 
-.text-black {
+/*.text-black {
     color: #202532;
 }
 
@@ -99,18 +95,18 @@ strong {
 .text-white {
     color: #fff !important
 }
-
-.text-underline {
+*/
+/*.text-underline {
     text-decoration: underline !important;
 }
 
 .text-shadow {
     text-shadow: text-shadow: 0 1px 0 #000;
-}
-
+}*/
+/*
 .background-white {
     background-color: #fff;
-}
+}*/
 
 
 /* Borders */
@@ -125,9 +121,9 @@ strong {
     border-bottom: 2px solid #efefef;
 }*/
 
-@media (min-width: 340px) {
+/*@media (min-width: 340px) {
 
-    .box-border-grey { /* TODO // Refactor on quote page */
+    .box-border-grey { 
         padding: 15px;      
         margin-bottom: 25px;
         background-color: #fff;
@@ -139,9 +135,9 @@ strong {
         border-color: #02C9FF;
     }
 
-}
+}*/
 
-.center-xs {
+/*.center-xs {
     text-align: center;
 }
 
@@ -153,10 +149,10 @@ strong {
   
 
 }
-
+*/
 /* MOVE TO layout > _header.scss */
 
-.so-sure-logo-dark {
+/*.so-sure-logo-dark {
     background: transparent no-repeat center top url("/images/logo/so-sure-logo-dark.svg");
     background-size: 130px;
     width: 130px;
@@ -168,7 +164,7 @@ strong {
     background-size: 130px;
     width: 130px;
     height: 30px;
-}
+}*/
 
 /*.so-sure-logo-xmas {
     background: transparent no-repeat center top url("/images/logo/xmas-full-logo.svg");
@@ -189,7 +185,7 @@ strong {
 
 
 /* MOVE TO common > _global.scss */
-h1, h2, h3,
+/*h1, h2, h3,
 .h1, .h2, .h3 {
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #202532;
@@ -199,7 +195,7 @@ h4, h5, h6,
 .h4, .h5, .h6 {
     font-family: "Avenir LT Std 45 Book", "Helvetica Neue", Helvetica, Arial, sans-serif;    
     color: #202532;
-}
+}*/
 
 /*.list-fa {
     padding-left: 30px;
@@ -220,7 +216,7 @@ h4, h5, h6,
 
 /* App Badges classes for stand alone section -  LEGACY??? Remove  */
 
-.app-badge img {
+/*.app-badge img {
   width: inherit;
 }
 
@@ -240,10 +236,10 @@ h4, h5, h6,
   .app-badge img {
     padding-top: 10px;
   }
-}
+}*/
 
 /* Navigation: MOVE TO layout > _header.scss */
-
+/*
 .navbar-default {
     z-index: 1000;
     margin-bottom: 0;
@@ -275,9 +271,9 @@ h4, h5, h6,
 .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
     background-color: transparent;
     border: none;
-}
+}*/
 
-.cc-window {
+/*.cc-window {
     flex-direction: row !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -289,17 +285,17 @@ h4, h5, h6,
 
 .cc-floating.cc-theme-classic {
     border-radius: 0;
-}
+}*/
 
-@media (min-width: 991px) {
+/*@media (min-width: 991px) {
   .navbar-nav>li {
       margin: 0px 5px;
       padding: 0px 5px;
   }
 }
+*/
 
-
-@media (max-width: 767px) {
+/*@media (max-width: 767px) {
     .navbar-default .navbar-collapse {
       background-color: #fff;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
@@ -324,7 +320,7 @@ h4, h5, h6,
     .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
         background-color: transparent !important;
     }
-}
+}*/
 
 /* TEXT LINE BREAK */
 
@@ -353,7 +349,7 @@ h4, h5, h6,
 
 /* DOWNLOAD APP: MOVE TO components > _buttons.scss  */
 
-#app-store {
+/*#app-store {
     padding-top: 20px;
     text-align: center;
 }
@@ -383,11 +379,11 @@ h4, h5, h6,
     .download-app img {
         width: 50%;
     }
-}
+}*/
 
 /* BUTTONS: MOVE TO components > _buttons.scss  */
 
-#app-store .btn-danger {
+/*#app-store .btn-danger {
     color: #fff;
     background-color: #ff3300;
     border-color: #ff3300;
@@ -398,7 +394,7 @@ h4, h5, h6,
     background-color: #ff6666;
     border-color: #ff6666;
 }
-
+*/
 
 /* LOGIN: MOVE TO layouts > _pages.scss */
 
@@ -486,7 +482,7 @@ h4, h5, h6,
 
 /* Download Now */
 
-.download-now {
+/*.download-now {
     background-color: #FFF;
     padding: 80px 20px 150px 20px;
     text-align: center;
@@ -494,20 +490,20 @@ h4, h5, h6,
 }
 .download-now p {
     color: #626B78;
-}
+}*/
 
 /* Benefits */
 
-.benefits img {
+/*.benefits img {
     height: 150px;
     padding-top: 30px;
     padding-bottom: 30px;
 }
-
+*/
 
 /* Section Tools: MOVE TO common > _global.scss */
 
-.section--pad {
+/*.section--pad {
     padding: 40px 0;
 }
 
@@ -563,24 +559,19 @@ h4, h5, h6,
         vertical-align: middle;
     }  
 
-}
+}*/
 
-.loading-overlay {
+/*.loading-overlay {
     width: 100%; height: 100%;
     position: absolute;
     z-index: 9999;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(255, 255, 255, 0.9);
     display: none;
-}
+}*/
 
-/* : MOVE TO components > _effects.scss */
-
-.light-gradient {
-  background: #Efefef; /* fallback for old browsers */
-  background: -webkit-linear-gradient(to top, #efefef , #FFFFFF); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to top, #efefef , #FFFFFF); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-}
+/* : MOVE TO components > _pallete.scss */
+/*
 .brand-gradient {
   background: #202532;
   background: -webkit-linear-gradient(to right, #000428 , #004e92);
@@ -602,7 +593,7 @@ background: rgba(51, 153, 255, 1);
     background: -ms-linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
     background: linear-gradient(45deg, rgba(51, 153, 255, 1) 50%, rgba(0, 204, 255, 1) 100%);
     filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#3399ff', endColorstr='#00ccff', GradientType=1);
-}
+}*/
 
 /* MOVE TO components > _buttons.scss */
 
@@ -617,7 +608,7 @@ background: rgba(51, 153, 255, 1);
     border-color: #67A53E;
 }
 
-.btn-subtle {
+/*.btn-subtle {
     background-color: #8B97B5;
     border-color: #8B97B5;
 }
@@ -628,6 +619,7 @@ background: rgba(51, 153, 255, 1);
     border-color: #8B97B5;
     color: #fff;
 }
+*/
 
 .btn-rounded {
     border-radius: 100px;

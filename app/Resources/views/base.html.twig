@@ -8,7 +8,7 @@
 
         {% include '::header.html.twig' %}
 
-        {% block stylesheets %}
+{#         {% block stylesheets %}
             {% stylesheets output = 'css/*'
             '../app/Resources/public/css/bootstrap.min.css'
             'components/cookieconsent/cookieconsent.min.css'
@@ -17,7 +17,16 @@
             %}
             <link rel="stylesheet" href="{{ asset_url }}">
             {% endstylesheets %}
-        {% endblock %}
+        {% endblock %} #}
+        {% block stylesheets %}
+            {% stylesheets output='css/*.css'
+                '../app/Resources/public/css/bootstrap.min.css'
+                'components/cookieconsent/cookieconsent.min.css'
+                '@AppBundle/Resources/public/sass/main.scss'
+            %}
+            <link rel="stylesheet" href="{{ asset_url }}">
+            {% endstylesheets %}
+        {% endblock %}        
         {% block remotestylesheets %}
         {% endblock %}
         {% block metaend %}{% endblock %}

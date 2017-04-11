@@ -1,0 +1,98 @@
+// header.scss
+
+// Logo
+.so-sure-logo {
+	width: 130px; height: 30px;
+
+	&-dark {
+		background: transparent no-repeat center top url("/images/logo/so-sure-logo-dark.svg");
+	    background-size: 130px;
+	}
+
+	&-light {
+		background: transparent no-repeat center top url("/images/logo/so-sure-logo-light.svg");
+		background-size: 130px;		
+	}
+}
+
+// Navbar
+.navbar-default {
+    z-index: 1000;
+    margin-bottom: 0;
+    border: 0;
+    background: rgba(0,0,0,0.0);
+    display: block;
+}
+
+.navbar-default .navbar-collapse {
+	background-color: $white;
+	border-top: 2px solid $grey-light;
+	border-bottom: 2px solid $grey-light;	
+}
+
+.navbar-default .navbar-nav > li > a {
+    font-size: 14px;
+    padding-top: 20px;
+    color: $blue;
+
+    &:hover {
+    	color: $blue-hover;
+    }
+
+    &:focus {
+    	color: $black;
+    	border-color: $black;
+    }
+}
+
+.navbar-default .navbar-toggle {
+    background-color: transparent;
+    border: none;
+
+	.icon-bar {
+		background-color: $blue;
+	}
+
+	&:hover,
+	&:focus {
+		background-color: transparent;
+		border: none;
+
+		.icon-bar {
+			background-color: $blue-hover;
+		}
+	}
+}
+
+@include breakpoint(tablet) {
+
+	.navbar-default .navbar-collapse {
+		background-color: transparent;
+		border: none;
+	}
+
+}
+
+@include breakpoint(laptop) {
+	
+	.navbar-nav > li {
+		margin: 0 5px;
+		padding: 0 5px;
+	}
+
+}
+
+// Cookie Consent
+.cc-window {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.cc-window .cc-message {
+    margin-bottom: 0 !important;
+}
+
+.cc-floating.cc-theme-classic {
+    border-radius: 0;
+}

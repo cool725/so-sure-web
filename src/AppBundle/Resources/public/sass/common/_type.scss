@@ -1,0 +1,33 @@
+// type.scss
+
+// Import fonts
+@font-face {
+    font-family: 'Avenir LT Std 45 Book';
+    font-style: normal;
+    font-weight: 300;
+    src: local('/fonts/Avenir LT Std 45 Book'), url('/fonts/AvenirLTStd-Book.woff') format('woff');
+}
+@font-face {
+    font-family: 'Avenir LT Std 85 Heavy';
+    font-style: bold;
+    font-weight: 700;
+    src: local('/fonts/Avenir LT Std 85 Heavy'), url('/fonts/AvenirLTStd-Heavy.woff') format('woff');
+}
+@font-face {
+    font-family: 'Avenir LT Std 55 Oblique';
+    font-style: italic;
+    font-weight: 300;
+    src: local('/fonts/Avenir LT Std 55 Oblique'), url('/fonts/AvenirLTStd-Oblique.woff') format('woff');
+}
+@font-face {
+    font-family: 'Avenir LT Std 35 Light';
+    font-style: light;
+    font-weight: 200;
+    src: local('/fonts/Avenir LT Std 35 Light'), url('/fonts/AvenirLTStd-Light.woff') format('woff');
+}
+
+// Font stacks
+$avenir-book: 'Avenir LT Std 45 Book', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$avenir-heavy: 'Avenir LT Std 85 Heavy', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$avenir-oblique: 'Avenir LT Std 55 Oblique', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$avenir-light: 'Avenir LT Std 35 Light', 'Helvetica Neue', Helvetica, Arial, sans-serif;
