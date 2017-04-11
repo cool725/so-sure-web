@@ -259,7 +259,7 @@ class DefaultController extends BaseController
     public function designPatternsAction()
     {
         return [];
-    }    
+    }
 
     /**
      * @Route("/register", name="register")
