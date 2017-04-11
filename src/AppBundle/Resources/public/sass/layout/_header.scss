@@ -36,7 +36,7 @@
     color: $blue;
 
     &:hover {
-    	color: $blue-hover;
+    	color: darken($blue, 20%);
     }
 
     &:focus {
@@ -59,7 +59,7 @@
 		border: none;
 
 		.icon-bar {
-			background-color: $blue-hover;
+			background-color: darken($blue, 20%);
 		}
 	}
 }

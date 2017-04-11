@@ -21,6 +21,9 @@
 	@else if $point == mobileish {
 		@media (max-width: 340px)  { @content ; }
 	}	
+	@else if $point == mobileishup {
+		@media (min-width: 340px)  { @content ; }
+	}		
 }
 
 // Border Radius

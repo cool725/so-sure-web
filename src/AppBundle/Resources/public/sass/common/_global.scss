@@ -98,7 +98,7 @@ h5, h6, .h5, .h6 {
 		position: relative;
 	}
 
-	@include breakpoint(mobileish) {
+	@include breakpoint(mobileishup) {
 
 		.box-border-grey {
 			padding: 15px;

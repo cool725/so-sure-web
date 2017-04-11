@@ -63,7 +63,7 @@
                         <div class="h2">£{{ phone_price.monthlyPremiumPrice }} <small>per month</small></div>
                         <div class="visible-xs-block">
                             {{ form_start(buy_form_banner, { 'attr': {'class':'text-center'}}) }}
-                                {{ form_widget(buy_form_banner.buy, {'label': ' Get it now', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-lg'}}) }}
+                                {{ form_widget(buy_form_banner.buy, {'label': ' Get it now', 'attr': {'class': 'btn btn-success  btn-block btn-lg'}}) }}
                                 <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
                             {{ form_end(buy_form_banner)}}                            
                         </div>                        
@@ -95,7 +95,7 @@
                             <li>Every year you and your friends don’t claim, your reward pot is paid to you.</li>
                         </ul>                                       
                         {{ form_start(buy_form, { 'attr': {'class':'text-center'}}) }}
-                            {{ form_widget(buy_form.buy_tablet, {'label': ' Get it now', 'attr': {'class': 'btn btn-success btn-rounded btn-block btn-lg'}}) }}
+                            {{ form_widget(buy_form.buy_tablet, {'label': ' Get it now', 'attr': {'class': 'btn btn-success  btn-block btn-lg'}}) }}
                             <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
                         {{ form_end(buy_form)}}
                     </div>

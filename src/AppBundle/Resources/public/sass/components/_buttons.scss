@@ -1,2 +1,94 @@
 // _buttons.scss
 
+.btn {
+	@include border-radius(100px);
+	padding: 10px 20px;
+
+	&:focus {
+		outline: none;
+	}
+}
+
+// @mixin btn-bg($color, $border) {
+// 	background: $color;
+// 	border-color: $border;
+	
+// 	&:hover,
+// 	&:focus {
+// 		background: darken($color, 15%);
+// 		transition: all 0.3s ease;
+// 		border-color: darken($border, 15%);
+// 	}
+
+// 	&:active {
+// 		background:darken($color, 25%);
+// 		border-color: darken($border, 25%);
+// 	} 
+// }
+
+@mixin btn($background, $color) {
+	border-color: $background;
+	color: $color;
+	background-color: $background;
+
+	&:hover, &:focus {
+		background-color: darken($background, 15%);
+		transition: all 0.3s ease;
+		border-color: darken($background, 15%);
+	}
+
+	&:active {
+		background-color: darken($background, 25%);
+		transition: all 0.3s ease;
+		box-shadow: none;		
+	}
+
+	&-hollow {
+		background-color: none;
+		color: $background;
+		border: 2px solid $background; 
+	
+		&:hover, &:focus {
+	  		color: darken($background, 15%); 
+	  		border-color: darken($background, 15%);
+		}
+
+		&:active {
+	  		color: darken($background, 25%); 
+	  		border-color: darken($background, 25%);
+	  		box-shadow: none;		
+		}		
+	}
+}
+// End Mixin
+
+.btn-default {
+	@include btn($white, $white);
+}
+
+.btn-primary {
+	@include btn($blue, $white);
+}
+
+.btn-success {
+	@include btn($green, $white);
+}
+
+.btn-danger {
+	@include btn($red, $white);
+}
+
+.btn-warning {
+	@include btn($amber, $white);
+}
+
+.btn-info {
+	@include btn($blue-lighter, $white);
+}
+
+// .btn-hollow {
+// 	background: none;
+// 	border-width: 2px;
+// }
+
+
