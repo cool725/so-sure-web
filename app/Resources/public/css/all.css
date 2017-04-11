@@ -620,7 +620,7 @@ background: rgba(51, 153, 255, 1);
     color: #fff;
 }
 */
-
+/*
 .btn-rounded {
     border-radius: 100px;
     padding: 12px 30px;
@@ -642,9 +642,9 @@ background: rgba(51, 153, 255, 1);
 .btn-hollow {
     background: none;
     border-width: 2px;
-    color: #3399ff; /* Bit hacky sort with addition of SASS */
-}
 
+}*/
+/*
 .btn-hollow-subtle {
     color: #8B97B5;
 }
@@ -653,7 +653,7 @@ background: rgba(51, 153, 255, 1);
     content: '\f053';
     font-family: FontAwesome;
     position: absolute;
-    /*left: 5px;  */
+
 }
 
 .btn-rounded.btn-arrow-left:after {
@@ -664,7 +664,7 @@ background: rgba(51, 153, 255, 1);
     content: '\f054';
     font-family: FontAwesome;
     position: absolute;
-    /*right: 5px;  */
+
 }
 
 .btn-rounded.btn-arrow-right:after {
@@ -675,7 +675,7 @@ background: rgba(51, 153, 255, 1);
     content: '\f04b';
     font-family: FontAwesome;
     position: absolute;
-    /*right: 5px;  */
+
 }
 
 .btn-rounded.btn-play-right:after {
@@ -696,7 +696,7 @@ background: rgba(51, 153, 255, 1);
 .btn:focus {
   outline: none;
 }
-
+*/
 .explainer-video-thumb {
     margin: 30px 0;
     cursor: pointer;
@@ -704,7 +704,7 @@ background: rgba(51, 153, 255, 1);
 }
 
 /* Main CTA: MOVE TO components > _buttons.scss  */
-
+/*
 @media (min-width: 992px) {
 .main-cta {
     display: flex;
@@ -712,11 +712,11 @@ background: rgba(51, 153, 255, 1);
     justify-content: center;
     height: 575px;
   }
-}
+}*/
 
 /* Footer CTA: MOVE TO components > _buttons.scss / layouts > _footer.scss */
 
-.footer-cta {
+/*.footer-cta {
   color: #fff;
   padding: 40px;
 }
@@ -787,7 +787,7 @@ a#get-quote-btn.btn.btn-primary {
     text-align: center !important;
   }
 }
-
+*/
 .error-page {
   padding-top: 100px;
   padding-bottom: 150px;

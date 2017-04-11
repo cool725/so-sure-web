@@ -28,6 +28,7 @@
 
 @mixin btn($background, $color) {
 	border-color: $background;
+	border-width: 2px;
 	color: $color;
 	background-color: $background;
 
@@ -84,6 +85,16 @@
 
 .btn-info {
 	@include btn($blue-lighter, $white);
+}
+
+.btn-black {
+	@include btn($black, $white);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: $white;
+	}
 }
 
 // .btn-hollow {

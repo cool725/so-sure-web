@@ -32,3 +32,31 @@
 .partnership {
 	background-color: $grey-light;
 }
+
+// Footer (Banner) CTA
+.footer-cta {
+	padding: 40px 0;
+	color: $white;
+	text-align: center;
+
+	h2 {
+		color: $white;
+		margin: 0;
+	}
+
+	li {
+		width: 45%;
+	}
+}
+
+@include breakpoint(laptop) {
+
+	.footer-cta {
+		text-align: left;
+
+		p {
+			margin: 0;
+		}		
+	}
+
+}
