@@ -12,7 +12,12 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\Invitation\InvitationRepository")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("invitation_type")
- * @MongoDB\DiscriminatorMap({"email"="EmailInvitation", "sms"="SmsInvitation"})
+ * @MongoDB\DiscriminatorMap({
+ *          "email"="EmailInvitation",
+ *          "sms"="SmsInvitation",
+ *          "scode"="SCodeInvitation",
+ *          "facebook"="FacebookInvitation"
+ * })
  * @MongoDB\Index(keys={"email"="asc", "mobile"="asc", "policy.id"="asc"}, sparse="true", unique="true")
  */
 abstract class Invitation
@@ -102,6 +107,7 @@ abstract class Invitation
     abstract public function getChannel();
     abstract public function getMaxReinvitations();
     abstract public function getInvitationDetail();
+    abstract public function getChannelDetails();
 
     public function __construct()
     {
@@ -370,6 +376,8 @@ abstract class Invitation
         } else {
             $data['image_url'] = $this->getInviteeImageUrl();
         }
+
+        $data['channel_details'] = $this->getChannelDetails();
 
         if ($debug) {
             $data = array_merge($data, [
