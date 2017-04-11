@@ -112,7 +112,9 @@ assetic:
     use_controller: '%kernel.debug%'
     filters:
         cssrewrite: ~
-
+        sass:
+            bin:        /usr/local/bin/sass
+            apply_to:   '\.sass$'
 fos_user:
     db_driver: mongodb
     firewall_name: main
