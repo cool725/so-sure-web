@@ -45,7 +45,7 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
-     * @Template
+     * @Route("/discount-vouchers", name="discount-vouchers")
      */
     public function indexAction(Request $request)
     {
@@ -126,7 +126,7 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        return array(
+        $data = array(
             'form_top' => $formTop->createView(),
             'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
@@ -134,6 +134,12 @@ class DefaultController extends BaseController
             'i7' => $i7,
             's7' => $s7
         );
+
+        if (in_array($request->get('_route'), ['discount-vouchers'])) {
+            return $this->render('AppBundle:Default:discountVouchers.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:Default:index.html.twig', $data);
+        }
     }
 
     /**
