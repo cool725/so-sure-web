@@ -122,3 +122,16 @@ h5, h6, .h5, .h6 {
 	#pp-cfp-trigger {
 	    display: none !important;
 	}
+
+	// Digits login
+	.digits-container iframe {
+		height: 250px;
+	}	
+
+	@include breakpoint(mobileishup) {
+		.digits-container iframe {
+			height: 200px;
+		}	
+	}
+
+

@@ -8,16 +8,6 @@
 
         {% include '::header.html.twig' %}
 
-{#         {% block stylesheets %}
-            {% stylesheets output = 'css/*'
-            '../app/Resources/public/css/bootstrap.min.css'
-            'components/cookieconsent/cookieconsent.min.css'
-            '../app/Resources/public/css/all.css'
-            '../app/Resources/public/css/footer.css'
-            %}
-            <link rel="stylesheet" href="{{ asset_url }}">
-            {% endstylesheets %}
-        {% endblock %} #}
         {% block stylesheets %}
             {% stylesheets output='css/*.css'
                 '../app/Resources/public/css/bootstrap.min.css'

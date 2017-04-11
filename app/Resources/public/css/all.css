@@ -111,9 +111,9 @@ strong {
 
 /* Borders */
 
-.box-border-grey {
+/*.box-border-grey {
     position: relative;
-}
+}*/
 
 /*.bottom-border-grey {
     padding-bottom: 15px;
@@ -397,7 +397,7 @@ h4, h5, h6,
 */
 
 /* LOGIN: MOVE TO layouts > _pages.scss */
-
+/*
 .swap-login-wrapper {
     margin-top: 40px;
 }
@@ -453,9 +453,9 @@ h4, h5, h6,
 
 .login .btn-facebook {
     margin-top: 60px;
-}
+}*/
 
-.reset-error-box {
+/*.reset-error-box {
     border: 2px solid red !important;
 }
 .reset-error {
@@ -478,7 +478,7 @@ h4, h5, h6,
   .digits-container iframe {
     height: 250px;
   }
-}
+}*/
 
 /* Download Now */
 
@@ -697,11 +697,11 @@ background: rgba(51, 153, 255, 1);
   outline: none;
 }
 */
-.explainer-video-thumb {
+/*.explainer-video-thumb {
     margin: 30px 0;
     cursor: pointer;
     border: 2px solid #eee;
-}
+}*/
 
 /* Main CTA: MOVE TO components > _buttons.scss  */
 /*
