@@ -324,7 +324,7 @@ h4, h5, h6,
 
 /* TEXT LINE BREAK */
 
-.text-break {
+/*.text-break {
     color: #202532;
     padding: 20px 0;
     font-family: "Avenir LT Std 85 Heavy", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -345,7 +345,7 @@ h4, h5, h6,
 .text-break .line:last-of-type {
     margin-right: 0;
 }
-
+*/
 
 /* DOWNLOAD APP: MOVE TO components > _buttons.scss  */
 
