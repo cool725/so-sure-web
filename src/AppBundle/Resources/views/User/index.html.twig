@@ -56,7 +56,7 @@
                     <div class="user-homepage--section">
                         <h3 class="text-grey-blue">Connections</h3>                        
                         <ul class="list-inline">
-                            {% for connection in policy.standardConnections %}
+                            {% for connection in policy.connections %}
                             <li>
                                 <img src="{{ connection.linkedUser.getImageUrlFallback }}"
                                 title="{{ connection.linkedUser.name }}"
@@ -73,7 +73,7 @@
                                 data-content="Connected on {{ connection.date|date('dS M') }}
                                     {# If policy has claimed, pot should be 0, so don't display connection values as confusing #}
                                     {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                                        (£{{ connection.value|number_format(2, '.', ',')  }})
+                                        (£{{ connection.totalValue|number_format(2, '.', ',')  }})
                                     {% endif %}
                                     ">
                             </li>
@@ -95,7 +95,7 @@
                     {% if policy.canInvite %}
                     <div id="scode-box" class="box-border-grey text-center">
                         <h4><strong>
-                            {% if scode %}
+                            {% if scode and scode.isStandard %}
                                 {{ scode.policy.user }} has invited you!
                             {% else %}
                                 Already received an invite?
