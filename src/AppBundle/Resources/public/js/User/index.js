@@ -49,16 +49,15 @@ $(function(){
     // });    
 
     // Connect with
-    // $('#scode-link').click(function(event) {
+    $('#scode-link').click(function(event) {
+        event.preventDefault();
 
-    //     event.preventDefault();
+        $('html, body').animate({
+            scrollTop: $('#scode-box').offset().top - 100
+        }, 1500);
 
-    //     $('html, body').animate({
-    //         scrollTop: $('#scode-box').offset().top - 100
-    //     }, 1500);
-
-    //     $('#scode-box').addClass('box-border--highlight');
-    // });    
+        $('#scode-box').addClass('box-border--highlight');
+    });
     
     // Copy button on scode
     var clipboard = new Clipboard('.btn-copy');

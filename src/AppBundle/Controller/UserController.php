@@ -203,7 +203,7 @@ class UserController extends BaseController
                     return new RedirectResponse($this->generateUrl('user_home'));
                 }
             }
-        } elseif ($scode) {
+        } elseif ($scode && $scode->isStandard()) {
             // @codingStandardsIgnoreStart
             $this->addFlash(
                 'success',
