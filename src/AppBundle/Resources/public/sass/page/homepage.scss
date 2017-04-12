@@ -1,0 +1,55 @@
+// homepage.scss
+
+@import "../mixins.scss";
+@import "../common/palette.scss";
+
+body {
+	@extend .brand-gradient;
+}
+
+// Adjust Navbar
+
+.navbar-default .navbar-nav > li > a {
+    font-size: 14px;
+    padding-top: 20px;
+    color: $blue;
+
+    &:hover {
+    	color: darken($blue, 20%);
+    	transition: all 0.3s ease;
+    }
+
+    &:focus {
+    	color: $black;
+    	border-color: $black;
+    	outline: none;
+    }
+    transition: all 0.3s ease;
+	
+	@include breakpoint(tablet) {
+		
+		color: $white;
+
+	}
+
+}
+
+.navbar-default .navbar-toggle {
+    background-color: transparent;
+    border: none;
+
+	.icon-bar {
+		background-color: $white;
+	}
+
+	&:hover, &:focus {
+		background-color: transparent;
+		border: none;
+		outline: none;
+		transition: all 0.3s ease;
+
+		.icon-bar {
+			background-color: darken($blue, 20%);
+		}
+	}
+}

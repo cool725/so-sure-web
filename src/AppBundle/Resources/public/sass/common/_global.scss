@@ -93,6 +93,15 @@ h5, h6, .h5, .h6 {
 		text-decoration: underline !important; 
 	}
 
+	// Backgrounds
+	.background-white {
+		background-color: $white;
+	}
+
+	.background-light-grey {
+		background-color: $grey-light;
+	}
+
 	// Borders
 	.box-border-grey {
 		position: relative;

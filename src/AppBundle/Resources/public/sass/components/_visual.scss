@@ -72,8 +72,22 @@
 }
 
 // Video
+.explainer-video {}
+
 .explainer-video-thumb {
-    margin: 30px 0;
+    position: relative;
+    margin: 20px 0 0;
     cursor: pointer;
-    border: 2px solid $grey-light;
+
+    svg  {
+        width: 80px;
+        position: absolute;
+        top: calc(50% - 40px); left: calc(50% - 40px);
+        transition: all 1s ease;
+    }
+
+    &:hover svg #play-bg {
+        fill: $green;
+    }
 }
+

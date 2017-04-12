@@ -1,0 +1,52 @@
+// article.scss
+
+@import "../mixins.scss";
+@import "../common/palette.scss";
+
+.hero h1 {
+	text-align: center;
+	padding-top: 20px;
+}
+
+.article-content {
+	background-color: $white;
+
+	p {
+		line-height: 2;
+		font-size: 18px;
+		margin: 0 0 20px;
+	}
+
+	ul {
+		margin: 0 0 20px;
+
+		li {
+			line-height: 2;
+			font-size: 18px;
+		}
+	}
+
+	img {
+		margin: 0 0 20px;
+	}
+
+	.h2 {
+		margin-bottom: 20px;
+	}
+}
+
+.thinkYourIPhone7IsInsuredByYourBank {
+    // background: $blue;
+   	// background-image: url(https://cdn.so-sure.com/images/articles/iphone7back.jpg);
+	@extend .brand-gradient;    
+    // background-position: top; 
+    // background-size: cover;
+}
+
+.isInsuranceWithVodafoneAllThatItSeems {
+    // background: $blue;
+	// background-image: url(https://cdn.so-sure.com/images/articles/vodafone-back.jpg);
+	@extend .brand-gradient;    
+	// background-position: top; 
+    // background-size: cover;  
+}

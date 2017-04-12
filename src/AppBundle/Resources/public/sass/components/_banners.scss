@@ -1,0 +1,38 @@
+// banners.scss
+
+.banner-sticky {
+	width: 100%;
+	position: fixed;
+	top: 0; left: 0;
+	padding: 15px 0;
+	z-index: 7000;
+	background-color: $black-opaque;
+	text-align: center;
+	transition: all 0.3s easeInQuart;
+
+	h3 {
+		margin: 0 0 5px;
+		color: $white;
+
+		span {
+			font-size: 65%;
+		
+			@include breakpoint(laptop) {		
+				font-size: inherit;
+			}				
+		}
+	}
+
+	@include breakpoint(tablet) {
+		text-align: left;
+
+		h3 {
+			margin: 10px 0;
+		}
+	}
+
+}
+
+.banner-sticky-hide {
+	display: none;
+}

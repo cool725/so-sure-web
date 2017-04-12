@@ -15,10 +15,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    '@AppBundle/Resources/public/css/Default/index.css'
-    '@AppBundle/Resources/public/css/Default/article.css'    
-    '@AppBundle/Resources/public/css/Default/modal.css' %}   
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/article.scss' %}   
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 

@@ -9,23 +9,6 @@
 	}
 }
 
-// @mixin btn-bg($color, $border) {
-// 	background: $color;
-// 	border-color: $border;
-	
-// 	&:hover,
-// 	&:focus {
-// 		background: darken($color, 15%);
-// 		transition: all 0.3s ease;
-// 		border-color: darken($border, 15%);
-// 	}
-
-// 	&:active {
-// 		background:darken($color, 25%);
-// 		border-color: darken($border, 25%);
-// 	} 
-// }
-
 @mixin btn($background, $color) {
 	border-color: $background;
 	border-width: 2px;
@@ -98,13 +81,11 @@
 	}
 }
 
+.btn-link-white {
+	@include btn(transparent, $white);
+}
+
 .btn-facebook {
 	@include btn($facebook, $white);
 }
-
-// .btn-hollow {
-// 	background: none;
-// 	border-width: 2px;
-// }
-
 

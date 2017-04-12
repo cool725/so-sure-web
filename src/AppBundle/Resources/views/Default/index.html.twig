@@ -12,26 +12,10 @@
     <meta name="keywords" content="mobile phone insurance, social insurance"/>
 {% endblock %}
 
-{# {% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets
-    '@AppBundle/Resources/public/css/Default/index.css'
-    '@AppBundle/Resources/public/css/Default/index.sass'
-    '@AppBundle/Resources/public/css/Default/homepage.css'
-    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
-    '@AppBundle/Resources/public/css/Default/scrollindicator.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'        
-    '@AppBundle/Resources/public/css/Default/videoOverlay.css'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
- #}
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
-    '@AppBundle/Resources/public/css/Default/scrollindicator.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'        
-    '@AppBundle/Resources/public/css/Default/videoOverlay.css'
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/homepage.scss'      
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 

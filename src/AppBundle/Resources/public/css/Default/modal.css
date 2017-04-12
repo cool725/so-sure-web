@@ -1,7 +1,7 @@
 /* Modal: MOVE TO components > _modal.scss */
 
 /* Standards */
-
+/*
 .modal {
 	background-color: rgba(0, 0, 0, 0.8);
 	opacity: .40;
@@ -13,41 +13,41 @@
 	border: 0;
 	border-radius: 0;
 	box-shadow: none;
-}
+}*/
 
 /* Header */
 
-.modal-header {
+/*.modal-header {
 	border-bottom: none;
 	padding: 15px 25px 0;
-}
+}*/
 
-.modal-header h2,
+/*.modal-header h2,
 .modal-header h3,
 .modal-header h4,
 .modal-header h5 {
 	border-bottom: 2px solid #efefef;
 	padding-bottom: 15px;
-}
+}*/
 
-.close {
+/*.close {
 	opacity: 1;
 	color: #626B78;
-}
+}*/
 
 /* Body */
 
-.modal-body {
+/*.modal-body {
 	padding: 15px 25px;	
-}
+}*/
 
 /* Footer */
 
-.modal-footer {}
+/*.modal-footer {}*/
 
 /* Fullscreen */
 
-.modal-fullscreen .modal-dialog {
+/*.modal-fullscreen .modal-dialog {
 	width: 100%;	
 	margin: 0 auto
 }
@@ -94,16 +94,13 @@
 		width: 1170px;
 	}
 
-}
+}*/
 
 /* Variations */
 
-.modal-middle { /* Align In the Middle */
-	padding-top: 10%;
-}
 
 /* Policy Modal */
-
+/*
 .modal-policy h1 {
 	font-size: 24px;
 }
@@ -160,4 +157,4 @@
 .modal-policy th {
 	font-weight: bold;
 }
-
+*/

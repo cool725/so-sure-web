@@ -1,6 +1,6 @@
 /* VIDEO OVERLAY: MOVE TO layouts > _includes.scss */
 
-.explainer-video {
+/*.explainer-video {
     cursor: pointer;
     margin-top: 70px;
     margin-bottom: 20px;
@@ -41,8 +41,8 @@
     width: 90%;
     height: 170px;
   }
-}
-.explainer-video-overlay {
+}*/
+/*.explainer-video-overlay {
   background-image: url(https://cdn.so-sure.com/images/home/explainer-video/video-overlay-play.png);
   background-size: cover;
   -webkit-background-size: cover;
@@ -60,10 +60,10 @@
     opacity: 1;
     text-decoration: none;
 }
-
+*/
 /* Video */
 
-#play-button {
+/*#play-button {
     position: absolute;
     top: calc(50% - 40px);
     left: calc(50% - 40px);
@@ -91,4 +91,4 @@
 
 .explainer-video-view-thumb:hover img {
     box-shadow: 0px 0px 20px 3px rgba(0, 0, 0, 0.5);
-}
+}*/
