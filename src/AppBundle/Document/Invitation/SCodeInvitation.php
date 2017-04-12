@@ -14,7 +14,6 @@ class SCodeInvitation extends Invitation
 {
     /**
      * @MongoDB\ReferenceOne(targetDocument="SCode")
-     * @Gedmo\Versioned
      */
     protected $scode;
 
