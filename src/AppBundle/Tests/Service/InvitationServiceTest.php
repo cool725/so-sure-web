@@ -1475,7 +1475,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals(
             'abcdefgh',
             static::$invitationService->resolveSCode('https://goo.gl/wSZGbc'),
-            'If error, try clearing cache.'
+            'If error, try running webvagrant, as requires server running on localhost.'
         );
         $this->assertEquals(
             'abcdefgh',
