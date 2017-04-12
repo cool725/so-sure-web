@@ -15,6 +15,7 @@ class SixpackService
 
     const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
     const EXPERIMENT_LANDING_HOME = 'landing-or-home';
+    const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
 
     /** @var LoggerInterface */
     protected $logger;
