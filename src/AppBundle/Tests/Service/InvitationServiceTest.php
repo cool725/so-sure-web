@@ -717,6 +717,17 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof SCodeInvitation);
         $this->assertNotNull($invitation->getInvitee());
         $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($policyInvitee->getStandardSCode()->getId(), $invitation->getSCode()->getId());
+        
+        $updatedInvitee = static::$userRepo->find($userInvitee->getId());
+        \Doctrine\Common\Util\Debug::dump($updatedInvitee);
+        $foundInvite = false;
+        foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
+            if ($invitation->getId() == $receviedInvitation->getId()) {
+                $foundInvite = true;
+            }
+        }
+        $this->assertTrue($foundInvite);
     }
 
     /**
