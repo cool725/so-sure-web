@@ -14,6 +14,7 @@ class SixpackService
     const TIMEOUT = 3;
 
     const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
+    const EXPERIMENT_LANDING_HOME = 'landing-or-home';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -26,26 +27,34 @@ class SixpackService
     /** @var RequestService */
     protected $requestService;
 
+    /** @var MixpanelService */
+    protected $mixpanel;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $url
      * @param RequestService  $requestService
+     * @param MixpanelService $mixpanel
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         $url,
-        RequestService $requestService
+        RequestService $requestService,
+        MixpanelService $mixpanel
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->url = $url;
         $this->requestService = $requestService;
+        $this->mixpanel = $mixpanel;
     }
 
-    public function participate($experiment, $alternatives, $trafficFraction = 1)
+    public function participate($experiment, $alternatives, $logMixpanel = false, $trafficFraction = 1)
     {
+        // default to first option
+        $result = $alternatives[0];
         try {
             $data = [
                 'experiment' => $experiment,
@@ -69,23 +78,47 @@ class SixpackService
             // {"status": "ok", "alternative": {"name": "red"}, "experiment": {"name": "button_color"}, "client_id": "12345678-1234-5678-1234-567812345678"}
             // @codingStandardsIgnoreEnd
             $data = json_decode($body, true);
-    
-            return $data['alternative']['name'];
+            $result = $data['alternative']['name'];
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Failed exp %s', $experiment), ['exception' => $e]);
         }
 
-        return $alternatives[0];
+        if ($logMixpanel) {
+            $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], false);
+        }
+
+        return $result;
     }
 
-    public function convert($experiment, $requireParticipating = true)
+    public function convert($experiment, $expectParticipating = false)
+    {
+        $unauth = $this->convertByClientId($this->requestService->getTrackingId(), $experiment);
+        if ($user = $this->requestService->getUser()) {
+            $auth = $this->convertByClientId($user->getId(), $experiment);
+        }
+
+        if (!$unauth && !$auth && $expectParticipating) {
+            if ($user) {
+                $this->logger->warning(sprintf(
+                    'Expected participation in experiment %s for user %s',
+                    $experiment,
+                    $user->getId()
+                ));
+            } else {
+                $this->logger->warning(sprintf(
+                    'Expected participation in experiment %s for anon user',
+                    $experiment
+                ));                
+            }
+        }
+    }
+
+    public function convertByClientId($clientId, $experiment)
     {
         try {
             $data = [
                 'experiment' => $experiment,
-                'client_id' => $this->requestService->getUser() ?
-                    $this->requestService->getUser()->getId() :
-                    $this->requestService->getTrackingId(),
+                'client_id' => $clientId
             ];
             $query = http_build_query($data);
             $url = sprintf('%s/convert?%s', $this->url, $query);
@@ -99,15 +132,15 @@ class SixpackService
             // {"status": "ok", "alternative": {"name": "red"}, "experiment": {"name": "button_color"}, "conversion": {"kpi": null, "value": null}, "client_id": "12345678-1234-5678-1234-567812345678"}
             // @codingStandardsIgnoreEnd
             $data = json_decode($body, true);
-    
-            return $data['alternative']['name'];
+
+            return true;
         } catch (ClientException $e) {
             $res = $e->getResponse();
             $body = (string) $res->getBody();
             $data = json_decode($body, true);
             // {"status": "failed", "message": "this client was not participating"}
-            if (!$requireParticipating && stripos($data['message'], 'not participating') !== false) {
-                $this->logger->info(sprintf('Did not particiapte exp %s', $experiment), ['exception' => $e]);
+            if (stripos($data['message'], 'not participating') !== false) {
+                return null;
             } else {
                 $this->logger->error(sprintf('Failed converting exp %s', $experiment), ['exception' => $e]);
             }
@@ -115,6 +148,6 @@ class SixpackService
             $this->logger->error(sprintf('Failed converting exp %s', $experiment), ['exception' => $e]);
         }
 
-        return null;
+        return false;
     }
 }

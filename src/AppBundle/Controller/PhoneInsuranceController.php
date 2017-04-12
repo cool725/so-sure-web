@@ -115,7 +115,7 @@ class PhoneInsuranceController extends BaseController
         $phone = null;
         $decodedModel = Phone::decodeModel($model);
         if ($id) {
-            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_AA, false);
+            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_AA);
 
             $phone = $repo->find($id);
             if ($phone->getMemory()) {
@@ -197,6 +197,17 @@ class PhoneInsuranceController extends BaseController
                 'make' => $phone->getMake(),
                 'model' => $phone->getEncodedModel(),
             ], UrlGeneratorInterface::ABSOLUTE_URL));
+        }
+
+        if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
+            $exp = $this->get('app.sixpack')->participate(
+                SixpackService::EXPERIMENT_LANDING_HOME,
+                ['landing', 'home'],
+                true
+            );
+            if ($exp == 'home') {
+                return new RedirectResponse($this->generateUrl('homepage'));
+            }
         }
 
         $user = new User();
