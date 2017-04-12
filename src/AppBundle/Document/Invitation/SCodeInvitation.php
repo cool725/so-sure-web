@@ -10,10 +10,10 @@ use AppBundle\Document\SCode;
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\Invitation\SCodeInvitationRepository")
  */
-class SCodeInvitation extends Invitation
+class SCodeInvitation extends EmailInvitation
 {
     /**
-     * @MongoDB\ReferenceOne(targetDocument="SCode")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\SCode")
      */
     protected $scode;
 
@@ -25,11 +25,6 @@ class SCodeInvitation extends Invitation
     public function getChannel()
     {
         return 'scode';
-    }
-
-    public function getMaxReinvitations()
-    {
-        return 5;
     }
 
     public function getInvitationDetail()

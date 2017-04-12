@@ -17,6 +17,7 @@ use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
+use AppBundle\Document\Invitation\SCodeInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\PhoneTrait;
 
@@ -167,7 +168,7 @@ class InvitationService
         return $invitationUrl;
     }
 
-    public function setInvitee(Invitation $invitation)
+    public function setInvitee(Invitation $invitation, $user = null)
     {
         $userRepo = $this->dm->getRepository(User::class);
         if ($invitation instanceof EmailInvitation) {
@@ -181,6 +182,14 @@ class InvitationService
             if ($user && $invitation->getInviter()->getId() != $user->getId()) {
                 $invitation->setInvitee($user);
                 $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
+            }
+        } elseif ($invitation instanceof SCodeInvitation) {
+            $scode = $invitation->getSCode();
+            if ($scode->isStandard()) {
+                if ($user && $invitation->getInviter()->getId() != $user->getId()) {
+                    $invitation->setInvitee($user);
+                    $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
+                }
             }
         }
     }
@@ -416,7 +425,7 @@ class InvitationService
         $prevInvitations = $invitationRepo->findDuplicate($policy, $scode);
         foreach ($prevInvitations as $prevInvitation) {
             if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
-                throw new DuplicateInvitationException('Email was already invited to this policy');
+                throw new DuplicateInvitationException('SCode was already invited to this policy');
             } elseif ($prevInvitation->isCancelled()) {
                 // Reinvitating a cancelled invitation, should re-active invitation
                 $invitation = $prevInvitation;
@@ -428,26 +437,33 @@ class InvitationService
                 $invitation = $prevInvitation;
                 $isReinvite = true;
             } else {
-                throw new DuplicateInvitationException('Email was already invited to this policy');
+                throw new DuplicateInvitationException('SCode was already invited to this policy');
             }
         }
 
         if (!$invitation) {
-            $invitation = new EmailInvitation();
-            $invitation->setEmail($email);
+            $invitation = new SCodeInvitation();
+            $invitation->setEmail($user->getEmail());
+            $invitation->setSCode($scode);
             $invitation->setPolicy($policy);
-            $invitation->setName($name);
-            $this->setInvitee($invitation);
+            $invitation->setName($user->getName());
+            $this->setInvitee($invitation, $user);
             $invitation->invite();
+
+            if ($scode->isReward()) {
+                $invitation->setAccepted(new \DateTime());
+            }
             $this->dm->persist($invitation);
             $this->dm->flush();
 
-            $link = $this->getShortLink($invitation);
-            $invitation->setLink($link);
+            if (!$scode->isReward()) {
+                $link = $this->getShortLink($invitation);
+                $invitation->setLink($link);
+            }
             $this->dm->flush();
         }
 
-        if (!$skipSend) {
+        if ($scode->isStandard()) {
             if ($invitation->getInvitee()) {
                 // User invite is the same for reinvite
                 $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE_USER);

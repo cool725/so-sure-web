@@ -15,6 +15,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
+use AppBundle\Document\Invitation\SCodeInvitation;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 
@@ -696,6 +697,28 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
     }
 
+    public function testSCodeInvitationInvitee()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationInvitee-inviter', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationInvitee-invitee', $this),
+            'bar'
+        );
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteBySCode($policy, $policyInvitee->getStandardSCode()->getCode());
+        $this->assertTrue($invitation instanceof SCodeInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
+    }
+
     /**
      * @expectedException AppBundle\Exception\SelfInviteException
      */
@@ -771,6 +794,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('inviter-scode', $this),
             'bar'
         );
+        static::$dm->persist($inviterUser);
         $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
 
         $inviteeUser = static::createUser(
@@ -778,6 +802,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invitee-scode', $this),
             'bar'
         );
+        static::$dm->persist($inviteeUser);
         $inviteePolicy = static::initPolicy($inviteeUser, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteBySCode(
