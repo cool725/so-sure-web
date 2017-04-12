@@ -150,6 +150,10 @@ class MixpanelService
 
     public function attributionByUser(User $user = null)
     {
+        $data = null;
+        if (!$user) {
+            return null;
+        }
         $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
         $results = $this->mixpanelData->data('engage', [
             'where' => $search

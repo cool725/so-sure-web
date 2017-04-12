@@ -22,6 +22,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
 use AppBundle\Service\MixpanelService;
+use AppBundle\Service\SixpackService;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
@@ -296,6 +297,8 @@ class UserController extends BaseController
         if (!$user->hasActivePolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         }
+
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
 
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
