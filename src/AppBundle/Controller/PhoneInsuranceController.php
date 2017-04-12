@@ -361,7 +361,7 @@ class PhoneInsuranceController extends BaseController
             //return $this->render('AppBundle:PhoneInsurance:insuranceLanding.html.twig', $data);
             return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
         } else {
-            return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
+            return $this->render('AppBundle:PhoneInsurance:quoteLowPriorityCalculator.html.twig', $data);
         }
 
         // //if ($phone->getCurrentPhonePrice()) {
