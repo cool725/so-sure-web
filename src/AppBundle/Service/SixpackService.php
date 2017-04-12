@@ -93,6 +93,7 @@ class SixpackService
     public function convert($experiment, $expectParticipating = false)
     {
         $unauth = $this->convertByClientId($this->requestService->getTrackingId(), $experiment);
+        $auth = null;
         if ($user = $this->requestService->getUser()) {
             $auth = $this->convertByClientId($user->getId(), $experiment);
         }
