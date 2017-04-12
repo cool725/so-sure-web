@@ -108,7 +108,7 @@ class SixpackService
                 $this->logger->warning(sprintf(
                     'Expected participation in experiment %s for anon user',
                     $experiment
-                ));                
+                ));
             }
         }
     }
