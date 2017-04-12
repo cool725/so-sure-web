@@ -4,8 +4,8 @@
 	@include border-radius(100px);
 	padding: 10px 20px;
 
-	&:focus {
-		outline: none;
+	&:focus, &:active {
+		outline: none !important;
 	}
 }
 

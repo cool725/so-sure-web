@@ -1,0 +1,49 @@
+// about.scss
+
+@import "../mixins";
+@import "../common/palette";
+
+.about-section {
+
+	h1 {
+		margin-bottom: 20px;
+	}
+
+	h2 {
+		color: $grey-dark;
+	}
+
+	ul {
+		margin-bottom: 20px;
+
+		li {
+			padding: 8px 0;
+			font-size: 17px;
+		}
+	}
+
+	small {
+		font-size: 60%;
+	}
+
+	.go-back {
+		margin-top: 20px;
+	}
+
+	.thumbnail {
+		padding: 15px 15px 4px;
+
+		&:hover {
+			background-color: $grey-light;
+
+			a {
+				text-decoration: none;
+			}
+		}
+	}
+}
+
+/* Modal */
+.team-member-img-modal {
+	margin: 0 auto;
+}

@@ -34,15 +34,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    '@AppBundle/Resources/public/css/Default/index.css'
-    '@AppBundle/Resources/public/css/Default/quotePhone.css'
-    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'    
-    '@AppBundle/Resources/public/css/Default/scrollindicator.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'    
-    '@AppBundle/Resources/public/css/Default/videoOverlay.css'
-    '@AppBundle/Resources/public/css/Default/rewardCalculator.css'    
-    '@AppBundle/Resources/public/css/Default/bannerSticky.css'        
+    {% stylesheets output='css/*.css'
+    '@AppBundle//Resources/public/sass/page/quote.scss'           
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -105,7 +98,7 @@
                                     <span>£50 Excess (£70 for Theft &amp; Loss)</span>
                                 </div>
                                 <div class="col-sm-6">
-                                    {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-success  btn-block'}}) }}
+                                    {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-lg  btn-block'}}) }}
                                     <ul class="list-inline">
                                         <li>
                                             <small><a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">Full Terms &amp; Conditions</a></small> 
@@ -326,7 +319,7 @@
                             </div>       
                         </div>
                         <div class="text-center">
-                            <a class="btn btn-primary-hollow" href="#" data-toggle="modal" data-target="#modal-fullscreen"><small class="text-underline">Video of how it works</i></small></a>
+                            <a class="btn btn-primary-hollow btn-xs" href="#" data-toggle="modal" data-target="#modal-fullscreen">Video of how it works <i class="fa fa-play-circle" aria-hidden="true"></i></a>
                         </div>                                         
                     </div>
                 </div>

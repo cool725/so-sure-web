@@ -1,5 +1,5 @@
 /* Cashback Total */
-.reward-total {
+/*.reward-total {
 	background-color: #d6ebff;
 	border: 2px solid #3399ff;
 	   -moz-border-radius: 4px;
@@ -9,8 +9,8 @@
 	text-align: center;
 	padding: 15px 15px 10px;
 	margin: 15px 0;
-}
-
+}*/
+/*
 .cashback-value {
 	color: #3399ff;
 	font-size: 38px;
@@ -19,10 +19,10 @@
 .cashback-with-claim {
 	text-decoration: line-through;
 	color: #8B97B5;
-}
+}*/
 
 /* Custom Reward Slider */
-
+/*
 .reward-slider {
 	margin: 25px 0;
 }
@@ -101,10 +101,10 @@
 	left: -10px;
 	touch-action: pan-x;
 	-ms-touch-action: pan-x;
-}
+}*/
 
 /* Premium Table */
-.premium-table table {
+/*.premium-table table {
 	margin-bottom: 5px;
 }
 
@@ -135,10 +135,10 @@
 
 .bar-us div {
 	background-color: #80CE4D;
-}
+}*/
 
 /* Claim options */
-.claim-options {
+/*.claim-options {
 	display: none;
 }
 
@@ -164,4 +164,4 @@
 
 .premium-and-claims {
 	position: relative;
-}
+}*/

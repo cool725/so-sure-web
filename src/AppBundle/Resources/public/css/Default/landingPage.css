@@ -1,4 +1,4 @@
-html, body {
+/*html, body {
 	height: 100%;
 }
 
@@ -49,7 +49,6 @@ h2 {
 	padding-bottom: 10px;
 }
 
-/* Steps */
 
 .step {
 	background-color: #fff;
@@ -90,7 +89,6 @@ h2 {
 	border: none;
 }
 
-/* Press */
 
 section.press {
 	background-color: transparent !important;
@@ -126,7 +124,6 @@ section.press h4 small {
 	.step:after {
 		left: 100%; top: 50%;
 		margin-top: -25px;
-		/*left: 100%; top: 25px;		*/
 	    border-bottom: solid 25px transparent;
 	    border-top: solid 25px transparent;	    
 	    border-left: solid 20px #fff;
@@ -146,3 +143,4 @@ section.press h4 small {
 	}
 
 }
+*/

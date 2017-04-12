@@ -11,10 +11,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-        '@AppBundle/Resources/public/css/About/index.css'
-        '@AppBundle/Resources/public/css/Default/modal.css'            
-        '@AppBundle/Resources/public/css/Default/videoOverlay.css'
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/about.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
     {% endstylesheets %}

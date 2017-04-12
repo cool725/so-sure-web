@@ -1,0 +1,161 @@
+// _rewardCalculator.scss
+
+@import "../mixins";
+@import "../common/palette";
+
+.reward-total {
+	margin: 15px 0;
+	padding: 15px 15px 10px;
+	background-color: $blue-lightest;
+	border: 2px solid $blue;
+	@include border-radius(4px);
+	text-align: center;
+
+	.cashback-value {
+		color: $blue;
+		font-size: 38px;
+
+		.cashback-with-claim {
+			text-decoration: line-through;
+			color: lighten($blue, 15%);
+		}
+	}	
+}
+
+.reward-slider {
+	margin: 25px 0;
+
+	.rewardslider,
+	.rewardslider__fill {
+		display: block;
+		@include border-radius(10px);
+	}	
+
+	.rewardslider {
+		background: $grey-light;
+		position: relative;
+	}
+
+	.rewardslider--horizontal {
+	  	width: 100%; height: 20px;
+	}
+
+	.rewardslider--vertical {
+		width: 20px;
+		min-height: 150px;
+		max-height: 100%;
+	}
+
+	.rewardslider--disabled {
+	  	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
+	  	opacity: 0.4;
+	}
+
+	.rewardslider__fill {
+		background: $blue-lighter;
+		position: absolute;
+	}
+
+	.rewardslider--horizontal .rewardslider__fill {
+		top: 0;
+		height: 100%;
+	}
+
+	.rewardslider--vertical .rewardslider__fill {
+		bottom: 0;
+		width: 100%;
+	}
+
+	.rewardslider__handle {
+		width: 40px; height: 40px;
+		background-color: $blue;
+		cursor: pointer;
+		display: inline-block;
+		position: absolute;
+		@include border-radius(50%);
+
+		color: $white;
+		font-weight: bold;
+		font-size: 22px;
+		text-align: center;
+		line-height: 42px;
+
+		&:hover, &:focus {
+			background-color: darken($blue, 15%);
+		}
+
+		&:active {
+			background-color: darken($blue, 25%);
+		}
+	}
+
+	.rewardslider--horizontal .rewardslider__handle {
+	  	top: -10px;
+	 	touch-action: pan-y;
+	  	-ms-touch-action: pan-y;
+	}
+
+	.rewardslider--vertical .rewardslider__handle {
+		left: -10px;
+		touch-action: pan-x;
+		-ms-touch-action: pan-x;
+	}
+}
+
+.premium-table {
+
+	table {
+		margin-bottom: 5px;
+
+		td {
+			padding-bottom: 3px;
+		}
+	}
+
+	.bar {
+		width: 100%; height: 20px;
+
+		div {
+			width: 0; height: 100%; 
+			background-color: $grey-light;	
+			@include border-radius(3px);	
+			transition: width 0.5s ease;	
+		}
+	}	
+
+	.bar-static {
+		height: 20px;
+		background-color: $blue;
+		@include border-radius(3px);	
+	}	
+
+	.bar-us div {
+		background-color: $green;
+	}	
+}
+
+.claim-options {
+	display: none;
+
+	button {
+		width: 100%;
+		text-align: left;
+		font-weight: bold;
+		font-size: 0.8em;
+
+		&:hover {
+			background-color: $blue-lightest;
+		}		
+
+		&:focus, &:active, .active {
+			background-color: $blue;
+			color: $white;
+			box-shadow: none;
+			outline: none;
+		}
+	}
+}
+
+.premium-and-claims {
+	position: relative;
+}

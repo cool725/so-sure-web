@@ -9,10 +9,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-        '@AppBundle/Resources/public/css/Default/modal.css'    
-        '@AppBundle/Resources/public/css/Default/homepage.css'
-        '@AppBundle/Resources/public/css/Default/landingPage.css'
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/landing.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
     {% endstylesheets %}

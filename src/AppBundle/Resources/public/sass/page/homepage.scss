@@ -1,7 +1,7 @@
 // homepage.scss
 
-@import "../mixins.scss";
-@import "../common/palette.scss";
+@import "../mixins";
+@import "../common/palette";
 
 body {
 	@extend .brand-gradient;

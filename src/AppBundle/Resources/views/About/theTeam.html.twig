@@ -9,16 +9,14 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-        '@AppBundle/Resources/public/css/About/index.css'
-        '@AppBundle/Resources/public/css/Default/modal.css'    
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/about.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
     {% endstylesheets %}
 {% endblock %}
 
 {% block body %}
-
     <section class="about-section section--pad">
         <div class="container">
 
