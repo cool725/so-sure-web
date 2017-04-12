@@ -389,6 +389,19 @@ class InvitationService
         return $this->inviteByEmail($policy, $user->getEmail(), $user->getName());
     }
 
+    public function inviteByFacebookId(Policy $policy, $facebookId)
+    {
+        $this->validatePolicy($policy);
+
+        $repo = $this->dm->getRepository(User::class);
+        $user = $repo->findOneBy(['facebookId' => (string) $facebookId]);
+        if (!$user) {
+            throw new NotFoundHttpException();
+        }
+
+        return $this->inviteByEmail($policy, $user->getEmail(), $user->getName());
+    }
+
     public function resolveSCode($scode)
     {
         if (strlen($scode) <= 8) {
