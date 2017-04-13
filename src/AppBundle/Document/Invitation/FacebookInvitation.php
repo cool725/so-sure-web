@@ -9,13 +9,14 @@ use AppBundle\Validator\Constraints as AppAssert;
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\Invitation\EmailInvitationRepository")
  */
-class EmailInvitation extends Invitation
+class FacebookInvitation extends EmailInvitation
 {
     /**
-     * @Assert\Email(strict=true)
-     * @MongoDB\Field(type="string", nullable=false)
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
      */
-    protected $email;
+    protected $facebookId;
 
     public function isSingleUse()
     {
@@ -24,7 +25,7 @@ class EmailInvitation extends Invitation
 
     public function getChannel()
     {
-        return 'email';
+        return 'facebook';
     }
 
     public function getMaxReinvitations()
@@ -37,18 +38,18 @@ class EmailInvitation extends Invitation
         return $this->getEmail();
     }
 
+    public function getFacebookId()
+    {
+        return $this->facebookId;
+    }
+
+    public function setFacebookId($facebookId)
+    {
+        $this->facebookId = $facebookId;
+    }
+
     public function getChannelDetails()
     {
-        return null;
-    }
-
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    public function setEmail($email)
-    {
-        $this->email = strtolower($email);
+        return $this->getFacebookId();
     }
 }

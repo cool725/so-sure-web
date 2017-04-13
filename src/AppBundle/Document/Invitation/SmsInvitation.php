@@ -49,4 +49,9 @@ class SmsInvitation extends Invitation
     {
         $this->mobile = $this->normalizeUkMobile($mobile);
     }
+
+    public function getChannelDetails()
+    {
+        return null;
+    }
 }

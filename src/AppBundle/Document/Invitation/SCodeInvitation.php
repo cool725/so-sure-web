@@ -29,7 +29,7 @@ class SCodeInvitation extends EmailInvitation
 
     public function getInvitationDetail()
     {
-        return $this->getSCode()->getCode();
+        return $this->getEmail();
     }
 
     public function getSCode()
@@ -40,5 +40,10 @@ class SCodeInvitation extends EmailInvitation
     public function setSCode(SCode $scode)
     {
         $this->scode = $scode;
+    }
+
+    public function getChannelDetails()
+    {
+        return $this->getSCode() ? $this->getSCode()->getType() : null;
     }
 }

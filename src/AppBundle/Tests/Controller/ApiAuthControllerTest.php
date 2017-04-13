@@ -2239,6 +2239,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             self::generateEmail('testNewFacebookInvitation-inviter', $this),
             'foo'
         );
+        $inviter->setFacebookId(rand(1, 999999));
         $cognitoIdentityId = $this->getAuthUser($inviter);
         $crawler = $this->generatePolicy($cognitoIdentityId, $inviter);
         $policyData = $this->verifyResponse(200);
@@ -2258,6 +2259,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $invitee);
         $policyData = $this->verifyResponse(200);
 
+        $inviteePolicyId = $policyData['id'];
         $this->payPolicy($invitee, $policyData['id']);
 
         $cognitoIdentityId = $this->getAuthUser($inviter);
@@ -2272,6 +2274,20 @@ class ApiAuthControllerTest extends BaseControllerTest
             strtolower(self::generateEmail('testNewFacebookInvitation-invitee', $this)),
             $data['invitation_detail']
         );
+
+        $cognitoIdentityId = $this->getAuthUser($invitee);
+        $url = sprintf("/api/v1/auth/user?_method=GET");
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals($inviter->getFacebookId(), $data['facebook_filters'][0]);
+
+        $cognitoIdentityId = $this->getAuthUser($inviter);
+        $url = sprintf("/api/v1/auth/policy/%s?_method=GET", $inviterPolicyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals($invitee->getFacebookId(), $data['facebook_filters'][0]);
     }
 
     public function testSentInvitationAppears()
