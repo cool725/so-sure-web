@@ -42,32 +42,32 @@
         <div class="container">
             
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
+                <div class="col-md-10 col-md-offset-1">
                     <p class="text-center">We are sure that they have the best intentions but this is what they offer:</p>  
-                    <div class="panel panel-default table-responsive">
+                    <div class="table-responsive">
                         <table class="table table-bordered">  
-                            <thead>
-                                <tr class="info">
-                                    <td width="25%" class="h3">
-                                        For iPhone 7 (32GB)<br>
-                                        <small>As of 13th April 2017</small>                                        
-                                    </td>
-                                    <td width="15%" align="center" class="h4">Price per month</td>
-                                    <td width="15%" align="center" class="h4">Money back when no claims</td>
-                                    <td colspan="2" class="h4">Speed to fulfil a claim for</td>                       
+                            <thead class="background-blue">
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>                                    
+                                    <td colspan="2" class="h4 text-white" align="center"><strong>Speed to fulfil a claim for</strong></td>                       
                                 </tr>
-                                <tr class="info">
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td class="h4">Damage/Breakdown</td>
-                                    <td class="h4">Loss/theft</td>
+                                <tr>
+                                    <td width="25%" class="h3 text-white">
+                                        {{ phone_name }} ({{ phone_memory }}GB)<br>
+                                        <small class="h4 text-white">As of 13th April 2017</small>                                        
+                                    </td>
+                                    <td width="15%" align="center" class="h4 text-white">Price per month</td>
+                                    <td width="15%" align="center" class="h4 text-white">Money back when no claims</td>                                    
+                                    <td class="h4 text-white">Damage/Breakdown</td>
+                                    <td class="h4 text-white">Loss/theft</td>
                                 </tr>
                             </thead>                   
                             <tbody>
                                 <tr class="so-sure">
                                     <td><strong>so-sure</strong></td>
-                                    <td align="center"><strong>£7.99</strong></td>
+                                    <td align="center"><strong>£{{ phone_price }}</strong></td>
                                     <td align="center"><strong>Up to 80% cashback</strong></td>
                                     <td><strong>Next working day</strong></td>
                                     <td><strong>Next working day</strong></td>
@@ -75,28 +75,28 @@
                                 <tr class="ee">
                                     <td>EE</td>
                                     <td align="center">£12</td>
-                                    <td align="center">0</td>
+                                    <td align="center">£0</td>
                                     <td>Next day for £50</td>
                                     <td>Next day</td>
                                 </tr>
                                 <tr class="vodafone">
                                     <td>Vodafone</td>
                                     <td align="center">£12</td>
-                                    <td align="center">0</td>
+                                    <td align="center">£0</td>
                                     <td>Up to 5 working days</td>
                                     <td>Next working day</td>
                                 </tr>
                                 <tr class="o2">
                                     <td>O2 <small>(iPhone 7 128GB)</small></td>
                                     <td align="center">£10</td>
-                                    <td align="center">0</td>
+                                    <td align="center">£0</td>
                                     <td>Next working day</td>
                                     <td>Next working day</td>
                                 </tr>
                                 <tr class="three">
                                     <td>Three</td>
                                     <td align="center">£14</td>
-                                    <td align="center">0</td>
+                                    <td align="center">£0</td>
                                     <td>Next day</td>
                                     <td>Next day</td>
                                 </tr>                                
@@ -109,7 +109,7 @@
             <div class="row">
                 <div class="col-md-8 col-md-offset-2 text-center">
                     <p>If you want a better deal, check us out!</p>
-                    <p>You can normally cancel your existing policy at no cost.</p>
+                    <p><i class="fa fa-info-circle text-blue" aria-hidden="true"></i> You can normally cancel your existing policy at no cost.</p>
                     <p><a href="#" data-event-url="{{ quote_route }}"
                        data-event="mobile-networks-iphone-7-btn" class="btn btn-success btn-rounded btn-lg sosure-track">View our offer for your iPhone 7</a></p>
                 </div>
