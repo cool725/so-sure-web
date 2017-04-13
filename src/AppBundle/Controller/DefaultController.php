@@ -485,6 +485,7 @@ class DefaultController extends BaseController
         if ($request->get('_route') == "samsung_s7_insured_with_your_mobile_network") {
             $phoneName = "Samsung S7";
             $phonePrice = "7.99";
+            $phoneMemory = "32";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
                 'make' => 'Samsung',
                 'model' => 'Galaxy+S7',
@@ -493,6 +494,7 @@ class DefaultController extends BaseController
         } elseif ($request->get('_route') == "google_pixel_insured_with_your_mobile_network") {
             $phoneName = "Google Pixel";
             $phonePrice = "8.49";
+            $phoneMemory = "32";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
                 'make' => 'Google',
                 'model' => 'Pixel',
@@ -501,6 +503,7 @@ class DefaultController extends BaseController
         } elseif ($request->get('_route') == "iphone_SE_insured_with_your_mobile_network") {
             $phoneName = "iPhone SE";
             $phonePrice = "6.99";
+            $phoneMemory = "16";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
                 'make' => 'Apple',
                 'model' => 'iPhone+SE',
@@ -509,6 +512,7 @@ class DefaultController extends BaseController
         } elseif ($request->get('_route') == "iphone_7_plus_insured_with_your_mobile_network") {
             $phoneName = "iPhone 7 Plus";
             $phonePrice = "9.99";
+            $phoneMemory = "32";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
                 'make' => 'Apple',
                 'model' => 'iPhone+7+Plus',
@@ -526,6 +530,7 @@ class DefaultController extends BaseController
         } elseif ($request->get('_route') == "iphone_6s_insured_with_your_mobile_network") {
             $phoneName = "iPhone 6S";
             $phonePrice = "7.99";
+            $phoneMemory = "32";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
                 'make' => 'Apple',
                 'model' => 'iPhone+6S',
@@ -534,13 +539,19 @@ class DefaultController extends BaseController
         } elseif ($request->get('_route') == "iphone_6_insured_with_your_mobile_network") {
             $phoneName = "iPhone 6";
             $phonePrice = "7.99";
+            $phoneMemory = "16";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
                 'make' => 'Apple',
                 'model' => 'iPhone+6',
                 'memory' => '16'
             ]);
         }
-        return array('phone_name' => $phoneName, 'phone_price' => $phonePrice, 'phone_memory' => $phoneMemory, 'quote_route' => $quoteRoute);
+        return array(
+            'phone_name' => $phoneName,
+            'phone_price' => $phonePrice,
+            'phone_memory' => $phoneMemory,
+            'quote_route' => $quoteRoute
+        );
     }
 
 
