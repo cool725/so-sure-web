@@ -548,6 +548,8 @@
                         {{ form_end(usertoken_form) }}
                         <strong>This will log the user out on their phone</strong>
                         <br>
+                        <em>Warning: Android v1.4.4.3 and below will not logout properly. The user will see a generic error instead of being logged out</em>
+                        <br>
                         Last Mobile Login:
                         {% if policy.user.latestMobileIdentityLog %}
                             {{ policy.user.latestMobileIdentityLog.date|date }}
