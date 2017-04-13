@@ -361,6 +361,10 @@ class AdminEmployeeController extends BaseController
         $imeiUploadForm = $this->get('form.factory')
             ->createNamedBuilder('imei_upload', ImeiUploadFileType::class, $imeiUploadFile)
             ->getForm();
+        $userTokenForm = $this->get('form.factory')
+            ->createNamedBuilder('usertoken_form')
+            ->add('regenerate', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -543,6 +547,28 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('usertoken_form')) {
+                $userTokenForm->handleRequest($request);
+                if ($userTokenForm->isSubmitted() && $userTokenForm->isValid()) {
+                    $policy->getUser()->resetToken();
+                    $dm = $this->getManager();
+                    $dm->flush();
+
+                    $identity = $this->get('app.cognito.identity');
+                    if ($identity->deleteLastestMobileToken($policy->getUser())) {
+                        $this->addFlash(
+                            'success',
+                            'Reset user token & deleted cognito credentials'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'success',
+                            'Reset user token. No cognito credentials present'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -561,6 +587,7 @@ class AdminEmployeeController extends BaseController
             'create_form' => $createForm->createView(),
             'connect_form' => $connectForm->createView(),
             'imei_upload_form' => $imeiUploadForm->createView(),
+            'usertoken_form' => $userTokenForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
