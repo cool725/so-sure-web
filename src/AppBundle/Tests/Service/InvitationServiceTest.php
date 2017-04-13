@@ -755,7 +755,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($userInvitee->getFacebookId(), $invitation->getFacebookId());
         
         $updatedInvitee = static::$userRepo->find($userInvitee->getId());
-        \Doctrine\Common\Util\Debug::dump($updatedInvitee);
+        //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
         $foundInvite = false;
         foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
             if ($invitation->getId() == $receviedInvitation->getId()) {

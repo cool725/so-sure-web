@@ -1032,25 +1032,30 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             $addresses[] = $this->getPolicyAddress()->toApiArray();
         }
         return [
-          'id' => $this->getId(),
-          'email' => $this->getEmailCanonical(),
-          'first_name' => $this->getFirstName(),
-          'last_name' => $this->getLastName(),
-          'facebook_id' => $this->getFacebookId(),
-          'cognito_token' => [ 'id' => $identityId, 'token' => $token ],
-          'user_token' => ['token' => $this->getToken()],
-          'addresses' => $addresses,
-          'mobile_number' => $this->getMobileNumber(),
-          'policies' => $this->eachApiArray($this->getPolicies()),
-          'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), true, $debug),
-          'has_cancelled_policy' => $this->hasCancelledPolicy(),
-          'has_unpaid_policy' => $this->hasUnpaidPolicy(),
-          'has_valid_policy' => $this->hasActivePolicy(), // poor initial naming :(
-          'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
-          'image_url' => $this->getImageUrl(),
-          'sns_endpoint' => $this->getSnsEndpoint() ? $this->getSnsEndpoint() : null,
-          'intercom_token' => $intercomHash,
-          'multipay_policies' => $this->eachApiArray($this->getActiveMultiPays()),
+            'id' => $this->getId(),
+            'email' => $this->getEmailCanonical(),
+            'first_name' => $this->getFirstName(),
+            'last_name' => $this->getLastName(),
+            'facebook_id' => $this->getFacebookId(),
+            'cognito_token' => [ 'id' => $identityId, 'token' => $token ],
+            'user_token' => ['token' => $this->getToken()],
+            'addresses' => $addresses,
+            'mobile_number' => $this->getMobileNumber(),
+            'policies' => $this->eachApiArray($this->getPolicies()),
+            'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), true, $debug),
+            'has_cancelled_policy' => $this->hasCancelledPolicy(),
+            'has_unpaid_policy' => $this->hasUnpaidPolicy(),
+            'has_valid_policy' => $this->hasActivePolicy(), // poor initial naming :(
+            'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
+            'image_url' => $this->getImageUrl(),
+            'sns_endpoint' => $this->getSnsEndpoint() ? $this->getSnsEndpoint() : null,
+            'intercom_token' => $intercomHash,
+            'multipay_policies' => $this->eachApiArray($this->getActiveMultiPays()),
+            'facebook_filters' => $this->eachApiMethod(
+                $this->getUnprocessedReceivedInvitations(),
+                'getInviterFacebookId',
+                false
+            ),
         ];
     }
 }

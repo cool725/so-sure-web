@@ -2174,6 +2174,7 @@ abstract class Policy
             'scodes' => $this->eachApiArray($this->getActiveSCodes()),
             'premium_payments' => $this->getPremiumPayments(),
             'premium_gwp' => $this->getPremiumGwpInstallmentPrice(),
+            'facebook_filters' => $this->eachApiMethod($this->getSentInvitations(), 'getInviteeFacebookId', false),
         ];
     }
 

@@ -355,6 +355,16 @@ abstract class Invitation
         return null;
     }
 
+    public function getInviterFacebookId()
+    {
+        return $this->getInviter() ? $this->getInviter()->getFacebookId() : null;
+    }
+
+    public function getInviteeFacebookId()
+    {
+        return $this->getInvitee() ? $this->getInvitee()->getFacebookId() : null;
+    }
+
     public function toApiArray($isReceivedInvitation = false, $debug = null)
     {
         $data = [
