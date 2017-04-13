@@ -1,7 +1,7 @@
 {% form_theme purchase_form 'AppBundle:Form:fields.html.twig' %}
 {% extends 'base.html.twig' %}
 
-{% block stylesheets %}
+{# {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
@@ -10,6 +10,19 @@
     'bundles/app/css/Default/selectPhoneMake.css' %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
+ #}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+        'components/bootstrap-daterangepicker/daterangepicker.css'       
+        'components/intl-tel-input/intlTelInput.css'
+        '@AppBundle/Resources/public/sass/page/checkout.scss'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
 
 {% block javascripts %}
     {{ parent() }}

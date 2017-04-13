@@ -1,5 +1,18 @@
 // forms.scss
 
+// Overides
+.form-group {
+    
+    .form-control {
+        border: 2px solid $grey-light;
+        box-shadow: none;
+    }
+
+    label {
+        font-size: 14px;
+    }
+}
+
 // Select Phone Make
 // - Hide form on load so no content flash
 #search-phone-form {

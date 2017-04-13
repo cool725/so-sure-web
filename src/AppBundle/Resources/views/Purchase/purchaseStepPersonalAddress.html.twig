@@ -1,17 +1,25 @@
 {% set use_pca = true %}
 {% extends 'base.html.twig' %}
 
-{% block stylesheets %}
+{# {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
-    'components/bootstrap-daterangepicker/daterangepicker.css'
-    '@AppBundle/Resources/public/css/Default/bannerSticky.css'       
+    'components/bootstrap-daterangepicker/daterangepicker.css'       
     'components/intl-tel-input/intlTelInput.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'    
-    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
     '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
     '@AppBundle/Resources/public/css/Purchase/checkout.css'%}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+ #}
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+        'components/bootstrap-daterangepicker/daterangepicker.css'       
+        'components/intl-tel-input/intlTelInput.css'   
+        '@AppBundle/Resources/public/sass/page/checkout.scss'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
 {% endblock %}
 
 {% block javascripts %}
@@ -81,7 +89,7 @@
 
                     <h3>Personal Details</h3>
                     <div class="text-center">
-                        <a href="#" onclick="fb_login();" class="btn btn-facebook" {% if app.user %}disabled{% endif %}>
+                        <a href="#" onclick="fb_login();" class="btn btn-facebook-hollow" {% if app.user %}disabled{% endif %}>
                             <i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook
                         </a>
                     </div>
