@@ -30,6 +30,10 @@
     margin: 0 0 10px;
 }
 
+.article-content .table>thead>tr>td {
+    vertical-align: middle;
+}
+
 .article-content .h2 {
     margin-bottom: 20px;
 }
