@@ -31,7 +31,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <br><br>
-                    <h1>Your {{ phone_name }} is covered by your mobile network.<br> Are you getting the best deal?</h1>
+                    <h1>Is your mobile network giving you the best deal on your {{ phone_name }} insurance?</h1>
                 </div>
             </div>
 
@@ -44,67 +44,65 @@
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <p class="text-center">We are sure that they have the best intentions but this is what they offer:</p>  
-                    <div class="table-responsive">
-                        <table class="table">   
-                            <thead class="background-blue" valign="middle">
-                                    <td valign="middle" align="center" class="text-white" width="18%">
-                                        {{ phone_name }} <br>({{ phone_memory }}GB)<br>
-                                        <small class="text-white">as of <br> 13th April 2017</small>                                        
-                                    </td>
-                                    <td width="15%" valign="middle" align="center" class="text-white">Price per <br>month</td>
-                                    <td width="15%" valign="middle" align="center" class="text-white">Money back <br> when no <br> claims</td>               
-                                    <td valign="middle" align="center" class="text-white" width="26%">
-                                        Speed to fulfil a claim for <br>
-                                        <small>Damage/Breakdown</small>
-                                    </td>
-                                    <td valign="middle" align="center" class="text-white" width="26%">
-                                        Speed to fulfil a claim for <br>
-                                        <small>Loss/theft</small>
-                                    </td>                                    
-                                </tr>
-                            </thead>                   
-                            <tbody>
-                                <tr class="ee">
-                                    <td>EE</td>
-                                    <td align="center">£12</td>
-                                    <td align="center">£0</td>
-                                    <td>Next day for £50</td>
-                                    <td>Next day</td>
-                                </tr>
-                                <tr class="vodafone">
-                                    <td>Vodafone</td>
-                                    <td align="center">£12</td>
-                                    <td align="center">£0</td>
-                                    <td>Up to 5 working days</td>
-                                    <td>Next working day</td>
-                                </tr>
-                                <tr class="o2">
-                                    <td>O2 <small><small>(for 128GB)</small></small></td>
-                                    <td align="center">£10</td>
-                                    <td align="center">£0</td>
-                                    <td>Next working day</td>
-                                    <td>Next working day</td>
-                                </tr>
-                                <tr class="three">
-                                    <td>Three</td>
-                                    <td align="center">£14</td>
-                                    <td align="center">£0</td>
-                                    <td>Next day</td>
-                                    <td>Next day</td>
-                                </tr>    
-                                <tr class="so-sure">
-                                    <td class="h4"><strong>so-sure</strong></td>
-                                    <td class="h4" align="center"><strong>£{{ phone_price }}</strong></td>
-                                    <td class="h4" align="center"><strong>Up to 80% <br>cashback</strong></td>
-                                    <td class="h4"><strong>Next working day</strong></td>
-                                    <td class="h4"><strong>Next working day</strong></td>
-                                </tr>                                                            
-                            </tbody>
-                        </table>  
+                    <div class="col-md-10 col-md-offset-1">
+                        <div class="table-responsive table-bordered">
+                            <table class="table">   
+                                <thead class="background-blue" valign="middle">
+                                        <td valign="middle" align="left" class="text-white" width="18%">
+                                            Insurance Provider
+                                        </td>
+                                        <td width="15%" valign="middle" align="center" class="text-white">Price per <br>month</td>
+                                        <td width="15%" valign="middle" align="center" class="text-white">Money back <br> when no <br> claims</td>               
+                                        <td valign="middle" align="center" class="text-white" width="26%">
+                                            Speed to fulfil a claim for <br>
+                                            <small>Damage/Breakdown</small>
+                                        </td>                 
+                                    </tr>
+                                </thead>                   
+                                <tbody>
+                                    <tr class="ee">
+                                        <td>EE</td>
+                                        <td align="center">£12</td>
+                                        <td align="center">£0</td>
+                                        <td>Next day for £50</td>
+                                    </tr>
+                                    <tr class="vodafone">
+                                        <td>Vodafone</td>
+                                        <td align="center">£12</td>
+                                        <td align="center">£0</td>
+                                        <td>Up to 5 working days</td>
+                                    </tr>
+                                    <tr class="o2">
+                                        <td>O2 <small><small>(for 128GB)</small></small></td>
+                                        <td align="center">£10</td>
+                                        <td align="center">£0</td>
+                                        <td>Next working day</td>
+                                    </tr>
+                                    <tr class="three">
+                                        <td>Three</td>
+                                        <td align="center">£14</td>
+                                        <td align="center">£0</td>
+                                        <td>Next day</td>
+                                    </tr>    
+                                    <tr class="so-sure">
+                                        <td class="h4"><strong>so-sure</strong></td>
+                                        <td class="h4" align="center"><strong>£{{ phone_price }}</strong></td>
+                                        <td class="h4" align="center"><strong>Up to £76 <br>cashback</strong></td>
+                                        <td class="h4"><strong>Next working day</strong></td>
+                                    </tr>                                                            
+                                </tbody>
+                            </table>  
+                        </div>
+                        <div class="text-right">
+                            <em>
+                                <small>Price based on an {{ phone_name }} ({{ phone_memory }}GB) as of 13th April 2017</small>
+                            </em>
+                        </div>
                     </div>
                 </div>
             </div>           
 
+<br>
             <div class="row">
                 <div class="col-md-8 col-md-offset-2 text-center">
                     <p>If you want a better deal, check us out!</p>
