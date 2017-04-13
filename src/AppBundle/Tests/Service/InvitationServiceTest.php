@@ -16,6 +16,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\SCodeInvitation;
+use AppBundle\Document\Invitation\FacebookInvitation;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 
@@ -695,18 +696,6 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof EmailInvitation);
         $this->assertNotNull($invitation->getInvitee());
         $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
-
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $userRepo = $dm->getRepository(User::class);
-        $updatedInvitee = $userRepo->find($userInvitee->getId());
-        //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
-        $foundInvite = false;
-        foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
-            if ($invitation->getId() == $receviedInvitation->getId()) {
-                $foundInvite = true;
-            }
-        }
-        $this->assertTrue($foundInvite);
     }
 
     public function testSCodeInvitationInvitee()
@@ -730,6 +719,40 @@ class InvitationServiceTest extends WebTestCase
         $this->assertNotNull($invitation->getInvitee());
         $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
         $this->assertEquals($policyInvitee->getStandardSCode()->getId(), $invitation->getSCode()->getId());
+        
+        $updatedInvitee = static::$userRepo->find($userInvitee->getId());
+        //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
+        $foundInvite = false;
+        foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
+            if ($invitation->getId() == $receviedInvitation->getId()) {
+                $foundInvite = true;
+            }
+        }
+        $this->assertTrue($foundInvite);
+    }
+
+    public function testFaceboookInvitationInvitee()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFaceboookInvitationInvitee-inviter', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFaceboookInvitationInvitee-invitee', $this),
+            'bar'
+        );
+        $userInvitee->setFacebookId(rand(1, 999999));
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteByFacebookId($policy, $userInvitee->getFacebookId());
+        $this->assertTrue($invitation instanceof FacebookInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($userInvitee->getFacebookId(), $invitation->getFacebookId());
         
         $updatedInvitee = static::$userRepo->find($userInvitee->getId());
         //\Doctrine\Common\Util\Debug::dump($updatedInvitee);

@@ -18,6 +18,7 @@ use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\SCodeInvitation;
+use AppBundle\Document\Invitation\FacebookInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\PhoneTrait;
 
@@ -190,6 +191,11 @@ class InvitationService
                     $user->addReceivedInvitation($invitation);
                     $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
                 }
+            }
+        } elseif ($invitation instanceof FacebookInvitation) {
+            if ($user && $invitation->getInviter()->getId() != $user->getId()) {
+                $user->addReceivedInvitation($invitation);
+                $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
             }
         }
     }
@@ -477,7 +483,7 @@ class InvitationService
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
             $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
             $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, [
-                'Invitation Method' => 'email',
+                'Invitation Method' => 'scode',
             ]);
             $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
             $now = new \DateTime();
@@ -509,15 +515,76 @@ class InvitationService
 
     public function inviteByFacebookId(Policy $policy, $facebookId)
     {
-        $this->validatePolicy($policy);
-
         $repo = $this->dm->getRepository(User::class);
         $user = $repo->findOneBy(['facebookId' => (string) $facebookId]);
         if (!$user) {
             throw new NotFoundHttpException();
         }
 
-        return $this->inviteByEmail($policy, $user->getEmail(), $user->getName());
+        $this->validatePolicy($policy);
+        $this->validateSoSurePolicyEmail($policy, $user->getEmail());
+        $this->validateNotConnectedByUser($policy, $user);
+
+        $invitation = null;
+        $isReinvite = false;
+        $invitationRepo = $this->dm->getRepository(FacebookInvitation::class);
+        $prevInvitations = $invitationRepo->findDuplicate($policy, $facebookId);
+        foreach ($prevInvitations as $prevInvitation) {
+            if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
+                throw new DuplicateInvitationException('Facebook user was already invited to this policy');
+            } elseif ($prevInvitation->isCancelled()) {
+                // Reinvitating a cancelled invitation, should re-active invitation
+                $invitation = $prevInvitation;
+                $invitation->setCancelled(null);
+                $this->dm->flush();
+                $isReinvite = true;
+            } elseif ($prevInvitation->canReinvite()) {
+                // A duplicate invitation can be considered a reinvitation
+                $invitation = $prevInvitation;
+                $isReinvite = true;
+            } else {
+                throw new DuplicateInvitationException('Facebook user was already invited to this policy');
+            }
+        }
+
+        if (!$invitation) {
+            $invitation = new FacebookInvitation();
+            $invitation->setFacebookId($facebookId);
+            $invitation->setEmail($user->getEmail());
+            $invitation->setPolicy($policy);
+            $invitation->setName($user->getName());
+            $this->setInvitee($invitation, $user);
+            $invitation->invite();
+            $this->dm->persist($invitation);
+            $this->dm->flush();
+
+            $link = $this->getShortLink($invitation);
+            $invitation->setLink($link);
+            $this->dm->flush();
+        }
+
+        if ($invitation->getInvitee()) {
+            // User invite is the same for reinvite
+            $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE_USER);
+        } else {
+            if ($isReinvite) {
+                $this->sendEmail($invitation, self::TYPE_EMAIL_REINVITE);
+            } else {
+                $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+            }
+        }
+        $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+        $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
+        $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, [
+            'Invitation Method' => 'facebook',
+        ]);
+        $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
+        $now = new \DateTime();
+        $this->mixpanel->queuePersonProperties([
+            'Last Invite Sent' => $now->format(\DateTime::ATOM),
+        ], false, $invitation->getInviter());
+
+        return $invitation;
     }
 
     public function resolveSCode($scode)
