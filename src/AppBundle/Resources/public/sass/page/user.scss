@@ -1,1 +1,191 @@
 // user.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "homepage";
+
+.navbar-default {
+    margin-bottom: 40px;
+}
+
+.user-homepage {
+
+	&--header {
+		text-align: center;
+		padding-bottom: 45px;
+
+		h2 {
+			margin-top: 20px;
+		}
+
+		img {
+			width: 140px; height: 140px;
+			display: block;
+			border: 4px solid $white;
+			margin: 0 auto;
+		}
+
+		@include breakpoint(tablet) {
+			text-align: left;
+
+			h2 {
+				margin-top: 5px;
+			}
+
+			img {
+				display: inline-block;
+				float: left;
+				margin: 0 15px 0 0;
+			}
+		}
+	}
+
+	&--nav {
+		background-color: $grey-light;
+	}
+
+	&--content {
+		background-color: $white;
+	}
+
+	&--section {
+		margin-bottom: 25px;
+	}
+
+}
+
+// Reward Pot 
+.circle-chart-container {
+    width: 180px; height: 180px;
+    position: relative;
+    margin: 0 auto 15px;
+
+    canvas {
+	    position: absolute;
+	    left: 50%; 
+	    margin-left: -90px;    	
+    }
+}
+
+.circle-chart--value {
+    width: 180px;
+    position: absolute;
+    left: 50%; top: 65px;
+    margin-left: -90px;
+}
+
+.circle-chart--full {
+    width: 180px;
+    position: absolute;
+    left: 50%; top: 35px;
+    margin-left: -90px;
+}
+
+.circle-chart--full-value {
+    width: 150px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+// Coffee Stamp
+.coffee-stamp,
+.invite-list li img,
+.coffee-stamp-add {
+    display: inline-block;
+    width: 68px; height: 68px;
+    margin-bottom: 15px;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.user-has-claimed {
+    border-color: $red;
+}
+
+
+// Nav 
+.nav-pills {
+
+	> li > a {
+		@include border-radius(0);
+	}
+
+	> li > a.active,
+	> li > a.active:hover,
+	> li > a.active:focus {
+	    background-color: transparent;
+	    color: $grey-dark;		
+	}
+}
+
+/* Welcome Page */
+
+.start-saving {
+    margin-bottom: 30px;
+}
+
+// Invalid Page
+.user-invalid {
+    margin-bottom: 40px;
+
+    @include breakpoint(tablet) {
+		margin-bottom: 200px;
+    }
+}
+
+// Invites
+
+.invite-list {
+
+	> li {
+	    padding: 5px 0 10px;
+	    margin: 5px 0;
+	    border-bottom: 1px solid $grey-light;		
+	
+		&:first-of-type {
+			margin-top: 0;
+		}
+		
+		&:last-of-type {
+		    margin-bottom: 0;
+		    border: none;			
+		}
+
+		img {
+			margin-right: 15px;
+		}
+	}
+
+    @include breakpoint(tablet) {
+		margin-top: 20px;
+    }		
+}
+
+// Invite Modal
+.modal-body {
+    padding-bottom: 30px;
+}
+
+@include breakpoint(tablet) {
+    .jssocials-share-whatsapp,
+    .jssocials-share-messenger {
+        display: none;
+    }
+}
+
+.trust {
+	  border: 1px solid #1d2f3b;
+	  border-radius: 15px;
+	  padding: 15px;
+	  margin-bottom: 20px;
+	  height: 280px;
+}
+
+.trust-photo {
+	  width: 150px;
+	  height: 150px;
+}
+
+.trust p {
+  	text-align: center;
+}

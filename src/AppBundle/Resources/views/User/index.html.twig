@@ -12,23 +12,12 @@
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
-{# {% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets
-    'components/jssocials/jssocials.css'
-    'components/jssocials/jssocials-theme-flat.css'    
-    '@AppBundle/Resources/public/css/Default/modal.css'
-    '@AppBundle/Resources/public/css/User/index.css'
-    '@AppBundle/Resources/public/css/User/trust.css' %}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
-{% endblock %} #}
-
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
     'components/jssocials/jssocials.css'
     'components/jssocials/jssocials-theme-flat.css'    
-    '@AppBundle/Resources/public/sass/page/user.css'%}
+    '@AppBundle/Resources/public/sass/page/user.scss'%}
     <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
 {% endblock %}
 
