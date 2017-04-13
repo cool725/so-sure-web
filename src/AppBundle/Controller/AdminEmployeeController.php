@@ -32,6 +32,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Invoice;
+use AppBundle\Document\SCode;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Stats;
@@ -901,8 +902,11 @@ class AdminEmployeeController extends BaseController
 
         $rewardForm = $this->get('form.factory')
             ->createNamedBuilder('rewardForm')
-            ->add('name', TextType::class)
+            ->add('firstName', TextType::class)
+            ->add('lastName', TextType::class)
+            ->add('code', TextType::class)
             ->add('email', EmailType::class)
+            ->add('defaultValue', TextType::class)
             ->add('next', SubmitType::class)
             ->getForm();
 
@@ -950,11 +954,22 @@ class AdminEmployeeController extends BaseController
                         $user = $userManager->createUser();
                         $user->setEnabled(true);
                         $user->setEmail($this->getDataString($rewardForm->getData(), 'email'));
-                        $user->setFirstName($this->getDataString($rewardForm->getData(), 'name'));
+                        $user->setFirstName($this->getDataString($rewardForm->getData(), 'firstName'));
+                        $user->setLastName($this->getDataString($rewardForm->getData(), 'lastName'));
                         $reward = new Reward();
                         $reward->setUser($user);
+                        $reward->setDefaultValue($this->getDataString($rewardForm->getData(), 'defaultValue'));
                         $dm->persist($user);
                         $dm->persist($reward);
+
+                        $code = $this->getDataString($rewardForm->getData(), 'code');
+                        if (strlen($code) > 0) {
+                            $scode = new SCode();
+                            $scode->setCode($code);
+                            $scode->setReward($reward);
+                            $scode->setType(SCode::TYPE_REWARD);
+                            $dm->persist($scode);
+                        }
                         $dm->flush();
                         $this->addFlash('success', sprintf(
                             'Added reward'

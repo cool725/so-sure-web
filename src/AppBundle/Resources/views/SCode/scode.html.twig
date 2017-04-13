@@ -41,8 +41,12 @@
             <div class="row">
                 <div class="col-md-12">
                     <h1 class="text-center">
-                       {% if scode is defined and scode and scode.policy %}
+                        {% if scode is defined and scode and scode.policy %}
                             Insure your phone with {{scode.policy.user.name}}.
+                        {% elseif scode is defined and scode and scode.reward %}
+                            Insure your phone.
+                            Signup and get a £{{ scode.reward.defaultValue|number_format(2, '.', ',') }} bonus added to you reward pot
+                            from {{scode.reward.user.name}}.
                         {% else %}
                             Insure your phone.
                         {% endif %}   

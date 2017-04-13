@@ -16,6 +16,7 @@ class SCode
     const TYPE_STANDARD = 'standard';
     const TYPE_MULTIPAY = 'multipay';
     const TYPE_AFFILIATE = 'affiliate';
+    const TYPE_REWARD = 'reward';
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -39,7 +40,7 @@ class SCode
     protected $code;
 
     /**
-     * @Assert\Choice({"standard", "multipay", "affiliate"}, strict=true)
+     * @Assert\Choice({"standard", "multipay", "affiliate", "reward"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -50,6 +51,12 @@ class SCode
      * @Gedmo\Versioned
      */
     protected $policy;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Reward")
+     * @Gedmo\Versioned
+     */
+    protected $reward;
 
     /**
      * @Assert\Type("bool")
@@ -198,11 +205,22 @@ class SCode
 
     public function setType($type)
     {
-        if (!in_array($type, [self::TYPE_STANDARD, self::TYPE_MULTIPAY])) {
+        if (!in_array($type, [self::TYPE_STANDARD, self::TYPE_MULTIPAY, self::TYPE_REWARD])) {
             throw new \InvalidArgumentException(sprintf('%s is not a valid type'));
         }
 
         $this->type = $type;
+    }
+
+    public function getReward()
+    {
+        return $this->reward;
+    }
+
+    public function setReward(Reward $reward)
+    {
+        $reward->setSCode($this);
+        $this->reward = $reward;
     }
 
     public function isActive()
@@ -236,9 +254,25 @@ class SCode
         $this->acceptors[] = $acceptor;
     }
 
+    public function getUser()
+    {
+        if ($this->getPolicy()) {
+            return $this->getPolicy()->getUser();
+        } elseif ($this->getReward()) {
+            return $this->getReward()->getUser();
+        }
+
+        return null;
+    }
+    
     public function isStandard()
     {
         return $this->getType() == self::TYPE_STANDARD;
+    }
+
+    public function isReward()
+    {
+        return $this->getType() == self::TYPE_REWARD;
     }
 
     public function toApiArray()

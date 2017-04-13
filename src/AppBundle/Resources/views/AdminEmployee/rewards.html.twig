@@ -25,6 +25,8 @@
     <table class="table table-stripped">
         <tr>
             <th>Bonus Type</th>
+            <th>SCode</th>
+            <th>Default Value</th>
             <th>Number Connections</th>
             <th>Total</th>
             <th></th>
@@ -32,8 +34,10 @@
         {% for reward in rewards %}
             <tr>
                 <td>{{ reward.user.name }} ({{ reward.user.email }})</td>
+                <td>{% if reward.sCode %}{{ reward.sCode.code }}{% else %}n/a{% endif %}</td>
+                <td>{% if reward.defaultValue %}£{{ reward.defaultValue|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                 <td>{{ reward.connections|length }}</td>
-                <td>{{ reward.potValue }}</td>
+                <td>£{{ reward.potValue|number_format(2, '.', ',') }}</td>
                 <td>
                     <button type="button" class="btn btn-info" data-user-name="{{ reward.user }}" data-reward-id="{{ reward.id }}" data-toggle="modal" data-target="#connectModal"
                     ><i class="fa fa-plus"></i> Add Bonus To User</button>                    
@@ -83,15 +87,30 @@
           <div class="modal-body">
             {{ form_start(rewardForm) }}
                 <div class="form-group">
-                    {{ form_label(rewardForm.name, 'Name') }}
-                    {{ form_errors(rewardForm.name) }}
-                    {{ form_widget(rewardForm.name, {'attr': {'placeholder':'Maps to first name'}}) }}
-                </div>                
+                    {{ form_label(rewardForm.firstName, 'First Name') }}
+                    {{ form_errors(rewardForm.firstName) }}
+                    {{ form_widget(rewardForm.firstName) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(rewardForm.lastName, 'Last Name') }}
+                    {{ form_errors(rewardForm.lastName) }}
+                    {{ form_widget(rewardForm.lastName) }}
+                </div>
                 <div class="form-group">
                     {{ form_label(rewardForm.email, 'Email') }}
                     {{ form_errors(rewardForm.email) }}
                     {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net'}}) }}
-                </div>                
+                </div>
+                <div class="form-group">
+                    {{ form_label(rewardForm.code, 'SCode') }}
+                    {{ form_errors(rewardForm.code) }}
+                    {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode'}}) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(rewardForm.defaultValue, 'Default Value') }}
+                    {{ form_errors(rewardForm.defaultValue) }}
+                    {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Default amount to add'}}) }}
+                </div>
                 <div class="form-group">
                     {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>

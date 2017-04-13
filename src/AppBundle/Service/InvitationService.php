@@ -17,6 +17,7 @@ use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
+use AppBundle\Document\Invitation\SCodeInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\PhoneTrait;
 
@@ -167,7 +168,7 @@ class InvitationService
         return $invitationUrl;
     }
 
-    public function setInvitee(Invitation $invitation)
+    public function setInvitee(Invitation $invitation, $user = null)
     {
         $userRepo = $this->dm->getRepository(User::class);
         if ($invitation instanceof EmailInvitation) {
@@ -181,6 +182,14 @@ class InvitationService
             if ($user && $invitation->getInviter()->getId() != $user->getId()) {
                 $invitation->setInvitee($user);
                 $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
+            }
+        } elseif ($invitation instanceof SCodeInvitation) {
+            $scode = $invitation->getSCode();
+            if ($scode->isStandard()) {
+                if ($user && $invitation->getInviter()->getId() != $user->getId()) {
+                    $invitation->setInvitee($user);
+                    $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
+                }
             }
         }
     }
@@ -206,12 +215,31 @@ class InvitationService
         }
     }
 
-    public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
+    public function validateNotConnectedByUser(Policy $policy, $user)
     {
-        $this->validatePolicy($policy);
-        $this->validateSoSurePolicyEmail($policy, $email);
-
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
+        if ($connectionRepo->isConnectedByUser($policy, $user)) {
+            throw new ConnectedInvitationException('You are already connected');
+        }
+
+        $connectionRepo = $this->dm->getRepository(RewardConnection::class);
+        if ($connectionRepo->isConnectedByUser($policy, $user)) {
+            throw new ConnectedInvitationException('You are already connected');
+        }
+
+        if ($policy->getUser()->getId() == $user->getId()) {
+            throw new SelfInviteException('User can not invite themself');
+        }
+    }
+
+    public function validateNotConnectedByEmail(Policy $policy, $email)
+    {
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
+        if ($connectionRepo->isConnectedByEmail($policy, $email)) {
+            throw new ConnectedInvitationException('You are already connected');
+        }
+
+        $connectionRepo = $this->dm->getRepository(RewardConnection::class);
         if ($connectionRepo->isConnectedByEmail($policy, $email)) {
             throw new ConnectedInvitationException('You are already connected');
         }
@@ -224,6 +252,13 @@ class InvitationService
         if ($policy->getUser()->getEmailCanonical() == strtolower($email)) {
             throw new SelfInviteException('User can not invite themself');
         }
+    }
+
+    public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
+    {
+        $this->validatePolicy($policy);
+        $this->validateSoSurePolicyEmail($policy, $email);
+        $this->validateNotConnectedByEmail($policy, $email);
 
         $invitation = null;
         $isReinvite = false;
@@ -357,20 +392,105 @@ class InvitationService
         return $invitation;
     }
 
-    public function inviteBySCode(Policy $policy, $scode, \DateTime $date = null)
+    public function inviteBySCode(Policy $policy, $code, \DateTime $date = null)
     {
-        $this->validatePolicy($policy);
-
         // check scode for url and resolve
-        $scode = $this->resolveSCode($scode);
+        $code = $this->resolveSCode($code);
 
         $repo = $this->dm->getRepository(SCode::class);
-        $scodeObj = $repo->findOneBy(['code' => $scode]);
-        if (!$scodeObj) {
+        $scode = $repo->findOneBy(['code' => $code]);
+        if (!$scode) {
             throw new NotFoundHttpException();
         }
-        $user = $scodeObj->getPolicy()->getUser();
 
+        if ($scode->isStandard()) {
+            $user = $scode->getPolicy()->getUser();
+        } elseif ($scode->isReward()) {
+            $user = $scode->getReward()->getUser();
+        }
+
+        $this->validatePolicy($policy);
+        $this->validateSoSurePolicyEmail($policy, $user->getEmail());
+        $this->validateNotConnectedByUser($policy, $user);
+
+        if ($scode->isReward()) {
+            $this->addReward($policy->getUser(), $scode->getReward());
+        }
+
+        $this->setSCodeLeadSource($policy, $user, $date);
+
+        $invitation = null;
+        $isReinvite = false;
+        $invitationRepo = $this->dm->getRepository(SCodeInvitation::class);
+        $prevInvitations = $invitationRepo->findDuplicate($policy, $scode);
+        foreach ($prevInvitations as $prevInvitation) {
+            if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
+                throw new DuplicateInvitationException('SCode was already invited to this policy');
+            } elseif ($prevInvitation->isCancelled()) {
+                // Reinvitating a cancelled invitation, should re-active invitation
+                $invitation = $prevInvitation;
+                $invitation->setCancelled(null);
+                $this->dm->flush();
+                $isReinvite = true;
+            } elseif ($prevInvitation->canReinvite()) {
+                // A duplicate invitation can be considered a reinvitation
+                $invitation = $prevInvitation;
+                $isReinvite = true;
+            } else {
+                throw new DuplicateInvitationException('SCode was already invited to this policy');
+            }
+        }
+
+        if (!$invitation) {
+            $invitation = new SCodeInvitation();
+            $invitation->setEmail($user->getEmail());
+            $invitation->setSCode($scode);
+            $invitation->setPolicy($policy);
+            $invitation->setName($user->getName());
+            $this->setInvitee($invitation, $user);
+            $invitation->invite();
+
+            if ($scode->isReward()) {
+                $invitation->setAccepted(new \DateTime());
+            }
+            $this->dm->persist($invitation);
+            $this->dm->flush();
+
+            if (!$scode->isReward()) {
+                $link = $this->getShortLink($invitation);
+                $invitation->setLink($link);
+            }
+            $this->dm->flush();
+        }
+
+        if ($scode->isStandard()) {
+            if ($invitation->getInvitee()) {
+                // User invite is the same for reinvite
+                $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE_USER);
+            } else {
+                if ($isReinvite) {
+                    $this->sendEmail($invitation, self::TYPE_EMAIL_REINVITE);
+                } else {
+                    $this->sendEmail($invitation, self::TYPE_EMAIL_INVITE);
+                }
+            }
+            $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
+            $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
+            $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, [
+                'Invitation Method' => 'email',
+            ]);
+            $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
+            $now = new \DateTime();
+            $this->mixpanel->queuePersonProperties([
+                'Last Invite Sent' => $now->format(\DateTime::ATOM),
+            ], false, $invitation->getInviter());
+        }
+
+        return $invitation;
+    }
+
+    private function setSCodeLeadSource($policy, $user, \DateTime $date = null)
+    {
         if (!$date) {
             $date = new \DateTime();
         }
@@ -385,8 +505,6 @@ class InvitationService
                 $user->setLeadSource(Lead::LEAD_SOURCE_SCODE);
             }
         }
-
-        return $this->inviteByEmail($policy, $user->getEmail(), $user->getName());
     }
 
     public function inviteByFacebookId(Policy $policy, $facebookId)
@@ -862,8 +980,12 @@ class InvitationService
         $this->dm->flush();
     }
 
-    public function addReward(User $sourceUser, Reward $reward, $amount)
+    public function addReward(User $sourceUser, Reward $reward, $amount = null)
     {
+        if (!$amount) {
+            $amount = $reward->getDefaultValue();
+        }
+
         if ($sourceUser->getCurrentPolicy()->hasMonetaryClaimed()) {
             throw new \InvalidArgumentException(sprintf(
                 'Unable to add bonus. %s has a monetary claim',
