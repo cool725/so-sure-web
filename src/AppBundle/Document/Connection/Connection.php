@@ -294,6 +294,7 @@ class Connection
             'id' => $this->getId(),
             'image_url' => $this->getLinkedUser() ? $this->getLinkedUser()->getImageUrl() : null,
             'value' => $this->toTwoDp($this->getTotalValue()),
+            'facebook_id' => $this->getLinkedUser() ? $this->getLinkedUser()->getFacebookId() : null,
         ];
     }
 }

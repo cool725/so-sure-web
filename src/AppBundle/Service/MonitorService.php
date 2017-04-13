@@ -136,7 +136,10 @@ class MonitorService
         foreach ($newPolicies as $newPolicy) {
             $intercomUser = $this->intercom->getIntercomUser($newPolicy->getUser());
             if ($intercomUser->custom_attributes->Premium <= 0) {
-                $errors[] = sprintf('%s has a 0 premium, yet has a policy', $newPolicy->getUser()->getEmail());
+                $errors[] = sprintf(
+                    'Intercom out of sync: %s has a 0 premium in intercom, yet has a policy',
+                    $newPolicy->getUser()->getEmail()
+                );
             }
         }
 

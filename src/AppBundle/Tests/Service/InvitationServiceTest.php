@@ -15,6 +15,8 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
+use AppBundle\Document\Invitation\SCodeInvitation;
+use AppBundle\Document\Invitation\FacebookInvitation;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 
@@ -696,6 +698,73 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
     }
 
+    public function testSCodeInvitationInvitee()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationInvitee-inviter', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationInvitee-invitee', $this),
+            'bar'
+        );
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteBySCode($policy, $policyInvitee->getStandardSCode()->getCode());
+        $this->assertTrue($invitation instanceof SCodeInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($policyInvitee->getStandardSCode()->getId(), $invitation->getSCode()->getId());
+        
+        $updatedInvitee = static::$userRepo->find($userInvitee->getId());
+        //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
+        $foundInvite = false;
+        foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
+            if ($invitation->getId() == $receviedInvitation->getId()) {
+                $foundInvite = true;
+            }
+        }
+        $this->assertTrue($foundInvite);
+    }
+
+    public function testFaceboookInvitationInvitee()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFaceboookInvitationInvitee-inviter', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFaceboookInvitationInvitee-invitee', $this),
+            'bar'
+        );
+        $userInvitee->setFacebookId(rand(1, 999999));
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteByFacebookId($policy, $userInvitee->getFacebookId());
+        $this->assertTrue($invitation instanceof FacebookInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($userInvitee->getFacebookId(), $invitation->getFacebookId());
+        
+        $updatedInvitee = static::$userRepo->find($userInvitee->getId());
+        //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
+        $foundInvite = false;
+        foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
+            if ($invitation->getId() == $receviedInvitation->getId()) {
+                $foundInvite = true;
+            }
+        }
+        $this->assertTrue($foundInvite);
+    }
+
     /**
      * @expectedException AppBundle\Exception\SelfInviteException
      */
@@ -771,6 +840,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('inviter-scode', $this),
             'bar'
         );
+        static::$dm->persist($inviterUser);
         $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
 
         $inviteeUser = static::createUser(
@@ -778,6 +848,7 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invitee-scode', $this),
             'bar'
         );
+        static::$dm->persist($inviteeUser);
         $inviteePolicy = static::initPolicy($inviteeUser, static::$dm, static::$phone, null, false, true);
 
         $invitation = self::$invitationService->inviteBySCode(
@@ -860,6 +931,50 @@ class InvitationServiceTest extends WebTestCase
         );
         $this->assertTrue($invitation instanceof EmailInvitation);
         $this->assertNotEquals(Lead::LEAD_SOURCE_SCODE, $inviteePolicy->getLeadSource());
+    }
+
+    public function testFacebookInvitation()
+    {
+        $inviterUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFacebookInvitation-inviter', $this),
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
+
+        $inviteeUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFacebookInvitation-invitee', $this),
+            'bar'
+        );
+        $inviteeUser->setFacebookId(rand(1, 999999));
+        static::$dm->persist($inviteeUser);
+        static::$dm->flush();
+        $inviteePolicy = static::initPolicy($inviteeUser, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteByFacebookId(
+            $inviterPolicy,
+            $inviteeUser->getFacebookId()
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function testFacebookInvitationNoFacebook()
+    {
+        $inviterUser = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFacebookInvitationNoFacebook', $this),
+            'bar'
+        );
+        $inviterPolicy = static::initPolicy($inviterUser, static::$dm, static::$phone, null, false, true);
+
+        $invitation = self::$invitationService->inviteByFacebookId(
+            $inviterPolicy,
+            -1
+        );
     }
 
     /**
@@ -1406,7 +1521,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals(
             'abcdefgh',
             static::$invitationService->resolveSCode('https://goo.gl/wSZGbc'),
-            'If error, try clearing cache.'
+            'If error, try running webvagrant, as requires server running on localhost.'
         );
         $this->assertEquals(
             'abcdefgh',

@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}so-sure - iPhone 7 insured with your mobile network? 
+{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
+    <meta name="keywords" content="mobile phone insurance, social insurance"/>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts    
+    '@AppBundle/Resources/public/js/Default/index.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    '@AppBundle/Resources/public/css/Default/index.css'
+    '@AppBundle/Resources/public/css/Default/article.css'    
+    '@AppBundle/Resources/public/css/Default/modal.css' %}   
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero alt-brand-gradient">
+        <div class="container">
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <br><br>
+                    <h1>Your {{ phone_name }} is covered by your mobile network.<br> Are you getting the best deal?</h1>
+                </div>
+            </div>
+
+        </div>
+    </section>   
+
+    <section class="article-content section--pad">
+        <div class="container">
+            
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <p class="text-center">We are sure that they have the best intentions but this is what they offer:</p>  
+                    <div class="table-responsive">
+                        <table class="table">   
+                            <thead class="background-blue" valign="middle">
+                                    <td valign="middle" align="center" class="text-white" width="18%">
+                                        {{ phone_name }} <br>({{ phone_memory }}GB)<br>
+                                        <small class="text-white">as of <br> 13th April 2017</small>                                        
+                                    </td>
+                                    <td width="15%" valign="middle" align="center" class="text-white">Price per <br>month</td>
+                                    <td width="15%" valign="middle" align="center" class="text-white">Money back <br> when no <br> claims</td>               
+                                    <td valign="middle" align="center" class="text-white" width="26%">
+                                        Speed to fulfil a claim for <br>
+                                        <small>Damage/Breakdown</small>
+                                    </td>
+                                    <td valign="middle" align="center" class="text-white" width="26%">
+                                        Speed to fulfil a claim for <br>
+                                        <small>Loss/theft</small>
+                                    </td>                                    
+                                </tr>
+                            </thead>                   
+                            <tbody>
+                                <tr class="ee">
+                                    <td>EE</td>
+                                    <td align="center">£12</td>
+                                    <td align="center">£0</td>
+                                    <td>Next day for £50</td>
+                                    <td>Next day</td>
+                                </tr>
+                                <tr class="vodafone">
+                                    <td>Vodafone</td>
+                                    <td align="center">£12</td>
+                                    <td align="center">£0</td>
+                                    <td>Up to 5 working days</td>
+                                    <td>Next working day</td>
+                                </tr>
+                                <tr class="o2">
+                                    <td>O2 <small><small>(for 128GB)</small></small></td>
+                                    <td align="center">£10</td>
+                                    <td align="center">£0</td>
+                                    <td>Next working day</td>
+                                    <td>Next working day</td>
+                                </tr>
+                                <tr class="three">
+                                    <td>Three</td>
+                                    <td align="center">£14</td>
+                                    <td align="center">£0</td>
+                                    <td>Next day</td>
+                                    <td>Next day</td>
+                                </tr>    
+                                <tr class="so-sure">
+                                    <td class="h4"><strong>so-sure</strong></td>
+                                    <td class="h4" align="center"><strong>£{{ phone_price }}</strong></td>
+                                    <td class="h4" align="center"><strong>Up to 80% <br>cashback</strong></td>
+                                    <td class="h4"><strong>Next working day</strong></td>
+                                    <td class="h4"><strong>Next working day</strong></td>
+                                </tr>                                                            
+                            </tbody>
+                        </table>  
+                    </div>
+                </div>
+            </div>           
+
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 text-center">
+                    <p>If you want a better deal, check us out!</p>
+                    <p>You can normally cancel your existing policy at no cost.</p>
+                    <p><a href="#" data-event-url="{{ quote_route }}"
+                       data-event="mobile-networks-iphone-7-btn" class="btn btn-success btn-rounded btn-lg sosure-track">View our offer for your iPhone 7</a></p>
+                </div>
+            </div>            
+
+        </div>
+    </section> 
+
+{% endblock %}

@@ -534,6 +534,30 @@
                         {{ form_end(imei_upload_form)}}
                     </td>
                 </tr>
+                <tr>
+                    <td>Mobile</td>
+                    <td>
+                        {% if policy.user.token %}
+                            {% set len = policy.user.token|length %}
+                            *******{{ policy.user.token|slice(len - 5, len - 1) }}
+                        {% else %}
+                            Not present
+                        {% endif %}
+                        {{ form_start(usertoken_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(usertoken_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
+                        {{ form_end(usertoken_form) }}
+                        <strong>This will log the user out on their phone</strong>
+                        <br>
+                        <em>Warning: Android v1.4.4.3 and below will not logout properly. The user will see a generic error instead of being logged out</em>
+                        <br>
+                        Last Mobile Login:
+                        {% if policy.user.latestMobileIdentityLog %}
+                            {{ policy.user.latestMobileIdentityLog.date|date }}
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </td>
+                </tr>
             </table>
         </div>
       {% endif %}

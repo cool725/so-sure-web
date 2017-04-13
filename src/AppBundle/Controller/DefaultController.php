@@ -45,7 +45,7 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
-     * @Template
+     * @Route("/discount-vouchers", name="discount-vouchers")
      */
     public function indexAction(Request $request)
     {
@@ -126,7 +126,7 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        return array(
+        $data = array(
             'form_top' => $formTop->createView(),
             'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
@@ -134,6 +134,12 @@ class DefaultController extends BaseController
             'i7' => $i7,
             's7' => $s7
         );
+
+        if (in_array($request->get('_route'), ['discount-vouchers'])) {
+            return $this->render('AppBundle:Default:discountVouchers.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:Default:index.html.twig', $data);
+        }
     }
 
     /**
@@ -471,6 +477,90 @@ class DefaultController extends BaseController
             ]);
         }
         return array('phone_name' => $phoneName, 'phone_price' => $phonePrice, 'quote_route' => $quoteRoute);
+    }
+
+    /**
+     * @Route("/samsung-s7-insured-with-your-mobile-network", name="samsung_s7_insured_with_your_mobile_network")
+     * @Route("/google-pixel-insured-with-your-mobile-network", name="google_pixel_insured_with_your_mobile_network")
+     * @Route("/iphone-SE-insured-with-your-mobile-network", name="iphone_SE_insured_with_your_mobile_network")
+     * @Route("/iphone-6-insured-with-your-mobile-network", name="iphone_6_insured_with_your_mobile_network")
+     * @Route("/iphone-6s-insured-with-your-mobile-network", name="iphone_6s_insured_with_your_mobile_network")
+     * @Route("/iphone-7-insured-with-your-mobile-network", name="iphone_7_insured_with_your_mobile_network")
+     * @Route("/iphone-7-plus-insured-with-your-mobile-network", name="iphone_7_plus_insured_with_your_mobile_network")
+     * @Template
+     */
+    public function insuredWithMobileNetwork(Request $request)
+    {
+        if ($request->get('_route') == "samsung_s7_insured_with_your_mobile_network") {
+            $phoneName = "Samsung S7";
+            $phonePrice = "7.99";
+            $phoneMemory = "32";
+            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+                'make' => 'Samsung',
+                'model' => 'Galaxy+S7',
+                'memory' => '32'
+            ]);
+        } elseif ($request->get('_route') == "google_pixel_insured_with_your_mobile_network") {
+            $phoneName = "Google Pixel";
+            $phonePrice = "8.49";
+            $phoneMemory = "32";
+            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+                'make' => 'Google',
+                'model' => 'Pixel',
+                'memory' => '32'
+            ]);
+        } elseif ($request->get('_route') == "iphone_SE_insured_with_your_mobile_network") {
+            $phoneName = "iPhone SE";
+            $phonePrice = "6.99";
+            $phoneMemory = "16";
+            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+                'make' => 'Apple',
+                'model' => 'iPhone+SE',
+                'memory' => '16'
+            ]);
+        } elseif ($request->get('_route') == "iphone_7_plus_insured_with_your_mobile_network") {
+            $phoneName = "iPhone 7 Plus";
+            $phonePrice = "9.99";
+            $phoneMemory = "32";
+            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+                'make' => 'Apple',
+                'model' => 'iPhone+7+Plus',
+                'memory' => '32'
+            ]);
+        } elseif ($request->get('_route') == "iphone_7_insured_with_your_mobile_network") {
+            $phoneName = "iPhone 7";
+            $phonePrice = "7.99";
+            $phoneMemory = "32";
+            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+                'make' => 'Apple',
+                'model' => 'iPhone+7',
+                'memory' => '32'
+            ]);
+        } elseif ($request->get('_route') == "iphone_6s_insured_with_your_mobile_network") {
+            $phoneName = "iPhone 6S";
+            $phonePrice = "7.99";
+            $phoneMemory = "32";
+            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+                'make' => 'Apple',
+                'model' => 'iPhone+6S',
+                'memory' => '32'
+            ]);
+        } elseif ($request->get('_route') == "iphone_6_insured_with_your_mobile_network") {
+            $phoneName = "iPhone 6";
+            $phonePrice = "7.99";
+            $phoneMemory = "16";
+            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+                'make' => 'Apple',
+                'model' => 'iPhone+6',
+                'memory' => '16'
+            ]);
+        }
+        return array(
+            'phone_name' => $phoneName,
+            'phone_price' => $phonePrice,
+            'phone_memory' => $phoneMemory,
+            'quote_route' => $quoteRoute
+        );
     }
 
 
