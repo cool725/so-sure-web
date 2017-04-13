@@ -25,13 +25,13 @@
 
 {% block body %}
 
-    <section class="hero isInsuranceWithVodafoneAllThatItSeems">
+    <section class="hero alt-brand-gradient">
         <div class="container">
             
             <div class="row">
                 <div class="col-md-12">
                     <br><br>
-                    <h1>Is your {{ phone_name }} is covered by your mobile network.<br> Are you getting the best deal?</h1>
+                    <h1>Your {{ phone_name }} is covered by your mobile network.<br> Are you getting the best deal?</h1>
                 </div>
             </div>
 
@@ -45,14 +45,14 @@
                 <div class="col-md-8 col-md-offset-2">
                     <p class="text-center">We are sure that they have the best intentions but this is what they offer:</p>  
                     <div class="table-responsive">
-                        <table class="table table-condensed">   
+                        <table class="table">   
                             <thead class="background-blue" valign="middle">
                                     <td valign="middle" align="center" class="text-white" width="18%">
-                                        {{ phone_name }} ({{ phone_memory }}GB)<br>
-                                        <small class="text-white">As of 13th April 2017</small>                                        
+                                        {{ phone_name }} <br>({{ phone_memory }}GB)<br>
+                                        <small class="text-white">as of <br> 13th April 2017</small>                                        
                                     </td>
-                                    <td width="15%" valign="middle" align="center" class="text-white">Price per month</td>
-                                    <td width="15%" valign="middle" align="center" class="text-white">Money back when no claims</td>               
+                                    <td width="15%" valign="middle" align="center" class="text-white">Price per <br>month</td>
+                                    <td width="15%" valign="middle" align="center" class="text-white">Money back <br> when no <br> claims</td>               
                                     <td valign="middle" align="center" class="text-white" width="26%">
                                         Speed to fulfil a claim for <br>
                                         <small>Damage/Breakdown</small>
@@ -64,13 +64,6 @@
                                 </tr>
                             </thead>                   
                             <tbody>
-                                <tr class="so-sure">
-                                    <td><strong>so-sure</strong></td>
-                                    <td align="center"><strong>£{{ phone_price }}</strong></td>
-                                    <td align="center"><strong>Up to 80% cashback</strong></td>
-                                    <td><strong>Next working day</strong></td>
-                                    <td><strong>Next working day</strong></td>
-                                </tr>
                                 <tr class="ee">
                                     <td>EE</td>
                                     <td align="center">£12</td>
@@ -86,7 +79,7 @@
                                     <td>Next working day</td>
                                 </tr>
                                 <tr class="o2">
-                                    <td>O2 <small><small>(iPhone 7 128GB)</small></small></td>
+                                    <td>O2 <small><small>(for 128GB)</small></small></td>
                                     <td align="center">£10</td>
                                     <td align="center">£0</td>
                                     <td>Next working day</td>
@@ -98,7 +91,14 @@
                                     <td align="center">£0</td>
                                     <td>Next day</td>
                                     <td>Next day</td>
-                                </tr>                                
+                                </tr>    
+                                <tr class="so-sure">
+                                    <td class="h4"><strong>so-sure</strong></td>
+                                    <td class="h4" align="center"><strong>£{{ phone_price }}</strong></td>
+                                    <td class="h4" align="center"><strong>Up to 80% <br>cashback</strong></td>
+                                    <td class="h4"><strong>Next working day</strong></td>
+                                    <td class="h4"><strong>Next working day</strong></td>
+                                </tr>                                                            
                             </tbody>
                         </table>  
                     </div>
