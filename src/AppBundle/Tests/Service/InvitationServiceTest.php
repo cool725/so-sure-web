@@ -695,6 +695,18 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof EmailInvitation);
         $this->assertNotNull($invitation->getInvitee());
         $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $updatedInvitee = $userRepo->find($userInvitee->getId());
+        //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
+        $foundInvite = false;
+        foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
+            if ($invitation->getId() == $receviedInvitation->getId()) {
+                $foundInvite = true;
+            }
+        }
+        $this->assertTrue($foundInvite);
     }
 
     public function testSCodeInvitationInvitee()
@@ -720,7 +732,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($policyInvitee->getStandardSCode()->getId(), $invitation->getSCode()->getId());
         
         $updatedInvitee = static::$userRepo->find($userInvitee->getId());
-        \Doctrine\Common\Util\Debug::dump($updatedInvitee);
+        //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
         $foundInvite = false;
         foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
             if ($invitation->getId() == $receviedInvitation->getId()) {

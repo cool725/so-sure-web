@@ -174,20 +174,20 @@ class InvitationService
         if ($invitation instanceof EmailInvitation) {
             $user = $userRepo->findOneBy(['emailCanonical' => $invitation->getEmail()]);
             if ($user && $invitation->getInviter()->getId() != $user->getId()) {
-                $invitation->setInvitee($user);
+                $user->addReceivedInvitation($invitation);
                 $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
             }
         } elseif ($invitation instanceof SmsInvitation) {
             $user = $userRepo->findOneBy(['mobileNumber' => $invitation->getMobile()]);
             if ($user && $invitation->getInviter()->getId() != $user->getId()) {
-                $invitation->setInvitee($user);
+                $user->addReceivedInvitation($invitation);
                 $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
             }
         } elseif ($invitation instanceof SCodeInvitation) {
             $scode = $invitation->getSCode();
             if ($scode->isStandard()) {
                 if ($user && $invitation->getInviter()->getId() != $user->getId()) {
-                    $invitation->setInvitee($user);
+                    $user->addReceivedInvitation($invitation);
                     $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
                 }
             }
