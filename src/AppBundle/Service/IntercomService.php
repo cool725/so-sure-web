@@ -690,12 +690,14 @@ class IntercomService
             $page++;
             $pages = $resp->pages->total_pages;
             foreach ($resp->contacts as $lead) {
-                $optedOut = $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
-                    $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
-                if ($lead->unsubscribed_from_emails && !$optedOut) {
-                    $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE);
-                    $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
-                    $output[] = sprintf("Added optout for %s", $lead->email);
+                if (strlen(trim($lead->email)) > 0) {
+                    $optedOut = $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
+                        $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                    if ($lead->unsubscribed_from_emails && !$optedOut) {
+                        $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE);
+                        $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                        $output[] = sprintf("Added optout for %s", $lead->email);
+                    }
                 }
 
                 if ($lead->last_request_at) {
@@ -741,21 +743,23 @@ class IntercomService
             $page++;
             $pages = $resp->pages->total_pages;
             foreach ($resp->users as $user) {
-                $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
-                    $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
-                if ($user->unsubscribed_from_emails && !$optedOut) {
-                    // Webhook callback from intercom issue
-                    $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE);
-                    $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
-                    $output[] = sprintf("Added optout for %s", $user->email);
-                } elseif (!$user->unsubscribed_from_emails && $optedOut) {
-                    // sosure user listener -> queue -> intercom update issue
-                    $sosureUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->email)]);
-                    if ($sosureUser) {
-                        $this->updateUser($sosureUser);
-                        $output[] = sprintf("Resync intercom user for %s", $user->email);
-                    } else {
-                        $output[] = sprintf("Unable to find so-sure user for %s", $user->email);
+                if (strlen(trim($user->email)) > 0) {
+                    $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
+                        $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                    if ($user->unsubscribed_from_emails && !$optedOut) {
+                        // Webhook callback from intercom issue
+                        $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE);
+                        $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                        $output[] = sprintf("Added optout for %s", $user->email);
+                    } elseif (!$user->unsubscribed_from_emails && $optedOut) {
+                        // sosure user listener -> queue -> intercom update issue
+                        $sosureUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->email)]);
+                        if ($sosureUser) {
+                            $this->updateUser($sosureUser);
+                            $output[] = sprintf("Resync intercom user for %s", $user->email);
+                        } else {
+                            $output[] = sprintf("Unable to find so-sure user for %s", $user->email);
+                        }
                     }
                 }
 
@@ -766,7 +770,7 @@ class IntercomService
                 } elseif ($user->created_at) {
                     $lastSeen = \DateTime::createFromFormat('U', $user->created_at);
                 } else {
-                    $this->logger->warning(sprintf('For user, unable to determine last seen %s', json_encode($lead)));
+                    $this->logger->warning(sprintf('For user, unable to determine last seen %s', json_encode($user)));
                 }
 
                 if ($lastSeen) {

@@ -30,18 +30,23 @@ class SCodeController extends BaseController
         $ip = $request->getClientIp();
         $isUK = $geoip->findCountry($ip) == "GB";
 
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(SCode::class);
+        $phoneRepo = $dm->getRepository(Phone::class);
+
         $scode = null;
         try {
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(SCode::class);
-            $scode = $repo->findOneBy(['code' => $code]);
-            $phoneRepo = $dm->getRepository(Phone::class);
-
-            // make sure to get policy user in code first rather than in twig in case policy/user was deleted
-            if (!$scode ||
-                (in_array($scode->getType(), [SCode::TYPE_STANDARD, SCode::TYPE_MULTIPAY]) &&
-                !$scode->getPolicy()->getUser())) {
-                throw new \Exception('Unknown scode');
+            if ($scode = $repo->findOneBy(['code' => $code])) {
+                // make sure to get policy user in code first rather than in twig in case policy/user was deleted
+                if (in_array($scode->getType(), [SCode::TYPE_STANDARD, SCode::TYPE_MULTIPAY])) {
+                    if (!$scode->getPolicy() || !$scode->getPolicy()->getUser()) {
+                        throw new \Exception('Unknown scode');
+                    }
+                } elseif (in_array($scode->getType(), [SCode::TYPE_REWARD])) {
+                    if (!$scode->getReward() || !$scode->getReward()->getUser()) {
+                        throw new \Exception('Unknown scode');
+                    }
+                }
             }
         } catch (\Exception $e) {
             $scode = null;

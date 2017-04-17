@@ -530,6 +530,7 @@ class ApiAuthController extends BaseController
             $name = $this->conformAlphanumericSpaceDot($this->getDataString($data, 'name'), 250);
             $scode = $this->getDataString($data, 'scode');
             $skipSend = $this->getDataBool($data, 'skip_send');
+            $facebookId = $this->getDataString($data, 'facebook_id');
             try {
                 $invitation  = null;
                 if ($email && $validator->isValid($email)) {
@@ -538,6 +539,8 @@ class ApiAuthController extends BaseController
                     $invitation = $invitationService->inviteBySms($policy, $mobile, $name, $skipSend);
                 } elseif ($scode && SCode::isValidSCode($scode)) {
                     $invitation = $invitationService->inviteBySCode($policy, $scode);
+                } elseif ($facebookId && strlen($facebookId) > 5 && strlen($facebookId) < 150) {
+                    $invitation = $invitationService->inviteByFacebookId($policy, $facebookId);
                 } else {
                     // TODO: General
                     return $this->getErrorJsonResponse(

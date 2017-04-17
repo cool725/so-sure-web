@@ -86,4 +86,24 @@ class CognitoIdentityService
 
         return $identityId;
     }
+
+    public function delete($cognitoIdentityId)
+    {
+        $result = $this->cognito->deleteIdentities(array(
+            'IdentityIdsToDelete' => [$cognitoIdentityId],
+        ));
+        $this->logger->info(sprintf('Delete cognito id: %s Res: %s', $cognitoIdentityId, json_encode($result)));
+
+        return true;
+    }
+
+    public function deleteLastestMobileToken(User $user)
+    {
+        $identityLog = $user->getLatestMobileIdentityLog();
+        if ($identityLog && $identityLog->getCognitoId()) {
+            return $this->delete($identityLog->getCognitoId());
+        }
+
+        return false;
+    }
 }

@@ -32,6 +32,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Invoice;
+use AppBundle\Document\SCode;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Stats;
@@ -361,6 +362,10 @@ class AdminEmployeeController extends BaseController
         $imeiUploadForm = $this->get('form.factory')
             ->createNamedBuilder('imei_upload', ImeiUploadFileType::class, $imeiUploadFile)
             ->getForm();
+        $userTokenForm = $this->get('form.factory')
+            ->createNamedBuilder('usertoken_form')
+            ->add('regenerate', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -543,6 +548,28 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('usertoken_form')) {
+                $userTokenForm->handleRequest($request);
+                if ($userTokenForm->isSubmitted() && $userTokenForm->isValid()) {
+                    $policy->getUser()->resetToken();
+                    $dm = $this->getManager();
+                    $dm->flush();
+
+                    $identity = $this->get('app.cognito.identity');
+                    if ($identity->deleteLastestMobileToken($policy->getUser())) {
+                        $this->addFlash(
+                            'success',
+                            'Reset user token & deleted cognito credentials'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'success',
+                            'Reset user token. No cognito credentials present'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -561,6 +588,7 @@ class AdminEmployeeController extends BaseController
             'create_form' => $createForm->createView(),
             'connect_form' => $connectForm->createView(),
             'imei_upload_form' => $imeiUploadForm->createView(),
+            'usertoken_form' => $userTokenForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -874,8 +902,11 @@ class AdminEmployeeController extends BaseController
 
         $rewardForm = $this->get('form.factory')
             ->createNamedBuilder('rewardForm')
-            ->add('name', TextType::class)
+            ->add('firstName', TextType::class)
+            ->add('lastName', TextType::class)
+            ->add('code', TextType::class)
             ->add('email', EmailType::class)
+            ->add('defaultValue', TextType::class)
             ->add('next', SubmitType::class)
             ->getForm();
 
@@ -923,11 +954,22 @@ class AdminEmployeeController extends BaseController
                         $user = $userManager->createUser();
                         $user->setEnabled(true);
                         $user->setEmail($this->getDataString($rewardForm->getData(), 'email'));
-                        $user->setFirstName($this->getDataString($rewardForm->getData(), 'name'));
+                        $user->setFirstName($this->getDataString($rewardForm->getData(), 'firstName'));
+                        $user->setLastName($this->getDataString($rewardForm->getData(), 'lastName'));
                         $reward = new Reward();
                         $reward->setUser($user);
+                        $reward->setDefaultValue($this->getDataString($rewardForm->getData(), 'defaultValue'));
                         $dm->persist($user);
                         $dm->persist($reward);
+
+                        $code = $this->getDataString($rewardForm->getData(), 'code');
+                        if (strlen($code) > 0) {
+                            $scode = new SCode();
+                            $scode->setCode($code);
+                            $scode->setReward($reward);
+                            $scode->setType(SCode::TYPE_REWARD);
+                            $dm->persist($scode);
+                        }
                         $dm->flush();
                         $this->addFlash('success', sprintf(
                             'Added reward'

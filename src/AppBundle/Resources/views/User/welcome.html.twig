@@ -6,7 +6,7 @@
     {{ parent() }}
     {% javascripts
     'components/vimeo-player-js/player.min.js'     
-    'bundles/app/js/User/index.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -124,7 +124,7 @@
             </div>
         </div>
     </section>
-    
+{#     
     <div class="modal modal-policy fade" id="policyModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -137,7 +137,29 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> #}
+
+    <div class="modal modal-fullscreen fade" 
+         id="policy-modal" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-labelledby="So-Sure Policy Terms" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>So-Sure Policy Terms</h3>
+                </div>
+                <div class="modal-body modal-policy">
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  policy.maxPot })) }}
+                </div>
+            </div>
+        </div>
+    </div>      
 
     {# Page Modals #}
 

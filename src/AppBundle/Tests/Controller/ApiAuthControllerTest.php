@@ -2232,6 +2232,64 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
+    public function testNewFacebookInvitation()
+    {
+        $inviter = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewFacebookInvitation-inviter', $this),
+            'foo'
+        );
+        $inviter->setFacebookId(rand(1, 999999));
+        $cognitoIdentityId = $this->getAuthUser($inviter);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $inviter);
+        $policyData = $this->verifyResponse(200);
+
+        $inviterPolicyId = $policyData['id'];
+        $this->payPolicy($inviter, $inviterPolicyId);
+
+        $invitee = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewFacebookInvitation-invitee', $this),
+            'foo'
+        );
+        $invitee->setFacebookId(rand(1, 999999));
+        static::$dm->persist($invitee);
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($invitee);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $invitee);
+        $policyData = $this->verifyResponse(200);
+
+        $inviteePolicyId = $policyData['id'];
+        $this->payPolicy($invitee, $policyData['id']);
+
+        $cognitoIdentityId = $this->getAuthUser($inviter);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $inviterPolicyId);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'facebook_id' => $invitee->getFacebookId()
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('foo bar', $data['name']);
+        $this->assertEquals(
+            strtolower(self::generateEmail('testNewFacebookInvitation-invitee', $this)),
+            $data['invitation_detail']
+        );
+
+        $cognitoIdentityId = $this->getAuthUser($invitee);
+        $url = sprintf("/api/v1/auth/user?_method=GET");
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals($inviter->getFacebookId(), $data['facebook_filters'][0]);
+
+        $cognitoIdentityId = $this->getAuthUser($inviter);
+        $url = sprintf("/api/v1/auth/policy/%s?_method=GET", $inviterPolicyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals($invitee->getFacebookId(), $data['facebook_filters'][0]);
+    }
+
     public function testSentInvitationAppears()
     {
         $user = self::createUser(

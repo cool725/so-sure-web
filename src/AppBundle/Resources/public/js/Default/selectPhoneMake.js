@@ -70,7 +70,10 @@ $(function(){
     var searchPhones = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
-        prefetch: { 'url': '/search-phone' },
+        prefetch: {
+            'url': '/search-phone',
+            'ttl': 1800000  // 30 minutes
+        },
         identify: function(obj) { return obj.id; },
         sorter: function(a, b) {
             var rxA = /(.*)\(([0-9]+)\s?GB\)/g;

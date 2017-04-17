@@ -478,6 +478,7 @@ services:
             logger:         "@logger"
             url:            "%sixpack_url%"
             requestService: "@app.request"
+            mixpanel:       "@app.mixpanel"
 
     app.feature:
         class: AppBundle\Service\FeatureService
