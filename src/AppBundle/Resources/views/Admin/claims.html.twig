@@ -2,8 +2,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    '@AppBundle/Resources/public/css/Admin/claims.css'
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/admin.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -13,7 +13,7 @@
         '@AppBundle/Resources/public/js/Claims/claimsModal.js'
     %}
     <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}            
+    {% endjavascripts %}
 {% endblock %}
 
 {% block body %}

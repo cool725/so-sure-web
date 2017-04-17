@@ -2,8 +2,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    '@AppBundle/Resources/public/css/Default/claimHandling.css'
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/admin.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
