@@ -18,7 +18,7 @@
 		@include breakpoint(tablet) {
 			 max-width: 510px;
 
-		}		
+		}
 
 	}
 
@@ -41,11 +41,11 @@
 	    display: inline-block;
 	    padding: 10px 0;
 	    border: 2px solid $blue;
-	    @include border-radius(3px);	
+	    @include border-radius(3px);
 
 	    &:first-of-type {
 	    	margin-right: 10%;
-	    }	
+	    }
 
 	    label {
 	    	text-align: center;
@@ -61,9 +61,9 @@
 		color: $white;
 	}
 
-	.address-manual-cont {    
+	.address-manual-cont {
 	    margin-top: 15px;
-	}	
+	}
 
 	@include breakpoint(tablet) {
         padding: 0 0 100px;
@@ -85,7 +85,7 @@
 
     label {
 	    font-size: 16px !important;
-	    font-weight: bold;    	
+	    font-weight: bold;
     }
 }
 
@@ -97,16 +97,16 @@
     -webkit-background-clip: padding-box;
           background-clip: padding-box;
     border: 2px solid $grey-light;
-    @include border-radius(4px);	
+    @include border-radius(4px);
 }
 
 .review-terms {
     background-color: $blue-lightest;
     border: 2px solid $blue;
- 	@include border-radius(4px);	
+ 	@include border-radius(4px);
     color: $grey-dark;
     padding: 25px;
-    margin: 15px 0;    
+    margin: 15px 0;
 
     ol {
     	padding-left: 25px;
@@ -134,7 +134,7 @@
 
     li {
 	    color: $red;
-	    font-size: 13px;    	
+	    font-size: 13px;
     }
 }
 
@@ -143,21 +143,20 @@
 	color: $red;
 }
 
-/* intl-tel-input */
-.intl-tel-input { 
-	display: block; 
+.intl-tel-input {
+	display: block;
 }
 
 .iti-flag {
 	background-image: url("/components/intl-tel-input/flags.png");}
 
-	@media only screen and (-webkit-min-device-pixel-ratio: 2), 
-	only screen and (min--moz-device-pixel-ratio: 2), 
-	only screen and (-o-min-device-pixel-ratio: 2 / 1), 
-	only screen and (min-device-pixel-ratio: 2), 
-	only screen and (min-resolution: 192dpi), 
+	@media only screen and (-webkit-min-device-pixel-ratio: 2),
+	only screen and (min--moz-device-pixel-ratio: 2),
+	only screen and (-o-min-device-pixel-ratio: 2 / 1),
+	only screen and (min-device-pixel-ratio: 2),
+	only screen and (min-resolution: 192dpi),
 	only screen and (min-resolution: 2dppx) {
-    
+
     	.iti-flag{background-image:url("/components/intl-tel-input/flags@2x.png")}
 }
 
