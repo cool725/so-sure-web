@@ -1,6 +1,6 @@
 {% extends '::base.html.twig' %}
 {% block body %}
-    <div class="login">
+
 <form class="form" action="" method="post">
     {% for flashMessage in app.session.flashbag.get("two_factor") %}
         <p class="error">{{ flashMessage|trans }}</p>
@@ -14,5 +14,5 @@
     {# The logout link gives the user a way out if they can't complete the second step #}
     <p class="cancel"><a href="{{ path("_security_logout") }}">Abort login</a></p>
 </form>
-    </div>
+
 {% endblock %}
