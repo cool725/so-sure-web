@@ -11,17 +11,14 @@
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
+
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-        '@AppBundle/Resources/public/css/Default/homepage.css'
-        '@AppBundle/Resources/public/css/User/index.css'
-        '@AppBundle/Resources/public/css/User/trust.css'
-        '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-    {% endstylesheets %}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/user.scss'%}
+    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
 {% endblock %}
+
 
 {% block body %}
     <section class="user-invalid">

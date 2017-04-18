@@ -114,7 +114,7 @@ assetic:
         cssrewrite: ~
         sass:
             bin:        /usr/local/bin/sass
-            apply_to:   '\.sass$'
+            apply_to:   '\.scss$'
 fos_user:
     db_driver: mongodb
     firewall_name: main

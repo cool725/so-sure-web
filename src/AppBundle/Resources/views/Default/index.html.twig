@@ -14,14 +14,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    '@AppBundle/Resources/public/css/Default/index.css'
-    '@AppBundle/Resources/public/css/Default/index.sass'
-    '@AppBundle/Resources/public/css/Default/homepage.css'
-    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
-    '@AppBundle/Resources/public/css/Default/scrollindicator.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'        
-    '@AppBundle/Resources/public/css/Default/videoOverlay.css'
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/homepage.scss'      
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -66,18 +60,18 @@
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
-    <section class="footer-cta">
+    <section class="footer-cta brand-gradient">
         <div class="container">
             <div class="row">
-                <div class="col-lg-8 text-left">
+                <div class="col-md-8">
                     <h2>Ready for better phone insurance?</h2>
                     <p class="lead">You can't always have better in life, but you can have better phone insurance.</p>
                 </div>
-                <div class="col-lg-2 text-center">
-                    <a href="mailto:hello@wearesosure.com" class="btn btn-info" id="open-intercom"><i class="fa fa-comments"></i> Chat with us</a>
-                </div>                
-                <div class="col-lg-2 text-center">
-                    <a class="btn btn-primary" id="get-quote-btn">Get a quote</a>
+                <div class="col-md-4">
+                    <ul class="list-inline">
+                        <li><a href="mailto:hello@wearesosure.com" class="btn btn-default-hollow btn-block" id="open-intercom">Chat with us <i class="fa fa-comments"></i></a></li>
+                        <li><a class="btn btn-black btn-block" id="get-quote-btn">Get a quote</i></a></li>
+                    </ul>
                 </div>
             </div>
         </div>

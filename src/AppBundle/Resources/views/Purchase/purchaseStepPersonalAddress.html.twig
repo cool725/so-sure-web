@@ -3,15 +3,13 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    'components/bootstrap-daterangepicker/daterangepicker.css'
-    '@AppBundle/Resources/public/css/Default/bannerSticky.css'       
-    'components/intl-tel-input/intlTelInput.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'    
-    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
-    '@AppBundle/Resources/public/css/Purchase/purchase-nav.css'
-    '@AppBundle/Resources/public/css/Purchase/checkout.css'%}
-    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    {% stylesheets output='css/*.css'
+        'components/bootstrap-daterangepicker/daterangepicker.css'
+        'components/intl-tel-input/intlTelInput.css'
+        '@AppBundle/Resources/public/sass/page/checkout.scss'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
 {% endblock %}
 
 {% block javascripts %}
@@ -22,9 +20,9 @@
     'components/typeahead.js/typeahead.bundle.min.js'
     'components/intl-tel-input/intlTelInput.min.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
-    '@AppBundle/Resources/public/js/Default/index.js'    
+    '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStepAddress.js' 
+    '@AppBundle/Resources/public/js/Purchase/purchaseStepAddress.js'
     '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -41,16 +39,16 @@
             <div class="row">
                 <div class="col-md-12">
                     <h3 class="text-center">Insurance for your
-                    {{ phone.make }} {{ phone.model }} {%    
+                    {{ phone.make }} {{ phone.model }} {%
                     if phone.memory %}
                         {{ phone.memory }}GB
                     {% endif %}
-                    - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h3>                    
+                    - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</h3>
                 </div>
             </div>
         </div>
     </section>
-{% endif %}  
+{% endif %}
 
 <section id="purchase-step-personal" class="checkout">
 
@@ -60,38 +58,38 @@
 
         {% if phone %}
         <h2 class="text-center h3">Insurance for your
-            <span class="text-nowrap">{{ phone.make }} {{ phone.model }} {%    
+            <span class="text-nowrap">{{ phone.make }} {{ phone.model }} {%
             if phone.memory %}
                 {{ phone.memory }}GB</span>
             {% endif %}
             <span class="text-nowrap"> - £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month</span></h2>
             <p class="text-center">
-                <a href="#"   
-                   data-toggle="modal" 
+                <a href="#"
+                   data-toggle="modal"
                    data-target="#quoteModel">
                    <small class="text-blue text-underline">Not the right phone? Select a new phone.</small>
-                </a>                
+                </a>
             </p>
         {% endif %}
 
         <div class="row">
-            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">                                      
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
 
                 <div class="checkout--step">
 
                     <h3>Personal Details</h3>
                     <div class="text-center">
-                        <a href="#" onclick="fb_login();" class="btn btn-facebook" {% if app.user %}disabled{% endif %}>
+                        <a href="#" onclick="fb_login();" class="btn btn-facebook-hollow" {% if app.user %}disabled{% endif %}>
                             <i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook
                         </a>
                     </div>
 
                     <div class="text-break text-grey">
                         <div class="line"></div>OR<div class="line"></div>
-                    </div>   
+                    </div>
 
                     {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
-                    
+
                         <div class="form-group {% if form_errors(purchase_form.email) %}has-error{% endif %}">
                             {{ form_label(purchase_form.email, 'Email:', { 'label_attr': {'class': ''} }) }}
                             {{ form_widget(purchase_form.email, {'attr':{'class':'form-control', 'placeholder': 'e.g. jane.smith@gmail.com'}}) }}
@@ -100,17 +98,17 @@
                         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
                             {{ form_label(purchase_form.name, 'Full Name:', { 'label_attr': {'class': ''} }) }}
                             {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'e.g. Jane Smith'}}) }}
-                            <div class="help-block with-errors">{{ form_errors(purchase_form.name) }}</div>                  
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.name) }}</div>
                         </div>
                         <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %} text-left">
                             {{ form_label(purchase_form.birthday, 'Date of Birth:', { 'label_attr': {'class': ''} }) }}
-                            {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday'}}) }} 
-                            <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>              
+                            {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday'}}) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
                         </div>
                         <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
                             {{ form_label(purchase_form.mobileNumber, 'Mobile Number:', { 'label_attr': {'class': ''} }) }}
                             {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'(0044|[+]44|0)[\\s]*7[\\s]*[1-9]([\\s]*([0-9][\\s]*){8})', 'title': 'Sorry, we only support UK Residents, please enter a valid UK Mobile Number.', 'placeholder':'e.g. +447700 111 222'}}) }}
-                        <div class="mobile-err help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>      
+                        <div class="mobile-err help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
                         </div>
 
                         {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
@@ -135,21 +133,21 @@
                                 {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1'}}) }}
                                 {% if showAddress %}
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
-                                {% endif %}                           
+                                {% endif %}
                             </div>
                             <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
                                 {{ form_label(purchase_form.addressLine2, 'Billing Address Line 2:', { 'label_attr': {'class': ''} }) }}
                                 {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2'}}) }}
                                 {% if showAddress %}
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
-                                {% endif %}                                 
+                                {% endif %}
                             </div>
                             <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
                                 {{ form_label(purchase_form.addressLine3, 'Billing Address Line 3:', { 'label_attr': {'class': ''} }) }}
                                 {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3'}}) }}
                                 {% if showAddress %}
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
-                                {% endif %}                             
+                                {% endif %}
                             </div>
                             <div class="form-group {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
                                 {{ form_label(purchase_form.city, 'Billing Address City:', { 'label_attr': {'class': ''} }) }}
@@ -170,33 +168,33 @@
                             <div class="form-group form-footer">
                                 <div class="row">
                                     <div class="col-xs-6 col-sm-6 col-md-6">
-                                        <a class="btn btn-subtle btn-rounded btn-hollow btn-block btn-hollow-subtle btn-arrow-left" href="{{ quote_url }}">MY QUOTE</a>
+                                        <a class="btn btn-primary-hollow" href="{{ quote_url }}">MY QUOTE</a>
                                     </div>
                                     <div class="col-xs-6 col-sm-6 col-md-6">
-                                        {{ form_widget(purchase_form.next, {'label': 'NEXT STEP', 'attr': {'class': 'btn btn-success btn-rounded  btn-block btn-arrow-right'}}) }}
+                                        {{ form_widget(purchase_form.next, {'label': 'NEXT STEP', 'attr': {'class': 'btn btn-success   btn-block btn-arrow-right'}}) }}
                                     </div>
                                 </div>
-                            </div>                                    
+                            </div>
                         {% else %}
                             <div class="form-group form-footer">
                                 <div class="row">
                                     <div class="col-sm-6 col-md-6 col-md-offset-3">
-                                        {{ form_widget(purchase_form.next, {'label': 'NEXT STEP', 'attr': {'class': 'btn btn-success btn-rounded  btn-block btn-arrow-right'}}) }}
+                                        {{ form_widget(purchase_form.next, {'label': 'NEXT STEP', 'attr': {'class': 'btn btn-success   btn-block btn-arrow-right'}}) }}
                                     </div>
                                 </div>
                             </div>
-                        {% endif %}                            
+                        {% endif %}
 
                     {{ form_end(purchase_form) }}
                 </div>
             </div>
         </div>
     </div>
-</section>   
+</section>
 
 {# Page Modals #}
 
-{% include 'AppBundle::Default/modalQuote.html.twig' %}    
+{% include 'AppBundle::Default/modalQuote.html.twig' %}
 
 {# End Page Modals #}
 

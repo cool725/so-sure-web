@@ -2,9 +2,9 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
+    {% stylesheets output='css/*.css'
     'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
-    '@AppBundle/Resources/public/css/Default/claimHandling.css'
+    '@AppBundle/Resources/public/sass/page/admin.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -21,7 +21,7 @@
         '@AppBundle/Resources/public/js/Claims/policy.js'
     %}
     <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}            
+    {% endjavascripts %}
 {% endblock %}
 
 {% block body %}
@@ -229,7 +229,7 @@
                 </div>
                 <div class="row">
                 <div class="col-md-12">
-                    <i>If cancellation list is empty, then most likely this is an open claim that must be resolved first.</i>                
+                    <i>If cancellation list is empty, then most likely this is an open claim that must be resolved first.</i>
                 </div>
                 </div>
             </div>

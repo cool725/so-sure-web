@@ -259,6 +259,15 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/design-patterns", name="design_patterns")
+     * @Template
+     */
+    public function designPatternsAction()
+    {
+        return [];
+    }
+
+    /**
      * @Route("/register", name="register")
      * @Template
      */

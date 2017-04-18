@@ -1,7 +1,8 @@
 /* Hide form on load whilst rendering */
-#search-phone-form {
+/*#search-phone-form {
     display: none;
-    /*margin-bottom: 25px;*/
+
+
 }
 
 .select-phone-box {
@@ -9,11 +10,11 @@
     padding: 15px;
     background-color: #efefef;
     margin-bottom: 15px;
-}
+}*/
 
 /* Dropdown styling */
 
-.select-phone-dropdown {
+/*.select-phone-dropdown {
     background-color: #fff;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAAJ1BMVEVmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmaP/QSjAAAADHRSTlMAAgMJC0uWpKa6wMxMdjkoAAAANUlEQVR4AeXJyQEAERAAsNl7Hf3X6xt0QL6JpZWq30pdvdadme+0PMdzvHm8YThHcT1H7K0BtOMDniZhWOgAAAAASUVORK5CYII=);
     -webkit-background-size: 13px 13px;
@@ -68,9 +69,9 @@
     #select-phone .input-group-btn {
       top: 0px !important;
     }
-}
+}*/
 
-#select-phone .device-select, .device-select .input-group {
+/*#select-phone .device-select, .device-select .input-group {
     display: inline-table;
     color: #202532;
     vertical-align: middle;
@@ -138,12 +139,12 @@
   #select-phone .device-select li {
     display: block !important;
   }
-}
+}*/
 
 /* Twitter Typehead */
 
 
-
+/*
 .search-phone-text {
     min-width: 100%;
     padding: 9px 15px;
@@ -215,7 +216,7 @@
         margin-right: 5px;
     }
 
-}
+*/}
 
 /*.tt-menu {
     background-color: white;

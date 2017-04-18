@@ -1,0 +1,40 @@
+// footer.scss
+
+.footer {
+	padding: 40px 0 70px;
+	position: relative;
+	z-index: 100;
+	
+	font-size: 14px;
+	text-align: center;
+
+	color: $white;
+	background-color: $black;
+
+	hr {
+		border: none;
+		border-top: 1px solid $grey-dark;
+	}
+
+	a {
+		color: $white;
+
+		&:hover,
+		&:focus {
+			color: $blue;
+			text-decoration: none;
+		}
+	}
+
+	.so-sure-logo {
+		margin: 0 auto 15px;
+	}
+}
+
+@include breakpoint(tablet) {
+
+	.footer {
+		text-align: left;
+	}
+
+}

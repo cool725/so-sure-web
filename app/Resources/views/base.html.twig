@@ -9,15 +9,14 @@
         {% include '::header.html.twig' %}
 
         {% block stylesheets %}
-            {% stylesheets output = 'css/*'
-            '../app/Resources/public/css/bootstrap.min.css'
-            'components/cookieconsent/cookieconsent.min.css'
-            '../app/Resources/public/css/all.css'
-            '../app/Resources/public/css/footer.css'
+            {% stylesheets output='css/*.css'
+                '../app/Resources/public/css/bootstrap.min.css'
+                'components/cookieconsent/cookieconsent.min.css'
+                '@AppBundle/Resources/public/sass/main.scss'
             %}
             <link rel="stylesheet" href="{{ asset_url }}">
             {% endstylesheets %}
-        {% endblock %}
+        {% endblock %}        
         {% block remotestylesheets %}
         {% endblock %}
         {% block metaend %}{% endblock %}

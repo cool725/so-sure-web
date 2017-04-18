@@ -1,11 +1,11 @@
 /* Checkout */
 
 .checkout {
-    padding: 0 0 30px;
+    /*padding: 0 0 30px;*/
 }
 
 .checkout h3 {
-    display: none;
+    /*display: none;*/
 }
 
 .checkout--step {
@@ -18,22 +18,19 @@
 }
 
 .checkout .form-group .form-control {
-    border: 2px solid #efefef;
-    box-shadow: none;
+    /*border: 2px solid #efefef;*/
+    /*box-shadow: none;*/
 }
 
 .checkout .form-group label {
-    font-size: 14px;
+    /*font-size: 14px;*/
 }    
 
 .checkout .form-footer {
     margin-top: 25px;
 }
 
-/*.checkout--phone-indent {
-    margin-left: 50px;
-}
-*/
+
 /* Radio Buttons */
 
 .checkout .radio {
@@ -76,7 +73,7 @@
     margin-top: 15px;
 }
 
-.checkout .btn-additional {
+/*.checkout .btn-additional {
     padding: 12px 30px;
     border: 2px solid #202532;
     background: none !important;
@@ -86,15 +83,15 @@
     -webkit-border-radius: 30px;
     background: none;
     color: #202532;    
-}
+}*/
 
-.checkout .square-o:before {
+/*.checkout .square-o:before {
 content: "\f096";
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;
     text-decoration: inherit;
-/*--adjust as necessary--*/
+
     color: #000;
     font-size: 18px;
     padding-right: 0.5em;
@@ -106,14 +103,14 @@ content: "\f046";
     font-style: normal;
     font-weight: normal;
     text-decoration: inherit;
-/*--adjust as necessary--*/
+
     color: #000;
     font-size: 18px;
     padding-right: 0.5em;
-}
+}*/
 
 /* Birthday */
-.birthday select {
+/*.birthday select {
     font-size: 14px;
     padding: 6px 12px;
     background-color: #fff;
@@ -141,21 +138,21 @@ content: "\f046";
 
 .review-terms li {
     padding: 5px 0;
-}
+}*/
 
 /* Includes */
 
-.purchase-download {
+/*.purchase-download {
     margin: 10px 0 40px;
 }
 
 .purchase-download--btns {
     text-align: center;
-}
+}*/
 
 /* Errors */
 
-.help-block ul {
+/*.help-block ul {
     list-style: none;
     text-align: left;
     margin: 0; padding: 0;
@@ -172,11 +169,11 @@ content: "\f046";
 
 .address-show-error-text {
     color: #ff6666;
-}
+}*/
 
 /* Twitter Typehead */
 
-.tt-menu {
+/*.tt-menu {
     background-color: white;
     border: 2px solid #efefef;
     margin-top: -2px;
@@ -198,18 +195,18 @@ content: "\f046";
 
 .twitter-typeahead, .tt-hint, .tt-input, .tt-menu {
     width: 100%;
-}
+}*/
 
 /* intl-tel-input */
-.intl-tel-input { display: block; }
+/*.intl-tel-input { display: block; }
 .iti-flag {background-image: url("/components/intl-tel-input/flags.png");}
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx){
     .iti-flag{background-image:url("/components/intl-tel-input/flags@2x.png")}
-}
+}*/
 
 /* Responsive */
 
-@media (min-width: 563px) {
+/*@media (min-width: 563px) {
 
     .checkout--step-review {
         padding: 0 20px;
@@ -245,5 +242,5 @@ content: "\f046";
 
 @media (min-width:992px) {
 
-
+*/
 }

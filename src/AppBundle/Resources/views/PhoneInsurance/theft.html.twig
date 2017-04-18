@@ -6,8 +6,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-        '@AppBundle/Resources/public/css/About/index.css'
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/about.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
     {% endstylesheets %}
@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block body %}
-<section class="about-section">
+<section class="about-section section--pad">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -41,6 +41,6 @@
 
 {% include 'AppBundle::Default/footerCta.html.twig' %}
 
-{% include 'AppBundle::Default/modalQuote.html.twig' %}    
+{% include 'AppBundle::Default/modalQuote.html.twig' %}
 
 {% endblock %}

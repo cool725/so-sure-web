@@ -6,8 +6,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-        '@AppBundle/Resources/public/css/About/index.css'
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/about.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
     {% endstylesheets %}
@@ -34,7 +34,7 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-            	<p class="go-back"><a href="{{ path('about_home') }}" class="btn btn-primary btn-rounded btn-hollow"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> Go back</a></p>
+            	<p class="go-back"><a href="{{ path('about_home') }}" class="btn btn-primary-hollow"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> Go back</a></p>
             </div>
         </div>
     </div>

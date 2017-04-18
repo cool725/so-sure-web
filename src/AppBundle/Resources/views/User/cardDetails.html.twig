@@ -4,10 +4,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    '@AppBundle/Resources/public/css/Default/modal.css'        
-    '@AppBundle/Resources/public/css/User/index.css'
-    '@AppBundle/Resources/public/css/User/trust.css' %}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/user.scss'%}
     <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
 {% endblock %}
 
@@ -26,7 +24,7 @@
                           <div class="row">
                               <div class="form-group col-sm-12 text-center">
                                   <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                  <input type="submit" class="btn btn-primary btn-rounded" value="Update your card details">
+                                  <input type="submit" class="btn btn-primary " value="Update your card details">
                               </div>
                           </div>
                       </form>

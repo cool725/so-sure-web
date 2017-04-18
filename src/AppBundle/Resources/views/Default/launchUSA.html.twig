@@ -13,9 +13,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    'bundles/app/css/Default/index.css'
-    'bundles/app/css/Default/launch-usa.css'
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/usa.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 

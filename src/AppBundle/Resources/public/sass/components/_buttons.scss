@@ -1,0 +1,102 @@
+// _buttons.scss
+
+.btn {
+	@include border-radius(100px);
+	padding: 10px 20px;
+
+	&:focus, &:active {
+		outline: none !important;
+	}
+}
+
+@mixin btn($background, $color) {
+	border-color: $background;
+	border-width: 2px;
+	color: $color;
+	background-color: $background;
+
+	// @extend .btn-so-sure;
+
+	&:hover, &:focus {
+		background-color: darken($background, 15%);
+		transition: all 0.3s ease;
+		border-color: darken($background, 15%);
+	}
+
+	&:active {
+		background-color: darken($background, 25%);
+		border-color: darken($background, 25%);
+		transition: all 0.3s ease;
+		box-shadow: none;		
+	}
+
+	&-hollow {
+		background-color: none;
+		color: $background;
+		border: 2px solid $background; 
+	
+		&:hover, &:focus {
+	  		color: darken($background, 15%); 
+	  		border-color: darken($background, 15%);
+		}
+
+		&:active {
+	  		color: darken($background, 25%); 
+	  		border-color: darken($background, 25%);
+	  		box-shadow: none;		
+		}		
+	}
+}
+// End Mixin
+
+.btn-default {
+	@include btn($white, $white);
+}
+
+.btn-primary {
+	@include btn($blue, $white);
+}
+
+.btn-success {
+	@include btn($green, $white);
+}
+
+.btn-danger {
+	@include btn($red, $white);
+}
+
+.btn-warning {
+	@include btn($amber, $white);
+}
+
+.btn-info {
+	@include btn($blue-lighter, $white);
+}
+
+.btn-black {
+	@include btn($black, $white);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: $white;
+	}
+}
+
+.btn-link-white {
+	@include btn(transparent, $white);
+}
+
+.btn-facebook {
+	@include btn($facebook, $white);
+}
+
+.input-group .btn {
+	@include border-right-radius(4px);
+	padding: 5px;
+
+	&:focus, &:active {
+		outline: none !important;
+	}	
+}
+

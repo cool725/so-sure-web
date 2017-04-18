@@ -1,0 +1,52 @@
+// header.scss
+
+// Logo
+.so-sure-logo {
+	width: 130px; height: 30px;
+
+	&-dark {
+		background: transparent no-repeat center top url("/images/logo/so-sure-logo-dark.svg");
+	    background-size: 130px;
+	}
+
+	&-light {
+		background: transparent no-repeat center top url("/images/logo/so-sure-logo-light.svg");
+		background-size: 130px;		
+	}
+}
+
+// Cookie Consent
+/* Cookie */
+.cc-message {
+    padding-right: 15px;
+}
+
+.cc-compliance {
+    align-self: flex-start;
+}
+
+.cc-btn { 
+    margin-top: 5px;
+}
+
+.cc-window {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.cc-window .cc-message {
+    margin-bottom: 0 !important;
+}
+
+.cc-floating.cc-theme-classic {
+    border-radius: 0;
+}
+
+@include breakpoint(tablet) {
+
+    .cc-btn { 
+        margin-top: 0;
+    }
+
+}

@@ -27,8 +27,9 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets '@AppBundle/Resources/public/css/User/trust.css' %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-    {% endstylesheets %}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/user.scss'%}
+    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
 {% endblock %}
+
 

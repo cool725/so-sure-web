@@ -1,0 +1,152 @@
+// landing.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "homepage";
+
+html, body {
+	height: 100%;
+}
+
+body {
+	display: flex;
+	min-height: 100vh;
+	flex-direction: column;
+}
+
+main {
+	flex: 1;
+}
+
+footer {
+	text-align: center;
+	color: $white;
+
+	small {
+		font-size: 11px;
+	}
+}
+
+h1 {
+	font-size: 27px;
+	line-height: 1.4;
+}
+
+h2 {
+	font-size: 24px;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+}
+
+.landing-list {
+	padding-left: 20px;
+
+	li {
+		font-size: 17px;
+		line-height: 1.4;
+		text-align: left;
+		padding: 10px 0;
+	}
+}
+
+.list-unstyled.landing-list {
+	margin: 0; 
+	padding: 0;
+}
+
+.step {
+	background-color: $white;
+	position: relative;
+
+	.step-inner {
+		padding: 15px 25px;
+	}
+
+	&:after {
+		width: 0; height: 0;
+		content: '';
+		position: absolute;
+		z-index: 100;
+		top: 100%;
+		left: 0; right: 0;
+		margin: 0 auto;
+	    border-top: solid 15px $white;
+	    border-left: solid 20px transparent;
+	    border-right: solid 20px transparent;			
+	}
+
+	&-blue {
+		background-color: $blue;
+		color: $grey-light;
+
+		h2 {
+			color: $white;
+		}
+
+		&:after {
+			border-top-color: $blue;
+		}
+	}
+
+	@include breakpoint(laptop) {
+		min-height: 612px;
+		text-align: left;
+
+		&:after {
+			left: 100%; top: 50%;
+			margin-top: -25px;
+		    border-bottom: solid 25px transparent;
+		    border-top: solid 25px transparent;	    
+		    border-left: solid 20px $white;
+		    border-right: none;		
+		}
+
+		&:last-of-type:after {
+			border: none;
+		}
+
+		&-blue:after {
+			border-left-color: $blue;
+		}		
+	}
+
+	@include breakpoint(desktop) {
+		.step {
+			min-height: 590px;
+		}
+	}
+}
+
+@include breakpoint(tablet) {
+
+	.step--shadow {
+		box-shadow: 0 2px 14px 0 rgba(0, 0, 0, 0.1);
+	}
+
+}
+
+@include breakpoint(laptop) {
+
+	h1 {
+		font-size: 36px;
+	}
+
+	h2 {
+		font-size: 30px;
+	}
+
+}
+
+// Modify press
+.press {
+	background-color: transparent;
+
+	h4 small {
+		color: $blue-lightest;
+	}
+}
+
+
+
+
+

@@ -1,0 +1,62 @@
+// includes.scss
+
+// Press
+.press {
+	padding: 15px 0;
+	background-color: $white;
+	text-align: center;
+
+	img {
+		margin: 0 auto;
+		display: inline-block;
+		max-width: 220px;
+	}
+}
+
+@include breakpoint(tablet) {
+
+	.press {
+
+		img {
+			width: 100%;
+		}
+
+		h4 {
+			margin: 15px 0 0;
+		}
+	}
+
+}
+
+// Partnership
+.partnership {
+	background-color: $grey-light;
+}
+
+// Footer (Banner) CTA
+.footer-cta {
+	padding: 40px 0;
+	color: $white;
+	text-align: center;
+
+	h2 {
+		color: $white;
+		margin: 0;
+	}
+
+	li {
+		width: 45%;
+	}
+}
+
+@include breakpoint(laptop) {
+
+	.footer-cta {
+		text-align: left;
+
+		p {
+			margin: 0;
+		}		
+	}
+
+}

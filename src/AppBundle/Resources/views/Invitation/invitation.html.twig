@@ -1,16 +1,15 @@
-{% set include_emoji = 1 %}
 {% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set include_emoji = 1 %}
+{% set white_logo = true %}
 
 {% block title %}so-sure - Join today and we'll reward you!{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    '@AppBundle/Resources/public/css/Default/index.css'
-    '@AppBundle/Resources/public/css/Default/selectPhoneMake.css'
-    '@AppBundle/Resources/public/css/Default/scrollindicator.css'
-    '@AppBundle/Resources/public/css/Default/modal.css'        
-    '@AppBundle/Resources/public/css/Default/videoOverlay.css'     
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/homepage.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -28,41 +27,39 @@
 
 {% block body %}
 
-    <section class="invitation">
+    <section class="invitation section--pad">
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 class="text-center">
+                    <h1 class="text-center text-white">
                         {% if invitation.inviter is defined %}
                             Insure your phone with {{invitation.inviter.name}}.
                         {% else %}
                             Insure your phone.
-                        {% endif %}    
+                        {% endif %}
                         <br>
-                        <span class="h2">Get up to 80% of your money back.</span>                   
+                        <span class="h2 text-white">Get up to 80% of your money back.</span>
                     </h1>
-                    <div class="select-phone-box">
+                    <div class="text-center">
                         {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
                     </div>
                     {% if invitation %}
-                        <br>
                         <div class="text-center">
                             {{ form_start(form) }}
                             {{ form_widget(form) }}
                             {{ form_end(form) }}
                         </div>
-                        <br>
                     {% endif %}
-                </div> 
+                </div>
             </div>
         </div>
-    </section>    
+    </section>
 
     {% include 'AppBundle::Default/press.html.twig' %}
 
     {% include 'AppBundle::Default/benefits.html.twig' %}
 
-    {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}   
+    {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
@@ -76,15 +73,15 @@
             </div>
             <div class="col-sm-3 col-md-2">
                 <img src="{{ cdn_url }}/images/munichre-logo.png" alt="Munich RE">
-            </div>    
+            </div>
             <div class="col-sm-3 col-md-2">
                 <img src="{{ cdn_url }}/images/salva-logo.png" alt="Salva">
-            </div>                        
+            </div>
         </div>
-    </section>   
+    </section>
 
     {# Page Modals #}
 
-    {% include 'AppBundle::Default/modalVideo.html.twig' %}        
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
     {% endblock %}

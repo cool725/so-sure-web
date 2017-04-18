@@ -14,6 +14,7 @@
     "test",
     "tests"
   ],
+
   "dependencies": {
     "jquery": "~2.2.4",
     "seiyria-bootstrap-slider": "^9.1",
@@ -30,10 +31,10 @@
     "cookieconsent": "^3.0.4",
     "vimeo-player-js": "^2.0.1",
     "intl-tel-input": "^11.0.4",
-    "jquery-circle-progress": "^1.2.1"
+    "jquery-circle-progress": "^1.2.1",
     "jquery-validation": "jquery.validate#^1.13.0"
-
   },
+
   "install": {
     "path": "web/components",
     "sources": {

@@ -1,0 +1,38 @@
+// palette.scss
+
+// Grayscale
+$white: #ffffff;
+$grey: #cccccc;
+$grey-light: #efefef;
+$grey-dark: #626b78;
+$black: #202532;
+
+// Red
+$red: #ff6666;
+$red-hover: darken($red, 20%);
+
+// Blues
+$blue: #3399ff;
+$blue-lightest: #d6ebff;
+$blue-lighter: #99ccff;
+$blue-grey: #8b97b5;
+
+// Green
+$green: #80ce4d;
+
+// Amber
+$amber: #ffd726;
+
+
+// Effects
+$white-opaque: rgba(255, 255, 255, 0.9);
+$black-opaque: rgba(0, 0, 0, 0.8);
+
+
+// Gradients
+.brand-gradient {
+	 @include linear-gradient(294deg, rgba(3, 189, 254, 0.55), #4481eb);
+}
+
+// Others
+$facebook: #4267B2;

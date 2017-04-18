@@ -1,0 +1,7 @@
+// alerts.scss
+
+.flash {
+    padding: 5px 10px;
+    margin-bottom: 15px;
+    @include border-radius(4px);
+}
