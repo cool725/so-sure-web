@@ -1,7 +1,17 @@
 {% extends '::base.html.twig' %}
 {% block body %}
-    <div class="login">
-        {% block fos_user_content %}
-        {% endblock fos_user_content %}
+
+<section class="section--pad login">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+
+                {% block fos_user_content %}
+                {% endblock fos_user_content %}
+
+            </div>
+        </div>
     </div>
+</section>
+
 {% endblock %}

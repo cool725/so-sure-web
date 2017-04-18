@@ -1,71 +1,62 @@
 {% extends "FOSUserBundle::layout.html.twig" %}
 {% block fos_user_content %}
 
-<section class="section--pad login">
-    <div class="container text-center">
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">        
+<h1>Welcome back!</h1>
+<div class="login-digits" style=""
+data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
 
-                <h1>Welcome back!</h1>
-                <div class="login-digits" style=""
-                data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
+    <p class="text-centre" style="padding-bottom: 20px;">Just enter your mobile number below, we'll then text you a code. Enter that code and, hey presto, you'll be logged in!</p>
 
-                    <p class="text-centre" style="padding-bottom: 20px;">Just enter your mobile number below, we'll then text you a code. Enter that code and, hey presto, you'll be logged in!</p>
-                
-                    <div class="digits-loading">
-                        <p><i class="fa fa-refresh fa-spin fa-2x fa-fw text-blue"></i></p>
-                        <p>Loading the mobile number login from Twitter's Digits...</p>
-                    </div>
-
-                    <div class="digits-container-wrapper">
-                        <div class="digits-container"></div>
-                    </div>
-
-                    <form method="POST" action="{{ path('digits_login') }}#mobile" id="digits-form">
-                        <input type="hidden" name="credentials" id="credentials">
-                        <input type="hidden" name="provider" id="provider">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
-                    </form>
-                
-                    <p class="swap-login-wrapper"><a href="#email" class="swap-login btn btn-primary-hollow">Prefer email login?</a></p>
-                </div>
-
-                <div class="login-email" style="display: none;">
-                    <p>Please login below.</p>
-                    <form class="" action="{{ path("fos_user_security_check") }}#email" method="post">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
-                        <div class="form-group">
-                            <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email Address" class="form-control" />
-                        </div>
-                        <div class="form-group">
-                            <input type="password" id="password" name="_password" required="required" placeholder="Password" class="form-control" />
-                        </div>
-                        {% if error %}
-                            <div class="error-text" style="padding-bottom: 10px;">Looks like the email address or password you’ve entered is incorrect. Please try again.</div>
-                        {% endif %}
-                        <div class="form-group">
-                            <label for="remember_me">
-                                <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} />
-                                Remember me
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-success btn-lg"/>
-                        </div>
-                        <div class="form-group">
-                            <small><a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a></small>
-                        </div>
-                    </form>
-                    <p class="swap-login-wrapper"><a href="#mobile" class="swap-login btn btn-primary-hollow btn-xs">Prefer mobile login?</a></p>
-                </div>
-
-                <div><a href="#" onclick="fb_login();" class="btn btn-facebook-hollow"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a></div>
-
-                <script id="digits-sdk" src="https://cdn.digits.com/1/sdk.js" async></script>
-            </div>
-        </div>
+    <div class="digits-loading">
+        <p><i class="fa fa-refresh fa-spin fa-2x fa-fw text-blue"></i></p>
+        <p>Loading the mobile number login from Twitter's Digits...</p>
     </div>
-</section>
+
+    <div class="digits-container-wrapper">
+        <div class="digits-container"></div>
+    </div>
+
+    <form method="POST" action="{{ path('digits_login') }}#mobile" id="digits-form">
+        <input type="hidden" name="credentials" id="credentials">
+        <input type="hidden" name="provider" id="provider">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+    </form>
+
+    <p class="swap-login-wrapper"><a href="#email" class="swap-login btn btn-primary-hollow">Prefer email login?</a></p>
+</div>
+
+<div class="login-email" style="display: none;">
+    <p>Please login below.</p>
+    <form class="" action="{{ path("fos_user_security_check") }}#email" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+        <div class="form-group">
+            <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email Address" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="password" id="password" name="_password" required="required" placeholder="Password" class="form-control" />
+        </div>
+        {% if error %}
+            <div class="error-text" style="padding-bottom: 10px;">Looks like the email address or password you’ve entered is incorrect. Please try again.</div>
+        {% endif %}
+        <div class="form-group">
+            <label for="remember_me">
+                <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} />
+                Remember me
+            </label>
+        </div>
+        <div class="form-group">
+            <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-success btn-lg"/>
+        </div>
+        <div class="form-group">
+            <small><a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a></small>
+        </div>
+    </form>
+    <p class="swap-login-wrapper"><a href="#mobile" class="swap-login btn btn-primary-hollow btn-xs">Prefer mobile login?</a></p>
+</div>
+
+<div><a href="#" onclick="fb_login();" class="btn btn-facebook-hollow"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a></div>
+
+<script id="digits-sdk" src="https://cdn.digits.com/1/sdk.js" async></script>
 
 {% endblock fos_user_content %}
 
