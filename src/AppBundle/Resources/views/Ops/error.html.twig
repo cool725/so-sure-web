@@ -2,8 +2,12 @@
 
 {% block title %}so-sure - Page not found{% endblock %}
 
-{% block remotestylesheets %}
-    <link rel="stylesheet" href="/css/error.css">
+{% block stylesheets %}
+    {% stylesheets output='css/error.css'
+        '@AppBundle/Resources/public/sass/page/error.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
 {% endblock %}
 
 {% block body %}
@@ -13,7 +17,7 @@
             <div class="col-md-12">
               <h1 class="section-title">Page Not Found</h1>
               <img class="logo" src="{{ cdn_url }}/images/logo/so-sure_blue-frown.svg" alt="Unhappy so-sure smiley" />
-              <p class="lead">Unforunately the page you requested couldn't be located. Check the URL for any misspellings or <a href="/">return to the homepage</a>.</p>
+              <p class="lead">Unforunately the page you requested couldn't be located. <br> Check the URL for any misspellings or <a href="/">return to the homepage</a>.</p>
             </div>
         </div>
     </div>
