@@ -5,7 +5,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    'components/vimeo-player-js/player.min.js'     
+    'components/vimeo-player-js/player.min.js'
     '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
@@ -45,12 +45,10 @@
                             <li>Your <strong>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</strong> is now insured!</li>
                             <li>Your policy number is <strong>{{ policy.policyNumber }}</strong></li>
                             <li>Your phone is now protected against Theft, Loss, Accidental Damage and Breakdown 😄</li>
-                            <li>
-                                <ul class="list-inline text-center">
-                                    <li><a data-toggle="modal" data-target="#policyModal" class="btn btn-primary ">Policy Details</a></li>
-                                    <li><a href="{{ path('user_home') }}" class="btn btn-primary ">Go to my account</a></li>
-                                </ul>
-                            </li>
+                        </ul>
+                        <ul class="list-inline text-center">
+                            <li><a data-toggle="modal" data-target="#policyModal" class="btn btn-primary ">Policy Details</a></li>
+                            <li><a href="{{ path('user_home') }}" class="btn btn-primary ">Go to my account</a></li>
                         </ul>
                     </div>
                 </div>
@@ -60,10 +58,10 @@
                         <ul class="list-inline">
                             <li>
                                 You have chosen to pay
-                                &pound;{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month 
+                                &pound;{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month
                                 {% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }} for your policy
                                 {% else %}Unknown{% endif %}
-                                and your policy is in effect from {{ policy.start|date('jS F Y') }} until {{ policy.end|date('jS F Y') }}.                                
+                                and your policy is in effect from {{ policy.start|date('jS F Y') }} until {{ policy.end|date('jS F Y') }}.
                             </li>
                             {% if policy.user.paymentMethod.cardType is defined %}
                             <li>
@@ -71,7 +69,7 @@
                                     Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) will be billed &pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} every month on the {{ policy.expectedBillingDate|date('jS') }}.
                                 {% elseif policy.getPremiumPlan == 'yearly' %}
                                     Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) was billed &pound;{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
-                                {% endif %}                                
+                                {% endif %}
                             </li>
                             {% endif %}
                         </ul>
@@ -96,16 +94,16 @@
                         <p class="lead">Install the app and login to start saving money!</p>
                         {% if policy.phone.isITunes %}
                         <div class="download-btn center">
-                            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-app-store-dark.svg" alt="Download so-sure on the App Store"></img>
+                            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/badge-app-store-dark.svg" alt="Download so-sure on the App Store" />
                             </a>
                         </div>
                         {% endif %}
                         {% if policy.phone.isGooglePlay %}
                         <div class="download-btn text-center">
-                            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/download-badge-google-play-dark.svg" alt="Get so-sure on Google Play"></img>
+                            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/badge-google-play-dark.svg" alt="Get so-sure on Google Play" />
                             </a>
                         </div>
-                        {% endif %}                        
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-sm-6 col-sm-offset-3">
@@ -116,15 +114,15 @@
                             <a class="explainer-video-view-thumb" data-toggle="modal" data-target="#modal-fullscreen">
                                 <img src="{{ cdn_url }}/images/home/explainer-video/explainer-video-frame-2.png" class="img-responsive">
                             </a>
-                        </div> 
+                        </div>
                         <p class="text-center">
-                        <a href="{{ path('user_home') }}" class="btn btn-primary ">3. Go to my account to get started</a></p>                  
+                        <a href="{{ path('user_home') }}" class="btn btn-primary ">3. Go to my account to get started</a></p>
                     </div>
-                </div>  
+                </div>
             </div>
         </div>
     </section>
-{#     
+{#
     <div class="modal modal-policy fade" id="policyModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -139,11 +137,11 @@
         </div>
     </div> #}
 
-    <div class="modal modal-fullscreen fade" 
-         id="policy-modal" 
-         tabindex="-1" 
-         role="dialog" 
-         aria-labelledby="So-Sure Policy Terms" 
+    <div class="modal modal-fullscreen fade"
+         id="policy-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="So-Sure Policy Terms"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -159,10 +157,10 @@
                 </div>
             </div>
         </div>
-    </div>      
+    </div>
 
     {# Page Modals #}
 
-    {% include 'AppBundle::Default/modalVideo.html.twig' %}    
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
 {% endblock %}
