@@ -146,15 +146,20 @@ class SlackCommand extends ContainerAwareCommand
         $yesterday->sub(new \DateInterval('P1D'));
         $total = $repo->countAllActivePolicies();
         $daily = $total - $repo->countAllActivePolicies($yesterday);
+        $weekStart = $repo->countAllActivePolicies($start);
+        $weekTarget = round($weekStart * 1.1) - $weekStart;
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
-            "*%s*\nTarget: %d\nActual: %d\nRemaining: %d\nLast 24 hours: *%d*\n\n_policy compounding_",
+            "*%s*\n\nLast 24 hours: *%d*\n\nWeekly Target: %d\nWeekly Actual: %d\nWeekly Remaining: %d\n\nOverall Target: %d\nOverall Actual: %d\nOverall Remaining: %d\n\n_policy compounding_",
             $weekText,
+            $daily,
+            $weekTarget,
+            $total - $weekStart,
+            $weekTarget + $weekStart - $total,
             $growthTarget,
             $total,
-            $target - $total,
-            $daily
+            $target - $total
         );
         // @codingStandardsIgnoreEnd
 
