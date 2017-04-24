@@ -280,7 +280,7 @@ class SCode
         return [
             'code' => $this->getCode(),
             'share_link' => $this->getShareLink(),
-            'sharer_name' => $this->getPolicy()->getUser()->getName(),
+            'sharer_name' => $this->getUser()->getName(),
             'type' => $this->getType(),
             'active' => $this->isActive() ? true : false,
         ];
