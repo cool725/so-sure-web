@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\Reward;
 use AppBundle\Document\Lead;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Sns;
@@ -15,9 +16,34 @@ use AppBundle\Service\RateLimitService;
  */
 class ApiControllerTest extends BaseControllerTest
 {
+    protected static $reward;
+
     public function setUp()
     {
         self::$redis->flushdb();
+    }
+
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+
+        $user = self::createUser(
+            self::$userManager,
+            'bonus-unauth@so-sure.net',
+            'foo'
+        );
+        $user->setFirstName('so-sure');
+        $user->setLastName('Rewards');
+        self::$reward = new Reward();
+        self::$reward->setUser($user);
+        $scode = new SCode();
+        $scode->setCode(sprintf('ssrs%d', rand(1000, 9999)));
+        $scode->setReward(self::$reward);
+        $scode->setType(SCode::TYPE_REWARD);
+        self::$reward->setSCode($scode);
+        static::$dm->persist(self::$reward);
+        static::$dm->persist($scode);
+        static::$dm->flush();
     }
 
     // login
@@ -689,6 +715,15 @@ class ApiControllerTest extends BaseControllerTest
         $url = sprintf('/api/v1/scode/%s?_method=GET', $sCode->getCode());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testGetRewardSCode()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$reward->getUser());
+        $url = sprintf('/api/v1/scode/%s?_method=GET', self::$reward->getSCode()->getCode());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(SCode::TYPE_REWARD, $data['type']);
     }
 
     // token

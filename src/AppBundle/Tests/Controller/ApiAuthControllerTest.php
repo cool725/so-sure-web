@@ -70,7 +70,13 @@ class ApiAuthControllerTest extends BaseControllerTest
         $user->setLastName('Rewards');
         self::$reward = new Reward();
         self::$reward->setUser($user);
+        $scode = new SCode();
+        $scode->setCode(sprintf('ssrs%d', rand(1000, 9999)));
+        $scode->setReward(self::$reward);
+        $scode->setType(SCode::TYPE_REWARD);
+        self::$reward->setSCode($scode);
         static::$dm->persist(self::$reward);
+        static::$dm->persist($scode);
         static::$dm->flush();
     }
 
