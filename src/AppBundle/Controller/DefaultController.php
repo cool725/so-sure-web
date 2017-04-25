@@ -70,14 +70,14 @@ class DefaultController extends BaseController
 
         $phone = null;
         $phoneName = (string) $request->get('phone');
-        $matches = [];
-        if (preg_match_all('/([^ ]+) (.*) ([0-9]+)GB/', $phoneName, $matches) !== false) {
-            $decodedModel = Phone::decodeModel($matches[2][0]);
+        $matches = null;
+        if (preg_match('/([^ ]+) (.*) ([0-9]+)GB/', $phoneName, $matches) !== false && count($matches) >= 3) {
+            $decodedModel = Phone::decodeModel($matches[2]);
             $phone = $phoneRepo->findOneBy([
                 'active' => true,
-                'make' => $matches[1][0],
+                'make' => $matches[1],
                 'model' => $decodedModel,
-                'memory' => (int) $matches[3][0]
+                'memory' => (int) $matches[3]
             ]);
         }
 

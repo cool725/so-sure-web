@@ -56,7 +56,7 @@ $(function(){
     }
 
     // If the form action is already defined, then allow the form to submit
-    if ($('#search-phone-form').attr('action').length == 0) {
+    if (!$('#search-phone-form').attr('action')) {
         $('#search-phone-form').bind('submit', preventDefault);
     }
 
