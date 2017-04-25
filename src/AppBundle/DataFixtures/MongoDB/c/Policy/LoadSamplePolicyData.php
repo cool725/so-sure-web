@@ -89,7 +89,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInvitee->setEnabled(true);
         $manager->persist($userInvitee);
-        $this->newPolicy($manager, $userInvitee, $count++, false, null, null, $iphoneSE, true);
+        $this->newPolicy($manager, $userInvitee, $count++, false, null, null, $iphoneSE, true, false);
 
         $user = $this->newUser('ios-testing+scode@so-sure.com', true);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
@@ -200,7 +200,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $promo = null,
         $code = null,
         $phone = null,
-        $paid = null
+        $paid = null,
+        $sendInvitation = true
     ) {
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
@@ -290,17 +291,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policyService = $this->container->get('app.policy');
         $policyService->generateScheduledPayments($policy, $startDate);
 
-        $invitation = new EmailInvitation();
-        $invitation->setInviter($user);
-        $invitation->setPolicy($policy);
-        $invitation->setEmail($this->faker->email);
-        $rand = rand(0, 2);
-        if ($rand == 0) {
-            $invitation->setCancelled($policy->getStart());
-        } elseif ($rand == 1) {
-            $invitation->setRejected($policy->getStart());
+        if ($sendInvitation) {
+            $invitation = new EmailInvitation();
+            $invitation->setInviter($user);
+            $invitation->setPolicy($policy);
+            $invitation->setEmail($this->faker->email);
+            $rand = rand(0, 2);
+            if ($rand == 0) {
+                $invitation->setCancelled($policy->getStart());
+            } elseif ($rand == 1) {
+                $invitation->setRejected($policy->getStart());
+            }
+            $manager->persist($invitation);
         }
-        $manager->persist($invitation);
 
         if ($policy->isPolicyPaidToDate(false, $now)) {
             $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);

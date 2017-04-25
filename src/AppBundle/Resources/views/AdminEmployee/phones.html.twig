@@ -21,10 +21,10 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
+    {% stylesheets output='css/*.css'
     'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
     'components/datatables.net-bs/dataTables.bootstrap.min.css'
-    '@AppBundle/Resources/public/css/Admin/phones.css'
+    '@AppBundle/Resources/public/sass/page/admin.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -55,7 +55,7 @@
         <button class="btn btn-success pull-right"  data-toggle="modal" data-target="#newPhoneModal">
           <i class="fa fa-plus"></i> Add upcoming phone
         </button>
-      </div>      
+      </div>
     </div>
     <div class="row">
     {{ form_start(form) }}
@@ -125,7 +125,7 @@
                             </td>
                             <td>
                               £{{ phone.getSalvaBinderMonthlyPremium|number_format(2, '.', ',') }}
-                              (£{{ phone.getSalvaMiniumumBinderMonthlyPremium|number_format(2, '.', ',') }}) 
+                              (£{{ phone.getSalvaMiniumumBinderMonthlyPremium|number_format(2, '.', ',') }})
                             </td>
                             <td>£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</td>
                             <td>£{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }} /
@@ -148,7 +148,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>        
+            </div>
             <div class="pagerfanta">
                 {{ pagerfanta(pager, 'twitter_bootstrap3') }}
             </div>
@@ -191,7 +191,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>        
+            </div>
             <div class="pagerfanta">
                 {{ pagerfanta(pager, 'twitter_bootstrap3') }}
             </div>
@@ -240,7 +240,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>        
+            </div>
             <div class="pagerfanta">
                 {{ pagerfanta(pager, 'twitter_bootstrap3') }}
             </div>
@@ -278,7 +278,7 @@
                       </span>
                     </div>
                   </div>
-                </div>                  
+                </div>
               </div>
               <div class="col-sm-6">
                 <div class="form-group">
