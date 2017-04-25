@@ -16,7 +16,13 @@
         <div role="tabpanel" class="tab-pane" id="policy">
             <div class="row">
                 <div class="col-md-7">
-                    <h2>Policy</h2>
+                    <h2>
+                        {% if policy.company %}
+                            Company Policy
+                        {% else %}
+                            Standard Policy
+                        {% endif %}
+                    </h2>
                     <table class="table table-striped">
                         <tr>
                             <td>Policy Number</td>
@@ -208,7 +214,30 @@
                     </div>
                 </div>
             </div>
-                
+
+                {% if policy.company %}
+                <h3>Company</h3>
+                <table class="table table-striped">
+                    <tr>
+                        <td>Name</td>
+                        <td>{{ policy.company.name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td>{{ policy.company.address }}</td>
+                    </tr>
+                    <tr>
+                        <td>Policies</td>
+                        <td>
+                          <strong>{{ policy.company.policies|length }}</strong>&nbsp;:&nbsp;
+                          {% for companyPolicy in policy.company.policies %}
+                            <a href="{{ path(policy_route, {'id': companyPolicy.id }) }}">{{ companyPolicy.policyNumber }}</a>;
+                          {% endfor %}
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+
                 {% if policy.isPolicy %}
                 <h3>Pot</h3>
                 <table class="table table-striped">
