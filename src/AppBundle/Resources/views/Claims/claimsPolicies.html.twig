@@ -2,8 +2,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    'bundles/app/css/Default/claimHandling.css'
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/admin.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -81,7 +81,7 @@
                 {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-primary'}}) }}
             </div>
         </div>
-      
+
     </div>
     {{ form_end(form) }}
     <h2>{{ policies.count }} Results</h2>
