@@ -95,7 +95,14 @@ class OpsController extends BaseController
 
         $policyRepo = $dm->getRepository(Policy::class);
         $unpaidPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID]);
-        $validPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_ACTIVE]);
+        $validPolicies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
+        $position = rand(1, count($validPolicies));
+        foreach ($validPolicies as $validPolicy) {
+            if ($position <= 0) {
+                break;
+            }
+            $position--;
+        }
         $cancelledPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_CANCELLED]);
 
         return [
