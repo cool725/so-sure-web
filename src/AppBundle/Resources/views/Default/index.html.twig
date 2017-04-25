@@ -44,8 +44,12 @@
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Next working day replacement or repair</li>
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Get cashback when no claims</li>
                     </ul>
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
-                </div>              
+                    {% if phone %}
+                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage', 'id': phone.id })) }}
+                    {% else %}
+                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
+                    {% endif %}
+                </div>
             </div>    
         </div>
     </section>    

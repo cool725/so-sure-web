@@ -55,8 +55,11 @@ $(function(){
         e.preventDefault();
     }
 
-    $('#search-phone-form').bind('submit', preventDefault);
-    
+    // If the form action is already defined, then allow the form to submit
+    if ($('#search-phone-form').attr('action').length == 0) {
+        $('#search-phone-form').bind('submit', preventDefault);
+    }
+
     function mySort(a, b) {
         if (a < b) {
             return -1;

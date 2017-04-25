@@ -68,6 +68,19 @@ class DefaultController extends BaseController
         $logger = $this->get('logger');
         $launchUser = $this->get('app.user.launch');
 
+        $phone = null;
+        $phoneName = (string) $request->get('phone');
+        $matches = [];
+        if (preg_match_all('/([^ ]+) (.*) ([0-9]+)GB/', $phoneName, $matches) !== false) {
+            $decodedModel = Phone::decodeModel($matches[2][0]);
+            $phone = $phoneRepo->findOneBy([
+                'active' => true,
+                'make' => $matches[1][0],
+                'model' => $decodedModel,
+                'memory' => (int) $matches[3][0]
+            ]);
+        }
+
         $userTop = new User();
         $referral = $request->get('referral');
         if ($referral) {
@@ -132,7 +145,8 @@ class DefaultController extends BaseController
             'referral' => $referral,
             'i6s' => $i6s,
             'i7' => $i7,
-            's7' => $s7
+            's7' => $s7,
+            'phone' => $phone,
         );
 
         if (in_array($request->get('_route'), ['discount-vouchers'])) {
@@ -145,23 +159,19 @@ class DefaultController extends BaseController
     /**
      * @Route("/select-phone", name="select_phone_make")
      * @Route("/select-phone/{type}", name="select_phone_make_type")
+     * @Route("/select-phone/{type}/{id}", name="select_phone_make_type_id")
      * @Template()
      */
-    public function selectPhoneMakeAction(Request $request, $type = null)
+    public function selectPhoneMakeAction(Request $request, $type = null, $id = null)
     {
         $deviceAtlas = $this->get('app.deviceatlas');
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phoneMake = new PhoneMake();
+        $phone = null;
         if ($request->getMethod() == "GET") {
-            $phone = $deviceAtlas->getPhone($request);
-            /*
-            if (!$phone) {
-                $phone = $this->getDefaultPhone();
-            }
-            */
-            if ($phone instanceof Phone) {
-                $phoneMake->setMake($phone->getMake());
+            if ($id) {
+                $phone = $phoneRepo->find($id);
             }
         }
         $post = $this->generateUrl('select_phone_make');
@@ -216,6 +226,7 @@ class DefaultController extends BaseController
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
             'type' => $type,
+            'phone' => $phone,
         ];
     }
 
