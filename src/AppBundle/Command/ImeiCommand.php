@@ -91,7 +91,11 @@ class ImeiCommand extends ContainerAwareCommand
         $claimNumber = $input->getOption('claim-number');
         $policyId = $input->getOption('policy-id');
         $claimscheck = $input->getOption('claimscheck');
-        $register = filter_var($input->getOption('register'), FILTER_VALIDATE_BOOLEAN);
+        $register = null;
+        // FILTER_NULL_ON_FAILURE  doesn't seem to work as expected, so just check for null first
+        if ($input->getOption('register') !== null) {
+            $register = filter_var($input->getOption('register'), FILTER_VALIDATE_BOOLEAN);
+        }
         $save = true === $input->getOption('save');
         $phone = $this->getPhone($device, $memory);
         $imeiService = $this->getContainer()->get('app.imei');
