@@ -56,7 +56,7 @@ $(function(){
     }
 
     $('#search-phone-form').bind('submit', preventDefault);
-    
+
     function mySort(a, b) {
         if (a < b) {
             return -1;
@@ -121,7 +121,7 @@ $(function(){
         templates: {
             notFound: [
               '<div class="empty-message">',
-                'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a id="open-intercom" href="#">ask us</a>',
+                'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a class="open-intercom" href="#">ask us</a>',
               '</div>'
             ].join('\n')
         }
@@ -129,13 +129,13 @@ $(function(){
 
     // Stop the content flash when rendering the input
     $('#loading-search-phone').fadeOut('fast', function() {
-        
+
         $('#search-phone-form').fadeIn();
-        
+
         if(window.location.href.indexOf('?quote=1') != -1) {
             $('#search-phone').focus();
             sosuretrack('Get A Quote Link');
-        }            
+        }
     });
 
     $('#search-phone').bind('typeahead:selected', function(ev, suggestion) {

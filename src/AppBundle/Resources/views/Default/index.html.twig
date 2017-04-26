@@ -15,7 +15,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/homepage.scss'      
+    '@AppBundle/Resources/public/sass/page/homepage.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -36,7 +36,7 @@
     <section class="hero" id="get-quote">
         <div class="container">
             <div class="row">
-                <div class="col-md-12">                    
+                <div class="col-md-12">
                     <h1>The insurance revolution is here</h1>
                     <h3 class="text-light-blue">Mobile phone insurance is finally worthwhile</h3>
                     <ul class="list-unstyled fa-list-bullet">
@@ -45,10 +45,10 @@
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Get cashback when no claims</li>
                     </ul>
                     {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
-                </div>              
-            </div>    
+                </div>
+            </div>
         </div>
-    </section>    
+    </section>
 
     {% include 'AppBundle::Default/press.html.twig' %}
 
@@ -69,7 +69,7 @@
                 </div>
                 <div class="col-md-4">
                     <ul class="list-inline">
-                        <li><a href="mailto:hello@wearesosure.com" class="btn btn-default-hollow btn-block" id="open-intercom">Chat with us <i class="fa fa-comments"></i></a></li>
+                        <li><a href="mailto:hello@wearesosure.com" class="btn btn-default-hollow btn-block open-intercom">Chat with us <i class="fa fa-comments"></i></a></li>
                         <li><a class="btn btn-black btn-block" id="get-quote-btn">Get a quote</i></a></li>
                     </ul>
                 </div>
@@ -80,12 +80,12 @@
 
     {% include 'AppBundle::Default/partnership.html.twig' %}
 
-    {# Page Modals #}         
+    {# Page Modals #}
 
-    {% include 'AppBundle::Default/modalVideo.html.twig' %}    
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
     {# {% include 'AppBundle::Default/modalQuote.html.twig' %}     #}
 
-    {# End Page Modals #}       
+    {# End Page Modals #}
 
 {% endblock %}
