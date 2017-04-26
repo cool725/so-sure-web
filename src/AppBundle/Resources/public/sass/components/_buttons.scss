@@ -27,24 +27,24 @@
 		background-color: darken($background, 25%);
 		border-color: darken($background, 25%);
 		transition: all 0.3s ease;
-		box-shadow: none;		
+		box-shadow: none;
 	}
 
 	&-hollow {
 		background-color: none;
 		color: $background;
-		border: 2px solid $background; 
-	
+		border: 2px solid $background;
+
 		&:hover, &:focus {
-	  		color: darken($background, 15%); 
+	  		color: darken($background, 15%);
 	  		border-color: darken($background, 15%);
 		}
 
 		&:active {
-	  		color: darken($background, 25%); 
+	  		color: darken($background, 25%);
 	  		border-color: darken($background, 25%);
-	  		box-shadow: none;		
-		}		
+	  		box-shadow: none;
+		}
 	}
 }
 // End Mixin
@@ -89,6 +89,12 @@
 
 .btn-facebook {
 	@include btn($facebook, $white);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: $white;
+	}
 }
 
 .input-group .btn {
@@ -97,6 +103,6 @@
 
 	&:focus, &:active {
 		outline: none !important;
-	}	
+	}
 }
 
