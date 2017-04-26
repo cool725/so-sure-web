@@ -1063,6 +1063,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 false
             ),
             'can_purchase_policy' => $this->canPurchasePolicy(),
+            'has_payment_method' => $this->hasValidPaymentMethod(),
         ];
     }
 }

@@ -1822,6 +1822,48 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
     }
 
+    public function testNewMulitplePolicyJudopayOk()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewMulitplePolicyJudopayOk', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $details = $judopay->testPayDetails(
+            $user,
+            $data['id'],
+            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => $details['consumer']['consumerToken'],
+            'card_token' => $details['cardDetails']['cardToken'],
+            'receipt_id' => $details['receiptId'],
+        ]]);
+        $policyData1 = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData1['status']);
+        $this->assertEquals($data['id'], $policyData1['id']);
+
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $policyData2 = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData2['status']);
+        $this->assertEquals($data['id'], $policyData2['id']);
+
+        $this->assertNotEquals($policyData1['id'], $policyData2['id']);
+    }
+
     public function testNewPolicyMultipayDeclinedJudopayOk()
     {
         $user = self::createUser(

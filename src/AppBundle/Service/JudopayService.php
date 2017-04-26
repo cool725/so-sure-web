@@ -1135,4 +1135,30 @@ class JudopayService
 
         return true;
     }
+
+    /**
+     * @param Policy    $policy
+     * @param \DateTime $date
+     */
+    public function multiPolicy(Policy $policy, \DateTime $date = null)
+    {
+        $this->statsd->startTiming("judopay.multipolicy");
+
+        if ($policy->getStatus() != null) {
+            throw new ProcessedException();
+        }
+
+        if (!$policy->getPayer()) {
+            $policy->setPayer($policy->getUser());
+        }
+
+        $this->tokenPay($policy);
+
+        $this->policyService->create($policy, $date, true);
+        $this->dm->flush();
+
+        $this->statsd->endTiming("judopay.multipolicy");
+
+        return true;
+    }
 }

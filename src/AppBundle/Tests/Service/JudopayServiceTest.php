@@ -756,4 +756,47 @@ class JudopayServiceTest extends WebTestCase
         $this->assertFalse(self::$judopay->cardExpiringEmail($policy));
         $this->assertTrue(self::$judopay->cardExpiringEmail($policy, new \DateTime('2020-12-15')));
     }
+
+    public function testJudoMultiPolicy()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoMultiPolicy', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy1 = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy2 = static::initPolicy($user, static::$dm, $phone);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy1->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        static::$policyService->setEnvironment('prod');
+        self::$judopay->add(
+            $policy1,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API
+        );
+        static::$policyService->setEnvironment('test');
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy1 = $repo->find($policy1->getId());
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy1->getStatus());
+        $this->assertGreaterThan(5, strlen($updatedPolicy1->getPolicyNumber()));
+
+        static::$policyService->setEnvironment('prod');
+        self::$judopay->multiPolicy($policy2);
+        static::$policyService->setEnvironment('test');
+
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy2 = $repo->find($policy2->getId());
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy2->getStatus());
+        $this->assertGreaterThan(5, strlen($updatedPolicy2->getPolicyNumber()));
+    }
 }

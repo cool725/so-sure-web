@@ -23,6 +23,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\JudoPaymentMethod;
 
 use AppBundle\Document\PhoneTrait;
 
@@ -647,8 +648,6 @@ class ApiAuthController extends BaseController
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
                 $judoData = $data['judo'];
-            } else {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
             $redis = $this->get('snc_redis.default');
@@ -693,6 +692,21 @@ class ApiAuthController extends BaseController
                     Payment::SOURCE_MOBILE,
                     $this->getDataString($judoData, 'device_dna')
                 );
+            } else {
+                if (!$policy->getUser()->hasValidPaymentMethod()) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
+                        'Invalid payment method for user',
+                        422
+                    );
+                }
+                $paymentMethod = $policy->getUser()->getPaymentMethod();
+                if ($paymentMethod instanceof JudoPaymentMethod) {
+                    $judo = $this->get('app.judopay');
+                    $judo->multiPolicy($policy);
+                } else {
+                    throw new ValidationException('Unsupport payment method');
+                }
             }
             $this->get('statsd')->endTiming("api.payPolicy");
 
