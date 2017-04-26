@@ -340,11 +340,11 @@ class ApiAuthController extends BaseController
             $user = $this->getUser();
             $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
 
-            // We'll probably want to change this in the future, but for now, a user can only create 1 policy
-            if ($user->hasPolicy()) {
+            // TODO: Add some type of limit of max (active) policies for a user
+            if (!$user->canPurchasePolicy()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_POLICY_LIMIT,
-                    'User can only have 1 policy',
+                    'User is not able to purchase additional policies',
                     422
                 );
             }

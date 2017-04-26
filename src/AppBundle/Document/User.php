@@ -521,6 +521,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
+    public function canPurchasePolicy()
+    {
+        // TODO: Add additional checks - perhaps any suspected fraudulent claims, etc
+        return !$this->hasCancelledPolicyWithUserDeclined();
+    }
+
     public function hasUnpaidPolicy()
     {
         foreach ($this->getPolicies() as $policy) {
@@ -1056,6 +1062,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 'getInviterFacebookId',
                 false
             ),
+            'can_purchase_policy' => $this->canPurchasePolicy(),
         ];
     }
 }
