@@ -330,6 +330,7 @@ class PhonePolicyTest extends WebTestCase
         $reward = $this->createReward(static::generateEmail('testGetRiskPolicyRewardConnection', $this));
 
         $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testGetRiskPolicyRewardConnection-user', $this));
         $policy->setStart(new \DateTime());
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
