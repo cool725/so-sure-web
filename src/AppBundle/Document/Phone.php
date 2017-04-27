@@ -428,6 +428,11 @@ class Phone
         $this->model = $model;
     }
 
+    public function getSearchQuerystring()
+    {
+        return sprintf('%s %s %sGB', $this->getMake(), $this->getEncodedModel(), $this->getMemory());
+    }
+
     public function getDevices()
     {
         return $this->devices;
