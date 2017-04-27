@@ -1845,7 +1845,11 @@ abstract class Policy
         }
 
         if (!$this->canCancel($reason, $date)) {
-            throw new \Exception('Unable to cancel policy');
+            throw new \Exception(sprintf(
+                'Unable to cancel policy %s/%s. Is claim in progress?',
+                $this->getPolicyNumber(),
+                $this->getId()
+            ));
         }
 
         if ($date == null) {

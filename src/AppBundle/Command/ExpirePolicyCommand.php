@@ -49,8 +49,22 @@ class ExpirePolicyCommand extends ContainerAwareCommand
         foreach ($policies as $policy) {
             if ($policy->shouldExpirePolicy($prefix)) {
                 if (!$dryRun) {
-                    $policyService->cancel($policy, Policy::CANCELLED_UNPAID);
-                    $output->writeln(sprintf('Cancelled Policy %s / %s', $policy->getPolicyNumber(), $policy->getId()));
+                    try {
+                        $policyService->cancel($policy, Policy::CANCELLED_UNPAID);
+                        $output->writeln(sprintf(
+                            'Cancelled Policy %s / %s',
+                            $policy->getPolicyNumber(),
+                            $policy->getId()
+                        ));
+                        $count++;
+                    } catch (\Exception $e) {
+                        $output->writeln(sprintf(
+                            'Error Cancelling Policy %s / %s. Ex: %s',
+                            $policy->getPolicyNumber(),
+                            $policy->getId(),
+                            $e->getMessage()
+                        ));
+                    }
                 } else {
                     $output->writeln(sprintf(
                         'Dry-Run - Should Cancel Policy %s / %s',
@@ -58,7 +72,6 @@ class ExpirePolicyCommand extends ContainerAwareCommand
                         $policy->getId()
                     ));
                 }
-                $count++;
             }
         }
 
