@@ -5,7 +5,7 @@
 
 .hero h1 {
 	text-align: center;
-	padding-top: 20px;
+	// padding-top: 20px;
 }
 
 .article-content {
@@ -32,6 +32,10 @@
 
 	.h2 {
 		margin-bottom: 20px;
+	}
+
+	.table {
+		margin-bottom: 0;
 	}
 
 	.table > thead > tr > td {
