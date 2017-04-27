@@ -68,6 +68,19 @@ class DefaultController extends BaseController
         $logger = $this->get('logger');
         $launchUser = $this->get('app.user.launch');
 
+        $phone = null;
+        $phoneName = (string) $request->get('phone');
+        $matches = null;
+        if (preg_match('/([^ ]+) (.*) ([0-9]+)GB/', $phoneName, $matches) !== false && count($matches) >= 3) {
+            $decodedModel = Phone::decodeModel($matches[2]);
+            $phone = $phoneRepo->findOneBy([
+                'active' => true,
+                'make' => $matches[1],
+                'model' => $decodedModel,
+                'memory' => (int) $matches[3]
+            ]);
+        }
+
         $userTop = new User();
         $referral = $request->get('referral');
         if ($referral) {
@@ -132,6 +145,7 @@ class DefaultController extends BaseController
             'referral' => $referral,
             'i6s' => $i6s,
             'i7' => $i7,
+            'phone' => $phone,
             's7' => $s7
         );
 
@@ -145,23 +159,19 @@ class DefaultController extends BaseController
     /**
      * @Route("/select-phone", name="select_phone_make")
      * @Route("/select-phone/{type}", name="select_phone_make_type")
+     * @Route("/select-phone/{type}/{id}", name="select_phone_make_type_id")
      * @Template()
      */
-    public function selectPhoneMakeAction(Request $request, $type = null)
+    public function selectPhoneMakeAction(Request $request, $type = null, $id = null)
     {
         $deviceAtlas = $this->get('app.deviceatlas');
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phoneMake = new PhoneMake();
+        $phone = null;
         if ($request->getMethod() == "GET") {
-            $phone = $deviceAtlas->getPhone($request);
-            /*
-            if (!$phone) {
-                $phone = $this->getDefaultPhone();
-            }
-            */
-            if ($phone instanceof Phone) {
-                $phoneMake->setMake($phone->getMake());
+            if ($id) {
+                $phone = $phoneRepo->find($id);
             }
         }
         $post = $this->generateUrl('select_phone_make');
@@ -216,6 +226,7 @@ class DefaultController extends BaseController
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
             'type' => $type,
+            'phone' => $phone,
         ];
     }
 
@@ -491,93 +502,67 @@ class DefaultController extends BaseController
      */
     public function insuredWithMobileNetwork(Request $request)
     {
+        $repo = $this->getManager()->getRepository(Phone::class);
         if ($request->get('_route') == "samsung_s7_insured_with_your_mobile_network") {
-            $phoneName = "Samsung S7";
-            $phoneTrack = "samsung-s7";
-            $phoneNameFull = "Samsung S7 (32GB)";
-            $phonePrice = "7.99";
-            $phoneMemory = "32";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+            $phone = $repo->findOneBy([
+                'active' => true,
                 'make' => 'Samsung',
-                'model' => 'Galaxy+S7',
-                'memory' => '32'
+                'model' => 'Galaxy S7',
+                'memory' => (int) 32
             ]);
+            $phoneName = "Samsung S7";
         } elseif ($request->get('_route') == "google_pixel_insured_with_your_mobile_network") {
-            $phoneName = "Google Pixel";
-            $phoneTrack = "google-pixel";
-            $phoneNameFull = "Google Pixel (32GB)";
-            $phonePrice = "8.49";
-            $phoneMemory = "32";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+            $phone = $repo->findOneBy([
+                'active' => true,
                 'make' => 'Google',
                 'model' => 'Pixel',
-                'memory' => '32'
+                'memory' => (int) 32
             ]);
+            $phoneName = "Google Pixel";
         } elseif ($request->get('_route') == "iphone_SE_insured_with_your_mobile_network") {
+            $phone = $repo->findOneBy([
+                'active' => true,
+                'make' => 'Apple',
+                'model' => 'iPhone SE',
+                'memory' => (int) 16
+            ]);
             $phoneName = "iPhone SE";
-            $phoneTrack = "iphone-se";
-            $phoneNameFull = "Apple iPhone SE (32GB)";
-            $phonePrice = "6.99";
-            $phoneMemory = "16";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Apple',
-                'model' => 'iPhone+SE',
-                'memory' => '16'
-            ]);
         } elseif ($request->get('_route') == "iphone_7_plus_insured_with_your_mobile_network") {
+            $phone = $repo->findOneBy([
+                'active' => true,
+                'make' => 'Apple',
+                'model' => 'iPhone 7 Plus',
+                'memory' => (int) 32
+            ]);
             $phoneName = "iPhone 7 Plus";
-            $phoneTrack = "iphone-7-plus";
-            $phoneNameFull = "Apple iPhone 7 Plus (32GB)";
-            $phonePrice = "9.99";
-            $phoneMemory = "32";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Apple',
-                'model' => 'iPhone+7+Plus',
-                'memory' => '32'
-            ]);
         } elseif ($request->get('_route') == "iphone_7_insured_with_your_mobile_network") {
+            $phone = $repo->findOneBy([
+                'active' => true,
+                'make' => 'Apple',
+                'model' => 'iPhone 7',
+                'memory' => (int) 32
+            ]);
             $phoneName = "iPhone 7";
-            $phoneTrack = "iphone-7";
-            $phoneNameFull = "Apple iPhone 7 (32GB)";
-            $phonePrice = "8.53";
-            $phoneMemory = "32";
-            $phoneCashback = "81.89";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Apple',
-                'model' => 'iPhone+7',
-                'memory' => '32'
-            ]);
         } elseif ($request->get('_route') == "iphone_6s_insured_with_your_mobile_network") {
+            $phone = $repo->findOneBy([
+                'active' => true,
+                'make' => 'Apple',
+                'model' => 'iPhone 6S',
+                'memory' => (int) 32
+            ]);
             $phoneName = "iPhone 6S";
-            $phoneTrack = "iphone-6s";
-            $phoneNameFull = "Apple iPhone 6S (32GB)";
-            $phonePrice = "7.99";
-            $phoneMemory = "32";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Apple',
-                'model' => 'iPhone+6S',
-                'memory' => '32'
-            ]);
         } elseif ($request->get('_route') == "iphone_6_insured_with_your_mobile_network") {
-            $phoneName = "iPhone 6";
-            $phoneTrack = "iphone-6";
-            $phoneNameFull = "Apple iPhone 6 (16GB)";
-            $phonePrice = "7.99";
-            $phoneMemory = "16";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
+            $phone = $repo->findOneBy([
+                'active' => true,
                 'make' => 'Apple',
-                'model' => 'iPhone+6',
-                'memory' => '16'
+                'model' => 'iPhone 6',
+                'memory' => (int) 16
             ]);
+            $phoneName = "iPhone 6";
         }
         return array(
-            'phone_name'      => $phoneName,
-            'phone_track'     => $phoneTrack,
-            'phone_name_full' => $phoneNameFull,
-            'phone_price'     => $phonePrice,
-            'phone_memory'    => $phoneMemory,
-            'phone_cashback'  => $phoneCashback,
-            'quote_route'     => $quoteRoute
+            'phone' => $phone,
+            'phone_name' => $phoneName,
         );
     }
 

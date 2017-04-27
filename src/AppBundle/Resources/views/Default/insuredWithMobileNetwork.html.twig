@@ -47,7 +47,7 @@
                             <thead class="background-blue" valign="middle">
                                 <tr>
                                     <td width="30%" align="center" class="text-white h4">
-                                        For {{ phone_name }} ({{ phone_memory }}) <br> as of 13th April 2017
+                                        For {{ phone_name }} ({{ phone.memory }}) <br> as of 13th April 2017
                                     </td>
                                     <td width="20%" align="center" class="text-white">Price per <br>month</td>
 
@@ -83,9 +83,9 @@
                                     <td align="center"><i class="fa fa-check fa-lg text-green" aria-hidden="true"></i> &nbsp;</td>
                                 </tr>
                                 <tr class="so-sure" valign="middle">
-                                    <td class="h3" align="center">so-sure</td>
-                                    <td class="h3" align="center">£{{ phone_price }}</td>
-                                    <td class="h3" align="center">£{{ phone_cashback }}</td>
+                                    <td class="h3" align="center">so-sure <br/><small>(live price)</small></td>
+                                    <td class="h3" align="center">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                                    <td class="h3" align="center">£{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }}</td>
                                     <td align="center"><strong><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> &nbsp;</strong></td>
                                 </tr>
                             </tbody>
@@ -108,14 +108,14 @@
                         <li>Full cover for theft, loss, accidental damage and breakdown</li>
                         <li>Next working day replacement or repair</li>
                         <li>Insure phones up to 3 years old</li>
-                        <li>Up to £{{ phone_cashback }} cashback every year when you and your friends don’t claim</li>
+                        <li>Up to £{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }} cashback every year when you and your friends don’t claim</li>
                     </ul>
                     <p>We created so-sure to restore trust in insurance. We believe that insurance should not hide behind small print (our terms and conditions are in plain English) and that careful people should get money back.</p>
 
                     <p class="text-center">
                         <a href="#"
-                           data-event-url=""
-                           data-event="mobile-networks-{{ phone_track }}-btn"
+                           data-event-url="{{ path('homepage', {'phone': phone.searchQuerystring })}}"
+                           data-event="Mobile Network {{ phone }}"
                            class="btn btn-success btn-rounded btn-lg sosure-track">Find out more about so-sure for your {{ phone_name }}</a></p>
                 </div>
             </div>
