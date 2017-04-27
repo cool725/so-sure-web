@@ -1461,7 +1461,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPremiumInstallments(12);
 
         // Policy doesn't have a payment, so should be expired
-        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-01-01")));
     }
 
     public function testShouldExpirePolicy()
@@ -1485,8 +1485,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
-        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-03-03")));
+        $this->assertFalse($policy->shouldExpirePolicy(null, new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-03-03")));
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1496,8 +1496,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
-        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-03-03")));
+        $this->assertFalse($policy->shouldExpirePolicy(null, new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-03-03")));
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1507,8 +1507,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-02-09")));
-        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-04-15")));
+        $this->assertFalse($policy->shouldExpirePolicy(null, new \DateTime("2016-02-09")));
+        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-04-15")));
     }
 
     public function testCanCancelPolicy()

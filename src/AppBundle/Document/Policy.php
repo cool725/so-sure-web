@@ -1585,9 +1585,9 @@ abstract class Policy
         return $this->getEnd()->diff($date)->days < 30;
     }
 
-    public function shouldExpirePolicy($date = null)
+    public function shouldExpirePolicy($prefix = null, $date = null)
     {
-        if (!$this->isValidPolicy() || $this->getPremiumPlan() != self::PLAN_MONTHLY) {
+        if (!$this->isValidPolicy($prefix) || $this->getPremiumPlan() != self::PLAN_MONTHLY) {
             return false;
         }
 

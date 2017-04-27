@@ -20,11 +20,26 @@ class ExpirePolicyCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:policy:expire')
             ->setDescription('Expire unpaid policies')
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not cancel policies, just report on policies that would be cancelled'
+            )
+            ->addOption(
+                'prefix',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy prefix'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $dryRun = true === $input->getOption('dry-run');
+        $prefix = $input->getOption('prefix');
+
         $policyService = $this->getContainer()->get('app.policy');
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $policyRepo = $dm->getRepository(Policy::class);
@@ -32,9 +47,17 @@ class ExpirePolicyCommand extends ContainerAwareCommand
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
         $count = 0;
         foreach ($policies as $policy) {
-            if ($policy->shouldExpirePolicy()) {
-                $policyService->cancel($policy, Policy::CANCELLED_UNPAID);
-                $output->writeln(sprintf('Cancelled Policy %s / %s', $policy->getPolicyNumber(), $policy->getId()));
+            if ($policy->shouldExpirePolicy($prefix)) {
+                if (!$dryRun) {
+                    $policyService->cancel($policy, Policy::CANCELLED_UNPAID);
+                    $output->writeln(sprintf('Cancelled Policy %s / %s', $policy->getPolicyNumber(), $policy->getId()));
+                } else {
+                    $output->writeln(sprintf(
+                        'Dry-Run - Should Cancel Policy %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    ));
+                }
                 $count++;
             }
         }
