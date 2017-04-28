@@ -28,7 +28,7 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <h1>Your {{ phone_name }} is insured with your mobile network. Get a better deal!</h1>
+                    <h1>Your {{ phone_name }} is insured with your mobile network. <br> Get a better deal!</h1>
                 </div>
             </div>
 
@@ -39,21 +39,21 @@
         <div class="container">
 
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
+                <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 
-                    <p>We are sure they have the best intentions, but this is how expensive they are:</p>
-                    <div class="table-responsive table-bordered">
+                    <p class="lead">We are sure they have the best intentions, but this is how expensive they are:</p>
+                    <div class="table-width table-responsive table-bordered">
                         <table class="table">
                             <thead class="background-blue" valign="middle">
                                 <tr>
-                                    <td width="30%" align="center" class="text-white h4">
-                                        For {{ phone_name }} ({{ phone.memory }}) <br> as of 13th April 2017
+                                    <td align="center" class="text-white">
+                                        For {{ phone_name }} <br class="visible-xs"> ({{ phone.memory }}GB) <br> <small>as of <br class="visible-xs"> 13th April 2017</small>
                                     </td>
-                                    <td width="20%" align="center" class="text-white">Price per <br>month</td>
+                                    <td align="center" class="text-white">Price per <br>month</td>
 
-                                    <td width="20%" align="center" class="text-white">Money back <br> when no <br> claims</td>
-                                    <td width="20%" align="center" class="text-white">
-                                        Next day or <br> Working Day Replacement
+                                    <td align="center" class="text-white">Money back <br> when no <br> claims</td>
+                                    <td align="center" class="text-white">
+                                        Next day or <br> Working Day <br>Replacement
                                     </td>
                                 </tr>
                             </thead>
@@ -83,15 +83,15 @@
                                     <td align="center"><i class="fa fa-check fa-lg text-green" aria-hidden="true"></i> &nbsp;</td>
                                 </tr>
                                 <tr class="so-sure" valign="middle">
-                                    <td class="h3" align="center">so-sure <br/><small>(live price)</small></td>
-                                    <td class="h3" align="center">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</td>
-                                    <td class="h3" align="center">£{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }}</td>
+                                    <td class="h4" align="center">so-sure</td>
+                                    <td class="h4" align="center">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                                    <td class="h4" align="center">£{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }}</td>
                                     <td align="center"><strong><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> &nbsp;</strong></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="text-center">
+                    <div>
                         <em>
                             <small>*Vodafone can take up to 5 working days for damage/breakdown.</small>
                         </em>
@@ -102,21 +102,22 @@
             <br>
 
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
+                <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
                     <p>If you want a better deal, switch to us. We offer:</p>
                     <ul>
-                        <li>Full cover for theft, loss, accidental damage and breakdown</li>
-                        <li>Next working day replacement or repair</li>
-                        <li>Insure phones up to 3 years old</li>
-                        <li>Up to £{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }} cashback every year when you and your friends don’t claim</li>
+                        <li><strong>Full cover</strong> for theft, loss, accidental damage and breakdown</li>
+                        <li><strong>Next working day</strong> replacement or repair</li>
+                        <li>Insure phones <strong>up to 3 years old</strong></li>
+                        <li>Up to <strong>£{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }} cashback</strong> every year when you and your friends don’t claim</li>
                     </ul>
-                    <p>We created so-sure to restore trust in insurance. We believe that insurance should not hide behind small print (our terms and conditions are in plain English) and that careful people should get money back.</p>
+                    <p>We created so-sure to restore trust in insurance. We believe that insurance should not hide behind small print (our terms and conditions are in plain English) and that careful people should get money back.</p> <br><br>
 
                     <p class="text-center">
                         <a href="#"
                            data-event-url="{{ path('homepage', {'phone': phone.searchQuerystring })}}"
                            data-event="Mobile Network {{ phone }}"
-                           class="btn btn-success btn-rounded btn-lg sosure-track">Find out more about so-sure for your {{ phone_name }}</a></p>
+                           class="btn btn-success btn-rounded btn-lg sosure-track">Chose a better deal</a>
+                    </p>
                 </div>
             </div>
 

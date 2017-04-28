@@ -12,17 +12,16 @@
 	background-color: $white;
 
 	p {
-		line-height: 2;
-		font-size: 18px;
-		margin: 0 0 20px;
+		// line-height: 2;
+		font-size: 17px;
+		line-height: 1.7;
 	}
 
 	ul {
-		margin: 0 0 20px;
 
 		li {
-			line-height: 2;
-			font-size: 18px;
+			font-size: 17px;
+			line-height: 1.7;
 		}
 	}
 
@@ -36,6 +35,11 @@
 
 	.table {
 		margin-bottom: 0;
+	}
+
+	.table-width {
+		// max-width: 660px;
+		// margin: 0 auto;
 	}
 
 	.table > thead > tr > td {
