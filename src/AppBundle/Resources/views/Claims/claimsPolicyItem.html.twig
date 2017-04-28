@@ -406,6 +406,10 @@
                     <td>{{ policy.user.mobileNumber }}</td>
                 </tr>
                 <tr>
+                    <td>Birthday</td>
+                    <td>{{ policy.user.birthday | date('d M Y', 'Europe/London') }}</td>
+                </tr>
+                <tr>
                     <td>Billing Address</td>
                     <td>{{ policy.user.billingAddress }}</td>
                 </tr>
