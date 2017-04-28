@@ -95,6 +95,9 @@ trait DateTrait
 
     public function dateDiffMonths($date1, $date2, $ceil = true)
     {
+        if ($date1 < $date2) {
+            return 0;
+        }
         $diff = $date1->diff($date2);
         $months = $diff->m + $diff->y * 12;
         if ($ceil) {

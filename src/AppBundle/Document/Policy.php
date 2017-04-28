@@ -1629,6 +1629,7 @@ abstract class Policy
         )) {
             $billingDate = $billingDate->sub(new \DateInterval('P1M'));
             // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
+            // print $this->getOutstandingPremiumToDate($billingDate) . PHP_EOL;
 
             // Ensure we don't loop indefinitely
             $maxCount--;
