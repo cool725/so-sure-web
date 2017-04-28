@@ -24,6 +24,7 @@ use AppBundle\Document\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\SoSurePayment;
+use AppBundle\Document\BacsPayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
@@ -416,6 +417,7 @@ class AdminController extends BaseController
             'all' => Payment::sumPayments($payments, $isProd),
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
+            'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
         ];
     }
 
