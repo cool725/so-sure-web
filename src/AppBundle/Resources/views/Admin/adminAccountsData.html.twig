@@ -8,12 +8,20 @@
         <td>£{{ paymentTotals.judo.received|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
+        <td>Paid in (bacs)</td>
+        <td>£{{ paymentTotals.bacs.received|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
         <td>Paid in (so-sure)</td>
         <td>£{{ paymentTotals.sosure.received|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
         <td>Refunded (cards)</td>
         <td>£{{ paymentTotals.judo.refunded|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td>Refunded (bacs)</td>
+        <td>£{{ paymentTotals.bacs.refunded|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
         <td>Refunded (so-sure)</td>
@@ -37,11 +45,11 @@
     </tr>
     <tr>
         <td>Number of Payments Received</td>
-        <td>{{ paymentTotals.judo.numReceived }}</td>
+        <td>{{ paymentTotals.judo.numReceived }} Judo + {{ paymentTotals.bacs.numReceived }} Bacs</td>
     </tr>
     <tr>
         <td>Number of Refunds</td>
-        <td>{{ paymentTotals.judo.numRefunded }}</td>
+        <td>{{ paymentTotals.judo.numRefunded }} Judo + {{ paymentTotals.bacs.numRefunded }} Bacs</td>
     </tr>
     <tr>
         <td>Average Payment Amount</td>
