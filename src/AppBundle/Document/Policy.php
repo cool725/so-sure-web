@@ -1585,9 +1585,9 @@ abstract class Policy
         return $this->getEnd()->diff($date)->days < 30;
     }
 
-    public function shouldExpirePolicy($date = null)
+    public function shouldExpirePolicy($prefix = null, $date = null)
     {
-        if (!$this->isValidPolicy()) {
+        if (!$this->isValidPolicy($prefix) || $this->getPremiumPlan() != self::PLAN_MONTHLY) {
             return false;
         }
 
@@ -1603,23 +1603,37 @@ abstract class Policy
             $date = new \DateTime();
         }
 
-        return $date >= $this->getPolicyExpirationDate();
+        return $date >= $this->getPolicyExpirationDate($date);
     }
 
     /**
      * Note that expiration date is for cancellations only and may be after policy end date
+     * Only makes sense if policy is a monthly plan
      */
-    public function getPolicyExpirationDate()
+    public function getPolicyExpirationDate(\DateTime $date = null)
     {
-        // TODO: Improve this logic - if user was late on last succesfully payment, then could be up to 1 month off
-        $date = clone $this->getLastSuccessfulPaymentCredit()->getDate();
-        // 1 month from the last successful payment approximates when the current payment is due
-        $date->add(new \DateInterval('P1M'));
+        if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+            return null;
+        }
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $billingDate = $this->getNextBillingDate($date);
+        // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
+        while ($this->getOutstandingPremiumToDate($billingDate) > 0 && !$this->areEqualToTwoDp(
+            $this->getOutstandingPremiumToDate($billingDate),
+            0
+        )) {
+            $billingDate = $billingDate->sub(new \DateInterval('P1M'));
+            // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
+        }
+        // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
 
         // and business rule of 30 days unpaid before auto cancellation
-        $date->add(new \DateInterval('P30D'));
+        $billingDate->add(new \DateInterval('P30D'));
 
-        return $date;
+        return $billingDate;
     }
 
     public function getPolicyExpirationDateDays(\DateTime $date = null)
@@ -1831,7 +1845,11 @@ abstract class Policy
         }
 
         if (!$this->canCancel($reason, $date)) {
-            throw new \Exception('Unable to cancel policy');
+            throw new \Exception(sprintf(
+                'Unable to cancel policy %s/%s. Is claim in progress?',
+                $this->getPolicyNumber(),
+                $this->getId()
+            ));
         }
 
         if ($date == null) {
@@ -1988,7 +2006,7 @@ abstract class Policy
             $expectedPaid = $this->getPremiumInstallmentPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
             $diff = $date->diff($this->getStart());
-            $months = $diff->m;
+            $months = $diff->m + $diff->y * 12;
             if ($diff->d > 0 || $diff->h > 0 || $diff->i > 0 || $diff->s > 0) {
                 $months++;
             }
