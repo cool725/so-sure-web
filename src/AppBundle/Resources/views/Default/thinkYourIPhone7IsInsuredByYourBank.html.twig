@@ -8,7 +8,7 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts    
+    {% javascripts
     '@AppBundle/Resources/public/js/Default/index.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -16,17 +16,15 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/article.scss' %}   
+    '@AppBundle/Resources/public/sass/page/article.scss' %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
 
-    <!-- Background image https://www.pexels.com/photo/space-gray-iphone-6-193004/ -->
-
-    <section class="hero thinkYourIPhone7IsInsuredByYourBank">
+    <section class="hero brand-gradient">
         <div class="container">
-            
+
             <div class="row">
                 <div class="col-md-12">
                     <h1 class="text-left">Think your iPhone 7 is insured by your bank? <br>Think again...</h1>
@@ -34,7 +32,7 @@
             </div>
 
         </div>
-    </section>   
+    </section>
 
     <section class="article-content section--pad">
         <div class="container">
@@ -77,6 +75,6 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
 {% endblock %}

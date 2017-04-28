@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}so-sure - iPhone 7 insured with Vodafone? 
+{% block title %}so-sure - iPhone 7 insured with Vodafone?
 {% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
@@ -9,7 +9,7 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts    
+    {% javascripts
     '@AppBundle/Resources/public/js/Default/index.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -17,15 +17,15 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/article.scss' %}   
+    '@AppBundle/Resources/public/sass/page/article.scss' %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
 
-    <section class="hero isInsuranceWithVodafoneAllThatItSeems">
+    <section class="hero brand-gradient">
         <div class="container">
-            
+
             <div class="row">
                 <div class="col-md-12">
                     <h1>{{ phone_name }} insured with Vodafone?</h1>
@@ -33,16 +33,16 @@
             </div>
 
         </div>
-    </section>   
+    </section>
 
     <section class="article-content section--pad">
         <div class="container">
-            
+
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <p>Vodafone may have the best intentions for their insurance customers but we’ve been hearing reports of outrageous wait times after the claim was approved.</p>
                 </div>
-            </div>           
+            </div>
 
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
@@ -59,7 +59,7 @@
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <div class="panel panel-default table-responsive">
-                        <table class="table table-bordered">  
+                        <table class="table table-bordered">
                             <thead>
                                 <tr class="info">
                                     <td width="30%"></td>
@@ -80,21 +80,21 @@
                                         <i class="fa fa-times fa-lg text-red" aria-hidden="true"></i> 7 working days for loss or theft
                                     </td>
                                     <td><i class="fa fa-check fa-lg text-green" aria-hidden="true"></i> Next working day.</td>
-                                </tr>                                
+                                </tr>
                             </tbody>
                         </table>
-                    </div>                  
+                    </div>
                 </div>
-            </div>              
+            </div>
 
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
-                    <p>Next day delivery, comprehensive cover and top customer service should come as standard but unfortunately they often don’t. That’s why so-sure:</p>       
+                    <p>Next day delivery, comprehensive cover and top customer service should come as standard but unfortunately they often don’t. That’s why so-sure:</p>
                     <ul>
                         <li>only sells full cover: loss, theft, damage, breakdown.</li>
                         <li>provides  next day replacement or repair.</li>
                         <li>up to 80% money back when you and your friends don’t claim.</li>
-                    </ul>    
+                    </ul>
                     <p>And we’re here to help 24 hours a day, 7 days a week.</p>
                     <p>If you feel like Vodafone or another company aren’t stepping up to the mark then It’s easy to switch: if you bought your policy within the last 14 days then (and haven’t claimed) you can cancel immediately for free, otherwise all you need to do is give them 30 days notice.</p>
                 </div>
@@ -105,11 +105,11 @@
                     <a href="#" data-event-url="{{ quote_route }}"
                        data-event="vodafone-iphone-btn" class="btn btn-success  btn-lg sosure-track">Make the switch</a>
                 </div>
-            </div>            
+            </div>
 
         </div>
     </section>
 
-    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}    
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
 {% endblock %}
