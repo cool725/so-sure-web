@@ -92,4 +92,20 @@ trait DateTrait
 
         return $businessDays;
     }
+
+    public function dateDiffMonths($date1, $date2, $ceil = true)
+    {
+        if ($date1 < $date2) {
+            return 0;
+        }
+        $diff = $date1->diff($date2);
+        $months = $diff->m + $diff->y * 12;
+        if ($ceil) {
+            if ($diff->d > 0 || $diff->h > 0 || $diff->i > 0 || $diff->s > 0) {
+                $months++;
+            }
+        }
+
+        return $months;
+    }
 }

@@ -1620,6 +1620,8 @@ abstract class Policy
         }
 
         $billingDate = $this->getNextBillingDate($date);
+        $maxCount = $this->dateDiffMonths($billingDate, $this->getStart());
+
         // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
         while ($this->getOutstandingPremiumToDate($billingDate) > 0 && !$this->areEqualToTwoDp(
             $this->getOutstandingPremiumToDate($billingDate),
@@ -1627,6 +1629,22 @@ abstract class Policy
         )) {
             $billingDate = $billingDate->sub(new \DateInterval('P1M'));
             // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
+            // print $this->getOutstandingPremiumToDate($billingDate) . PHP_EOL;
+
+            // Ensure we don't loop indefinitely
+            $maxCount--;
+            if ($maxCount < 0) {
+                throw new \Exception(sprintf(
+                    'Failed to find a date with a 0 outstanding premium (%f). Policy %s/%s',
+                    $this->getOutstandingPremiumToDate($billingDate),
+                    $this->getPolicyNumber(),
+                    $this->getId()
+                ));
+                // Older method of using the last payment recevied date to determine expiration
+                // $billingDate = clone $this->getLastSuccessfulPaymentCredit()->getDate();
+                // $billingDate->add(new \DateInterval('P1M'));
+                // break;
+            }
         }
         // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
 
@@ -2005,11 +2023,7 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $expectedPaid = $this->getPremiumInstallmentPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-            $diff = $date->diff($this->getStart());
-            $months = $diff->m + $diff->y * 12;
-            if ($diff->d > 0 || $diff->h > 0 || $diff->i > 0 || $diff->s > 0) {
-                $months++;
-            }
+            $months = $this->dateDiffMonths($date, $this->getStart());
             $expectedPaid = $this->getPremiumInstallmentPrice() * $months;
         } else {
             throw new \Exception('Unknown premium plan');
