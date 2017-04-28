@@ -23,7 +23,7 @@
 	}
 
 	@include breakpoint(tablet) {
-		
+
 		h1 {
 			text-align: center;
 		}
@@ -43,7 +43,7 @@
 	}
 
 	.price {
-		margin: 20px 0 0; 
+		margin: 20px 0 0;
 	}
 
 	@include breakpoint(tablet) {
@@ -66,16 +66,16 @@
 	ul {
 	    padding-left: 30px;
 	    margin: 15px 0 0 0;
-	    position: relative;	
-	    
+	    position: relative;
+
 	    li {
 		    padding: 4px 0;
 		    color: $grey-dark;
-		    position: relative;	    	
-	    }	
+		    position: relative;
+	    }
 
 	    li.h4 {
-	    	
+
 	    	&:first-of-type {
 				margin-top: 0;
 	    	}
@@ -88,7 +88,7 @@
 
 	.fa-lg {
 	    position: absolute;
-	    left: -30px; top: 4px;		
+	    left: -30px; top: 4px;
 	}
 
 	p.h4 {
@@ -100,24 +100,24 @@
 	    position: relative;
 	    text-align: center;
 	    padding: 10px 15px;
-	    margin: 25px 0 10px;	
+	    margin: 25px 0 10px;
 
 	    &:before {
 		    width: 0; height: 0;
 		    content: '';
 		    position: absolute;
 		    bottom: 100%; left: 0; right: 0;
-		    margin: 0 auto;    
+		    margin: 0 auto;
 		    border-style: solid;
 		    border-width: 0 10px 10px 10px;
-		    border-color: transparent transparent $grey-light transparent;  	    	
-	    }	
+		    border-color: transparent transparent $grey-light transparent;
+	    }
 	}
 
 	@include breakpoint(mobileishup) {
-		padding: 25px;      
+		padding: 25px;
 		border: 2px solid $grey-light;
-		@include border-radius(4px);    	
+		@include border-radius(4px);
 	}
 
 	@include breakpoint(tablet) {
@@ -129,7 +129,7 @@
 	}
 }
 
-.stat-banner, .phone-details  { 
+.stat-banner, .phone-details  {
 	padding: 20px 15px;
 	color: $white;
 
@@ -142,7 +142,7 @@
 
 			&:before {
 			  content: '\2022';
-			  margin-right: 0.5em;				
+			  margin-right: 0.5em;
 			}
 		}
 	}
@@ -154,7 +154,7 @@
 
 .memory-dropdown {
     min-width: 200px !important;
-    left: auto; right: auto;	
+    left: auto; right: auto;
 
     @include breakpoint(mobileishup) {
 		right: 0 !important;
@@ -177,7 +177,7 @@
 		max-width: 840px;
 		margin: 25px auto;
 		position: relative;
-	
+
 		h1, .h3, .h4 {
 			line-height: 1;
 		}
@@ -186,8 +186,9 @@
 }
 
 // Email
-.input-group .form-control.input-lg {
+.input-group .form-control {
     border: 2px solid $grey-light;
-	@include border-left-radius(4px);
     box-shadow: none;
 }
+
+
