@@ -1458,9 +1458,10 @@ class PhonePolicyTest extends WebTestCase
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setPremiumInstallments(12);
 
         // Policy doesn't have a payment, so should be expired
-        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-01-01")));
     }
 
     public function testShouldExpirePolicy()
@@ -1474,6 +1475,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setPremiumInstallments(12);
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1483,8 +1485,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
-        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-03-03")));
+        $this->assertFalse($policy->shouldExpirePolicy(null, new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-03-03")));
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1494,8 +1496,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-01-01")));
-        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-03-03")));
+        $this->assertFalse($policy->shouldExpirePolicy(null, new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-03-03")));
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1505,8 +1507,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldExpirePolicy(new \DateTime("2016-02-09")));
-        $this->assertTrue($policy->shouldExpirePolicy(new \DateTime("2016-04-15")));
+        $this->assertFalse($policy->shouldExpirePolicy(null, new \DateTime("2016-02-09")));
+        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-04-15")));
     }
 
     public function testCanCancelPolicy()
@@ -2317,6 +2319,30 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(new \DateTime('2016-03-02'), $policy->getPolicyExpirationDate());
         $this->assertEquals(1, $policy->getPolicyExpirationDateDays(new \DateTime('2016-03-01')));
         $this->assertEquals(30, $policy->getPolicyExpirationDateDays(new \DateTime('2016-02-01')));
+
+        // add an ontime payment
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
+        $payment->setDate(new \DateTime('2016-02-01'));
+        $policy->addPayment($payment);
+
+        // expected payment 1/2/16 + 1 month = 1/3/16 + 30 days = 31/3/16
+        $this->assertEquals(new \DateTime('2016-03-31'), $policy->getPolicyExpirationDate());
+    
+        // add a late payment
+        $payment = new JudoPayment();
+        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
+        $payment->setDate(new \DateTime('2016-03-30'));
+        $policy->addPayment($payment);
+
+        // expected payment 1/3/16 + 1 month = 1/4/16 + 30 days = 1/5/16
+        $this->assertEquals(new \DateTime('2016-05-01'), $policy->getPolicyExpirationDate());
     }
 
     public function testHasCorrectPolicyStatus()
