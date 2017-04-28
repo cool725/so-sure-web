@@ -91,7 +91,10 @@ class PhonePolicy extends Policy
             throw new \Exception('Phone must have a price');
         }
 
-        $this->setPremium($phone->getCurrentPhonePrice($date)->createPremium($date));
+        // Only set premium if not already present
+        if (!$this->getPremium()) {
+            $this->setPremium($phone->getCurrentPhonePrice($date)->createPremium($date));
+        }
     }
 
     public function getPhoneVerified()
