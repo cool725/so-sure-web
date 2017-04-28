@@ -1084,8 +1084,10 @@ class ApiAuthController extends BaseController
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
             if ($policy = $user->getCurrentPolicy()) {
+                $now = new \DateTime();
                 if ($policy->getStart() > new \DateTime('2017-02-01') &&
                     $policy->getStart() < new \DateTime('2017-04-01') &&
+                    $now < new \DateTime('2017-04-01') &&
                     !$policy->getPromoCode()) {
                     if ($reward = $this->findRewardUser('bonus@so-sure.net')) {
                         $invitationService = $this->get('app.invitation');

@@ -2880,15 +2880,18 @@ class ApiAuthControllerTest extends BaseControllerTest
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
-        $this->assertEquals(Policy::PROMO_APP_MARCH_2017, $data['policies'][0]['promo_code']);
+        // its after apr now, so assume no promo
+        $this->assertNotEquals(Policy::PROMO_APP_MARCH_2017, $data['policies'][0]['promo_code']);
+        /*
         $this->assertEquals('so-sure Rewards', $data['policies'][0]['connections'][0]['name']);
         $this->assertEquals(5, $data['policies'][0]['connections'][0]['value']);
         $this->assertEquals(5, $data['policies'][0]['pot']['value']);
+        */
 
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
-        $this->assertEquals(5, $data['policies'][0]['pot']['value']);
+        $this->assertEquals(0, $data['policies'][0]['pot']['value']);
     }
 
     public function testGetCurrentUserPromoAppMarch2017Apr()
