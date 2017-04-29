@@ -356,7 +356,11 @@ class DaviesClaim
             if (!is_numeric($days)) {
                 // unfortunately davies is incapable of formatting dates
                 // so may be an excel date or may be a d/m/Y formatted string
-                $origin = $this->startOfDay(\DateTime::createFromFormat('d/m/Y', $days));
+                $date = \DateTime::createFromFormat('d/m/Y', $days);
+                if (!$date instanceof \DateTime) {
+                    throw new \Exception('Unable to parse date');
+                }
+                $origin = $this->startOfDay($date);
             } else {
                 $origin = new \DateTime("1900-01-01");
                 $origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
