@@ -305,7 +305,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $manager->persist($invitation);
         }
 
-        if ($policy->isPolicyPaidToDate(false, $now)) {
+        if ($policy->isPolicyPaidToDate($now)) {
             $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         } else {
             $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
