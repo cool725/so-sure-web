@@ -448,6 +448,11 @@ abstract class Policy
         return $this->start;
     }
 
+    public function getStartForBilling()
+    {
+        return $this->adjustDayForBilling($this->getStart());
+    }
+
     public function setStart(\DateTime $start)
     {
         $this->start = $start;
@@ -906,9 +911,7 @@ abstract class Policy
         $date = clone $this->getStart();
 
         // To allow billing on same date every month, 28th is max allowable day on month
-        if ($date->format('d') > 28) {
-            $date->sub(new \DateInterval(sprintf('P%dD', $date->format('d') - 28)));
-        }
+        $date = $this->adjustDayForBilling($date);
 
         return $date;
     }
@@ -916,7 +919,7 @@ abstract class Policy
     public function getNextBillingDate($date, $filtered = true)
     {
         $nextDate = new \DateTime();
-        $nextDate->setTime(0, 0);
+        $this->clearTime($nextDate);
         if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
             $nextDate->setDate($date->format('Y'), $date->format('m'), $this->getStart()->format('d'));
             if ($nextDate < $date) {
@@ -924,8 +927,8 @@ abstract class Policy
             }
 
             // To allow billing on same date every month, 28th is max allowable day on month
-            if ($filtered && $nextDate->format('d') > 28) {
-                $nextDate->sub(new \DateInterval(sprintf('P%dD', $nextDate->format('d') - 28)));
+            if ($filtered) {
+                $nextDate = $this->adjustDayForBilling($nextDate);
             }
         } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $nextDate->setDate($date->format('Y'), $this->getStart()->format('m'), $this->getStart()->format('d'));
@@ -2023,12 +2026,16 @@ abstract class Policy
         if (!$date) {
             $date = new \DateTime();
         }
+        $date = $this->adjustDayForBilling($date);
 
         $expectedPaid = 0;
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $expectedPaid = $this->getPremiumInstallmentPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-            $months = $this->dateDiffMonths($date, $this->getStart());
+            $months = $this->dateDiffMonths($date, $this->getStartForBilling());
+            // print $date->format(\DateTime::ATOM) . PHP_EOL;
+            // print $this->getStartForBilling()->format(\DateTime::ATOM) . PHP_EOL;
+            // print $months . PHP_EOL;
             $expectedPaid = $this->getPremiumInstallmentPrice() * $months;
         } else {
             throw new \Exception('Unknown premium plan');
@@ -2102,6 +2109,7 @@ abstract class Policy
 
         $totalPaid = $this->getTotalSuccessfulPayments($date);
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
+        // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
         if ($exact) {
             return $this->areEqualToTwoDp($expectedPaid, $totalPaid);

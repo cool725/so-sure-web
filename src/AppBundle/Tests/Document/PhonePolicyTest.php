@@ -2013,8 +2013,11 @@ class PhonePolicyTest extends WebTestCase
         );
     }
 
-    private function createPolicyForCancellation($amount, $commission, $installments)
+    private function createPolicyForCancellation($amount, $commission, $installments, $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime("2016-01-01");
+        }
         $user = new User();
         $user->setEmail(self::generateEmail(sprintf('cancel-policy-%d', rand(1, 9999999)), $this));
         self::$dm->persist($user);
@@ -2026,7 +2029,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
+        $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setPremiumInstallments($installments);
 
         $this->addPayment($policy, $amount, $commission);
@@ -2349,6 +2352,83 @@ class PhonePolicyTest extends WebTestCase
 
         // expected payment 1/3/16 + 1 month = 1/4/16 + 30 days = 1/5/16
         $this->assertEquals(new \DateTime('2016-05-01'), $policy->getPolicyExpirationDate());
+    }
+
+    public function testPolicyIsPaidToDate()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(true, new \DateTime('2016-01-31')));
+        $this->assertFalse($policy->isPolicyPaidToDate(true, new \DateTime('2016-02-01 00:01')));
+
+        // add an ontime payment
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
+        $payment->setDate(new \DateTime('2016-02-01'));
+        $policy->addPayment($payment);
+
+        $this->assertTrue($policy->isPolicyPaidToDate(true, new \DateTime('2016-02-01 00:01')));
+        $this->assertFalse($policy->isPolicyPaidToDate(true, new \DateTime('2016-03-01 00:01')));
+
+        // add a late payment
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
+        $payment->setDate(new \DateTime('2016-03-30'));
+        $policy->addPayment($payment);
+
+        // we don't actually check when payment arrives, just that its there...
+        $this->assertTrue($policy->isPolicyPaidToDate(true, new \DateTime('2016-03-01')));
+        $this->assertFalse($policy->isPolicyPaidToDate(true, new \DateTime('2016-04-01 00:01')));
+    }
+
+    public function testPolicyIsPaidToDate28()
+    {
+        $date = new \DateTime('2016-01-30');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12,
+            $date
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(true, new \DateTime('2016-01-31 00:01')));
+        $this->assertTrue($policy->isPolicyPaidToDate(true, new \DateTime('2016-02-01')));
+        $this->assertFalse($policy->isPolicyPaidToDate(true, new \DateTime('2016-03-01')));
+
+        // add an ontime payment
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
+        $payment->setDate(new \DateTime('2016-02-28'));
+        $policy->addPayment($payment);
+
+        $this->assertTrue($policy->isPolicyPaidToDate(true, new \DateTime('2016-03-01')));
+        $this->assertFalse($policy->isPolicyPaidToDate(true, new \DateTime('2016-04-01')));
+
+        // add a late payment
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
+        $payment->setDate(new \DateTime('2016-04-15'));
+        $policy->addPayment($payment);
+
+        print PHP_EOL;
+        // we don't actually check when payment arrives, just that its there...
+        $this->assertTrue($policy->isPolicyPaidToDate(true, new \DateTime('2016-04-15 00:01')));
+        $this->assertFalse($policy->isPolicyPaidToDate(true, new \DateTime('2016-05-01 00:01')));
     }
 
     public function testHasCorrectPolicyStatus()

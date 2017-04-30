@@ -108,4 +108,22 @@ trait DateTrait
 
         return $months;
     }
+
+    public function adjustDayForBilling($date, $clearTimeIfAdjusted = false)
+    {
+        $billingDate = clone $date;
+        if ($billingDate->format('d') > 28) {
+            $billingDate->sub(new \DateInterval(sprintf('P%dD', $billingDate->format('d') - 28)));
+            if ($clearTimeIfAdjusted) {
+                $this->clearTime($billingDate);
+            }
+        }
+
+        return $billingDate;
+    }
+
+    public function clearTime($date)
+    {
+        $date->setTime(0, 0);
+    }
 }
