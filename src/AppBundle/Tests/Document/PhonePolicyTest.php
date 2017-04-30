@@ -2267,6 +2267,12 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStart(new \DateTime('2016-01-15'));
         $this->assertEquals(new \DateTime('2016-02-15'), $policy->getNextBillingDate(new \DateTime('2016-02-14')));
         $this->assertEquals(new \DateTime('2016-03-15'), $policy->getNextBillingDate(new \DateTime('2016-02-16')));
+
+        $policy = new SalvaPhonePolicy();
+        $policy->setPremiumInstallments(12);
+        $policy->setStart(new \DateTime('2016-03-29'));
+        $this->assertEquals(new \DateTime('2016-04-28'), $policy->getNextBillingDate(new \DateTime('2016-04-14')));
+        $this->assertEquals(new \DateTime('2016-05-28'), $policy->getNextBillingDate(new \DateTime('2016-04-30')));
     }
 
     public function testGetNextBillingDateYearly()
