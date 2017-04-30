@@ -613,7 +613,7 @@ class JudopayService
     {
         // if payment fails at exactly same second as payment is due, technically policy is still paid to date
         // this is problematic if setting the policy state to unpaid prior to calling this method
-        $isPaidToDate = $policy->isPolicyPaidToDate(false, $date);
+        $isPaidToDate = $policy->isPolicyPaidToDate($date);
 
         // update status if it makes sense to
         if ($isPaidToDate &&

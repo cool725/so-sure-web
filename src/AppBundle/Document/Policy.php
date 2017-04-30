@@ -2026,13 +2026,14 @@ abstract class Policy
         if (!$date) {
             $date = new \DateTime();
         }
-        $date = $this->adjustDayForBilling($date);
+        $date = $this->adjustDayForBilling($date, true);
 
         $expectedPaid = 0;
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $expectedPaid = $this->getPremiumInstallmentPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
             $months = $this->dateDiffMonths($date, $this->getStartForBilling());
+            // print PHP_EOL;
             // print $date->format(\DateTime::ATOM) . PHP_EOL;
             // print $this->getStartForBilling()->format(\DateTime::ATOM) . PHP_EOL;
             // print $months . PHP_EOL;
@@ -2094,14 +2095,14 @@ abstract class Policy
             return false;
         }
 
-        if ($this->isPolicyPaidToDate(false, $date)) {
+        if ($this->isPolicyPaidToDate($date)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } else {
             return $this->getStatus() == self::STATUS_UNPAID;
         }
     }
 
-    public function isPolicyPaidToDate($exact = true, \DateTime $date = null)
+    public function isPolicyPaidToDate(\DateTime $date = null)
     {
         if (!$this->isPolicy()) {
             return null;
@@ -2111,12 +2112,8 @@ abstract class Policy
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
         // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
-        if ($exact) {
-            return $this->areEqualToTwoDp($expectedPaid, $totalPaid);
-        } else {
-            // >= doesn't quite allow for minor float differences
-            return $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
-        }
+        // >= doesn't quite allow for minor float differences
+        return $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
     }
 
     public function arePolicyScheduledPaymentsCorrect($prefix = null, \DateTime $date = null)

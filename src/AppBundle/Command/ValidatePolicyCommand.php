@@ -96,7 +96,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
             }
 
-            $valid = $policy->isPolicyPaidToDate(true, $validateDate);
+            $valid = $policy->isPolicyPaidToDate($validateDate);
             $lines[] = sprintf('%spaid to date', $valid ? '' : 'NOT ');
             if (!$valid) {
                 $lines[] = $this->failurePaymentMessage($policy, $prefix, $validateDate);
