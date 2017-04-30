@@ -913,7 +913,7 @@ abstract class Policy
         return $date;
     }
 
-    public function getNextBillingDate($date)
+    public function getNextBillingDate($date, $filtered = true)
     {
         $nextDate = new \DateTime();
         $nextDate->setTime(0, 0);
@@ -921,6 +921,11 @@ abstract class Policy
             $nextDate->setDate($date->format('Y'), $date->format('m'), $this->getStart()->format('d'));
             if ($nextDate < $date) {
                 $nextDate->add(new \DateInterval('P1M'));
+            }
+
+            // To allow billing on same date every month, 28th is max allowable day on month
+            if ($filtered && $nextDate->format('d') > 28) {
+                $nextDate->sub(new \DateInterval(sprintf('P%dD', $nextDate->format('d') - 28)));
             }
         } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $nextDate->setDate($date->format('Y'), $this->getStart()->format('m'), $this->getStart()->format('d'));

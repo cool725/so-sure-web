@@ -275,7 +275,9 @@ class SalvaPhonePolicy extends PhonePolicy
             if ($this->isRefundAllowed()) {
                 $endDate = clone $this->getEnd();
             } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-                $endDate = $this->getNextBillingDate(clone $this->getEnd());
+                // TODO: Not sure how filtered will affect salva days in policy
+                // should investigate....
+                $endDate = $this->getNextBillingDate(clone $this->getEnd(), false);
             }
         }
 
