@@ -151,7 +151,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     continue;
                 }
                 $warnClaim = false;
-                if ($policy->isPolicyPaidToDate(true, $validateDate) === false) {
+                if ($policy->isPolicyPaidToDate($validateDate) === false) {
                     $this->header($policy, $policies, $lines);
                     $warnClaim = true;
                     $lines[] = "Not Paid To Date";
