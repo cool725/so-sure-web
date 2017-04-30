@@ -2425,7 +2425,6 @@ class PhonePolicyTest extends WebTestCase
         $payment->setDate(new \DateTime('2016-04-15'));
         $policy->addPayment($payment);
 
-        print PHP_EOL;
         // we don't actually check when payment arrives, just that its there...
         $this->assertTrue($policy->isPolicyPaidToDate(true, new \DateTime('2016-04-15 00:01')));
         $this->assertFalse($policy->isPolicyPaidToDate(true, new \DateTime('2016-05-01 00:01')));
