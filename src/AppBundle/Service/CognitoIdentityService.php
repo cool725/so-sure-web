@@ -21,25 +21,31 @@ class CognitoIdentityService
     /** @var string */
     protected $identityPoolId;
 
+    /** @var string */
+    protected $environment;
+
     /**
      * @param LoggerInterface $logger
      * @param DocumentManager $dm
      * @param                 $cognito
      * @param string          $developerLogin
      * @param string          $identityPoolId
+     * @param string          $environment
      */
     public function __construct(
         LoggerInterface $logger,
         DocumentManager $dm,
         $cognito,
         $developerLogin,
-        $identityPoolId
+        $identityPoolId,
+        $environment
     ) {
         $this->logger = $logger;
         $this->dm = $dm;
         $this->cognito = $cognito;
         $this->developerLogin = $developerLogin;
         $this->identityPoolId = $identityPoolId;
+        $this->environment = $environment;
     }
 
     /**
@@ -60,9 +66,14 @@ class CognitoIdentityService
         if ($cognitoIdentityId) {
             $devIdentity['IdentityId'] = $cognitoIdentityId;
         }
-        $result = $this->cognito->getOpenIdTokenForDeveloperIdentity($devIdentity);
-        $identityId = $result->get('IdentityId');
-        $token = $result->get('Token');
+        if ($this->environment != "test") {
+            $result = $this->cognito->getOpenIdTokenForDeveloperIdentity($devIdentity);
+            $identityId = $result->get('IdentityId');
+            $token = $result->get('Token');
+        } else {
+            $identityId = $user->getId();
+            $token = $user->getId();
+        }
         $this->logger->debug(sprintf('Found Cognito Identity %s', $identityId));
         if (!$identityId || !$token) {
             $this->logger->error(sprintf(

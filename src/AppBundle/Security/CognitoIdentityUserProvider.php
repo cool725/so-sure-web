@@ -36,6 +36,9 @@ class CognitoIdentityUserProvider implements UserProviderInterface
     /** @var FacebookService */
     protected $fb;
 
+    /** @var string */
+    protected $environment;
+
     /**
      */
     public function __construct(
@@ -45,7 +48,8 @@ class CognitoIdentityUserProvider implements UserProviderInterface
         $developerLogin,
         $identityPoolId,
         LoggerInterface $logger,
-        FacebookService $fb
+        FacebookService $fb,
+        $environment
     ) {
         $this->userManager = $userManager;
         $this->dm = $dm;
@@ -54,9 +58,9 @@ class CognitoIdentityUserProvider implements UserProviderInterface
         $this->identityPoolId = $identityPoolId;
         $this->logger = $logger;
         $this->fb = $fb;
+        $this->environment = $environment;
     }
 
-    
     /**
      * @param string $cognitoIdentityId
      *
@@ -70,6 +74,9 @@ class CognitoIdentityUserProvider implements UserProviderInterface
 
         try {
             $repo = $this->dm->getRepository(User::class);
+            if ($this->environment == "test") {
+                return $repo->find($cognitoIdentityId);
+            }
             $identities = $this->cognito->describeIdentity([
                 'IdentityId' => $cognitoIdentityId
             ]);
