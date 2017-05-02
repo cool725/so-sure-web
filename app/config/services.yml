@@ -19,6 +19,7 @@ services:
             identityPoolId: "%aws_cognito_identitypoolid%"
             logger:         "@logger"
             facebook:       "@app.facebook"
+            environment:    "%kernel.environment%"
 
     app.user.cognitoidentity.authenticator:
         class: AppBundle\Security\CognitoIdentityAuthenticator
@@ -177,6 +178,7 @@ services:
             coginto:        "@aws.cognito"
             developerLogin: "%cognito_developer_login%"
             identityPoolId: "%aws_cognito_identitypoolid%"
+            environment:    "%kernel.environment%"
 
     base.imei:
         abstract: true
