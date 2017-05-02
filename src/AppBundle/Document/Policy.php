@@ -362,11 +362,39 @@ abstract class Policy
     }
 
     /**
+     * Failed Payments
+     */
+    public function getFailedPayments()
+    {
+        $payments = $this->getPayments();
+        if (is_object($payments)) {
+            $payments = $payments->toArray();
+        }
+        if (!$this->getPayments()) {
+            return [];
+        }
+
+        return array_filter($payments, function ($payment) {
+            return !$payment->isSuccess();
+        });
+    }
+
+    /**
      * Payments filtered by credits (pos amount)
      */
     public function getSuccessfulPaymentCredits()
     {
         return array_filter($this->getSuccessfulPayments(), function ($payment) {
+            return $payment->getAmount() > 0 && !$payment instanceof SoSurePayment;
+        });
+    }
+
+    /**
+     * Payments filtered by credits (pos amount)
+     */
+    public function getFailedPaymentCredits()
+    {
+        return array_filter($this->getFailedPayments(), function ($payment) {
             return $payment->getAmount() > 0 && !$payment instanceof SoSurePayment;
         });
     }
