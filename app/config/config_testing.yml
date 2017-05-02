@@ -1,0 +1,87 @@
+imports:
+    - { resource: config.yml }
+
+framework:
+    # 10.* required for the elb load balancing health check
+    trusted_hosts: ['testing.wearesosure.com', '10\.\d+\.\d+\.\d+']
+#    validation:
+#        cache: validator.mapping.cache.apc
+#    serializer:
+#        cache: serializer.mapping.cache.apc
+
+#doctrine:
+#    orm:
+#        metadata_cache_driver: apc
+#        result_cache_driver: apc
+#        query_cache_driver: apc
+framework:
+    session:
+        cookie_secure: true
+
+scheb_two_factor:
+    trusted_computer:
+        cookie_secure: true           # Set the 'Secure' (HTTPS Only) flag on the trusted_computer cookie
+
+monolog:
+    channels: ['receperio']
+    handlers:
+        rollbar:
+            id: "app.logger.rollbar"
+            formatter: "app.logger.lineformatter"
+            type: rollbar
+            level: warning
+            channels: ['!event']
+        salva:
+            type:   stream
+            path:   "%kernel.logs_dir%/salva.log"
+            level:  info
+            channels: ["salva"]            
+        davies:
+            type:   stream
+            path:   "%kernel.logs_dir%/davies.log"
+            level:  info
+            channels: ["davies"]            
+        receperio:
+            type:   stream
+            path:   "%kernel.logs_dir%/receperio.log"
+            level:  info
+            channels: ["receperio"]            
+        main:
+            type:   stream
+            path:   "%kernel.logs_dir%/%kernel.environment%.log"
+            level:  info
+            channels: ["!event"]
+        console:
+            type:  console
+
+swiftmailer:
+    default_mailer: default
+    mailers:
+        default:
+            delivery_address: "tech+envmail@so-sure.com"
+
+staffim_rollbar:
+    # Rollbar access token
+    access_token: %rollbar_access_token%
+    # PHP error level (see http://php.net/manual/en/function.error-reporting.php)
+    error_level: -1
+    # Values from scrub.parameters are replaced by the key for specified exceptions
+    scrub:
+        exceptions:
+            - PDOException
+        parameters:
+            key: unknown
+
+services:
+    staging.apierror:
+        class:   AppBundle\Listener\ApiResponseSubscriber
+        arguments:
+            redis: "@snc_redis.default"
+        tags:
+            - {name:kernel.event_subscriber}
+
+nelmio_security:
+    # forced HTTPS handling, don't combine with flexible mode
+    forced_ssl:
+        hsts_max_age: 3600 # 30 days
+        hsts_subdomains: true
