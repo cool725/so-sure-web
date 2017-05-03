@@ -31,6 +31,18 @@ class LloydsService
     {
         $filename = $lloydsFile->getFile();
 
+        $data = $this->processActualCsv($filename);
+
+        $lloydsFile->addMetadata('total', $data['total']);
+        $lloydsFile->setDate($data['date']);
+        $lloydsFile->setDailyReceived($data['dailyReceived']);
+        $lloydsFile->setDailyProcessing($data['dailyProcessing']);
+
+        return $data;
+    }
+
+    public function processActualCsv($filename)
+    {
         $header = null;
         $lines = array();
         $dailyReceived = array();
@@ -62,19 +74,27 @@ class LloydsService
                     }
 
                     $processedDates = explode('8008566', $line['Transaction Description']);
-                    // Expected something like MDIR  8008566SEP21 8008566
-                    if (stripos($line['Transaction Description'], 'MDIR') === false ||
+
+                    // For now incoming payments appear to be FPI.
+                    // May need to base detection of just MDIR in description in the future though
+                    if (in_array($line['Transaction Type'], ['FPI'])) {
+                        // Incoming faster payments
+                        // 28/04/2017,FPI,'30-65-41,36346160,XXX...XXX ,,425.53,2733.96
+                        $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
+                    } elseif (stripos($line['Transaction Description'], 'MDIR') === false ||
                         count($processedDates) < 2) {
                         $this->logger->warning(sprintf(
                             'Skipping line as unable to parse description. %s',
                             implode($line)
                         ));
                         continue;
+                    } else {
+                        // Standard incoming from barclays
+                        // 13/04/2017,BGC,'30-65-41,36346160,MDIR  8008566APR11 8008566 ,,32.37,1219.18
+                        $processedDate = new \DateTime($processedDates[1]);
                     }
 
                     $this->logger->info(sprintf('Processing line. %s', implode($line)));
-                    // e.g. SEP21
-                    $processedDate = new \DateTime($processedDates[1]);
 
                     // In the case where we're in Jan processing for Dec of previous year, as the above
                     // doesn't have a year it will assume Dec of current year (e.g. in the future)
@@ -116,11 +136,6 @@ class LloydsService
             'dailyReceived' => $dailyReceived,
             'dailyProcessing' => $dailyProcessing,
         ];
-
-        $lloydsFile->addMetadata('total', $data['total']);
-        $lloydsFile->setDate($data['date']);
-        $lloydsFile->setDailyReceived($data['dailyReceived']);
-        $lloydsFile->setDailyProcessing($data['dailyProcessing']);
 
         return $data;
     }
