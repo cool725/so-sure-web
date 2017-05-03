@@ -279,6 +279,15 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/mobile-phone-insurance-for-your-company", name="mobile_phone_insurance_for_your_company")
+     * @Template
+     */
+    public function mobileInsuranceForYourCompany()
+    {
+        return [];
+    }
+
+    /**
      * @Route("/register", name="register")
      * @Template
      */
