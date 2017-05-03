@@ -15,8 +15,6 @@
 	color: $color;
 	background-color: $background;
 
-	// @extend .btn-so-sure;
-
 	&:hover, &:focus {
 		background-color: darken($background, 15%);
 		transition: all 0.3s ease;

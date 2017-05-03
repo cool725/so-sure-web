@@ -1,0 +1,64 @@
+// _buttons.scss
+
+.btn {
+	@include border-radius(4px);
+	border-width: 1px;
+
+	&:hover {
+		transition: all 0.3s ease;
+		cursor: pointer;
+	}
+
+	&:focus, &:active {
+		cursor: pointer;
+		outline: none !important;
+		transition: all 0.3s ease;
+		box-shadow: none;
+	}
+}
+
+@mixin btn($background-color, $color, $color2) {
+	background-color: $background-color;
+	color: $color;
+
+	&:hover, &:focus {
+		background-color: darken($background-color, 15%);
+		color: $color;
+	}
+
+	&:active {
+		background-color: darken($background-color, 25%);
+		color: $color2;
+	}
+
+	&-hollow {
+		background-color: transparent;
+		border-color: $background-color;
+		color: $background-color;
+
+		&:hover, &:focus {
+			background-color: darken($background-color, 15%);
+			border-color: darken($background-color, 15%);
+			color: $color2;
+		}
+
+		&:active {
+			background-color: darken($background-color, 25%);
+			border-color: darken($background-color, 25%);
+			color: $color2;
+		}
+	}
+
+}
+// End Mixin
+
+.btn-blue {
+	@include btn($primary-blue, $white, $white);
+}
+
+.btn-grey {
+	@include btn($pale-grey, $dark-grey, $white);
+}
+
+
+
