@@ -78,9 +78,13 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Approved Claims [KPI: 36]</td>
+                            <td>Approved Claims [KPI: 36]
+                                    <span class="badge" title="Days delayed - requires input by davies so may be missed">-3 (approx)</span>
+                            </td>
                             {% for week in weeks %}
-                                <td>{{ week.period['approvedClaims']['total'] }}</td>
+                                <td>{{ week.period['approvedClaims']['total'] }}
+                                    <i class="fa fa-clock-o" title="Value is delayed"></i>
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
@@ -138,15 +142,25 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Apple App Installs [KPI: 192]</td>
+                            <td>Apple App Installs [KPI: 192]
+                                    <span class="badge" title="Days delayed">-4</span>
+                            </td>
                             {% for week in weeks %}
-                                <td>{{ week['install-apple'] }}</td>
+                                <td>
+                                    {{ week['install-apple'] }}
+                                    <i class="fa fa-clock-o" title="Value is delayed"></i>
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Google App Installs [KPI: 193]</td>
+                            <td>Google App Installs [KPI: 193]
+                                    <span class="badge" title="Days delayed">-4</span>
+                            </td>
                             {% for week in weeks %}
-                                <td>{{ week['install-google'] }}</td>
+                                <td>
+                                    {{ week['install-google'] }}
+                                    <i class="fa fa-clock-o" title="Value is delayed"></i>
+                                </td>
                             {% endfor %}
                         </tr>
                     </tbody>
