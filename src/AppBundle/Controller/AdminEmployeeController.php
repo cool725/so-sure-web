@@ -1143,9 +1143,18 @@ class AdminEmployeeController extends BaseController
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(PhonePolicy::class);
         $statsRepo = $dm->getRepository(Stats::class);
-        
+
         $date = new \DateTime('2016-09-12');
         $now = new \DateTime();
+        // TODO: Be smarter with start date, but this at least drops number of queries down significantly
+        while ($date < $now) {
+            $end = clone $date;
+            $end->add(new \DateInterval('P6D'));
+            $end = $this->endOfDay($end);
+            $date = $date->add(new \DateInterval('P7D'));
+        }
+        $date = $date->sub(new \DateInterval('P21D'));
+
         $count = 1;
         while ($date < $now) {
             $end = clone $date;
@@ -1163,6 +1172,8 @@ class AdminEmployeeController extends BaseController
             $week['period'] = $reporting->report($start, $end, true);
             $week['total'] = $reporting->report(new \DateTime(SoSure::POLICY_START), $end, true);
 
+            $approved = $week['total']['approvedClaims']['approved'];
+            $week['freq-claims'] = $approved / $week['total']['data']['totalPolicies'];
             $week['total-policies'] = $policyRepo->countAllActivePolicies($date);
             $stats = $statsRepo->getStatsByRange($start, $date);
             foreach ($stats as $stat) {
