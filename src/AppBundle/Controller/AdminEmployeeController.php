@@ -1172,7 +1172,8 @@ class AdminEmployeeController extends BaseController
             $week['period'] = $reporting->report($start, $end, true);
             $week['total'] = $reporting->report(new \DateTime(SoSure::POLICY_START), $end, true);
 
-            $approved = $week['total']['approvedClaims']['approved'];
+            $approved = $week['total']['approvedClaims'][Claim::STATUS_APPROVED] +
+                $week['total']['approvedClaims'][Claim::STATUS_SETTLED];
             $week['freq-claims'] = $approved / $week['total']['data']['totalPolicies'];
             $week['total-policies'] = $policyRepo->countAllActivePolicies($date);
             $stats = $statsRepo->getStatsByRange($start, $date);
