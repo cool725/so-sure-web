@@ -10,12 +10,13 @@
 // Common
 @import "common/variables";
 @import "common/palette";
+@import "common/paletteNew";
 
 @import "common/type";
 @import "common/global";
 
 // Components
-@import "components/buttons";
+@import "components/buttonsNew";
 @import "components/modal";
 @import "components/banners";
 @import "components/visual";
@@ -25,7 +26,6 @@
 @import "components/tables";
 @import "components/panels";
 @import "components/alerts";
-
 
 // Layouts
 @import "layout/footer";
