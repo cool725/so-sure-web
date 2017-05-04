@@ -15,6 +15,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\RewardConnection;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -41,6 +42,7 @@ use AppBundle\Exception\RateLimitException;
 class PolicyService
 {
     use CurrencyTrait;
+    use DateTrait;
 
     const S3_BUCKET = 'policy.so-sure.com';
     const KEY_POLICY_QUEUE = 'policy:queue';
@@ -633,6 +635,19 @@ class PolicyService
 
         // Flush the manager, so we only will have the scheduled payments in the changeset in case we need to clear it
         $this->dm->flush();
+
+        // Ensure that billing dates are updated
+        foreach($policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED) as $scheduledPayment) {
+            if ($scheduledPayment->hasCorrectBillingDay() === false) {
+                $adjustedScheduledDay = $this->setDayOfMonth($scheduledPayment->getScheduled(), $policy->getBillingDay());
+                $scheduledPayment->setScheduled($adjustedScheduledDay);
+            }        
+        }
+        if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
+            $this->dm->flush();
+            return null;
+        }
+
         $scheduledPayments = [];
         // Try cancellating scheduled payments until amount matches
         while (!$policy->arePolicyScheduledPaymentsCorrect($prefix, $date) &&

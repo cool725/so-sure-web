@@ -47,6 +47,8 @@ use AppBundle\Document\File\BarclaysFile;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\Form\Cancel;
+use AppBundle\Document\Form\BillingDay;
+use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\ClaimType;
@@ -366,6 +368,11 @@ class AdminEmployeeController extends BaseController
             ->createNamedBuilder('usertoken_form')
             ->add('regenerate', SubmitType::class)
             ->getForm();
+        $billing = new BillingDay();
+        $billing->setPolicy($policy);
+        $billingForm = $this->get('form.factory')
+            ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -570,6 +577,18 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('billing_form')) {
+                $billingForm->handleRequest($request);
+                if ($billingForm->isValid()) {
+                    $policyService->adjustScheduledPayments($policy);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Updated billing date'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -589,6 +608,7 @@ class AdminEmployeeController extends BaseController
             'connect_form' => $connectForm->createView(),
             'imei_upload_form' => $imeiUploadForm->createView(),
             'usertoken_form' => $userTokenForm->createView(),
+            'billing_form' => $billingForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

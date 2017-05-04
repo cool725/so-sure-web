@@ -199,6 +199,13 @@ abstract class Policy
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
+    protected $billing;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $end;
 
     /**
@@ -484,6 +491,25 @@ abstract class Policy
     public function setStart(\DateTime $start)
     {
         $this->start = $start;
+    }
+
+    public function getBilling()
+    {
+        if ($this->billing) {
+            return $this->billing;
+        } else {
+            return $this->getStartForBilling();
+        }
+    }
+
+    public function getBillingDay()
+    {
+        return $this->getBilling()->format('j');
+    }
+
+    public function setBilling(\DateTime $billing)
+    {
+        $this->billing = $billing;
     }
 
     public function getEnd()
@@ -933,23 +959,12 @@ abstract class Policy
         $this->id = $id;
     }
 
-    public function getExpectedBillingDate()
-    {
-        // TODO: consolidate with PolicyService::generateScheduledPayments
-        $date = clone $this->getStart();
-
-        // To allow billing on same date every month, 28th is max allowable day on month
-        $date = $this->adjustDayForBilling($date);
-
-        return $date;
-    }
-
     public function getNextBillingDate($date, $filtered = true)
     {
         $nextDate = new \DateTime();
         $this->clearTime($nextDate);
         if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-            $nextDate->setDate($date->format('Y'), $date->format('m'), $this->getStart()->format('d'));
+            $nextDate->setDate($date->format('Y'), $date->format('m'), $this->getBilling()->format('d'));
             if ($nextDate < $date) {
                 $nextDate->add(new \DateInterval('P1M'));
             }
@@ -1005,6 +1020,7 @@ abstract class Policy
         $startDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
 
         $this->setStart($startDate);
+        $this->setBilling($this->getStartForBilling());
         $nextYear = clone $this->getStart();
         // This is same date/time but add 1 to the year
         $nextYear = $nextYear->modify('+1 year');
@@ -1656,7 +1672,7 @@ abstract class Policy
         }
 
         $billingDate = $this->getNextBillingDate($date);
-        $maxCount = $this->dateDiffMonths($billingDate, $this->getStart());
+        $maxCount = $this->dateDiffMonths($billingDate, $this->getBilling());
 
         // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
         while ($this->getOutstandingPremiumToDate($billingDate) > 0 && !$this->areEqualToTwoDp(
@@ -2060,10 +2076,10 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $expectedPaid = $this->getPremiumInstallmentPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-            $months = $this->dateDiffMonths($date, $this->getStartForBilling());
+            $months = $this->dateDiffMonths($date, $this->getBilling());
             // print PHP_EOL;
             // print $date->format(\DateTime::ATOM) . PHP_EOL;
-            // print $this->getStartForBilling()->format(\DateTime::ATOM) . PHP_EOL;
+            // print $this->getBilling()->format(\DateTime::ATOM) . PHP_EOL;
             // print $months . PHP_EOL;
             $expectedPaid = $this->getPremiumInstallmentPrice() * $months;
         } else {
@@ -2147,8 +2163,15 @@ abstract class Policy
     public function arePolicyScheduledPaymentsCorrect($prefix = null, \DateTime $date = null)
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
-        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
 
+        // All Scheduled day must match the billing day
+        foreach ($scheduledPayments as $scheduledPayment) {
+            if ($scheduledPayment->hasCorrectBillingDay() === false) {
+                return false;
+            }
+        }
+
+        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
         $outstanding = $this->getYearlyPremiumPrice() - $this->getTotalSuccessfulPayments($date);
         //print sprintf("%f ?= %f\n", $outstanding, $totalScheduledPayments);
 
