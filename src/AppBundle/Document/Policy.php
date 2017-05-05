@@ -2155,6 +2155,22 @@ abstract class Policy
         return $this->areEqualToTwoDp($outstanding, $totalScheduledPayments);
     }
 
+    public function getSupportWarnings()
+    {
+        $warnings = ['Ensure DPA is validated (Intercom - DPA message). If cancellation requested, and DPA not validated, referrer to Dylan for retention.'];
+        if ($this->hasOpenClaim(true)) {
+            $warnings[] = sprintf('Policy has an open claim. Check & Notify Davies prior to cancellation (do not cancel if phone was shipped).');
+        }
+        if ($this->hasMonetaryClaimed()) {
+            $warnings[] = sprintf('Policy has had a sucessful claim. Do NOT allow cancellation.');
+        }
+        if ($this->hasSuspectedFraudulentClaim()) {
+            $warnings[] = sprintf('Policy has had a suspected fraudulent claim. Do NOT allow policy upgrade.');
+        }
+
+        return $warnings;
+    }
+
     public function getClaimsWarnings()
     {
         $warnings = [];
