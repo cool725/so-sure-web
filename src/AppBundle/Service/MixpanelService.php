@@ -218,7 +218,7 @@ class MixpanelService
         $time = new \DateTime();
         $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
         $query = [
-            'where' => sprintf('datetime(%s) > user["$last_seen"]', $time->format('U')),
+            'where' => sprintf('datetime(%s) > user["$last_seen"] or not defined (user["$last_seen"])', $time->format('U')),
         ];
         $data = $this->mixpanelData->data('engage', $query);
         $count = 0;
