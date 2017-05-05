@@ -2157,9 +2157,13 @@ abstract class Policy
 
     public function getSupportWarnings()
     {
+        // @codingStandardsIgnoreStart
         $warnings = ['Ensure DPA is validated (Intercom - DPA message). If cancellation requested, and DPA not validated, referrer to Dylan for retention.'];
+        // @codingStandardsIgnoreEnd
         if ($this->hasOpenClaim(true)) {
+            // @codingStandardsIgnoreStart
             $warnings[] = sprintf('Policy has an open claim. Check & Notify Davies prior to cancellation (do not cancel if phone was shipped).');
+            // @codingStandardsIgnoreEnd
         }
         if ($this->hasMonetaryClaimed()) {
             $warnings[] = sprintf('Policy has had a sucessful claim. Do NOT allow cancellation.');
