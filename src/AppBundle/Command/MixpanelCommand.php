@@ -96,7 +96,7 @@ class MixpanelCommand extends ContainerAwareCommand
             if (!$id) {
                 throw new \Exception('email or id is required');
             }
-            $results = $this->getMixpanel()->delete($id);
+            $results = $this->getMixpanel()->queueDelete($id);
             $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
         } elseif ($action == 'clear') {
             $this->getMixpanel()->clearQueue();
@@ -108,8 +108,8 @@ class MixpanelCommand extends ContainerAwareCommand
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
             }
         } else {
-            $count = $this->getMixpanel()->process($process);
-            $output->writeln(sprintf("Sent %s updates", $count));
+            $data = $this->getMixpanel()->process($process);
+            $output->writeln(sprintf("Processed %d Requeued: %d", $data['processed'], $data['requeued']));
         }
     }
     
