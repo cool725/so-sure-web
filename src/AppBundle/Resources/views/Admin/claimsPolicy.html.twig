@@ -28,8 +28,19 @@
 <div class="container"{% if policy.isEnded %}style="background-color: #F2DEDE; opacity: 0.7"{% endif %}>
     <h2>so-sure Admin - <a href="{{ path('admin_user', {'id': policy.user.id}) }}">{{policy.user.name }}</a> {% if policy.isEnded %} - {{ policy.status|upper }} POLICY{% endif %}</h2>
   {% if not policy.isEnded %}
+        <div class="row">
+    <div class="bg-warning col-md-6" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+        <h3 class="text-center">SUPPORT</h3>
+        <ul>
+            {% for warning in policy.supportWarnings %}
+                <li style="list-style: none">
+                    <i class="fa fa-warning"></i>  {{ warning }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
     {% if policy.claimsWarnings|length > 0 %}
-    <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+    <div class="bg-warning col-md-6" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <h3 class="text-center">Claims Warnings</h3>
         <ul>
             {% for warning in policy.claimsWarnings %}
@@ -39,7 +50,8 @@
             {% endfor %}
         </ul>
     </div>
-    {% endif %}
+{% endif %}
+        </div>
     <div class="bg-danger text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <div class="row">
             <div class="col-md-12 text-center">
