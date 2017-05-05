@@ -1174,7 +1174,8 @@ class AdminEmployeeController extends BaseController
 
             $approved = $week['total']['approvedClaims'][Claim::STATUS_APPROVED] +
                 $week['total']['approvedClaims'][Claim::STATUS_SETTLED];
-            $week['freq-claims'] = $approved / $week['total']['data']['totalPolicies'];
+            $total = $week['total']['data']['newPolicies'] - $week['total']['data']['endingEndingPolicies'];
+            $week['freq-claims'] = $approved / $total;
             $week['total-policies'] = $policyRepo->countAllActivePolicies($date);
             $stats = $statsRepo->getStatsByRange($start, $date);
             foreach ($stats as $stat) {
