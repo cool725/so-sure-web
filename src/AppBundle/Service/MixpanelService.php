@@ -210,6 +210,26 @@ class MixpanelService
         return $data;
     }
 
+    public function deleteOldUsers($days = null)
+    {
+        if (!$days) {
+            $days = 28;
+        }
+        $time = new \DateTime();
+        $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
+        $query = [
+            'where' => sprintf('datetime(%s) > user["$last_seen"]', $time->format('U')),
+        ];
+        $data = $this->mixpanelData->data('engage', $query);
+        $count = 0;
+        foreach ($data['results'] as $user) {
+            $this->queueDelete($user['$distinct_id'], 0);
+            $count++;
+        }
+
+        return ['count' => $count, 'total' => $data['total']];
+    }
+
     public function stats($start, $end)
     {
         $stats = [];
@@ -677,10 +697,15 @@ class MixpanelService
         }
     }
 
-    public function queueDelete($userId)
+    public function queueDelete($userId, $delayMinutes = null)
     {
+        if ($delayMinutes === null) {
+            $delayMinutes = 2;
+        }
         $processTime = new \DateTime();
-        $processTime = $processTime->add(new \DateInterval('PT2M'));
+        if ($delayMinutes > 0) {
+            $processTime = $processTime->add(new \DateInterval(sprintf('PT%dM', $delayMinutes)));
+        }
         $this->queue(self::QUEUE_DELETE, $userId, ['processTime' => $processTime->format('U')]);
     }
 
