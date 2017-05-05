@@ -23,6 +23,7 @@ class MixpanelService
     const QUEUE_TRACK = 'track';
     const QUEUE_ALIAS = 'alias';
     const QUEUE_ATTRIBUTION = 'attribution';
+    const QUEUE_DELETE = 'delete';
 
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
@@ -255,19 +256,29 @@ class MixpanelService
     
     public function process($max)
     {
-        $count = 0;
-        while ($count < $max) {
+        $requeued = 0;
+        $processed = 0;
+        while ($processed + $requeued < $max) {
             $user = null;
             $data = null;
             try {
                 $queueItem = $this->redis->lpop(self::KEY_MIXPANEL_QUEUE);
                 if (!$queueItem) {
-                    return $count;
+                    break;
                 }
                 $data = unserialize($queueItem);
 
                 if (isset($data['action'])) {
                     $action = $data['action'];
+                }
+
+                // Requeue anything not yet ready to process
+                $now = new \DateTime();
+                if (isset($data['properties']) && isset($data['properties']['processTime'])
+                    && $data['properties']['processTime'] > $now->format('U')) {
+                    $requeued++;
+                    $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
+                    continue;
                 }
 
                 if ($action == self::QUEUE_PERSON_PROPERTIES) {
@@ -314,10 +325,16 @@ class MixpanelService
                     }
 
                     $this->attribution($data['userId']);
+                } elseif ($action == self::QUEUE_DELETE) {
+                    if (!isset($data['userId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->delete($data['userId']);
                 } else {
                     throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
-                $count = $count + 1;
+                $processed++;
             } catch (\InvalidArgumentException $e) {
                 $this->logger->error(sprintf(
                     'Error processing Mixpanel queue message %s. Ex: %s',
@@ -338,7 +355,7 @@ class MixpanelService
             }
         }
 
-        return $count;
+        return ['processed' => $processed, 'requeued' => $requeued];
     }
 
     public function queueAttribution(User $user)
@@ -658,6 +675,13 @@ class MixpanelService
                 $trackingId
             ));
         }
+    }
+
+    public function queueDelete($userId)
+    {
+        $processTime = new \DateTime();
+        $processTime = $processTime->add(new \DateInterval('PT2M'));
+        $this->queue(self::QUEUE_DELETE, $userId, ['processTime' => $processTime->format('U')]);
     }
 
     public function delete($id)

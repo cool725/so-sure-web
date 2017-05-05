@@ -168,7 +168,7 @@ class ApiExternalController extends BaseController
                     'Mixpanel delete %s',
                     $user['$distinct_id']
                 ));
-                $mixpanel->delete($user['$distinct_id']);
+                $mixpanel->queueDelete($user['$distinct_id']);
             }
 
             return new JsonResponse([]);
