@@ -226,7 +226,7 @@ class MixpanelService
         $data = $this->mixpanelData->data('engage', $query);
         $count = 0;
         foreach ($data['results'] as $user) {
-            $this->queueDelete($user['$distinct_id']);
+            $this->queueDelete($user['$distinct_id'], 0);
             $count++;
         }
 
