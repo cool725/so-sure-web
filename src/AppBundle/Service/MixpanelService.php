@@ -213,7 +213,7 @@ class MixpanelService
     public function deleteOldUsers($days = null)
     {
         if (!$days) {
-            $days = 28;
+            $days = 90;
         }
         $time = new \DateTime();
         $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
@@ -223,7 +223,7 @@ class MixpanelService
         $data = $this->mixpanelData->data('engage', $query);
         $count = 0;
         foreach ($data['results'] as $user) {
-            $this->queueDelete($user['$distinct_id'], 0);
+            $this->queueDelete($user['$distinct_id']);
             $count++;
         }
 
