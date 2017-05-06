@@ -89,6 +89,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     if ($policyService->adjustScheduledPayments($policy)) {
                         $lines[] = "Successfully adjusted the scheduled payments";
                     } else {
+                        $policy = $this->dm->merge($policy);
                         $lines[] = "Failed to adjust the scheduled payments";
                     }
                 } else {

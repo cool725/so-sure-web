@@ -219,7 +219,10 @@ class JudopayService
         } else {
             // Existing policy - add payment + prevent duplicate billing
             $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $source, $deviceDna, $date);
-            $this->policyService->adjustScheduledPayments($policy, $date);
+            if (!$this->policyService->adjustScheduledPayments($policy, $date)) {
+                // Reload object from db
+                $policy = $this->dm->merge($policy);
+            }
 
             $this->validatePolicyStatus($policy, $date);
             $this->dm->flush();
@@ -614,12 +617,14 @@ class JudopayService
         // if payment fails at exactly same second as payment is due, technically policy is still paid to date
         // this is problematic if setting the policy state to unpaid prior to calling this method
         $isPaidToDate = $policy->isPolicyPaidToDate($date);
-
+        // print sprintf('%s paid: %s', $policy->getStatus(), $isPaidToDate ? 'yes' : 'no') . PHP_EOL;
         // update status if it makes sense to
         if ($isPaidToDate &&
             in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])
         ) {
             $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+            // print 'status -> active' . PHP_EOL;
+            // \Doctrine\Common\Util\Debug::dump($policy);
         } elseif (!$isPaidToDate) {
             $this->logger->error(sprintf('Policy %s is not paid to date', $policy->getPolicyNumber()));
 
