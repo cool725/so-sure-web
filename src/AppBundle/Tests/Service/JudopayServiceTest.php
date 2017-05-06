@@ -237,6 +237,47 @@ class JudopayServiceTest extends WebTestCase
         $this->assertGreaterThan(5, strlen($updatedPolicy->getPolicyNumber()));
     }
 
+    public function testJudoAdditionalUnexpectedPayment()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoAdditionalUnexpectedPayment', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        static::$policyService->setEnvironment('prod');
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
+        static::$policyService->setEnvironment('test');
+
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        static::$dm->flush();
+
+        $scheduledPayment = $policy->getScheduledPayments()[0];
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $scheduledPayment->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        static::$policyService->setEnvironment('prod');
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
+        static::$policyService->setEnvironment('test');
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy->getStatus());
+    }
+
     public function testJudoCommission()
     {
         $user = $this->createValidUser(static::generateEmail('judo-commission', $this));

@@ -623,6 +623,11 @@ class PolicyService
         ));
     }
 
+    /**
+     * If returns false, make sure to re-load policy
+     * $policy = $this->dm->merge($policy);
+     * TODO: Fix that
+     */
     public function adjustScheduledPayments(Policy $policy, \DateTime $date = null)
     {
         $log = [];
@@ -663,8 +668,6 @@ class PolicyService
             }
             // Avoid persisting any changes (shouldn't be as we just reset the cancellation)
             $this->dm->clear();
-            // Reload object from db
-            $policy = $this->dm->merge($policy);
             $this->logger->error(sprintf(
                 'For Policy %s, unable to adjust scheduled payments to meet expected payment amount',
                 $policy->getPolicyNumber()
