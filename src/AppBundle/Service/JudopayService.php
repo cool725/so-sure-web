@@ -1137,10 +1137,13 @@ class JudopayService
     }
 
     /**
+     * TODO: Change name
+     *
      * @param Policy    $policy
+     * @param double    $amount
      * @param \DateTime $date
      */
-    public function multiPolicy(Policy $policy, \DateTime $date = null)
+    public function multiPolicy(Policy $policy, $amount, \DateTime $date = null)
     {
         $this->statsd->startTiming("judopay.multipolicy");
 
@@ -1152,7 +1155,7 @@ class JudopayService
             $policy->setPayer($policy->getUser());
         }
 
-        $this->tokenPay($policy);
+        $this->tokenPay($policy, $amount);
 
         $this->policyService->create($policy, $date, true);
         $this->dm->flush();

@@ -648,6 +648,14 @@ class ApiAuthController extends BaseController
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
                 $judoData = $data['judo'];
+            } elseif (isset($data['existing'])) {
+                if (!$this->validateFields($data['existing'], ['amount'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+
+                $existingData = $data['existing'];
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
             $redis = $this->get('snc_redis.default');
@@ -692,7 +700,7 @@ class ApiAuthController extends BaseController
                     Payment::SOURCE_MOBILE,
                     $this->getDataString($judoData, 'device_dna')
                 );
-            } else {
+            } elseif ($existingData) {
                 if (!$policy->getUser()->hasValidPaymentMethod()) {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
@@ -703,11 +711,14 @@ class ApiAuthController extends BaseController
                 $paymentMethod = $policy->getUser()->getPaymentMethod();
                 if ($paymentMethod instanceof JudoPaymentMethod) {
                     $judo = $this->get('app.judopay');
-                    $judo->multiPolicy($policy);
+                    $judo->multiPolicy($policy, $existingData['amount']);
                 } else {
                     throw new ValidationException('Unsupport payment method');
                 }
+            } else {
+                throw new \Exception('Unknown payment method');
             }
+
             $this->get('statsd')->endTiming("api.payPolicy");
 
             return new JsonResponse($policy->toApiArray());

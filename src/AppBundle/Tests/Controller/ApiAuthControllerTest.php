@@ -1856,7 +1856,9 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['existing' => [
+            'amount' => '7.02'
+        ]]);
         $policyData2 = $this->verifyResponse(200);
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData2['status']);
         $this->assertEquals($data['id'], $policyData2['id']);

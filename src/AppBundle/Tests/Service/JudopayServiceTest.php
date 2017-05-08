@@ -790,7 +790,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertGreaterThan(5, strlen($updatedPolicy1->getPolicyNumber()));
 
         static::$policyService->setEnvironment('prod');
-        self::$judopay->multiPolicy($policy2);
+        self::$judopay->multiPolicy($policy2, $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         static::$policyService->setEnvironment('test');
 
         $repo = $dm->getRepository(Policy::class);
