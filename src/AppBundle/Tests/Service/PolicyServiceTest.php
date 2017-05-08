@@ -31,6 +31,8 @@ class PolicyServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
+    use \AppBundle\Document\DateTrait;
+
     protected static $container;
     protected static $policyService;
     protected static $dm;
@@ -512,6 +514,62 @@ class PolicyServiceTest extends WebTestCase
         // 1 scheduled payment should be cancelled to offset the additional payment received
         $this->assertTrue(self::$policyService->adjustScheduledPayments($policy));
         $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
+    }
+
+    public function testAdjustScheduledPaymentsLaterDate()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testAdjustScheduledPaymentsLaterDate', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-10-01'),
+            true
+        );
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-10-01'));
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $billingDate = $this->setDayOfMonth($policy->getBilling(), '28');
+        $policy->setBilling($billingDate);
+
+        $this->assertNull(self::$policyService->adjustScheduledPayments($policy));
+        $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
+        $this->assertEquals(11, count($scheduledPayments));
+        $this->assertEquals(28, $scheduledPayments[0]->getScheduledDay());
+    }
+
+    public function testAdjustScheduledPaymentsEarlierDate()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testAdjustScheduledPaymentsEarlierDate', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-10-28'),
+            true
+        );
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-10-28'));
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $billingDate = $this->setDayOfMonth($policy->getBilling(), '1');
+        $policy->setBilling($billingDate);
+
+        $this->assertNull(self::$policyService->adjustScheduledPayments($policy));
+        $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
+        $this->assertEquals(11, count($scheduledPayments));
+        $this->assertEquals(1, $scheduledPayments[0]->getScheduledDay());
     }
 
     public function testUnableToAdjustScheduledPayments()
