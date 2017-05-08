@@ -2,7 +2,6 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
-use DeviceAtlasCloudClient;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Document\PlayDevice;
@@ -49,8 +48,11 @@ class DeviceAtlasService
     public function getPhone(Request $request)
     {
         $userAgent = $request->headers->get('User-Agent');
+
+        return null;
+
         try {
-            $result = DeviceAtlasCloudClient::getDeviceData($userAgent);
+            // $result = DeviceAtlasCloudClient::getDeviceData($userAgent);
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
 
@@ -78,8 +80,10 @@ class DeviceAtlasService
     public function isMobile(Request $request)
     {
         $userAgent = $request->headers->get('User-Agent');
+
+        return null;
         try {
-            $result = DeviceAtlasCloudClient::getDeviceData($userAgent);
+            // $result = DeviceAtlasCloudClient::getDeviceData($userAgent);
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
 
