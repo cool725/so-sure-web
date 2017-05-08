@@ -37,6 +37,13 @@ class KernelListener
 
         $request  = $event->getRequest();
         $session = $request->getSession();
+
+        // honor utm_nooverride flag
+        $noOverride = $request->query->get('utm_nooverride');
+        if ($noOverride == "1") {
+            return;
+        }
+
         $source = $request->query->get('utm_source');
         $medium = $request->query->get('utm_medium');
         $campaign = $request->query->get('utm_campaign');
