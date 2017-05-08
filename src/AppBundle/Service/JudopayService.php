@@ -205,7 +205,8 @@ class JudopayService
             ));
         }
 
-        if (!$policy->getStatus() || $policy->getStatus() == PhonePolicy::STATUS_PENDING) {
+        if (!$policy->getStatus() ||
+            in_array($policy->getStatus(), [PhonePolicy::STATUS_PENDING, PhonePolicy::STATUS_MULTIPAY_REJECTED])) {
             // New policy
 
             // Mark policy as pending for monitoring purposes
