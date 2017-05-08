@@ -7,6 +7,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\JudoPayment;
@@ -1819,6 +1820,43 @@ class ApiAuthControllerTest extends BaseControllerTest
         $prefix = $policy->getPolicyPrefix($environment);
         $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect($prefix));
         $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
+    }
+
+    public function testNewPolicyMultipayDeclinedJudopayOk()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyMultipayDeclinedJudopayOk', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $repo = static::$dm->getRepository(PhonePolicy::class);
+        $policy = $repo->find($data['id']);
+        $policy->setStatus(PhonePolicy::STATUS_MULTIPAY_REJECTED);
+        static::$dm->flush();
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $receiptId = $judopay->testPay(
+            $user,
+            $data['id'],
+            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => '55779911',
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals($data['id'], $policyData['id']);
     }
 
     // policy/{id}/terms
