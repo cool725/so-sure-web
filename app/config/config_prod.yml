@@ -34,6 +34,10 @@ swiftmailer:
             encryption: "%sparkpost_mailer_encryption%"
             spool:      { type: service, id: snc_redis.swiftmailer.spool }
 
+assetic:
+    workers:
+        cache_busting: ~
+
 monolog:
     handlers:
         rollbar:

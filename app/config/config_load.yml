@@ -53,6 +53,10 @@ swiftmailer:
         default:
             delivery_address: "tech+envmail@so-sure.com"
 
+assetic:
+    workers:
+        cache_busting: ~
+
 staffim_rollbar:
     # Rollbar access token
     access_token: %rollbar_access_token%

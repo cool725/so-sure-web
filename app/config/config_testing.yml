@@ -22,6 +22,10 @@ scheb_two_factor:
     trusted_computer:
         cookie_secure: true           # Set the 'Secure' (HTTPS Only) flag on the trusted_computer cookie
 
+assetic:
+    workers:
+        cache_busting: ~
+
 monolog:
     channels: ['receperio']
     handlers:
