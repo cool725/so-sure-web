@@ -107,7 +107,7 @@ monolog:
     channels: ['receperio']
 
 assetic:
-    bundles:        [ AppBundle, FOSUserBundle ]
+    bundles:        [ AppBundle, FOSUserBundle, TwigBundle ]
     debug:          '%kernel.debug%'
     use_controller: '%kernel.debug%'
     filters:

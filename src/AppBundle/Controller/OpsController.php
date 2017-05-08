@@ -53,14 +53,6 @@ class OpsController extends BaseController
     }
 
     /**
-     * @Route("/error", name="ops_error")
-     */
-    public function errorAction()
-    {
-        return [];
-    }
-
-    /**
      * @Route("/exception", name="ops_exception")
      */
     public function exceptionAction()
