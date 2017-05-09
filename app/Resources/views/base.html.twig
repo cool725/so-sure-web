@@ -70,7 +70,11 @@
         {% endif %}
 
         {% block nav %}
-            {% include '::nav.html.twig' %}
+            {% if new_stylesheet is defined and new_stylesheet == 1 %}
+                {% include '::nav_new.html.twig' %}
+            {% else %}
+                {% include '::nav.html.twig' %}
+            {% endif %}
         {% endblock %}
 
         {% if app.session.isStarted %}

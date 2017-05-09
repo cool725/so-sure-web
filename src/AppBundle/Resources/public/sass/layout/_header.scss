@@ -11,8 +11,13 @@
 
 	&-light {
 		background: transparent no-repeat center top url("/images/logo/so-sure-logo-light.svg");
-		background-size: 130px;		
+		background-size: 130px;
 	}
+
+    &-blue-flat {
+        background: transparent no-repeat center top url("https://cdn.so-sure.com/images/logo/so-sure_so-sure-full-logo-blue-flat.svg");
+        background-size: 130px;
+    }
 }
 
 // Cookie Consent
@@ -25,7 +30,7 @@
     align-self: flex-start;
 }
 
-.cc-btn { 
+.cc-btn {
     margin-top: 5px;
 }
 
@@ -45,7 +50,7 @@
 
 @include breakpoint(tablet) {
 
-    .cc-btn { 
+    .cc-btn {
         margin-top: 0;
     }
 
