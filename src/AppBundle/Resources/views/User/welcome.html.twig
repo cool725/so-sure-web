@@ -66,7 +66,7 @@
                             {% if policy.user.paymentMethod.cardType is defined %}
                             <li>
                                 {% if policy.getPremiumPlan == 'monthly'%}
-                                    Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) will be billed &pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} every month on the {{ policy.expectedBillingDate|date('jS') }}.
+                                    Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) will be billed &pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} every month on the {{ policy.billing|date('jS') }}.
                                 {% elseif policy.getPremiumPlan == 'yearly' %}
                                     Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) was billed &pound;{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
                                 {% endif %}

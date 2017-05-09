@@ -1473,8 +1473,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('expire-policy', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
-        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
         $policy->setPremiumInstallments(12);
 
         $payment = new JudoPayment();

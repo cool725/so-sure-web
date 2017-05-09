@@ -122,6 +122,14 @@ trait DateTrait
         return $billingDate;
     }
 
+    public function setDayOfMonth($date, $day)
+    {
+        $adjustedDate = clone $date;
+        $adjustedDate->modify(sprintf('-%d day', $adjustedDate->format('j') - $day));
+
+        return $adjustedDate;
+    }
+
     public function clearTime($date)
     {
         return $date->setTime(0, 0);

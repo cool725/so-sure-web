@@ -126,6 +126,11 @@ class ScheduledPayment
         return $this->scheduled;
     }
 
+    public function getScheduledDay()
+    {
+        return $this->getScheduled()->format('j');
+    }
+
     public function setPayment(Payment $payment)
     {
         $this->payment = $payment;
@@ -184,6 +189,15 @@ class ScheduledPayment
         }
 
         return $this->getScheduled() <= $date;
+    }
+
+    public function hasCorrectBillingDay()
+    {
+        if ($this->getType() == self::TYPE_RESCHEDULED) {
+            return null;
+        }
+
+        return $this->getScheduledDay() == $this->policy->getBillingDay();
     }
 
     public function toApiArray()
