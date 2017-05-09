@@ -309,6 +309,8 @@ nexy_slack:
     endpoint:             "%slack_webhook%"
 
 nelmio_security:
+    csp: ~
+
     # prevents framing of the entire site
     clickjacking:
         paths:
