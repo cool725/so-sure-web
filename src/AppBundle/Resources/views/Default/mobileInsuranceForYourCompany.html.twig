@@ -30,29 +30,59 @@
 {% block body %}
 
     <section class="corporate-hero">
-        {# <div class="container-fluid"> #}
-            <div class="corporate-hero-inner">
-                <h1 class="text-blue">Mobile phone insurance for your company</h1>
-                <p class="lead">Next working day replacement or repair on phones up to 3 years old <br class="hidden-xs"> with up to 80% of your premium back every year.</p>
-                <a href="#" class="btn btn-green btn-lg">Get a quote</a>
-                <div class="fom">
-                    <a href="#"><small>Find out more <br> <i class="fa fa-chevron-down" aria-hidden="true"></i></small></a>
-                </div>
+        <div class="corporate-hero-inner">
+            <h1 class="text-blue">Mobile phone insurance for your company</h1>
+            <p class="lead">Next working day replacement or repair on phones up to 3 years old <br class="hidden-xs"> with up to 80% of your premium back every year.</p>
+            <a href="#" class="btn btn-green btn-lg">Get a quote</a>
+            <div class="fom">
+                <a href="#"><small>Find out more <br> <i class="fa fa-chevron-down" aria-hidden="true"></i></small></a>
             </div>
-        {# </div> #}
+        </div>
     </section>
 
-    <section class="section--pad">
+    <section class="section--pad background-off-white">
         <div class="container">
 
             <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <div class="seen-on">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="col-md-12">
-                    <p>Business</p>
+                    <h2 class="text-blue text-center">We are straight-forward and transparent</h2>
+                    <p class="lead text-center">Our <a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">terms &amp; conditions</a> are written in plain english <br> and our main benefits include:</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p class="lead">A replacement phone in your hands the next working day, one working day in Europe.</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="lead">Second hand or refurbished phone cover on devices up to 3 years old.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p class="lead">International travel cover on any trip not excedding 90 days.</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="lead">‘Group no claims bonus’ allowing you to get up to 80% of your premium back every year.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </div>
     </section>
+
+    {# Page Modals #}
+
 
 {% endblock %}
 
