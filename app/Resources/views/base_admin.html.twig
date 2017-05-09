@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>
+            {% block title %}so-sure{% endblock %}
+        </title>
+        {% block meta %}{% endblock %}
+
+        {% include '::header.html.twig' %}
+
+        {% block stylesheets %}
+            {% stylesheets output='css/*.css'
+                '../app/Resources/public/css/bootstrap.min.css'
+                'components/cookieconsent/cookieconsent.min.css'
+                '@AppBundle/Resources/public/sass/main.scss'
+            %}
+            <link rel="stylesheet" href="{{ asset_url }}">
+            {% endstylesheets %}
+        {% endblock %}
+        {% block remotestylesheets %}
+        {% endblock %}
+        {% block metaend %}{% endblock %}
+    </head>
+    <body>
+        <!-- Google Tag Manager Data Layer -->
+        <script>
+            dataLayer = [{
+                'branch': {
+                    'banner': {% if app.user is null or not app.user %}true{% else %}false{% endif %},
+                    'referral': '{% if app is not null and app.session.isStarted %}{{ app.session.get('referral') }}{% endif %}',
+                    'scode': '{% if app is not null and app.session.isStarted %}{{ app.session.get('scode') }}{% endif %}'
+                },
+                'user': {
+                    'id': {% if app.user is null or not app.user %}undefined{% else %}'{{ app.user.id }}'{% endif %}
+                },
+                'intercom': {
+                    {# TODO: transition from intercom.user_id to user.id #}
+                    'user_id': {% if app.user is null or not app.user %}null{% else %}'{{ app.user.id }}'{% endif %},
+                    'user_hash': {% if app.user is null or not app.user %}null{% else %}'{{ intercom(app.user) }}'{% endif %},
+                    'email':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.email }}'{% endif %},
+                    'name':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.name }}'{% endif %},
+                    'created_at':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.created|date('U') }}'{% endif %},
+                    'quote_url': '{% if app.session.get('quote_url') %}{{ app.session.get('quote_url') }}{% endif %}',
+                    'enabled': {% block intercom_enabled %}true{% endblock %}
+                }{% block gtm_data %}{% endblock %}
+            }];
+        </script>
+
+        <!-- Google Tag Manager -->
+        <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KGBBJQ{{ ga_tag_manager_env|raw }}"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        '//www.googletagmanager.com/gtm.js?id='+i+dl+'{{ ga_tag_manager_env|raw }}';f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
+        <!-- End Google Tag Manager -->
+
+        {% if environment != 'prod' and app.request.get('hide_env') != '1' %}
+            <div style="background-color: red; text-align: center; color: white;"><strong>{{ environment }}</strong> <a href="{{ path('ops_pages') }}"><i class="fa fa-wrench"></i></a></div>
+        {% endif %}
+
+        {% block nav %}
+            {% include '::nav.html.twig' %}
+        {% endblock %}
+
+        {% if app.session.isStarted %}
+            {% if app.session.flashBag.peekAll | length > 0 %}
+                <div class="container text-center">
+                    {% for flash_message in app.session.flashBag.get('success') %}
+                        <div class="bg-success flash">
+                            <h4>{{ flash_message|raw }}</h4>
+                        </div>
+                    {% endfor %}
+                    {% for flash_message in app.session.flashBag.get('warning') %}
+                        <div class="bg-warning flash">
+                            <h4>{{ flash_message|raw }}</h4>
+                        </div>
+                    {% endfor %}
+                    {% for flash_message in app.session.flashBag.get('error') %}
+                        <div class="bg-danger flash">
+                            <h4>{{ flash_message|raw }}</h4>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% block body %}{% endblock %}
+
+        {% block footer %}{% endblock %}
+
+        {% if use_cdn %}
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+        {% else %}
+            <script src="/components/jquery/jquery.min.js"></script>
+            <script src="/components/bootstrap/bootstrap.js"></script>
+        {% endif %}
+
+        {% block javascripts %}
+            {% if hide_cookie_warning is defined and hide_cookie_warning %}
+                {% javascripts
+                '@AppBundle/Resources/public/js/*' %}
+                <script src="{{ asset_url }}"></script>
+                {% endjavascripts %}
+            {% else %}
+                {% javascripts
+                'components/cookieconsent/cookieconsent.min.js'
+                '@AppBundle/Resources/public/js/*' %}
+                <script src="{{ asset_url }}"></script>
+                {% endjavascripts %}
+            {% endif %}
+        {% endblock %}
+    </body>
+</html>

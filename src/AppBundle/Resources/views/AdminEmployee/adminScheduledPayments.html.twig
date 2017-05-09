@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_admin.html.twig' %}
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
@@ -18,87 +18,98 @@
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
+<div class="container">
 
-<div class="row">
-    <div class="col-md-6">
-        <h1>Scheduled Payments {{ month }} / {{ year }}</h1>
-        <h4>Total: £{{ total|number_format(2, '.', ',') }} <i class="fa fa-question-circle" title="Total of payments that are either successful or scheduled" style="cursor: pointer"></i></h4>
-    </div>
-    <form id='scheduled-payments-form' method="POST">
-    <div class="col-md-2">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class='input-group date' id='scheduled-payments'>
-                <input name="scheduled-payments" type='text' class="form-control" value="{{month}}-{{year}}" />
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
-            </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Scheduled Payments {{ month }} / {{ year }}</h1>
+            <h4>Total: £{{ total|number_format(2, '.', ',') }} <i class="fa fa-question-circle" title="Total of payments that are either successful or scheduled" style="cursor: pointer"></i></h4>
         </div>
+        <form id='scheduled-payments-form' method="POST">
+            <div class="col-md-2">
+                <div class="form-group" style="padding-top: 15px;">
+                    <div class='input-group date' id='scheduled-payments'>
+                        <input name="scheduled-payments" type='text' class="form-control" value="{{month}}-{{year}}" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group" style="padding-top: 15px;">
+                    <button class="btn btn-default">View Scheduled Payments</button>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="col-md-2">
-        <div class="form-group" style="padding-top: 15px;">
-            <button class="btn btn-default">View Scheduled Payments</button>
-        </div>                
+
+    <div class="row">
+        <table class="table table-striped">
+            <tbody>
+                <tr>
+                    <th>Policy</th>
+                    <th>Type</th>
+                    <th>Scheduled Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Card</th>
+                </tr>
+                {% for scheduledPayment in scheduledPayments if scheduledPayment.policy.validPolicy %}
+                    {% set isExpired = false %}
+                    {% if scheduledPayment.policy.user and scheduledPayment.policy.user.paymentMethod and scheduledPayment.policy.user.paymentMethod.isCardExpired(end) %}
+                        {% set isExpired = true %}
+                    {% endif %}
+                    <tr class="{% if scheduledPayment.status == 'failed' %}danger{% elseif isExpired %}warning{% endif %}">
+                        <td>
+                            <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
+                                {{ scheduledPayment.policy.policyNumber }}
+                            </a>
+                            {% if scheduledPayment.policy.status == 'unpaid' %}
+                                <i class="fa fa-warning"
+                                   title="Policy is unpaid. Unless payment is made, policy will be automatically cancelled on {{ scheduledPayment.policy.getPolicyExpirationDate|date('d M Y H:i', 'Europe/London') }}"></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if scheduledPayment.type == 'scheduled' %}
+                                <i class="fa fa-clock-o" title="Scheduled Payment"></i>
+                            {% elseif scheduledPayment.type == 'rescheduled' %}
+                                <i class="fa fa-refresh" title="Re-Scheduled Payment"></i>
+                            {% else %}
+                                {{ scheduledPayment.type }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if scheduledPayment.status == 'cancelled' %}
+                                <del>
+                            {% endif %}
+                            {{ scheduledPayment.scheduled | date('d M Y H:i', 'Europe/London')  }}
+                            {% if scheduledPayment.status == 'cancelled' %}
+                                </del>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if scheduledPayment.status == 'cancelled' %}
+                                <del>
+                            {% endif %}
+                            £{{ scheduledPayment.amount |number_format(2, '.', ',') }}
+                            {% if scheduledPayment.status == 'cancelled' %}
+                                </del>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ scheduledPayment.status }}
+                        </td>
+                        <td>
+                            {% if scheduledPayment.policy.user and scheduledPayment.policy.user.paymentMethod %}
+                                {{ scheduledPayment.policy.user.paymentMethod }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    </form>
-</div>
-<div class="row">
-  <table class="table table-striped">
-    <tbody>
-        <tr>
-            <th>Policy</th>
-            <th>Type</th>
-            <th>Scheduled Date</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Card</th>
-        </tr>
-{% for scheduledPayment in scheduledPayments if scheduledPayment.policy.validPolicy %}
-    {% set isExpired = false %}
-    {% if scheduledPayment.policy.user and scheduledPayment.policy.user.paymentMethod and scheduledPayment.policy.user.paymentMethod.isCardExpired(end) %}
-        {% set isExpired = true %}
-    {% endif %}
-    <tr class="{% if scheduledPayment.status == 'failed' %}danger{% elseif isExpired %}warning{% endif %}">
-        <td>
-            <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
-                {{ scheduledPayment.policy.policyNumber }}
-            </a>
-            {% if scheduledPayment.policy.status == 'unpaid' %}
-                <i class="fa fa-warning"
-                   title="Policy is unpaid. Unless payment is made, policy will be automatically cancelled on {{ scheduledPayment.policy.getPolicyExpirationDate|date('d M Y H:i', 'Europe/London') }}"></i>
-            {% endif %}
-        </td>
-        <td>
-            {% if scheduledPayment.type == 'scheduled' %}
-                <i class="fa fa-clock-o" title="Scheduled Payment"></i>
-            {% elseif scheduledPayment.type == 'rescheduled' %}
-                <i class="fa fa-refresh" title="Re-Scheduled Payment"></i>
-            {% else %}
-                {{ scheduledPayment.type }}
-            {% endif %}
-        </td>
-        <td>
-            {% if scheduledPayment.status == 'cancelled' %}<del>{% endif %}
-            {{ scheduledPayment.scheduled | date('d M Y H:i', 'Europe/London')  }}
-            {% if scheduledPayment.status == 'cancelled' %}</del>{% endif %}
-        </td>
-        <td>
-            {% if scheduledPayment.status == 'cancelled' %}<del>{% endif %}
-            £{{ scheduledPayment.amount |number_format(2, '.', ',') }}
-            {% if scheduledPayment.status == 'cancelled' %}</del>{% endif %}
-        </td>
-        <td>
-            {{ scheduledPayment.status }}            
-        </td>
-        <td>{% if scheduledPayment.policy.user and scheduledPayment.policy.user.paymentMethod %}
-                {{ scheduledPayment.policy.user.paymentMethod }}
-            {% endif %}
-        </td>
-    </tr>
-{% endfor %}
-    </tbody>
-  </table>
-    
+
 </div>
 {% endblock %}
