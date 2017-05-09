@@ -395,6 +395,7 @@ nelmio_security:
                 - https://*.twitter.com
                 - http://*.twitter.com
                 - https://*.twimg.com
+                - https://www.google.com
                 - 'data:'
 
     # prevents framing of the entire site
