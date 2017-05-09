@@ -322,6 +322,7 @@ nelmio_security:
             default-src:
                 - 'self'
                 - https://maxcdn.bootstrapcdn.com
+                - https://www.digits.com
                 - https://*.optimizely.com
                 - https://js.intercomcdn.com
                 - https://*.intercom.io
