@@ -397,6 +397,8 @@ nelmio_security:
                 - https://*.twimg.com
                 - https://www.google.com
                 - https://www.google.co.uk
+                - https://*.intercomassets.com
+                - https://*.intercomcdn.com
                 - 'data:'
 
     # prevents framing of the entire site
