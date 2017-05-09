@@ -61,6 +61,15 @@ class OpsController extends BaseController
     }
 
     /**
+     * @Route("/csp", name="ops_csp")
+     * @Template()
+     */
+    public function cspAction()
+    {
+        return [];
+    }
+
+    /**
      * @Route("/exception503", name="ops_exception_503")
      */
     public function exceptionDeniedAction()
