@@ -20,23 +20,26 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-
+        '@AppBundle/Resources/public/sass/page/corporate.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
+{# {% block nav %}{% endblock %} #}
+
 {% block body %}
 
-    <section class="section--pad">
-        <div class="container">
-
-            <div class="row">
-                <div class="col-md-12">
-                    <h1>Title</h1>
+    <section class="corporate-hero">
+        {# <div class="container-fluid"> #}
+            <div class="corporate-hero-inner">
+                <h1 class="text-blue">Mobile phone insurance for your company</h1>
+                <p class="lead">Next working day replacement or repair on phones up to 3 years old <br class="hidden-xs"> with up to 80% of your premium back every year.</p>
+                <a href="#" class="btn btn-green btn-lg">Get a quote</a>
+                <div class="fom">
+                    <a href="#"><small>Find out more <br> <i class="fa fa-chevron-down" aria-hidden="true"></i></small></a>
                 </div>
             </div>
-
-        </div>
+        {# </div> #}
     </section>
 
     <section class="section--pad">
@@ -52,3 +55,5 @@
     </section>
 
 {% endblock %}
+
+{% block footer %}{% endblock %}

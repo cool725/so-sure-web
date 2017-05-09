@@ -60,5 +60,9 @@
 	@include btn($pale-grey, $dark-grey, $white);
 }
 
+.btn-green {
+	@include btn($green, $white, $white);
+}
+
 // Others
 
