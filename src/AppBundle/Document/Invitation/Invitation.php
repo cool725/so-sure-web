@@ -388,6 +388,7 @@ abstract class Invitation
         }
 
         $data['channel_details'] = $this->getChannelDetails();
+        $data['policy_id'] = $this->getPolicy() ? $this->getPolicy()->getId() : null;
 
         if ($debug) {
             $data = array_merge($data, [
