@@ -153,7 +153,7 @@ body {
 
 .section-corporate-form {
     position: relative;
-    overflow-y: hidden;
+    // overflow-y: hidden;
 
     .container {
         position: relative;
@@ -240,6 +240,28 @@ body {
         }
 
 
+    }
+}
+
+.example-cashback-text {
+    position: relative;
+
+    p {
+        margin-top: 10px;
+
+        @include breakpoint(laptop) {
+            margin-top: none;
+        }
+    }
+
+    .cheers {
+        display: none;
+
+        @include breakpoint(desktop) {
+            position: absolute;
+            display: inline;
+            bottom: -80px; right: 70px;
+        }
     }
 }
 
