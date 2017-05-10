@@ -83,6 +83,18 @@ class ConnectionRepository extends BaseDocumentRepository
         return false;
     }
 
+    public function isConnectedByPolicy(Policy $sourcePolicy, Policy $linkedPolicy)
+    {
+        $connectionLinks = $this->createQueryBuilder()
+            ->field('sourcePolicy')->references($sourcePolicy)
+            ->field('linkedPolicy')->references($linkedPolicy)
+            ->getQuery()
+            ->execute()
+            ->count();
+
+        return $connectionLinks > 0;
+    }
+
     public function count(\DateTime $start = null, \DateTime $end = null, $cancelled = false)
     {
         $qb = $this->createQueryBuilder();

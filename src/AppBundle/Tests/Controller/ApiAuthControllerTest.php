@@ -1358,6 +1358,48 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(403);
     }
 
+    // policy/{id}/connect
+
+    /**
+     *
+     */
+    public function testMultiPolicyConnect()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testConnect', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyDataA = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyDataA['id']);
+
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyDataB = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyDataB['id']);
+
+        $url = sprintf("/api/v1/auth/policy/%s/connect", $policyDataA['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'policy_id' => $policyDataB['id']
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/policy/%s/connect", $policyDataA['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'policy_id' => $policyDataB['id']
+        ]);
+        $data = $this->verifyResponse(422);
+
+        $url = sprintf("/api/v1/auth/policy/%s/connect", $policyDataB['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'policy_id' => $policyDataA['id']
+        ]);
+        $data = $this->verifyResponse(422);
+    }
+
     // policy/{id}/pay dd
 
     /**

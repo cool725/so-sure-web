@@ -260,6 +260,19 @@ class InvitationService
         }
     }
 
+    public function validateNotConnectedByPolicy(Policy $sourcePolicy, Policy $linkedPolicy)
+    {
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
+        if ($connectionRepo->isConnectedByPolicy($sourcePolicy, $linkedPolicy)) {
+            throw new ConnectedInvitationException('You are already connected');
+        }
+
+        $connectionRepo = $this->dm->getRepository(RewardConnection::class);
+        if ($connectionRepo->isConnectedByPolicy($sourcePolicy, $linkedPolicy)) {
+            throw new ConnectedInvitationException('You are already connected');
+        }
+    }
+
     public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
     {
         $this->validatePolicy($policy);
@@ -889,11 +902,50 @@ class InvitationService
         return $inviteeConnection;
     }
 
+    public function connect(Policy $policyA, Policy $policyB, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $this->validatePolicy($policyA);
+        $this->validatePolicy($policyB);
+
+        $this->validateNotConnectedByPolicy($policyA, $policyB);
+        $this->validateNotConnectedByPolicy($policyB, $policyA);
+
+        $connectionA = $this->addConnection(
+            $policyA,
+            $policyB->getUser(),
+            $policyB,
+            null,
+            $date
+        );
+        $connectionB = $this->addConnection(
+            $policyB,
+            $policyA->getUser(),
+            $policyA,
+            null,
+            $date
+        );
+        $this->dm->flush();
+
+        $now = new \DateTime();
+        /*
+        $this->mixpanel->queueTrackWithUser($policyA->getUser(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
+            'Connection Value' => $inviterConnection->getTotalValue(),
+        ]);
+        $this->mixpanel->queuePersonProperties([
+            'Last connection complete' => $now->format(\DateTime::ATOM),
+        ], false, $policyA->getUser());
+        */
+    }
+
     protected function addConnection(
         Policy $policy,
         User $linkedUser,
         Policy $linkedPolicy,
-        Invitation $invitation,
+        Invitation $invitation = null,
         \DateTime $date = null
     ) {
         if ($policy->getId() == $linkedPolicy->getId()) {
@@ -913,8 +965,10 @@ class InvitationService
         $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);
         $connection->setPromoValue($promoConnectionValue);
-        $connection->setInvitation($invitation);
-        $connection->setInitialInvitationDate($invitation->getCreated());
+        if ($invitation) {
+            $connection->setInvitation($invitation);
+            $connection->setInitialInvitationDate($invitation->getCreated());
+        }
         $connection->setExcludeReporting(!$policy->isValidPolicy());
         $policy->addConnection($connection);
         $policy->updatePotValue();

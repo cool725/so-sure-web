@@ -503,6 +503,104 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/policy/{id}/connect", name="api_auth_new_connection")
+     * @Method({"POST"})
+     */
+    public function newConnectionAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!isset($data['policy_id'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted('connect', $policy);
+
+            $connectPolicy = $repo->find($data['policy_id']);
+            if (!$connectPolicy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted('connect', $connectPolicy);
+
+            $invitationService = $this->get('app.invitation');
+            try {
+                $invitationService->connect($policy, $connectPolicy);
+                $policy = $repo->find($id);
+
+                return new JsonResponse($policy->toApiArray());
+            } catch (DuplicateInvitationException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_DUPLICATE,
+                    'Duplicate invitation',
+                    422
+                );
+            } catch (ConnectedInvitationException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_CONNECTED,
+                    'Already connected invitation',
+                    422
+                );
+            } catch (OptOutException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_OPTOUT,
+                    'Person has opted out of invitations',
+                    422
+                );
+            } catch (InvalidPolicyException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
+                    'Policy not yet been paid',
+                    422
+                );
+            } catch (SelfInviteException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_SELF_INVITATION,
+                    'User can not invite themself',
+                    422
+                );
+            } catch (FullPotException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_MAXPOT,
+                    'User has a full pot',
+                    422
+                );
+            } catch (ClaimException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
+                    'User has previously claimed',
+                    422
+                );
+            } catch (NotFoundHttpException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy/code',
+                    404
+                );
+            } catch (\Exception $e) {
+                $this->get('logger')->error('Error in api newConnection.', ['exception' => $e]);
+
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+            }
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api newConnection.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/policy/{id}/invitation", name="api_auth_new_invitation")
      * @Method({"POST"})
      */
