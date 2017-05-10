@@ -29,7 +29,7 @@
 
 {% block body %}
 
-    <section class="corporate-hero">
+    <section class="corporate-hero" id="hero-welcome">
         <div class="corporate-hero-inner">
             <h1 class="text-blue">Mobile phone insurance for your company</h1>
             <p class="lead">Next working day replacement or repair on phones up to 3 years old <br class="hidden-xs"> with up to 80% of your premium back every year.</p>
@@ -40,12 +40,16 @@
         </div>
     </section>
 
-    <section class="section--pad background-off-white">
+    <section class="curved-parent background-off-white" id="key-benefits">
         <div class="container">
 
             <div class="row">
-                <div class="col-md-6 col-md-offset-3">
+                <div class="col-md-12">
                     <div class="seen-on">
+                        <strong><small>SEEN ON</small></strong>
+                        <img src="{{ cdn_url }}/images/corporate/so-sure_the_guardian.png" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town">
+                        <img src="{{ cdn_url }}/images/corporate/so-sure_financial_times.png" alt="Financial Times - Innovation to watch: Friends based insurance" class="img-responsive">
+                        <img src="{{ cdn_url }}/images/corporate/so-sure_insurance_post.png" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app" class="img-responsive">
                     </div>
                 </div>
             </div>
@@ -53,7 +57,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <h2 class="text-blue text-center">We are straight-forward and transparent</h2>
-                    <p class="lead text-center">Our <a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">terms &amp; conditions</a> are written in plain english <br> and our main benefits include:</p>
+                    <p class="lead text-center">Our <a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">terms &amp; conditions</a> are written in plain english and our main benefits include:</p>
                 </div>
             </div>
 
@@ -61,20 +65,67 @@
                 <div class="col-md-8 col-md-offset-2">
                     <div class="row">
                         <div class="col-sm-6">
+                            <img src="{{ cdn_url }}/images/corporate/so-sure_replacement_phone.svg" alt="Replacement Phone" class="block-img">
                             <p class="lead">A replacement phone in your hands the next working day, one working day in Europe.</p>
                         </div>
                         <div class="col-sm-6">
+                            <img src="{{ cdn_url }}/images/corporate/so-sure_older_phones.svg" alt="Old Phone" class="block-img">
                             <p class="lead">Second hand or refurbished phone cover on devices up to 3 years old.</p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-6">
+                            <img src="{{ cdn_url }}/images/corporate/so-sure_worldwide_cover.svg" alt="Worldwide Cover" class="block-img">
                             <p class="lead">International travel cover on any trip not excedding 90 days.</p>
                         </div>
                         <div class="col-sm-6">
+                            <img src="{{ cdn_url }}/images/corporate/so-sure_group_bonus.svg" alt="Group Bonus" class="block-img">
                             <p class="lead">‘Group no claims bonus’ allowing you to get up to 80% of your premium back every year.</p>
                         </div>
                     </div>
+                </div>
+            </div>
+
+        </div>
+        <svg class="curved-background" viewBox="0 0 500 500" preserveAspectRatio="xMinYMin meet">
+            <path d="M0,100 C150,200 350,0 500,100 L500,00 L0,0 Z" style="stroke: none; fill:#f6f7fb;"></path>
+        </svg>
+    </section>
+
+
+    <section class="section--pad" id="main-benefits">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+
+                    <div class="panel panel-pad text-center">
+                        <h2 class="text-blue text-center">What is covered</h2>
+                        <p class="lead">We expect you to take resonable care of your phone but should something happen our policy covers:</p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                1
+                            </div>
+                            <div class="col-md-4">
+                                2
+                            </div>
+                            <div class="col-md-4">
+                                3
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                4
+                            </div>
+                            <div class="col-md-4">
+                                5
+                            </div>
+                            <div class="col-md-4">
+                                6
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 

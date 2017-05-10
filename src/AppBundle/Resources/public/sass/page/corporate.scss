@@ -3,10 +3,30 @@
 @import "../mixins";
 @import "../common/paletteNew";
 
+// .curved-parent {
+//     position: relative;
+//     padding-bottom: 100px;
+// }
+
+// .curved-background {
+//     position: absolute;
+//     top: 100%; left: 0;
+// }
+
+body {
+    background-color: $lightest-blue;
+}
+
+.navbar {
+    background-color: $white;
+}
+
 .corporate-hero {
     position: relative;
     overflow: hidden;
     min-height: 500px;
+
+    background-color: $white;
 
     border-bottom: 3px solid $light-blue;
 
@@ -74,17 +94,26 @@
     }
 
     &:before {
+        display: none;
         left: -85px;
         z-index: 8;
         background-position: left bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-left-bottom.svg');
+
+        @include breakpoint(mobileishup) {
+            display: block;
+        }
     }
 
     &:after {
-        right: -120px;
+        right: -100px;
         z-index: 7;
         background-position: right bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-right-bottom.svg');
+
+        @include breakpoint(mobileishup) {
+            right: -120px;
+        }
     }
 }
 
@@ -106,5 +135,52 @@
     @include breakpoint(tablet) {
         padding: 100px 0 30px;
     }
+}
+
+
+.seen-on {
+    text-align: center;
+    padding: 30px 0;
+
+    small {
+        color: $light-blue;
+    }
+
+    img {
+        display: block;
+        margin: 5px auto;
+        vertical-align: middle;
+        width: 200px;
+
+        @include breakpoint(tablet) {
+            display: inline-block;
+            margin-top: -1px;
+        }
+    }
+}
+
+// TODO Move elsewhere
+.block-img {
+    display: block;
+    margin: 30px auto;
+}
+
+.panel-pad {
+    padding: 0 15px 15px;
+
+    @include breakpoint(tablet) {
+        padding: 0 30px 30px;
+    }
+}
+
+.curved-parent {
+    position: relative;
+}
+
+.curved-background {
+    display: inline-block;
+    position: absolute;
+    top: 100%; left: 0;
+    z-index: -1;
 }
 
