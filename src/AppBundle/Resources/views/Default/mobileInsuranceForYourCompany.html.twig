@@ -236,18 +236,18 @@
 
                     <h2 class="text-blue text-center">Contact us to get a quote or find out more</h2>
 
-                    <form>
+                    {{ form_start(lead_form) }}
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">Name <span class="req">*</span></label>
-                                    <input type="text" class="form-control">
+                                    {{ form_widget(lead_form.name, { 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">Company <span class="req">*</span></label>
-                                    <input type="text" class="form-control">
+                                    {{ form_widget(lead_form.company, { 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
                         </div>
@@ -255,29 +255,25 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">Phone No. <span class="req">*</span></label>
-                                    <input type="text" class="form-control">
+                                    {{ form_widget(lead_form.phone, { 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">Email <span class="req">*</span></label>
-                                    <input type="text" class="form-control">
+                                    {{ form_widget(lead_form.email, { 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <select class="form-control">
-                                        <option value="">No. of phones to insure...</option>
-                                    </select>
+                                    {{ form_widget(lead_form.phones, { 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <select class="form-control">
-                                        <option value="">Purchasing timeframe...</option>
-                                    </select>
+                                    {{ form_widget(lead_form.timeframe, { 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
                         </div>
@@ -285,18 +281,18 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="">Your message <span class="req">*</span></label>
-                                    <textarea class="form-control" rows="10"></textarea>
+                                    {{ form_widget(lead_form.message, { 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12 text-center">
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-blue btn-lg">Get in touch</button>
+                                    {{ form_widget(lead_form.submit, { 'label': 'Get in touch', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    {{ form_end(lead_form) }}
 
                 </div>
             </div>

@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -282,9 +285,71 @@ class DefaultController extends BaseController
      * @Route("/mobile-phone-insurance-for-your-company", name="mobile_phone_insurance_for_your_company")
      * @Template
      */
-    public function mobileInsuranceForYourCompany()
+    public function mobileInsuranceForYourCompany(Request $request)
     {
-        return [];
+        $leadForm = $this->get('form.factory')
+            ->createNamedBuilder('lead_form')
+            ->add('email', EmailType::class)
+            ->add('name', TextType::class)
+            ->add('company', TextType::class)
+            ->add('phone', TextType::class)
+            ->add('phones', ChoiceType::class, [
+                'required' => true,
+                'placeholder' => 'No. of phones to insure...',
+                'choices' => [
+                    'less than 10' => 'less than 10',
+                    '10-50' => '10-50',
+                    'more than 50' => 'more than 50',
+                    'uncertain' => 'uncertain'
+                ],
+            ])
+            ->add('timeframe', ChoiceType::class, [
+                'required' => true,
+                'placeholder' => 'Purchasing timeframe...',
+                'choices' => [
+                    'immedidate' => 'immedidate',
+                    'this quarter' => 'this quarter',
+                    'next quarter' => 'next quarter',
+                    'next year' => 'next year',
+                    'uncertain' => 'uncertain'
+                ],
+            ])
+            ->add('message', TextareaType::class)
+            ->add('submit', SubmitType::class)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('lead_form')) {
+                $leadForm->handleRequest($request);
+                if ($leadForm->isValid()) {
+                    $body = sprintf(
+                        "Name: %s\nCompany: %s\nEmail: %s\nContact #: %s\n# Phones: %s\nPurchasing Timeframe: %s\nMessage: %s",
+                        $leadForm->getData()['name'],
+                        $leadForm->getData()['company'],
+                        $leadForm->getData()['email'],
+                        $leadForm->getData()['phone'],
+                        $leadForm->getData()['phones'],
+                        $leadForm->getData()['timeframe'],
+                        $leadForm->getData()['message']
+                    );
+
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject('Company inquiry')
+                        ->setFrom('info@so-sure.com')
+                        ->setTo('sales@so-sure.com')
+                        ->setBody($body, 'text/html');
+                    $this->get('mailer')->send($message);
+                    $this->addFlash(
+                        'success',
+                        "Thanks. We'll be in touch shortly"
+                    );
+                }
+            }
+        }
+
+        return [
+            'lead_form' => $leadForm->createView(),
+        ];
     }
 
     /**
