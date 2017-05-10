@@ -14,7 +14,8 @@
 // }
 
 body {
-    background-color: $lightest-blue;
+    // background-color: $lightest-blue;
+    background-color: $off-white;
 }
 
 .navbar {
@@ -117,25 +118,18 @@ body {
     }
 }
 
-.corporate-hero-text {
-
-    &:before, &:after {
-        content: '';
-        position: absolute;
-        z-index: auto;
-        width: 600px; height: 452px;
-    }
-
-    &:before {
-        left: 0;
-        background-position: left bottom;
-        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-left.svg');
-    }
-
-    @include breakpoint(tablet) {
-        padding: 100px 0 30px;
-    }
+.section-corporate {
+    position: relative;
+    padding: 20px 0 0;
 }
+
+.curved-background {
+    display: inline-block;
+    position: absolute;
+    top: 100%; left: 0;
+    z-index: 2;
+}
+
 
 
 .seen-on {
@@ -172,20 +166,11 @@ body {
 
 .panel-pad {
     padding: 0 15px 15px;
+    position: relative;
+    z-index: 3;
 
     @include breakpoint(tablet) {
         padding: 0 30px 30px;
     }
-}
-
-.curved-parent {
-    position: relative;
-}
-
-.curved-background {
-    display: inline-block;
-    position: absolute;
-    top: 100%; left: 0;
-    z-index: -1;
 }
 
