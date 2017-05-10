@@ -25,6 +25,7 @@ body {
 .corporate-hero {
     position: relative;
     overflow-y: hidden;
+    overflow-x: hidden;
     min-height: 500px;
 
     background-color: $white;
