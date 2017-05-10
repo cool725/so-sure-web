@@ -322,6 +322,7 @@ class DefaultController extends BaseController
             if ($request->request->has('lead_form')) {
                 $leadForm->handleRequest($request);
                 if ($leadForm->isValid()) {
+                    // @codingStandardsIgnoreStart
                     $body = sprintf(
                         "Name: %s\nCompany: %s\nEmail: %s\nContact #: %s\n# Phones: %s\nPurchasing Timeframe: %s\nMessage: %s",
                         $leadForm->getData()['name'],
@@ -332,6 +333,7 @@ class DefaultController extends BaseController
                         $leadForm->getData()['timeframe'],
                         $leadForm->getData()['message']
                     );
+                    // @codingStandardsIgnoreEnd
 
                     $message = \Swift_Message::newInstance()
                         ->setSubject('Company inquiry')
