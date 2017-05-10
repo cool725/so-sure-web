@@ -1,0 +1,409 @@
+// corporate.scss
+
+@import "../mixins";
+@import "../common/paletteNew";
+
+body {
+    background-color: $white;
+}
+
+.navbar {
+    background-color: $white;
+}
+
+.corporate-hero {
+    position: relative;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    min-height: 500px;
+
+    background-color: $white;
+
+    border-bottom: 3px solid $light-blue;
+
+    > .corporate-hero-inner {
+        max-width: 770px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 120px;
+        text-align: center;
+        position: relative;
+        z-index: 10;
+
+        h1 {
+            margin: 0;
+            padding: 0 15px 20px 15px;
+            font-size: 30px;
+
+            @include breakpoint(tablet) {
+                padding: 0 0 20px;
+                font-size: 36px;
+            }
+        }
+
+        p {
+            margin: 0;
+            padding: 0 20px 20px;
+
+            @include breakpoint(tablet) {
+                padding-bottom: 35px;
+            }
+        }
+
+        .fom {
+            margin-top: 30px;
+
+            a {
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+
+            @include breakpoint(tablet) {
+                margin-top: 60px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            margin-top: 150px;
+        }
+
+    }
+
+    &:before, &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        background-repeat: no-repeat;
+        width: 600px; height: 450px;
+
+        opacity: 0.6;
+    }
+
+    &:before {
+        // display: none;
+        left: -200px;
+        z-index: 8;
+        background-position: left bottom;
+        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-left-bottom.svg');
+
+        @include breakpoint(midtablet) {
+            display: block;
+            left: -100px;
+        }
+
+        @include breakpoint(tablet) {
+            left: -80px;
+        }
+
+        @include breakpoint(laptop) {
+            left: -40px;
+        }
+
+        @include breakpoint(desktop) {
+            left: 0;
+        }
+    }
+
+    &:after {
+        right: -100px;
+        z-index: 7;
+        background-position: right bottom;
+        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-right-bottom.svg');
+
+        @include breakpoint(mobileishup) {
+            right: 0;
+        }
+
+        @include breakpoint(midtablet) {
+            right: -100px;
+        }
+
+        @include breakpoint(tablet) {
+            right: -80px;
+        }
+
+        @include breakpoint(laptop) {
+            right: 0;
+        }
+
+        @include breakpoint(desktop) {
+            right: 0;
+        }
+
+    }
+}
+
+.section-corporate {
+    position: relative;
+    // padding: 20px 0 0;
+}
+
+.section-corporate-pad {
+    padding-bottom: 30px;
+
+    h2 {
+        margin-top: 0;
+    }
+
+    @include breakpoint(tablet) {
+        padding-bottom: 50px;
+    }
+
+    &-both {
+        padding-top: 30px;
+
+        @include breakpoint(tablet) {
+            padding-top: 80px;
+        }
+    }
+}
+
+.curved-background {
+    display: inline-block;
+    position: absolute;
+    top: 100%; left: 0;
+    z-index: 2;
+}
+
+.section-fix {
+    position: relative;
+    z-index: 3;
+    // margin-top: 100px;
+}
+
+.section-corporate-form {
+    position: relative;
+    // overflow-y: hidden;
+
+    .container {
+        position: relative;
+        z-index: 10;
+    }
+
+   &:before, &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        background-repeat: no-repeat;
+        width: 600px; height: 450px;
+
+        opacity: 0.6;
+    }
+
+    &:before {
+        display: none;
+        left: 0;
+        z-index: 8;
+        background-position: left bottom;
+        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-left-bottom.svg');
+
+        @include breakpoint(midtablet) {
+            display: block;
+            left: -140px;
+        }
+
+        @include breakpoint(tablet) {
+            left: -80px;
+        }
+
+        @include breakpoint(laptop) {
+            left: -40px;
+        }
+
+        @include breakpoint(desktop) {
+            left: 0;
+        }
+    }
+
+    &:after {
+        display: none;
+        right: 0;
+        z-index: 7;
+        background-position: right bottom;
+        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-right-bottom.svg');
+
+        @include breakpoint(mobileishup) {
+            right: 0;
+            display: block;
+        }
+
+        @include breakpoint(midtablet) {
+            right: -100px;
+        }
+
+        @include breakpoint(tablet) {
+            right: -80px;
+        }
+
+        @include breakpoint(laptop) {
+            right: 0;
+        }
+
+        @include breakpoint(desktop) {
+            right: 0;
+        }
+    }
+}
+
+// Press
+.seen-on {
+    text-align: center;
+    padding: 30px 0;
+
+    small {
+        color: $light-blue;
+    }
+
+    img {
+        display: block;
+        margin: 5px auto;
+        vertical-align: middle;
+        width: 200px;
+
+        @include breakpoint(tablet) {
+            display: inline-block;
+            margin-top: -1px;
+        }
+    }
+}
+
+// Cashback
+.cashback-steps {
+    position: relative;
+
+    @include breakpoint(laptop) {
+
+        &:after {
+            content: '';
+            width: 100%; height: 4px;
+            border-top: 3px dashed $lightest-blue;
+            z-index: -1;
+            position: absolute;
+            top: 100px;;
+        }
+
+
+    }
+}
+
+.example-cashback-text {
+    position: relative;
+
+    p {
+        margin-top: 10px;
+
+        @include breakpoint(laptop) {
+            margin-top: none;
+        }
+    }
+
+    .cheers {
+        display: none;
+
+        @include breakpoint(desktop) {
+            position: absolute;
+            display: inline;
+            bottom: -80px; right: 70px;
+        }
+    }
+}
+
+// Tables
+.panel {
+    .table {
+
+        > thead {
+
+            > tr {
+                > td {
+                    font-weight: bold;
+                    background-color: $primary-blue;
+                    color: $white;
+
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+
+                    &:first-of-type {
+                        border-right: 2px solid $pale-grey;
+                    }
+                }
+            }
+        }
+
+        > tbody {
+
+            > tr {
+                > td {
+                    font-weight: bold;
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                    border-color: $pale-grey;
+                    border-width: 2px;
+
+                    &:first-of-type {
+                        border-right: 2px solid $pale-grey;
+                    }
+                }
+
+                &:first-of-type {
+                    > td {
+                        border-top: none;
+                    }
+                }
+            }
+        }
+
+    }
+
+    .table:first-child > thead:first-child > tr:first-child td:first-child {
+        border-top-left-radius: 10px;
+    }
+
+    .table:first-child > thead:first-child > tr:first-child td:last-child {
+        border-top-right-radius: 10px;
+    }
+}
+
+// TODO Move elsewhere
+
+h4.h-light {
+    line-height: 30px;
+}
+
+h3.h-light,
+.h3.h-light {
+    line-height: 40px;
+}
+
+
+.block-img {
+    display: block;
+    margin: 30px auto;
+}
+
+.panel {
+    @include border-radius(10px);
+    border: none;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+
+    h2 {
+        margin-top: 0;
+    }
+}
+
+.panel-pad {
+    padding: 30px;
+    position: relative;
+    z-index: 3;
+
+    @include breakpoint(tablet) {
+        padding: 30px;
+    }
+
+    @include breakpoint(laptop) {
+        padding: 50px;
+    }
+}
+
+

@@ -1,11 +1,14 @@
+{# Header
+-----------------------------------------------------------------------------#}
+
 <meta charset="UTF-8" />
 
-<!-- Mobile Specific Metas
-–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+{# Mobile Specific Meta
+-----------------------------------------------------------------------------#}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Favicon
-–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+{# Favicon
+-----------------------------------------------------------------------------#}
 <link rel="icon" type="image/png" href="{{ cdn_url }}/images/favicons/favicon.png">
 <link rel="shortcut icon" href="{{ cdn_url }}/images/favicons/favicon.ico" type="image/x-icon" />
 
@@ -35,8 +38,8 @@
 <meta name="msapplication-square150x150logo" content="{{ cdn_url }}/images/favicons/ms-icon-150x150.png" />
 <meta name="msapplication-square310x310logo" content="{{ cdn_url }}/images/favicons/ms-icon-310x310.png" />
 
-<!-- FB Open Graph Tags
-–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+{# FB Open Graph Tags
+-----------------------------------------------------------------------------#}
 <meta property="fb:app_id" content="{{ fb_appid }}" />
 <meta property="og:url" content="{{ app.request.uri }}" />
 <meta property="og:type" content="website" />
@@ -53,20 +56,19 @@
 {% endif %}
 <meta property="fb:pages" content="781483845311300" />
 
-<!-- Twitter Tags
-–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+{# Twitter Tags
+-----------------------------------------------------------------------------#}
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:site" content="@wearesosure" />
 <meta name=”twitter:image” content="{{ cdn_url }}/images/so-sure-welcome.png" />
 
-<!-- Font
-–––––––––––––––––––––––––––––––––––––––––––––––––– -->
-<link rel="application/x-font-woff" href="/fonts/AvenirLTStd-Book.woff">
-<link rel="application/x-font-woff" href="/fonts/AvenirLTStd-Heavy.woff">
-<link rel="application/x-font-woff" href="/fonts/AvenirLTStd-Light.woff">
-<link rel="application/x-font-woff" href="/fonts/AvenirLTStd-Oblique.woff">
-
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+{# Font
+-----------------------------------------------------------------------------#}
+{# <link rel="application/x-font-woff" href="{{ cdn_url }}/fonts/AvenirLTStd-Book.woff">
+<link rel="application/x-font-woff" href="{{ cdn_url }}/fonts/AvenirLTStd-Heavy.woff">
+<link rel="application/x-font-woff" href="{{ cdn_url }}/fonts/AvenirLTStd-Light.woff">
+<link rel="application/x-font-woff" href="{{ cdn_url }}/fonts/AvenirLTStd-Oblique.woff">
+ #}
 {% if include_emoji is defined and include_emoji == 1 %}
-<link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
+    <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
 {% endif %}

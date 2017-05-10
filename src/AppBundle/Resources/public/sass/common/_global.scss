@@ -27,13 +27,13 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4 {
 
 h5, h6, .h5, .h6 {
 	font-family: $avenir-book;
-	color: $black;	
+	color: $black;
 }
 
 
 // Helpers - for rapid prototyping
 
-	// Alignment 
+	// Alignment
 	.center-xs {
 		text-align: center;
 	}
@@ -90,7 +90,7 @@ h5, h6, .h5, .h6 {
 	}
 
 	.text-underline {
-		text-decoration: underline !important; 
+		text-decoration: underline !important;
 	}
 
 	// Backgrounds
@@ -119,7 +119,7 @@ h5, h6, .h5, .h6 {
 
 	    .box-border--highlight {
 	        border-color: $blue;
-	    }		
+	    }
 
 	}
 
@@ -135,12 +135,11 @@ h5, h6, .h5, .h6 {
 	// Digits login
 	.digits-container iframe {
 		height: 250px;
-	}	
+	}
 
 	@include breakpoint(mobileishup) {
 		.digits-container iframe {
 			height: 200px;
-		}	
+		}
 	}
-
 

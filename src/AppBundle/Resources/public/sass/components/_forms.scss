@@ -1,15 +1,43 @@
 // forms.scss
 
 // Overides
-.form-group {
-    
-    .form-control {
-        border: 2px solid $grey-light;
+.form-control {
+    border: 2px solid $grey-light;
+    box-shadow: none;
+
+    margin-bottom: 5px;
+
+    &:focus {
         box-shadow: none;
+        outline: none;
+        border-color: $blue-lighter;
+    }
+}
+
+.has-error {
+
+    .form-control {
+        border-color: $red;
+
+        &:focus {
+            box-shadow: none;
+            outline: none;
+            border-color: $red;
+        }
     }
 
-    label {
-        font-size: 14px;
+    .help-block {
+        color: $red;
+    }
+}
+
+label {
+    font-size: 15px;
+    font-family: $avenir-heavy;
+    margin-bottom: 5px;
+
+    .req {
+        color: $blue;
     }
 }
 
@@ -37,7 +65,7 @@
     margin-top: 15px;
 }
 
-.twitter-typeahead, 
+.twitter-typeahead,
 .tt-input,
 .tt-menu,
 .tt-hint {
@@ -46,7 +74,7 @@
 
 .tt-menu {
     max-height: 176px;
-    margin: -2px 0 0; 
+    margin: -2px 0 0;
     background-color: $white;
     border: 2px solid $grey-light;
     @include border-bottom-radius(4px);
@@ -81,17 +109,17 @@
 
     .btn-get-quote {
         margin-top: 0;
-    }    
+    }
 
-    .twitter-typeahead, 
+    .twitter-typeahead,
     .tt-input,
     .tt-menu,
     .tt-hint {
         max-width: 320px;
-    }    
+    }
 
     .twitter-typeahead {
         margin-right: 5px;
-    }	
+    }
 
 }

@@ -1,0 +1,51 @@
+{# Primary Page Layout
+-----------------------------------------------------------------------------#}
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+
+            </button>
+            <a class="navbar-brand" href="/">
+                <div class="so-sure-logo so-sure-logo-blue-flat"></div>
+            </a>
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right text-center">
+                {% if app.user is not null and app.user %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
+                    {% elseif is_granted('ROLE_EMPLOYEE') %}
+                        <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
+                    {% elseif is_granted('ROLE_CLAIMS') %}
+                        <li><a href="{{ path('claims_home') }}"><i class="fa fa-home"></i> Claims</a></li>
+                    {% else %}
+                        <li class=""><a href="{{ path('user_home') }}">Your Account</a></li>
+                    {% endif %}
+
+                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        <li><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></li>
+                    {% else %}
+                        <li>
+                            <span>
+                                <a href="{{ path('fos_user_security_logout') }}" class="btn btn-blue-hollow navbar-btn">Logout</a>
+                            </span>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li>
+                        <span>
+                            <a href="{{ path('fos_user_security_login') }}" class="btn btn-blue-hollow navbar-btn"> Login</a>
+                        </span>
+                    </li>
+
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

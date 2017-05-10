@@ -1,54 +1,75 @@
 {% extends 'base.html.twig' %}
 
+{# Set vars #}
+{% set include_emoji = 1 %}
+{% set new_stylesheet = 1 %}
+
 {% block body %}
 <br><br><br><br>
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <h1>Heading h1</h1><br>
-            <h2>Heading h2</h2><br>
-            <h3>Heading h3</h3><br>
-            <h4>Heading h4</h4><br>
-            <h5>Heading h5</h5><br>
-            <p class="lead">Traditional insurance has consistently let us down: they charge a lot of money and then when you claim they hide behind small print and painful process not to pay you out. That needed to change, so I created so-sure.</p>            
-            <p>Traditional insurance has consistently let us down: they charge a lot of money and then when you claim they hide behind small print and painful process not to pay you out. That needed to change, so I created so-sure.</p>
-            <div class="box-border-grey">
-                .box-border-grey
-                <p>Traditional insurance has consistently let us down: they charge a lot of money and then when you claim they hide behind small print and painful process not to pay you out. That needed to change, so I created so-sure.</p>
+            <h4 class="text-blue">Buttons</h4>
+            <ul class="list-unstyled">
+                <li><a href="#" class="btn btn-blue">Call to action</a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-blue-hollow">Call to action</a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-grey">Call to action</a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-blue btn-lg">Call to action large</a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-blue-hollow btn-lg">Call to action large</a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-grey btn-lg">Call to action large</a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-blue btn-xs">Call to action small</a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-blue-hollow btn-xs">Call to action small</a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-grey btn-xs">Call to action small</a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-blue">Call to action with icon <i class="fa fa-user" aria-hidden="true"></i></a></li>
+                <li><br></li>
+                <li><a href="#" class="btn btn-blue-hollow">Call to action with icon <i class="fa fa-user" aria-hidden="true"></i></a></li>
+                <li><br></li>
+            </ul>
+            <h4 class="text-blue">Inputs</h4>
+            <div class="form-group">
+                <label for="">Standard Input <span class="req">*</span></label>
+                <input type="text" placeholder="Placeholder text..." class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="">Disabled Input <span class="req">*</span></label>
+                <input type="text" placeholder="Placeholder text..." class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="">With Help Text <span class="req">*</span></label>
+                <input type="text" placeholder="Placeholder text..." class="form-control">
+                <small class="help-block">Help text for an input 14px ‘Avenir Light’ same colour as body</small>
+            </div>
+            <div class="form-group has-error">
+                <label for="">Error Input <span class="req">*</span></label>
+                <input type="text" placeholder="Placeholder text..." class="form-control">
+                <small class="help-block">Help text for an input 14px ‘Avenir Light’ same colour as body</small>
             </div>
         </div>
         <div class="col-md-6">
-            <ul class="list-unstyled">
-                <li style="background:black;padding:3px;"><a href="#" class="btn btn-default-hollow">Call to action default</a></li>                
-                <li><br></li>
-                <li><a href="#" class="btn btn-primary">Call to action primary</a></li>
-                <li><br></li>
-                <li><a href="#" class="btn btn-primary-hollow">Call to action primary</a></li>
-                <li><br></li>                
-                <li><a href="#" class="btn btn-success">Call to action success</a></li>
-                <li><br></li>
-                <li><a href="#" class="btn btn-success-hollow">Call to action success</a></li>
-                <li><br></li>                                
-                <li><a href="#" class="btn btn-danger">Call to action danger</a></li>
-                <li><br></li>         
-                <li><a href="#" class="btn btn-danger-hollow">Call to action danger</a></li>
-                <li><br></li>                         
-                <li><a href="#" class="btn btn-warning">Call to action warning</a></li>                         
-                <li><br></li>
-                <li><a href="#" class="btn btn-warning-hollow">Call to action warning</a></li>                         
-                <li><br></li>                
-                <li><a href="#" class="btn btn-info">Call to action info</a></li>                         
-                <li><br></li>     
-                <li><a href="#" class="btn btn-info-hollow">Call to action info</a></li>                         
-                <li><br></li>                                
-                <li><a href="#" class="btn btn-link">Call to action link</a></li>
-                <li><br></li>        
-                <li><br></li>                                
-                <li><a href="#" class="btn btn-primary btn-xs">Call to action xs</a></li>
-                <li><br></li>
-                <li><a href="#" class="btn btn-primary btn-lg">Call to action lg</a></li>
-                <li><br></li>                                
-            </ul>
+            <h4 class="text-blue">Headings</h4>
+            <h1>Heading H1</h1>
+            <h1 class="h-light">Heading H1</h1>
+            <h2>Heading H2</h2>
+            <h2 class="h-light">Heading H2</h2>
+            <h3>Heading H3</h3>
+            <h3 class="h-light">Heading H3 Light</h3>
+            <h4>Heading H4</h4>
+            <h4 class="h-light">Heading H4</h4>
+            <h4 class="text-blue">Body Text</h4>
+            <p>Our main body text uses the font ‘Avenir Light’ set at 16px, line height is set to 1.428571429 and <a href="#">here is a link</a>. The colour of body text is set to #626b78.</p>
+            <h4 class="text-blue">Primary Text</h4>
+            <p class="lead">Primary text is 18px which reduces on tablet and below to 16px to match the body, (currently this is bootstrap’s functionaility). This has a line height of 1.4.</p>
+            <h4 class="text-blue">Secondary Text</h4>
+            <p><small>Secondary text or small text is set to 14px, this is used for additional info and descriptions, we try to avoid small print so we should not use anything smaller than 14px. Small should use the ‘Avenir Light’ font.</small></p>
         </div>
     </div>
 </div>
@@ -58,6 +79,6 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets
- 
+
     %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}

@@ -9,14 +9,23 @@
         {% include '::header.html.twig' %}
 
         {% block stylesheets %}
-            {% stylesheets output='css/*.css'
-                '../app/Resources/public/css/bootstrap.min.css'
-                'components/cookieconsent/cookieconsent.min.css'
-                '@AppBundle/Resources/public/sass/main.scss'
-            %}
-            <link rel="stylesheet" href="{{ asset_url }}">
-            {% endstylesheets %}
-        {% endblock %}        
+            {% if new_stylesheet is defined and new_stylesheet == 1 %}
+                {% stylesheets output='css/*.css'
+                    'components/cookieconsent/cookieconsent.min.css'
+                    '@AppBundle/Resources/public/sass/mainNew.scss'
+                %}
+                <link rel="stylesheet" href="{{ asset_url }}">
+                {% endstylesheets %}
+            {% else %}
+                {% stylesheets output='css/*.css'
+                    'components/cookieconsent/cookieconsent.min.css'
+                    '@AppBundle/Resources/public/sass/main.scss'
+                %}
+                <link rel="stylesheet" href="{{ asset_url }}">
+                {% endstylesheets %}
+            {% endif %}
+        {% endblock %}
+
         {% block remotestylesheets %}
         {% endblock %}
         {% block metaend %}{% endblock %}
@@ -61,12 +70,16 @@
         {% endif %}
 
         {% block nav %}
-            {% include '::nav.html.twig' %}
+            {% if new_stylesheet is defined and new_stylesheet == 1 %}
+                {% include '::nav_new.html.twig' %}
+            {% else %}
+                {% include '::nav.html.twig' %}
+            {% endif %}
         {% endblock %}
 
         {% if app.session.isStarted %}
             {% if app.session.flashBag.peekAll | length > 0 %}
-                <div class="container text-center">
+                <div class="container text-center flash-container">
                     {% for flash_message in app.session.flashBag.get('success') %}
                         <div class="bg-success flash">
                             <h4>{{ flash_message|raw }}</h4>
@@ -99,7 +112,7 @@
             <script src="/components/jquery/jquery.min.js"></script>
             <script src="/components/bootstrap/bootstrap.js"></script>
         {% endif %}
-        
+
         {% block javascripts %}
             {% if hide_cookie_warning is defined and hide_cookie_warning %}
                 {% javascripts
