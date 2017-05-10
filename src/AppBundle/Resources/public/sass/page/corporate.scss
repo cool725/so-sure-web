@@ -24,7 +24,7 @@ body {
 
 .corporate-hero {
     position: relative;
-    overflow: hidden;
+    overflow-y: hidden;
     min-height: 500px;
 
     background-color: $white;
@@ -62,6 +62,12 @@ body {
 
         .fom {
             margin-top: 30px;
+
+            a {
+                &:hover {
+                    text-decoration: none;
+                }
+            }
 
             @include breakpoint(tablet) {
                 margin-top: 60px;
@@ -142,6 +148,58 @@ body {
     position: relative;
     z-index: 3;
     margin-top: 100px;
+}
+
+
+.section-corporate-form {
+    position: relative;
+    overflow-y: hidden;
+
+    .container {
+        position: relative;
+        z-index: 10;
+    }
+
+   &:before, &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        background-repeat: no-repeat;
+        width: 600px; height: 450px;
+        background-size: 450px 300px;
+
+        @include breakpoint(tablet) {
+            background-size: 500px 350px;
+        }
+
+        @include breakpoint(desktop) {
+            background-size: 600px 450px;
+        }
+    }
+
+    &:before {
+        display: none;
+        left: -85px;
+        z-index: 8;
+        background-position: left bottom;
+        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-left-bottom.svg');
+
+        @include breakpoint(mobileishup) {
+            display: block;
+        }
+    }
+
+    &:after {
+        display: none;
+        right: -120px;
+        z-index: 7;
+        background-position: right bottom;
+        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-right-bottom.svg');
+
+        @include breakpoint(mobileishup) {
+            display: block;
+        }
+    }
 }
 
 // Press
@@ -231,7 +289,7 @@ h3.h-light,
 
 .panel {
     border: none;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
 
     h2 {
         margin-top: 0;

@@ -4,7 +4,7 @@ $(function(){
         toggleText: function(a, b){
             return this.text(this.text() == b ? a : b);
         }
-    });  
+    });
 
     $('#get-quote-btn').click(function(event) {
 
@@ -15,7 +15,7 @@ $(function(){
         }, 1500);
 
         $('#search-phone').focus();
-    });      
+    });
 
     $('#phone_phone').change(function() {
         $.get('/price/' + this.value + '/', function(data) {
@@ -59,11 +59,30 @@ $(function(){
         $('html, body').animate({
             scrollTop: $('#cashback-card').offset().top
         }, 1500);
-    });    
+    });
+
+    $('#corporate-get-quote').click(function(event) {
+
+        event.preventDefault();
+
+        $('html, body').animate({
+            scrollTop: $('#corporate-get-quote-form').offset().top
+        }, 1500);
+    });
+
+    $('#fom').click(function(event) {
+
+        event.preventDefault();
+
+        $('html, body').animate({
+            scrollTop: $('#key-benefits').offset().top
+        }, 1500);
+    });
+
 
     // Collapse Panels - FAQs
     $('.panel-heading').click(function(event) {
-        
+
         event.preventDefault();
 
         $(this).toggleClass('panel-open');
@@ -79,7 +98,7 @@ $(function(){
 
         var modal = $(this);
         var h1    = $(this).find('h1');
-        var h2    = $(this).find('h2');        
+        var h2    = $(this).find('h2');
 
         // modal.find('h1').hide();
 
@@ -94,6 +113,6 @@ $(function(){
         });
 
 
-    });    
+    });
 
 });
