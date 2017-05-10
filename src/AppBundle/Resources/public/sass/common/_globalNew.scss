@@ -3,17 +3,23 @@
 // Control the type for the site
 
 body {
-	font-family: $avenir-book;
+	font-family: $avenir-light;
+	font-size: 16px;
 	color: $black;
+
 	background-color: $white;
 }
 
-strong {
-	font-family: $avenir-heavy;
+small {
+	font-size: 14px;
 }
 
-em {
-	font-family: $avenir-light;
+strong {
+	font-family: $avenir-book;
+}
+
+.lead {
+	font-size: 18px;
 }
 
 i {
@@ -30,6 +36,31 @@ h5, h6, .h5, .h6 {
 	color: $black;
 }
 
+h1 {
+	margin-top: 20px;
+	margin-bottom: 30px;
+}
+
+h2, h3, h4, .h1, .h2, .h3, .h4  {
+	margin-top: 30px;
+	margin-bottom: 20px;
+}
+
+.h-light {
+	font-family: $avenir-light;
+}
+
+a {
+	color: $blue;
+
+	&:hover, &:focus {
+		color: darken($blue, 15%);
+	}
+
+	&:active {
+		color: darken($blue, 25%);
+	}
+}
 
 // Helpers - for rapid prototyping
 
@@ -142,4 +173,5 @@ h5, h6, .h5, .h6 {
 			height: 200px;
 		}
 	}
+
 

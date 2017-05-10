@@ -25,7 +25,7 @@ body {
         max-width: 770px;
         margin-left: auto;
         margin-right: auto;
-        margin-top: 40px;
+        margin-top: 120px;
         text-align: center;
         position: relative;
         z-index: 10;
@@ -65,12 +65,9 @@ body {
         }
 
         @include breakpoint(tablet) {
-            margin-top: 120px;
-        }
-
-        @include breakpoint(desktop) {
             margin-top: 150px;
         }
+
     }
 
     &:before, &:after {
@@ -79,18 +76,20 @@ body {
         bottom: 0;
         background-repeat: no-repeat;
         width: 600px; height: 450px;
+
+        opacity: 0.6;
     }
 
     &:before {
-        display: none;
-        left: 0;
+        // display: none;
+        left: -200px;
         z-index: 8;
         background-position: left bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-left-bottom.svg');
 
         @include breakpoint(midtablet) {
             display: block;
-            left: -140px;
+            left: -100px;
         }
 
         @include breakpoint(tablet) {
@@ -188,6 +187,8 @@ body {
         bottom: 0;
         background-repeat: no-repeat;
         width: 600px; height: 450px;
+
+        opacity: 0.6;
     }
 
     &:before {

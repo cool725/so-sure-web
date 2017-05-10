@@ -4,4 +4,8 @@
     padding: 5px 10px;
     margin-bottom: 15px;
     @include border-radius(4px);
+
+    h4 {
+        margin-top: 20px;
+    }
 }
