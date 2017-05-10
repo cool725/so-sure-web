@@ -3,18 +3,7 @@
 @import "../mixins";
 @import "../common/paletteNew";
 
-// .curved-parent {
-//     position: relative;
-//     padding-bottom: 100px;
-// }
-
-// .curved-background {
-//     position: absolute;
-//     top: 100%; left: 0;
-// }
-
 body {
-    // background-color: $lightest-blue;
     background-color: $off-white;
 }
 
@@ -90,26 +79,30 @@ body {
         bottom: 0;
         background-repeat: no-repeat;
         width: 600px; height: 450px;
-        background-size: 450px 300px;
-
-        @include breakpoint(tablet) {
-            background-size: 500px 350px;
-        }
-
-        @include breakpoint(desktop) {
-            background-size: 600px 450px;
-        }
     }
 
     &:before {
         display: none;
-        left: -85px;
+        left: 0;
         z-index: 8;
         background-position: left bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-left-bottom.svg');
 
-        @include breakpoint(mobileishup) {
+        @include breakpoint(midtablet) {
             display: block;
+            left: -140px;
+        }
+
+        @include breakpoint(tablet) {
+            left: -80px;
+        }
+
+        @include breakpoint(laptop) {
+            left: -40px;
+        }
+
+        @include breakpoint(desktop) {
+            left: 0;
         }
     }
 
@@ -120,8 +113,25 @@ body {
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-right-bottom.svg');
 
         @include breakpoint(mobileishup) {
-            right: -120px;
+            right: 0;
         }
+
+        @include breakpoint(midtablet) {
+            right: -100px;
+        }
+
+        @include breakpoint(tablet) {
+            right: -80px;
+        }
+
+        @include breakpoint(laptop) {
+            right: 0;
+        }
+
+        @include breakpoint(desktop) {
+            right: 0;
+        }
+
     }
 }
 
@@ -178,38 +188,59 @@ body {
         bottom: 0;
         background-repeat: no-repeat;
         width: 600px; height: 450px;
-        background-size: 450px 300px;
-
-        @include breakpoint(tablet) {
-            background-size: 500px 350px;
-        }
-
-        @include breakpoint(desktop) {
-            background-size: 600px 450px;
-        }
     }
 
     &:before {
         display: none;
-        left: -85px;
+        left: 0;
         z-index: 8;
         background-position: left bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-left-bottom.svg');
 
-        @include breakpoint(mobileishup) {
+        @include breakpoint(midtablet) {
             display: block;
+            left: -140px;
+        }
+
+        @include breakpoint(tablet) {
+            left: -80px;
+        }
+
+        @include breakpoint(laptop) {
+            left: -40px;
+        }
+
+        @include breakpoint(desktop) {
+            left: 0;
         }
     }
 
     &:after {
         display: none;
-        right: -120px;
+        right: 0;
         z-index: 7;
         background-position: right bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-right-bottom.svg');
 
         @include breakpoint(mobileishup) {
+            right: 0;
             display: block;
+        }
+
+        @include breakpoint(midtablet) {
+            right: -100px;
+        }
+
+        @include breakpoint(tablet) {
+            right: -80px;
+        }
+
+        @include breakpoint(laptop) {
+            right: 0;
+        }
+
+        @include breakpoint(desktop) {
+            right: 0;
         }
     }
 }
