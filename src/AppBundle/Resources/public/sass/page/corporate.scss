@@ -224,50 +224,79 @@ body {
     }
 }
 
+// Cashback
+.cashback-steps {
+    position: relative;
+
+    @include breakpoint(laptop) {
+
+        &:after {
+            content: '';
+            width: 100%; height: 4px;
+            border-top: 3px dashed $lightest-blue;
+            z-index: -1;
+            position: absolute;
+            top: 100px;;
+        }
+
+
+    }
+}
+
 // Tables
-.table {
+.panel {
+    .table {
 
-    > thead {
+        > thead {
 
-        > tr {
-            > td {
-                font-weight: bold;
-                background-color: $primary-blue;
-                color: $white;
-
-                padding-top: 15px;
-                padding-bottom: 15px;
-
-                &:first-of-type {
-                    border-right: 2px solid $pale-grey;
-                }
-            }
-        }
-    }
-
-    > tbody {
-
-        > tr {
-            > td {
-                font-weight: bold;
-                padding-top: 15px;
-                padding-bottom: 15px;
-                border-color: $pale-grey;
-                border-width: 2px;
-
-                &:first-of-type {
-                    border-right: 2px solid $pale-grey;
-                }
-            }
-
-            &:first-of-type {
+            > tr {
                 > td {
-                    border-top: none;
+                    font-weight: bold;
+                    background-color: $primary-blue;
+                    color: $white;
+
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+
+                    &:first-of-type {
+                        border-right: 2px solid $pale-grey;
+                    }
                 }
             }
         }
+
+        > tbody {
+
+            > tr {
+                > td {
+                    font-weight: bold;
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                    border-color: $pale-grey;
+                    border-width: 2px;
+
+                    &:first-of-type {
+                        border-right: 2px solid $pale-grey;
+                    }
+                }
+
+                &:first-of-type {
+                    > td {
+                        border-top: none;
+                    }
+                }
+            }
+        }
+
     }
 
+    .table:first-child > thead:first-child > tr:first-child td:first-child {
+        border-top-left-radius: 10px;
+    }
+
+    .table:first-child > thead:first-child > tr:first-child td:last-child {
+        border-top-right-radius: 10px;
+    }
 }
 
 // TODO Move elsewhere
@@ -288,6 +317,7 @@ h3.h-light,
 }
 
 .panel {
+    @include border-radius(10px);
     border: none;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
 
@@ -297,12 +327,16 @@ h3.h-light,
 }
 
 .panel-pad {
-    padding: 15px;
+    padding: 30px;
     position: relative;
     z-index: 3;
 
     @include breakpoint(tablet) {
-        padding: 40px 30px;
+        padding: 30px;
+    }
+
+    @include breakpoint(laptop) {
+        padding: 50px;
     }
 }
 
