@@ -166,6 +166,10 @@ img[data-src] {
     z-index: 2;
 }
 
+.curved-background-top {
+    top: 0;
+}
+
 .section-fix {
     position: relative;
     z-index: 3;
@@ -175,7 +179,7 @@ img[data-src] {
     position: relative;
 
     @include breakpoint(desktop) {
-        padding-top: 200px;
+        padding-top: 100px;
     }
 
     .container {
@@ -353,6 +357,9 @@ img[data-src] {
 }
 
 // TODO Move elsewhere
+.lazy {
+    display: none;
+}
 
 h4.h-light {
     line-height: 30px;
