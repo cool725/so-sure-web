@@ -338,6 +338,8 @@ nelmio_security:
                 - https://*.google.ie
                 - gsa://onpageload
                 - https://*.doubleclick.net
+                - https://*.hotjar.com 
+                - 'data:'
             child-src:
                 - 'self'
                 - https://www.youtube.com
