@@ -46,6 +46,12 @@ monolog:
             type: rollbar
             level: warning
             channels: ['!event']
+        rollbar-security:
+            id: "app.logger.rollbar-security"
+            formatter: "app.logger.lineformatter"
+            type: rollbar
+            level: notice
+            channels: ['security']
         salva:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"

@@ -3,6 +3,11 @@ app:
     type:     annotation
     prefix:   /
 
+nelmio_security:
+    path:     /nelmio/csp/report
+    defaults: { _controller: nelmio_security.csp_reporter_controller:indexAction }
+    methods:  [POST]
+
 DpnXmlSitemapBundle:
     resource: "@DpnXmlSitemapBundle/Resources/config/routing.xml"
 

@@ -309,6 +309,99 @@ nexy_slack:
     endpoint:             "%slack_webhook%"
 
 nelmio_security:
+    csp:
+        report_logger_service: monolog.logger.security
+        enforce:
+            # see full description below
+            level1_fallback: true
+            # only send directives supported by the browser, defaults to false
+            # this is a port of https://github.com/twitter/secureheaders/blob/83a564a235c8be1a8a3901373dbc769da32f6ed7/lib/secure_headers/headers/policy_management.rb#L97
+            browser_adaptive:
+                enabled: true
+            report-uri: "%router.request_context.base_url%/nelmio/csp/report"
+            default-src:
+                - 'self'
+                - https://maxcdn.bootstrapcdn.com
+                - https://www.digits.com
+                - https://*.optimizely.com
+                - https://js.intercomcdn.com
+                - https://*.intercom.io
+                - wss://*.intercom.io
+                - https://app.getsentry.com
+                - https://player.vimeo.com
+                - http://*.facebook.com
+                - https://api.prodpad.com
+                - https://*.postcodeanywhere.co.uk
+            child-src:
+                - 'self'
+                - https://www.youtube.com
+                - https://*.digits.com
+                - http://*.facebook.com
+                - https://player.vimeo.com
+            script-src:
+                - 'self'
+                - 'unsafe-inline'
+                - 'unsafe-eval'
+                - https://cdn.so-sure.com
+                - https://*.twimg.com
+                - https://*.twitter.com
+                - https://*.digits.com
+                - https://ajax.googleapis.com
+                - https://maxcdn.bootstrapcdn.com
+                - https://www.googletagmanager.com
+                - http://www.googletagmanager.com
+                - https://app.prodpad.com
+                - https://cdn.iubenda.com
+                - http://cdn.iubenda.com
+                - https://www.google-analytics.com
+                - http://www.google-analytics.com
+                - https://*.facebook.net
+                - http://*.facebook.net
+                - https://*.facebook.com
+                - http://*.facebook.com
+                - https://cdn.optimizely.com
+                - http://cdn.optimizely.com
+                - https://widget.intercom.io
+                - https://js.intercomcdn.com
+                - https://waitlisted.co
+                - https://*.ads-twitter.com
+                - https://static.hotjar.com
+                - https://*.pcapredict.com
+                - http://*.pcapredict.com
+            style-src:
+                - 'self'
+                - 'unsafe-inline'
+                - https://cdn.so-sure.com
+                - https://maxcdn.bootstrapcdn.com
+                - https://app.prodpad.com
+                - https://cdn.digits.com
+                - https://waitlisted.co
+                - https://*.twitter.com
+                - http://*.twitter.com
+                - https://afeld.github.io
+            img-src:
+                - 'self'
+                - https://cdn.so-sure.com
+                - https://facebook.com
+                - https://www.facebook.com
+                - https://*.gravatar.com
+                - https://*.wp.com
+                - https://cdn.mxpnl.com
+                - http://cdn.mxpnl.com
+                - https://www.google-analytics.com
+                - http://www.google-analytics.com
+                - https://stats.g.doubleclick.net
+                - https://heapanalytics.com
+                - http://heapanalytics.com
+                - https://*.twitter.com
+                - http://*.twitter.com
+                - https://*.twimg.com
+                - https://www.google.com
+                - https://www.google.co.uk
+                - https://*.intercomassets.com
+                - https://*.intercomcdn.com
+                - 'data:'
+
     # prevents framing of the entire site
     clickjacking:
         paths:
