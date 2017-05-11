@@ -341,8 +341,6 @@ nelmio_security:
                 - https://*.hotjar.com 
                 - https://*.google.ie
                 - 'data:'
-            font-src:
-                - 'data:'
             child-src:
                 - 'self'
                 - https://www.youtube.com
