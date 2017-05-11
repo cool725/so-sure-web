@@ -13,7 +13,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    '@AppBundle/Resources/public/js/Default/index.js' %}
+    '@AppBundle/Resources/public/js/Default/corporate.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
@@ -36,15 +36,23 @@
 
             <h1 class="text-blue">Mobile phone insurance for your company</h1>
             <p class="lead">Next working day replacement or repair on phones up to 3 years old <br class="hidden-xs"> with up to 80% of your premium back every year.</p>
-            <a id="corporate-get-quote" href="#" class="btn btn-green btn-lg">Get a quote</a>
+            <a id="corporate-get-quote"
+               href="#"
+               class="btn btn-green btn-lg scroll-too"
+               data-scroll-to-anchor="#corporate-get-quote-form">Get a quote</a>
             <div class="fom">
-                <a id="fom" href="#"><small>Find out more <br> <i class="fa fa-chevron-down" aria-hidden="true"></i></small></a>
+                <a id="fom"
+                   href="#"
+                   class="scroll-too"
+                   data-scroll-to-anchor="#key-benefits">
+                   <small>Find out more <br> <i class="fa fa-chevron-down" aria-hidden="true"></i></small>
+                </a>
             </div>
 
         </div>
     </section>
 
-    <section class="section-corporate section-corporate-pad" id="key-benefits">
+    <section class="section-corporate section-corporate-pad" id="seen-on">
         <div class="container">
 
             <div class="row">
@@ -57,6 +65,12 @@
                     </div>
                 </div>
             </div>
+
+        </div>
+    </section>
+
+    <section class="section-corporate section-corporate-pad" id="key-benefits">
+        <div class="container">
 
             <div class="row">
                 <div class="col-md-12">
