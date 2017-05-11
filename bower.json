@@ -32,13 +32,17 @@
     "intl-tel-input": "^11.0.4",
     "jquery-circle-progress": "^1.2.1",
     "jquery-validation": "jquery.validate#^1.13.0",
-    "bootstrap-sass": "^3.3.7"
+    "bootstrap-sass": "^3.3.7",
+    "jquery_lazyload": "jquery.lazyload#^1.9.7"
   },
   "install": {
     "path": "web/components",
     "sources": {
       "jquery": [
         "bower_components/jquery/dist/jquery.min.js"
+      ],
+      "jquery_lazyload": [
+        "bower_components/jquery_lazyload/jquery.lazyload.js"
       ],
       "seiyria-bootstrap-slider": [
         "bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js",
