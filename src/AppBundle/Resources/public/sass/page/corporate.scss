@@ -15,17 +15,17 @@ body {
     position: relative;
     overflow-y: hidden;
     overflow-x: hidden;
+
     min-height: 500px;
 
     background-color: $white;
-
     border-bottom: 3px solid $light-blue;
 
     > .corporate-hero-inner {
         max-width: 770px;
         margin-left: auto;
         margin-right: auto;
-        margin-top: 120px;
+        margin-top: 80px;
         text-align: center;
         position: relative;
         z-index: 10;
@@ -76,67 +76,46 @@ body {
         bottom: 0;
         background-repeat: no-repeat;
         width: 600px; height: 450px;
+        background-size: 30%;
 
-        opacity: 0.6;
+        // opacity: 0.9;
+
+        @include breakpoint(midtablet) {
+            background-size: 40%;
+        }
+
+        @include breakpoint(tablet) {
+            background-size: 50%;
+        }
+
+        @include breakpoint(laptop) {
+            background-size: 55%;
+        }
+
+        @include breakpoint(desktop) {
+            background-size: 70%;
+            height: 600px;
+        }
+
     }
 
     &:before {
-        // display: none;
-        left: -200px;
+        left: 0px;
         z-index: 8;
         background-position: left bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-left-bottom.svg');
-
-        @include breakpoint(midtablet) {
-            display: block;
-            left: -100px;
-        }
-
-        @include breakpoint(tablet) {
-            left: -80px;
-        }
-
-        @include breakpoint(laptop) {
-            left: -40px;
-        }
-
-        @include breakpoint(desktop) {
-            left: 0;
-        }
     }
 
     &:after {
-        right: -100px;
+        right: 0px;
         z-index: 7;
         background-position: right bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-right-bottom.svg');
-
-        @include breakpoint(mobileishup) {
-            right: 0;
-        }
-
-        @include breakpoint(midtablet) {
-            right: -100px;
-        }
-
-        @include breakpoint(tablet) {
-            right: -80px;
-        }
-
-        @include breakpoint(laptop) {
-            right: 0;
-        }
-
-        @include breakpoint(desktop) {
-            right: 0;
-        }
-
     }
 }
 
 .section-corporate {
     position: relative;
-    // padding: 20px 0 0;
 }
 
 .section-corporate-pad {
