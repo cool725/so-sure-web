@@ -131,11 +131,15 @@ class MonitorService
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $twoDays = new \DateTime();
         $twoDays = $twoDays->sub(new \DateInterval('P2D'));
-        $newPolicies = $repo->findAllNewPolicies(null, $twoDays);
+
+        // delay 10 minutes to allow time to sync
+        $tenMinutes = new \DateTime();
+        $tenMinutes = $tenMinutes->sub(new \DateInterval('PT10M'));
+        $newPolicies = $repo->findAllNewPolicies(null, $twoDays, $tenMinutes);
         $errors = [];
         foreach ($newPolicies as $newPolicy) {
             $intercomUser = $this->intercom->getIntercomUser($newPolicy->getUser());
-            if ($intercomUser->custom_attributes->Premium <= 0) {
+            if (is_object($intercomUser) && $intercomUser->custom_attributes->Premium <= 0) {
                 $errors[] = sprintf(
                     'Intercom out of sync: %s has a 0 premium in intercom, yet has a policy',
                     $newPolicy->getUser()->getEmail()
