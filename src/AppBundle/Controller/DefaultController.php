@@ -167,7 +167,6 @@ class DefaultController extends BaseController
      */
     public function selectPhoneMakeAction(Request $request, $type = null, $id = null)
     {
-        $deviceAtlas = $this->get('app.deviceatlas');
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phoneMake = new PhoneMake();

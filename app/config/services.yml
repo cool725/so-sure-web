@@ -395,6 +395,11 @@ services:
         arguments:
             - access_token: '%rollbar_access_token%'
 
+    app.logger.rollbar-security:
+        class: AppBundle\Classes\Rollbar
+        arguments:
+            - access_token: '%rollbar_access_token%'
+
     app.logger.lineformatter:
         class: Monolog\Formatter\LineFormatter
         calls:

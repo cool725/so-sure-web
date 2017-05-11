@@ -22,6 +22,19 @@ class Rollbar extends \RollbarNotifier
                     stripos($source->getMessage(), "Untrusted Host") !== false) {
                     return true;
                 }
+
+                // Verify: GET -UsEd https://wearesosure.com/login_check
+                if ($source instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException &&
+                    stripos($source->getMessage(), "GET /login_check") !== false) {
+                    return true;
+                }
+
+                // Uncertain how to verify, AccessDeniedHttpExceptionVoter is supposed to prevent rollbar
+                // however, messages on occasion still come through. It might occur when session times out...
+                // But hopefully this will prevent
+                if ($source instanceof \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException) {
+                    return true;
+                }
             }
 
             return false;
