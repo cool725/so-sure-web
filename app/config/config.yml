@@ -369,7 +369,7 @@ nelmio_security:
                 - https://*.hotjar.com
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
-                - https://www.googleadservices.com
+                - https://*.googleadservices.com
             style-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -403,6 +403,8 @@ nelmio_security:
                 - https://*.intercomassets.com
                 - https://*.intercomcdn.com
                 - https://t.co
+                - https://*.doubleclick.net
+                - https://*.googleadservices.com
                 - 'data:'
 
     # prevents framing of the entire site
