@@ -88,9 +88,9 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Approved Claim Freq</td>
+                            <td>Approved Claim Freq (avg weekly)</td>
                             {% for week in weeks %}
-                                <td>{{ (100 * week['freq-claims']) | number_format(1, '.', ',') }}%</td>
+                                <td>{{ week['freq-claims'] | number_format(1, '.', ',') }}%</td>
                             {% endfor %}
                         </tr>                        
                         <tr>
