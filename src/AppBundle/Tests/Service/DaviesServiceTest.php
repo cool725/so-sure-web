@@ -395,6 +395,58 @@ class DaviesServiceTest extends WebTestCase
         $this->assertTrue($foundMatch);
     }
 
+    public function testValidateClaimDetailsIncorrectExcess()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = "Loss - From Pocket";
+        $daviesClaim->excess = 50;
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/does not have the correct excess value/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertTrue($foundMatch);
+    }
+
+    public function testValidateClaimDetailsClosedWithReserve()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->lossType = "Loss - From Pocket";
+        $daviesClaim->reserved = 10;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep('/still has a reserve fee/', $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        $this->assertTrue($foundMatch);
+    }
+
     public function testValidateClaimDetailsReservedPresent()
     {
         $policy = static::createUserPolicy(true);

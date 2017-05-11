@@ -460,6 +460,19 @@ class DaviesService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
+        if ($daviesClaim->isExcessValueCorrect() === false) {
+            $msg = sprintf(
+                'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
+                $daviesClaim->claimNumber,
+                $daviesClaim->getExpectedExcess(),
+                $daviesClaim->excess,
+                $daviesClaim->getClaimType(),
+                $daviesClaim->getClaimStatus()
+            );
+            $this->logger->warning($msg);
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        }
+
         if ($daviesClaim->isIncurredValueCorrect() === false) {
             $msg = sprintf(
                 'Claim %s does not have the correct incurred value. Expected %0.2f Actual %0.2f',
@@ -479,6 +492,15 @@ class DaviesService
                 $daviesClaim->claimNumber,
                 $claim->totalChargesWithVat(),
                 $daviesClaim->reciperoFee
+            );
+            $this->logger->warning($msg);
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        }
+
+        if ($daviesClaim->isClosed(true) && $daviesClaim->reserved > 0) {
+            $msg = sprintf(
+                'Claim %s is closed, yet still has a reserve fee.',
+                $daviesClaim->claimNumber
             );
             $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;

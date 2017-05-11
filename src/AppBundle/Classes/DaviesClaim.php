@@ -115,6 +115,40 @@ class DaviesClaim
         return $this->reserved;
     }
 
+    public function getExpectedExcess()
+    {
+        // Declined, withdrawn should not have excess
+        if (in_array($this->getClaimStatus(), [Claim::STATUS_DECLINED, Claim::STATUS_WITHDRAWN])) {
+            return 0;
+        }
+
+        if (in_array($this->getClaimType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
+            return 70;
+        } elseif (in_array($this->getClaimType(), [
+            Claim::TYPE_DAMAGE,
+            Claim::TYPE_WARRANTY,
+            Claim::TYPE_EXTENDED_WARRANTY
+        ])) {
+            return 50;
+        }
+
+        return null;
+    }
+
+    public function isExcessValueCorrect()
+    {
+        if ($this->excess > 0) {
+            return $this->excess == $this->getExpectedExcess();
+        }
+
+        // Settled claims should always have excess
+        if ($this->getClaimStatus() == Claim::STATUS_SETTLED) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function isIncurredValueCorrect()
     {
         $expected = $this->getExpectedIncurred();
@@ -174,10 +208,10 @@ class DaviesClaim
             return Claim::TYPE_THEFT;
         } elseif (stripos($this->lossType, self::TYPE_DAMAGE) !== false) {
             return Claim::TYPE_DAMAGE;
-        } elseif (stripos($this->lossType, self::TYPE_WARRANTY) !== false) {
-            return Claim::TYPE_WARRANTY;
         } elseif (stripos($this->lossType, self::TYPE_EXTENDED_WARRANTY) !== false) {
             return Claim::TYPE_EXTENDED_WARRANTY;
+        } elseif (stripos($this->lossType, self::TYPE_WARRANTY) !== false) {
+            return Claim::TYPE_WARRANTY;
         } else {
             return null;
         }
