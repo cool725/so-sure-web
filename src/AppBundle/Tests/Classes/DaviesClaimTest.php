@@ -322,15 +322,23 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $davies = new DaviesClaim();
         $davies->lossType = "Loss - From Pocket";
         $this->assertEquals(Claim::TYPE_LOSS, $davies->getClaimType());
+        $this->assertEquals(70, $davies->getExpectedExcess());
 
         $davies->lossType = "Warranty - Audio Fault";
         $this->assertEquals(Claim::TYPE_WARRANTY, $davies->getClaimType());
+        $this->assertEquals(50, $davies->getExpectedExcess());
 
         $davies->lossType = "Accidental Damage - Dropped (Away From Home)   ";
         $this->assertEquals(Claim::TYPE_DAMAGE, $davies->getClaimType());
+        $this->assertEquals(50, $davies->getExpectedExcess());
 
         $davies->lossType = "Theft - From Pocket";
         $this->assertEquals(Claim::TYPE_THEFT, $davies->getClaimType());
+        $this->assertEquals(70, $davies->getExpectedExcess());
+
+        $davies->lossType = "Extended Warranty - Audio Fault";
+        $this->assertEquals(Claim::TYPE_EXTENDED_WARRANTY, $davies->getClaimType());
+        $this->assertEquals(50, $davies->getExpectedExcess());
     }
 
     /**

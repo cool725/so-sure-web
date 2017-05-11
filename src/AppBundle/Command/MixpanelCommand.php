@@ -85,7 +85,7 @@ class MixpanelCommand extends ContainerAwareCommand
             $results = $this->getMixpanel()->updateUser($user);
             $output->writeln('Queued user update');
         } elseif ($action == 'sync-all') {
-            $policies = $this->getPhonePolicyRepository()->findAllActivePolicies(null);
+            $policies = $this->getPhonePolicyRepository()->findAllActiveUnpaidPolicies();
             $count = 0;
             foreach ($policies as $policy) {
                 $results = $this->getMixpanel()->updateUser($policy->getUser());

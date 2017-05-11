@@ -339,6 +339,12 @@ nelmio_security:
                 - gsa://onpageload
                 - https://*.doubleclick.net
                 - https://*.hotjar.com 
+                - https://*.google.ie
+                - https://cdn.so-sure.com
+                - https://www.youtube.com
+                - https://*.fastly.net
+                - https://maxcdn.bootstrapcdn.com
+                - http://maxcdn.bootstrapcdn.com
                 - 'data:'
             child-src:
                 - 'self'
@@ -346,6 +352,7 @@ nelmio_security:
                 - https://*.digits.com
                 - http://*.facebook.com
                 - https://player.vimeo.com
+                - https://*.hotjar.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -377,6 +384,8 @@ nelmio_security:
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
                 - https://*.googleadservices.com
+                - https://code.jquery.com
+                - 'data:'
             style-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -388,6 +397,9 @@ nelmio_security:
                 - https://*.twitter.com
                 - http://*.twitter.com
                 - https://afeld.github.io
+                - https://*.fastly.net
+                - https://maxcdn.bootstrapcdn.com
+                - http://maxcdn.bootstrapcdn.com
             img-src:
                 - 'self'
                 - https://cdn.so-sure.com
@@ -414,6 +426,8 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://*.fbcdn.net
                 - 'data:'
+                - https://*.google.ie
+                - https://*.google.be
 
     # prevents framing of the entire site
     clickjacking:
