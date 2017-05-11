@@ -341,12 +341,15 @@ nelmio_security:
                 - https://*.hotjar.com 
                 - https://*.google.ie
                 - 'data:'
+            font-src:
+                - 'data:'
             child-src:
                 - 'self'
                 - https://www.youtube.com
                 - https://*.digits.com
                 - http://*.facebook.com
                 - https://player.vimeo.com
+                - https://*.hotjar.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -378,6 +381,7 @@ nelmio_security:
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
                 - https://*.googleadservices.com
+                - 'data:'
             style-src:
                 - 'self'
                 - 'unsafe-inline'
