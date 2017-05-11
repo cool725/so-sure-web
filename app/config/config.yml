@@ -339,6 +339,7 @@ nelmio_security:
                 - gsa://onpageload
                 - https://*.doubleclick.net
                 - https://*.hotjar.com 
+                - 'data:'
             child-src:
                 - 'self'
                 - https://www.youtube.com
