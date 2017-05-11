@@ -47,29 +47,7 @@ class DeviceAtlasService
      */
     public function getPhone(Request $request)
     {
-        $userAgent = $request->headers->get('User-Agent');
-
         return null;
-
-        try {
-            // $result = DeviceAtlasCloudClient::getDeviceData($userAgent);
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
-
-            return null;
-        }
-        if (!isset($result['properties']) ||
-            !isset($result['properties']['isMobilePhone']) ||
-            $result['properties']['isMobilePhone'] != 1) {
-            return null;
-        }
-
-        $manufacturer = $result['properties']['manufacturer'];
-        $model = $result['properties']['model'];
-        $osVersion = $result['properties']['osVersion'];
-        $marketingName = isset($result['properties']['marketingName']) ? $result['properties']['marketingName'] : null;
-
-        return $this->getPhoneFromDetails($manufacturer, $marketingName, $model, $osVersion);
     }
 
     /**
@@ -79,27 +57,7 @@ class DeviceAtlasService
      */
     public function isMobile(Request $request)
     {
-        $userAgent = $request->headers->get('User-Agent');
-
         return null;
-        try {
-            // $result = DeviceAtlasCloudClient::getDeviceData($userAgent);
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
-
-            return null;
-        }
-
-        if (!isset($result['properties']) ||
-            !isset($result['properties']['isMobilePhone'])) {
-            return null;
-        }
-
-        if ($result['properties']['isMobilePhone'] == 1) {
-            return true;
-        }
-
-        return false;
     }
 
     public function getMissing()
