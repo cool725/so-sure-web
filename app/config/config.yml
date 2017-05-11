@@ -414,6 +414,7 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://*.fbcdn.net
                 - 'data:'
+                - https://*.google.ie
 
     # prevents framing of the entire site
     clickjacking:
