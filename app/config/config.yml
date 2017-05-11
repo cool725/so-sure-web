@@ -343,6 +343,8 @@ nelmio_security:
                 - https://cdn.so-sure.com
                 - https://www.youtube.com
                 - https://*.fastly.net
+                - https://maxcdn.bootstrapcdn.com
+                - http://maxcdn.bootstrapcdn.com
                 - 'data:'
             child-src:
                 - 'self'
