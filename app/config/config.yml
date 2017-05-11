@@ -342,6 +342,9 @@ nelmio_security:
                 - https://*.google.ie
                 - https://cdn.so-sure.com
                 - https://www.youtube.com
+                - https://*.fastly.net
+                - https://maxcdn.bootstrapcdn.com
+                - http://maxcdn.bootstrapcdn.com
                 - 'data:'
             child-src:
                 - 'self'
@@ -395,6 +398,8 @@ nelmio_security:
                 - http://*.twitter.com
                 - https://afeld.github.io
                 - https://*.fastly.net
+                - https://maxcdn.bootstrapcdn.com
+                - http://maxcdn.bootstrapcdn.com
             img-src:
                 - 'self'
                 - https://cdn.so-sure.com
