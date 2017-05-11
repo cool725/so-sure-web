@@ -332,6 +332,7 @@ nelmio_security:
                 - http://*.facebook.com
                 - https://api.prodpad.com
                 - https://*.postcodeanywhere.co.uk
+                - https://*.hotjar.com
             child-src:
                 - 'self'
                 - https://www.youtube.com
@@ -365,9 +366,10 @@ nelmio_security:
                 - https://js.intercomcdn.com
                 - https://waitlisted.co
                 - https://*.ads-twitter.com
-                - https://static.hotjar.com
+                - https://*.hotjar.com
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
+                - https://www.googleadservices.com
             style-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -400,6 +402,7 @@ nelmio_security:
                 - https://www.google.co.uk
                 - https://*.intercomassets.com
                 - https://*.intercomcdn.com
+                - https://t.co
                 - 'data:'
 
     # prevents framing of the entire site
