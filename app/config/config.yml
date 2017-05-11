@@ -336,7 +336,8 @@ nelmio_security:
                 - https://*.postcodeanywhere.co.uk
                 - https://*.hotjar.com
                 - https://*.google.ie
-                - gsa://onpageload 
+                - gsa://onpageload
+                - https://*.doubleclick.net
             child-src:
                 - 'self'
                 - https://www.youtube.com
