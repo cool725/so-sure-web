@@ -61,23 +61,23 @@ $(function(){
         }, 1500);
     });
 
-    $('#corporate-get-quote').click(function(event) {
+    // $('#corporate-get-quote').click(function(event) {
 
-        event.preventDefault();
+    //     event.preventDefault();
 
-        $('html, body').animate({
-            scrollTop: $('#corporate-get-quote-form').offset().top
-        }, 1500);
-    });
+    //     $('html, body').animate({
+    //         scrollTop: $('#corporate-get-quote-form').offset().top
+    //     }, 1500);
+    // });
 
-    $('#fom').click(function(event) {
+    // $('#fom').click(function(event) {
 
-        event.preventDefault();
+    //     event.preventDefault();
 
-        $('html, body').animate({
-            scrollTop: $('#key-benefits').offset().top
-        }, 1500);
-    });
+    //     $('html, body').animate({
+    //         scrollTop: $('#key-benefits').offset().top
+    //     }, 1500);
+    // });
 
 
     // Collapse Panels - FAQs

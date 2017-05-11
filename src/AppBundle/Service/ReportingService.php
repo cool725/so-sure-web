@@ -265,4 +265,22 @@ class ReportingService
             'approvedClaims' => $approvedClaimsTotals,
         ];
     }
+
+    public function sumTotalPoliciesPerWeek(\DateTime $end = null)
+    {
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+
+        $start = new \DateTime('2016-09-12');
+        $total = 0;
+        if (!$end) {
+            $end = new \DateTime();
+        }
+        $weeks = floor($end->diff($start)->days / 7);
+        for ($i = 1; $i <= $weeks; $i++) {
+            $start = $start->add(new \DateInterval('P7D'));
+            $total += $policyRepo->countAllNewPolicies($start);
+        }
+
+        return $total;
+    }
 }
