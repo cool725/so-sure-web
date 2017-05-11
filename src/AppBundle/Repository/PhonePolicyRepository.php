@@ -104,7 +104,7 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are active (excluding so-sure test ones)
      */
-    public function findAllActivePolicies($leadSource, \DateTime $startDate = null, \DateTime $endDate = null)
+    public function findAllActivePolicies(\DateTime $startDate = null, \DateTime $endDate = null)
     {
         if (!$endDate) {
             $endDate = new \DateTime();
@@ -118,7 +118,6 @@ class PhonePolicyRepository extends PolicyRepository
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
-        $qb->field('leadSource')->equals($leadSource);
         $qb->field('start')->lte($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);

@@ -874,7 +874,7 @@ class PolicyService
     public function getBreakdownData()
     {
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllActivePolicies(null);
+        $policies = $repo->findAllActivePolicies();
         $phones = [];
         $makes = [];
         foreach ($policies as $policy) {
