@@ -340,6 +340,8 @@ nelmio_security:
                 - https://*.doubleclick.net
                 - https://*.hotjar.com 
                 - https://*.google.ie
+                - https://cdn.so-sure.com
+                - https://www.youtube.com
                 - 'data:'
             child-src:
                 - 'self'
@@ -379,6 +381,7 @@ nelmio_security:
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
                 - https://*.googleadservices.com
+                - https://code.jquery.com
                 - 'data:'
             style-src:
                 - 'self'
@@ -391,6 +394,7 @@ nelmio_security:
                 - https://*.twitter.com
                 - http://*.twitter.com
                 - https://afeld.github.io
+                - https://*.fastly.net
             img-src:
                 - 'self'
                 - https://cdn.so-sure.com
@@ -418,6 +422,7 @@ nelmio_security:
                 - https://*.fbcdn.net
                 - 'data:'
                 - https://*.google.ie
+                - https://*.google.be
 
     # prevents framing of the entire site
     clickjacking:
