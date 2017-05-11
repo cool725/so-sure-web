@@ -33,20 +33,13 @@ class InvitationController extends BaseController
         $repo = $dm->getRepository(Invitation::class);
         $invitation = $repo->find($id);
         $phoneRepo = $dm->getRepository(Phone::class);
-        $deviceAtlas = $this->get('app.deviceatlas');
 
         if ($invitation && $invitation->isSingleUse() && $invitation->isInviteeProcessed()) {
             return $this->render('AppBundle:Invitation:processed.html.twig', [
                 'invitation' => $invitation,
             ]);
         } elseif ($this->getUser() !== null) {
-            // If user is on their mobile, use branch to redirect to app
-            if ($deviceAtlas->isMobile($request)) {
-                return $this->redirect($this->getParameter('branch_share_url'));
-            }
-            // otherwise, the standard invitation is ok for now
-            // TODO: Once invitations can be accepted on the web,
-            // we should use branch for everything
+            return $this->redirect($this->getParameter('branch_share_url'));
         } elseif ($invitation && $invitation->isCancelled()) {
             // If invitation was cancelled, don't mention who invited them (clear the invitation),
             // but still try to convert user
