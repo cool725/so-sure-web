@@ -15,4 +15,11 @@ $(function(){
 
     });
 
+    // Lazy load images
+    $('img[data-src]').each(function() {
+        $(this).attr('src', $(this).attr('data-src'));
+        $(this).removeAttr('data-src');
+    });
+
+
 });
