@@ -428,8 +428,11 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://*.fbcdn.net
                 - 'data:'
-                - https://*.google.ie
-                - https://*.google.be
+                - https://www.google.ie
+                - https://www.google.be
+                - https://www.google.de
+                - https://www.google.com.ph
+                - https://www.google.lv
 
     # prevents framing of the entire site
     clickjacking:
