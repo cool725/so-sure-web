@@ -354,6 +354,7 @@ nelmio_security:
                 - http://*.facebook.com
                 - https://player.vimeo.com
                 - https://*.hotjar.com
+                - https://*.doubleclick.net
             script-src:
                 - 'self'
                 - 'unsafe-inline'
