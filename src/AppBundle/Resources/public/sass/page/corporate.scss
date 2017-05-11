@@ -35,7 +35,7 @@ img[data-src] {
         max-width: 770px;
         margin-left: auto;
         margin-right: auto;
-        margin-top: 80px;
+        margin-top: 40px;
         text-align: center;
         position: relative;
         z-index: 10;
@@ -74,6 +74,10 @@ img[data-src] {
             }
         }
 
+        @include breakpoint(mobileishup) {
+            margin-top: 100px;
+        }
+
         @include breakpoint(tablet) {
             margin-top: 150px;
         }
@@ -85,42 +89,50 @@ img[data-src] {
         position: absolute;
         bottom: 0;
         background-repeat: no-repeat;
-        width: 600px; height: 450px;
-        background-size: 30%;
-
-        // opacity: 0.9;
-
-        @include breakpoint(midtablet) {
-            background-size: 40%;
-        }
-
-        @include breakpoint(tablet) {
-            background-size: 50%;
-        }
-
-        @include breakpoint(laptop) {
-            background-size: 55%;
-        }
-
-        @include breakpoint(desktop) {
-            background-size: 70%;
-            height: 600px;
-        }
     }
 
     &:before {
-        left: 0px;
+        width: 600px; height: 450px;
+        left: 0;
         z-index: 8;
         background-position: left bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-left-bottom.svg');
+        background-size: 30%;
+        @include breakpoint(midtablet) {
+            background-size: 40%;
+        }
+        @include breakpoint(tablet) {
+            background-size: 50%;
+        }
+        @include breakpoint(laptop) {
+            background-size: 55%;
+        }
+        @include breakpoint(desktop) {
+            background-size: 70%;
+        }
     }
 
     &:after {
-        right: 0px;
+        width: 352px; height: 450px;
+        right: 0;
         z-index: 7;
         background-position: right bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-right-bottom.svg');
+        background-size: 40%;
+        @include breakpoint(midtablet) {
+            background-size: 50%;
+        }
+        @include breakpoint(tablet) {
+            background-size: 65%;
+        }
+        @include breakpoint(laptop) {
+            background-size: 75%;
+        }
+        @include breakpoint(desktop) {
+            background-size: 90%;
+        }
     }
+
 }
 
 .section-corporate {
@@ -130,7 +142,7 @@ img[data-src] {
 .section-corporate-pad {
     padding-bottom: 30px;
 
-    + h2 {
+    h2 {
         margin-top: 0;
     }
 
@@ -176,35 +188,48 @@ img[data-src] {
         position: absolute;
         bottom: 0;
         background-repeat: no-repeat;
-        width: 600px; height: 450px;
-        background-size: 30%;
-
-        @include breakpoint(midtablet) {
-            background-size: 40%;
-        }
-
-        @include breakpoint(tablet) {
-            background-size: 50%;
-        }
-
-        @include breakpoint(laptop) {
-            background-size: 55%;
-        }
-
     }
 
     &:before {
+        width: 600px; height: 450px;
         left: 0;
         z-index: 8;
         background-position: left bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-left-bottom.svg');
+        background-size: 30%;
+        @include breakpoint(midtablet) {
+            background-size: 40%;
+        }
+        @include breakpoint(tablet) {
+            background-size: 50%;
+        }
+        @include breakpoint(laptop) {
+            background-size: 55%;
+        }
+        @include breakpoint(desktop) {
+            background-size: 70%;
+        }
     }
 
     &:after {
+        width: 352px; height: 450px;
         right: 0;
         z-index: 7;
         background-position: right bottom;
         background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-right-bottom.svg');
+        background-size: 40%;
+        @include breakpoint(midtablet) {
+            background-size: 50%;
+        }
+        @include breakpoint(tablet) {
+            background-size: 65%;
+        }
+        @include breakpoint(laptop) {
+            background-size: 75%;
+        }
+        @include breakpoint(desktop) {
+            background-size: 90%;
+        }
     }
 }
 
