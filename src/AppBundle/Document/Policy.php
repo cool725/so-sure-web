@@ -2291,12 +2291,19 @@ abstract class Policy
         ];
     }
 
-    public static function sumYearlyPremiumPrice($policies, $prefix = null)
+    public static function sumYearlyPremiumPrice($policies, $prefix = null, $activeUnpaidOnly = false)
     {
         $total = 0;
         foreach ($policies as $policy) {
             if ($policy->isValidPolicy($prefix)) {
-                $total += $policy->getYearlyPremiumPrice();
+                $includePolicy = true;
+                if ($activeUnpaidOnly &&
+                    !in_array($policy->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
+                    $includePolicy = false;
+                }
+                if ($includePolicy) {
+                    $total += $policy->getYearlyPremiumPrice();
+                }
             }
         }
 
