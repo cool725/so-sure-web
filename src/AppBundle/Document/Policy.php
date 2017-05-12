@@ -507,8 +507,12 @@ abstract class Policy
         return $this->getBilling()->format('j');
     }
 
-    public function setBilling(\DateTime $billing)
+    public function setBilling(\DateTime $billing, \DateTime $changeDate = null)
     {
+        // Only if changing billing date - allow the initial setting if unpaid
+        if ($this->billing && !$this->isPolicyPaidToDate($changeDate)) {
+            throw new \Exception('Unable to changing billing date unless policy is paid to date');
+        }
         $this->billing = $billing;
     }
 
