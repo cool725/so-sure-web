@@ -21,6 +21,9 @@ class BillingDayType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $policy = $builder->getData()->getPolicy();
+        $enabled = $policy->isPolicyPaidToDate();
+
         $days = [];
         for ($i = 1; $i <= 28; $i++) {
             $days[$i] = $i;
@@ -30,7 +33,7 @@ class BillingDayType extends AbstractType
                     'choices' => $days,
                     'required' => true
             ])
-            ->add('update', SubmitType::class)
+            ->add('update', SubmitType::class, ['disabled' => !$enabled])
         ;
     }
 

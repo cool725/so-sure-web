@@ -602,6 +602,7 @@
                         {{ form_widget(billing_form.day) }}
                         {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
                         {{ form_end(billing_form) }}
+                        {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
                     </td>
                 </tr>
                 {% endif %}
