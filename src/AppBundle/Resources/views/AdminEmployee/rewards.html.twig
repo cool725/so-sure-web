@@ -17,7 +17,7 @@
     </div>
     <div class="col-md-2">
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#rewardModal" style="margin-top: 20px"
-        ><i class="fa fa-plus"></i> New Bonus Type</button>        
+        ><i class="fa fa-plus"></i> New Bonus Type</button>
     </div>
 </div>
 <div class="row">
@@ -40,7 +40,7 @@
                 <td>£{{ reward.potValue|number_format(2, '.', ',') }}</td>
                 <td>
                     <button type="button" class="btn btn-info" data-user-name="{{ reward.user }}" data-reward-id="{{ reward.id }}" data-toggle="modal" data-target="#connectModal"
-                    ><i class="fa fa-plus"></i> Add Bonus To User</button>                    
+                    ><i class="fa fa-plus"></i> Add Bonus To User</button>
                 </td>
             </tr>
         {% endfor %}
@@ -61,17 +61,17 @@
                     {{ form_label(connectForm.email, 'Email') }}
                     {{ form_errors(connectForm.email) }}
                     {{ form_widget(connectForm.email) }}
-                </div>                
+                </div>
                 <div class="form-group">
                     {{ form_label(connectForm.amount, 'Bonus Amount') }}
                     {{ form_errors(connectForm.amount) }}
                     {{ form_widget(connectForm.amount) }}
-                </div>                
+                </div>
                 <div class="form-group">
                     {{ form_widget(connectForm.rewardId) }}
                     {{ form_widget(connectForm.next, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
-            {{ form_end(connectForm) }}    
+            {{ form_end(connectForm) }}
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@
                 <div class="form-group">
                     {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
-            {{ form_end(rewardForm) }}    
+            {{ form_end(rewardForm) }}
           </div>
         </div>
       </div>

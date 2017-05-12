@@ -40,7 +40,7 @@
             <button class="btn btn-primary">View Accounts</button>
             &nbsp;
             <a target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}"><i class="fa fa-print"></i></a>
-        </div>                
+        </div>
     </div>
     </form>
 </div>
@@ -58,12 +58,12 @@
             {{ form_label(judoForm.file, 'File') }}
             {{ form_errors(judoForm.file) }}
             {{ form_widget(judoForm.file) }}
-        </div>                
+        </div>
     </div>
     <div class="col-md-1">
         <div class="form-group">
             {{ form_widget(judoForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
-        </div>                
+        </div>
     </div>
 </div>
 {{ form_end(judoForm) }}
@@ -81,6 +81,6 @@
         </ul>
         {% endif %}
     {% endfor %}
-    
+
 </div>
 {% endblock %}

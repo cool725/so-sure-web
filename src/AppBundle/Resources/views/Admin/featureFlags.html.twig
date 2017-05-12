@@ -13,10 +13,10 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-8">
-            <h2>so-sure Feature Flags</h2>      
+            <h2>so-sure Feature Flags</h2>
         </div>
     </div>
-        
+
     {% if features|length == 0 %}
     <div class="row-fluid">
         <h2>No features are present in the db</h2>
@@ -51,10 +51,10 @@
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>        
+            </div>
         </div>
     </div>
     {% endif %}
 </div>
-    
+
 {% endblock %}

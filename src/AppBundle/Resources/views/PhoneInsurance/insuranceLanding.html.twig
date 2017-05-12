@@ -18,7 +18,7 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts 
+    {% javascripts
         '@AppBundle/Resources/public/js/Default/index.js'
     %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
@@ -36,9 +36,9 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="{{ path('fos_user_security_login') }}">Login</a></li>
                     </ul>
-                </div>                
-            </div>  
-        </nav>    
+                </div>
+            </div>
+        </nav>
     </header>
 {% endblock %}
 
@@ -48,7 +48,7 @@
             <h1 class="text-center text-white">Cheap {{ phone }} Insurance </h1>
             <h2 class="text-center text-light-blue hidden-md hidden-lg"><span class="text-nowrap">only £{{ phone_price.monthlyPremiumPrice }} per month</span></h2>
             <div class="row steps--shadow">
-                
+
                 <div class="col-md-4 step">
                     <div class="step-inner">
                         <h2 class="h1"><span class="text-grey-blue">1</span> Insure 📱</h2>
@@ -62,9 +62,9 @@
                         <div class="visible-xs-block">
                             {{ form_start(buy_form_banner, { 'attr': {'class':'text-center'}}) }}
                                 {{ form_widget(buy_form_banner.buy, {'label': ' Get it now', 'attr': {'class': 'btn btn-success  btn-block btn-lg'}}) }}
-                                <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
-                            {{ form_end(buy_form_banner)}}                            
-                        </div>                        
+                                <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a>
+                            {{ form_end(buy_form_banner)}}
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4 step step-blue">
@@ -88,30 +88,30 @@
                         <ul class="landing-list">
                             <li>Enjoy massive savings off your next year's policy, or</li>
                             <li>get cash back to spend how you want.</li>
-                        </ul>         
+                        </ul>
                         <ul class="list-unstyled landing-list">
                             <li>Every year you and your friends don’t claim, your reward pot is paid to you.</li>
-                        </ul>                                       
+                        </ul>
                         {{ form_start(buy_form, { 'attr': {'class':'text-center'}}) }}
                             {{ form_widget(buy_form.buy_tablet, {'label': ' Get it now', 'attr': {'class': 'btn btn-success  btn-block btn-lg'}}) }}
-                            <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a> 
+                            <a data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger" class="btn btn-link btn-xs">Full Terms &amp; Conditions</a>
                         {{ form_end(buy_form)}}
                     </div>
-                </div>                                                
+                </div>
 
             </div>
         </div>
 
         {% include 'AppBundle::Default/press.html.twig' %}
-              
+
     </main>
 
 
-    <div class="modal modal-fullscreen fade" 
-         id="policy-modal" 
-         tabindex="-1" 
-         role="dialog" 
-         aria-labelledby="So-Sure Policy Terms" 
+    <div class="modal modal-fullscreen fade"
+         id="policy-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="So-Sure Policy Terms"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -127,7 +127,7 @@
                 </div>
             </div>
         </div>
-    </div>      
+    </div>
 {% endblock %}
 
 {% block footer %}

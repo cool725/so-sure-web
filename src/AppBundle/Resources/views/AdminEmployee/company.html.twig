@@ -17,7 +17,7 @@
     </div>
     <div class="col-md-2">
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#companyModal" style="margin-top: 20px"
-        ><i class="fa fa-plus"></i> New Company</button>        
+        ><i class="fa fa-plus"></i> New Company</button>
     </div>
 </div>
 <div class="row">
@@ -37,7 +37,7 @@
                 </td>
                 <td>
                     <button type="button" class="btn btn-info" data-company-name="{{ company.name }}" data-company-id="{{ company.id }}" data-toggle="modal" data-target="#belongModal"
-                    ><i class="fa fa-plus"></i> Add User To Company</button>                    
+                    ><i class="fa fa-plus"></i> Add User To Company</button>
                 </td>
             </tr>
         {% endfor %}
@@ -63,7 +63,7 @@
                     {{ form_widget(belongForm.companyId) }}
                     {{ form_widget(belongForm.next, {'label': 'Add', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
-            {{ form_end(belongForm) }}    
+            {{ form_end(belongForm) }}
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@
                 <div class="form-group">
                     {{ form_widget(companyForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
-            {{ form_end(companyForm) }}    
+            {{ form_end(companyForm) }}
           </div>
         </div>
       </div>

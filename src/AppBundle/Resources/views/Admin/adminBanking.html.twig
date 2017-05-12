@@ -82,7 +82,7 @@
                 <td>Lloyds Total for month (received date)</td>
                 <td>£{{ totalReceived|number_format(2, '.', ',') }}</td>
             </tr>
-        </table>        
+        </table>
     </div>
 </div>
 <div class="row">
@@ -239,7 +239,7 @@
                     {{ form_label(barclaysForm.file, 'File') }}
                     {{ form_errors(barclaysForm.file) }}
                     {{ form_widget(barclaysForm.file) }}
-                </div>                
+                </div>
                 <div class="form-group">
                     {{ form_widget(barclaysForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
@@ -265,11 +265,11 @@
                     {{ form_label(lloydsForm.file, 'File') }}
                     {{ form_errors(lloydsForm.file) }}
                     {{ form_widget(lloydsForm.file) }}
-                </div>                
+                </div>
                 <div class="form-group">
                     {{ form_widget(lloydsForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
-            {{ form_end(lloydsForm) }}    
+            {{ form_end(lloydsForm) }}
           </div>
         </div>
       </div>
