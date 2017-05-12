@@ -2040,13 +2040,16 @@ class PhonePolicyTest extends WebTestCase
         return $policy;
     }
 
-    private function addPayment($policy, $amount, $commission)
+    private function addPayment($policy, $amount, $commission, \DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime('2016-01-01');
+        }
         $payment = new JudoPayment();
         $payment->setAmount($amount);
         $payment->setTotalCommission($commission);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setDate(new \DateTime('2016-01-01'));
+        $payment->setDate($date);
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 

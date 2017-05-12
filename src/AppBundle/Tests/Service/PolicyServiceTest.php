@@ -536,12 +536,94 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $billingDate = $this->setDayOfMonth($policy->getBilling(), '28');
-        $policy->setBilling($billingDate);
+        $policy->setBilling($billingDate, new \DateTime('2016-10-02'));
 
         $this->assertNull(self::$policyService->adjustScheduledPayments($policy));
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $this->assertEquals(11, count($scheduledPayments));
         $this->assertEquals(28, $scheduledPayments[0]->getScheduledDay());
+    }
+
+    public function testPolicyCancelledTooEarly()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyCancelledTooEarly', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2017-01-29'),
+            true
+        );
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2017-01-29'));
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertEquals(new \DateTime('2017-03-30'), $policy->getPolicyExpirationDate());
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-02-28')
+        );
+        $this->assertEquals(new \DateTime('2017-04-27'), $policy->getPolicyExpirationDate());
+
+        // in previous case, payment was on 16/4, which was after the change in billing date
+        // and cause the problem. as exception will prevent, no point in testing that case here
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-04-12')
+        );
+        $this->assertEquals(new \DateTime('2017-05-28'), $policy->getPolicyExpirationDate());
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-04-20')));
+
+        $billingDate = $this->setDayOfMonth($policy->getBilling(), '15');
+        $policy->setBilling($billingDate, new \DateTime('2017-04-20'));
+
+        $this->assertTrue(self::$policyService->adjustScheduledPayments($policy));
+        $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
+        $this->assertEquals(15, $scheduledPayments[0]->getScheduledDay());
+
+        $this->assertEquals(new \DateTime('2017-05-15'), $policy->getPolicyExpirationDate());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testPolicyUnpaidUnableToChangeBilling()
+    {
+        $pastDue = new \DateTime();
+        $pastDue = $pastDue->sub(new \DateInterval('P35D'));
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyUnpaidUnableToChangeBilling', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $pastDue,
+            true
+        );
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, $pastDue);
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertFalse($policy->isPolicyPaidToDate());
+
+        $billingDate = $this->setDayOfMonth($policy->getBilling(), '15');
+        $policy->setBilling($billingDate);
     }
 
     public function testAdjustScheduledPaymentsEarlierDate()
@@ -564,7 +646,7 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $billingDate = $this->setDayOfMonth($policy->getBilling(), '1');
-        $policy->setBilling($billingDate);
+        $policy->setBilling($billingDate, new \DateTime('2016-11-05'));
 
         $this->assertNull(self::$policyService->adjustScheduledPayments($policy));
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
