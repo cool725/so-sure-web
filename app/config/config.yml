@@ -387,6 +387,7 @@ nelmio_security:
                 - http://*.pcapredict.com
                 - https://*.googleadservices.com
                 - https://code.jquery.com
+                - https://cdn.heapanalytics.com
                 - 'data:'
             style-src:
                 - 'self'
@@ -433,6 +434,11 @@ nelmio_security:
                 - https://www.google.de
                 - https://www.google.com.ph
                 - https://www.google.lv
+                - https://www.google.com.sg
+                - https://www.google.co.nz
+                - https://www.google.co.in
+                - https://www.google.ae
+                - https://www.google.com.co
 
     # prevents framing of the entire site
     clickjacking:
