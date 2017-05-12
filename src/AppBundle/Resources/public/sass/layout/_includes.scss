@@ -2,14 +2,14 @@
 
 // Press
 .press {
-	padding: 15px 0;
+	padding: 15px;
 	background-color: $white;
 	text-align: center;
 
 	img {
-		margin: 0 auto;
+		margin:  auto;
 		display: inline-block;
-		max-width: 220px;
+		max-width: 200px;
 	}
 }
 
@@ -22,7 +22,7 @@
 		}
 
 		h4 {
-			margin: 15px 0 0;
+			margin: 32px 0 0;
 		}
 	}
 
@@ -56,7 +56,7 @@
 
 		p {
 			margin: 0;
-		}		
+		}
 	}
 
 }
