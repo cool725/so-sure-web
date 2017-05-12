@@ -338,7 +338,7 @@ nelmio_security:
                 - https://*.google.ie
                 - gsa://onpageload
                 - https://*.doubleclick.net
-                - https://*.hotjar.com 
+                - https://*.hotjar.com
                 - https://*.google.ie
                 - https://cdn.so-sure.com
                 - https://www.youtube.com
@@ -399,7 +399,7 @@ nelmio_security:
                 - https://waitlisted.co
                 - https://*.twitter.com
                 - http://*.twitter.com
-                - https://afeld.github.io
+                - https://*.maxcdn.com
                 - https://*.fastly.net
                 - https://maxcdn.bootstrapcdn.com
                 - http://maxcdn.bootstrapcdn.com
