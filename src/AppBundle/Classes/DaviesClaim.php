@@ -117,11 +117,6 @@ class DaviesClaim
 
     public function getExpectedExcess()
     {
-        // Declined, withdrawn should not have excess
-        if (in_array($this->getClaimStatus(), [Claim::STATUS_DECLINED, Claim::STATUS_WITHDRAWN])) {
-            return 0;
-        }
-
         if (in_array($this->getClaimType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
             return 70;
         } elseif (in_array($this->getClaimType(), [
