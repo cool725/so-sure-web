@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-8">
-                <h2>so-sure Opt Outs</h2>                
+                <h2>so-sure Opt Outs</h2>
             </div>
             <div class="col-sm-4" style="padding-top:20px;">
                 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#addEmailModal"
@@ -13,7 +13,7 @@
                     ><i class="fa fa-phone"></i></button>
             </div>
         </div>
-        
+
     {% if optouts|length == 0 %}
     <div class="row-fluid">
         <h2>No opt outs found</h2>
@@ -44,12 +44,12 @@
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>        
+            </div>
         </div>
     </div>
     {% endif %}
 </div>
-    
+
     <div class="modal fade" id="addEmailModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">

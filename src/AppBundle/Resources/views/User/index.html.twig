@@ -16,7 +16,7 @@
     {{ parent() }}
     {% stylesheets output='css/*.css'
     'components/jssocials/jssocials.css'
-    'components/jssocials/jssocials-theme-flat.css'    
+    'components/jssocials/jssocials-theme-flat.css'
     '@AppBundle/Resources/public/sass/page/user.scss'%}
     <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
 {% endblock %}
@@ -52,13 +52,13 @@
                     </div>
                     {% endif %}
                     <div class="user-homepage--section">
-                        <h3 class="text-grey-blue">Connections</h3>                        
+                        <h3 class="text-grey-blue">Connections</h3>
                         <ul class="list-inline">
                             {% for connection in policy.connections %}
                             <li>
                                 <img src="{{ connection.linkedUser.getImageUrlFallback }}"
                                 title="{{ connection.linkedUser.name }}"
-                                alt="{{ connection.linkedUser.name }}" 
+                                alt="{{ connection.linkedUser.name }}"
                                 class="
                                 {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}           img-circle coffee-stamp
                                 {% else %}
@@ -103,7 +103,7 @@
                         {{ form_start(scode_form, {'attr': {'class': ''}}) }}
                             <div class="form-group">
                                 {{ form_errors(scode_form.scode) }}
-                                <div class="input-group">         
+                                <div class="input-group">
                                     {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
                                     <span class="input-group-btn">
                                         {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
@@ -112,8 +112,8 @@
                                 <div class="help-block with-errors" id="scode-form-code-err"></div>
                             </div>
                         {{ form_end(scode_form) }}
-                    </div>    
-                    {% endif %}                      
+                    </div>
+                    {% endif %}
                     <div class="box-border-grey text-center">
                         <h4><strong>Reward Pot</strong></h4>
                         <div id="reward-pot-chart" class="circle-chart-container"
@@ -151,7 +151,7 @@
                             </small>
                         </p>
                     </div>
-                    {% endif %}              
+                    {% endif %}
                 </div>
             </div>
 
@@ -182,16 +182,16 @@
                      class="modal-body text-center"
                      data-share-link="{{ policy.standardSCode.shareLink }}"
                      data-share-text="Hey, I've just joined so-sure – better insurance that is up to 80% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: {{ policy.standardSCode.shareLink }}. Add my code after you pay: {{ policy.standardSCode.code }}">
-                    <h4>Invite via:</h4>   
-                    <div id="share"></div>  
+                    <h4>Invite via:</h4>
+                    <div id="share"></div>
                     <div class="text-break text-grey">
                         <div class="line"></div>OR<div class="line"></div>
-                    </div>   
-                    <div class="row">                    
+                    </div>
+                    <div class="row">
                         <form class="col-sm-8 col-sm-offset-2">
                             <div class="form-group">
                                 <label for="scode" class="h4">Share this link:</label>
-                                <div class="input-group">                            
+                                <div class="input-group">
                                     <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
                                     <span class="input-group-btn">
                                         <button class="btn btn-primary btn-copy"
@@ -206,22 +206,22 @@
                     </div>
                     <div class="text-break text-grey">
                         <div class="line"></div>OR<div class="line"></div>
-                    </div>        
-                    <h4>Email an invite:</h4>            
+                    </div>
+                    <h4>Email an invite:</h4>
                     <p><small>Just enter their email below and we'll do the rest..</small></p>
                     <div class="row">
                         {{ form_start(email_form, {'attr': {'class': 'col-sm-8 col-sm-offset-2'}}) }}
                             <div class="form-group">
                                 {{ form_errors(email_form.email) }}
-                                <div class="input-group">         
+                                <div class="input-group">
                                     {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
                                     <span class="input-group-btn">
-                                        {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-success'}}) }}                                
+                                        {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-success'}}) }}
                                     </span>
                                 </div>
                             </div>
-                        {{ form_end(email_form) }}               
-                    </div>                
+                        {{ form_end(email_form) }}
+                    </div>
                 </div>
             </div>
         </div>

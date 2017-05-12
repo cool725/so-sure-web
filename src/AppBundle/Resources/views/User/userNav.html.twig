@@ -3,8 +3,8 @@
             <div class="col-md-12">
                 <img src="{{ policy.user.getImageUrlFallback }}" alt="{{ policy.user.firstname }}" class="img-circle user-img">
                 <h2 class="text-white">Welcome back, {{ policy.user.firstname }}!</h2>
-                <h3 class="text-light-blue">{{ policy.phone }}</h3>     
-                <h5 class="text-light-blue">Policy: {{ policy.policyNumber }} ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>           
+                <h3 class="text-light-blue">{{ policy.phone }}</h3>
+                <h5 class="text-light-blue">Policy: {{ policy.policyNumber }} ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
                 {# <span class="text-white"><em>Policy:</em> {{ policy.policyNumber }} ({{ policy.start|date('d M Y') }} - {{ policy.end|date('d M Y') }})</span> #}
                 {# <br /><span class="text-white"><em>Phone:</em> {{ policy.phone }}</span> #}
             </div>
@@ -19,6 +19,6 @@
                     {# <li role="presentation"><a href="#">Personal Info</a></li> #}
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' %}active{% endif %}"><a href="{{ path('user_card_details') }}">Payment Details</a></li>
                 </ul>
-            </nav>  
+            </nav>
         </div>
     </section>

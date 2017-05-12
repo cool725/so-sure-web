@@ -59,7 +59,7 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="general">
 
-        <h3>Excludes Policies: 
+        <h3>Excludes Policies:
             {% for excluded_policy in excluded_policies %}
             <a href="{{ path('admin_policy', {'id': excluded_policy.id }) }}">{{ excluded_policy.policyNumber }}</a>
             {% endfor %}
@@ -100,7 +100,7 @@
                         <tr>
                             <td style="padding-left: 30px">New Policies (Direct)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{{ data.newDirectPolicies }}</td>
                             <td>{{ data.totalDirectPolicies }}</td>
@@ -108,7 +108,7 @@
                         <tr>
                             <td style="padding-left: 30px">New Policies (Invitation)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{{ data.newInvitationPolicies }}</td>
                             <td>{{ data.totalInvitationPolicies }}</td>
@@ -116,7 +116,7 @@
                         <tr>
                             <td style="padding-left: 30px">New Policies (SCode)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{{ data.newSCodePolicies }}</td>
                             <td>{{ data.totalSCodePolicies }}</td>
@@ -181,15 +181,15 @@
                             <td>{% if data.newPoliciesAvgPremium is defined %}<span title="£{{ data.newPoliciesPremium }} total">£{{ data.newPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
                             <td><del>{% if data.totalPoliciesAvgPremium is defined %}<span title="£{{ data.totalPoliciesPremium }} total">£{{ data.totalPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</del>
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Incorrect figure" data-content="This figure appears to be incorrect. See Clubhouse ch3122 for latest status. Workaround is to run report from 2016-09-01 to present."></i>                                                        
-                            
+           title="Incorrect figure" data-content="This figure appears to be incorrect. See Clubhouse ch3122 for latest status. Workaround is to run report from 2016-09-01 to present."></i>
+
                             </td>
                         </tr>
                         <!--
                         <tr>
                             <td style="padding-left: 30px">Avg Yearly Premium (Direct)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{% if data.newDirectPoliciesAvgPremium is defined %}<span title="£{{ data.newDirectPoliciesPremium }} total">£{{ data.newDirectPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
                             <td>{% if data.totalDirectPoliciesAvgPremium is defined %}<span title="£{{ data.totalDirectPoliciesPremium }} total">£{{ data.totalDirectPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
@@ -197,14 +197,14 @@
                         <tr>
                             <td style="padding-left: 30px">Avg Yearly Premium (Invitation)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{% if data.newInvitationPoliciesAvgPremium is defined %}<span title="£{{ data.newInvitationPolicies }} total">£{{ data.newInvitationPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
                             <td>{% if data.totalInvitationPoliciesAvgPremium is defined %}<span title="£{{ data.totalInvitationPolicies }} total">£{{ data.totalInvitationPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
                         </tr>
                             <td style="padding-left: 30px">Avg Yearly Premium (SCode)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{% if data.newSCodePoliciesAvgPremium is defined %}<span title="£{{ data.newSCodePoliciesPremium }} total">£{{ data.newSCodePoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
                             <td>{% if data.totalSCodePoliciesAvgPremium is defined %}<span title="£{{ data.totalSCodePoliciesPremium }} total">£{{ data.totalSCodePoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
@@ -233,7 +233,7 @@
                             </td>
                             <td>{{ data['newTotalConnections'] }}
         <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Details" data-content="New connections made across all policies during period"></i>                            
+           title="Details" data-content="New connections made across all policies during period"></i>
                             </td>
                             <td>{{ data['totalTotalConnections'] }}</td>
                         </tr>
@@ -244,7 +244,7 @@
                             </td>
                             <td>{{ data['newActiveConnections'] }}
         <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Details" data-content="New connections made across all policies during period"></i>                            
+           title="Details" data-content="New connections made across all policies during period"></i>
                             </td>
                             <td>{{ data['totalActiveConnections'] }}</td>
                         </tr>
@@ -255,7 +255,7 @@
                             </td>
                             <td>{{ data['newEndedConnections'] }}
         <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Details" data-content="New connections made across all policies during period"></i>                            
+           title="Details" data-content="New connections made across all policies during period"></i>
                             </td>
                             <td>{{ data['totalEndedConnections'] }}</td>
                         </tr>
@@ -270,7 +270,7 @@
                         <tr>
                             <td style="padding-left: 30px">Invitations (Direct)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{{ data.newDirectInvitations }}</td>
                             <td>{{ data.totalDirectInvitations }}</td>
@@ -278,14 +278,14 @@
                         <tr>
                             <td style="padding-left: 30px">Invitations (Invitation)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{{ data.newInvitationInvitations }}</td>
                             <td>{{ data.totalInvitationInvitations }}</td>
                         </tr>
                             <td style="padding-left: 30px">Invitations (SCode)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{{ data.newSCodeInvitations }}</td>
                             <td>{{ data.totalSCodeInvitations }}</td>
@@ -298,7 +298,7 @@
                         <tr>
                             <td style="padding-left: 30px">Avg # of Invitations per policy (Direct)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{% if data.newAvgDirectInvitations != 'n/a' %}{{ data.newAvgDirectInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                             <td>{% if data.totalAvgDirectInvitations != 'n/a' %}{{ data.totalAvgDirectInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
@@ -306,7 +306,7 @@
                         <tr>
                             <td style="padding-left: 30px">Avg # of Invitations per policy (Invitation)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{% if data.newAvgInvitationInvitations != 'n/a' %}{{ data.newAvgInvitationInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                             <td>{% if data.totalAvgInvitationInvitations != 'n/a' %}{{ data.totalAvgInvitationInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
@@ -314,7 +314,7 @@
                         <tr>
                             <td style="padding-left: 30px">Avg # of Invitations per policy (SCode)
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
                             </td>
                             <td>{% if data.newAvgSCodeInvitations != 'n/a' %}{{ data.newAvgSCodeInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                             <td>{% if data.totalAvgSCodeInvitations != 'n/a' %}{{ data.totalAvgSCodeInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
@@ -337,9 +337,9 @@
                         <tr>
                             <td>Avg hours to connect
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>                                                        
+           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
         <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Details" data-content="From when invitation was sent to user to user accepting.  For scode this would starting from when scode was entered as invite code to acceptance."></i>                            
+           title="Details" data-content="From when invitation was sent to user to user accepting.  For scode this would starting from when scode was entered as invite code to acceptance."></i>
                             </td>
                             <td></td>
                             <td>{{ data.totalAvgHoursToConnect|number_format(1, '.', ',')  }}</td>
@@ -359,7 +359,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    
+
                         <tr>
                             <td>Policies with X Connection</td>
                             <td>{{ data.policyConnections.total }}</td>
@@ -395,7 +395,7 @@
                             <th>Month</th>
                             <th>Total
         <i style="cursor: pointer" class="fa fa-info-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           data-content="Includes both Successful & Scheduled Payments"></i>                                                        
+           data-content="Includes both Successful & Scheduled Payments"></i>
                             </th>
                         </tr>
                     </thead>
@@ -410,7 +410,7 @@
                 </table>
             </div>
         </div>
-            </div>        
+            </div>
         </div>
     </div>
 </div>

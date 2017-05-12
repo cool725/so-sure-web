@@ -30,7 +30,7 @@
                                 {% if policy.policyNumber|length %}
                                     {{ policy.policyNumber }}
                                 {% else %}
-                                    N/A 
+                                    N/A
                                 {% endif %}
                             </td>
                         </tr>
@@ -42,7 +42,7 @@
                                         data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
                                         data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
                                         >Show Alternatives</button>
-    
+
                             </td>
                         </tr>
                         <tr>
@@ -95,7 +95,7 @@
                             )
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
                                             >Payments</button>
-                            
+
                             </td>
                         </tr>
                         {% endif %}
@@ -562,7 +562,7 @@
                             {{ form_label(imei_upload_form.file, 'File') }}
                             {{ form_errors(imei_upload_form.file) }}
                             {{ form_widget(imei_upload_form.file) }}
-                        </div>                
+                        </div>
                         <div class="form-group">
                             {{ form_widget(imei_upload_form.upload, {'attr': {'class': 'btn btn-success'}})}}<br>
                             <strong>Please verify that imei matches prior to uploading</strong>
@@ -674,7 +674,7 @@
                                 <i class="fa fa-minus text-danger"></i>
                             {% endif %}
                         </td>
-                    </tr>                      
+                    </tr>
                   {% endfor %}
               </tbody>
             </table>
@@ -707,9 +707,9 @@
                             £{{ scheduledPayment.amount | number_format(2, '.', ',') }}
                         </td>
                         <td>
-                            {{ scheduledPayment.status }}            
+                            {{ scheduledPayment.status }}
                         </td>
-                    </tr>                      
+                    </tr>
                   {% endfor %}
               </tbody>
             </table>
@@ -753,7 +753,7 @@
           </div>
           <div class="modal-body">
             <div class="row">
-                <div class="col-md-12">                    
+                <div class="col-md-12">
                     <div class="form-group">
                         {{ form_label(bacs_form.date) }}
                         {{ form_errors(bacs_form.date) }}

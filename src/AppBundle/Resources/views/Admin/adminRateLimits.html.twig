@@ -4,10 +4,10 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-8">
-            <h2>so-sure Rate Limits</h2>                
+            <h2>so-sure Rate Limits</h2>
         </div>
     </div>
-        
+
     {% if rateLimits|length == 0 %}
     <div class="row-fluid">
         <h2>No rate limits present</h2>
@@ -32,10 +32,10 @@
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>        
+            </div>
         </div>
     </div>
     {% endif %}
 </div>
-    
+
 {% endblock %}
