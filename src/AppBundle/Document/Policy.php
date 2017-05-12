@@ -485,7 +485,11 @@ abstract class Policy
 
     public function getStartForBilling()
     {
-        return $this->adjustDayForBilling($this->getStart());
+        if ($this->getStart()) {
+            return $this->adjustDayForBilling($this->getStart());
+        } else {
+            return null;
+        }
     }
 
     public function setStart(\DateTime $start)

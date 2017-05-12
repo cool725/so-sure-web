@@ -43,6 +43,8 @@ class BillingDay
     public function setPolicy(Policy $policy)
     {
         $this->policy = $policy;
-        $this->setDay($policy->getBilling()->format('j'));
+        if ($policy->getBilling()) {
+            $this->setDay($policy->getBilling()->format('j'));
+        }
     }
 }
