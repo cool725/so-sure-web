@@ -439,6 +439,7 @@ nelmio_security:
                 - https://www.google.co.in
                 - https://www.google.ae
                 - https://www.google.com.co
+                - https://www.google.com.au
 
     # prevents framing of the entire site
     clickjacking:
