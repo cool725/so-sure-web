@@ -64,11 +64,7 @@
 
 {# Font
 -----------------------------------------------------------------------------#}
-{# <link rel="application/x-font-woff" href="{{ cdn_url }}/fonts/AvenirLTStd-Book.woff">
-<link rel="application/x-font-woff" href="{{ cdn_url }}/fonts/AvenirLTStd-Heavy.woff">
-<link rel="application/x-font-woff" href="{{ cdn_url }}/fonts/AvenirLTStd-Light.woff">
-<link rel="application/x-font-woff" href="{{ cdn_url }}/fonts/AvenirLTStd-Oblique.woff">
- #}
+
 {% if include_emoji is defined and include_emoji == 1 %}
-    <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
+    <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
 {% endif %}
