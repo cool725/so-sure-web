@@ -78,7 +78,8 @@
                             {% endfor %}
                             {% if policy.canInvite %}
                             <li>
-                                <a href="#" data-toggle="modal" data-target="#inviteModal"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
+                                {# id="connect-with" used in tests #}
+                                <a id="connect-with" href="#" data-toggle="modal" data-target="#inviteModal"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
                             </li>
                             {% endif %}
                         </ul>
@@ -135,7 +136,7 @@
                              data-bonus-days-remaining="{{ days_left }}">
                              <div class="{% if policy.getCurrentConnectionValues['teaser']|length > 0 %}circle-chart--full{% else %}circle-chart--value{% endif %}">
                                  <span class="h2 text-red">{{ days_left }}</span><br>
-                                 <small class="text-red">days</small>
+                                 <small class="text-red">days</small><br>
                                  {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
                                  <small class="circle-chart--full-value">{{ policy.getCurrentConnectionValues['teaser'] }}</small>
                                 {% endif %}

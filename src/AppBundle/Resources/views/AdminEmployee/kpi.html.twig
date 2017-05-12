@@ -48,6 +48,12 @@
                             {% endfor %}
                         </tr>
                         <tr>
+                            <td>Run Rate Premium</td>
+                            {% for week in weeks %}
+                                <td>£{{ week.total.data['totalRunRate'] |number_format(2, '.', ',') }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
                             <td>Total Policies [KPI: 17]</td>
                             {% for week in weeks %}
                                 <td>{{ week.total.data['newPolicies'] - week.total.data['endingEndingPolicies'] }}</td>

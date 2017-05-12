@@ -85,6 +85,18 @@ class SlackCommand extends ContainerAwareCommand
                 $policy->getPolicyNumber(),
                 $diff->days
             );
+            if ($policy->hasMonetaryClaimed(true)) {
+                $text = sprintf(
+                    "%s\n*WARNING: Policy has a monetary claim and should be retained if at all possible*",
+                    $text
+                );
+            }
+            if ($policy->hasOpenClaim(true)) {
+                $text = sprintf(
+                    "%s\n*WARNING: Policy has a open claim which should be cleared with Davies prior to cancellation*",
+                    $text
+                );
+            }
             $lines[] = $text;
 
             // @codingStandardsIgnoreEnd

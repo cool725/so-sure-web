@@ -132,7 +132,7 @@ class ReportingService
 
         $totalSCodePolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_SCODE);
         $data['totalSCodePolicies'] = $totalSCodePolicies->count();
-        $data['totalSCodePoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalInvitationPolicies);
+        $data['totalSCodePoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalSCodePolicies);
         if ($data['totalSCodePolicies'] != 0) {
             $data['totalSCodePoliciesAvgPremium'] = $this->toTwoDp(
                 $data['totalSCodePoliciesPremium'] / $data['totalSCodePolicies']
@@ -255,6 +255,10 @@ class ReportingService
             $data['totalWeightedAvgConnections'] = null;
         }
         $data['totalAvgHoursToConnect'] = $connectionRepo->avgHoursToConnect();
+
+        $data['totalRunRate'] = Policy::sumYearlyPremiumPrice($totalDirectPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($totalInvitationPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($totalSCodePolicies, null, true);
 
         return [
             'start' => $start,
