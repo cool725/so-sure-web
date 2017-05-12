@@ -78,7 +78,8 @@
                             {% endfor %}
                             {% if policy.canInvite %}
                             <li>
-                                <a href="#" data-toggle="modal" data-target="#inviteModal"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
+                                {# id="connect-with" used in tests #}
+                                <a id="connect-with" href="#" data-toggle="modal" data-target="#inviteModal"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
                             </li>
                             {% endif %}
                         </ul>

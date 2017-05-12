@@ -108,7 +108,7 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/');
 
         // todo - will fail during leap year
-        $this->validateBonus($crawler, 305, 305);
+        $this->validateBonus($crawler, 304, 304);
         $this->validateRewardPot($crawler, 0);
         $this->validateInviteAllowed($crawler, true);
     }
