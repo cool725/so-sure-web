@@ -117,7 +117,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * @AppAssert\Token()
-     * @Assert\Length(min="0", max="50")
+     * @Assert\Length(min="0", max="100")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
