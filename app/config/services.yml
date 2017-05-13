@@ -8,6 +8,7 @@ services:
         arguments: ["@fos_user.user_manager",{facebook: facebook_id}]
         calls:
             - [setFacebook, ['@app.facebook']]
+            - [setRequestStack, ['@request_stack']]
 
     app.user.cognitoidentity:
         class: AppBundle\Security\CognitoIdentityUserProvider
