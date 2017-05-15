@@ -73,7 +73,7 @@ class BICommand extends ContainerAwareCommand
                sprintf('"%s"', $policy->getPolicyNumber()),
                sprintf('"%d"', $user->getAge()),
                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
-               sprintf('"%s"', $user->getCurrentPolicy()->getStart()->format('Y-m-d')),
+               sprintf('"%s"', $policy->getStart()->format('Y-m-d')),
                sprintf('"%s"', $policy->getStatus()),
                sprintf('"%s"', $user->getId()),
             ]);

@@ -25,6 +25,10 @@ class S3TwigExtension extends \Twig_Extension
 
     public function s3DownloadLink($bucket, $key)
     {
+        if (!$key || strlen(trim($key)) == 0) {
+            return null;
+        }
+
         $keyItems = explode('/', $key);
         $filename = $keyItems[count($keyItems) - 1];
         $command = $this->s3->getCommand('GetObject', array(
