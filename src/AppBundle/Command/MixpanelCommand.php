@@ -21,7 +21,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution (or blank for process)'
+                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|count-users (or blank for process)'
             )
             ->addOption(
                 'email',
@@ -101,6 +101,9 @@ class MixpanelCommand extends ContainerAwareCommand
         } elseif ($action == 'delete-old-users') {
             $data = $this->getMixpanel()->deleteOldUsers();
             $output->writeln(sprintf("Queued %d users for deletion (of %d)", $data['count'], $data['total']));
+        } elseif ($action == 'count-users') {
+            $total = $this->getMixpanel()->getUserCount();
+            $output->writeln(sprintf("%d Users", $total));
         } elseif ($action == 'clear') {
             $this->getMixpanel()->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));

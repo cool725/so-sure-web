@@ -26,22 +26,27 @@ class MonitorService
 
     protected $intercom;
 
+    protected $mixpanel;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param                 $redis
      * @param                 $intercom
+     * @param                 $mixpanel
      */
     public function __construct(
         DocumentManager  $dm,
         LoggerInterface $logger,
         $redis,
-        $intercom
+        $intercom,
+        $mixpanel
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->redis = $redis;
         $this->intercom = $intercom;
+        $this->mixpanel = $mixpanel;
     }
 
     public function run($name)
@@ -149,6 +154,16 @@ class MonitorService
 
         if ($errors) {
             throw new \Exception(json_encode($errors));
+        }
+    }
+
+    public function mixpanelUserCount()
+    {
+        // acutal 26000 for plan
+        $maxUsers = 25000;
+        $total = $this->mixpanel->getUserCount();
+        if ($total > $maxUsers) {
+            throw new \Exception(sprintf('User count %d too high (warning %d)', $total, $maxUsers));
         }
     }
 }

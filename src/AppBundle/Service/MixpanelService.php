@@ -210,6 +210,15 @@ class MixpanelService
         return $data;
     }
 
+    public function getUserCount()
+    {
+        $query = [
+        ];
+        $data = $this->mixpanelData->data('engage', $query);
+
+        return $data['total'];
+    }
+
     public function deleteOldUsers($days = null)
     {
         if (!$days) {
