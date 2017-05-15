@@ -355,6 +355,8 @@ nelmio_security:
                 - https://player.vimeo.com
                 - https://*.hotjar.com
                 - https://*.doubleclick.net
+                - https://*.googletagmanager.com
+                - https://*.iubenda.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -427,6 +429,7 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://*.fbcdn.net
                 - https://*.vimeocdn.com
+                - https://cdn.iubenda.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
