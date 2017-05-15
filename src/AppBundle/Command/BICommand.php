@@ -57,7 +57,7 @@ class BICommand extends ContainerAwareCommand
     private function exportPolicies()
     {
         $repo = $this->getManager()->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllPolicies();
+        $policies = $repo->findAllStartedPolicies();
         $lines = [];
         $lines[] = implode(',', [
             '"Policy Number"',

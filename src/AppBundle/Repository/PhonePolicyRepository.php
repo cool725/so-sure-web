@@ -134,7 +134,7 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are active (excluding so-sure test ones)
      */
-    public function findAllPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
+    public function findAllStartedPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
     {
         if (!$endDate) {
             $endDate = new \DateTime();
@@ -143,6 +143,12 @@ class PhonePolicyRepository extends PolicyRepository
         $policy = new PhonePolicy();
 
         $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_CANCELLED,
+                Policy::STATUS_EXPIRED,
+            ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
         $qb->field('start')->lte($endDate);
