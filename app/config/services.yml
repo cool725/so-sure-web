@@ -451,6 +451,7 @@ services:
             logger:   "@logger"
             redis:    "@snc_redis.default"
             intercom: "@app.intercom"
+            mixpanel: "@app.mixpanel"
 
     app.annie:
         class: AppBundle\Service\AppAnnieService
