@@ -57,10 +57,12 @@ class BICommand extends ContainerAwareCommand
     private function exportPolicies()
     {
         $repo = $this->getManager()->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllActiveUnpaidPolicies();
+        $policies = $repo->findAllPolicies();
         $lines = [];
         $lines[] = implode(',', [
             '"Policy Number"',
+            '"Policy Status"',
+            '"Policy Holder Id"',
             '"Age of Policy Holder"',
             '"Postcode of Policy Holder"',
             '"Policy Start Date"',
@@ -69,6 +71,8 @@ class BICommand extends ContainerAwareCommand
             $user = $policy->getUser();
             $lines[] = implode(',', [
                sprintf('"%s"', $policy->getPolicyNumber()),
+               sprintf('"%s"', $policy->getStatus()),
+               sprintf('"%s"', $user->getId()),
                sprintf('"%d"', $user->getAge()),
                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
                sprintf('"%s"', $user->getCurrentPolicy()->getStart()->format('Y-m-d')),
