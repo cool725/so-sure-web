@@ -37,6 +37,13 @@ class PhonePolicy extends Policy
     protected $phoneVerified;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $screenVerified;
+
+    /**
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
