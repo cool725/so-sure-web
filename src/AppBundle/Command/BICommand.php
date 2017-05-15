@@ -61,21 +61,21 @@ class BICommand extends ContainerAwareCommand
         $lines = [];
         $lines[] = implode(',', [
             '"Policy Number"',
-            '"Policy Status"',
-            '"Policy Holder Id"',
             '"Age of Policy Holder"',
             '"Postcode of Policy Holder"',
             '"Policy Start Date"',
+            '"Policy Status"',
+            '"Policy Holder Id"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
             $lines[] = implode(',', [
                sprintf('"%s"', $policy->getPolicyNumber()),
-               sprintf('"%s"', $policy->getStatus()),
-               sprintf('"%s"', $user->getId()),
                sprintf('"%d"', $user->getAge()),
                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
                sprintf('"%s"', $user->getCurrentPolicy()->getStart()->format('Y-m-d')),
+               sprintf('"%s"', $policy->getStatus()),
+               sprintf('"%s"', $user->getId()),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
