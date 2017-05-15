@@ -379,6 +379,9 @@ class AdminEmployeeController extends BaseController
         $billingForm = $this->get('form.factory')
             ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
             ->getForm();
+        $resendEmailForm = $this->get('form.factory')
+            ->createNamedBuilder('resend_email_form')->add('resend', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -497,6 +500,17 @@ class AdminEmployeeController extends BaseController
                             'Unable to run receperio checks (no imei number)'
                         );
                     }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('resend_email_form')) {
+                $resendEmailForm->handleRequest($request);
+                if ($resendEmailForm->isValid()) {
+                    $policyService->resendPolicyEmail($policy);
+                    $this->addFlash(
+                        'success',
+                        'Resent the policy email.'
+                    );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
@@ -632,6 +646,7 @@ class AdminEmployeeController extends BaseController
             'screen_upload_form' => $screenUploadForm->createView(),
             'usertoken_form' => $userTokenForm->createView(),
             'billing_form' => $billingForm->createView(),
+            'resend_email_form' => $resendEmailForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

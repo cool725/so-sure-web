@@ -31,6 +31,10 @@ $('.confirm-imei-rerun').on("click",function() {
     return confirm('Are you sure you want to rerun the imei/serial number checks? This costs £0.07.');
 });
 
+$('.confirm-resend-email').on("click",function() {
+    return confirm('Are you sure you want to resend the Policy Welcome Email?');
+});
+
 
 $(document).ready(function(){
     $('[data-toggle="popover"]').popover();
