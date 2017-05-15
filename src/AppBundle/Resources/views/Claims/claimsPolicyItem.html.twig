@@ -279,6 +279,10 @@
                         <td>{% if policy.phoneVerified %}Yes{% elseif policy.phoneVerified is null %}Unknown{% else %}No{% endif %}</td>
                     </tr>
                     <tr>
+                        <td>Screen verified <i class="fa fa-info" title="User has sent in a photo which validates their screen was not damaged prior to policy taken out."></i></td>
+                        <td>{% if policy.screenVerified %}Yes{% elseif policy.screenVerified is null %}Unknown{% else %}No{% endif %}</td>
+                    </tr>
+                    <tr>
                         <td>User Signup - Country of Ip</td>
                         <td>{{ fraud.signup_country }}</td>
                     </tr>
@@ -568,6 +572,22 @@
                             <strong>Please verify that imei matches prior to uploading</strong>
                         </div>
                         {{ form_end(imei_upload_form)}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Screen Selfie Upload</td>
+                    <td>
+                        {{ form_start(screen_upload_form)}}
+                        <div class="form-group">
+                            {{ form_label(screen_upload_form.file, 'File') }}
+                            {{ form_errors(screen_upload_form.file) }}
+                            {{ form_widget(screen_upload_form.file) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(screen_upload_form.upload, {'attr': {'class': 'btn btn-success'}})}}<br>
+                            <strong>Please verify that screen is not damaged and appears to match the phone type prior to uploading</strong>
+                        </div>
+                        {{ form_end(screen_upload_form)}}
                     </td>
                 </tr>
                 <tr>

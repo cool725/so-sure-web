@@ -46,6 +46,7 @@ use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\File\BarclaysFile;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\File\ImeiUploadFile;
+use AppBundle\Document\File\ScreenUploadFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Form\Type\BillingDayType;
@@ -66,6 +67,7 @@ use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\ImeiUploadFileType;
+use AppBundle\Form\Type\ScreenUploadFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
 use AppBundle\Form\Type\UserDetailType;
 use AppBundle\Exception\RedirectException;
@@ -364,6 +366,10 @@ class AdminEmployeeController extends BaseController
         $imeiUploadForm = $this->get('form.factory')
             ->createNamedBuilder('imei_upload', ImeiUploadFileType::class, $imeiUploadFile)
             ->getForm();
+        $screenUploadFile = new ScreenUploadFile();
+        $screenUploadForm = $this->get('form.factory')
+            ->createNamedBuilder('screen_upload', ScreenUploadFileType::class, $screenUploadFile)
+            ->getForm();
         $userTokenForm = $this->get('form.factory')
             ->createNamedBuilder('usertoken_form')
             ->add('regenerate', SubmitType::class)
@@ -555,6 +561,22 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('screen_upload')) {
+                $screenUploadForm->handleRequest($request);
+                if ($screenUploadForm->isSubmitted() && $screenUploadForm->isValid()) {
+                    $dm = $this->getManager();
+                    // we're assuming that a manaual check is done to verify
+                    $policy->setScreenVerified(true);
+                    $screenUploadFile->setPolicy($policy);
+                    $screenUploadFile->setBucket('policy.so-sure.com');
+                    $screenUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                    $policy->addPolicyFile($screenUploadFile);
+                    $dm->persist($screenUploadFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             } elseif ($request->request->has('usertoken_form')) {
                 $userTokenForm->handleRequest($request);
                 if ($userTokenForm->isSubmitted() && $userTokenForm->isValid()) {
@@ -607,6 +629,7 @@ class AdminEmployeeController extends BaseController
             'create_form' => $createForm->createView(),
             'connect_form' => $connectForm->createView(),
             'imei_upload_form' => $imeiUploadForm->createView(),
+            'screen_upload_form' => $screenUploadForm->createView(),
             'usertoken_form' => $userTokenForm->createView(),
             'billing_form' => $billingForm->createView(),
             'fraud' => $checks,

@@ -37,6 +37,13 @@ class PhonePolicy extends Policy
     protected $phoneVerified;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $screenVerified;
+
+    /**
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -107,6 +114,19 @@ class PhonePolicy extends Policy
         // If a phone is verified successfully at any point in time, then the verified flag should remain set
         if ($this->getPhoneVerified() !== true) {
             $this->phoneVerified = $phoneVerified;
+        }
+    }
+
+    public function getScreenVerified()
+    {
+        return $this->screenVerified;
+    }
+
+    public function setScreenVerified($screenVerified)
+    {
+        // If a phone is verified successfully at any point in time, then the verified flag should remain set
+        if ($this->getScreenVerified() !== true) {
+            $this->screenVerified = $screenVerified;
         }
     }
 
