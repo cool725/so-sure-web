@@ -18,11 +18,13 @@ class MixpanelCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:mixpanel')
             ->setDescription('Run mixpanel')
+            // @codingStandardsIgnoreStart
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
                 'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|count-users (or blank for process)'
             )
+            // @codingStandardsIgnoreEnd
             ->addOption(
                 'email',
                 null,
