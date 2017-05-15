@@ -37,7 +37,7 @@ class ScreenUploadFile extends UploadFile
         $now = new \DateTime();
 
         return sprintf(
-            'imei/%s/screen-%d-%02d-%02d-%s',
+            'screen/%s/screen-%d-%02d-%02d-%s',
             $this->policy->getId(),
             $now->format('Y'),
             $now->format('m'),

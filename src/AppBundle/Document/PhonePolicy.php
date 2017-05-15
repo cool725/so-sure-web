@@ -117,6 +117,19 @@ class PhonePolicy extends Policy
         }
     }
 
+    public function getScreenVerified()
+    {
+        return $this->screenVerified;
+    }
+
+    public function setScreenVerified($screenVerified)
+    {
+        // If a phone is verified successfully at any point in time, then the verified flag should remain set
+        if ($this->getScreenVerified() !== true) {
+            $this->screenVerified = $screenVerified;
+        }
+    }
+
     public function getImei()
     {
         return $this->imei;
