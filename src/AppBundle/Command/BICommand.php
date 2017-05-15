@@ -20,13 +20,27 @@ class BICommand extends ContainerAwareCommand
         $this
             ->setName('sosure:bi')
             ->setDescription('Run a bi export')
+            ->addOption(
+                'debug',
+                null,
+                InputOption::VALUE_NONE,
+                'show debug output'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->exportPolicies();
-        $this->exportClaims();
+        $debug = $input->getOption('debug');
+        $lines = $this->exportPolicies();
+        if ($debug) {
+            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        }
+
+        $lines = $this->exportClaims($debug);
+        if ($debug) {
+            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        }
     }
 
     private function exportClaims()
@@ -52,6 +66,8 @@ class BICommand extends ContainerAwareCommand
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
+
+        return $lines;
     }
 
     private function exportPolicies()
@@ -64,8 +80,10 @@ class BICommand extends ContainerAwareCommand
             '"Age of Policy Holder"',
             '"Postcode of Policy Holder"',
             '"Policy Start Date"',
+            '"Policy End Date"',
             '"Policy Status"',
             '"Policy Holder Id"',
+            '"Policy Cancellation Reason"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -74,11 +92,15 @@ class BICommand extends ContainerAwareCommand
                sprintf('"%d"', $user->getAge()),
                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
                sprintf('"%s"', $policy->getStart()->format('Y-m-d')),
+               sprintf('"%s"', $policy->getEnd()->format('Y-m-d')),
                sprintf('"%s"', $policy->getStatus()),
                sprintf('"%s"', $user->getId()),
+               sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : null),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
+
+        return $lines;
     }
     
     private function getManager()
