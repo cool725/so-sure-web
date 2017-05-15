@@ -626,6 +626,16 @@
                     </td>
                 </tr>
                 {% endif %}
+                <tr>
+                    <td>
+                        Resend Policy Welcome Email
+                    </td>
+                    <td>
+                        {{ form_start(resend_email_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(resend_email_form.resend, {'label': 'Resend Email', 'attr': {'class': 'btn btn-danger confirm-resend-email'}}) }}
+                        {{ form_end(resend_email_form) }}
+                      </td>
+                </tr>
             </table>
         </div>
       {% endif %}

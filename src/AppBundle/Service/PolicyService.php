@@ -24,6 +24,7 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\PolicyTermsFile;
 use AppBundle\Document\File\PolicyScheduleFile;
+use AppBundle\Document\File\S3File;
 
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Event\PolicyEvent;
@@ -759,6 +760,35 @@ class PolicyService
         }
 
         $this->dispatchEvent(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
+    }
+
+    public function resendPolicyEmail(Policy $policy)
+    {
+        $files = [];
+        foreach ($policy->getPolicyFiles() as $file) {
+            if ($file instanceof PolicyScheduleFile ||
+                $file instanceof PolicyTermsFile) {
+                $files[] = $this->downloadS3($file);
+            }
+        }
+
+        $this->newPolicyEmail($policy, $files);
+    }
+
+    public function downloadS3(S3File $s3file)
+    {
+        $file = sprintf('%s/%s', sys_get_temp_dir(), $s3file->getFilename());
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
+        $result = $this->s3->getObject(array(
+            'Bucket' => $s3file->getBucket(),
+            'Key'    => $s3file->getKey(),
+            'SaveAs' => $file,
+        ));
+
+        return $file;
     }
 
     /**
