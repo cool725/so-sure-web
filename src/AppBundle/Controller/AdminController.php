@@ -545,7 +545,7 @@ class AdminController extends BaseController
 
                     return $this->redirectToRoute('admin_banking_date', [
                         'year' => $date->format('Y'),
-                        'month' => $date->format('m'),
+                        'month' => $date->format('n'),
                     ]);
                 }
             } elseif ($request->request->has('barclays')) {
@@ -563,7 +563,7 @@ class AdminController extends BaseController
 
                     return $this->redirectToRoute('admin_banking_date', [
                         'year' => $date->format('Y'),
-                        'month' => $date->format('m'),
+                        'month' => $date->format('n'),
                     ]);
                 }
             }
