@@ -15,6 +15,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Service\MixpanelService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use AppBundle\Document\Invitation\EmailInvitation;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Route("/ops")
@@ -61,10 +62,10 @@ class OpsController extends BaseController
     }
 
     /**
-     * @Route("/csp", name="ops_csp")
+     * @Route("/csp-warning", name="ops_csp_warning")
      * @Template()
      */
-    public function cspAction()
+    public function cspWarningAction()
     {
         return [];
     }
@@ -131,5 +132,51 @@ class OpsController extends BaseController
         }
 
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Queued', 200);
+    }
+
+
+    /**
+     * @Route("/csp", name="ops_csp")
+     */
+    public function cspAction(Request $request)
+    {
+        $logger = $this->get('logger');
+        $violationReport = $request->getContent();
+        if (empty($violationReport)) {
+            $logger->debug('Content-Security-Policy Endpoint called without data');
+
+            return new Response('No report data sent?', 411);
+        }
+
+        $violationReport = json_decode($violationReport, true);
+        if ($violationReport === null) {
+            $logger->debug('Content-Security-Policy Endpoint called with invalid JSON data');
+
+            return new Response('Invalid JSON data supplied?', 400);
+        }
+
+        if (!isset($violationReport['csp-report'])) {
+            $logger->debug('Content-Security-Policy Endpoint called without "csp-report" data');
+
+            return new Response('Invalid report data, no "csp-report" data supplied.', 400);
+        }
+
+        if (isset($violationReport['csp-report']['blocked-uri'])) {
+            $host = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_HOST));
+            if (in_array($host, [
+                'nikkomsgchannel'
+            ])) {
+                $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
+
+                return new Response('', 204);
+            }
+        }
+
+        $logger->warning(
+            'Content-Security-Policy Violation Reported',
+            $violationReport
+        );
+
+        return new Response('', 204);
     }
 }
