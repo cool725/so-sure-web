@@ -111,7 +111,7 @@
                       {% set phoneProfit = phone.policyProfit(expected_claim_frequency, consumer_payout, ipt_rebate) %}
                         <tr {% if not phone.active %}class="danger"{% endif %}>
                             <td><a href="{{ path('quote_phone', {'id': phone.id}) }}">{{ phone }}</a>
-                            {% if phone.shouldBeRetired %}<span class="text-danger"><i class="glyphicon glyphicon-time" title="{{ phone.monthAge }} months old"></i></span>{% endif %}
+                            {% if phone.shouldBeRetired %}<span class="text-danger"><i class="fa fa-time" title="{{ phone.monthAge }} months old"></i></span>{% endif %}
                             </td>
                             {% if phone.currentPhonePrice %}
                             <td>
@@ -274,7 +274,7 @@
                     <div class='input-group date' id='phone-from-group'>
                       <input type="text" class="form-control" id="phone-from" name="from" required="required">
                       <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
+                        <span class="fa fa-calendar"></span>
                       </span>
                     </div>
                   </div>
@@ -287,7 +287,7 @@
                     <div class='input-group date' id='phone-to-group'>
                       <input type="text" class="form-control" id="phone-to" name="to">
                       <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
+                        <span class="fa fa-calendar"></span>
                       </span>
                     </div>
                   </div>
