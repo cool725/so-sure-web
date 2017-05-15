@@ -25,7 +25,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  * })
  * @Gedmo\Loggable
  */
-abstract class S3File
+class S3File
 {
     /**
      * @MongoDB\Id
