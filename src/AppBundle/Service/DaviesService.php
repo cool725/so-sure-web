@@ -414,9 +414,14 @@ class DaviesService
 
         $now = new \DateTime();
         if ($daviesClaim->isOpen() || ($daviesClaim->dateClosed && $daviesClaim->dateClosed->diff($now)->days < 5)) {
-            similar_text($claim->getPolicy()->getUser()->getName(), $daviesClaim->insuredName, $percent);
+            // lower case & remove title
+            $daviesInsuredName = strtolower($daviesClaim->insuredName);
+            foreach (['Mr. ', 'Mr ', 'Mrs. ', 'Mrs ', 'Miss '] as $title) {
+                $daviesInsuredName = str_replace($title, '', $daviesInsuredName);
+            }
+            similar_text(strtolower($claim->getPolicy()->getUser()->getName()), $daviesInsuredName, $percent);
 
-            if ($percent < 30) {
+            if ($percent < 50) {
                 throw new \Exception(sprintf(
                     'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
                     $daviesClaim->claimNumber,
