@@ -382,7 +382,6 @@ nelmio_security:
                 - http://cdn.optimizely.com
                 - https://*.intercom.io
                 - https://*.intercomcdn.com
-                - https://waitlisted.co
                 - https://*.ads-twitter.com
                 - https://*.hotjar.com
                 - https://*.pcapredict.com
@@ -390,8 +389,9 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://code.jquery.com
                 - https://cdn.heapanalytics.com
-                - 'data:'
+                - http://downloads.mailchimp.com
                 - https://*.maxcdn.com
+                - 'data:'
             style-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -399,12 +399,12 @@ nelmio_security:
                 - https://maxcdn.bootstrapcdn.com
                 - https://app.prodpad.com
                 - https://cdn.digits.com
-                - https://waitlisted.co
                 - https://*.twitter.com
                 - http://*.twitter.com
                 - https://*.fastly.net
                 - https://maxcdn.bootstrapcdn.com
                 - http://maxcdn.bootstrapcdn.com
+                - https://cdn-images.mailchimp.com
             img-src:
                 - 'self'
                 - https://cdn.so-sure.com
