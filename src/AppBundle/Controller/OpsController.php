@@ -164,7 +164,9 @@ class OpsController extends BaseController
         if (isset($violationReport['csp-report']['blocked-uri'])) {
             $host = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_HOST));
             if (in_array($host, [
-                'nikkomsgchannel'
+                'nikkomsgchannel',
+                'www.bizographics.com',
+                'secure.adnxs.com',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 
