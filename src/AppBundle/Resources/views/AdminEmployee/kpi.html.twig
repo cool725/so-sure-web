@@ -22,11 +22,28 @@
 {% block body %}
 <div class="container" style="margin-bottom: 50px">
 
-<div class="row">
-    <div class="col-md-6">
-        <h1>so-sure KPI</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h1>so-sure KPI</h1>
+        </div>
+        <form id='kpi-form' method="POST">
+            <div class="col-md-2">
+                <div class="form-group" style="padding-top: 15px;">
+                    <div class='input-group date' id='kpi'>
+                        <input name="kpi" type='text' class="form-control" value="{{ now|date('d-m-Y') }}" />
+                        <span class="input-group-addon">
+                            <span class="fa fa-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group" style="padding-top: 15px;">
+                    <button class="btn btn-primary">Adjust date</button>
+                </div>
+            </div>
+        </form>
     </div>
-</div>
     <div class="row">
         <div class="col-md-11">
             <div class="table-responsive">
