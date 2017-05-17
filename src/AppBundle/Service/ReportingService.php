@@ -94,6 +94,8 @@ class ReportingService
             );
         }
 
+        $newToDateDirectPolicies = $policyRepo->findAllNewPolicies(null, null, $end);
+
         $totalDirectPolicies = $policyRepo->findAllNewPolicies();
         $data['totalDirectPolicies'] = $totalDirectPolicies->count();
         $data['totalDirectPoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalDirectPolicies);
@@ -112,6 +114,8 @@ class ReportingService
             );
         }
 
+        $newToDateInvitationPolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_INVITATION, null, $end);
+
         $totalInvitationPolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_INVITATION);
         $data['totalInvitationPolicies'] = $totalInvitationPolicies->count();
         $data['totalInvitationPoliciesPremium'] = Policy::sumYearlyPremiumPrice($totalInvitationPolicies);
@@ -129,6 +133,8 @@ class ReportingService
                 $data['newSCodePoliciesPremium'] / $data['newSCodePolicies']
             );
         }
+
+        $newToDateSCodePolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_SCODE, null, $end);
 
         $totalSCodePolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_SCODE);
         $data['totalSCodePolicies'] = $totalSCodePolicies->count();
@@ -257,9 +263,9 @@ class ReportingService
         }
         $data['totalAvgHoursToConnect'] = $connectionRepo->avgHoursToConnect();
 
-        $data['totalRunRate'] = Policy::sumYearlyPremiumPrice($totalDirectPolicies, null, true) +
-            Policy::sumYearlyPremiumPrice($totalInvitationPolicies, null, true) +
-            Policy::sumYearlyPremiumPrice($totalSCodePolicies, null, true);
+        $data['totalRunRate'] = Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($newToDateInvitationPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($newToDateSCodePolicies, null, true);
 
         return [
             'start' => $start,
