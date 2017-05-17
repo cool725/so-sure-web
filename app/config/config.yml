@@ -390,7 +390,6 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://code.jquery.com
                 - https://cdn.heapanalytics.com
-                - http://downloads.mailchimp.com
                 - https://*.maxcdn.com
                 - https://snap.licdn.com # linkedin
                 - https://*.linkedin.com
