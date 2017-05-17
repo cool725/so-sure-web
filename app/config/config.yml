@@ -345,6 +345,7 @@ nelmio_security:
                 - https://*.fastly.net
                 - https://maxcdn.bootstrapcdn.com
                 - http://maxcdn.bootstrapcdn.com
+                - https://*.iubenda.com
                 - 'data:'
             child-src:
                 - 'self'
@@ -433,6 +434,7 @@ nelmio_security:
                 - https://*.vimeocdn.com
                 - https://*.linkedin.com
                 - https://cdn.iubenda.com
+                - https://www.gstatic.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
