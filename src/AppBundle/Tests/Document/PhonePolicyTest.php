@@ -182,7 +182,7 @@ class PhonePolicyTest extends WebTestCase
     public function testLinkedClaimed()
     {
         $policyA = static::createUserPolicy(true);
-        $policyA->getUser()->setEmail(static::generateEmail('testSelfClaimed', $this));
+        $policyA->getUser()->setEmail(static::generateEmail('testLinkedClaimed', $this));
         static::$dm->persist($policyA->getUser());
         static::$dm->persist($policyA);
         static::$dm->flush();
