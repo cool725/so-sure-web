@@ -1194,16 +1194,21 @@ class AdminEmployeeController extends BaseController
 
     /**
      * @Route("/kpi", name="admin_kpi")
+     * @Route("/kpi/{now}", name="admin_kpi_date")
      * @Template
      */
-    public function kpiAction()
+    public function kpiAction($now = null)
     {
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(PhonePolicy::class);
         $statsRepo = $dm->getRepository(Stats::class);
 
+        if (!$now) {
+            $now = new \DateTime();
+        } else {
+            $now = new \DateTime($now);
+        }
         $date = new \DateTime('2016-09-12');
-        $now = new \DateTime();
         // TODO: Be smarter with start date, but this at least drops number of queries down significantly
         while ($date < $now) {
             $end = clone $date;
@@ -1263,6 +1268,7 @@ class AdminEmployeeController extends BaseController
 
         return [
             'weeks' => array_slice($weeks, -3),
+            'now' => $now,
         ];
     }
 }
