@@ -83,7 +83,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
 
-            $this->header($policy, [], $lines);
+            $blank = [];
+            $this->header($policy, $blank, $lines);
             if ($adjustScheduledPayments) {
                 if (!$policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate)) {
                     if ($policyService->adjustScheduledPayments($policy)) {
