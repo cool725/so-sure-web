@@ -135,7 +135,7 @@
                             </td>
                             <td>{{ policy.user.mobileNumber }}</td>
                             <td>
-                                <span title="Number of Claims (any status)">{{ policy.claims|length }}</span>
+                                <span title="Number of Claims + Linked Claims (any status)">{{ (policy.claims|length + policy.linkedClaims|length) }}</span>
                                 /
                                 <span title="Number of Network Claims (any status)">{{ policy.networkClaims|length }}</span>
                             </td>

@@ -158,6 +158,50 @@ class PhonePolicyTest extends WebTestCase
         ));
     }
 
+    public function testSelfClaimed()
+    {
+        $policyA = static::createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('testSelfClaimed', $this));
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+
+        $claimA = new Claim();
+        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setClosedDate(new \DateTime("2016-01-01"));
+        $policyA->addClaim($claimA);
+        $this->assertTrue($policyA->hasMonetaryClaimed());
+        $this->assertEquals(
+            SalvaPhonePolicy::RISK_CONNECTED_SELF_CLAIM,
+            $policyA->getRiskReason(new \DateTime("2016-01-10"))
+        );
+    }
+
+    public function testLinkedClaimed()
+    {
+        $policyA = static::createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('testLinkedClaimed', $this));
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+        $this->assertFalse($policyA->hasMonetaryClaimed());
+
+        $claimA = new Claim();
+        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setClosedDate(new \DateTime("2016-01-01"));
+        $policyA->addLinkedClaim($claimA);
+        $this->assertFalse($policyA->hasMonetaryClaimed());
+        $this->assertTrue($policyA->hasMonetaryClaimed(false, true));
+        $this->assertEquals(
+            SalvaPhonePolicy::RISK_CONNECTED_SELF_CLAIM,
+            $policyA->getRiskReason(new \DateTime("2016-01-10"))
+        );
+    }
+
     public function testHasNetworkClaimedInLast30DaysWithOpenStatus()
     {
         $policyA = static::createUserPolicy(true);
@@ -947,6 +991,21 @@ class PhonePolicyTest extends WebTestCase
                 $this->assertGreaterThan(0, $networkConnection->getTotalValue());
             }
         }
+    }
+
+    public function testCancelPolicyUpgrade()
+    {
+        $policyA = static::createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('testCancelPolicyUpgrade', $this));
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->flush();
+
+        $policyA->cancel(SalvaPhonePolicy::CANCELLED_UPGRADE);
+
+        $this->assertEquals(SalvaPhonePolicy::STATUS_CANCELLED, $policyA->getStatus());
+        $this->assertEquals(SalvaPhonePolicy::CANCELLED_UPGRADE, $policyA->getCancelledReason());
+        $this->assertFalse($policyA->getUser()->isLocked());
     }
 
     public function testCancelPolicyCancelsScheduledPayments()

@@ -55,6 +55,7 @@ abstract class Policy
     const CANCELLED_BADRISK = 'badrisk';
     const CANCELLED_DISPOSSESSION = 'dispossession';
     const CANCELLED_WRECKAGE = 'wreckage';
+    const CANCELLED_UPGRADE = 'upgrade';
 
     const PLAN_MONTHLY = 'monthly';
     const PLAN_YEARLY = 'yearly';
@@ -122,7 +123,7 @@ abstract class Policy
     /**
      * @Assert\Choice({
      *  "unpaid", "actual-fraud", "suspected-fraud", "user-requested",
-     *  "cooloff", "badrisk", "dispossession", "wreckage"
+     *  "cooloff", "badrisk", "dispossession", "wreckage", "upgrade"
      * }, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -176,9 +177,18 @@ abstract class Policy
     protected $connections = array();
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim", cascade={"persist"})
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim",
+     *  mappedBy="policy",
+     *  cascade={"persist"})
      */
     protected $claims = array();
+
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim",
+     *  mappedBy="linkedPolicy",
+     *  cascade={"persist"})
+     */
+    protected $linkedClaims = array();
 
     /**
      * @Assert\DateTime()
@@ -680,6 +690,17 @@ abstract class Policy
         return $this->claims;
     }
 
+    public function addLinkedClaim(Claim $claim)
+    {
+        $claim->setLinkedPolicy($this);
+        $this->linkedClaims[] = $claim;
+    }
+
+    public function getLinkedClaims()
+    {
+        return $this->linkedClaims;
+    }
+
     public function isClaimAllowed($claim)
     {
         if (!$claim->isLostTheft()) {
@@ -1129,7 +1150,8 @@ abstract class Policy
             $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
             // Never refund for certain cancellation reasons
             return false;
-        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED) {
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED ||
+            $this->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
             // user has 30 days from when they requested cancellation
             // however, as we don't easily have a scheduled cancellation
             // we will start with a manual cancellation that should be done
@@ -1413,13 +1435,16 @@ abstract class Policy
             return self::RISK_PENDING_CANCELLATION_POLICY;
         }
 
+        // Once of the few cases where we want to check linked claims as can affect risk rating
+        if ($this->hasMonetaryClaimed(true, true)) {
+            // a self claim can be before the pot is adjusted.  also a pot zero is not always due to a self claim
+            return self::RISK_CONNECTED_SELF_CLAIM;
+            // return self::RISK_LEVEL_HIGH;
+        }
+
         if (count($this->getStandardConnections()) > 0) {
             // Connected and value of their pot is zero
-            if ($this->hasMonetaryClaimed(true)) {
-                // a self claim can be before the pot is adjusted.  also a pot zero is not always due to a self claim
-                return self::RISK_CONNECTED_SELF_CLAIM;
-                // return self::RISK_LEVEL_HIGH;
-            } elseif ($this->areEqualToFourDp($this->getPotValue(), 0) ||
+            if ($this->areEqualToFourDp($this->getPotValue(), 0) ||
                 $this->areEqualToFourDp($this->getPotValue() - $this->getPromoPotValue(), 0)) {
                 // pot is empty, or pot is entirely made up of promo values
                 return self::RISK_CONNECTED_POT_ZERO;
@@ -1524,15 +1549,31 @@ abstract class Policy
         return $cliffDate;
     }
 
-    public function hasMonetaryClaimed($includeOpen = false)
+    public function hasMonetaryClaimed($includeOpen = false, $includeLinked = false)
     {
-        return count($this->getMonetaryClaimed($includeOpen)) > 0;
+        $count = count($this->getMonetaryClaimed($includeOpen));
+        if ($includeLinked) {
+            $count += count($this->getMonetaryLinkedClaimed($includeOpen));
+        }
+        return $count > 0;
     }
 
     public function getMonetaryClaimed($includeOpen = false)
     {
         $claims = [];
         foreach ($this->claims as $claim) {
+            if ($claim->isMonetaryClaim($includeOpen)) {
+                $claims[] = $claim;
+            }
+        }
+
+        return $claims;
+    }
+
+    public function getMonetaryLinkedClaimed($includeOpen = false)
+    {
+        $claims = [];
+        foreach ($this->linkedClaims as $claim) {
             if ($claim->isMonetaryClaim($includeOpen)) {
                 $claims[] = $claim;
             }

@@ -152,6 +152,14 @@
                             <td>{{ data.totalUserRequestedPolicies }}</td>
                         </tr>
                         <tr>
+                            <td style="padding-left: 30px">Cancelled Policy Upgrades
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Cancellation data only" data-content="Currently, this only affect the cancellation data shown and not the new policies"></i>
+                            </td>
+                            <td>{{ data.endingUpgradePolicies }}</td>
+                            <td>{{ data.totalUpgradePolicies }}</td>
+                        </tr>
+                        <tr>
                             <td style="padding-left: 30px">Cancelled Cooloff Policies
                             </td>
                             <td>{{ data.endingCooloffPolicies }}</td>
