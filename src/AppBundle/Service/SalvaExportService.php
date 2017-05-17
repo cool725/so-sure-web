@@ -451,6 +451,9 @@ class SalvaExportService
                 $reason = self::CANCELLED_SUSPECTED_FRAUD;
             } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_USER_REQUESTED) {
                 $reason = self::CANCELLED_USER_REQUESTED;
+            } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_UPGRADE) {
+                // upgrade is just for our purposes
+                $reason = self::CANCELLED_USER_REQUESTED;
             } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_COOLOFF) {
                 $reason = self::CANCELLED_COOLOFF;
             } elseif ($phonePolicy->getCancelledReason() == SalvaPhonePolicy::CANCELLED_BADRISK) {

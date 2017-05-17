@@ -33,10 +33,16 @@ class Claim
     protected $id;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="claims")
      * @Gedmo\Versioned
      */
     protected $policy;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="linkedClaims")
+     * @Gedmo\Versioned
+     */
+    protected $linkedPolicy;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="User")
@@ -310,6 +316,16 @@ class Claim
     public function setPolicy($policy)
     {
         $this->policy = $policy;
+    }
+
+    public function getLinkedPolicy()
+    {
+        return $this->linkedPolicy;
+    }
+
+    public function setLinkedPolicy($linkedPolicy)
+    {
+        $this->linkedPolicy = $linkedPolicy;
     }
 
     public function getHandler()

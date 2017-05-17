@@ -5,7 +5,7 @@
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#user">User</a></li>
       <li role="presentation"><a href="#policy">Policy</a></li>
-      <li role="presentation"><a href="#claims">Claims <span class="badge" title="Number of claims">{{ policy.claims|length }}</span></a></li>
+      <li role="presentation"><a href="#claims">Claims <span class="badge" title="Number of claims">{{ (policy.claims|length + policy.linkedClaims|length) }}</span></a></li>
       <li role="presentation"><a href="#network">Network Claims <span class="badge" title="Number of network claims">{{ policy.networkClaims|length }}</span></a></li>
       <li role="presentation"><a href="#history">History</a></li>
       {% if is_granted('ROLE_ADMIN') %}
@@ -318,6 +318,7 @@
                 </table>
         </div>
         <div role="tabpanel" class="tab-pane" id="claims">
+            <h4>Claims</h4>
             {% if policy.claims|length > 0 %}
                 <table class="table table-striped">
                     <tr>
@@ -333,6 +334,54 @@
                     {% for claim in policy.claims %}
                     <tr>
                         <td style="width: 20%;">{{ claim.recordedDate|date }}</td>
+                        <td style="width: 10%;" id="claim_{{ claim.id }}">
+                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
+                            data-claim='{{ claim.toModalArray|json_encode }}'>
+                                {{ claim.number }}</button>
+                        </td>
+                        <td style="width: 10%;">{{ claim.type }}</td>
+                        <td style="width: 10%;">{{ claim.status }}</td>
+                        <td style="width: 10%;">£{{ claim.totalChargesWithVat|number_format(2, '.', ',') }}</td>
+                        <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
+                          {{ claim.crimeRef }}
+                        </td>
+                        <td style="width: 10%;" class="{% if claim.suspectedFraud or claim.shouldCancelPolicy %}danger{% endif %}">
+                          {% if claim.suspectedFraud %}Suspected Fraud;{% endif %}
+                          {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
+                        </td>
+                        <td style="width: 20%;">{{ claim.notes }}
+                            <button title="Edit notes" type="button" class="btn btn-primary"
+                                    data-toggle="modal" data-target="#notesModal"
+                                data-update="{{ path('claims_notes', {'id': claim.id}) }}"
+                                data-notes="{{ claim.notes }}"><i class="fa fa-edit"></i></button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+            <h4>No claims</h4>
+            {% endif %}
+            <hr />
+            <h4>Linked Claims (e.g. Policy Upgrade)</h4>
+            {% if policy.linkedClaims|length > 0 %}
+                <table class="table table-striped">
+                    <tr>
+                        <th>Date</th>
+                        <th>Policy Number</th>
+                        <th>Claims Number</th>
+                        <th>Claims Type</th>
+                        <th>Claims Status</th>
+                        <th>Recipero Fees</th>
+                        <th>Crime Ref</th>
+                        <th>Flags</th>
+                        <th>Notes</th>
+                    </tr>
+                    {% for claim in policy.linkedClaims %}
+                    <tr>
+                        <td style="width: 20%;">{{ claim.recordedDate|date }}</td>
+                        <td style="width: 20%;"><a href="{{ path(policy_route, {'id':claim.policy.id}) }}">
+                            {{ claim.policy.policyNumber }}
+                        </a></td>
                         <td style="width: 10%;" id="claim_{{ claim.id }}">
                             <button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
                             data-claim='{{ claim.toModalArray|json_encode }}'>

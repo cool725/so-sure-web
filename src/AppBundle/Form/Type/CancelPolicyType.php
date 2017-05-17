@@ -22,6 +22,7 @@ class CancelPolicyType extends AbstractType
         $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_SUSPECTED_FRAUD, 'Fraud (suspected)');
         $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_DISPOSSESSION, 'Dispossession');
         $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_WRECKAGE, 'Wreckage');
+        $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_UPGRADE, 'Upgrade');
 
         $preferred = [];
         if ($policy->isWithinCooloffPeriod() && !$policy->hasMonetaryClaimed(true)) {

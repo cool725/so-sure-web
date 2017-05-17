@@ -1,0 +1,15 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your requested policy upgrade
+
+**
+------------------------------------------------------------
+You've requested a policy upgrade. Due to the way our system works, we will be cancelling your previous policy and creating a new policy.
+
+This email serves as official notice that your policy {{ policy.policyNumber }} is now cancelled and no longer in effect.
+
+You should expect another email shortly with your new policy details.
+
+If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
+
+{% endblock body %}

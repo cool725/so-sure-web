@@ -145,6 +145,7 @@ class ReportingService
             'ActualFraud' => Policy::CANCELLED_ACTUAL_FRAUD,
             'SuspectedFraud' => Policy::CANCELLED_SUSPECTED_FRAUD,
             'UserRequested' => Policy::CANCELLED_USER_REQUESTED,
+            'Upgrade' => Policy::CANCELLED_UPGRADE,
             'Cooloff' => Policy::CANCELLED_COOLOFF,
             'BadRisk' => Policy::CANCELLED_BADRISK,
             'Dispossession' => Policy::CANCELLED_DISPOSSESSION,
