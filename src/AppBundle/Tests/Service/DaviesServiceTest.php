@@ -677,6 +677,31 @@ class DaviesServiceTest extends WebTestCase
         $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
     }
 
+    public function testSaveClaimsNegativePhoneValue()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setNumber(1);
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->phoneReplacementCost = -70;
+        $daviesClaim->incurred = -70;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        static::$daviesService->saveClaim($daviesClaim, $claim);
+        $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
+        $now = new \DateTime();
+        $yesterday = $this->subBusinessDays($now, 1);
+        $this->assertEquals($yesterday, $claim->getApprovedDate());
+    }
+
     public function testSaveClaimsYesterday()
     {
         $policy = static::createUserPolicy(true);
