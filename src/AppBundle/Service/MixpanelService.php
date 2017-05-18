@@ -530,36 +530,30 @@ class MixpanelService
         if ($user->getFacebookId()) {
             $userData['Facebook'] = true;
         }
-        if ($policy = $user->getCurrentPolicy()) {
-            if ($phone = $policy->getPhone()) {
-                $userData['Device Insured'] = $phone->__toString();
-                $userData['OS'] = $phone->getOs();
-            }
-            if ($premium = $policy->getPremium()) {
-                $userData['Final Monthly Cost'] = $premium->getMonthlyPremiumPrice();
-            }
-            if ($plan = $policy->getPremiumPlan()) {
-                $userData['Payment Option'] = $plan;
-                $userData['Number of Payments Received'] = count($policy->getSuccessfulPaymentCredits());
-                if ($payment = $policy->getLastSuccessfulPaymentCredit()) {
-                    $userData['Last payment received'] = $payment->getDate()->format(\DateTime::ATOM);
-                }
-            }
-            $userData['Number of Connections'] = count($policy->getConnections());
-            $userData['Reward Pot Value'] = $policy->getPotValue();
-            $userData['Policy Status'] = $policy->getStatus();
-            if ($connection = $policy->getLastConnection()) {
-                $userData['Last connection complete'] = $connection->getDate()->format(\DateTime::ATOM);
-            }
-            if ($policy->getStatus() == Policy::STATUS_CANCELLED) {
-                $userData['Cancellation Reason'] = $policy->getCancelledReason();
-            }
-            if ($policy->getStart()) {
-                $diff = $policy->getStart()->getTimestamp() - $policy->getUser()->getCreated()->getTimestamp();
-                $userData['Minutes to Final Purchase'] = round($diff / 60);
-            }
-            $diff = $policy->getCreated()->getTimestamp() - $policy->getUser()->getCreated()->getTimestamp();
-            $userData['Minutes to Start Purchase'] = round($diff / 60);
+
+        $analytics = $user->getAnalytics();
+        $userData['Number of Policies'] = $analytics['numberPolicies'];
+        $userData['Number of Payments Received'] = $analytics['paymentsReceived'];
+        $userData['Number of Connections'] = $analytics['connections'];
+        $userData['Reward Pot Value'] = $analytics['rewardPot'];
+        if ($analytics['os']) {
+            $userData['OS'] = $analytics['os'];
+        }
+        if ($analytics['lastPaymentReceived']) {
+            $userData['Last payment received'] = $analytics['lastPaymentReceived']->format(\DateTime::ATOM);
+        }
+        if ($analytics['lastConnection']) {
+            $userData['Last connection complete'] = $analytics['lastConnection']->format(\DateTime::ATOM);
+        }
+
+        if ($analytics['firstPolicy']['minutesStartPurchase']) {
+            $userData['Minutes to Start Purchase'] = $analytics['firstPolicy']['minutesStartPurchase'];
+        }
+        if ($analytics['firstPolicy']['minutesFinalPurchase']) {
+            $userData['Minutes to Final Purchase'] = $analytics['firstPolicy']['minutesFinalPurchase'];
+        }
+        if ($analytics['firstPolicy']['monthlyPremium']) {
+            $userData['Final Monthly Cost'] = $analytics['firstPolicy']['monthlyPremium'];
         }
 
         $this->queuePersonProperties($userData, false, $user);

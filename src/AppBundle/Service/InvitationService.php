@@ -433,7 +433,7 @@ class InvitationService
         $this->validateNotConnectedByUser($policy, $user);
 
         if ($scode->isReward()) {
-            $this->addReward($policy->getUser(), $scode->getReward());
+            $this->addReward($policy, $scode->getReward());
         }
 
         $this->setSCodeLeadSource($policy, $user, $date);
@@ -887,6 +887,7 @@ class InvitationService
         $now = new \DateTime();
         $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
             'Connection Value' => $inviterConnection->getTotalValue(),
+            'Policy Id' => $inviterPolicy->getId(),
         ]);
         $this->mixpanel->queuePersonProperties([
             'Last connection complete' => $now->format(\DateTime::ATOM),
@@ -894,6 +895,7 @@ class InvitationService
 
         $this->mixpanel->queueTrackWithUser($invitation->getInvitee(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
             'Connection Value' => $inviteeConnection->getTotalValue(),
+            'Policy Id' => $inviteePolicy->getId(),
         ]);
         $this->mixpanel->queuePersonProperties([
             'Last connection complete' => $now->format(\DateTime::ATOM),
@@ -1101,31 +1103,31 @@ class InvitationService
         $this->dm->flush();
     }
 
-    public function addReward(User $sourceUser, Reward $reward, $amount = null)
+    public function addReward(Policy $policy, Reward $reward, $amount = null)
     {
         if (!$amount) {
             $amount = $reward->getDefaultValue();
         }
 
-        if ($sourceUser->getCurrentPolicy()->hasMonetaryClaimed()) {
+        if ($policy->hasMonetaryClaimed()) {
             throw new \InvalidArgumentException(sprintf(
-                'Unable to add bonus. %s has a monetary claim',
-                $sourceUser->getEmail()
+                'Unable to add bonus. Poliicy %s has a monetary claim',
+                $policy->getId()
             ));
         }
-        if (count($sourceUser->getCurrentPolicy()->getNetworkClaims(true)) > 0) {
+        if (count($policy->getNetworkClaims(true)) > 0) {
             throw new \InvalidArgumentException(sprintf(
-                '%s has a network claim',
-                $sourceUser->getEmail()
+                'Policy %s has a network claim',
+                $policy->getId()
             ));
         }
         $connection = new RewardConnection();
-        $sourceUser->getCurrentPolicy()->addConnection($connection);
+        $policy->addConnection($connection);
         $connection->setLinkedUser($reward->getUser());
         $connection->setPromoValue($amount);
         $reward->addConnection($connection);
         $reward->updatePotValue();
-        $sourceUser->getCurrentPolicy()->updatePotValue();
+        $policy->updatePotValue();
         $this->dm->persist($connection);
         $this->dm->flush();
 

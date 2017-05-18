@@ -1332,7 +1332,13 @@ class ApiControllerTest extends BaseControllerTest
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         $updatedUser = $repo->find($user->getId());
-        $this->assertTrue($updatedUser->getCurrentPolicy()->getPhoneVerified());
+        $isVerified = false;
+        foreach ($updatedUser->getAllPolicies() as $policy) {
+            if ($policy->getPhoneVerified()) {
+                $isVerified = true;
+            }
+        }
+        $this->assertTrue($isVerified);
     }
 
     public function testReplay()

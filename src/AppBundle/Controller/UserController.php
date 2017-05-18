@@ -63,7 +63,7 @@ class UserController extends BaseController
             $scode = $repo->findOneBy(['code' => $code]);
         }
 
-        $policy = $user->getCurrentPolicy();
+        $policy = $user->getFirstPolicy();
         $scode = null;
         if ($session = $this->get('session')) {
             $scode = $repo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
@@ -135,7 +135,6 @@ class UserController extends BaseController
                     return new RedirectResponse($this->generateUrl('user_home'));
                 }
 
-                $policy = $this->getUser()->getCurrentPolicy();
                 try {
                     $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
                     if ($invitation) {
@@ -231,7 +230,7 @@ class UserController extends BaseController
         }
 
         return array(
-            'policy' => $user->getCurrentPolicy(),
+            'policy' => $policy,
             'email_form' => $emailInvitationForm->createView(),
             'invitation_form' => $invitationForm->createView(),
             'scode_form' => $scodeForm->createView(),
@@ -254,8 +253,8 @@ class UserController extends BaseController
         }
 
         // If there are any policies in progress, redirect to the purchase
-        $initPolicies = $user->getInitPolicies();
-        if (count($initPolicies) > 0) {
+        $unInitPolicies = $user->getUnInitPolicies();
+        if (count($unInitPolicies) > 0) {
             return $this->redirectToRoute('purchase_step_policy');
         }
 

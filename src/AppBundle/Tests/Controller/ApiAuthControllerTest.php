@@ -556,8 +556,6 @@ class ApiAuthControllerTest extends BaseControllerTest
             self::generateEmail('testPutMultiPay-payee', $this),
             true
         );
-        $payerPolicy = $multiPay->getPayer()->getCurrentPolicy();
-
         $payerCognitoIdentityId = $this->getAuthUser($multiPay->getPayer());
         $url = sprintf('/api/v1/auth/multipay/%s?_method=PUT', $multiPay->getId());
         $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [

@@ -115,6 +115,30 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->inviteByEmail($policy, static::generateEmail('testDuplicateEmail-invite', $this));
     }
 
+    public function testInviterMultiplePolicyEmail()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testInviterMultiplePolicyEmail-user', $this),
+            'bar'
+        );
+        $policyA = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $policyB = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $invitationA = self::$invitationService->inviteByEmail(
+            $policyA,
+            static::generateEmail('testInviterMultiplePolicyEmail-invite', $this)
+        );
+        $this->assertTrue($invitationA instanceof EmailInvitation);
+        static::$dm->flush();
+
+        $invitationB = self::$invitationService->inviteByEmail(
+            $policyB,
+            static::generateEmail('testInviterMultiplePolicyEmail-invite', $this)
+        );
+        $this->assertTrue($invitationB instanceof EmailInvitation);
+        static::$dm->flush();
+    }
+
     public function testDuplicateEmailReInvites()
     {
         $user = static::createUser(
@@ -1508,7 +1532,7 @@ class InvitationServiceTest extends WebTestCase
         );
 
         $reward = $this->createReward(static::generateEmail('testAddReward-R', $this));
-        $connection = static::$invitationService->addReward($policy->getUser(), $reward, 10);
+        $connection = static::$invitationService->addReward($policy, $reward, 10);
         $this->assertEquals(20, $policy->getPotValue());
         $this->assertEquals(2, count($policy->getConnections()));
     }
