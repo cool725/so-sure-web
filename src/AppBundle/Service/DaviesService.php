@@ -398,7 +398,7 @@ class DaviesService
 
     public function validateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
     {
-        if ($claim->getPolicy()->getPolicyNumber() != $daviesClaim->policyNumber) {
+        if (strtolower($claim->getPolicy()->getPolicyNumber()) != strtolower($daviesClaim->policyNumber)) {
             throw new \Exception(sprintf(
                 'Claim %s does not match policy number %s',
                 $daviesClaim->claimNumber,
