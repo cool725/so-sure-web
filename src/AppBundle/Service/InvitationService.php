@@ -871,14 +871,9 @@ class InvitationService
         // The invitation should never be sent in the first place, but in case
         // there was perhaps an email update in the meantime
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
-        if ($invitation instanceof EmailInvitation) {
-            if ($connectionRepo->isConnectedByEmail($invitation->getPolicy(), $invitation->getEmail())) {
-                throw new ConnectedInvitationException('You are already connected');
-            }
-        } elseif ($invitation instanceof SmsInvitation) {
-            if ($connectionRepo->isConnectedBySms($invitation->getPolicy(), $invitation->getMobile())) {
-                throw new ConnectedInvitationException('You are already connected');
-            }
+        if ($connectionRepo->isConnectedByPolicy($inviterPolicy, $inviteePolicy) ||
+            $connectionRepo->isConnectedByPolicy($inviteePolicy, $inviterPolicy)) {
+                throw new ConnectedInvitationException('You  are already connected');
         }
 
         // If there was a concellation in the network, new connection should replace the cancelled connection
