@@ -450,25 +450,35 @@ class InvitationService
 
         $this->setSCodeLeadSource($policy, $user, $date);
 
+        $inviteePolicies = 0;
+        if ($scode->isStandard()) {
+            $inviteePolicies = count($user->getValidPolicies(true));
+        }
+
         $invitation = null;
         $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(SCodeInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $scode);
+        $duplicateInvitationCount = 0;
         foreach ($prevInvitations as $prevInvitation) {
-            if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
-                throw new DuplicateInvitationException('SCode was already invited to this policy');
-            } elseif ($prevInvitation->isCancelled()) {
+            if ($prevInvitation->isCancelled()) {
                 // Reinvitating a cancelled invitation, should re-active invitation
                 $invitation = $prevInvitation;
                 $invitation->setCancelled(null);
                 $this->dm->flush();
                 $isReinvite = true;
-            } elseif ($prevInvitation->canReinvite()) {
+                break;
+            } elseif ($prevInvitation->canReinvite() &&
+                !$prevInvitation->isAccepted() && !$prevInvitation->isRejected()) {
                 // A duplicate invitation can be considered a reinvitation
                 $invitation = $prevInvitation;
                 $isReinvite = true;
-            } else {
-                throw new DuplicateInvitationException('SCode was already invited to this policy');
+                break;
+            }
+
+            $duplicateInvitationCount++;
+            if ($duplicateInvitationCount > $inviteePolicies) {
+                throw new DuplicateInvitationException('Scode was already invited to this policy');
             }
         }
 

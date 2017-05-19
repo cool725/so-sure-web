@@ -797,6 +797,49 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($foundInvite);
     }
 
+    public function testSCodeMultiplePolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeMultiplePolicy-inviter', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeMultiplePolicy-invitee', $this),
+            'bar'
+        );
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, true);
+
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->create($policyInvitee);
+        static::$policyService->setEnvironment('test');
+        // Policy needs to be active
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policyInvitee->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        static::$invitationService->setEnvironment('prod');
+        $invitation = self::$invitationService->inviteBySCode($policy, $policyInvitee->getStandardSCode()->getCode());
+        $this->assertTrue($invitation instanceof SCodeInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($policyInvitee->getStandardSCode()->getId(), $invitation->getSCode()->getId());
+
+        $updatedInvitee = static::$userRepo->find($userInvitee->getId());
+        //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
+        $foundInvite = false;
+        foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
+            if ($invitation->getId() == $receviedInvitation->getId()) {
+                $foundInvite = true;
+            }
+        }
+        $this->assertTrue($foundInvite);
+    }
+
     public function testFaceboookInvitationInvitee()
     {
         $user = static::createUser(
