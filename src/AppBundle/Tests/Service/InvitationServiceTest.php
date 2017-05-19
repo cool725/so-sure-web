@@ -139,6 +139,48 @@ class InvitationServiceTest extends WebTestCase
         static::$dm->flush();
     }
 
+    public function testInviteeMultiplePolicyEmail()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testInviteeMultiplePolicyEmail-user', $this),
+            'bar'
+        );
+        $invitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testInviteeMultiplePolicyEmail-invitee', $this),
+            'bar'
+        );
+        $policyA = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policyB = static::initPolicy($invitee, static::$dm, static::$phone, null, true);
+        $policyC = static::initPolicy($invitee, static::$dm, static::$phone, null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policyA);
+        static::$policyService->create($policyB);
+        static::$policyService->create($policyC);
+        static::$policyService->setEnvironment('test');
+        // Policy needs to be active
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        $policyC->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        self::$invitationService->setEnvironment('prod');
+        $invitationA = self::$invitationService->inviteByEmail(
+            $policyA,
+            $invitee->getEmail()
+        );
+        $this->assertTrue($invitationA instanceof EmailInvitation);
+        static::$dm->flush();
+
+        $invitationB = self::$invitationService->inviteByEmail(
+            $policyA,
+            $invitee->getEmail()
+        );
+        $this->assertTrue($invitationB instanceof EmailInvitation);
+        static::$dm->flush();
+    }
+
     public function testDuplicateEmailReInvites()
     {
         $user = static::createUser(

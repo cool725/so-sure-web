@@ -18,7 +18,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  *          "scode"="SCodeInvitation",
  *          "facebook"="FacebookInvitation"
  * })
- * @MongoDB\Index(keys={"email"="asc", "mobile"="asc", "policy.id"="asc"}, sparse="true", unique="true")
+ * @MongoDB\Index(keys={"email"="asc", "mobile"="asc", "policy.id"="asc"}, sparse="true")
  */
 abstract class Invitation
 {
