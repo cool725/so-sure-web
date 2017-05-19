@@ -674,6 +674,7 @@ class MixpanelService
             $properties['$browser'] = $userAgentDetails->ua->family;
             $properties['$browser_version'] = $userAgentDetails->ua->toVersion();
             $properties['User Agent'] = $userAgent;
+            $properties['Device Category'] = $this->requestService->getDeviceCategory();
         }
         $this->queue(self::QUEUE_TRACK, $userId, $properties, $event);
 

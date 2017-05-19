@@ -7,6 +7,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\User;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Mobile_Detect;
 
 class RequestService
 {
@@ -18,6 +19,7 @@ class RequestService
 
     protected $tokenStorage;
     protected $adminCookieValue;
+    protected $mobileDetect;
 
     /**
      * @param RequestStack    $requestStack
@@ -35,6 +37,9 @@ class RequestService
         $this->logger = $logger;
         $this->tokenStorage = $tokenStorage;
         $this->adminCookieValue = $adminCookieValue;
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            $this->mobileDetect = new Mobile_Detect($this->requestStack->getCurrentRequest()->server->all());
+        }
     }
 
     public function getReferer()
@@ -118,6 +123,28 @@ class RequestService
         }
 
         return null;
+    }
+
+    public function isMobileDevice()
+    {
+        return $this->mobileDetect->isMobile();
+    }
+
+    public function isTabletDevice()
+    {
+        return $this->mobileDetect->isTablet();
+    }
+
+    public function getDeviceCategory()
+    {
+        // Tablet detection must be first
+        if ($this->isTabletDevice()) {
+            return 'Tablet';
+        } elseif ($this->isMobileDevice()) {
+            return 'Mobile';
+        } else {
+            return 'Desktop';
+        }
     }
 
     public function getTrackingId()
