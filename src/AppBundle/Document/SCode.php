@@ -10,6 +10,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\SCodeRepository")
  * @Gedmo\Loggable
+ * @MongoDB\Index(keys={"code"="asc", "reward.id"="asc", "policy.id"="asc"}, sparse="true", unique="true")
  */
 class SCode
 {
@@ -34,7 +35,6 @@ class SCode
      * @Assert\Length(min="2", max="50")
      * @AppAssert\Alphanumeric()
      * @MongoDB\Field(type="string")
-     * @MongoDB\Index(unique=true)
      * @Gedmo\Versioned
      */
     protected $code;
@@ -284,5 +284,16 @@ class SCode
             'type' => $this->getType(),
             'active' => $this->isActive() ? true : false,
         ];
+    }
+
+    public function __clone()
+    {
+        $scode = new SCode();
+        $scode->setActive($this->isActive());
+        $scode->setCode($this->getCode());
+        $scode->setShareLink($this->getShareLink());
+        $scode->setType($this->getType());
+
+        return $scode;
     }
 }

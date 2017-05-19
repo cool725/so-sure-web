@@ -845,6 +845,39 @@ class PolicyServiceTest extends WebTestCase
         $this->assertNotEquals($policy->getStandardSCode()->getCode(), $scode->getCode());
     }
 
+    public function testScodeMultiplePolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testScodeMultiplePolicy', $this),
+            'bar',
+            static::$dm
+        );
+        $policyA = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+        $policyB = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+        static::$policyService->create($policyA, new \DateTime('2016-01-01'));
+        $this->assertNotNull($policyA->getStandardSCode());
+
+        static::$policyService->create($policyB, new \DateTime('2016-01-01'));
+        $this->assertNotNull($policyB->getStandardSCode());
+        $this->assertEquals(
+            $policyA->getStandardSCode()->getCode(),
+            $policyB->getStandardSCode()->getCode()
+        );
+    }
+
     public function testValidatePremiumIptRateChange()
     {
         $user = static::createUser(

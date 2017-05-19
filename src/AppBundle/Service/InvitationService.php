@@ -450,11 +450,6 @@ class InvitationService
 
         $this->setSCodeLeadSource($policy, $user, $date);
 
-        $inviteePolicies = 0;
-        if ($invitee) {
-            $inviteePolicies = count($user->getValidPolicies(true));
-        }
-
         $invitation = null;
         $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(SCodeInvitation::class);
