@@ -224,12 +224,15 @@ class InvitationService
     public function validateNotConnectedByUser(Policy $policy, $user)
     {
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
-        if ($connectionRepo->isConnectedByUser($policy, $user)) {
-            throw new ConnectedInvitationException('You are already connected');
+        $count = $connectionRepo->getConnectedByUserCount($policy, $user);
+        if ($count > 0 && $count >= count($user->getValidPolicies(true))) {
+            throw new ConnectedInvitationException(sprintf('You are already connected %d time(s)', $count));
         }
 
+        // only 1 reward per user
         $connectionRepo = $this->dm->getRepository(RewardConnection::class);
-        if ($connectionRepo->isConnectedByUser($policy, $user)) {
+        $count = $connectionRepo->getConnectedByUserCount($policy, $user);
+        if ($count > 0) {
             throw new ConnectedInvitationException('You are already connected');
         }
 

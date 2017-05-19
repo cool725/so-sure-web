@@ -840,6 +840,54 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($foundInvite);
     }
 
+    public function testSCodeMultiplePolicies()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeMultiplePolicies-A', $this),
+            'bar'
+        );
+        $policy1 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
+        $policy2 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
+
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeMultiplePolicies-B', $this),
+            'bar'
+        );
+        $policy3 = static::initPolicy($userB, static::$dm, static::$phone, null, true);
+        $policy4 = static::initPolicy($userB, static::$dm, static::$phone, null, true);
+
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy1);
+        static::$policyService->create($policy2);
+        static::$policyService->create($policy3);
+        static::$policyService->create($policy4);
+        static::$policyService->setEnvironment('test');
+        // Policy needs to be active
+        $policy1->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy3->setStatus(Policy::STATUS_ACTIVE);
+        $policy4->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        static::$invitationService->setEnvironment('prod');
+        $invitation = self::$invitationService->inviteBySCode($policy1, $policy3->getStandardSCode()->getCode());
+        $this->assertTrue($invitation instanceof SCodeInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userB->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($policy3->getStandardSCode()->getId(), $invitation->getSCode()->getId());
+
+        self::$invitationService->accept($invitation, $policy3);
+
+        // allow a second invitation as policy 1 should be able to connect to policy 4 (and policy 4 has same scode)
+        $invitation = self::$invitationService->inviteBySCode($policy1, $policy3->getStandardSCode()->getCode());
+        $this->assertTrue($invitation instanceof SCodeInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userB->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($policy3->getStandardSCode()->getId(), $invitation->getSCode()->getId());
+    }
+
     public function testFaceboookInvitationInvitee()
     {
         $user = static::createUser(
