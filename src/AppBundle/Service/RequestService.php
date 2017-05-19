@@ -127,12 +127,20 @@ class RequestService
 
     public function isMobileDevice()
     {
-        return $this->mobileDetect->isMobile();
+        if ($this->mobileDetect) {
+            return $this->mobileDetect->isMobile();
+        }
+
+        return null;
     }
 
     public function isTabletDevice()
     {
-        return $this->mobileDetect->isTablet();
+        if ($this->mobileDetect) {
+            return $this->mobileDetect->isTablet();
+        }
+
+        return null;
     }
 
     public function getDeviceCategory()
