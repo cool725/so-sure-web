@@ -621,8 +621,10 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $this->assertFalse($policy->isPolicyPaidToDate());
+        $this->assertNotNull($policy->getBilling());
 
-        $billingDate = $this->setDayOfMonth($policy->getBilling(), '15');
+        $now = new \DateTime();
+        $billingDate = $this->setDayOfMonth($now, '15');
         $policy->setBilling($billingDate);
     }
 
