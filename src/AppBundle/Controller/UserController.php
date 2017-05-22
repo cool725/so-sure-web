@@ -129,7 +129,8 @@ class UserController extends BaseController
             $unconnectedUserPolicyForm->handleRequest($request);
             if ($unconnectedUserPolicyForm->isSubmitted() && $unconnectedUserPolicyForm->isValid()) {
                 foreach ($policy->getUnconnectedUserPolicies() as $unconnectedPolicy) {
-                    if ($unconnectedUserPolicyForm->get(sprintf('connect_%s', $unconnectedPolicy->getId()))->isClicked()) {
+                    $buttonName = sprintf('connect_%s', $unconnectedPolicy->getId());
+                    if ($unconnectedUserPolicyForm->get($buttonName)->isClicked()) {
                         $invitationService->connect($policy, $unconnectedPolicy);
                         $this->addFlash(
                             'success',
