@@ -81,6 +81,17 @@
 	}
 }
 
+.btn-arrow-right {
+
+	&:after {
+		font-family: FontAwesome;
+		content: '\f0da';
+		position: relative;
+		padding-left: 10px;
+		font-size: 90%;
+	}
+}
+
 .btn-link-white {
 	@include btn(transparent, $white);
 }
