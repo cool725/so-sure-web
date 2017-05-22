@@ -71,6 +71,27 @@
                         {{ form_end(invitation_form) }}
                     </div>
                     {% endif %}
+                    {% if policy.sentInvitations|length > 0 %}
+                    <h3 class="text-grey-blue">Sent invitations</h3>
+                    <div class="user-homepage--section">
+                        {{ form_start(sent_invitation_form, {'attr': { 'class': 'form-inline'}}) }}
+                            <ul class="list-unstyled invite-list">
+                                {% for invitation in policy.sentInvitations %}
+                                <li class="clearfix">
+                                    <img src="{{ invitation.invitee.getImageUrlFallback }}" class="img-circle pull-left" alt="">
+                                    <h4 class="h4 pull-left">{{ invitation.invitee.name }}<br>
+                                    <small>Sent on {{ invitation.created|date('d M Y H:i', 'Europe/London')  }}</small></h4>
+                                    <ul class="list-inline pull-right">
+                                        <li>{{ form_widget(attribute(sent_invitation_form, 'cancel_' ~ invitation.id), {'attr': {'class': 'btn btn-danger  btn-xs'}}) }}</li>
+                                        <li>{{ form_widget(attribute(sent_invitation_form, 'reinvite_' ~ invitation.id), {'attr': {'class': 'btn btn-success  btn-xs'}}) }}</li>
+                                    </ul>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {{ form_errors(sent_invitation_form) }}
+                        {{ form_end(sent_invitation_form) }}
+                    </div>
+                    {% endif %}
                     <div class="user-homepage--section">
                         <h3 class="text-grey-blue">Connections</h3>
                         <ul class="list-inline">

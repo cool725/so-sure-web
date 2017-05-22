@@ -17,6 +17,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\SCodeInvitationType;
 use AppBundle\Form\Type\InvitationType;
+use AppBundle\Form\Type\SentInvitationType;
 use AppBundle\Form\Type\UnconnectedUserPolicyType;
 use AppBundle\Document\Invitation\EmailInvitation;
 
@@ -82,6 +83,9 @@ class UserController extends BaseController
         $invitationForm = $this->get('form.factory')
             ->createNamedBuilder('invitation', InvitationType::class, $user)
             ->getForm();
+        $sentInvitationForm = $this->get('form.factory')
+            ->createNamedBuilder('sent_invitation', SentInvitationType::class, $policy)
+            ->getForm();
         $scodeForm = $this->get('form.factory')
             ->createNamedBuilder('scode', SCodeInvitationType::class, ['scode' => $scode ? $scode->getCode() : null])
             ->getForm();
@@ -98,7 +102,7 @@ class UserController extends BaseController
                     sprintf('%s was invited', $emailInvitiation->getEmail())
                 );
 
-                return new RedirectResponse($this->generateUrl('user_home'));
+                return new RedirectResponse($this->generateUrl('user_policy', ['policyId' => $policy->getId()]));
             }
         } elseif ($request->request->has('invitation')) {
             $invitationForm->handleRequest($request);
@@ -112,7 +116,9 @@ class UserController extends BaseController
                             sprintf("You're now connected with %s", $invitation->getInviter()->getName())
                         );
 
-                        return new RedirectResponse($this->generateUrl('user_home'));
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
                     } elseif ($invitationForm->get(sprintf('reject_%s', $invitation->getId()))->isClicked()) {
                         $this->denyAccessUnlessGranted(InvitationVoter::REJECT, $invitation);
                         $invitationService->reject($invitation);
@@ -121,7 +127,38 @@ class UserController extends BaseController
                             sprintf("You've declined the invitation from %s", $invitation->getInviter()->getName())
                         );
 
-                        return new RedirectResponse($this->generateUrl('user_home'));
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
+                    }
+                }
+            }
+        } elseif ($request->request->has('sent_invitation')) {
+            $sentInvitationForm->handleRequest($request);
+            if ($sentInvitationForm->isSubmitted() && $sentInvitationForm->isValid()) {
+                foreach ($policy->getSentInvitations() as $invitation) {
+                    if ($sentInvitationForm->get(sprintf('reinvite_%s', $invitation->getId()))->isClicked()) {
+                        $this->denyAccessUnlessGranted(InvitationVoter::REINVITE, $invitation);
+                        $connection = $invitationService->reinvite($invitation);
+                        $this->addFlash(
+                            'success',
+                            sprintf("Re-sent invitation to %s", $invitation->getInvitee()->getName())
+                        );
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
+                    } elseif ($sentInvitationForm->get(sprintf('cancel_%s', $invitation->getId()))->isClicked()) {
+                        $this->denyAccessUnlessGranted(InvitationVoter::CANCEL, $invitation);
+                        $invitationService->cancel($invitation);
+                        $this->addFlash(
+                            'warning',
+                            sprintf("Cancelled invitation to %s", $invitation->getInvitee()->getName())
+                        );
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
                     }
                 }
             }
@@ -137,7 +174,9 @@ class UserController extends BaseController
                             sprintf("You're now connected with %s", $unconnectedPolicy->getDefaultName())
                         );
 
-                        return new RedirectResponse($this->generateUrl('user_home'));
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
                     }
                 }
             }
@@ -156,7 +195,9 @@ class UserController extends BaseController
                         sprintf("SCode %s is missing or been withdrawn", $code)
                     );
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
                 }
 
                 try {
@@ -173,63 +214,81 @@ class UserController extends BaseController
                     }
                     $this->addFlash('success', $message);
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 } catch (DuplicateInvitationException $e) {
                     $this->addFlash(
                         'warning',
                         sprintf("SCode %s has already been used by you", $code)
                     );
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 } catch (ConnectedInvitationException $e) {
                     $this->addFlash(
                         'warning',
                         sprintf("You're already connected")
                     );
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 } catch (OptOutException $e) {
                     $this->addFlash(
                         'warning',
                         sprintf("Sorry, but your friend has opted out of any more invitations")
                     );
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 } catch (InvalidPolicyException $e) {
                     $this->addFlash(
                         'warning',
                         sprintf("Please make sure your policy is paid to date before connecting")
                     );
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 } catch (SelfInviteException $e) {
                     $this->addFlash(
                         'warning',
                         sprintf("You cannot invite yourself")
                     );
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 } catch (FullPotException $e) {
                     $this->addFlash(
                         'warning',
                         sprintf("You or your friend has a full pot!")
                     );
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 } catch (ClaimException $e) {
                     $this->addFlash(
                         'warning',
                         sprintf("You or your friend has a claim.")
                     );
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 } catch (NotFoundHttpException $e) {
                     $this->addFlash(
                         'warning',
                         sprintf("Not able to find this scode")
                     );
 
-                    return new RedirectResponse($this->generateUrl('user_home'));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 }
             }
         } elseif ($scode) {
@@ -257,6 +316,7 @@ class UserController extends BaseController
             'policy' => $policy,
             'email_form' => $emailInvitationForm->createView(),
             'invitation_form' => $invitationForm->createView(),
+            'sent_invitation_form' => $sentInvitationForm->createView(),
             'scode_form' => $scodeForm->createView(),
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
