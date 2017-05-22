@@ -68,11 +68,11 @@ class PurchaseController extends BaseController
     {
         $session = $request->getSession();
         $user = $this->getUser();
+        /* TODO: Consider if we want warning that you're purchasing additional policy
         if ($user && $user->hasPolicy()) {
             $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
-
-            return $this->redirectToRoute('user_home');
         }
+        */
         /*
         if ($user->getFirstName() && $user->getLastName() && $user->getMobileNumber() && $user->getBirthday()) {
             return $this->redirectToRoute('purchase_step_2');
@@ -258,11 +258,14 @@ class PurchaseController extends BaseController
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('purchase');
+        }
+        /* TODO: Consider if we want warning that you're purchasing additional policy
         } elseif ($user->hasPolicy()) {
             $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
 
             return $this->redirectToRoute('user_home');
         }
+        */
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
         if (!$user->hasValidBillingDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
@@ -397,13 +400,29 @@ class PurchaseController extends BaseController
                                 'Final Monthly Cost' => $price->getMonthlyPremiumPrice(),
                                 'Policy Id' => $policy->getId(),
                             ]);
-                            $webpay = $this->get('app.judopay')->webpay(
-                                $policy,
-                                $purchase->getAmount(),
-                                $request->getClientIp(),
-                                $request->headers->get('User-Agent')
-                            );
-                            $purchase->setAgreed(true);
+                            if ($purchaseForm->get('next')->isClicked()) {
+                                $webpay = $this->get('app.judopay')->webpay(
+                                    $policy,
+                                    $purchase->getAmount(),
+                                    $request->getClientIp(),
+                                    $request->headers->get('User-Agent')
+                                );
+                                $purchase->setAgreed(true);
+                            } elseif ($purchaseForm->get('existing')->isClicked()) {
+                                // TODO: Try/catch
+                                if ($this->get('app.judopay')->existing(
+                                    $policy,
+                                    $purchase->getAmount()
+                                )) {
+                                    $purchase->setAgreed(true);
+                                    return $this->redirectToRoute('user_welcome');
+                                } else {
+                                    $this->addFlash(
+                                        'warning',
+                                        "Sorry, there was a problem with your existing payment method. Try again, or use the Pay with new card option."
+                                    );
+                                }
+                            }
                         } else {
                             $this->addFlash(
                                 'error',

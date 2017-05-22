@@ -85,6 +85,9 @@ class PurchaseStepPhoneType extends AbstractType
                         'disabled' => true
                 ]);
             }
+            if ($purchase->getUser()->hasValidPaymentMethod()) {
+                $form->add('existing', SubmitType::class); 
+            }
         });
     }
 

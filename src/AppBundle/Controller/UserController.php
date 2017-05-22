@@ -37,12 +37,14 @@ class UserController extends BaseController
 {
     /**
      * @Route("/", name="user_home")
+     * @Route("/{policyId}", name="user_policy", requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, $policyId = null)
     {
         $dm = $this->getManager();
-        $repo = $dm->getRepository(SCode::class);
+        $policyRepo = $dm->getRepository(Policy::class);
+        $scodeRepo = $dm->getRepository(SCode::class);
         $user = $this->getUser();
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             // mainly for facebook registration, although makes sense for all users
@@ -60,13 +62,21 @@ class UserController extends BaseController
         $scode = null;
         $session = $request->getSession();
         if ($code = $session->get('scode')) {
-            $scode = $repo->findOneBy(['code' => $code]);
+            $scode = $scodeRepo->findOneBy(['code' => $code]);
         }
 
-        $policy = $user->getFirstPolicy();
+        if ($policyId) {
+            $policy = $policyRepo->find($policyId);
+        } else {
+            $policy = $user->getLatestPolicy();
+        }
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
         $scode = null;
         if ($session = $this->get('session')) {
-            $scode = $repo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
+            $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
         }
 
         $invitationService = $this->get('app.invitation');
@@ -269,7 +279,7 @@ class UserController extends BaseController
     public function unpaidPolicyAction(Request $request)
     {
         $user = $this->getUser();
-        $policy = $user->getCurrentPolicy();
+        $policy = $user->getUnpaidPolicy();
         if ($policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             throw new \Exception('Unpaid policy should only be triggered for monthly plans');
         }
@@ -325,7 +335,7 @@ class UserController extends BaseController
 
         return array(
             'policy_key' => $this->getParameter('policy_key'),
-            'policy' => $user->getCurrentPolicy()
+            'policy' => $user->getLatestPolicy()
         );
     }
 
@@ -346,7 +356,6 @@ class UserController extends BaseController
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'user' => $user,
-            'policy' => $user->getCurrentPolicy(),
         ];
 
         return $data;

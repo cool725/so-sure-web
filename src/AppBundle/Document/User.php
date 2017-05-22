@@ -538,13 +538,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function hasUnpaidPolicy()
     {
+        return $this->getUnpaidPolicy() !== null;
+    }
+
+    public function getUnpaidPolicy()
+    {
         foreach ($this->getPolicies() as $policy) {
             if ($policy->getStatus() == Policy::STATUS_UNPAID) {
-                return true;
+                return $policy;
             }
         }
 
-        return false;
+        return null;
     }
 
     public function hasActivePolicy()
@@ -586,21 +591,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
-    public function getCurrentPolicy()
-    {
-        foreach ($this->getPolicies() as $policy) {
-            if (in_array($policy->getStatus(), [
-                Policy::STATUS_ACTIVE,
-                Policy::STATUS_PENDING,
-                Policy::STATUS_UNPAID
-            ])) {
-                return $policy;
-            }
-        }
-
-        return null;
-    }
-
     public function getValidPolicies($includeUnpaid = false)
     {
         $policies = [];
@@ -628,6 +618,24 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         // sort older to recent
         usort($policies, function ($a, $b) {
             return $a->getStart() > $b->getStart();
+        });
+
+        return $policies[0];
+    }
+
+    public function getLatestPolicy()
+    {
+        $policies = $this->getCreatedPolicies();
+        if (!is_array($policies)) {
+            $policies = $policies->getValues();
+        }
+        if (count($policies) == 0) {
+            return null;
+        }
+
+        // sort most recent to older
+        usort($policies, function ($a, $b) {
+            return $a->getStart() < $b->getStart();
         });
 
         return $policies[0];
