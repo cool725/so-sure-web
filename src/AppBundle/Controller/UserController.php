@@ -59,12 +59,6 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
-        $scode = null;
-        $session = $request->getSession();
-        if ($code = $session->get('scode')) {
-            $scode = $scodeRepo->findOneBy(['code' => $code]);
-        }
-
         if ($policyId) {
             $policy = $policyRepo->find($policyId);
         } else {
@@ -135,7 +129,7 @@ class UserController extends BaseController
                 }
 
                 $code = $scodeForm->getData()['scode'];
-                $scode = $repo->findOneBy(['code' => $code]);
+                $scode = $scodeRepo->findOneBy(['code' => $code]);
                 if (!$scode || !SCode::isValidSCode($scode->getCode())) {
                     $this->addFlash(
                         'warning',
