@@ -1,4 +1,4 @@
-// Coroporate JS
+// Corporate JS
 $(function(){
 
     // SCROLL TOO - Wahoooooo

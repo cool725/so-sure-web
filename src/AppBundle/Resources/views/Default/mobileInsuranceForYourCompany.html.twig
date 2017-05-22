@@ -10,14 +10,6 @@
     <meta name="keywords" content="mobile phone insurance, social insurance, mobile phone insurance for your company"/>
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/jquery_lazyload/jquery.lazyload.js'
-    '@AppBundle/Resources/public/js/Default/corporate.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %}
-
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
@@ -39,12 +31,12 @@
             <p class="lead">Next working day replacement or repair on phones up to 3 years old <br class="hidden-xs"> with up to 80% of your premium back every year.</p>
             <a id="corporate-get-quote"
                href="#"
-               class="btn btn-green btn-lg scroll-too"
+               class="btn btn-green btn-lg scroll-to"
                data-scroll-to-anchor="#corporate-get-quote-form">Get a quote</a>
             <div class="fom">
                 <a id="fom"
                    href="#"
-                   class="scroll-too"
+                   class="scroll-to"
                    data-scroll-to-anchor="#key-benefits">
                    <small>Find out more <br> <i class="fa fa-chevron-down" aria-hidden="true"></i></small>
                 </a>
@@ -318,5 +310,13 @@
     </div>
     {# Page Modals #}
 
-
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/jquery_lazyload/jquery.lazyload.js'
+    '@AppBundle/Resources/public/js/Default/corporate.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
