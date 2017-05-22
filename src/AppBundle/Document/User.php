@@ -673,7 +673,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 }
             }
             if ($plan = $policy->getPremiumPlan()) {
-                $data['annualPremium'] = $policy->getPremium()->getYearlyPremiumPrice();
+                $data['annualPremium'] += $policy->getPremium()->getYearlyPremiumPrice();
                 $data['paymentsReceived'] += count($policy->getSuccessfulPaymentCredits());
 
                 if ($payment = $policy->getLastSuccessfulPaymentCredit()) {
