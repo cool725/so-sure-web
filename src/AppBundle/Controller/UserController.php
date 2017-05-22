@@ -17,6 +17,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\SCodeInvitationType;
 use AppBundle\Form\Type\InvitationType;
+use AppBundle\Form\Type\UnconnectedUserPolicyType;
 use AppBundle\Document\Invitation\EmailInvitation;
 
 use AppBundle\Service\FacebookService;
@@ -84,6 +85,9 @@ class UserController extends BaseController
         $scodeForm = $this->get('form.factory')
             ->createNamedBuilder('scode', SCodeInvitationType::class, ['scode' => $scode ? $scode->getCode() : null])
             ->getForm();
+        $unconnectedUserPolicyForm = $this->get('form.factory')
+            ->createNamedBuilder('unconnectedPolicy', UnconnectedUserPolicyType::class, $policy)
+            ->getForm();
 
         if ($request->request->has('email')) {
             $emailInvitationForm->handleRequest($request);
@@ -115,6 +119,21 @@ class UserController extends BaseController
                         $this->addFlash(
                             'warning',
                             sprintf("You've declined the invitation from %s", $invitation->getInviter()->getName())
+                        );
+
+                        return new RedirectResponse($this->generateUrl('user_home'));
+                    }
+                }
+            }
+        } elseif ($request->request->has('unconnectedPolicy')) {
+            $unconnectedUserPolicyForm->handleRequest($request);
+            if ($unconnectedUserPolicyForm->isSubmitted() && $unconnectedUserPolicyForm->isValid()) {
+                foreach ($policy->getUnconnectedUserPolicies() as $unconnectedPolicy) {
+                    if ($unconnectedUserPolicyForm->get(sprintf('connect_%s', $unconnectedPolicy->getId()))->isClicked()) {
+                        $invitationService->connect($policy, $unconnectedPolicy);
+                        $this->addFlash(
+                            'success',
+                            sprintf("You're now connected with %s", $unconnectedPolicy->getDefaultName())
                         );
 
                         return new RedirectResponse($this->generateUrl('user_home'));
@@ -239,6 +258,7 @@ class UserController extends BaseController
             'invitation_form' => $invitationForm->createView(),
             'scode_form' => $scodeForm->createView(),
             'scode' => $scode,
+            'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
         );
     }
 
