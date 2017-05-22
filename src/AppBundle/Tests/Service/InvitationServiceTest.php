@@ -945,6 +945,66 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->accept($invitation, $policy4);
     }
 
+    public function testSCodeMultiplePoliciesFacebook()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeMultiplePoliciesFacebook-A', $this),
+            'bar'
+        );
+        $userA->setFacebookId(rand(1, 999999));
+        $policy1 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
+        $policy2 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
+
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeMultiplePoliciesFacebook-B', $this),
+            'bar'
+        );
+        $userB->setFacebookId(rand(1, 999999));
+        $policy3 = static::initPolicy($userB, static::$dm, static::$phone, null, true);
+        $policy4 = static::initPolicy($userB, static::$dm, static::$phone, null, true);
+
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy1);
+        static::$policyService->create($policy2);
+        static::$policyService->create($policy3);
+        static::$policyService->create($policy4);
+        static::$policyService->setEnvironment('test');
+        // Policy needs to be active
+        $policy1->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy3->setStatus(Policy::STATUS_ACTIVE);
+        $policy4->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        static::$invitationService->setEnvironment('prod');
+        $invitation = self::$invitationService->inviteByFacebookId($policy1, $userB->getFacebookId());
+        $this->assertTrue($invitation instanceof FacebookInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userB->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($userB->getFacebookId(), $invitation->getFacebookId());
+
+        self::$invitationService->accept($invitation, $policy3);
+
+        // allow a second invitation as policy 1 should be able to connect to policy 4 (and policy 4 has same scode)
+        $invitation = self::$invitationService->inviteByFacebookId($policy1, $userB->getFacebookId());
+        $this->assertTrue($invitation instanceof FacebookInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userB->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($userB->getFacebookId(), $invitation->getFacebookId());
+
+        self::$invitationService->accept($invitation, $policy4);
+
+        $exception = false;
+        try {
+            $invitation = self::$invitationService->inviteByFacebookId($policy1, $userB->getFacebookId());
+        } catch (ConnectedInvitationException $e) {
+            $exception = true;
+        }
+        $this->assertTrue($exception);
+    }
+
     public function testFaceboookInvitationInvitee()
     {
         $user = static::createUser(

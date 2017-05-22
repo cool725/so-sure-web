@@ -563,24 +563,31 @@ class InvitationService
         $this->validateSoSurePolicyEmail($policy, $user->getEmail());
         $this->validateNotConnectedByUser($policy, $user);
 
+        $inviteePolicies = count($user->getValidPolicies(true));
+
         $invitation = null;
         $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(FacebookInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $facebookId);
+        $duplicateInvitationCount = 0;
         foreach ($prevInvitations as $prevInvitation) {
-            if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
-                throw new DuplicateInvitationException('Facebook user was already invited to this policy');
-            } elseif ($prevInvitation->isCancelled()) {
+            if ($prevInvitation->isCancelled()) {
                 // Reinvitating a cancelled invitation, should re-active invitation
                 $invitation = $prevInvitation;
                 $invitation->setCancelled(null);
                 $this->dm->flush();
                 $isReinvite = true;
-            } elseif ($prevInvitation->canReinvite()) {
+                break;
+            } elseif ($prevInvitation->canReinvite() &&
+                !$prevInvitation->isAccepted() && !$prevInvitation->isRejected()) {
                 // A duplicate invitation can be considered a reinvitation
                 $invitation = $prevInvitation;
                 $isReinvite = true;
-            } else {
+                break;
+            }
+
+            $duplicateInvitationCount++;
+            if ($duplicateInvitationCount > $inviteePolicies) {
                 throw new DuplicateInvitationException('Facebook user was already invited to this policy');
             }
         }
