@@ -983,7 +983,7 @@ class AdminEmployeeController extends BaseController
                             ])) {
                             $reward = $rewardRepo->find($connectForm->getData()['rewardId']);
                             $invitationService = $this->get('app.invitation');
-                            foreach ($souurceUser->getValidPolicies() as $policy) {
+                            foreach ($sourceUser->getValidPolicies() as $policy) {
                                 $invitationService->addReward(
                                     $policy,
                                     $reward,

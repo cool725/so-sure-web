@@ -533,7 +533,15 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function canPurchasePolicy()
     {
         // TODO: Add additional checks - perhaps any suspected fraudulent claims, etc
-        return !$this->hasCancelledPolicyWithUserDeclined();
+        if ($this->hasCancelledPolicyWithUserDeclined()) {
+            return false;
+        }
+
+        if (count($this->getValidPolicies()) > 5) {
+            return false;
+        }
+
+        return true;
     }
 
     public function hasUnpaidPolicy()

@@ -341,7 +341,6 @@ class ApiAuthController extends BaseController
             $user = $this->getUser();
             $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
 
-            // TODO: Add some type of limit of max (active) policies for a user
             if (!$user->canPurchasePolicy()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_POLICY_LIMIT,
