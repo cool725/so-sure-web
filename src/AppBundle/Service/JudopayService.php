@@ -1137,18 +1137,26 @@ class JudopayService
     }
 
     /**
-     * TODO: Change name
      *
      * @param Policy    $policy
      * @param double    $amount
      * @param \DateTime $date
      */
-    public function multiPolicy(Policy $policy, $amount, \DateTime $date = null)
+    public function existing(Policy $policy, $amount, \DateTime $date = null)
     {
-        $this->statsd->startTiming("judopay.multipolicy");
+        $this->statsd->startTiming("judopay.existing");
 
         if ($policy->getStatus() != null) {
             throw new ProcessedException();
+        }
+
+        $premium = $policy->getPremium();
+        if ($amount < $premium->getMonthlyPremiumPrice() &&
+            !$this->areEqualToTwoDp($amount, $premium->getMonthlyPremiumPrice())) {
+            throw new InvalidPremiumException();
+        } elseif ($amount > $premium->getYearlyPremiumPrice() &&
+            !$this->areEqualToTwoDp($amount, $premium->getYearlyPremiumPrice())) {
+            throw new InvalidPremiumException();
         }
 
         if (!$policy->getPayer()) {
@@ -1160,7 +1168,7 @@ class JudopayService
         $this->policyService->create($policy, $date, true);
         $this->dm->flush();
 
-        $this->statsd->endTiming("judopay.multipolicy");
+        $this->statsd->endTiming("judopay.existing");
 
         return true;
     }

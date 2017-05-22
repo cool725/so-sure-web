@@ -809,7 +809,7 @@ class ApiAuthController extends BaseController
                 $paymentMethod = $policy->getUser()->getPaymentMethod();
                 if ($paymentMethod instanceof JudoPaymentMethod) {
                     $judo = $this->get('app.judopay');
-                    $judo->multiPolicy($policy, $existingData['amount']);
+                    $judo->existing($policy, $existingData['amount']);
                 } else {
                     throw new ValidationException('Unsupport payment method');
                 }
