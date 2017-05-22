@@ -281,7 +281,8 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/mobile-phone-insurance-for-your-company", name="mobile_phone_insurance_for_your_company")
+     * @Route("/mobile-phone-insurance-for-your-company", name="mobile_phone_insurance_for_your_company",
+     options={"sitemap"="priority":"1.0"}})
      * @Route("/mobile-phone-insurance-for-your-company/thank-you",
      *          name="mobile_phone_insurance_for_your_company_thanks")
      * @Template
