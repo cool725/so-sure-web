@@ -280,7 +280,6 @@ class InvitationService
     {
         $this->validatePolicy($policy);
         $this->validateSoSurePolicyEmail($policy, $email);
-        $this->validateNotConnectedByEmail($policy, $email);
 
         $userRepo = $this->dm->getRepository(User::class);
         $invitee = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
@@ -289,11 +288,19 @@ class InvitationService
             $inviteePolicies = count($invitee->getValidPolicies(true));
         }
 
+        if ($invitee) {
+            // if user exists, much better check, especially for multiple policies
+            $this->validateNotConnectedByUser($policy, $invitee);
+        } else {
+            $this->validateNotConnectedByEmail($policy, $email);
+        }
+
         $invitation = null;
         $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(EmailInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $email);
-        $duplicateInvitationCount = 0;
+        $singleInvitationCount = 0;
+        $totalInvitationCount = 0;
         foreach ($prevInvitations as $prevInvitation) {
             if ($prevInvitation->isCancelled()) {
                 // Reinvitating a cancelled invitation, should re-active invitation
@@ -310,8 +317,11 @@ class InvitationService
                 break;
             }
 
-            $duplicateInvitationCount++;
-            if ($duplicateInvitationCount > $inviteePolicies) {
+            if (!$prevInvitation->isProcessed()) {
+                $singleInvitationCount++;
+            }
+            $totalInvitationCount++;
+            if ($singleInvitationCount >= 1 || $totalInvitationCount > $inviteePolicies) {
                 throw new DuplicateInvitationException('Email was already invited to this policy');
             }
         }
@@ -462,7 +472,8 @@ class InvitationService
         $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(SCodeInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $scode);
-        $duplicateInvitationCount = 0;
+        $singleInvitationCount = 0;
+        $totalInvitationCount = 0;
         foreach ($prevInvitations as $prevInvitation) {
             if ($prevInvitation->isCancelled()) {
                 // Reinvitating a cancelled invitation, should re-active invitation
@@ -479,9 +490,12 @@ class InvitationService
                 break;
             }
 
-            $duplicateInvitationCount++;
-            if ($duplicateInvitationCount > $inviteePolicies) {
-                throw new DuplicateInvitationException('Scode was already invited to this policy');
+            if (!$prevInvitation->isProcessed()) {
+                $singleInvitationCount++;
+            }
+            $totalInvitationCount++;
+            if ($singleInvitationCount >= 1 || $totalInvitationCount > $inviteePolicies) {
+                throw new DuplicateInvitationException('SCode was already invited to this policy');
             }
         }
 
@@ -569,7 +583,8 @@ class InvitationService
         $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(FacebookInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $facebookId);
-        $duplicateInvitationCount = 0;
+        $singleInvitationCount = 0;
+        $totalInvitationCount = 0;
         foreach ($prevInvitations as $prevInvitation) {
             if ($prevInvitation->isCancelled()) {
                 // Reinvitating a cancelled invitation, should re-active invitation
@@ -586,8 +601,11 @@ class InvitationService
                 break;
             }
 
-            $duplicateInvitationCount++;
-            if ($duplicateInvitationCount > $inviteePolicies) {
+            if (!$prevInvitation->isProcessed()) {
+                $singleInvitationCount++;
+            }
+            $totalInvitationCount++;
+            if ($singleInvitationCount >= 1 || $totalInvitationCount > $inviteePolicies) {
                 throw new DuplicateInvitationException('Facebook user was already invited to this policy');
             }
         }

@@ -1087,10 +1087,15 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             );
         }
 
+        if (strlen($this->getFirstName()) > 0) {
+            $initial = strtolower($this->getFirstName()[0]);
+        } else {
+            $initial = strtolower($this->getEmail()[0]);
+        }
         return $this->gravatarImageFallback(
             $this->getEmail(),
             $size,
-            sprintf('https://cdn.so-sure.com/images/alpha/%s.png', strtolower($this->getFirstName()[0]))
+            sprintf('https://cdn.so-sure.com/images/alpha/%s.png', $initial)
         );
     }
 

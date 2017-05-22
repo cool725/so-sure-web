@@ -31,6 +31,7 @@ use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\OptOutException;
 use AppBundle\Exception\ConnectedInvitationException;
+use AppBundle\Exception\DuplicateInvitationException;
 
 /**
  * @group functional-nonet
@@ -166,6 +167,8 @@ class InvitationServiceTest extends WebTestCase
         static::$dm->flush();
 
         self::$invitationService->setEnvironment('prod');
+
+        // first invite
         $invitationA = self::$invitationService->inviteByEmail(
             $policyA,
             $invitee->getEmail()
@@ -173,12 +176,42 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitationA instanceof EmailInvitation);
         static::$dm->flush();
 
+        // try second invite, but should fail
+        $exception = false;
+        try {
+            $invitationB = self::$invitationService->inviteByEmail(
+                $policyA,
+                $invitee->getEmail()
+            );
+        } catch (DuplicateInvitationException $e) {
+            $exception = true;
+        }
+        $this->assertTrue($exception);
+
+        // accept first invite
+        self::$invitationService->accept($invitationA, $policyB);
+
+        // send another invite should now work
         $invitationB = self::$invitationService->inviteByEmail(
             $policyA,
             $invitee->getEmail()
         );
         $this->assertTrue($invitationB instanceof EmailInvitation);
-        static::$dm->flush();
+
+        // accept invite should also work
+        self::$invitationService->accept($invitationB, $policyC);
+
+        // no more policies left to connect - invite should fail
+        $exception = false;
+        try {
+            $invitationB = self::$invitationService->inviteByEmail(
+                $policyA,
+                $invitee->getEmail()
+            );
+        } catch (ConnectedInvitationException $e) {
+            $exception = true;
+        }
+        $this->assertTrue($exception);
     }
 
     public function testDuplicateEmailReInvites()
@@ -878,6 +911,19 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($userB->getId(), $invitation->getInvitee()->getId());
         $this->assertEquals($policy3->getStandardSCode()->getId(), $invitation->getSCode()->getId());
 
+        // try second invite, but should fail
+        $exception = false;
+        try {
+            $invitation = self::$invitationService->inviteBySCode(
+                $policy1,
+                $policy3->getStandardSCode()->getCode()
+            );
+        } catch (DuplicateInvitationException $e) {
+            $exception = true;
+        }
+        $this->assertTrue($exception);
+
+        // accept first invite
         self::$invitationService->accept($invitation, $policy3);
 
         // allow a second invitation as policy 1 should be able to connect to policy 4 (and policy 4 has same scode)
@@ -886,6 +932,20 @@ class InvitationServiceTest extends WebTestCase
         $this->assertNotNull($invitation->getInvitee());
         $this->assertEquals($userB->getId(), $invitation->getInvitee()->getId());
         $this->assertEquals($policy3->getStandardSCode()->getId(), $invitation->getSCode()->getId());
+
+        // accept second invite
+        self::$invitationService->accept($invitation, $policy4);
+
+        $exception = false;
+        try {
+            $invitation = self::$invitationService->inviteBySCode(
+                $policy1,
+                $policy3->getStandardSCode()->getCode()
+            );
+        } catch (ConnectedInvitationException $e) {
+            $exception = true;
+        }
+        $this->assertTrue($exception);
     }
 
     public function testSCodeMultiplePoliciesConnected()

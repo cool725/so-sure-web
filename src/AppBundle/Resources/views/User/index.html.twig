@@ -78,8 +78,8 @@
                             <ul class="list-unstyled invite-list">
                                 {% for invitation in policy.sentInvitations %}
                                 <li class="clearfix">
-                                    <img src="{{ invitation.invitee.getImageUrlFallback }}" class="img-circle pull-left" alt="">
-                                    <h4 class="h4 pull-left">{{ invitation.invitee.name }}<br>
+                                    <img src="{{ invitation.inviteeImageUrlFallback }}" class="img-circle pull-left" alt="">
+                                    <h4 class="h4 pull-left">{{ invitation.inviteeName }}<br>
                                     <small>Sent on {{ invitation.created|date('d M Y H:i', 'Europe/London')  }}</small></h4>
                                     <ul class="list-inline pull-right">
                                         <li>{{ form_widget(attribute(sent_invitation_form, 'cancel_' ~ invitation.id), {'attr': {'class': 'btn btn-danger  btn-xs'}}) }}</li>

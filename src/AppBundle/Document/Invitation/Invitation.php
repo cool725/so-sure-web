@@ -342,6 +342,25 @@ abstract class Invitation
         return null;
     }
 
+    public function getInviteeImageUrlFallback($size = 100)
+    {
+        if ($this->getInvitee()) {
+            return $this->getInvitee()->getImageUrlFallback($size);
+        }
+
+        if ($this instanceof EmailInvitation) {
+            $initial = strtolower($this->getEmail()[0]);
+
+            return $this->gravatarImageFallback(
+                $this->getEmail(),
+                $size,
+                sprintf('https://cdn.so-sure.com/images/alpha/%s.png', $initial)
+            );
+        }
+
+        return null;
+    }
+
     public function getInviterImageUrl($size = 100)
     {
         if ($this->getInviter()) {
