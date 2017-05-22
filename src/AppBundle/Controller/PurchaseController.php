@@ -417,10 +417,12 @@ class PurchaseController extends BaseController
                                     $purchase->setAgreed(true);
                                     return $this->redirectToRoute('user_welcome');
                                 } else {
+                                    // @codingStandardsIgnoreStart
                                     $this->addFlash(
                                         'warning',
                                         "Sorry, there was a problem with your existing payment method. Try again, or use the Pay with new card option."
                                     );
+                                    // @codingStandardsIgnoreEnd
                                 }
                             }
                         } else {
