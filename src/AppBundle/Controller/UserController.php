@@ -142,7 +142,7 @@ class UserController extends BaseController
                         $connection = $invitationService->reinvite($invitation);
                         $this->addFlash(
                             'success',
-                            sprintf("Re-sent invitation to %s", $invitation->getInvitee()->getName())
+                            sprintf("Re-sent invitation to %s", $invitation->getInviteeName())
                         );
 
                         return new RedirectResponse(
@@ -153,7 +153,7 @@ class UserController extends BaseController
                         $invitationService->cancel($invitation);
                         $this->addFlash(
                             'warning',
-                            sprintf("Cancelled invitation to %s", $invitation->getInvitee()->getName())
+                            sprintf("Cancelled invitation to %s", $invitation->getInviteeName())
                         );
 
                         return new RedirectResponse(
