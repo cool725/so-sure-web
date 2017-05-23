@@ -6,11 +6,11 @@
         {{ form_errors(form.plainPassword.first) }}
         </div>
         <div class="form-group">
-            <input id="fos_user_resetting_form_plainPassword_first" type="password" {% if not form.vars.valid %}class="form-control reset-error-box"{% endif %}
+            <input id="fos_user_resetting_form_plainPassword_first" type="password" class="form-control {% if not form.vars.valid %} reset-error-box{% endif %}"
                 name="fos_user_resetting_form[plainPassword][first]" required="required" class="username" placeholder="New Password"/>
         </div>
         <div class="form-group">
-            <input id="fos_user_resetting_form_plainPassword_second" type="password" {% if not form.vars.valid %}class="form-control reset-error-box"{% endif %}
+            <input id="fos_user_resetting_form_plainPassword_second" type="password" class="form-control {% if not form.vars.valid %} reset-error-box{% endif %}"
                 name="fos_user_resetting_form[plainPassword][second]" required="required" class="form-control password" placeholder="Confirm Password" />
         </div>
         <div class="form-group">
