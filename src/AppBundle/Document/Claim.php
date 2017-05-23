@@ -275,6 +275,22 @@ class Claim
     protected $shippingAddress;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $fnolRisk;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $fnolRiskReason;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="Charge", mappedBy="claim", cascade={"persist"})
      */
     protected $charges = array();
@@ -315,6 +331,12 @@ class Claim
 
     public function setPolicy($policy)
     {
+        if (!$this->getFnolRisk()) {
+            $this->setFnolRisk($policy->getRisk());
+        }
+        if (!$this->getFnolRiskReason()) {
+            $this->setFnolRiskReason($policy->getRiskReason());
+        }
         $this->policy = $policy;
     }
 
@@ -685,6 +707,26 @@ class Claim
     public function setShippingAddress($shippingAddress)
     {
         $this->shippingAddress = $shippingAddress;
+    }
+
+    public function getFnolRisk()
+    {
+        return $this->fnolRisk;
+    }
+
+    public function setFnolRisk($fnolRisk)
+    {
+        $this->fnolRisk = $fnolRisk;
+    }
+
+    public function getFnolRiskReason()
+    {
+        return $this->fnolRiskReason;
+    }
+
+    public function setFnolRiskReason($fnolRiskReason)
+    {
+        $this->fnolRiskReason = $fnolRiskReason;
     }
 
     public function getCharges()
