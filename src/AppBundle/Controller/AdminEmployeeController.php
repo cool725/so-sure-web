@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\Salva;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
@@ -350,6 +351,7 @@ class AdminEmployeeController extends BaseController
         $bacsPayment = new BacsPayment();
         $bacsPayment->setDate(new \DateTime());
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacsPayment)
             ->getForm();
@@ -517,6 +519,23 @@ class AdminEmployeeController extends BaseController
             } elseif ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
+                    if ($this->areEqualToTwoDp(
+                        $bacsPayment->getAmount(),
+                        $policy->getPremium()->getMonthlyPremiumPrice()
+                    )) {
+                        $bacsPayment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+                    } elseif ($this->areEqualToTwoDp(
+                        $bacsPayment->getAmount(),
+                        $policy->getPremium()->getYearlyPremiumPrice()
+                    )) {
+                        $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+                    } else {
+                        $this->get('logger')->warning(sprintf(
+                            'Unable to determine commission on bacs payment for policy %s',
+                            $policy->getId()
+                        ));
+                    }
+
                     $policy->addPayment($bacsPayment);
                     $dm->flush();
                     $this->addFlash(
