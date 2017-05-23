@@ -10,27 +10,26 @@ class ConnectionRepository extends BaseDocumentRepository
 {
     use PhoneTrait;
 
-    public function isConnectedByUser(Policy $policy, $user)
+    public function getConnectedByUserCount(Policy $policy, $user)
     {
-        $connectionSourceLinks = $this->createQueryBuilder()
+        $count = 0;
+        $count += $this->createQueryBuilder()
             ->field('sourcePolicy')->references($policy)
             ->field('linkedUser')->references($user)
             ->getQuery()
-            ->execute();
-        if (count($connectionSourceLinks) > 0) {
-            return true;
-        }
+            ->execute()
+            ->count();
 
-        $connectionLinkSources = $this->createQueryBuilder()
+        /*
+        $count += $this->createQueryBuilder()
             ->field('linkedPolicy')->references($policy)
-            ->field('sourceUser')->references($policy)
+            ->field('sourceUser')->references($user)
             ->getQuery()
-            ->execute();
-        if (count($connectionLinkSources) > 0) {
-            return true;
-        }
+            ->execute()
+            ->count();
+        */
 
-        return false;
+        return $count;
     }
 
     public function isConnectedByEmail(Policy $policy, $email)
@@ -81,6 +80,18 @@ class ConnectionRepository extends BaseDocumentRepository
         }
 
         return false;
+    }
+
+    public function isConnectedByPolicy(Policy $sourcePolicy, Policy $linkedPolicy)
+    {
+        $connectionLinks = $this->createQueryBuilder()
+            ->field('sourcePolicy')->references($sourcePolicy)
+            ->field('linkedPolicy')->references($linkedPolicy)
+            ->getQuery()
+            ->execute()
+            ->count();
+
+        return $connectionLinks > 0;
     }
 
     public function count(\DateTime $start = null, \DateTime $end = null, $cancelled = false)

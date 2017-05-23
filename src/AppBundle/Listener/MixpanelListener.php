@@ -28,6 +28,7 @@ class MixpanelListener
         $payment = $event->getPayment();
         $this->mixpanel->queueTrackWithUser($payment->getUser(), MixpanelService::EVENT_PAYMENT, [
             'Amount' => $payment->getAmount(),
+            'Policy Id' => $payment->getPolicy()->getId(),
         ]);
     }
 
@@ -36,6 +37,7 @@ class MixpanelListener
         $policy = $event->getPolicy();
         $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_PURCHASE_POLICY, [
             'Payment Option' => $policy->getPremiumPlan(),
+            'Policy Id' => $policy->getId(),
         ]);
     }
 
@@ -44,6 +46,7 @@ class MixpanelListener
         $policy = $event->getPolicy();
         $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_CANCEL_POLICY, [
             'Cancellation Reason' => $policy->getCancelledReason(),
+            'Policy Id' => $policy->getId(),
         ]);
     }
 }

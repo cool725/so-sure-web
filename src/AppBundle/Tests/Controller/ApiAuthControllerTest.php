@@ -556,8 +556,6 @@ class ApiAuthControllerTest extends BaseControllerTest
             self::generateEmail('testPutMultiPay-payee', $this),
             true
         );
-        $payerPolicy = $multiPay->getPayer()->getCurrentPolicy();
-
         $payerCognitoIdentityId = $this->getAuthUser($multiPay->getPayer());
         $url = sprintf('/api/v1/auth/multipay/%s?_method=PUT', $multiPay->getId());
         $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
@@ -1358,6 +1356,48 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(403);
     }
 
+    // policy/{id}/connect
+
+    /**
+     *
+     */
+    public function testMultiPolicyConnect()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testConnect', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyDataA = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyDataA['id']);
+
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyDataB = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyDataB['id']);
+
+        $url = sprintf("/api/v1/auth/policy/%s/connect", $policyDataA['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'policy_id' => $policyDataB['id']
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/policy/%s/connect", $policyDataA['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'policy_id' => $policyDataB['id']
+        ]);
+        $data = $this->verifyResponse(422);
+
+        $url = sprintf("/api/v1/auth/policy/%s/connect", $policyDataB['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'policy_id' => $policyDataA['id']
+        ]);
+        $data = $this->verifyResponse(422);
+    }
+
     // policy/{id}/pay dd
 
     /**
@@ -1820,6 +1860,50 @@ class ApiAuthControllerTest extends BaseControllerTest
         $prefix = $policy->getPolicyPrefix($environment);
         $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect($prefix));
         $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
+    }
+
+    public function testNewMulitplePolicyJudopayOk()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewMulitplePolicyJudopayOk', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $details = $judopay->testPayDetails(
+            $user,
+            $data['id'],
+            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => $details['consumer']['consumerToken'],
+            'card_token' => $details['cardDetails']['cardToken'],
+            'receipt_id' => $details['receiptId'],
+        ]]);
+        $policyData1 = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData1['status']);
+        $this->assertEquals($data['id'], $policyData1['id']);
+
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['existing' => [
+            'amount' => '7.02'
+        ]]);
+        $policyData2 = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData2['status']);
+        $this->assertEquals($data['id'], $policyData2['id']);
+
+        $this->assertNotEquals($policyData1['id'], $policyData2['id']);
     }
 
     public function testNewPolicyMultipayDeclinedJudopayOk()

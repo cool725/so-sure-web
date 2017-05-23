@@ -241,6 +241,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->login($inviteeEmail, $password, 'user/');
         $crawler = self::$client->request('GET', '/user/');
+        // print $crawler->html();
         $form = $crawler->selectButton('Accept')->form();
         $crawler = self::$client->submit($form);
 

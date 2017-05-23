@@ -135,7 +135,7 @@ class ClaimsServiceTest extends WebTestCase
         $this->assertEquals(0, $policy->getPotValue());
 
         $reward = $this->createReward(static::generateEmail('testProcessClaimRewardConnection-R', $this));
-        $connection = static::$invitationService->addReward($user, $reward, 10);
+        $connection = static::$invitationService->addReward($policy, $reward, 10);
         $this->assertEquals(10, $connection->getPromoValue());
         $this->assertEquals(10, $policy->getPotValue());
 
@@ -161,11 +161,11 @@ class ClaimsServiceTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
 
         $reward1 = $this->createReward(static::generateEmail('testProcessClaimRewards1', $this));
-        $connection = static::$invitationService->addReward($user, $reward1, 10);
+        $connection = static::$invitationService->addReward($policy, $reward1, 10);
         $this->assertEquals(10, $connection->getPromoValue());
 
         $reward2 = $this->createReward(static::generateEmail('testProcessClaimRewards2', $this));
-        $connection = static::$invitationService->addReward($user, $reward2, 10);
+        $connection = static::$invitationService->addReward($policy, $reward2, 10);
         $this->assertEquals(10, $connection->getPromoValue());
     }
 }
