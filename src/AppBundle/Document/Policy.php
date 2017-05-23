@@ -2301,6 +2301,31 @@ abstract class Policy
             'scheduled' => $this->eachApiArray($this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED)),
         ];
     }
+
+    public function hasUnconnectedUserPolicies()
+    {
+        return count($this->getUnconnectedUserPolicies()) > 0;
+    }
+
+    public function getUnconnectedUserPolicies()
+    {
+        $unconnectedPolicies = [];
+        foreach ($this->getUser()->getValidPolicies() as $policy) {
+            if ($policy->getId() != $this->getId()) {
+                $connectionFound = false;
+                foreach ($this->getConnections() as $connection) {
+                    $connectionFound = $connectionFound ||
+                        $connection->getLinkedPolicy()->getId() == $policy->getId();
+                }
+                if (!$connectionFound) {
+                    $unconnectedPolicies[] = $policy;
+                }
+            }
+        }
+
+        return $unconnectedPolicies;
+    }
+
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms()) {

@@ -23,6 +23,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\JudoPaymentMethod;
 
 use AppBundle\Document\PhoneTrait;
 
@@ -340,11 +341,10 @@ class ApiAuthController extends BaseController
             $user = $this->getUser();
             $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
 
-            // We'll probably want to change this in the future, but for now, a user can only create 1 policy
-            if ($user->hasPolicy()) {
+            if (!$user->canPurchasePolicy()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_POLICY_LIMIT,
-                    'User can only have 1 policy',
+                    'User is not able to purchase additional policies',
                     422
                 );
             }
@@ -502,6 +502,104 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/policy/{id}/connect", name="api_auth_new_connection")
+     * @Method({"POST"})
+     */
+    public function newConnectionAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!isset($data['policy_id'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted('connect', $policy);
+
+            $connectPolicy = $repo->find($data['policy_id']);
+            if (!$connectPolicy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted('connect', $connectPolicy);
+
+            $invitationService = $this->get('app.invitation');
+            try {
+                $invitationService->connect($policy, $connectPolicy);
+                $policy = $repo->find($id);
+
+                return new JsonResponse($policy->toApiArray());
+            } catch (DuplicateInvitationException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_DUPLICATE,
+                    'Duplicate invitation',
+                    422
+                );
+            } catch (ConnectedInvitationException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_CONNECTED,
+                    'Already connected invitation',
+                    422
+                );
+            } catch (OptOutException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_OPTOUT,
+                    'Person has opted out of invitations',
+                    422
+                );
+            } catch (InvalidPolicyException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
+                    'Policy not yet been paid',
+                    422
+                );
+            } catch (SelfInviteException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_SELF_INVITATION,
+                    'User can not invite themself',
+                    422
+                );
+            } catch (FullPotException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_MAXPOT,
+                    'User has a full pot',
+                    422
+                );
+            } catch (ClaimException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
+                    'User has previously claimed',
+                    422
+                );
+            } catch (NotFoundHttpException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy/code',
+                    404
+                );
+            } catch (\Exception $e) {
+                $this->get('logger')->error('Error in api newConnection.', ['exception' => $e]);
+
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+            }
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api newConnection.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/policy/{id}/invitation", name="api_auth_new_invitation")
      * @Method({"POST"})
      */
@@ -647,6 +745,12 @@ class ApiAuthController extends BaseController
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
                 $judoData = $data['judo'];
+            } elseif (isset($data['existing'])) {
+                if (!$this->validateFields($data['existing'], ['amount'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+
+                $existingData = $data['existing'];
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
@@ -693,7 +797,25 @@ class ApiAuthController extends BaseController
                     Payment::SOURCE_MOBILE,
                     $this->getDataString($judoData, 'device_dna')
                 );
+            } elseif ($existingData) {
+                if (!$policy->getUser()->hasValidPaymentMethod()) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
+                        'Invalid payment method for user',
+                        422
+                    );
+                }
+                $paymentMethod = $policy->getUser()->getPaymentMethod();
+                if ($paymentMethod instanceof JudoPaymentMethod) {
+                    $judo = $this->get('app.judopay');
+                    $judo->existing($policy, $existingData['amount']);
+                } else {
+                    throw new ValidationException('Unsupport payment method');
+                }
+            } else {
+                throw new \Exception('Unknown payment method');
             }
+
             $this->get('statsd')->endTiming("api.payPolicy");
 
             return new JsonResponse($policy->toApiArray());
@@ -1083,7 +1205,7 @@ class ApiAuthController extends BaseController
             $this->get('statsd')->endTiming("api.getCurrentUser");
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
-            if ($policy = $user->getCurrentPolicy()) {
+            foreach ($user->getValidPolicies(true) as $policy) {
                 $now = new \DateTime();
                 if ($policy->getStart() > new \DateTime('2017-02-01') &&
                     $policy->getStart() < new \DateTime('2017-04-01') &&
@@ -1091,7 +1213,7 @@ class ApiAuthController extends BaseController
                     !$policy->getPromoCode()) {
                     if ($reward = $this->findRewardUser('bonus@so-sure.net')) {
                         $invitationService = $this->get('app.invitation');
-                        $invitationService->addReward($user, $reward, 5);
+                        $invitationService->addReward($policy, $reward, 5);
                         $policy->setPromoCode(Policy::PROMO_APP_MARCH_2017);
                         $this->getManager()->flush();
                         $user = $this->getUser();
@@ -1211,7 +1333,7 @@ class ApiAuthController extends BaseController
 
             if ($this->isDataStringPresent($data, 'first_name') &&
                 $this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50) != $user->getFirstName()) {
-                if ($user->hasActivePolicy()) {
+                if ($user->hasPolicy()) {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
                         'Unable to change name after policy is created',
@@ -1223,7 +1345,7 @@ class ApiAuthController extends BaseController
             }
             if ($this->isDataStringPresent($data, 'last_name') &&
                 $this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50) != $user->getLastName()) {
-                if ($user->hasActivePolicy()) {
+                if ($user->hasPolicy()) {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
                         'Unable to change name after policy is created',
@@ -1427,6 +1549,9 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
+            /*
+            // The way the client currently works, checking billing details is problematic
+            // Removing for now - could look at having the client choose which quote request to use
             if (!$user->hasValidBillingDetails()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_INVALID_ADDRESS,
@@ -1434,6 +1559,7 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
+            */
             $this->denyAccessUnlessGranted('edit', $user);
 
             $make = $this->getRequestString($request, 'make');

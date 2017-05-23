@@ -12,11 +12,12 @@ class PolicyVoter extends Voter
     const VIEW = 'view';
     const EDIT = 'edit';
     const SEND_INVITATION = 'send-invitation';
+    const CONNECT = 'connect';
 
     public function supports($attribute, $subject)
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, array(self::VIEW, self::EDIT, self::SEND_INVITATION))) {
+        if (!in_array($attribute, array(self::VIEW, self::EDIT, self::SEND_INVITATION, self::CONNECT))) {
             return false;
         }
 

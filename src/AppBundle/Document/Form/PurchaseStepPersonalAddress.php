@@ -4,6 +4,7 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\Address;
+use AppBundle\Document\User;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\PhoneTrait;
@@ -11,6 +12,8 @@ use AppBundle\Document\PhoneTrait;
 class PurchaseStepPersonalAddress
 {
     use PhoneTrait;
+
+    protected $user;
 
     /**
      * @var string
@@ -251,8 +254,19 @@ class PurchaseStepPersonalAddress
         ];
     }
 
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+    }
+
     public function populateFromUser($user)
     {
+        $this->user = $user;
         $this->setEmail($user->getEmail());
         $this->setFirstName($user->getFirstName());
         $this->setLastName($user->getLastName());

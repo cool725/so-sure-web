@@ -379,7 +379,7 @@ class PhonePolicyTest extends WebTestCase
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
 
-        $connection = static::$invitationService->addReward($policy->getUser(), $reward, 10);
+        $connection = static::$invitationService->addReward($policy, $reward, 10);
         $this->assertEquals(10, $policy->getPotValue());
         $this->assertEquals(10, $connection->getPromoValue());
 
