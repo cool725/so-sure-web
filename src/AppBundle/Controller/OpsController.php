@@ -125,7 +125,7 @@ class OpsController extends BaseController
         if ($request->get('_route') == 'ops_track_invite') {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_INVITE, [
                 'Invitation Method' => 'web',
-                'Shared Bundle' => $event
+                'Shared Bundle' => $event,
             ]);
         } else {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, ['Test Name' => $event]);

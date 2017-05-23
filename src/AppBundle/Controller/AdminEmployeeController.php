@@ -548,7 +548,7 @@ class AdminEmployeeController extends BaseController
                     );
                     $invitationService->accept(
                         $invitation,
-                        $invitation->getInvitee()->getCurrentPolicy(),
+                        $invitation->getInvitee()->getFirstPolicy(),
                         null,
                         true
                     );
@@ -983,11 +983,13 @@ class AdminEmployeeController extends BaseController
                             ])) {
                             $reward = $rewardRepo->find($connectForm->getData()['rewardId']);
                             $invitationService = $this->get('app.invitation');
-                            $invitationService->addReward(
-                                $sourceUser,
-                                $reward,
-                                $this->toTwoDp($connectForm->getData()['amount'])
-                            );
+                            foreach ($sourceUser->getValidPolicies() as $policy) {
+                                $invitationService->addReward(
+                                    $policy,
+                                    $reward,
+                                    $this->toTwoDp($connectForm->getData()['amount'])
+                                );
+                            }
                             $this->addFlash('success', sprintf(
                                 'Added reward connection'
                             ));

@@ -13,6 +13,7 @@ use AppBundle\Document\JudoPayment;
 use AppBundle\Document\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Classes\Salva;
+use AppBundle\Exception\InvalidPremiumException;
 
 /**
  * @group functional-net
@@ -755,5 +756,74 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertFalse(self::$judopay->cardExpiringEmail($policy));
         $this->assertTrue(self::$judopay->cardExpiringEmail($policy, new \DateTime('2020-12-15')));
+    }
+
+    public function testJudoExisting()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoMultiPolicy', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy1 = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy2 = static::initPolicy($user, static::$dm, $phone);
+        $policy3 = static::initPolicy($user, static::$dm, $phone);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy1->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        static::$policyService->setEnvironment('prod');
+        self::$judopay->add(
+            $policy1,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API
+        );
+        static::$policyService->setEnvironment('test');
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy1 = $repo->find($policy1->getId());
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy1->getStatus());
+        $this->assertGreaterThan(5, strlen($updatedPolicy1->getPolicyNumber()));
+
+        static::$policyService->setEnvironment('prod');
+        self::$judopay->existing($policy2, $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        static::$policyService->setEnvironment('test');
+
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy2 = $repo->find($policy2->getId());
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy2->getStatus());
+        $this->assertGreaterThan(5, strlen($updatedPolicy2->getPolicyNumber()));
+
+        static::$policyService->setEnvironment('prod');
+        $invalidPremium = false;
+        try {
+            self::$judopay->existing($policy3, 0.01);
+        } catch (InvalidPremiumException $e) {
+            $invalidPremium = true;
+        }
+        $this->assertTrue($invalidPremium);
+
+        $invalidPremium = false;
+        try {
+            self::$judopay->existing($policy3, $phone->getCurrentPhonePrice()->getYearlyPremiumPrice() + 0.01);
+        } catch (InvalidPremiumException $e) {
+            $invalidPremium = true;
+        }
+        $this->assertTrue($invalidPremium);
+
+        self::$judopay->existing($policy3, $phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        static::$policyService->setEnvironment('test');
+
+        $updatedPolicy3 = $repo->find($policy3->getId());
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy3->getStatus());
+        $this->assertGreaterThan(5, strlen($updatedPolicy3->getPolicyNumber()));
     }
 }
