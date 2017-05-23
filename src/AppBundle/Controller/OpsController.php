@@ -174,6 +174,8 @@ class OpsController extends BaseController
                 'nikkomsgchannel',
                 'www.bizographics.com',
                 'secure.adnxs.com',
+                'gb.api4load.com',
+                'af.adsloads.com',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 
