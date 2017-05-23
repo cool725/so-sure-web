@@ -38,8 +38,9 @@
                                 {% for unconnectedPolicy in policy.unconnectedUserPolicies %}
                                 <li class="clearfix">
                                     <img src="{{ app.user.getImageUrlFallback }}" class="img-circle pull-left" alt="">
-                                    <h4 class="h4 pull-left">{{ unconnectedPolicy.defaultName }}<br>
-                                    <small>Policy created on {{ unconnectedPolicy.start|date('d M Y H:i', 'Europe/London')  }}</small></h4>
+                                    <h4 class="h4 pull-left">{{ unconnectedPolicy.defaultName }}<br />
+                                    <small>{{ unconnectedPolicy.policyNumber }}<br>
+                                    Policy created on {{ unconnectedPolicy.start|date('d M Y H:i', 'Europe/London')  }}</small></h4>
                                     <ul class="list-inline pull-right">
                                         <li>{{ form_widget(attribute(unconnected_user_policy_form, 'connect_' ~ unconnectedPolicy.id), {'attr': {'class': 'btn btn-success  btn-xs'}}) }}</li>
                                     </ul>
