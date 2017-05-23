@@ -1427,6 +1427,9 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
+            /*
+            // The way the client currently works, checking billing details is problematic
+            // Removing for now - could look at having the client choose which quote request to use
             if (!$user->hasValidBillingDetails()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_USER_INVALID_ADDRESS,
@@ -1434,6 +1437,7 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
+            */
             $this->denyAccessUnlessGranted('edit', $user);
 
             $make = $this->getRequestString($request, 'make');
