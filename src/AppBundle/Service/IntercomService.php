@@ -240,27 +240,13 @@ class IntercomService
             $data['phone'] = $user->getMobileNumber();
         }
 
-        $policyValue = 0;
-        $pot = 0;
-        $connections = 0;
-        foreach ($user->getValidPolicies() as $policy) {
-            if ($policy->isValidPolicy()) {
-                $policyValue += $policy->getPremium()->getYearlyPremiumPrice();
-                $pot += $policy->getPotValue();
-                $connections += count($policy->getConnections());
-            }
-        }
-
-        $data['custom_attributes']['Premium'] = $policyValue;
-        $data['custom_attributes']['Pot'] = $pot;
-        $data['custom_attributes']['Connections'] = $connections;
-        $data['custom_attributes']['Promo Code'] = $user->getCurrentPolicy() ?
-            $user->getCurrentPolicy()->getPromoCode() :
-            '';
+        $analytics = $user->getAnalytics();
+        $data['custom_attributes']['Premium'] = $analytics['annualPremium'];
+        $data['custom_attributes']['Pot'] = $analytics['rewardPot'];
+        $data['custom_attributes']['Connections'] = $analytics['connections'];
+        $data['custom_attributes']['Approved Claims'] = $analytics['approvedClaims'];
+        $data['custom_attributes']['Promo Code'] = $analytics['firstPolicy']['promoCode'];
         $data['custom_attributes']['Pending Invites'] = count($user->getUnprocessedReceivedInvitations());
-        $data['custom_attributes']['Approved Claims'] = $user->getCurrentPolicy() ?
-            count($user->getCurrentPolicy()->getApprovedClaims()) :
-            0;
 
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {

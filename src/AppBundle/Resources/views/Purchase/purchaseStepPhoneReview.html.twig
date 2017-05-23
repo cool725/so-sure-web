@@ -103,17 +103,33 @@
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.agreed) }}</div>
                                 </div>
                             </div>
-                            <div class="form-group form-footer">
-                                <div class="row">
-                                    <div class="col-xs-6 col-sm-6 col-md-6">
-                                        <a class="btn btn-primary-hollow" href="{{ path('purchase_step_personal') }}">Back</a>
-                                    </div>
-                                    <div class="col-xs-6 col-sm-6 col-md-6">
-                                        {{ form_widget(purchase_form.next, {'label': 'PAY NOW', 'attr': {'class': 'btn btn-success   btn-block btn-arrow-right'}}) }}
+                            {% if app.user.hasValidPaymentMethod %}
+                                <div class="form-group form-footer">
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <a class="btn btn-primary-hollow" href="{{ path('purchase_step_personal') }}">Back</a>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-success   btn-block btn-arrow-right'}}) }}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>
+                                <p class="text-center"><small>
+                                {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-link btn-block btn-arrow-right'}}) }}
+                                <i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>
+                            {% else %}
+                                <div class="form-group form-footer">
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <a class="btn btn-primary-hollow" href="{{ path('purchase_step_personal') }}">Back</a>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            {{ form_widget(purchase_form.next, {'label': 'PAY NOW', 'attr': {'class': 'btn btn-success   btn-block btn-arrow-right'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-center"><small><i class="fa fa-info-circle"></i> <em>You will be redirected to Judo Pay to complete your purchase.</em></small></p>
+                            {% endif %}
                                 <p class="text-center"><small>
                                     <img src="{{ cdn_url }}/images/payment/Visa.png" alt="Visa">
                                     <img src="{{ cdn_url }}/images/payment/MasterCard.png" alt="Mastercard">

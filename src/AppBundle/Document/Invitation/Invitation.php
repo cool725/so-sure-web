@@ -18,7 +18,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  *          "scode"="SCodeInvitation",
  *          "facebook"="FacebookInvitation"
  * })
- * @MongoDB\Index(keys={"email"="asc", "mobile"="asc", "policy.id"="asc"}, sparse="true", unique="true")
+ * @MongoDB\Index(keys={"email"="asc", "mobile"="asc", "policy.id"="asc"}, sparse="true")
  */
 abstract class Invitation
 {
@@ -342,6 +342,25 @@ abstract class Invitation
         return null;
     }
 
+    public function getInviteeImageUrlFallback($size = 100)
+    {
+        if ($this->getInvitee()) {
+            return $this->getInvitee()->getImageUrlFallback($size);
+        }
+
+        if ($this instanceof EmailInvitation) {
+            $initial = strtolower($this->getEmail()[0]);
+
+            return $this->gravatarImageFallback(
+                $this->getEmail(),
+                $size,
+                sprintf('https://cdn.so-sure.com/images/alpha/%s.png', $initial)
+            );
+        }
+
+        return null;
+    }
+
     public function getInviterImageUrl($size = 100)
     {
         if ($this->getInviter()) {
@@ -388,6 +407,7 @@ abstract class Invitation
         }
 
         $data['channel_details'] = $this->getChannelDetails();
+        $data['policy_id'] = $this->getPolicy() ? $this->getPolicy()->getId() : null;
 
         if ($debug) {
             $data = array_merge($data, [

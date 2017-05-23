@@ -294,7 +294,12 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    return $this->redirectToRoute('purchase');
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        return $this->redirectToRoute('purchase_step_policy');
+                    } else {
+                        return $this->redirectToRoute('purchase');
+                    }
                 }
             } elseif ($request->request->has('buy_form_banner')) {
                 $buyBannerForm->handleRequest($request);
@@ -309,7 +314,12 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    return $this->redirectToRoute('purchase');
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        return $this->redirectToRoute('purchase_step_policy');
+                    } else {
+                        return $this->redirectToRoute('purchase');
+                    }
                 }
             }
         }

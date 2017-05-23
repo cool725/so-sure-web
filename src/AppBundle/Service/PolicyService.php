@@ -356,6 +356,32 @@ class PolicyService
 
             $this->generateScheduledPayments($policy, $date);
 
+            // Generate/set scode prior to creating policy as policy create has a fallback scode creation
+            $scode = null;
+            foreach ($user->getAllPolicies() as $loopPolicy) {
+                if ($loopPolicy->getId() != $policy->getId() &&
+                    $scode = $loopPolicy->getStandardSCode()) {
+                    $scode = clone $scode;
+                    $policy->addSCode($scode);
+                    break;
+                }
+            }
+
+            if (!$scode) {
+                $scode = $this->uniqueSCode($policy);
+                $shortLink = $this->branch->generateSCode($scode->getCode());
+                // branch is preferred, but can fallback to old website version if branch is down
+                if (!$shortLink) {
+                    $link = $this->router->generate(
+                        'scode',
+                        ['code' => $scode->getCode()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    );
+                    $shortLink = $this->shortLink->addShortLink($link);
+                }
+                $scode->setShareLink($shortLink);
+            }
+
             if ($prefix) {
                 $policy->create(
                     $this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID),
@@ -368,18 +394,6 @@ class PolicyService
 
             $this->setPromoCode($policy);
 
-            $scode = $this->uniqueSCode($policy);
-            $shortLink = $this->branch->generateSCode($scode->getCode());
-            // branch is preferred, but can fallback to old website version if branch is down
-            if (!$shortLink) {
-                $link = $this->router->generate(
-                    'scode',
-                    ['code' => $scode->getCode()],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                );
-                $shortLink = $this->shortLink->addShortLink($link);
-            }
-            $scode->setShareLink($shortLink);
             $this->dm->flush();
 
             $this->queueMessage($policy);

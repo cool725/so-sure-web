@@ -1135,4 +1135,41 @@ class JudopayService
 
         return true;
     }
+
+    /**
+     *
+     * @param Policy    $policy
+     * @param double    $amount
+     * @param \DateTime $date
+     */
+    public function existing(Policy $policy, $amount, \DateTime $date = null)
+    {
+        $this->statsd->startTiming("judopay.existing");
+
+        if ($policy->getStatus() != null) {
+            throw new ProcessedException();
+        }
+
+        $premium = $policy->getPremium();
+        if ($amount < $premium->getMonthlyPremiumPrice() &&
+            !$this->areEqualToTwoDp($amount, $premium->getMonthlyPremiumPrice())) {
+            throw new InvalidPremiumException();
+        } elseif ($amount > $premium->getYearlyPremiumPrice() &&
+            !$this->areEqualToTwoDp($amount, $premium->getYearlyPremiumPrice())) {
+            throw new InvalidPremiumException();
+        }
+
+        if (!$policy->getPayer()) {
+            $policy->setPayer($policy->getUser());
+        }
+
+        $this->tokenPay($policy, $amount);
+
+        $this->policyService->create($policy, $date, true);
+        $this->dm->flush();
+
+        $this->statsd->endTiming("judopay.existing");
+
+        return true;
+    }
 }
