@@ -621,8 +621,10 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $this->assertFalse($policy->isPolicyPaidToDate());
+        $this->assertNotNull($policy->getBilling());
 
-        $billingDate = $this->setDayOfMonth($policy->getBilling(), '15');
+        $now = new \DateTime();
+        $billingDate = $this->setDayOfMonth($now, '15');
         $policy->setBilling($billingDate);
     }
 
@@ -843,6 +845,39 @@ class PolicyServiceTest extends WebTestCase
 
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         $this->assertNotEquals($policy->getStandardSCode()->getCode(), $scode->getCode());
+    }
+
+    public function testScodeMultiplePolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testScodeMultiplePolicy', $this),
+            'bar',
+            static::$dm
+        );
+        $policyA = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+        $policyB = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+        static::$policyService->create($policyA, new \DateTime('2016-01-01'));
+        $this->assertNotNull($policyA->getStandardSCode());
+
+        static::$policyService->create($policyB, new \DateTime('2016-01-01'));
+        $this->assertNotNull($policyB->getStandardSCode());
+        $this->assertEquals(
+            $policyA->getStandardSCode()->getCode(),
+            $policyB->getStandardSCode()->getCode()
+        );
     }
 
     public function testValidatePremiumIptRateChange()

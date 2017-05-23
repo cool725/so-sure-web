@@ -49,10 +49,8 @@ class PurchaseStepPersonalAddressType extends AbstractType
             $years[] = $year;
         }
         $builder
-            ->add('email', EmailType::class, ['required' => $this->required])
             ->add('firstName', HiddenType::class, ['required' => false])
             ->add('lastName', HiddenType::class, ['required' => false])
-            ->add('name', TextType::class, ['required' => $this->required])
             ->add('birthday', BirthdayType::class, [
                   'required' => $this->required,
                   'format'   => 'dd MM yyyy',
@@ -69,6 +67,19 @@ class PurchaseStepPersonalAddressType extends AbstractType
             ->add('postcode', TextType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
         ;
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $purchaseStepData = $event->getData();
+            $user = $purchaseStepData->getUser();
+            $form = $event->getForm();
+            $form->add('email', EmailType::class, [
+                'required' => $this->required,
+                'disabled' => $user ? $user->hasPolicy() : false,
+            ]);
+            $form->add('name', TextType::class, [
+                'required' => $this->required,
+                'disabled' => $user ? $user->hasPolicy() : false,
+            ]);
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)

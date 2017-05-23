@@ -346,6 +346,7 @@ nelmio_security:
                 - https://maxcdn.bootstrapcdn.com
                 - http://maxcdn.bootstrapcdn.com
                 - https://*.iubenda.com
+                - https://*.googletagmanager.com
                 - 'data:'
             child-src:
                 - 'self'
@@ -365,6 +366,7 @@ nelmio_security:
                 - https://cdn.so-sure.com
                 - https://*.twimg.com
                 - https://*.twitter.com
+                - https://twitter.com
                 - https://*.digits.com
                 - https://ajax.googleapis.com
                 - https://maxcdn.bootstrapcdn.com
@@ -388,10 +390,11 @@ nelmio_security:
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
                 - https://*.googleadservices.com
+                - https://*.googlesyndication.com
                 - https://code.jquery.com
                 - https://cdn.heapanalytics.com
                 - https://*.maxcdn.com
-                - https://snap.licdn.com # linkedin
+                - https://*.licdn.com # linkedin
                 - https://*.linkedin.com
                 - 'data:'
             style-src:

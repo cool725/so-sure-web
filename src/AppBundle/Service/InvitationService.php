@@ -224,12 +224,15 @@ class InvitationService
     public function validateNotConnectedByUser(Policy $policy, $user)
     {
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
-        if ($connectionRepo->isConnectedByUser($policy, $user)) {
-            throw new ConnectedInvitationException('You are already connected');
+        $count = $connectionRepo->getConnectedByUserCount($policy, $user);
+        if ($count > 0 && $count >= count($user->getValidPolicies(true))) {
+            throw new ConnectedInvitationException(sprintf('You are already connected %d time(s)', $count));
         }
 
+        // only 1 reward per user
         $connectionRepo = $this->dm->getRepository(RewardConnection::class);
-        if ($connectionRepo->isConnectedByUser($policy, $user)) {
+        $count = $connectionRepo->getConnectedByUserCount($policy, $user);
+        if ($count > 0) {
             throw new ConnectedInvitationException('You are already connected');
         }
 
@@ -260,30 +263,65 @@ class InvitationService
         }
     }
 
+    public function validateNotConnectedByPolicy(Policy $sourcePolicy, Policy $linkedPolicy)
+    {
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
+        if ($connectionRepo->isConnectedByPolicy($sourcePolicy, $linkedPolicy)) {
+            throw new ConnectedInvitationException('You are already connected');
+        }
+
+        $connectionRepo = $this->dm->getRepository(RewardConnection::class);
+        if ($connectionRepo->isConnectedByPolicy($sourcePolicy, $linkedPolicy)) {
+            throw new ConnectedInvitationException('You are already connected');
+        }
+    }
+
     public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
     {
         $this->validatePolicy($policy);
         $this->validateSoSurePolicyEmail($policy, $email);
-        $this->validateNotConnectedByEmail($policy, $email);
+
+        $userRepo = $this->dm->getRepository(User::class);
+        $invitee = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $inviteePolicies = 0;
+        if ($invitee) {
+            $inviteePolicies = count($invitee->getValidPolicies(true));
+        }
+
+        if ($invitee) {
+            // if user exists, much better check, especially for multiple policies
+            $this->validateNotConnectedByUser($policy, $invitee);
+        } else {
+            $this->validateNotConnectedByEmail($policy, $email);
+        }
 
         $invitation = null;
         $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(EmailInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $email);
+        $singleInvitationCount = 0;
+        $totalInvitationCount = 0;
         foreach ($prevInvitations as $prevInvitation) {
-            if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
-                throw new DuplicateInvitationException('Email was already invited to this policy');
-            } elseif ($prevInvitation->isCancelled()) {
+            if ($prevInvitation->isCancelled()) {
                 // Reinvitating a cancelled invitation, should re-active invitation
                 $invitation = $prevInvitation;
                 $invitation->setCancelled(null);
                 $this->dm->flush();
                 $isReinvite = true;
-            } elseif ($prevInvitation->canReinvite()) {
+                break;
+            } elseif ($prevInvitation->canReinvite() &&
+                !$prevInvitation->isAccepted() && !$prevInvitation->isRejected()) {
                 // A duplicate invitation can be considered a reinvitation
                 $invitation = $prevInvitation;
                 $isReinvite = true;
-            } else {
+                break;
+            }
+
+            if (!$prevInvitation->isProcessed()) {
+                $singleInvitationCount++;
+            }
+            $totalInvitationCount++;
+            if ($singleInvitationCount >= 1 || $totalInvitationCount > $inviteePolicies) {
                 throw new DuplicateInvitationException('Email was already invited to this policy');
             }
         }
@@ -420,29 +458,43 @@ class InvitationService
         $this->validateNotConnectedByUser($policy, $user);
 
         if ($scode->isReward()) {
-            $this->addReward($policy->getUser(), $scode->getReward());
+            $this->addReward($policy, $scode->getReward());
         }
 
         $this->setSCodeLeadSource($policy, $user, $date);
+
+        $inviteePolicies = 0;
+        if ($scode->isStandard()) {
+            $inviteePolicies = count($user->getValidPolicies(true));
+        }
 
         $invitation = null;
         $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(SCodeInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $scode);
+        $singleInvitationCount = 0;
+        $totalInvitationCount = 0;
         foreach ($prevInvitations as $prevInvitation) {
-            if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
-                throw new DuplicateInvitationException('SCode was already invited to this policy');
-            } elseif ($prevInvitation->isCancelled()) {
+            if ($prevInvitation->isCancelled()) {
                 // Reinvitating a cancelled invitation, should re-active invitation
                 $invitation = $prevInvitation;
                 $invitation->setCancelled(null);
                 $this->dm->flush();
                 $isReinvite = true;
-            } elseif ($prevInvitation->canReinvite()) {
+                break;
+            } elseif ($prevInvitation->canReinvite() &&
+                !$prevInvitation->isAccepted() && !$prevInvitation->isRejected()) {
                 // A duplicate invitation can be considered a reinvitation
                 $invitation = $prevInvitation;
                 $isReinvite = true;
-            } else {
+                break;
+            }
+
+            if (!$prevInvitation->isProcessed()) {
+                $singleInvitationCount++;
+            }
+            $totalInvitationCount++;
+            if ($singleInvitationCount >= 1 || $totalInvitationCount > $inviteePolicies) {
                 throw new DuplicateInvitationException('SCode was already invited to this policy');
             }
         }
@@ -525,24 +577,35 @@ class InvitationService
         $this->validateSoSurePolicyEmail($policy, $user->getEmail());
         $this->validateNotConnectedByUser($policy, $user);
 
+        $inviteePolicies = count($user->getValidPolicies(true));
+
         $invitation = null;
         $isReinvite = false;
         $invitationRepo = $this->dm->getRepository(FacebookInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $facebookId);
+        $singleInvitationCount = 0;
+        $totalInvitationCount = 0;
         foreach ($prevInvitations as $prevInvitation) {
-            if ($prevInvitation->isAccepted() || $prevInvitation->isRejected()) {
-                throw new DuplicateInvitationException('Facebook user was already invited to this policy');
-            } elseif ($prevInvitation->isCancelled()) {
+            if ($prevInvitation->isCancelled()) {
                 // Reinvitating a cancelled invitation, should re-active invitation
                 $invitation = $prevInvitation;
                 $invitation->setCancelled(null);
                 $this->dm->flush();
                 $isReinvite = true;
-            } elseif ($prevInvitation->canReinvite()) {
+                break;
+            } elseif ($prevInvitation->canReinvite() &&
+                !$prevInvitation->isAccepted() && !$prevInvitation->isRejected()) {
                 // A duplicate invitation can be considered a reinvitation
                 $invitation = $prevInvitation;
                 $isReinvite = true;
-            } else {
+                break;
+            }
+
+            if (!$prevInvitation->isProcessed()) {
+                $singleInvitationCount++;
+            }
+            $totalInvitationCount++;
+            if ($singleInvitationCount >= 1 || $totalInvitationCount > $inviteePolicies) {
                 throw new DuplicateInvitationException('Facebook user was already invited to this policy');
             }
         }
@@ -833,14 +896,9 @@ class InvitationService
         // The invitation should never be sent in the first place, but in case
         // there was perhaps an email update in the meantime
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
-        if ($invitation instanceof EmailInvitation) {
-            if ($connectionRepo->isConnectedByEmail($invitation->getPolicy(), $invitation->getEmail())) {
-                throw new ConnectedInvitationException('You are already connected');
-            }
-        } elseif ($invitation instanceof SmsInvitation) {
-            if ($connectionRepo->isConnectedBySms($invitation->getPolicy(), $invitation->getMobile())) {
-                throw new ConnectedInvitationException('You are already connected');
-            }
+        if ($connectionRepo->isConnectedByPolicy($inviterPolicy, $inviteePolicy) ||
+            $connectionRepo->isConnectedByPolicy($inviteePolicy, $inviterPolicy)) {
+                throw new ConnectedInvitationException('You  are already connected');
         }
 
         // If there was a concellation in the network, new connection should replace the cancelled connection
@@ -874,6 +932,7 @@ class InvitationService
         $now = new \DateTime();
         $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
             'Connection Value' => $inviterConnection->getTotalValue(),
+            'Policy Id' => $inviterPolicy->getId(),
         ]);
         $this->mixpanel->queuePersonProperties([
             'Last connection complete' => $now->format(\DateTime::ATOM),
@@ -881,6 +940,7 @@ class InvitationService
 
         $this->mixpanel->queueTrackWithUser($invitation->getInvitee(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
             'Connection Value' => $inviteeConnection->getTotalValue(),
+            'Policy Id' => $inviteePolicy->getId(),
         ]);
         $this->mixpanel->queuePersonProperties([
             'Last connection complete' => $now->format(\DateTime::ATOM),
@@ -889,11 +949,50 @@ class InvitationService
         return $inviteeConnection;
     }
 
+    public function connect(Policy $policyA, Policy $policyB, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $this->validatePolicy($policyA);
+        $this->validatePolicy($policyB);
+
+        $this->validateNotConnectedByPolicy($policyA, $policyB);
+        $this->validateNotConnectedByPolicy($policyB, $policyA);
+
+        $connectionA = $this->addConnection(
+            $policyA,
+            $policyB->getUser(),
+            $policyB,
+            null,
+            $date
+        );
+        $connectionB = $this->addConnection(
+            $policyB,
+            $policyA->getUser(),
+            $policyA,
+            null,
+            $date
+        );
+        $this->dm->flush();
+
+        $now = new \DateTime();
+        /*
+        $this->mixpanel->queueTrackWithUser($policyA->getUser(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
+            'Connection Value' => $inviterConnection->getTotalValue(),
+        ]);
+        $this->mixpanel->queuePersonProperties([
+            'Last connection complete' => $now->format(\DateTime::ATOM),
+        ], false, $policyA->getUser());
+        */
+    }
+
     protected function addConnection(
         Policy $policy,
         User $linkedUser,
         Policy $linkedPolicy,
-        Invitation $invitation,
+        Invitation $invitation = null,
         \DateTime $date = null
     ) {
         if ($policy->getId() == $linkedPolicy->getId()) {
@@ -913,8 +1012,10 @@ class InvitationService
         $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);
         $connection->setPromoValue($promoConnectionValue);
-        $connection->setInvitation($invitation);
-        $connection->setInitialInvitationDate($invitation->getCreated());
+        if ($invitation) {
+            $connection->setInvitation($invitation);
+            $connection->setInitialInvitationDate($invitation->getCreated());
+        }
         $connection->setExcludeReporting(!$policy->isValidPolicy());
         $policy->addConnection($connection);
         $policy->updatePotValue();
@@ -1047,31 +1148,31 @@ class InvitationService
         $this->dm->flush();
     }
 
-    public function addReward(User $sourceUser, Reward $reward, $amount = null)
+    public function addReward(Policy $policy, Reward $reward, $amount = null)
     {
         if (!$amount) {
             $amount = $reward->getDefaultValue();
         }
 
-        if ($sourceUser->getCurrentPolicy()->hasMonetaryClaimed()) {
+        if ($policy->hasMonetaryClaimed()) {
             throw new \InvalidArgumentException(sprintf(
-                'Unable to add bonus. %s has a monetary claim',
-                $sourceUser->getEmail()
+                'Unable to add bonus. Poliicy %s has a monetary claim',
+                $policy->getId()
             ));
         }
-        if (count($sourceUser->getCurrentPolicy()->getNetworkClaims(true)) > 0) {
+        if (count($policy->getNetworkClaims(true)) > 0) {
             throw new \InvalidArgumentException(sprintf(
-                '%s has a network claim',
-                $sourceUser->getEmail()
+                'Policy %s has a network claim',
+                $policy->getId()
             ));
         }
         $connection = new RewardConnection();
-        $sourceUser->getCurrentPolicy()->addConnection($connection);
+        $policy->addConnection($connection);
         $connection->setLinkedUser($reward->getUser());
         $connection->setPromoValue($amount);
         $reward->addConnection($connection);
         $reward->updatePotValue();
-        $sourceUser->getCurrentPolicy()->updatePotValue();
+        $policy->updatePotValue();
         $this->dm->persist($connection);
         $this->dm->flush();
 

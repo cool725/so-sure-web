@@ -427,14 +427,23 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
-    /**
-     * TODO: Rename to getUnInitPolicies
-     */
-    public function getInitPolicies()
+    public function getUnInitPolicies()
     {
         $policies = [];
         foreach ($this->policies as $policy) {
             if (!$policy->getStatus()) {
+                $policies[] = $policy;
+            }
+        }
+
+        return $policies;
+    }
+
+    public function getCreatedPolicies()
+    {
+        $policies = [];
+        foreach ($this->policies as $policy) {
+            if ($policy->getStatus()) {
                 $policies[] = $policy;
             }
         }
@@ -521,15 +530,34 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
+    public function canPurchasePolicy()
+    {
+        // TODO: Add additional checks - perhaps any suspected fraudulent claims, etc
+        if ($this->hasCancelledPolicyWithUserDeclined()) {
+            return false;
+        }
+
+        if (count($this->getValidPolicies()) > 5) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function hasUnpaidPolicy()
+    {
+        return $this->getUnpaidPolicy() !== null;
+    }
+
+    public function getUnpaidPolicy()
     {
         foreach ($this->getPolicies() as $policy) {
             if ($policy->getStatus() == Policy::STATUS_UNPAID) {
-                return true;
+                return $policy;
             }
         }
 
-        return false;
+        return null;
     }
 
     public function hasActivePolicy()
@@ -571,31 +599,115 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
-    public function getCurrentPolicy()
-    {
-        foreach ($this->getPolicies() as $policy) {
-            if (in_array($policy->getStatus(), [
-                Policy::STATUS_ACTIVE,
-                Policy::STATUS_PENDING,
-                Policy::STATUS_UNPAID
-            ])) {
-                return $policy;
-            }
-        }
-
-        return null;
-    }
-
-    public function getValidPolicies()
+    public function getValidPolicies($includeUnpaid = false)
     {
         $policies = [];
         foreach ($this->getPolicies() as $policy) {
             if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
                 $policies[] = $policy;
+            } elseif ($includeUnpaid && $policy->getStatus() == Policy::STATUS_UNPAID) {
+                $policies[] = $policy;
             }
         }
 
         return $policies;
+    }
+
+    public function getFirstPolicy()
+    {
+        $policies = $this->getCreatedPolicies();
+        if (!is_array($policies)) {
+            $policies = $policies->getValues();
+        }
+        if (count($policies) == 0) {
+            return null;
+        }
+
+        // sort older to recent
+        usort($policies, function ($a, $b) {
+            return $a->getStart() > $b->getStart();
+        });
+
+        return $policies[0];
+    }
+
+    public function getLatestPolicy()
+    {
+        $policies = $this->getCreatedPolicies();
+        if (!is_array($policies)) {
+            $policies = $policies->getValues();
+        }
+        if (count($policies) == 0) {
+            return null;
+        }
+
+        // sort most recent to older
+        usort($policies, function ($a, $b) {
+            return $a->getStart() < $b->getStart();
+        });
+
+        return $policies[0];
+    }
+
+    public function getAnalytics()
+    {
+        $data = [];
+        $data['os'] = null;
+        $data['annualPremium'] = 0;
+        $data['paymentsReceived'] = 0;
+        $data['lastPaymentReceived'] = null;
+        $data['lastConnection'] = null;
+        $data['connections'] = 0;
+        $data['rewardPot'] = 0;
+        $data['numberPolicies'] = 0;
+        $data['approvedClaims'] = 0;
+        foreach ($this->getValidPolicies(true) as $policy) {
+            $data['connections'] += count($policy->getConnections());
+            $data['rewardPot'] += $policy->getPotValue();
+            $data['approvedClaims'] += count($policy->getApprovedClaims());
+            if ($phone = $policy->getPhone()) {
+                if (!$data['os']) {
+                    $data['os'] = $phone->getOs();
+                } elseif ($data['os'] != $phone->getOs()) {
+                    $data['os'] = 'Multiple';
+                }
+            }
+            if ($plan = $policy->getPremiumPlan()) {
+                $data['annualPremium'] += $policy->getPremium()->getYearlyPremiumPrice();
+                $data['paymentsReceived'] += count($policy->getSuccessfulPaymentCredits());
+
+                if ($payment = $policy->getLastSuccessfulPaymentCredit()) {
+                    if (!$data['lastPaymentReceived'] || $data['lastPaymentReceived'] < $payment->getDate()) {
+                        $data['lastPaymentReceived'] = $payment->getDate();
+                    }
+                }
+            }
+            if ($connection = $policy->getLastConnection()) {
+                if (!$data['lastConnection'] || $data['lastConnection'] < $connection->getDate()) {
+                    $data['lastConnection'] = $connection->getDate();
+                }
+            }
+            $data['numberPolicies']++;
+        }
+        $data['firstPolicy'] = [];
+        $data['firstPolicy']['promoCode'] = null;
+        $data['firstPolicy']['monthlyPremium'] = null;
+        $data['firstPolicy']['minutesFinalPurchase'] = null;
+        $data['firstPolicy']['minutesStartPurchase'] = null;
+        if ($policy = $this->getFirstPolicy()) {
+            $data['firstPolicy']['promoCode'] = $policy->getPromoCode();
+            if ($premium = $policy->getPremium()) {
+                $data['firstPolicy']['monthlyPremium'] = $premium->getMonthlyPremiumPrice();
+            }
+            if ($policy->getStart()) {
+                $diff = $policy->getStart()->getTimestamp() - $this->getCreated()->getTimestamp();
+                $data['firstPolicy']['minutesFinalPurchase'] = round($diff / 60);
+            }
+            $diff = $policy->getCreated()->getTimestamp() - $this->getCreated()->getTimestamp();
+            $data['firstPolicy']['minutesStartPurchase'] = round($diff / 60);
+        }
+
+        return $data;
     }
 
     public function addSentInvitation(Invitation $invitation)
@@ -783,7 +895,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $this->latestMobileIdentityLog = $identityLog;
 
-        if ($policy = $this->getCurrentPolicy()) {
+        foreach ($this->getAllPolicies() as $policy) {
+            // No need to updated cancelled or expired policies
+            if (in_array($policy->getStatus(), [Policy::STATUS_CANCELLED, Policy::STATUS_EXPIRED])) {
+                continue;
+            }
             if ($policy instanceof PhonePolicy) {
                 $policy->setPhoneVerified($identityLog->isSamePhone($policy->getPhone()));
             }
@@ -971,10 +1087,15 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             );
         }
 
+        if (strlen($this->getFirstName()) > 0) {
+            $initial = strtolower($this->getFirstName()[0]);
+        } else {
+            $initial = strtolower($this->getEmail()[0]);
+        }
         return $this->gravatarImageFallback(
             $this->getEmail(),
             $size,
-            sprintf('https://cdn.so-sure.com/images/alpha/%s.png', strtolower($this->getFirstName()[0]))
+            sprintf('https://cdn.so-sure.com/images/alpha/%s.png', $initial)
         );
     }
 
@@ -1056,6 +1177,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 'getInviterFacebookId',
                 false
             ),
+            'can_purchase_policy' => $this->canPurchasePolicy(),
+            'has_payment_method' => $this->hasValidPaymentMethod(),
         ];
     }
 }

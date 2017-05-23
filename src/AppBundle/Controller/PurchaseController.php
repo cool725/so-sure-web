@@ -68,11 +68,11 @@ class PurchaseController extends BaseController
     {
         $session = $request->getSession();
         $user = $this->getUser();
+        /* TODO: Consider if we want warning that you're purchasing additional policy
         if ($user && $user->hasPolicy()) {
             $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
-
-            return $this->redirectToRoute('user_home');
         }
+        */
         /*
         if ($user->getFirstName() && $user->getLastName() && $user->getMobileNumber() && $user->getBirthday()) {
             return $this->redirectToRoute('purchase_step_2');
@@ -258,11 +258,14 @@ class PurchaseController extends BaseController
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('purchase');
+        }
+        /* TODO: Consider if we want warning that you're purchasing additional policy
         } elseif ($user->hasPolicy()) {
             $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
 
             return $this->redirectToRoute('user_home');
         }
+        */
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
         if (!$user->hasValidBillingDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
@@ -394,15 +397,34 @@ class PurchaseController extends BaseController
                             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
                                 'Device Insured' => $purchase->getPhone()->__toString(),
                                 'OS' => $purchase->getPhone()->getOs(),
-                                'Final Monthly Cost' => $price->getMonthlyPremiumPrice()
+                                'Final Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                                'Policy Id' => $policy->getId(),
                             ]);
-                            $webpay = $this->get('app.judopay')->webpay(
-                                $policy,
-                                $purchase->getAmount(),
-                                $request->getClientIp(),
-                                $request->headers->get('User-Agent')
-                            );
-                            $purchase->setAgreed(true);
+                            if ($purchaseForm->get('next')->isClicked()) {
+                                $webpay = $this->get('app.judopay')->webpay(
+                                    $policy,
+                                    $purchase->getAmount(),
+                                    $request->getClientIp(),
+                                    $request->headers->get('User-Agent')
+                                );
+                                $purchase->setAgreed(true);
+                            } elseif ($purchaseForm->get('existing')->isClicked()) {
+                                // TODO: Try/catch
+                                if ($this->get('app.judopay')->existing(
+                                    $policy,
+                                    $purchase->getAmount()
+                                )) {
+                                    $purchase->setAgreed(true);
+                                    return $this->redirectToRoute('user_welcome');
+                                } else {
+                                    // @codingStandardsIgnoreStart
+                                    $this->addFlash(
+                                        'warning',
+                                        "Sorry, there was a problem with your existing payment method. Try again, or use the Pay with new card option."
+                                    );
+                                    // @codingStandardsIgnoreEnd
+                                }
+                            }
                         } else {
                             $this->addFlash(
                                 'error',
@@ -519,8 +541,8 @@ class PurchaseController extends BaseController
         $repo = $dm->getRepository(Payment::class);
         $reference = $request->get('Reference');
         if (!$reference) {
-            $initPolicies = $this->getUser()->getInitPolicies();
-            if (count($initPolicies) > 0) {
+            $unInitPolicies = $this->getUser()->getUnInitPolicies();
+            if (count($unInitPolicies) > 0) {
                 $this->addFlash('warning', 'You seem to have a policy that you started creating, but is unpaid.');
                 return $this->redirectToRoute('purchase_step_policy');
             }
