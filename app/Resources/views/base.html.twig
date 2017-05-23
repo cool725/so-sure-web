@@ -33,25 +33,61 @@
     <body>
         <!-- Google Tag Manager Data Layer -->
         <script>
+            {% if intercom_enabled is not defined %}
+                {% set intercom_enabled = true %}
+            {% endif %}
+            {% if app is not null and app.session.isStarted %}
+                {% set session_referral = app.session.get('referral') %}
+                {% set session_scode = app.session.get('scode') %}
+                {% set session_quote_url = app.session.get('quote_url') %}
+            {% else %}
+                {% set session_referral = '' %}
+                {% set session_scode = '' %}
+                {% set session_quote_url = '' %}
+            {% endif %}
             dataLayer = [{
-                'branch': {
-                    'banner': {% if app.user is null or not app.user %}true{% else %}false{% endif %},
-                    'referral': '{% if app is not null and app.session.isStarted %}{{ app.session.get('referral') }}{% endif %}',
-                    'scode': '{% if app is not null and app.session.isStarted %}{{ app.session.get('scode') }}{% endif %}'
-                },
-                'user': {
-                    'id': {% if app.user is null or not app.user %}undefined{% else %}'{{ app.user.id }}'{% endif %}
-                },
-                'intercom': {
-                    {# TODO: transition from intercom.user_id to user.id #}
-                    'user_id': {% if app.user is null or not app.user %}null{% else %}'{{ app.user.id }}'{% endif %},
-                    'user_hash': {% if app.user is null or not app.user %}null{% else %}'{{ intercom(app.user) }}'{% endif %},
-                    'email':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.email }}'{% endif %},
-                    'name':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.name }}'{% endif %},
-                    'created_at':  {% if app.user is null or not app.user %}null{% else %}'{{ app.user.created|date('U') }}'{% endif %},
-                    'quote_url': '{% if app.session.get('quote_url') %}{{ app.session.get('quote_url') }}{% endif %}',
-                    'enabled': {% block intercom_enabled %}true{% endblock %}
-                }{% block gtm_data %}{% endblock %}
+                {% if (app is not defined or app is null) or
+                    ( (app.user is not defined or app.user is null or not app.user) or
+                      (app.session.isStarted and is_granted('ROLE_PREVIOUS_ADMIN'))
+                    )
+                %}
+                    'branch': {
+                        'banner': true,
+                        'referral': '{{ session_referral }}',
+                        'scode': '{{ session_scode }}'
+                    },
+                    'user': {
+                        'id': undefined,
+                    },
+                    'intercom': {
+                        'user_id': null,
+                        'user_hash': null,
+                        'email': null,
+                        'name':  null,
+                        'created_at': null,
+                        'quote_url': '{{ session_quote_url }}',
+                        'enabled': {% if intercom_enabled %}true{% else %}false{% endif %}
+                    }
+                {% else %}
+                    'branch': {
+                        'banner': false,
+                        'referral': '{{ session_referral }}',
+                        'scode': '{{ session_scode }}'
+                    },
+                    'user': {
+                        'id': '{{ app.user.id }}'
+                    },
+                    'intercom': {
+                        'user_id': '{{ app.user.id }}',
+                        'user_hash': '{{ intercom(app.user) }}',
+                        'email': '{{ app.user.email }}',
+                        'name': '{{ app.user.name }}',
+                        'created_at': '{{ app.user.created|date('U') }}',
+                        'quote_url': '{{ session_quote_url }}',
+                        'enabled': {% if intercom_enabled %}true{% else %}false{% endif %}
+                    }
+                {% endif %}
+                {% block gtm_data %}{% endblock %}
             }];
         </script>
 
