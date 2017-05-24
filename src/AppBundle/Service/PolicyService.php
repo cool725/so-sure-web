@@ -779,14 +779,29 @@ class PolicyService
     public function resendPolicyEmail(Policy $policy)
     {
         $files = [];
+        // make sure we get the most recent version of each file type as there may be more than 1 if regenerated
         foreach ($policy->getPolicyFiles() as $file) {
-            if ($file instanceof PolicyScheduleFile ||
-                $file instanceof PolicyTermsFile) {
-                $files[] = $this->downloadS3($file);
+            $add = false;
+            $class = get_class($file);
+            if ($file instanceof PolicyScheduleFile || $file instanceof PolicyTermsFile) {
+                if (!isset($files[$class])) {
+                    $add = true;
+                } elseif ($file->getCreated() > $files[$class]->getCreated()) {
+                    $add = true;
+                }
+            }
+
+            if ($add) {
+                $files[$class] = $file;
             }
         }
 
-        $this->newPolicyEmail($policy, $files);
+        $attachments = [];
+        foreach ($files as $file) {
+            $attachments[] = $this->downloadS3($file);
+        }
+
+        $this->newPolicyEmail($policy, $attachments, 'bcc@so-sure.com');
     }
 
     public function downloadS3(S3File $s3file)
@@ -808,7 +823,7 @@ class PolicyService
     /**
      * @param Policy $policy
      */
-    public function newPolicyEmail(Policy $policy, $attachmentFiles = null)
+    public function newPolicyEmail(Policy $policy, $attachmentFiles = null, $bcc = null)
     {
         try {
             $this->mailer->sendTemplate(
@@ -818,7 +833,8 @@ class PolicyService
                 ['policy' => $policy],
                 'AppBundle:Email:policy/new.txt.twig',
                 ['policy' => $policy],
-                $attachmentFiles
+                $attachmentFiles,
+                $bcc
             );
             $policy->setLastEmailed(new \DateTime());
         } catch (\Exception $e) {
