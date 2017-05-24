@@ -1,0 +1,28 @@
+// phoneLanding.scss
+
+@import "../mixins";
+@import "../common/paletteNew";
+
+body {
+    background-color: $white;
+}
+
+.navbar {
+    background-color: $white;
+}
+
+.phone {
+    margin-bottom: 30px;
+    text-align: center;
+
+    @include breakpoint(tablet) {
+        margin-bottom: 60px;
+    }
+}
+
+.notmyphone-link {
+
+    @include breakpoint(tablet) {
+        margin-top: 50%;
+    }
+}
