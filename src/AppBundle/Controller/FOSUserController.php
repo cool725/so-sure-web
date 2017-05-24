@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use FOS\UserBundle\Model\UserInterface;
 
 use FOS\UserBundle\Event\FilterUserResponseEvent;
@@ -43,6 +45,12 @@ class FOSUserController extends ResettingController
             throw new NotFoundHttpException(sprintf(
                 'The user with "confirmation token" does not exist for value "%s"',
                 $token
+            ));
+        }
+
+        if (!$user->isEnabled()) {
+            throw new AccessDeniedHttpException(sprintf(
+               'Please contact support@wearesosure.com to enable this account' 
             ));
         }
 

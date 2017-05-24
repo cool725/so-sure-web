@@ -70,6 +70,8 @@ use AppBundle\Form\Type\ImeiUploadFileType;
 use AppBundle\Form\Type\ScreenUploadFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
 use AppBundle\Form\Type\UserDetailType;
+use AppBundle\Form\Type\UserEmailType;
+use AppBundle\Form\Type\UserPermissionType;
 use AppBundle\Exception\RedirectException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -675,6 +677,12 @@ class AdminEmployeeController extends BaseController
         $userDetailForm = $this->get('form.factory')
             ->createNamedBuilder('user_detail_form', UserDetailType::class, $user)
             ->getForm();
+        $userEmailForm = $this->get('form.factory')
+            ->createNamedBuilder('user_email_form', UserEmailType::class, $user)
+            ->getForm();
+        $userPermissionForm = $this->get('form.factory')
+            ->createNamedBuilder('user_permission_form', UserPermissionType::class, $user)
+            ->getForm();
 
         $policyData = new SalvaPhonePolicy();
         $policyForm = $this->get('form.factory')
@@ -752,6 +760,28 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('user_email_form')) {
+                $userEmailForm->handleRequest($request);
+                if ($userEmailForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Changed User Email'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
+            } elseif ($request->request->has('user_permission_form')) {
+                $userPermissionForm->handleRequest($request);
+                if ($userPermissionForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Updated User Permissions'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
             }
         }
 
@@ -760,6 +790,8 @@ class AdminEmployeeController extends BaseController
             'reset_form' => $resetForm->createView(),
             'policy_form' => $policyForm->createView(),
             'user_detail_form' => $userDetailForm->createView(),
+            'user_email_form' => $userEmailForm->createView(),
+            'user_permission_form' => $userPermissionForm->createView(),
         ];
     }
 
