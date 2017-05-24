@@ -572,6 +572,15 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/samsung-galaxy-insurance", name="samsung_galaxy_insurance")
+     * @Template
+     */
+    public function samsungGalaxyInsurance()
+    {
+        return array();
+    }
+
+    /**
      * @Route("/samsung-s7-insured-with-your-mobile-network", name="samsung_s7_insured_with_your_mobile_network")
      * @Route("/google-pixel-insured-with-your-mobile-network", name="google_pixel_insured_with_your_mobile_network")
      * @Route("/iphone-SE-insured-with-your-mobile-network", name="iphone_SE_insured_with_your_mobile_network")
