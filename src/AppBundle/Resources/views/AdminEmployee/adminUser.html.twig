@@ -22,6 +22,10 @@
                     <td>
                         {{ form_start(reset_form) }}
                         {{ form_widget(reset_form.reset, {'label': 'Send reset email', 'attr': {'class': 'btn btn-danger'}}) }}
+                        {{ form_end(reset_form) }}
+
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userEmailModal"
+                            ><i class="fa fa-edit"></i> Change Email Address</button>
                     </td>
                 </tr>
                 <tr>
@@ -32,8 +36,8 @@
                         {% endif %}
                     </td>
                     <td>
-                            <button type="button" class="btn btn-info {% if user.hasActivePolicy %}disabled{% endif %}" data-toggle="modal" data-target="#userDetailModal"
-                               {% if user.hasActivePolicy %}title="Active policy - no changes allowed" disabled{% endif %} ><i class="fa fa-edit"></i> Edit User Details</button>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userDetailModal"
+                            ><i class="fa fa-edit"></i> Edit User Details</button>
                     </td>
                 </tr>
                 <tr>
@@ -41,16 +45,16 @@
                     <td>{% if user.birthday %}{{ user.birthday|date('d M Y', 'Europe/London') }}{% else %}Not set{% endif %}
                     </td>
                     <td>
-                            <button type="button" class="btn btn-info {% if user.hasActivePolicy %}disabled{% endif %}" data-toggle="modal" data-target="#userDetailModal"
-                               {% if user.hasActivePolicy %}title="Active policy - no changes allowed" disabled{% endif %} ><i class="fa fa-edit"></i> Edit User Details</button>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userDetailModal"
+                            ><i class="fa fa-edit"></i> Edit User Details</button>
                     </td>
                 </tr>
                 <tr>
                     <td>Mobile</td>
                     <td>{{ user.mobileNumber }}</td>
                     <td>
-                            <button type="button" class="btn btn-info {% if user.hasActivePolicy %}disabled{% endif %}" data-toggle="modal" data-target="#userDetailModal"
-                               {% if user.hasActivePolicy %}title="Active policy - no changes allowed" disabled{% endif %} ><i class="fa fa-edit"></i> Edit User Details</button>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userDetailModal"
+                            ><i class="fa fa-edit"></i> Edit User Details</button>
 
                     </td>
                 </tr>
@@ -62,10 +66,15 @@
                 <tr>
                     <td>User Status</td>
                     <td>
-                        {% if user.locked %}locked{% elseif user.enabled %}enabled{% else %}disabled{%endif %}
+                        {% if user.locked and not user.enabled %}locked / disabled
+                        {% elseif user.locked %}locked
+                        {% elseif not user.enabled %}disabled
+                        {% else %}enabled
+                        {%endif %}
                     </td>
                     <td>
-                        <i class="fa fa-warning" title="TODO: Enable/Disable/Lock"></i>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userPermissionModal"
+                            ><i class="fa fa-edit"></i> Edit User Permissions</button>
                     </td>
                 </tr>
                 <tr>
@@ -156,11 +165,13 @@
                         {{ form_label(user_detail_form.firstName) }}
                         {{ form_errors(user_detail_form.firstName) }}
                         {{ form_widget(user_detail_form.firstName) }}
+                        <strong>WARNING! Changing this field will trigger a salva policy update!</strong>
                     </div>
                     <div class="form-group">
                         {{ form_label(user_detail_form.lastName) }}
                         {{ form_errors(user_detail_form.lastName) }}
                         {{ form_widget(user_detail_form.lastName) }}
+                        <strong>WARNING! Changing this field will trigger a salva policy update!</strong>
                     </div>
                     <div class="form-group">
                         {{ form_label(user_detail_form.birthday) }}
@@ -183,4 +194,64 @@
       </div>
     </div>
 
+    <div class="modal fade" id="userEmailModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+            {{ form_start(user_email_form )}}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Change User Email</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(user_email_form.email) }}
+                        {{ form_errors(user_email_form.email) }}
+                        {{ form_widget(user_email_form.email) }}
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+                {{ form_widget(user_email_form.update, {'label': 'Change User Email Address', 'attr': {'class': 'btn btn-success'}}) }}
+          </div>
+          {{ form_end(user_email_form )}}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="userPermissionModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+            {{ form_start(user_permission_form )}}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Change User Permissions</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(user_permission_form.enabled) }}
+                        {{ form_errors(user_permission_form.enabled) }}
+                        {{ form_widget(user_permission_form.enabled) }}
+                        <strong>Admin enable/disable - Will disable user logging in</strong>
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(user_permission_form.locked) }}
+                        {{ form_errors(user_permission_form.locked) }}
+                        {{ form_widget(user_permission_form.locked) }}
+                        <strong>Too many login attempts - Will disable user from logging in until password reset</strong>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+                {{ form_widget(user_permission_form.update, {'label': 'Update User Permissions', 'attr': {'class': 'btn btn-success'}}) }}
+          </div>
+          {{ form_end(user_permission_form )}}
+        </div>
+      </div>
+    </div>
 {% endblock %}
