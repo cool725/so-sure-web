@@ -1,0 +1,16 @@
+// carousel.scss
+
+.carousel-control {
+	opacity: 1;
+	text-shadow: none;
+	color: $blue;
+
+	&:hover, &:focus, &:active {
+		color: $dark-blue;
+	}
+}
+
+.left.carousel-control,
+.right.carousel-control {
+	background: none;
+}
