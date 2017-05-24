@@ -28,7 +28,13 @@
         <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_policy.user.email }}">User Policy Invalid</a> <b>(auto impersonate {{ cancelled_policy.user.email }}</b>
     </li>
     <li>
+        <a href="{{ url('user_home') }}?_impersonate={{ valid_multiple_policy.user.email }}">User Home - Multiple Policy</a> <b>(auto impersonate {{ valid_multiple_policy.user.email }})</b>
+    </li>
+    <li>
         <a href="{{ url('user_home') }}?_impersonate={{ valid_policy.user.email }}">User Home</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
+    </li>
+    <li>
+        <a href="{{ url('user_home') }}?_impersonate={{ invitation.inviter.email }}">User Home - Sent Invitation</a> <b>(auto impersonate {{ invitation.inviter.email }})</b>
     </li>
     <li>
         <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">User Welcome</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
@@ -54,13 +60,13 @@
         <a href="/_error/403">403</a>
     </li>
     <li>
-        <a href="/_error/403">404</a>
+        <a href="/_error/404">404</a>
     </li>
     <li>
-        <a href="/_error/403">500</a>
+        <a href="/_error/500">500</a>
     </li>
     <li>
-        <a href="/_error/403">503</a>
+        <a href="/_error/503">503</a>
     </li>
 </ul>
 

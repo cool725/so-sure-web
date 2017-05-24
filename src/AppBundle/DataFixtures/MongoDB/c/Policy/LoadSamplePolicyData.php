@@ -49,6 +49,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         foreach ($users as $user) {
             $this->newPolicy($manager, $user, $count);
             $count++;
+
+            // add a second policy for some users
+            $rand = rand(1, 5);
+            if ($rand == 1) {
+                $this->newPolicy($manager, $user, $count);
+                $count++;
+            }
         }
 
         foreach ($users as $user) {

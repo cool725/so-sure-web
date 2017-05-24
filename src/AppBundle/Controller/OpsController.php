@@ -105,6 +105,12 @@ class OpsController extends BaseController
             }
             $position--;
         }
+        foreach ($validPolicies as $validMultiplePolicy) {
+            $user = $validMultiplePolicy->getUser();
+            if (count($user->getValidPolicies(true)) > 1 && $user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+                break;
+            }
+        }
         $cancelledPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_CANCELLED]);
 
         return [
@@ -113,6 +119,7 @@ class OpsController extends BaseController
             'unpaid_policy' => $unpaidPolicy,
             'valid_policy' => $validPolicy,
             'cancelled_policy' => $cancelledPolicy,
+            'valid_multiple_policy' => $validMultiplePolicy,
         ];
     }
 
@@ -167,6 +174,8 @@ class OpsController extends BaseController
                 'nikkomsgchannel',
                 'www.bizographics.com',
                 'secure.adnxs.com',
+                'gb.api4load.com',
+                'af.adsloads.com',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 

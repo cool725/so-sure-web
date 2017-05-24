@@ -50,7 +50,7 @@ class FOSUserController extends ResettingController
 
         if (!$user->isEnabled()) {
             throw new AccessDeniedHttpException(sprintf(
-               'Please contact support@wearesosure.com to enable this account' 
+                'Please contact support@wearesosure.com to enable this account'
             ));
         }
 

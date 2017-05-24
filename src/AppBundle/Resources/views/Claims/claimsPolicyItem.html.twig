@@ -855,6 +855,7 @@
                         {{ form_label(bacs_form.amount) }} (£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }})
                         {{ form_errors(bacs_form.amount) }}
                         {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
+                        <strong>WARNING! - If not using a monthly or yearly amount, a manual addition to the bac payment commission in the database is required</strong>
                     </div>
                     <div class="form-group">
                         {{ form_label(bacs_form.reference) }}
