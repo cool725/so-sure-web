@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+
+{% block title %}so-sure - Samsung Galaxy Insurance
+{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
+    <meta name="keywords" content="mobile phone insurance, social insurance, samsung galaxy insurance"/>
+{% endblock %}
+
+{# {% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/jquery_lazyload/jquery.lazyload.js'
+    '@AppBundle/Resources/public/js/Default/corporate.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %} #}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/phoneLanding.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{# {% block nav %}{% endblock %} #}
+
+{% block body %}
+
+    <section class="section--pad">
+        <div class="container">
+
+            <div class="landing-title">
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <h1 class="text-center text-blue">
+                            {{ make|capitalize }} Insurance
+                        </h1>
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="samsung-galaxy-carousel" class="carousel slide landing-phones  visible-xs" data-ride="carousel" data-interval="false">
+
+                <!-- Wrapper for slides -->
+                <div class="carousel-inner" role="listbox">
+                    {% set first = true %}
+                    {% for phone in phones %}
+                    <div class="item {% if first %}active{% endif %}">
+                        <div class="phone">
+                            <img src="" alt="Phone" width="120" height="190">
+                            <h2 class="h4">{{ phone.make }} {{ phone.model }}</h2>
+                            <p>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</p>
+                            <a href="#" class="btn btn-blue">{{ phone.memory }}GB</a>
+                        </div>
+                    </div>
+                    {% set first = false %}
+                    {% endfor %}
+                    <div class="item">
+                        <p class="text-center notmyphone-link">Can't find your phone?<br> <a href="#">Click here</a></p>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <a class="left carousel-control" href="#samsung-galaxy-carousel" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="right carousel-control" href="#samsung-galaxy-carousel" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+
+            <div class="landing-phones hidden-xs">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+                        <div class="row">
+                    {% set first = true %}
+                    {% for phone in phones %}
+                            <div class="col-sm-4 col-md-3">
+                                <div class="phone">
+                                    <img src="" alt="Phone" width="120" height="190">
+                                    <h2 class="h4">{{ phone.make }} {{ phone.model }}</h2>
+                                    <p>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</p>
+                                    <a href="#" class="btn btn-blue">{{ phone.memory }}GB</a>
+                                </div>
+                            </div>
+                    {% endfor %}
+                            <div class="col-sm-4 col-md-3">
+                                <p class="text-center notmyphone-link">Can't find your phone?<br> <a href="#">Click here</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if make == "Samsung" %}
+            <div class="landing-copy">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <p>Samsung didn’t start getting serious about smartphones until they released the Samsung Galaxy S in 2010. While they had released earlier models - this was the first to really capture the imagination. The new phone used the Android operating system, had a top of the range processor and even a good quality camera.</p>
+                        <p>The phone has a devoted following and there are often clashes between them and fans of the iPhone. The two companies have had a heated rivalry over the past few years and are certainly intertwined.</p>
+                        <p>The Samsung Galaxy is a hugely reliable phone which offers you (nearly) all the features of the Apple iPhone. Synonymous with quality - Samsung always manufacture high-quality goods and the Galaxy series is no different.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </section>
+
+{% endblock %}
