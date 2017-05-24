@@ -95,6 +95,19 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
+     * @Route("/phone-insurance/{make}", name="quote_make", requirements={"make":"[a-zA-Z]+"})
+     * @Template
+     */
+    public function makeInsurance($make)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phones = $repo->findBy(['make' => $make, 'active' => true]);
+
+        return array('phones' => $phones, 'make' => $make);
+    }
+
+    /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
      *
