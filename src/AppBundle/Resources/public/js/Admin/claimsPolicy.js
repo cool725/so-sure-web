@@ -35,6 +35,9 @@ $('.confirm-resend-email').on("click",function() {
     return confirm('Are you sure you want to resend the Policy Welcome Email?');
 });
 
+$('.confirm-regenerate-schedule').on("click",function() {
+    return confirm('Are you sure you want to re-generate the Policy Schedule?');
+});
 
 $(document).ready(function(){
     $('[data-toggle="popover"]').popover();

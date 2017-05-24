@@ -386,6 +386,9 @@ class AdminEmployeeController extends BaseController
         $resendEmailForm = $this->get('form.factory')
             ->createNamedBuilder('resend_email_form')->add('resend', SubmitType::class)
             ->getForm();
+        $regeneratePolicyScheduleForm = $this->get('form.factory')
+            ->createNamedBuilder('regenerate_policy_schedule_form')->add('regenerate', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -646,6 +649,18 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('regenerate_policy_schedule_form')) {
+                $regeneratePolicyScheduleForm->handleRequest($request);
+                if ($regeneratePolicyScheduleForm->isValid()) {
+                    $policyService->generatePolicySchedule($policy);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Re-generated Policy Schedule'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -668,6 +683,7 @@ class AdminEmployeeController extends BaseController
             'usertoken_form' => $userTokenForm->createView(),
             'billing_form' => $billingForm->createView(),
             'resend_email_form' => $resendEmailForm->createView(),
+            'regenerate_policy_schedule_form' => $regeneratePolicyScheduleForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
