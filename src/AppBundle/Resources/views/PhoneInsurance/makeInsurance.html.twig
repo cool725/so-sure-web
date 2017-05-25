@@ -33,13 +33,15 @@
     <section class="section--pad">
         <div class="container">
 
-            <div class="landing-title">
+            <div class="landing-title text-center">
                 <div class="row">
                     <div class="col-md-12">
 
-                        <h1 class="text-center text-blue">
+                        <h1 class="text-blue">
                             {{ make|capitalize }} Insurance
                         </h1>
+
+                        <p class="lead">Select your model to get a quote</p>
 
                     </div>
                 </div>
@@ -52,13 +54,15 @@
                     {% set first = true %}
                     {% for phone in phones %}
                     <div class="item {% if first %}active{% endif %}">
-                        <div class="phone">
+                        <div class="phone thumbnail">
                             <img src="" alt="Phone" width="120" height="190">
-                            <h2 class="h4">{{ phone.make }} {{ phone.model }}</h2>
-                            <p>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</p>
-                            {% for mem, url in phone.mem %}
-                                <a href="{{ url }}" class="btn btn-blue">{{ mem }}GB</a>
-                            {% endfor %}
+                            <div class="caption">
+                                <h2 class="h4">{{ phone.model }}</h2>
+                                <p><small>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
+                                {% for mem, url in phone.mem %}
+                                    {# <a href="{{ url }}" class="btn btn-blue">{{ mem }}GB</a> #}
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                     {% set first = false %}
@@ -82,24 +86,47 @@
             <div class="landing-phones hidden-xs">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                        <div class="row">
-                    {% set first = true %}
-                    {% for phone in phones %}
-                            <div class="col-sm-4 col-md-3">
-                                <div class="phone">
-                                    <img src="" alt="Phone" width="120" height="190">
-                                    <h2 class="h4">{{ phone.make }} {{ phone.model }}</h2>
-                                    <p>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</p>
-                                    {% for mem, url in phone.mem %}
-                                        <a href="{{ url }}" class="btn btn-blue">{{ mem }}GB</a>
-                                    {% endfor %}
-                                </div>
+                        {% set first = true %}
+                        {% for phone in phones %}
+                            <div class="col-sm-4 col-md-4">
+                                {% if phone.mem|length <= 1 %}
+                                    <a href="#">
+                                        <div class="phone thumbnail">
+                                            <div class="phone-hover">
+                                                <div class="phone-hover--inner">
+                                                    <div class="mem-btns">
+                                                        <h4>Get quote <i class="fa fa-angle-right" aria-hidden="true"></i></h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <img src="" alt="Phone" width="120" height="190">
+                                            <div class="caption">
+                                                <h2 class="h4">{{ phone.model }}</h2>
+                                                <p><small>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                {% else %}
+                                    <div class="phone thumbnail">
+                                        <div class="phone-hover">
+                                            <div class="phone-hover--inner">
+                                                <div class="mem-btns">
+                                                    <p>Choose your storage for a quote:</p>
+                                                    {% for mem, url in phone.mem %}
+                                                        <a href="{{ url }}" class="btn btn-blue btn-block">{{ mem }}GB</a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <img src="" alt="Phone" width="120" height="190">
+                                        <div class="caption">
+                                            <h2 class="h4">{{ phone.model }}</h2>
+                                            <p><small>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
-                    {% endfor %}
-                            <div class="col-sm-4 col-md-3">
-                                <p class="text-center notmyphone-link">Can't find your phone?<br> <a href="#">Click here</a></p>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>

@@ -7,17 +7,64 @@ body {
     background-color: $white;
 }
 
+a {
+    &:hover {
+        text-decoration: none !important;
+    }
+}
+
 .navbar {
     background-color: $white;
 }
 
 .phone {
-    margin-bottom: 30px;
     text-align: center;
+}
 
-    @include breakpoint(tablet) {
-        margin-bottom: 60px;
+.phone.thumbnail {
+    position: relative;
+    border-color: transparent;
+    padding-top: 30px;
+
+    > img {
+        display: inline;
+        margin: 0;
+        height: 190px;
+        max-width: none;
     }
+}
+
+.phone-hover {
+    width: 100%; height: 100%;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    display: none;
+    opacity: 0;
+
+    // transition: background-color 0.5s ease-in-out;
+
+    background-color: rgba(153, 204, 255, 0.55);
+    border: 2px solid $light-blue;
+    @include border-radius(4px);
+
+    &--inner {
+        width: 100%; height: 100%;
+        display: table;
+
+        padding: 0 30px;
+    }
+
+    .mem-btns {
+        width: 100%; height: 100%;
+        display: table-cell;
+
+        vertical-align: middle;
+    }
+}
+
+.phone:hover .phone-hover {
+    display: block;
+    opacity: 1;
 }
 
 .notmyphone-link {
