@@ -38,6 +38,7 @@ use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
+use AppBundle\Service\IntercomService;
 
 class PhoneInsuranceController extends BaseController
 {
@@ -217,7 +218,7 @@ class PhoneInsuranceController extends BaseController
             ->getForm();
 
         $lead = new Lead();
-        $lead->setSource(Lead::SOURCE_BUY);
+        $lead->setSource(Lead::SOURCE_SAVE_QUOTE);
         $leadForm = $this->get('form.factory')
             ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
             ->getForm();
@@ -253,6 +254,8 @@ class PhoneInsuranceController extends BaseController
                     if (!$existingLead) {
                         $dm->persist($lead);
                         $dm->flush();
+                    } else {
+                        $lead = $existingLead;
                     }
                     $sevenDays = new \DateTime();
                     $sevenDays = $sevenDays->add(new \DateInterval('P7D'));
@@ -269,6 +272,12 @@ class PhoneInsuranceController extends BaseController
                     $this->get('app.mixpanel')->queuePersonProperties([
                         '$email' => $lead->getEmail()
                     ], true);
+                    $this->get('app.intercom')->queueLead($lead, IntercomService::QUEUE_EVENT_SAVE_QUOTE, [
+                        'quoteUrl' => $session->get('quote_url'),
+                        'phone' => $phone->__toString(),
+                        'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                        'expires' => $sevenDays,
+                    ]);
 
                     $this->addFlash('success', sprintf(
                         "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."

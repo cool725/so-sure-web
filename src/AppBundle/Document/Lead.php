@@ -13,9 +13,11 @@ class Lead
 {
     use PhoneTrait;
 
+    // Add to source options below
     const SOURCE_TEXT_ME = 'text-me';
     const SOURCE_LAUNCH_USA = 'launch-usa';
     const SOURCE_BUY = 'buy';
+    const SOURCE_SAVE_QUOTE = 'save-quote';
 
     // Lead Source is used in User & Policy
     const LEAD_SOURCE_INVITATION = 'invitation';
@@ -45,7 +47,7 @@ class Lead
     protected $email;
 
     /**
-     * @Assert\Choice({"text-me", "launch-usa", "buy"}, strict=true)
+     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;

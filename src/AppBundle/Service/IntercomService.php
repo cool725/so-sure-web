@@ -48,6 +48,8 @@ class IntercomService
     const QUEUE_EVENT_CLAIM_APPROVED = 'claim-approved';
     const QUEUE_EVENT_CLAIM_SETTLED = 'claim-settled';
 
+    const QUEUE_EVENT_SAVE_QUOTE = 'quote-saved';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -272,11 +274,12 @@ class IntercomService
         return $resp;
     }
 
-    public function updateLead(Lead $lead)
+    public function updateLead(Lead $lead, $data = null)
     {
-        $data = array(
-            'email' => $lead->getEmail(),
-        );
+        if (!$data) {
+            $data = [];
+        }
+        $data['email'] = $lead->getEmail();
         if ($lead->getIntercomId()) {
             $data['id'] = $lead->getIntercomId();
         }
@@ -309,6 +312,26 @@ class IntercomService
     {
         $user = $claim->getPolicy()->getUser();
         $this->sendEvent($user, $event, []);
+    }
+
+    public function sendSaveQuoteEvent(Lead $lead, $event, $additional)
+    {
+        $data = [];
+        if ($additional && isset($additional['quoteUrl'])) {
+            $data['custom_attributes']['Saved Quote Url'] = $additional['quoteUrl'];
+        }
+        if ($additional && isset($additional['phone'])) {
+            $data['custom_attributes']['Saved Quote Phone'] = $additional['phone'];
+        }
+        if ($additional && isset($additional['price'])) {
+            $data['custom_attributes']['Saved Quote Price'] = $additional['price'];
+        }
+        if ($additional && isset($additional['expires'])) {
+            $data['custom_attributes']['Saved Quote Expires'] = $additional['expires']->getTimestamp();
+        }
+        $this->sendLeadEvent($lead, $event, []);
+        // Needs to go on the lead object in order to be able to access property via intercom messaging
+        $this->updateLead($lead, $data);
     }
 
     public function sendInvitationEvent(Invitation $invitation, $event)
@@ -368,6 +391,23 @@ class IntercomService
         $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
     }
 
+    private function sendLeadEvent(Lead $lead, $event, $data, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $data['event_name'] = $event;
+        $data['created_at'] = $date->getTimestamp();
+        $data['email'] = $lead->getEmail();
+        if ($lead->getIntercomId()) {
+            $data['id'] = $lead->getIntercomId();
+        }
+
+        $resp = $this->client->events->create($data);
+        $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
+    }
+
     public function process($max)
     {
         $count = 0;
@@ -400,6 +440,12 @@ class IntercomService
                     }
 
                     $this->updateLead($this->getLead($data['leadId']));
+                } elseif ($action == self::QUEUE_EVENT_SAVE_QUOTE) {
+                    if (!isset($data['leadId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->sendSaveQuoteEvent($this->getLead($data['leadId']), $action, $data['additional']);
                 } elseif ($action == self::QUEUE_EVENT_CLAIM_CREATED ||
                           $action == self::QUEUE_EVENT_CLAIM_APPROVED ||
                           $action == self::QUEUE_EVENT_CLAIM_SETTLED) {
