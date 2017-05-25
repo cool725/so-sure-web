@@ -58,19 +58,18 @@
                             <img src="" alt="Phone" width="120" height="190">
                             <div class="caption">
                                 <h2 class="h4">{{ phone.model }}</h2>
-                                <p><small>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
+                                <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
                                 {% for mem, url in phone.mem %}
-                                    {# <a href="{{ url }}" class="btn btn-blue">{{ mem }}GB</a> #}
+                                    <a href="{{ url }}" class="btn btn-blue">{{ mem }}GB</a>
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
                     {% set first = false %}
                     {% endfor %}
-                    <div class="item">
-                        <p class="text-center notmyphone-link">Can't find your phone?<br> <a href="#">Click here</a></p>
-                    </div>
                 </div>
+
+                <p class="lead text-center">Can't find your phone? <a href="#">Click here</a></p>
 
                 <!-- Controls -->
                 <a class="left carousel-control" href="#samsung-galaxy-carousel" role="button" data-slide="prev">
@@ -102,7 +101,7 @@
                                             <img src="" alt="Phone" width="120" height="190">
                                             <div class="caption">
                                                 <h2 class="h4">{{ phone.model }}</h2>
-                                                <p><small>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
+                                                <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
                                             </div>
                                         </div>
                                     </a>
@@ -121,12 +120,13 @@
                                         <img src="" alt="Phone" width="120" height="190">
                                         <div class="caption">
                                             <h2 class="h4">{{ phone.model }}</h2>
-                                            <p><small>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
+                                            <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
                                         </div>
                                     </div>
                                 {% endif %}
                             </div>
                         {% endfor %}
+                        <p class="lead text-center">Can't find your phone? <a href="#">Click here</a></p>
                     </div>
                 </div>
             </div>

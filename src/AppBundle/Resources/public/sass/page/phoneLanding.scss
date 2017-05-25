@@ -66,10 +66,3 @@ a {
     display: block;
     opacity: 1;
 }
-
-.notmyphone-link {
-
-    @include breakpoint(tablet) {
-        margin-top: 50%;
-    }
-}
