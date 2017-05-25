@@ -10,7 +10,7 @@ class DaviesClaim
     use CurrencyTrait;
     use DateTrait;
 
-    const SHEET_NAME_V6 = 'Cumulative';
+    const SHEET_NAME_V6 = 'Created - Cumulative';
     const SHEET_NAME_V1 = 'Original';
     const CLIENT_NAME = "So-Sure -Mobile";
     const COLUMN_COUNT_V1 = 31;
