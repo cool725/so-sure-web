@@ -347,6 +347,7 @@ nelmio_security:
                 - http://maxcdn.bootstrapcdn.com
                 - https://*.iubenda.com
                 - https://*.googletagmanager.com
+                - https://*.googlesyndication.com
                 - 'data:'
             child-src:
                 - 'self'

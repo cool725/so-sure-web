@@ -183,6 +183,17 @@ class OpsController extends BaseController
             }
         }
 
+        // any violation on http are not relivant - should only be https
+        if (isset($violationReport['csp-report']['document-uri'])) {
+            $host = strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_HOST));
+            $scheme = strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_SCHEME));
+            if ($scheme == "http" && $host == "wearesosure.com") {
+                $logger->debug(sprintf('Content-Security-Policy called with non-https host: %s', $host));
+
+                return new Response('', 204);
+            }
+        }
+
         $logger->warning(
             'Content-Security-Policy Violation Reported',
             $violationReport
