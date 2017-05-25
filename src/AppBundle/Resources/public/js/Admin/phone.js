@@ -81,3 +81,18 @@ $('.phone-active').click(function() {
         });
     }
 });
+
+$('.phone-highlight').click(function() {
+    if (confirm('Are you sure you want to make this phone (un)highlighted?')) {
+        var url = $(this).data('highlight');
+        var token = $(this).data('token');
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: { token: token },
+            success: function(result) {
+                window.location = window.location;
+            }
+        });
+    }
+});

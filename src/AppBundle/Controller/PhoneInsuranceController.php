@@ -101,9 +101,27 @@ class PhoneInsuranceController extends BaseController
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $phones = $repo->findBy(['make' => $make, 'active' => true]);
+        $phones = $repo->findBy(
+            ['make' => $make, 'active' => true, 'highlight' => true],
+            ['releaseDate' => 'desc', 'initialPrice' => 'desc']
+        );
+        $phonesMem = [];
+        foreach ($phones as $phone) {
+            if (!isset($phonesMem[$phone->getName()])) {
+                $phonesMem[$phone->getName()] = [
+                    'make' => $phone->getMake(),
+                    'model' => $phone->getModel(),
+                    'currentPhonePrice' => $phone->getCurrentPhonePrice(),
+                ];
+            }
+            $phonesMem[$phone->getName()]['mem'][$phone->getMemory()] = $this->generateUrl(
+                'quote_make_model_memory',
+                ['make' => $phone->getMake(), 'model' => $phone->getModel(), 'memory' => $phone->getMemory()]
+            );
+            ksort($phonesMem[$phone->getName()]['mem']);
+        }
 
-        return array('phones' => $phones, 'make' => $make);
+        return array('phones' => $phonesMem, 'make' => $make);
     }
 
     /**

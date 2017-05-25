@@ -206,6 +206,12 @@ class Phone
      */
     protected $funFacts;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $highlight;
+
     public function __construct()
     {
     }
@@ -433,6 +439,11 @@ class Phone
         return sprintf('%s %s %sGB', $this->getMake(), $this->getEncodedModel(), $this->getMemory());
     }
 
+    public function getName()
+    {
+        return sprintf('%s %s', $this->getMake(), $this->getModel());
+    }
+
     public function getDevices()
     {
         return $this->devices;
@@ -543,6 +554,16 @@ class Phone
     public function setFunFacts($funFacts)
     {
         $this->funFacts = $funFacts;
+    }
+
+    public function isHighlight()
+    {
+        return $this->highlight;
+    }
+
+    public function setHighlight($highlight)
+    {
+        $this->highlight = $highlight;
     }
 
     public function getMonthAge()
