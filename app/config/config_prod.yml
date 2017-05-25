@@ -40,17 +40,15 @@ assetic:
 
 monolog:
     handlers:
-        swift:
-            type:       swift_mailer
-            from_email: 'alert@so-sure.com'
-            to_email:   'alert@so-sure.com'
-            # or list of recipients
-            # to_email:   ['dev1@example.com', 'dev2@example.com', ...]
-            subject:    'Prod Error! %%message%%'
-            level:      warning
-            channels: ['!event']
-            formatter:  monolog.formatter.html
-            content_type: text/html
+        #swift:
+        #    type:       swift_mailer
+        #    from_email: 'alert@so-sure.com'
+        #    to_email:   'alert@so-sure.com'
+        #    subject:    'Prod Error! %%message%%'
+        #    level:      warning
+        #    channels: ['!event']
+        #    formatter:  monolog.formatter.html
+        #    content_type: text/html
         rollbar:
             id: "app.logger.rollbar"
             formatter: "app.logger.lineformatter"
