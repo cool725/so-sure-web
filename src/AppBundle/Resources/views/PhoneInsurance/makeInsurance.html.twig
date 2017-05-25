@@ -56,7 +56,9 @@
                             <img src="" alt="Phone" width="120" height="190">
                             <h2 class="h4">{{ phone.make }} {{ phone.model }}</h2>
                             <p>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</p>
-                            <a href="#" class="btn btn-blue">{{ phone.memory }}GB</a>
+                            {% for mem, url in phone.mem %}
+                                <a href="{{ url }}" class="btn btn-blue">{{ mem }}GB</a>
+                            {% endfor %}
                         </div>
                     </div>
                     {% set first = false %}
@@ -88,7 +90,9 @@
                                     <img src="" alt="Phone" width="120" height="190">
                                     <h2 class="h4">{{ phone.make }} {{ phone.model }}</h2>
                                     <p>From £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</p>
-                                    <a href="#" class="btn btn-blue">{{ phone.memory }}GB</a>
+                                    {% for mem, url in phone.mem %}
+                                        <a href="{{ url }}" class="btn btn-blue">{{ mem }}GB</a>
+                                    {% endfor %}
                                 </div>
                             </div>
                     {% endfor %}
