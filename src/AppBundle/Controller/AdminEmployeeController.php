@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\Salva;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
@@ -70,6 +71,8 @@ use AppBundle\Form\Type\ImeiUploadFileType;
 use AppBundle\Form\Type\ScreenUploadFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
 use AppBundle\Form\Type\UserDetailType;
+use AppBundle\Form\Type\UserEmailType;
+use AppBundle\Form\Type\UserPermissionType;
 use AppBundle\Exception\RedirectException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -350,6 +353,7 @@ class AdminEmployeeController extends BaseController
         $bacsPayment = new BacsPayment();
         $bacsPayment->setDate(new \DateTime());
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacsPayment)
             ->getForm();
@@ -381,6 +385,9 @@ class AdminEmployeeController extends BaseController
             ->getForm();
         $resendEmailForm = $this->get('form.factory')
             ->createNamedBuilder('resend_email_form')->add('resend', SubmitType::class)
+            ->getForm();
+        $regeneratePolicyScheduleForm = $this->get('form.factory')
+            ->createNamedBuilder('regenerate_policy_schedule_form')->add('regenerate', SubmitType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -517,6 +524,23 @@ class AdminEmployeeController extends BaseController
             } elseif ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
+                    if ($this->areEqualToTwoDp(
+                        $bacsPayment->getAmount(),
+                        $policy->getPremium()->getMonthlyPremiumPrice()
+                    )) {
+                        $bacsPayment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+                    } elseif ($this->areEqualToTwoDp(
+                        $bacsPayment->getAmount(),
+                        $policy->getPremium()->getYearlyPremiumPrice()
+                    )) {
+                        $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+                    } else {
+                        $this->get('logger')->warning(sprintf(
+                            'Unable to determine commission on bacs payment for policy %s',
+                            $policy->getId()
+                        ));
+                    }
+
                     $policy->addPayment($bacsPayment);
                     $dm->flush();
                     $this->addFlash(
@@ -625,6 +649,18 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('regenerate_policy_schedule_form')) {
+                $regeneratePolicyScheduleForm->handleRequest($request);
+                if ($regeneratePolicyScheduleForm->isValid()) {
+                    $policyService->generatePolicySchedule($policy);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Re-generated Policy Schedule'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -647,6 +683,7 @@ class AdminEmployeeController extends BaseController
             'usertoken_form' => $userTokenForm->createView(),
             'billing_form' => $billingForm->createView(),
             'resend_email_form' => $resendEmailForm->createView(),
+            'regenerate_policy_schedule_form' => $regeneratePolicyScheduleForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -674,6 +711,12 @@ class AdminEmployeeController extends BaseController
             ->getForm();
         $userDetailForm = $this->get('form.factory')
             ->createNamedBuilder('user_detail_form', UserDetailType::class, $user)
+            ->getForm();
+        $userEmailForm = $this->get('form.factory')
+            ->createNamedBuilder('user_email_form', UserEmailType::class, $user)
+            ->getForm();
+        $userPermissionForm = $this->get('form.factory')
+            ->createNamedBuilder('user_permission_form', UserPermissionType::class, $user)
             ->getForm();
 
         $policyData = new SalvaPhonePolicy();
@@ -752,6 +795,28 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('user_email_form')) {
+                $userEmailForm->handleRequest($request);
+                if ($userEmailForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Changed User Email'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
+            } elseif ($request->request->has('user_permission_form')) {
+                $userPermissionForm->handleRequest($request);
+                if ($userPermissionForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Updated User Permissions'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
             }
         }
 
@@ -760,6 +825,8 @@ class AdminEmployeeController extends BaseController
             'reset_form' => $resetForm->createView(),
             'policy_form' => $policyForm->createView(),
             'user_detail_form' => $userDetailForm->createView(),
+            'user_email_form' => $userEmailForm->createView(),
+            'user_permission_form' => $userPermissionForm->createView(),
         ];
     }
 

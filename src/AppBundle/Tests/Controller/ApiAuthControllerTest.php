@@ -1862,6 +1862,26 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
     }
 
+    public function testNewPolicyJudopayMissingReceipt()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyJudopayMissingReceipt', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '',
+            'card_token' => '',
+            'receipt_id' => '',
+        ]]);
+        $policyData = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
     public function testNewMulitplePolicyJudopayOk()
     {
         $user = self::createUser(

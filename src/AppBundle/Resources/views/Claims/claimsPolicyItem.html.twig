@@ -312,7 +312,7 @@
                     {% for file in policy.policyFiles %}
                     <tr>
                         <td>{{ file.fileType }}</td>
-                        <td><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a></td>
+                        <td><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Generated {{ file.created|date }})</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -642,7 +642,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Mobile</td>
+                    <td>Mobile User Token</td>
                     <td>
                         {% if policy.user.token %}
                             {% set len = policy.user.token|length %}
@@ -686,6 +686,16 @@
                         {{ form_widget(resend_email_form.resend, {'label': 'Resend Email', 'attr': {'class': 'btn btn-danger confirm-resend-email'}}) }}
                         {{ form_end(resend_email_form) }}
                       </td>
+                </tr>
+                <tr>
+                    <td>
+                        Regenerate Policy Schedule<br />(Name change, etc)
+                    </td>
+                    <td>
+                        {{ form_start(regenerate_policy_schedule_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(regenerate_policy_schedule_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-regenerate-schedule'}}) }}
+                        {{ form_end(regenerate_policy_schedule_form) }}
+                    </td>
                 </tr>
             </table>
         </div>
@@ -845,6 +855,7 @@
                         {{ form_label(bacs_form.amount) }} (£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }})
                         {{ form_errors(bacs_form.amount) }}
                         {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
+                        <strong>WARNING! - If not using a monthly or yearly amount, a manual addition to the bac payment commission in the database is required</strong>
                     </div>
                     <div class="form-group">
                         {{ form_label(bacs_form.reference) }}

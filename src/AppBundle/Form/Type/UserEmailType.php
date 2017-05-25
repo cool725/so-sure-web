@@ -14,21 +14,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\OptOut\EmailOptOut;
 
-class UserDetailType extends AbstractType
+class UserEmailType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $years = [];
-        $now = new \DateTime();
-        for ($year = (int) $now->format('Y'); $year >= $now->format('Y') - AgeValidator::MAX_AGE; $year--) {
-            $years[] = $year;
-        }
-
         $builder
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('birthday', DateType::class)
-            ->add('mobileNumber', TextType::class)
+            ->add('email', EmailType::class)
             ->add('update', SubmitType::class)
         ;
     }
