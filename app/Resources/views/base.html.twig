@@ -10,15 +10,13 @@
 
         {% block stylesheets %}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% stylesheets output='css/*.css'
-                    'components/cookieconsent/cookieconsent.min.css'
+                {% stylesheets output='css/*.css' filter='uglifycss' filter='cssrewrite'
                     '@AppBundle/Resources/public/sass/mainNew.scss'
                 %}
                 <link rel="stylesheet" href="{{ asset_url }}">
                 {% endstylesheets %}
             {% else %}
-                {% stylesheets output='css/*.css'
-                    'components/cookieconsent/cookieconsent.min.css'
+                {% stylesheets output='css/*.css' filter='uglifycss' filter='cssrewrite'
                     '@AppBundle/Resources/public/sass/main.scss'
                 %}
                 <link rel="stylesheet" href="{{ asset_url }}">
