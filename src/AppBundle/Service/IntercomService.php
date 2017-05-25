@@ -274,11 +274,12 @@ class IntercomService
         return $resp;
     }
 
-    public function updateLead(Lead $lead)
+    public function updateLead(Lead $lead, $data = null)
     {
-        $data = array(
-            'email' => $lead->getEmail(),
-        );
+        if (!$data) {
+            $data = [];
+        }
+        $data['email'] = $lead->getEmail();
         if ($lead->getIntercomId()) {
             $data['id'] = $lead->getIntercomId();
         }
@@ -317,12 +318,20 @@ class IntercomService
     {
         $data = [];
         if ($additional && isset($additional['quoteUrl'])) {
-            $data['metadata']['Quote Url'] = $additional['quoteUrl'];
+            $data['custom_attributes']['Saved Quote Url'] = $additional['quoteUrl'];
         }
         if ($additional && isset($additional['phone'])) {
-            $data['metadata']['Phone'] = $additional['phone'];
+            $data['custom_attributes']['Saved Quote Phone'] = $additional['phone'];
         }
-        $this->sendLeadEvent($lead, $event, $data);
+        if ($additional && isset($additional['price'])) {
+            $data['custom_attributes']['Saved Quote Price'] = $additional['price'];
+        }
+        if ($additional && isset($additional['expires'])) {
+            $data['custom_attributes']['Saved Quote Expires'] = $additional['expires']->getTimestamp();
+        }
+        $this->sendLeadEvent($lead, $event, []);
+        // Needs to go on the lead object in order to be able to access property via intercom messaging
+        $this->updateLead($lead, $data);
     }
 
     public function sendInvitationEvent(Invitation $invitation, $event)

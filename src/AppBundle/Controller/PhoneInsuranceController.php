@@ -275,6 +275,8 @@ class PhoneInsuranceController extends BaseController
                     $this->get('app.intercom')->queueLead($lead, IntercomService::QUEUE_EVENT_SAVE_QUOTE, [
                         'quoteUrl' => $session->get('quote_url'),
                         'phone' => $phone->__toString(),
+                        'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                        'expires' => $sevenDays,
                     ]);
 
                     $this->addFlash('success', sprintf(
