@@ -48,6 +48,8 @@ class IntercomService
     const QUEUE_EVENT_CLAIM_APPROVED = 'claim-approved';
     const QUEUE_EVENT_CLAIM_SETTLED = 'claim-settled';
 
+    const QUEUE_EVENT_SAVE_QUOTE = 'quote-saved';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -311,6 +313,18 @@ class IntercomService
         $this->sendEvent($user, $event, []);
     }
 
+    public function sendSaveQuoteEvent(Lead $lead, $event, $additional)
+    {
+        $data = [];
+        if ($additional && isset($additional['quoteUrl'])) {
+            $data['metadata']['Quote Url'] = $additional['quoteUrl'];
+        }
+        if ($additional && isset($additional['phone'])) {
+            $data['metadata']['Phone'] = $additional['phone'];
+        }
+        $this->sendLeadEvent($lead, $event, $data);
+    }
+
     public function sendInvitationEvent(Invitation $invitation, $event)
     {
         // QUEUE_EVENT_INVITATION_PENDING
@@ -368,6 +382,23 @@ class IntercomService
         $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
     }
 
+    private function sendLeadEvent(Lead $lead, $event, $data, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $data['event_name'] = $event;
+        $data['created_at'] = $date->getTimestamp();
+        $data['email'] = $lead->getEmail();
+        if ($lead->getIntercomId()) {
+            $data['id'] = $lead->getIntercomId();
+        }
+
+        $resp = $this->client->events->create($data);
+        $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
+    }
+
     public function process($max)
     {
         $count = 0;
@@ -400,6 +431,12 @@ class IntercomService
                     }
 
                     $this->updateLead($this->getLead($data['leadId']));
+                } elseif ($action == self::QUEUE_EVENT_SAVE_QUOTE) {
+                    if (!isset($data['leadId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->sendSaveQuoteEvent($this->getLead($data['leadId']), $action, $data['additional']);
                 } elseif ($action == self::QUEUE_EVENT_CLAIM_CREATED ||
                           $action == self::QUEUE_EVENT_CLAIM_APPROVED ||
                           $action == self::QUEUE_EVENT_CLAIM_SETTLED) {
