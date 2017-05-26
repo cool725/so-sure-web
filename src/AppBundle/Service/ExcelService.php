@@ -43,7 +43,6 @@ class ExcelService
     {
         if (in_array($mimeType, [
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "text/plain",
         ])) {
             return self::FILETYPE_XLSX;
         } elseif (in_array($mimeType, [
