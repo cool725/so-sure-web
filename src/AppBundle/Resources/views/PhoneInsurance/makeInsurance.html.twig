@@ -2,6 +2,10 @@
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
+{% set make_extra = '' %}
+{% if make == "Samsung" %}
+    {% set make_extra = 'Galaxy' %}
+{% endif %}
 
 {% block title %}so-sure - Samsung Galaxy Insurance
 {% endblock %}
@@ -9,14 +13,6 @@
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
     <meta name="keywords" content="mobile phone insurance, social insurance, samsung galaxy insurance"/>
 {% endblock %}
-
-{# {% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/jquery_lazyload/jquery.lazyload.js'
-    '@AppBundle/Resources/public/js/Default/corporate.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %} #}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -38,7 +34,7 @@
                     <div class="col-md-12">
 
                         <h1 class="text-blue">
-                            {{ make|capitalize }} Insurance
+                            {{ make|capitalize }} {{ make_extra }}  Insurance
                         </h1>
 
                         <p class="lead">Select your model to get a quote</p>
@@ -69,8 +65,6 @@
                     {% endfor %}
                 </div>
 
-                <p class="lead text-center">Can't find your phone? <a href="#">Click here</a></p>
-
                 <!-- Controls -->
                 <a class="left carousel-control" href="#samsung-galaxy-carousel" role="button" data-slide="prev">
                     <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
@@ -89,22 +83,24 @@
                         {% for phone in phones %}
                             <div class="col-sm-4 col-md-4">
                                 {% if phone.mem|length <= 1 %}
-                                    <a href="#">
-                                        <div class="phone thumbnail">
-                                            <div class="phone-hover">
-                                                <div class="phone-hover--inner">
-                                                    <div class="mem-btns">
-                                                        <h4>Get quote <i class="fa fa-angle-right" aria-hidden="true"></i></h4>
+                                    {% for mem, url in phone.mem %}
+                                        <a href="{{ url }}">
+                                            <div class="phone thumbnail">
+                                                <div class="phone-hover">
+                                                    <div class="phone-hover--inner">
+                                                        <div class="mem-btns">
+                                                            <h4>Get a quote <i class="fa fa-angle-right" aria-hidden="true"></i></h4>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <img src="" alt="Phone" width="120" height="190" class="lazy">
+                                                <div class="caption">
+                                                    <h2 class="h4">{{ phone.model }}</h2>
+                                                    <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
+                                                </div>
                                             </div>
-                                            <img src="" alt="Phone" width="120" height="190">
-                                            <div class="caption">
-                                                <h2 class="h4">{{ phone.model }}</h2>
-                                                <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
-                                            </div>
-                                        </div>
-                                    </a>
+                                        </a>
+                                    {% endfor %}
                                 {% else %}
                                     <div class="phone thumbnail">
                                         <div class="phone-hover">
@@ -117,7 +113,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <img src="" alt="Phone" width="120" height="190">
+                                        <img src="" alt="Phone" width="120" height="190" class="lazy">
                                         <div class="caption">
                                             <h2 class="h4">{{ phone.model }}</h2>
                                             <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
@@ -126,10 +122,11 @@
                                 {% endif %}
                             </div>
                         {% endfor %}
-                        <p class="lead text-center">Can't find your phone? <a href="#">Click here</a></p>
                     </div>
                 </div>
             </div>
+
+            <p class="lead text-center">Can't find your phone? <a href="#">Click here</a></p>
 
             {% if make == "Samsung" %}
             <div class="landing-copy">
@@ -146,4 +143,12 @@
         </div>
     </section>
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/jquery_lazyload/jquery.lazyload.js'
+    '@AppBundle/Resources/public/js/Default/makeInsurance.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
