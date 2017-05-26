@@ -84,14 +84,13 @@ class BrightstarService extends S3EmailService
         $user = $policy->getUser();
         similar_text(strtolower($user->getName()), $brightstar->name, $percent);
         if ($percent < 50) {
-            /*
             throw new \Exception(sprintf(
                 'Brightstar Claim %s: %s does not match expected insuredName %s (match %0.1f)',
                 $brightstar->claimNumber,
                 $brightstar->name,
                 $user->getName(),
                 $percent
-            ));*/
+            ));
         } elseif ($percent < 75) {
             $msg = sprintf(
                 'Brightstar Claim %s: %s does not match expected insuredName %s (match %0.1f)',
