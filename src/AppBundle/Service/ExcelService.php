@@ -41,13 +41,16 @@ class ExcelService
 
     public function getFileFormat($mimeType)
     {
-        if ($mimeType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+        if (in_array($mimeType, [
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "text/plain",
+        ])) {
             return self::FILETYPE_XLSX;
         } elseif (in_array($mimeType, [
             "application/vnd.ms-excel",
             "application/vnd.ms-office",
             "application/CDFV2-unknown",
-            "application/octet-stream"
+            "application/octet-stream",
         ])) {
             return self::FILETYPE_XLS;
         } else {
