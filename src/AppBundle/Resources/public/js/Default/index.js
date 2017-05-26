@@ -26,7 +26,7 @@ $(function(){
 
     });
 
-    if ($('.lazy').length) {
+    if(jQuery().lazyload) {
         // Lazy load images
         $('img.lazy').show().lazyload({
             threshold : 200,
