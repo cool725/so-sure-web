@@ -51,7 +51,7 @@
                     {% for phone in phones %}
                     <div class="item {% if first %}active{% endif %}">
                         <div class="phone thumbnail">
-                            <img src="" alt="so-sure - {{ phone.model }} insurance" width="120" height="190">
+                            <img src="" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" width="120" height="190">
                             <div class="caption">
                                 <h2 class="h4">{{ phone.model }}</h2>
                                 <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
@@ -93,7 +93,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <img src="" alt="so-sure - {{ phone.model }} insurance" width="120" height="190" class="lazy">
+                                                <img src="" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" width="120" height="190" class="lazy">
                                                 <div class="caption">
                                                     <h2 class="h4">{{ phone.model }}</h2>
                                                     <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
@@ -113,7 +113,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <img src="" alt="so-sure - {{ phone.model }} insurance" width="120" height="190" class="lazy">
+                                        <img src="" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" width="120" height="190" class="lazy">
                                         <div class="caption">
                                             <h2 class="h4">{{ phone.model }}</h2>
                                             <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
