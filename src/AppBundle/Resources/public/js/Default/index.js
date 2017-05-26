@@ -26,6 +26,12 @@ $(function(){
 
     });
 
+    // Lazy load images
+    $('img.lazy').show().lazyload({
+        threshold : 200,
+        effect: 'fadeIn'
+    });
+
     // ???
     $('#phone_phone').change(function() {
         $.get('/price/' + this.value + '/', function(data) {

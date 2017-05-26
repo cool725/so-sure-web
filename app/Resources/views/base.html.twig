@@ -161,6 +161,7 @@
                 {% endjavascripts %}
             {% else %}
                 {% javascripts
+                'components/jquery_lazyload/jquery.lazyload.js'
                 'components/cookieconsent/cookieconsent.min.js'
                 '@AppBundle/Resources/public/js/*' %}
                 <script src="{{ asset_url }}"></script>
