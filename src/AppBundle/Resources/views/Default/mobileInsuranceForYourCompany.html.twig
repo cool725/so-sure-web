@@ -315,7 +315,20 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    '@AppBundle/Resources/public/js/Default/index.js' %}
+    '@AppBundle/Resources/public/js/Default/index.js'
+    'components/jquery_lazyload/jquery.lazyload.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
+    <script>
+
+        $(function(){
+
+            // Lazy load images
+            $('img.lazy').show().lazyload({
+                threshold : 200,
+                effect: 'fadeIn'
+            });
+
+        });
+    </script>
 {% endblock %}
 

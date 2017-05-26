@@ -1,6 +1,0 @@
-// Corporate JS
-$(function(){
-
-
-
-});
