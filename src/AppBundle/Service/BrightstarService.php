@@ -26,7 +26,7 @@ class BrightstarService extends S3EmailService
 
     public function processExcelData($key, $data)
     {
-        return $this->checkClaims($key, $data);   
+        return $this->checkClaims($key, $data);
     }
 
     public function postProcess()
@@ -138,7 +138,7 @@ class BrightstarService extends S3EmailService
                 $brightstar->orderDate->format('d M Y')
             );
             $this->logger->warning($msg);
-            $this->errors[$brightstar->claimNumber][] = $msg;            
+            $this->errors[$brightstar->claimNumber][] = $msg;
         }
         // TODO: Validate replacement imei & delivery date (set?)
         // TODO: Validate returning imei matches original - will require saving off imei in list
@@ -150,7 +150,7 @@ class BrightstarService extends S3EmailService
         // TODO: Validate Phone Number?
         // TODO: Validate Email?
         // TODO: Validate claim value?
-        // TODO: Store handset value, fmi active, & repairable against claim?        
+        // TODO: Store handset value, fmi active, & repairable against claim?
     }
 
     public function emailReport()

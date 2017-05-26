@@ -76,7 +76,7 @@ abstract class S3EmailService
 
     public function setPath($pathPrefix)
     {
-        $this->path = sprintf('%s/%s', $pathPrefix, $this->environment);        
+        $this->path = sprintf('%s/%s', $pathPrefix, $this->environment);
     }
 
     public function getErrors()
@@ -89,11 +89,11 @@ abstract class S3EmailService
         $this->errors = [];
     }
 
-    abstract function processExcelData($key, $data);
-    abstract function postProcess();
-    abstract function getNewS3File();
-    abstract function getColumnsFromSheetName($sheetName);
-    abstract function createLineObject($line, $columns);
+    abstract public function processExcelData($key, $data);
+    abstract public function postProcess();
+    abstract public function getNewS3File();
+    abstract public function getColumnsFromSheetName($sheetName);
+    abstract public function createLineObject($line, $columns);
 
     public function import($sheetName)
     {

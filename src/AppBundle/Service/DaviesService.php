@@ -34,7 +34,7 @@ class DaviesService extends S3EmailService
 
     public function processExcelData($key, $data)
     {
-        return $this->saveClaims($key, $claims);   
+        return $this->saveClaims($key, $claims);
     }
 
     public function postProcess()
