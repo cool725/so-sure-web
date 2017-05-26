@@ -29,6 +29,7 @@ i {
 h1, h2, h3, h4, .h1, .h2, .h3, .h4 {
 	font-family: $avenir-heavy;
 	color: $black;
+	line-height: 1.49;
 }
 
 h5, h6, .h5, .h6 {
@@ -50,6 +51,10 @@ h2, h3, h4, .h1, .h2, .h3, .h4  {
 	font-family: $avenir-light;
 }
 
+p {
+	line-height: 1.5;
+}
+
 a {
 	color: $blue;
 
@@ -60,6 +65,13 @@ a {
 	&:active {
 		color: darken($blue, 25%);
 	}
+}
+
+
+hr {
+	border: 0;
+	margin: 30px 0;
+	border-top: 2px dashed $light-blue;
 }
 
 // Helpers - for rapid prototyping

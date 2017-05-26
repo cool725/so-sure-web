@@ -51,7 +51,7 @@
                     {% for phone in phones %}
                     <div class="item {% if first %}active{% endif %}">
                         <div class="phone thumbnail">
-                            <img src="" alt="Phone" width="120" height="190">
+                            <img src="" alt="so-sure - {{ phone.model }} insurance" width="120" height="190">
                             <div class="caption">
                                 <h2 class="h4">{{ phone.model }}</h2>
                                 <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
@@ -93,7 +93,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <img src="" alt="Phone" width="120" height="190" class="lazy">
+                                                <img src="" alt="so-sure - {{ phone.model }} insurance" width="120" height="190" class="lazy">
                                                 <div class="caption">
                                                     <h2 class="h4">{{ phone.model }}</h2>
                                                     <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
@@ -113,7 +113,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <img src="" alt="Phone" width="120" height="190" class="lazy">
+                                        <img src="" alt="so-sure - {{ phone.model }} insurance" width="120" height="190" class="lazy">
                                         <div class="caption">
                                             <h2 class="h4">{{ phone.model }}</h2>
                                             <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
@@ -128,7 +128,13 @@
 
             <p class="lead text-center">Can't find your phone? <a href="#">Click here</a></p>
 
-            {% if make == "Samsung" %}
+        </div>
+    </section>
+
+    <section class="section--pad">
+        <div class="container">
+
+           {% if make == "Samsung" %}
             <div class="landing-copy">
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2">
@@ -139,6 +145,52 @@
                 </div>
             </div>
             {% endif %}
+
+        </div>
+    </section>
+
+    <section class="section--pad text-center">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+                    {# <hr> #}
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="" width="150" height="150" alt="so-sure - Next working day repair/replacement">
+                            <h4 class="h-light">Next working day repair/replacement</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <img src="" width="150" height="150" alt="so-sure - Cash back when you and your friends don’t claim">
+                            <h4 class="h-light">Cash back when you and your friends don’t claim</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <img src="" width="150" height="150" alt="so-sure - 24/7 Live Support">
+                            <h4 class="h-light">24/7 Live Support</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <img src="" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
+                            <h4 class="h-light">Instant cover when you buy your policy</h4>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <section class="section--pad text-center">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <img src="" width="170" height="50" alt="so-sure - {{ make|capitalize }} {{ make_extra }} Insurance">
+                    <img src="" width="170" height="50" alt="so-sure - {{ make|capitalize }} {{ make_extra }} Insurance">
+                </div>
+            </div>
 
         </div>
     </section>
