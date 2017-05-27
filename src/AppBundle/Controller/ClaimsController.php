@@ -138,7 +138,8 @@ class ClaimsController extends BaseController
                         $this->addFlash('error', sprintf('Duplicate claim number %s', $claim->getNumber()));
                     }
                 } else {
-                    $this->get('logger')->error(sprintf('Error adding claim for policy %s. %s',
+                    $this->get('logger')->error(sprintf(
+                        'Error adding claim for policy %s. %s',
                         $policy->getId(),
                         (string) $formClaim->getErrors(true, false)
                     ));
