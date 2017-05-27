@@ -37,11 +37,13 @@ class ClaimType extends AbstractType
         $builder
             ->add('number', TextType::class)
             ->add('status', ChoiceType::class, ['choices' => [
-                Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,
                 Claim::STATUS_INREVIEW => Claim::STATUS_INREVIEW,
+                Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,
                 Claim::STATUS_WITHDRAWN => Claim::STATUS_WITHDRAWN,
                 Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
-            ]])
+            ],
+                'preferred_choices' => [Claim::STATUS_INREVIEW]
+            ])
             ->add('suspected_fraud', CheckboxType::class, ['required' => false])
             ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
