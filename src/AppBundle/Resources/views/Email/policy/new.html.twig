@@ -13,7 +13,15 @@
                 As a reminder your policy is for a <strong>{{ policy.phone }}</strong> and runs from <strong>{{ policy.start | date('d M Y H:i', 'Europe/London') }}</strong> to <strong>{{ policy.end | date('d M Y H:i', 'Europe/London') }}</strong>.<br><br>
                 We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to
 				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
-		   </div>
+				<br><br>
+		  	   We take fraud very seriously and will always take steps to prosecute when fraudlent behaviour is present.
+			   We would remind you that you previously confirmed that your phone is currently in full working condition and
+			   your screen is not cracked. If that is not the case, we will exercise our right to cancel the policy
+			   and will report the fraud to the police.
+			   <br><br>
+			   Given this notice, if you think you have purchased this policy by mistake, please
+			   email <a href="mailto:support@wearesosure.com?subject=Please cancel {{ policy.policyNumber }} as my phone was damaged prior to purchase">support@wearesosure.com</a> today.
+			   We will then cancel the policy and refund you the full amount.
 		</div>
 	{{ macros.end_table() }}
 {% endblock %}

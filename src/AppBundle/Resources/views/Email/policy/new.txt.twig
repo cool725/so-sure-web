@@ -10,17 +10,12 @@ Your policy is for {{ policy.phone }} and runs from {{ policy.start | date('d M 
 
 We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
 
-{% if policy.promoCode != 'launch' %}
-Want up to 80% of your money back?
+We take fraud very seriously and will always take steps to prosecute when fraudlent behaviour is present. We would remind you that you previously confirmed that your phone is currently in full working condition and your screen is not cracked. If that is not the case, we will exercise our right to cancel the policy and will report the fraud to the police.
+			   
+Given this notice, if you think you have purchased this policy by mistake, please email us today.
 
-For each friend that also buys insurance, we'll add up to £{{ policy.connectionValue }} to your Reward Pot (we'll also do the same for them).
+To: support@wearesosure.com
+Subject: Please cancel {{ policy.policyNumber }} as my phone was damaged prior to purchase
 
-Connect with {{ policy.maxConnections }} friends and provided none of you make a claim you'll get 80% of your money back at the end of the year.
-{% else %}
-Want your insurance for free?
-
-As one of first 1,000 customers, we'd like to reward you! For each friend that also buys insurance, we'll add up to {{ policy.connectionValue }} to your Reward Pot (rather than the usual £10).
-
-Connect with {{ policy.maxConnections }} friends and provided none of you make a claim you'll get all your money back at the end of the year!
-{% endif %}
+We will then cancel the policy and refund you the full amount.
 {% endblock body %}
