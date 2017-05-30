@@ -54,7 +54,7 @@
 
                     <div class="item {% if first %}active{% endif %}">
                         <div class="phone thumbnail">
-                            <img src="{{ cdn_url }}/images/library/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
+                            <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
                             <div class="caption">
                                 <h2 class="h4">{{ phone.model }}</h2>
                                 <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
@@ -100,7 +100,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <img src="{{ cdn_url }}/images/library/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
+                                                <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
                                                 <div class="caption">
                                                     <h2 class="h4">{{ phone.model }}</h2>
                                                     <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
@@ -120,7 +120,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <img src="{{ cdn_url }}/images/library/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
+                                        <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
                                         <div class="caption">
                                             <h2 class="h4">{{ phone.model }}</h2>
                                             <p><small>from £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</small></p>
@@ -165,19 +165,19 @@
 
                     <div class="row">
                         <div class="col-sm-6 col-md-3">
-                            <img src="" width="150" height="150" alt="so-sure - Next working day repair/replacement">
+                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_next-working-day.svg" width="150" height="150" alt="so-sure - Next working day repair/replacement">
                             <h4 class="h-light">Next working day repair/replacement</h4>
                         </div>
                         <div class="col-sm-6 col-md-3">
-                            <img src="" width="150" height="150" alt="so-sure - Cash back when you and your friends don’t claim">
+                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_connections.svg" width="150" height="150" alt="so-sure - Cash back when you and your friends don’t claim">
                             <h4 class="h-light">Cash back when you and your friends don’t claim</h4>
                         </div>
                         <div class="col-sm-6 col-md-3">
-                            <img src="" width="150" height="150" alt="so-sure - 24/7 Live Support">
+                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_call-center.svg" width="150" height="150" alt="so-sure - 24/7 Live Support">
                             <h4 class="h-light">24/7 Live Support</h4>
                         </div>
                         <div class="col-sm-6 col-md-3">
-                            <img src="" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
+                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_old-and-refurb.svg" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
                             <h4 class="h-light">Instant cover when you buy your policy</h4>
                         </div>
                     </div>
@@ -193,8 +193,14 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <img src="{{ cdn_url }}/images/library/{{ make }}/so-sure_{{ make }}-logo.png" width="170" height="50" alt="so-sure - {{ make|capitalize }} {{ make_extra }} Insurance">
-                    <img src="" width="170" height="50" alt="so-sure">
+                    <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ make }}-logo-so-sure.png"
+                         width="170"
+                         height="60"
+                         alt="so-sure - {{ make|capitalize }} {{ make_extra }} Insurance">
+                    <img src="{{ cdn_url }}/images/logo/so-sure_so-sure-full-logo-blue-flat.svg"
+                         width="170"
+                         height="60"
+                         alt="so-sure - mobile phone insurance">
                 </div>
             </div>
 
