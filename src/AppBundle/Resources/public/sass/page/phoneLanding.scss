@@ -32,6 +32,11 @@ a {
         height: 190px;
         max-width: none;
     }
+
+    .caption {
+        position: relative;
+        z-index: 10;
+    }
 }
 
 .phone-hover {
@@ -40,10 +45,11 @@ a {
     top: 0; left: 0; bottom: 0; right: 0;
     display: none;
     opacity: 0;
+    z-index: 9;
 
     // transition: background-color 0.5s ease-in-out;
 
-    background-color: rgba(214, 235, 255, 0.75);
+    background-color: rgba(214, 235, 255, 0.85);
     border: 2px solid $light-blue;
     @include border-radius(4px);
 
@@ -54,11 +60,14 @@ a {
         padding: 0 30px;
     }
 
-    .mem-btns {
+    .mem-btns, .one-btn {
         width: 100%; height: 100%;
         display: table-cell;
+        vertical-align: top;
+    }
 
-        vertical-align: middle;
+    .one-btn {
+        padding-top: 80px;
     }
 }
 
