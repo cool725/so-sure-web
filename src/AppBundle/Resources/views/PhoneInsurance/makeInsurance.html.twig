@@ -34,7 +34,7 @@
                     <div class="col-md-12">
 
                         <h1 class="text-blue">
-                            {{ make|capitalize }} {{ make_extra }}  Insurance
+                            {{ make|capitalize }} {{ make_extra }} Insurance
                         </h1>
 
                         <p class="lead">Select your model to get a quote</p>
@@ -68,7 +68,6 @@
                     {% endfor %}
                 </div>
 
-                <!-- Controls -->
                 <a class="left carousel-control" href="#samsung-galaxy-carousel" role="button" data-slide="prev">
                     <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
@@ -166,7 +165,7 @@
                     <div class="row">
                         <div class="col-sm-6 col-md-3">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_next-working-day.svg" width="150" height="150" alt="so-sure - Next working day repair/replacement">
-                            <h4 class="h-light">Next working day repair/replacement</h4>
+                            <h4 class="h-light">Next working day replacement or repair</h4>
                         </div>
                         <div class="col-sm-6 col-md-3">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_connections.svg" width="150" height="150" alt="so-sure - Cash back when you and your friends don’t claim">
@@ -177,7 +176,7 @@
                             <h4 class="h-light">24/7 Live Support</h4>
                         </div>
                         <div class="col-sm-6 col-md-3">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_old-and-refurb.svg" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
+                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_instant-cover.svg" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
                             <h4 class="h-light">Instant cover when you buy your policy</h4>
                         </div>
                     </div>
@@ -240,7 +239,7 @@
     {% javascripts
     'components/jquery_lazyload/jquery.lazyload.js'
     'components/typeahead.js/typeahead.bundle.min.js'
-    '@AppBundle/Resources/public/js/Default/makeInsurance.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
