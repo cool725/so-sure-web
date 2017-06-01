@@ -13,7 +13,12 @@
                 As a reminder your policy is for a <strong>{{ policy.phone }}</strong> and runs from <strong>{{ policy.start | date('d M Y H:i', 'Europe/London') }}</strong> to <strong>{{ policy.end | date('d M Y H:i', 'Europe/London') }}</strong>.<br><br>
                 We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to
 				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
-		   </div>
+				<br><br>
+
+			   We take fraud very seriously and do prosecute. When you purchased your policy, you confirmed that your phone was in full working condition and without a cracked screen. If you failed to disclose the state of your phone accurately, we may exercise our right to cancel the policy and will report any instance of fraud to the police.
+
+			   <br><br>
+			   If you think you might have purchased your policy by mistake, email us at <a href="mailto:support@wearesosure.com?subject=Please cancel {{ policy.policyNumber }} as my phone was damaged prior to purchase">support@wearesosure.com</a> <b>today</b> and we cancel the policy and refund your premium. If you are in any doubt, please email us at <a href="mailto:info@wearesosure.com?subject=Query from {{ policy.policyNumber }}">info@wearesosure.com.</a>
 		</div>
 	{{ macros.end_table() }}
 {% endblock %}
