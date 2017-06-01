@@ -176,8 +176,24 @@ class OpsController extends BaseController
                 'secure.adnxs.com',
                 'gb.api4load.com',
                 'af.adsloads.com',
+                'ph.adsloads.com',
+                'cdn.stats-collector.org',
+                'translate.googleapis.com',
+                'client.comprigo.com',
+                'www.video2mp3.at',
+                's3.amazonaws.com',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
+
+                return new Response('', 204);
+            }
+
+            $scheme = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_SCHEME));
+            if (in_array($scheme, [
+                'ms-appx-web',
+                'none',
+            ])) {
+                $logger->debug(sprintf('Content-Security-Policy called with ignore scheme: %s', $scheme));
 
                 return new Response('', 204);
             }
