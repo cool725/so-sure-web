@@ -95,6 +95,37 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
+     * @Route("/phone-insurance/{make}", name="quote_make", requirements={"make":"[a-zA-Z]+"})
+     * @Template
+     */
+    public function makeInsurance($make)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phones = $repo->findBy(
+            ['make' => $make, 'active' => true, 'highlight' => true],
+            ['releaseDate' => 'desc', 'initialPrice' => 'desc']
+        );
+        $phonesMem = [];
+        foreach ($phones as $phone) {
+            if (!isset($phonesMem[$phone->getName()])) {
+                $phonesMem[$phone->getName()] = [
+                    'make' => $phone->getMake(),
+                    'model' => $phone->getModel(),
+                    'currentPhonePrice' => $phone->getCurrentPhonePrice(),
+                ];
+            }
+            $phonesMem[$phone->getName()]['mem'][$phone->getMemory()] = $this->generateUrl(
+                'quote_make_model_memory',
+                ['make' => $phone->getMake(), 'model' => $phone->getModel(), 'memory' => $phone->getMemory()]
+            );
+            ksort($phonesMem[$phone->getName()]['mem']);
+        }
+
+        return array('phones' => $phonesMem, 'make' => $make);
+    }
+
+    /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
      *
