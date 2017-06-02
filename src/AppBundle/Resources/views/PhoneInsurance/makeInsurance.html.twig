@@ -50,7 +50,8 @@
                     {% set first = true %}
                     {% for phone in phones %}
 
-                    {% set img_url = phone.model|replace({' ': '-', '+': "-plus"})|lower %}
+                    {# Probably a better way to do this? #}
+                    {% set img_url = phone.model|replace({' ': '-', '+': "-Plus"}) %}
 
                     <div class="item {% if first %}active{% endif %}">
                         <div class="phone thumbnail">
@@ -85,7 +86,7 @@
                         {% for phone in phones %}
 
                             {# Probably a better way to do this? #}
-                            {% set img_url = phone.model|replace({' ': '-', '+': "-plus"})|lower %}
+                            {% set img_url = phone.model|replace({' ': '-', '+': "-Plus"}) %}
 
                             <div class="col-sm-4 col-md-4">
                                 {% if phone.mem|length <= 1 %}
