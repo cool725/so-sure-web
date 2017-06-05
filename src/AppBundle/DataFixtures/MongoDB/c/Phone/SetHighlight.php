@@ -26,7 +26,7 @@ class SetHighlight implements FixtureInterface, ContainerAwareInterface
         $repo = $manager->getRepository(Phone::class);
         $data = [
             'Samsung' => [
-                'Galaxy S8', 'Galaxy S8+', 'Galaxy S7', 'Galaxy S7 edge', 'Galaxy S6', 'Galaxy S6 Edge'
+                'Galaxy S8', 'Galaxy S8+', 'Galaxy S7', 'Galaxy S7 Edge', 'Galaxy S6', 'Galaxy S6 Edge'
             ]
         ];
         foreach ($data as $make => $models) {
