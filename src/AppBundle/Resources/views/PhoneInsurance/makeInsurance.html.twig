@@ -18,6 +18,7 @@
     {{ parent() }}
     {% stylesheets output='css/*.css'
         'components/owl.carousel/owl.carousel.min.css'
+        'components/owl.carousel/owl.theme.default.min.css'
         '@AppBundle/Resources/public/sass/page/phoneLanding.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
@@ -44,7 +45,7 @@
                 </div>
             </div>
 
-            <div class="owl-carousel visible-xs">
+            <div class="owl-carousel owl-theme visible-xs">
             {% for phone in phones %}
 
             {# Probably a better way to do this? #}

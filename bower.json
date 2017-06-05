@@ -47,7 +47,8 @@
       ],
       "owl.carousel": [
         "bower_components/owl.carousel/dist/owl.carousel.min.js",
-        "bower_components/owl.carousel/dist/assets/owl.carousel.min.css"
+        "bower_components/owl.carousel/dist/assets/owl.carousel.min.css",
+        "bower_components/owl.carousel/dist/assets/owl.theme.default.min.css"
       ],
       "seiyria-bootstrap-slider": [
         "bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js",
