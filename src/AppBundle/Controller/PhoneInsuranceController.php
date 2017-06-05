@@ -249,7 +249,7 @@ class PhoneInsuranceController extends BaseController
                 );
                 if ($exp == 'cpc-manufacturer') {
                     return new RedirectResponse($this->generateUrl('insure_make', ['make' => 'Samsung']));
-                }                
+                }
             } else {
                 $exp = $this->get('app.sixpack')->participate(
                     SixpackService::EXPERIMENT_LANDING_HOME,
@@ -411,7 +411,7 @@ class PhoneInsuranceController extends BaseController
                 $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                     'Device Selected' => $phone->__toString(),
                     'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-                ]);                
+                ]);
             }
         }
 
