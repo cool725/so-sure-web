@@ -114,11 +114,9 @@
 	    }
 	}
 
-	@include breakpoint(mobileishup) {
-		padding: 25px;
-		border: 2px solid $grey-light;
-		@include border-radius(4px);
-	}
+	padding: 25px;
+	border: 2px solid $grey-light;
+	@include border-radius(4px);
 
 	@include breakpoint(tablet) {
 		max-width: none;
