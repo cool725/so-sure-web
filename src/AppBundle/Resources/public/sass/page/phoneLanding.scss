@@ -82,13 +82,14 @@ a {
     .item {
         text-align: center;
         display: none;
+        min-width: 120px;
 
         &-inner {
             // height: 300px;
         }
 
         img {
-            height: 300px; width: auto;
+            height: 250px; width: auto;
             margin: 0 auto;
             display: block;
         }
