@@ -54,7 +54,7 @@
                 <div class="item">
                     <div class="item-inner">
                         <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
-                        <h2 class="h4 text-center">{{ phone.model }}</h2>
+                        <h2 class="h5 text-center">{{ phone.model }}</h2>
                         {% for mem, url in phone.mem %}
                             <a href="{{ url }}" class="btn btn-blue btn-30">{{ mem }}GB</a>
                         {% endfor %}
