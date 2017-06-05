@@ -45,18 +45,22 @@
             </div>
 
             <div class="owl-carousel visible-xs">
-            {# {% set first = true %} #}
             {% for phone in phones %}
 
             {# Probably a better way to do this? #}
             {% set img_url = phone.model|replace({' ': '-', '+': "-Plus"}) %}
 
                 <div class="item">
-                    <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
-                    <h2 class="h4 text-center">{{ phone.model }}</h2>
+                    <div class="item-inner">
+                        <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
+                        <h2 class="h4 text-center">{{ phone.model }}</h2>
+                        {% for mem, url in phone.mem %}
+                            <a href="{{ url }}" class="btn btn-blue btn-30">{{ mem }}GB</a>
+                        {% endfor %}
+                    </div>
                 </div>
 
-            {# {% set first = false %} #}
+
             {% endfor %}
             </div>
 

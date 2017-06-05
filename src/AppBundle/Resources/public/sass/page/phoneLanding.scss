@@ -77,8 +77,20 @@ a {
 }
 
 .owl-carousel {
+    margin-bottom: 30px;
 
     .item {
-        // width: 50%;
+        text-align: center;
+        display: none;
+
+        &-inner {
+            // height: 300px;
+        }
+
+        img {
+            height: 300px; width: auto;
+            margin: 0 auto;
+            display: block;
+        }
     }
 }
