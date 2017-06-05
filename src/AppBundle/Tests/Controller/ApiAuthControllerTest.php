@@ -1515,7 +1515,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,
             self::$JUDO_TEST_CARD_PIN
@@ -1543,8 +1543,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(7, $policyData['pot']['max_connections'], json_encode($policyData));
         // $this->assertEquals(83.88, $policyData['pot']['max_value']);
         // 6.38 gwp * 1.1 = 7.018 * 12 = 84.24 * .8 = 67.39
-        $this->assertEquals(67.39, $policyData['pot']['max_value']);
-        $this->assertEquals(7.02, $policyData['premium']);
+        $this->assertEquals(68.64, $policyData['pot']['max_value']);
+        $this->assertEquals(7.15, $policyData['premium']);
         $this->assertEquals(6.38, $policyData['premium_gwp']);
         $highConnectionValue = 0;
         $lowConnectionValue = null;
@@ -1603,7 +1603,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,
             self::$JUDO_TEST_CARD_PIN
@@ -1648,7 +1648,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $userA,
             $dataA['id'],
-            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,
             self::$JUDO_TEST_CARD_PIN
@@ -1688,7 +1688,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             '4221 6900 0000 4963',
             '12/20',
             '125'
@@ -1755,7 +1755,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,
             self::$JUDO_TEST_CARD_PIN
@@ -1801,7 +1801,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,
             self::$JUDO_TEST_CARD_PIN
@@ -1823,7 +1823,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policy = $repo->find($policyData['id']);
         //\Doctrine\Common\Util\Debug::dump($policy->getSuccessfulPayments());
         $this->assertEquals(11, count($policy->getScheduledPayments()));
-        $this->assertEquals(7.02, $policy->getTotalSuccessfulPayments());
+        $this->assertEquals(7.15, $policy->getTotalSuccessfulPayments());
 
         // Now assume an unpaid payment
         $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
@@ -1832,7 +1832,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'] + rand(1, 999999),
-            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,
             self::$JUDO_TEST_CARD_PIN
@@ -1852,7 +1852,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policy = $repo->find($policyData['id']);
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertEquals(7.02 * 2, $policy->getTotalSuccessfulPayments());
+        $this->assertEquals(7.15 * 2, $policy->getTotalSuccessfulPayments());
 
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
         $this->assertEquals('monthly', $policyData['premium_plan']);
@@ -1897,7 +1897,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $details = $judopay->testPayDetails(
             $user,
             $data['id'],
-            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,
             self::$JUDO_TEST_CARD_PIN
@@ -1917,7 +1917,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['existing' => [
-            'amount' => '7.02'
+            'amount' => '7.15'
         ]]);
         $policyData2 = $this->verifyResponse(200);
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData2['status']);
@@ -1946,7 +1946,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
-            '7.02', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt)
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,
             self::$JUDO_TEST_CARD_PIN
