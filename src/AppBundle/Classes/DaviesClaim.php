@@ -290,7 +290,7 @@ class DaviesClaim extends DaviesExcel
             $this->replacementImei = $this->nullIfBlank($data[++$i]);
             $this->replacementReceivedDate = $this->excelDate($data[++$i]);
 
-            if (in_array($columns,  [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7])) {
+            if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7])) {
                 $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
                 $this->phoneReplacementCostReserved = $this->nullIfBlank($data[++$i]);
                 $this->accessories = $this->nullIfBlank($data[++$i]);
@@ -322,10 +322,10 @@ class DaviesClaim extends DaviesExcel
             $this->dateClosed = $this->excelDate($data[++$i]);
             $this->shippingAddress = $this->nullIfBlank($data[++$i]);
 
-            if (in_array($columns,  [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7])) {
+            if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7])) {
                 $this->daviesIncurred = $this->nullIfBlank($data[++$i]);
             }
-            if (in_array($columns,  [self::COLUMN_COUNT_V7])) {
+            if (in_array($columns, [self::COLUMN_COUNT_V7])) {
                 $this->risk = $this->nullIfBlank($data[++$i]);
             }
 
