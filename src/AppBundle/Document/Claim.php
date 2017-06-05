@@ -599,6 +599,17 @@ class Claim
         }
     }
 
+    public function isPhoneReturnExpected()
+    {
+        if (in_array($this->getType(), [Claim::TYPE_DAMAGE, Claim::TYPE_WARRANTY, Claim::TYPE_EXTENDED_WARRANTY])) {
+            return true;
+        } elseif (in_array($this->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
+            return false;
+        } else {
+            throw new \Exception(sprintf('Unknown type for phone returned: %s', $this->getType()));
+        }
+    }
+
     public function getReservedValue()
     {
         return $this->reservedValue;

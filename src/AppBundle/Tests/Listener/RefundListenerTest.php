@@ -86,7 +86,13 @@ class RefundListenerTest extends WebTestCase
             static::generateEmail('testRefundListenerCancelledCooloff', $this),
             'bar'
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-11-01'),
+            false
+        );
         static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-11-01'));
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
@@ -134,7 +140,13 @@ class RefundListenerTest extends WebTestCase
             static::generateEmail('testRefundListenerCancelledCooloffYearly', $this),
             'bar'
         );
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-11-01'),
+            false
+        );
         static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-11-01'), false);
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);

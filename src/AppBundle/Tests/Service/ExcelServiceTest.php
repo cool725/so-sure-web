@@ -39,7 +39,7 @@ class ExcelTest extends WebTestCase
     {
         $davies = sprintf("%s/../src/AppBundle/Tests/Resources/So-SureDailyClaimsReport.xls", self::$rootDir);
         $csv = sprintf("%s/davies.csv", sys_get_temp_dir());
-        self::$excel->convertToCsv($davies, $csv, DaviesClaim::SHEET_NAME_V6);
+        self::$excel->convertToCsv($davies, $csv, 'Cumulative');
         $this->assertTrue(file_exists($csv));
 
         $data = array_map('str_getcsv', file($csv));

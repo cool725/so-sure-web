@@ -395,9 +395,9 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals(0, $data['quotes'][0]['monthly_loss']);
         $this->assertEquals(0, $data['quotes'][0]['yearly_loss']);
 
-        // gwp 5.93 was 6.49 (9.5% ipt), now 6.52 (10% ipt)
-        $this->assertEquals(6.52, $data['quotes'][0]['monthly_premium']);
-        $this->assertEquals(78.24, $data['quotes'][0]['yearly_premium']);
+        // gwp 5.93 was 6.49 (9.5% ipt), now 6.52 (10% ipt), now 6.64 (12%)
+        $this->assertEquals(6.64, $data['quotes'][0]['monthly_premium']);
+        $this->assertEquals(79.68, $data['quotes'][0]['yearly_premium']);
         /*
         $this->assertEquals(6.49, $data['quotes'][0]['monthly_premium']);
         $this->assertEquals(77.88, $data['quotes'][0]['yearly_premium']);
@@ -420,7 +420,7 @@ class ApiControllerTest extends BaseControllerTest
         $maxConnections = 7;
         // see above for pricing changes
         // $maxPot = 62.30;
-        $maxPot = 62.59;
+        $maxPot = 63.74;
         $this->assertEquals($connectionValue, $data['quotes'][0]['connection_value']);
         $this->assertEquals($maxConnections, $data['quotes'][0]['max_connections']);
         $this->assertEquals($maxPot, $data['quotes'][0]['max_pot']);

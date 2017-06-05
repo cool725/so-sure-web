@@ -21,7 +21,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "policyTerms"="PolicyTermsFile",
  *      "invoice"="InvoiceFile",
  *      "davies"="DaviesFile",
- *      "imeiUpload"="ImeiUploadFile"
+ *      "imeiUpload"="ImeiUploadFile",
+ *      "brightstar"="BrightstarFile"
  * })
  * @Gedmo\Loggable
  */

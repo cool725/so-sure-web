@@ -1,0 +1,33 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Brightstar Report{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><font face="arial, helvetica neue, helvetica, sans-serif">
+           <h2>Brightstar Report</h2>
+           <h3>Last received daily export: {% if latestFile %}{{ latestFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
+           <h3>Last successful daily export: {% if successFile %}{{ successFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
+		   </div>
+
+		   <div style="font-size: 14px; text-align: left;"><font face="arial, helvetica neue, helvetica, sans-serif">
+		   {% if errors|length > 0 %}
+			   <h3>Warnings/Errors in last import</h3>
+			{% for claimNumber,msgs in errors %}
+				 <p>Claim: {{ claimNumber }}</p>
+					 <ul>
+						 {% for msg in msgs %}
+							 <li>{{ msg }}</li>
+						 {% endfor %}
+					 </ul>
+			 {% endfor %}
+		   {% endif %}
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+	{{ macros.email_button_table(url('admin_claims'), "View Claims", "View Claims")}}
+{% endblock %}
