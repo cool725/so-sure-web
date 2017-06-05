@@ -76,46 +76,9 @@ a {
     opacity: 1;
 }
 
-.carousel,
-.carousel-inner,
-.carousel-inner > .item {
-    overflow: hidden;
-}
-.carousel-inner:before {
-    position:absolute;
-    top:0;
-    bottom: 0;
-    right: 82%;
-    left: 0;
-    content:"";
-    display:block;
-    background-color: #fff;
-    z-index: 2;
-}
-.carousel-inner:after {
-    position:absolute;
-    top:0;
-    bottom:0;
-    right: 0;
-    left: 82%;
-    content:"";
-    display:block;
-    background-color:#fff;
-    z-index: 2;
-}
+.owl-carousel {
 
-.carousel-control.left, .carousel-control.right {
-    background: initial;
-    width: 30%;
-    color: #000;
-    z-index: 10;
-    top: -10px;
-}
-
-.carousel-control.left {
-    left: -20px;
-}
-
-.carousel-control.right {
-    right: -20px;
+    .item {
+        // width: 50%;
+    }
 }

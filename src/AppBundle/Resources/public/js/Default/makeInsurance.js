@@ -1,18 +1,12 @@
 // Make Insurance JS
 $(function(){
 
-    $('.carousel .item').each(function () {
-        var next = $(this).next();
-        if (!next.length) {
-            next = $(this).siblings(':first');
-        }
-        next.children(':first-child').clone().appendTo($(this));
-        if (next.next().length > 0) {
-            next.next().children(':first-child').clone().appendTo($(this));
-        } else {
-            $(this).siblings(':first').children(':first-child').clone().appendTo($(this));
-        }
+    // Init carousel
+    $('.owl-carousel').owlCarousel({
+        margin: 30,
+        stagePadding: 100,
+        // autoWidth: true,
+        items: 1,
     });
-
 
 });
