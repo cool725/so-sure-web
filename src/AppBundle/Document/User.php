@@ -1119,7 +1119,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function allowedMonthlyPayments()
     {
-        if (!$this->hasValidDetails()) {
+        if (!$this->hasValidDetails() || !$this->getBillingAddress()) {
             return false;
         }
 
