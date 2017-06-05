@@ -3,10 +3,11 @@ $(function(){
 
     // Init carousel
     $('.owl-carousel').owlCarousel({
-        margin: 30,
+        margin: 40,
         stagePadding: 100,
-        // autoWidth: true,
         items: 1,
     });
+
+    $('.item').trigger('initialized.owl.carousel').show();
 
 });
