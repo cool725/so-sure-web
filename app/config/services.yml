@@ -295,16 +295,34 @@ services:
         tags:
             - { name: monolog.logger, channel: salva }
 
+    base.s3email:
+        abstract: true
+        class: AppBundle\Service\S3EmailService
+        calls:
+            - [setLogger, ['@monolog.logger.receperio']]
+            - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
+            - [setExcel, ['@app.excel']]
+            - [setS3, ['@aws.s3']]
+            - [setEnvironment, ['%kernel.environment%']]
+
     app.davies:
+        parent: base.s3email
         class: AppBundle\Service\DaviesService
-        arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            logger:         "@logger"
-            excel:          "@app.excel"
-            s3:             "@aws.s3"
-            claims:         "@app.claims"
-            environment:    "%kernel.environment%"
-            mailer:         "@app.mailer"
+        calls:
+            - [setClaims, ['@app.claims']]
+            - [setMailer, ['@app.mailer']]
+            - [setBucket, ['ops.so-sure.com']]
+            - [setPath, ['claims-report']]
+        tags:
+            - { name: monolog.logger, channel: davies }
+
+    app.brightstar:
+        parent: base.s3email
+        class: AppBundle\Service\BrightstarService
+        calls:
+            - [setBucket, ['ops.so-sure.com']]
+            - [setPath, ['brightstar-report']]
+            - [setMailer, ['@app.mailer']]
         tags:
             - { name: monolog.logger, channel: davies }
 
