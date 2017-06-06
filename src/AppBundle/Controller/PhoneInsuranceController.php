@@ -96,9 +96,10 @@ class PhoneInsuranceController extends BaseController
 
     /**
      * @Route("/phone-insurance/{make}", name="quote_make", requirements={"make":"[a-zA-Z]+"})
+     * @Route("/insure/{make}", name="insure_make", requirements={"make":"[a-zA-Z]+"})
      * @Template
      */
-    public function makeInsurance($make)
+    public function makeInsurance(Request $request, $make)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -121,6 +122,14 @@ class PhoneInsuranceController extends BaseController
             );
             ksort($phonesMem[$phone->getName()]['mem']);
         }
+
+        $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
+        if (in_array($request->get('_route'), ['insure_make'])) {
+            $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
+        }
+        $this->get('app.mixpanel')->queueTrackWithUtm($event, [
+            'Manufacturer' => $make,
+        ]);
 
         return array('phones' => $phonesMem, 'make' => $make);
     }
@@ -232,13 +241,24 @@ class PhoneInsuranceController extends BaseController
         }
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            $exp = $this->get('app.sixpack')->participate(
-                SixpackService::EXPERIMENT_LANDING_HOME,
-                ['landing', 'home'],
-                true
-            );
-            if ($exp == 'home') {
-                return new RedirectResponse($this->generateUrl('homepage'));
+            if ($make == "Samsung") {
+                $exp = $this->get('app.sixpack')->participate(
+                    SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER,
+                    ['cpc-quote', 'cpc-manufacturer'],
+                    true
+                );
+                if ($exp == 'cpc-manufacturer') {
+                    return new RedirectResponse($this->generateUrl('insure_make', ['make' => 'Samsung']));
+                }
+            } else {
+                $exp = $this->get('app.sixpack')->participate(
+                    SixpackService::EXPERIMENT_LANDING_HOME,
+                    ['landing', 'home'],
+                    true
+                );
+                if ($exp == 'home') {
+                    return new RedirectResponse($this->generateUrl('homepage'));
+                }
             }
         }
 
@@ -374,7 +394,7 @@ class PhoneInsuranceController extends BaseController
         if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
             $event = MixpanelService::EVENT_QUOTE_PAGE;
             if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-                $event = MixpanelService::EVENT_LANDING_PAGE;
+                $event = MixpanelService::EVENT_CPC_QUOTE_PAGE;
             }
             $this->get('app.mixpanel')->queueTrackWithUtm($event, [
                 'Device Selected' => $phone->__toString(),
@@ -384,6 +404,15 @@ class PhoneInsuranceController extends BaseController
                 'First Device Selected' => $phone->__toString(),
                 'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
             ], true);
+
+            // Deprecated - Landing Page event - Keep for awhile for a transition period
+            // TODO: Remove
+            if ($event == MixpanelService::EVENT_CPC_QUOTE_PAGE) {
+                $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                    'Device Selected' => $phone->__toString(),
+                    'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                ]);
+            }
         }
 
         $data = array(

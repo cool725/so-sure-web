@@ -15,6 +15,7 @@ class SixpackService
 
     const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
     const EXPERIMENT_LANDING_HOME = 'landing-or-home';
+    const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
 
     // Completed test - SW-45
     // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
