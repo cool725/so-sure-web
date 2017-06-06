@@ -17,6 +17,8 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
+        'components/owl.carousel/owl.carousel.min.css'
+        'components/owl.carousel/owl.theme.default.min.css'
         '@AppBundle/Resources/public/sass/page/phoneLanding.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
@@ -37,46 +39,30 @@
                             {{ make|capitalize }} {{ make_extra }} Insurance
                         </h1>
 
-                        <p class="lead hidden-xs">Select your model to get a quote</p>
+                        <p class="lead">Select your model to get a quote</p>
 
                     </div>
                 </div>
             </div>
 
-            <div id="samsung-galaxy-carousel" class="carousel slide landing-phones  visible-xs" data-ride="carousel" data-interval="false">
+            <div class="owl-carousel owl-theme visible-xs">
+            {% for phone in phones %}
 
-                <!-- Wrapper for slides -->
-                <div class="carousel-inner" role="listbox">
-                    {% set first = true %}
-                    {% for phone in phones %}
+            {# Probably a better way to do this? #}
+            {% set img_url = phone.model|replace({' ': '-', '+': "-Plus"}) %}
 
-                    {# Probably a better way to do this? #}
-                    {% set img_url = phone.model|replace({' ': '-', '+': "-Plus"}) %}
-
-                    <div class="item {% if first %}active{% endif %}">
-                        <div class="phone thumbnail">
-                            <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
-                            <div class="caption">
-                                <h2 class="h4">{{ phone.model }}</h2>
-                                <p class="visible-xs">Select your model to get a quote</p>
-                                {% for mem, url in phone.mem %}
-                                    <a href="{{ url }}" class="btn btn-blue">{{ mem }}GB</a>
-                                {% endfor %}
-                            </div>
-                        </div>
+                <div class="item">
+                    <div class="item-inner">
+                        <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
+                        <h2 class="h5 text-center">{{ phone.model }}</h2>
+                        {% for mem, url in phone.mem %}
+                            <a href="{{ url }}" class="btn btn-blue btn-30">{{ mem }}GB</a>
+                        {% endfor %}
                     </div>
-                    {% set first = false %}
-                    {% endfor %}
                 </div>
 
-                <a class="left carousel-control" href="#samsung-galaxy-carousel" role="button" data-slide="prev">
-                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                </a>
-                <a class="right carousel-control" href="#samsung-galaxy-carousel" role="button" data-slide="next">
-                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
-                </a>
+
+            {% endfor %}
             </div>
 
             <div class="landing-phones hidden-xs">
@@ -238,7 +224,9 @@
     {% javascripts
     'components/jquery_lazyload/jquery.lazyload.js'
     'components/typeahead.js/typeahead.bundle.min.js'
+    'components/owl.carousel/owl.carousel.min.js'
     '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Default/makeInsurance.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

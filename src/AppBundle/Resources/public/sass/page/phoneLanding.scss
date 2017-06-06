@@ -75,3 +75,27 @@ a {
     display: block;
     opacity: 1;
 }
+
+.owl-carousel {
+    margin-bottom: 30px;
+
+    .item {
+        text-align: center;
+        display: none;
+        min-width: 120px;
+
+        &-inner {
+            // height: 300px;
+        }
+
+        img {
+            height: 250px; width: auto;
+            margin: 0 auto;
+            display: block;
+        }
+    }
+}
+
+.owl-theme .owl-nav.disabled + .owl-dots {
+    margin-top: 30px;
+}

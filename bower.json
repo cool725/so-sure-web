@@ -33,7 +33,8 @@
     "jquery-circle-progress": "^1.2.1",
     "jquery-validation": "jquery.validate#^1.13.0",
     "bootstrap-sass": "^3.3.7",
-    "jquery_lazyload": "jquery.lazyload#^1.9.7"
+    "jquery_lazyload": "jquery.lazyload#^1.9.7",
+    "owl.carousel": "^2.2.1"
   },
   "install": {
     "path": "web/components",
@@ -43,6 +44,11 @@
       ],
       "jquery_lazyload": [
         "bower_components/jquery_lazyload/jquery.lazyload.js"
+      ],
+      "owl.carousel": [
+        "bower_components/owl.carousel/dist/owl.carousel.min.js",
+        "bower_components/owl.carousel/dist/assets/owl.carousel.min.css",
+        "bower_components/owl.carousel/dist/assets/owl.theme.default.min.css"
       ],
       "seiyria-bootstrap-slider": [
         "bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js",
