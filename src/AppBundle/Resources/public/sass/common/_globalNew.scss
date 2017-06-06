@@ -175,15 +175,29 @@ hr {
 	    display: none !important;
 	}
 
-	// Digits login
-	.digits-container iframe {
-		height: 250px;
+	.login-digits {
+		position: relative;
 	}
 
-	@include breakpoint(mobileishup) {
-		.digits-container iframe {
-			height: 200px;
-		}
+	.digits-loading {
+		width: 100%; height: 100%;
+		background-color: $white;
+		text-align: center;
+		position: absolute;
+		top: 0; left: 0; right: 0; bottom: 0;
+	}
+
+
+	.login-email,
+	.login-digits {
+		height: 360px;
+		margin-bottom: 20px;
+	}
+
+	// Digits login
+	.digits-container-wrapper,
+	.digits-container iframe {
+		height: 230px;
 	}
 
 
