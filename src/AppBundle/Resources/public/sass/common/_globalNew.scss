@@ -177,13 +177,7 @@ hr {
 
 	// Digits login
 	.digits-container iframe {
-		height: 250px;
-	}
-
-	@include breakpoint(mobileishup) {
-		.digits-container iframe {
-			height: 200px;
-		}
+		height: 230px;
 	}
 
 
