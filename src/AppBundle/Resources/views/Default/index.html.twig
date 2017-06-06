@@ -14,7 +14,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets output='css/*.css'
+    {% stylesheets output='css/*.css' filter='uglifycss' filter='cssrewrite'
     '@AppBundle/Resources/public/sass/page/homepage.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
