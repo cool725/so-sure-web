@@ -175,6 +175,18 @@ hr {
 	    display: none !important;
 	}
 
+	.login-digits {
+		position: relative;
+	}
+
+	.digits-loading {
+		width: 100%; height: 230px;
+		text-align: center;
+		position: absolute;
+		top: 0;
+	}
+
+
 	.login-email,
 	.login-digits {
 		height: 360px;
