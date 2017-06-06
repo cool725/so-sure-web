@@ -175,7 +175,14 @@ hr {
 	    display: none !important;
 	}
 
+	.login-email,
+	.login-digits {
+		height: 360px;
+		margin-bottom: 20px;
+	}
+
 	// Digits login
+	.digits-container-wrapper,
 	.digits-container iframe {
 		height: 230px;
 	}
