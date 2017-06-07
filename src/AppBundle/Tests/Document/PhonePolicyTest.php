@@ -2645,4 +2645,49 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhoneVerified(false);
         $this->assertTrue($policy->getPhoneVerified());
     }
+
+    public function testIsRefundAllowed()
+    {
+        $policy = new SalvaPhonePolicy();
+        $allowedRefunds = [
+            Policy::CANCELLED_USER_REQUESTED,
+            Policy::CANCELLED_COOLOFF,
+            Policy::CANCELLED_DISPOSSESSION,
+            Policy::CANCELLED_WRECKAGE,
+        ];
+        $upgrade = Policy::CANCELLED_UPGRADE;
+        $disallowedRefunds = [
+            Policy::CANCELLED_UNPAID,
+            Policy::CANCELLED_ACTUAL_FRAUD,
+            Policy::CANCELLED_SUSPECTED_FRAUD,
+        ];
+        foreach ($allowedRefunds as $reason) {
+            $policy->setCancelledReason($reason);
+            $this->assertTrue($policy->isRefundAllowed());
+        }
+        foreach ($disallowedRefunds as $reason) {
+            $policy->setCancelledReason($reason);
+            $this->assertFalse($policy->isRefundAllowed());
+        }
+
+        $policy->setCancelledReason($upgrade);
+        $this->assertTrue($policy->isRefundAllowed());
+
+        $claim = new Claim();
+        $claim->setRecordedDate(new \DateTime("2016-01-01"));
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setClosedDate(new \DateTime("2016-01-01"));
+        $policy->addClaim($claim);
+
+        $policy->setCancelledReason($upgrade);
+        $this->assertTrue($policy->isRefundAllowed());
+        foreach ($allowedRefunds as $reason) {
+            $policy->setCancelledReason($reason);
+            $this->assertFalse($policy->isRefundAllowed());
+        }
+        foreach ($disallowedRefunds as $reason) {
+            $policy->setCancelledReason($reason);
+            $this->assertFalse($policy->isRefundAllowed());
+        }
+    }
 }
