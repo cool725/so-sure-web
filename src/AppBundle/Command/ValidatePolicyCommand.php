@@ -29,7 +29,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 'date',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Pretent its this date'
+                'Pretend its this date'
             )
             ->addOption(
                 'policyNumber',
@@ -142,8 +142,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             if ($policy->isCancelled()) {
                 $lines[] = sprintf(
                     'Policy is cancelled. Refund %f / Commission %f',
-                    $policy->getRefundAmount(),
-                    $policy->getRefundCommissionAmount()
+                    $policy->getRefundAmount($validateDate),
+                    $policy->getRefundCommissionAmount($validateDate)
                 );
             }
         } else {
