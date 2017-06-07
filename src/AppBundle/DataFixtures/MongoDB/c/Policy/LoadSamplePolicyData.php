@@ -415,10 +415,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (in_array($claim->getType(), [
             Claim::TYPE_LOSS,
             Claim::TYPE_THEFT,
+        ])) {
+            $claim->setExcess(70);
+        } elseif (in_array($claim->getType(), [
             Claim::TYPE_DAMAGE,
+            Claim::TYPE_WARRANTY,
             Claim::TYPE_EXTENDED_WARRANTY,
         ])) {
-            $claim->setExcess($claim->getExpectedExcess());
+            $claim->setExcess(50);
         }
         $claim->setClaimHandlingFees(15);
         $claim->setTransactionFees(rand(90,190) / 100);

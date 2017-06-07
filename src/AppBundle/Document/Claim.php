@@ -588,17 +588,6 @@ class Claim
         $this->claimHandlingFees = $claimHandlingFees;
     }
 
-    public function getExpectedExcess()
-    {
-        if (in_array($this->getType(), [Claim::TYPE_DAMAGE, Claim::TYPE_EXTENDED_WARRANTY])) {
-            return 50;
-        } elseif (in_array($this->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
-            return 70;
-        } else {
-            throw new \Exception(sprintf('Unknown type for expected excess: %s', $this->getType()));
-        }
-    }
-
     public function isPhoneReturnExpected()
     {
         if (in_array($this->getType(), [Claim::TYPE_DAMAGE, Claim::TYPE_WARRANTY, Claim::TYPE_EXTENDED_WARRANTY])) {
