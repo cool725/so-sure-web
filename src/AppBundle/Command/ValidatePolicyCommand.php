@@ -139,6 +139,13 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 );
                 // @codingStandardsIgnoreEnd
             }
+            if ($policy->isCancelled()) {
+                $lines[] = sprintf(
+                    'Policy is cancelled. Refund %f / Commission %f',
+                    $policy->getRefundAmount(),
+                    $policy->getRefundCommissionAmount()
+                );
+            }
         } else {
             $policies = $policyRepo->findAll();
             $lines[] = 'Policy Validation';
