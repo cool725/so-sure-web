@@ -70,6 +70,12 @@ snc_redis:
         client: session
         ttl: 3600
 
+#assetic:
+#    filters:
+#        uglifycss:
+#            bin:        /usr/local/bin/uglifycss
+#            apply_to:   '\.css$'
+
 #nelmio_security:
 #    forced_ssl:
 #        hsts_max_age: 3600 # 30 days

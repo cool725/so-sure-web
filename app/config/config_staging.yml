@@ -25,6 +25,10 @@ scheb_two_factor:
 assetic:
     workers:
         cache_busting: ~
+    filters:
+        uglifycss:
+            bin:        /usr/local/bin/uglifycss
+            apply_to:   '\.css$'
 
 monolog:
     channels: ['receperio']
