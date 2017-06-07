@@ -10,7 +10,8 @@
 /app/cache/dev/
 /app/cache/
 /app/report/
-/app/Resources/node_modules/.bin
+/app/Resources/node_modules
+/app/Resources/node_modules/*
 /app/spool/
 /bin
 /log
