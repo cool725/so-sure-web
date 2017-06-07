@@ -9,16 +9,15 @@
         {% include '::header.html.twig' %}
 
         {% block stylesheets %}
+            {# Whilst we are transitioning use two different main stylesheets #}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
                 {% stylesheets output='css/*.css'
-                    'components/cookieconsent/cookieconsent.min.css'
                     '@AppBundle/Resources/public/sass/mainNew.scss'
                 %}
                 <link rel="stylesheet" href="{{ asset_url }}">
                 {% endstylesheets %}
             {% else %}
                 {% stylesheets output='css/*.css'
-                    'components/cookieconsent/cookieconsent.min.css'
                     '@AppBundle/Resources/public/sass/main.scss'
                 %}
                 <link rel="stylesheet" href="{{ asset_url }}">
