@@ -29,7 +29,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 'date',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Pretent its this date'
+                'Pretend its this date'
             )
             ->addOption(
                 'policyNumber',
@@ -138,6 +138,13 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     'WARNING!! - Prior successful claim (extra care should be used to avoid cancellation)'
                 );
                 // @codingStandardsIgnoreEnd
+            }
+            if ($policy->isCancelled()) {
+                $lines[] = sprintf(
+                    'Policy is cancelled. Refund %f / Commission %f',
+                    $policy->getRefundAmount($validateDate),
+                    $policy->getRefundCommissionAmount($validateDate)
+                );
             }
         } else {
             $policies = $policyRepo->findAll();

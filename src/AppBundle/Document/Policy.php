@@ -1139,9 +1139,10 @@ abstract class Policy
 
     public function isRefundAllowed()
     {
-        // For all cases, if there's a claim, then no not allow refund
-        // TODO: Should this be open claim???  Possibly shouldn't allow cancellation if there is an option claim
-        if ($this->hasMonetaryClaimed(true)) {
+        // Policy upgrade should allow a refund regardless of claim status
+        // For all other cases, if there's a claim, then no not allow refund
+        // TODO: Should this be open claim???  Possibly shouldn't allow cancellation if there is an open claim
+        if ($this->hasMonetaryClaimed(true) && $this->getCancelledReason() != Policy::CANCELLED_UPGRADE) {
             return false;
         }
 
