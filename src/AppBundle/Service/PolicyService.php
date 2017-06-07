@@ -645,7 +645,7 @@ class PolicyService
      * $policy = $this->dm->merge($policy);
      * TODO: Fix that
      */
-    public function adjustScheduledPayments(Policy $policy, \DateTime $date = null)
+    public function adjustScheduledPayments(Policy $policy, $expectSingleAdjustment = false, \DateTime $date = null)
     {
         $log = [];
         $prefix = $policy->getPolicyPrefix($this->environment);
@@ -688,7 +688,12 @@ class PolicyService
 
         if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
             $this->dm->flush();
-            $this->logger->warning(implode(PHP_EOL, $log));
+            // If user has manually paid, there should be a single adjustment made, so reduce log level
+            if ($expectSingleAdjustment && count($scheduledPayments) == 1) {
+                $this->logger->info(implode(PHP_EOL, $log));
+            } else {
+                $this->logger->warning(implode(PHP_EOL, $log));
+            }
 
             return true;
         } else {
