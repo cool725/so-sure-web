@@ -54,6 +54,16 @@ class ClaimRepository extends DocumentRepository
         return $qb->getQuery()->execute();
     }
 
+    public function findClosedClaims($start, $end)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('closedDate')->gte($start)
+            ->field('closedDate')->lt($end)
+        ;
+
+        return $qb->getQuery()->execute();
+    }
+
     public function findOutstanding()
     {
         $qb = $this->createQueryBuilder()

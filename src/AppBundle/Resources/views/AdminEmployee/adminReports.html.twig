@@ -328,13 +328,13 @@
                             <td>{% if data.totalAvgSCodeInvitations != 'n/a' %}{{ data.totalAvgSCodeInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                         </tr>
                         <tr>
-                            <td>Claims</td>
+                            <td>Claims (FNOL based date)</td>
                             <td>{{ claims.total }}</td>
                             <td></td>
                         </tr>
                         {% for claim, value in claims if claim != 'total' %}
                         <tr>
-                            <td style="padding-left: 30px">Claims - {{ claim }}</td>
+                            <td style="padding-left: 30px">Claims (FNOL based date) - {{ claim }}</td>
                             <td>{{ value }}
                                 <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
                                            title="Data May Change" data-content="Claim status is point in time and so may change when viewed historically vs when claims may still be in progress"></i>
@@ -342,6 +342,11 @@
                             <td></td>
                         </tr>
                         {% endfor %}
+                        <tr>
+                            <td>Closed Claims (Closed based date)</td>
+                            <td>{{ closedClaims.total }}</td>
+                            <td></td>
+                        </tr>
                         <tr>
                             <td>Avg hours to connect
         <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
