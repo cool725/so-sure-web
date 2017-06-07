@@ -55,6 +55,8 @@ class ReportingService
         $claimsTotals = Claim::sumClaims($claims);
         $approvedClaims = $claimsRepo->findApprovedClaims($start, $end);
         $approvedClaimsTotals = Claim::sumClaims($approvedClaims);
+        $closedClaims = $claimsRepo->findClosedClaims($start, $end);
+        $closedClaimsTotals = Claim::sumClaims($closedClaims);
 
         $invalidPolicies = $policyRepo->getActiveInvalidPolicies();
         $invalidPoliciesIds = [];
@@ -274,6 +276,7 @@ class ReportingService
             'excluded_policies' => $excludedPolicies,
             'claims' => $claimsTotals,
             'approvedClaims' => $approvedClaimsTotals,
+            'closedClaims' => $closedClaimsTotals,
         ];
     }
 
