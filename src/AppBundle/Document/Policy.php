@@ -690,6 +690,29 @@ abstract class Policy
         return $this->claims;
     }
 
+    public function getLatestClaim($requireReplacementImei = false)
+    {
+        $claims = $this->getClaims();
+        if (!is_array($claims)) {
+            $claims = $claims->getValues();
+        }
+        if ($requireReplacementImei) {
+            $claims = array_filter($claims, function ($claim) {
+                return $claim->getReplacementImei() !== null;
+            });
+        }
+        if (count($claims) == 0) {
+            return null;
+        }
+
+        // sort most recent to older
+        usort($claims, function ($a, $b) {
+            return $a->getRecordedDate() < $b->getRecordedDate();
+        });
+
+        return $claims[0];
+    }
+
     public function addLinkedClaim(Claim $claim)
     {
         $claim->setLinkedPolicy($this);
