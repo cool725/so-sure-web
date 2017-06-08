@@ -1,102 +1,25 @@
-$(function(){
-    var phones = $('#select-phone-data').data('phones');
-    var updatePhones = function() {
-        var make = $('.select-phone-make').val();
-        var options = $(".select-phones");
-        options.empty();
-        if (make) {
-            options.append($("<option />").val("").text('Select your ' + make + ' device'));
-        } else {
-            options.append($("<option />").val("").text('Select your phone make first'));
-        }
-        $.each(phones[make], function(key, value) {
-            options.append($("<option />").val(key).text(value));
-        });
+
+var sosure = sosure || {};
+
+sosure.selectPhoneMake = (function() {
+    var self = {};
+
+    self.fuse_options = {
+      keys: ['name'],
+      shouldSort: true,
+      threshold: 0.4,
     }
-    $('.select-phone-make').on('change', function(e) {
-        updatePhones();
-    });
-    updatePhones();
-
-    $('#launch_phone_make').change(function() {
-        $('#launch_phone_make').removeClass('has-error')
-        $('#launch_phone_phoneId').removeClass('has-error')
-    });
-
-    $('#launch_phone_phoneId').change(function() {
-        $('#launch_phone_phoneId').removeClass('has-error')
-    });
-
-    $("#launch_phone_next").click(function(event) {
-
-        event.preventDefault();
-
-        if ($('#launch_phone_make').val() == "") {
-            $('#launch_phone_make').addClass('has-error')
-        }
-        else {
-            $('#launch_phone_make').removeClass('has-error')
-        }
-
-        if ($('#launch_phone_phoneId').val() == "") {
-            $('#launch_phone_phoneId').addClass('has-error')
-        }
-        else {
-            $('#launch_phone_phoneId').removeClass('has-error')
-        }
-
-        if ($('#launch_phone_make').val() != "" && $('#launch_phone_phoneId').val() != "") {
-            $('form[name="launch_phone"]').submit()
-        }
-    });
-
-    // Twitter Typeahead
-    function preventDefault(e) {
-        e.preventDefault();
+    self.delayTimer = null;
+    
+    self.init = function() {
+        // make sure we always have a fuse to query against, even if no data
+        self.fuse = new Fuse([], self.fuse_options);
+        self.load_fuse();
     }
-
-    // If the form action is already defined, then allow the form to submit
-    if (!$('#search-phone-form').attr('action')) {
-        $('#search-phone-form').bind('submit', preventDefault);
-    }
-
-    function mySort(a, b) {
-        if (a < b) {
-            return -1;
-        } else if (a > b) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    var searchPhones = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        prefetch: {
-            'url': '/search-phone',
-            'ttl': 1800000  // 30 minutes
-        },
-        identify: function(obj) { return obj.id; },
-        sorter: function(a, b) {
-            var rxA = /(.*)\(([0-9]+)\s?GB\)/g;
-            var rxB = /(.*)\(([0-9]+)\s?GB\)/g;
-            var arrA = rxA.exec(a.name);
-            var arrB = rxB.exec(b.name);
-            if (arrA === null || arrB === null) {
-                return mySort(a.name, b.name);
-            } else if (arrA[1] == arrB[1]) {
-                return mySort(parseInt(arrA[2]), parseInt(arrB[2]));
-            } else {
-                return mySort(arrA[1], arrB[1]);
-            }
-        }
-    });
-
-    var delayTimer;
-    function sendSearch(page) {
-        clearTimeout(delayTimer);
-        delayTimer = setTimeout(function() {
+    
+    self.sendSearch = function(page) {
+        clearTimeout(self.delayTimer);
+        self.delayTimer = setTimeout(function() {
             dataLayer.push({
               event: 'Search',
                 'GAPage':page
@@ -105,10 +28,45 @@ $(function(){
         }, 1000);
     }
 
-    function searchPhonesWithGa(q, sync) {
+    self.load_fuse = function() {
+        $.ajax({
+            url: '/search-phone',
+            type: 'GET',
+            success: function(result) {
+                self.fuse = new Fuse(result, self.fuse_options);
+            }.bind(self)
+        });        
+    }
+
+    self.searchPhonesWithGa = function (q, sync) {
         var page = '/search?q=' + q;
-        sendSearch(page);
-        searchPhones.search(q, sync);
+        self.sendSearch(page);
+        if (typeof self.fuse !== 'undefined') {
+            results = self.fuse.search(q);
+            //console.log(results);
+            sync(results);
+        } else {
+            alert('no fuse');
+        }
+    }
+
+    // Twitter Typeahead
+    self.preventDefault = function(e) {
+        e.preventDefault();
+    }
+
+    return self;
+})();
+
+$(function(){
+    sosure.selectPhoneMake.init();
+});
+
+$(function(){
+
+    // If the form action is already defined, then allow the form to submit
+    if (!$('#search-phone-form').attr('action')) {
+        $('#search-phone-form').bind('submit', sosure.selectPhoneMake.preventDefault);
     }
 
     $('#search-phone').typeahead({
@@ -118,7 +76,7 @@ $(function(){
     },
     {
         name: 'searchPhonesWithGa',
-        source: searchPhonesWithGa,
+        source: sosure.selectPhoneMake.searchPhonesWithGa,
         display: 'name',
         limit: 100,
         templates: {
@@ -142,7 +100,7 @@ $(function(){
     });
 
     $('#search-phone').bind('typeahead:selected', function(ev, suggestion) {
-        $('#search-phone-form').unbind('submit', preventDefault);
+        $('#search-phone-form').unbind('submit', sosure.selectPhoneMake.preventDefault);
     });
 
     $('#search-phone').bind('typeahead:select', function(ev, suggestion) {
