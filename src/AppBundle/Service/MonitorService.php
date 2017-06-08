@@ -169,4 +169,24 @@ class MonitorService
             throw new \Exception(sprintf('User count %d too high (warning %d)', $total, $maxUsers));
         }
     }
+
+    public function policyImeiUpdatedFromClaim()
+    {
+        $repo = $this->dm->getRepository(Claim::class);
+        // TODO: For now, checking all claims is fine - eventually will want to filter out older claims
+        // however, we do want to include more recently closed claims as that's the bit that can have issues
+        // claim is closed prior to being able to update imei
+        $claims = $repo->findAll();
+        foreach ($claims as $claim) {
+            $policy = $claim->getPolicy();
+            if ($lastestClaimForPolicy = $policy->getLatestClaim(true)) {
+                if ($policy->getImei() != $lastestClaimForPolicy->getReplacementImei()) {
+                    throw new \Exception(sprintf(
+                        'Policy %s has a claim w/replacement imei that does not match current imei',
+                        $policy->getId()
+                    ));
+                }
+            }
+        }
+    }
 }
