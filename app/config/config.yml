@@ -356,6 +356,8 @@ nelmio_security:
                 - https://cdn.so-sure.com
                 - https://*.gstatic.com
                 - https://*.intercomcdn.com
+                - https://*.fastly.net
+                - https://maxcdn.bootstrapcdn.com
                 - 'data:'
             child-src:
                 - 'self'
