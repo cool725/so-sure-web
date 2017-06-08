@@ -669,6 +669,18 @@ class InvitationService
                     $url = $stats->getEffectiveUri();
                 }
             ]);
+
+            // Branch now performs a javascript redirect using window.location
+            $host = strtolower(parse_url($url, PHP_URL_HOST));
+            if (in_array($host, ['sosure.app.link', 'sosure.test-app.link'])) {
+                $body = (string) $res->getBody();
+                $pattern = '/.*window\.location\s*=\s*["]([^"]*)["].*/m';
+                $matches = array();
+                preg_match($pattern, $body, $matches);
+                if (count($matches) >= 2 && filter_var($matches[1], FILTER_VALIDATE_URL)) {
+                    $url = $matches[1];
+                }
+            }
             $parts = explode('/', parse_url($url, PHP_URL_PATH));
 
             return $parts[count($parts) - 1];
