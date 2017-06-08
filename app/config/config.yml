@@ -115,9 +115,6 @@ assetic:
         sass:
             bin:        /usr/local/bin/sass
             apply_to:   '\.scss$'
-        uglifycss:
-            bin:        /usr/local/bin/uglifycss
-            apply_to:   '\.css$'
         # uglifyjs2:
             # bin:        /usr/local/bin/uglifyjs
 fos_user:
