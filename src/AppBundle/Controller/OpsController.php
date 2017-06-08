@@ -182,6 +182,8 @@ class OpsController extends BaseController
                 'client.comprigo.com',
                 'www.video2mp3.at',
                 's3.amazonaws.com',
+                'junglenet-a.akamaihd.net',
+                'del.icio.us',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 
