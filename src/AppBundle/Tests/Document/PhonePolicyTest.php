@@ -369,6 +369,53 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_LOW, $policyConnected->getRisk(new \DateTime("2016-02-20")));
     }
 
+    public function testPotValueWithClaimedCancelledPolicy()
+    {
+        $policyA = static::createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('testNetworkPotValueWithClaimedCancelledPolicy-a', $this));
+        $policyB = static::createUserPolicy(true);
+        $policyB->getUser()->setEmail(static::generateEmail('testNetworkPotValueWithClaimedCancelledPolicy-b', $this));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyB);
+        static::$dm->persist($connectionA);
+        static::$dm->persist($connectionB);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+        $this->assertNotNull($policyB->getId());
+
+        $policyA->updatePotValue();
+        $policyB->updatePotValue();
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $claimA = new Claim();
+        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setClosedDate(new \DateTime("2016-01-01"));
+        $policyA->addClaim($claimA);
+
+        $policyA->updatePotValue();
+        $policyB->updatePotValue();
+
+        $this->assertEquals(0, $policyA->getPotValue());
+        $this->assertEquals(0, $policyB->getPotValue());
+
+        $policyA->cancel(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
+
+        $this->assertEquals(SalvaPhonePolicy::STATUS_CANCELLED, $policyA->getStatus());
+        $this->assertEquals(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, $policyA->getCancelledReason());
+
+        $policyA->updatePotValue();
+        $policyB->updatePotValue();
+
+        $this->assertEquals(0, $policyA->getPotValue());
+        $this->assertEquals(0, $policyB->getPotValue());
+    }
+
     public function testGetRiskReasonPolicyRewardConnection()
     {
         $reward = $this->createReward(static::generateEmail('testGetRiskPolicyRewardConnection', $this));
