@@ -47,7 +47,7 @@
             {{ form_widget(form.status) }}
         </div>
       </div>
-      {% if is_granted('ROLE_ADMIN') %}
+      {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE') %}
         <div class="row">
             <div class="form-group col-sm-4">
                 {{ form_label(form.imei, 'IMEI') }}
