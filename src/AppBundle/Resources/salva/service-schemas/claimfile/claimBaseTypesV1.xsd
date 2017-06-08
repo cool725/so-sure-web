@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://sims.salva.ee/service/schema/claimfile/v1"
+    xmlns="http://sims.salva.ee/service/schema/claimfile/v1"
+    xmlns:base="http://sims.salva.ee/service/schema/v1"
+    xmlns:policy="http://sims.salva.ee/service/schema/policy/v1"
+    elementFormDefault="qualified"
+    attributeFormDefault="qualified">
+
+    <xs:import namespace="http://sims.salva.ee/service/schema/v1" schemaLocation="../baseTypesV1.xsd"></xs:import>
+    <xs:import namespace="http://sims.salva.ee/service/schema/policy/v1" schemaLocation="../policy/policyBaseTypesV1.xsd"></xs:import>
+
+    <xs:complexType name="claimFileType">
+        <xs:sequence>
+            <xs:element name="recordId" type="xs:long" minOccurs="0"/>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="accidentNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="accident" type="accidentType" minOccurs="0"/>
+            <xs:element name="productCode" type="base:nonEmptyString" minOccurs="0"/>
+            <xs:element name="policyNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="lossAdjusterUser" type="xs:string" minOccurs="0"/>
+            <xs:element name="lossAdjusterUserFullName" type="xs:string" minOccurs="0"/>
+            <xs:element name="claimFileNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="claimFileStatusCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="registryObject" type="policy:registryObjectType" minOccurs="0"/>
+            <xs:element name="injuryCausesCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="note" type="xs:string" minOccurs="0"/>
+            <xs:element name="claimFileTypeCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="oppositePartyCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="responsibleInsuredObject" type="claimInsuredObjectType" minOccurs="0"/>
+            <xs:element name="manualHandlingCost" type="xs:decimal" minOccurs="0"/>
+            <xs:element name="customerBehaviourCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="responsibleRegistryObject" type="policy:registryObjectType" minOccurs="0"/>
+            <xs:element name="mtplOwnInsurerHandlerCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="regressFileStatusCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="baseClaimFileNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="claims">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="claim" type="claimType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="claimFileFields">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="claimFileField" type="policy:objectFieldType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="claimFileCustomers" type="policy:customersContainerType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="accidentType">
+        <xs:sequence>
+            <xs:element name="recordId" type="xs:long" minOccurs="0"/>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="accidentNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="lossTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="notificationTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="detectionTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="countryCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="location" type="xs:string" minOccurs="0"/>
+            <xs:element name="address" type="base:addressType" minOccurs="0"/>
+            <xs:element name="regionExternalCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="note" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType> 
+
+    <xs:complexType name="claimType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="claimTypeCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="currencyCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="reserveAmount" type="base:moneyType" minOccurs="0"/>
+            <xs:element name="deductibleAmount" type="base:moneyType" minOccurs="0"/>
+            <xs:element name="reductionAmount" type="base:moneyType" minOccurs="0"/>
+            <xs:element name="insuredObject" type="claimInsuredObjectType" minOccurs="0"/>
+            <xs:element name="recipientCustomer" type="policy:customerType" minOccurs="0"/>
+            <xs:element name="note" type="xs:string" minOccurs="0"/>
+            <xs:element name="insurerObligationNo" type="xs:string" minOccurs="0"/>
+            <xs:element name="totalCompensation" type="base:moneyType" minOccurs="0"/>
+
+            <xs:element name="invoiceRows" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="invoiceRow" type="policy:invoiceRowType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="claimInsuredObjectType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="name" type="xs:string" minOccurs="0"/>
+            <xs:element name="productObjectCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="objectRiskCode" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="claimFilesContainerType">
+        <xs:sequence>
+            <xs:element name="claimFile" minOccurs="0" maxOccurs="unbounded" type="claimFileType"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

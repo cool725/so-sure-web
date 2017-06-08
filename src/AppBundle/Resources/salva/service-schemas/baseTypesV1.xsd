@@ -40,7 +40,8 @@
 
     <xs:complexType name="addressType">
         <xs:sequence>
-            <xs:element name="countryCode" type="nonEmptyString"/>
+            <xs:element name="id" type="xs:long" minOccurs="0"/> 
+            <xs:element name="countryCode" type="xs:string" minOccurs="0"/>
             <xs:element name="building" type="xs:string" minOccurs="0"/>
             <xs:element name="room" type="xs:string" minOccurs="0"/>
             <xs:element name="additionalAddress" type="xs:string" minOccurs="0"/>
@@ -73,8 +74,8 @@
     </xs:complexType>
 
     <xs:simpleType name="nonEmptyString">
-	    <xs:restriction base="xs:string">
-	        <xs:pattern value=".*\S+.*"/>
-	    </xs:restriction>
+        <xs:restriction base="xs:string">
+            <xs:pattern value=".*\S+.*"/>
+        </xs:restriction>
     </xs:simpleType>
 </xs:schema>

@@ -65,6 +65,7 @@
             <xs:element name="calculatedPremium" type="base:moneyType" minOccurs="0"/>
             <xs:element name="finalPremium" type="base:moneyType" minOccurs="0"/>
             <xs:element name="salesChannelCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="tariffDate" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="registryObject" type="registryObjectType" minOccurs="0"/>
             <xs:element name="objectCustomers" type="customersContainerType" minOccurs="0"/>
             <xs:element name="objectFields">
@@ -160,6 +161,7 @@
             <xs:element name="certificateNo" type="xs:string" minOccurs="0"/>
             <xs:element name="constructionYear" type="xs:int" minOccurs="0"/>
             <xs:element name="vehicleCategoryCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="refreshAddressBuffer" type="xs:boolean" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -175,8 +177,10 @@
             <xs:element name="address" type="base:addressType" minOccurs="0"/>
             <xs:element name="email" type="xs:string" minOccurs="0"/>
             <xs:element name="phone" type="xs:string" minOccurs="0"/>
+            <xs:element name="noSpam" type="xs:boolean" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="role" type="base:nonEmptyString"/>
+        <xs:attribute name="oppositeParty" type="xs:boolean"/>
     </xs:complexType>
 
     <xs:complexType name="policiesContainerType">
