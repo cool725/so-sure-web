@@ -608,10 +608,12 @@ class PurchaseController extends BaseController
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
                         ['Policy Id' => $policy->getId()]
                     );
+                    // @codingStandardsIgnoreStart
                     $this->addFlash(
                         'success',
                         'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
                     );
+                    // @codingStandardsIgnoreEnd
                 }
             }
         } else {
