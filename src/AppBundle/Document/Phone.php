@@ -417,7 +417,9 @@ class Phone
         return str_replace(' ', '+', $model);
     }
 
-    // TODO: Adjust cdn images to use encodedModel instead
+    /**
+      * TODO: Adjust cdn images to use encodedModel instead
+      */
     public function getImageEncodedModel()
     {
         $model = str_replace('+', '-Plus', $this->getModel());
