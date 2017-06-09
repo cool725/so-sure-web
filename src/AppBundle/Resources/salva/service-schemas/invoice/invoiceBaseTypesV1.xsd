@@ -20,6 +20,7 @@
             <xs:element name="usedDepositAmount" type="base:moneyType" minOccurs="0"/>
             <xs:element name="referenceNo" type="xs:string" minOccurs="0"/>
             <xs:element name="fullyPaid" type="xs:boolean"/>
+            <xs:element name="reversed" type="xs:boolean"/>
             <xs:element name="recipientCustomer" type="policy:customerType"/>
             <xs:element name="payerCustomer" type="policy:customerType"/>
 
@@ -34,9 +35,9 @@
     </xs:complexType>
 
     <xs:complexType name="invoicesContainerType">
-	    <xs:sequence>
-	        <xs:element name="invoice" minOccurs="0" maxOccurs="unbounded" type="invoiceType"/>
-	    </xs:sequence>
+        <xs:sequence>
+            <xs:element name="invoice" minOccurs="0" maxOccurs="unbounded" type="invoiceType"/>
+        </xs:sequence>
     </xs:complexType>
 
 </xs:schema>

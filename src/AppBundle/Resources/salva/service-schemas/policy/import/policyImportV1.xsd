@@ -34,8 +34,8 @@
         <xs:complexContent>
             <xs:extension base="base:abstractResponseType">
                 <xs:sequence>
-					<xs:element name="policies" type="policy:policiesContainerType"/>
-					<xs:element name="request" type="serviceRequestType"/>
+                    <xs:element name="policies" type="policy:policiesContainerType"/>
+                    <xs:element name="request" type="serviceRequestType"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>

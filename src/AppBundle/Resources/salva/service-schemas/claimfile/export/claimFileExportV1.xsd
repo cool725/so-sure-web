@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://sims.salva.ee/service/schema/invoice/export/v1"
-    xmlns="http://sims.salva.ee/service/schema/invoice/export/v1"
-    xmlns:invoice="http://sims.salva.ee/service/schema/invoice/v1"
+    targetNamespace="http://sims.salva.ee/service/schema/claimfile/export/v1"
+    xmlns="http://sims.salva.ee/service/schema/claimfile/export/v1"
     xmlns:base="http://sims.salva.ee/service/schema/v1"
+    xmlns:claim="http://sims.salva.ee/service/schema/claimfile/v1"
     elementFormDefault="qualified"
     attributeFormDefault="qualified">
 
     <xs:import namespace="http://sims.salva.ee/service/schema/v1" schemaLocation="../../baseTypesV1.xsd"></xs:import>
-    <xs:import namespace="http://sims.salva.ee/service/schema/invoice/v1" schemaLocation="../invoiceBaseTypesV1.xsd"></xs:import>
+    <xs:import namespace="http://sims.salva.ee/service/schema/claimfile/v1" schemaLocation="../claimBaseTypesV1.xsd"></xs:import>
 
     <xs:element name="serviceRequest" type="serviceRequestType"/>
     <xs:element name="serviceResponse" type="serviceResponseType"/>
 
     <xs:complexType name="serviceRequestType">
         <xs:all>
-            <xs:element name="invoiceNo" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="claimFileNo" type="base:nonEmptyString"/>
         </xs:all>
     </xs:complexType>
 
@@ -23,7 +23,7 @@
         <xs:complexContent>
             <xs:extension base="base:abstractResponseType">
                 <xs:sequence>
-                    <xs:element name="invoices" type="invoice:invoicesContainerType"/>
+                    <xs:element name="claimFiles" type="claim:claimFilesContainerType"/>
                     <xs:element name="request" type="serviceRequestType"/>
                 </xs:sequence>
             </xs:extension>
