@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}so-sure - Better Phone Insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
+    <meta name="keywords" content="mobile phone insurance, social insurance"/>
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero brand-gradient">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="text-left">Was your phone damaged prior to purchase?</h1>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="article-content section--pad">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <p>
+                        We understand that mistakes happen. If your phone was damaged prior to purchasing your policy,
+                        you can easily rectify this mistake by clicking the cancel button now.
+                    </p>
+                    <p>
+                        Keep in mind that we take fraud very seriously and do prosecute.
+                        When you purchased your policy, you confirmed that your phone was in full working condition and without a cracked screen.
+                        If you failed to disclose the state of your phone accurately, we may exercise our right to cancel the policy and will report any instance of fraud to the police.
+                        
+                    </p>
+                    <p>
+                        {{ form_start(cancel_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(cancel_form.cancel, {'label': 'Please cancel my policy', 'attr': {'class': 'btn btn-danger'}}) }}
+                        {{ form_end(cancel_form) }}
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
