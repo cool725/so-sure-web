@@ -2309,6 +2309,29 @@ abstract class Policy
             );
         }
 
+        if ($this instanceof PhonePolicy) {
+            $foundSerial = false;
+            $mismatch = false;
+            foreach ($this->getCheckmendCertsAsArray(false) as $key => $cert) {
+                if (isset($cert['certId']) && $cert['certId'] == 'serial') {
+                    $foundSerial = true;
+                    if (!isset($cert['response']['makes']) ||
+                        count($cert['response']['makes']) == 0
+                    ) {
+                        $mismatch = true;
+                    }
+                }
+            }
+
+            if (!$foundSerial || $mismatch) {
+                // @codingStandardsIgnoreStart
+                $warnings[] = sprintf(
+                    'Recipero was unable to verify if the phone insured matches the imei given. Secondary verification of the type of phone may be advisable.'
+                );
+                // @codingStandardsIgnoreEnd
+            }
+        }
+
         return $warnings;
     }
 
