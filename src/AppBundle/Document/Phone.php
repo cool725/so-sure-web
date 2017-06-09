@@ -417,6 +417,16 @@ class Phone
         return str_replace(' ', '+', $model);
     }
 
+    /**
+      * TODO: Adjust cdn images to use encodedModel instead
+      */
+    public function getImageEncodedModel()
+    {
+        $model = str_replace('+', '-Plus', $this->getModel());
+
+        return str_replace(' ', '-', $model);
+    }
+
     public static function decodeModel($encodedModel)
     {
         $decodedModel = str_replace('+', ' ', $encodedModel);
@@ -534,6 +544,19 @@ class Phone
     public function setImageUrl($imageUrl)
     {
         $this->imageUrl = $imageUrl;
+    }
+
+    public function getImageUrlWithFallback()
+    {
+        if ($this->getImageUrl()) {
+            return $this->getImageUrl();
+        }
+
+        return sprintf(
+            'https://cdn.so-sure.com/images/library_phones/%s/%s.png',
+            $this->getMake(),
+            $this->getImageEncodedModel()
+        );
     }
 
     public function getDescription()
