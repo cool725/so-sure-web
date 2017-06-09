@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Classes;
 
+use AppBundle\Document\Address;
 use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
@@ -70,11 +71,23 @@ class Brightstar extends DaviesExcel
     public $faultReplacementDeliveryReceivedDate;
     public $faultReplacementDpdTracking;
 
+    public function getAddress()
+    {
+        $address = new Address();
+        $address->setLine1($this->address1);
+        $address->setLine2($this->address2);
+        $address->setLine3($this->address3);
+        $address->setCity($this->city);
+        $address->setPostcode($this->postcode);
+
+        return $address;
+    }
+
     public function getServiceType()
     {
-        if (stripos($this->service, self::SERVICE_TYPE_DELIVER) !== false) {
+        if (stripos(strtolower($this->service), strtolower(self::SERVICE_TYPE_DELIVER)) !== false) {
             return self::SERVICE_TYPE_DELIVER;
-        } elseif (stripos($this->service, self::SERVICE_TYPE_SWAP) !== false) {
+        } elseif (stripos(strtolower($this->service), strtolower(self::SERVICE_TYPE_SWAP)) !== false) {
             return self::SERVICE_TYPE_SWAP;
         } else {
             return null;

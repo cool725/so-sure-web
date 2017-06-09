@@ -100,6 +100,7 @@ abstract class S3EmailService
         $lines = [];
         $keys = $this->listS3();
         foreach ($keys as $key) {
+            $this->clearErrors();
             $lines[] = sprintf('Processing %s/%s', $this->path, $key);
             $processed = false;
             try {
