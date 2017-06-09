@@ -106,6 +106,7 @@ class DigitsService
             } elseif (!$user->getDigitsId()) {
                 // First time login, so we should store the digits id against the user record
                 $user->setDigitsId($id);
+                $user->setMobileNumberVerified(true);
                 $this->dm->flush();
             } elseif ($user->getDigitsId() != $id) {
                 throw new \Exception(sprintf(
@@ -122,6 +123,12 @@ class DigitsService
                 $user->getId(),
                 $mobileNumber
             ));
+        } else {
+            // new digits user above will now have mobile verified set, but for older users, set if they login again
+            if (!$user->getMobileNumberVerified()) {
+                $user->setMobileNumberVerified(true);
+                $this->dm->flush();
+            }
         }
 
         // Moved to last to help with debugging - onced resolved, could be place earlier in process
