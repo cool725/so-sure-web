@@ -47,13 +47,9 @@
 
             <div class="owl-carousel owl-theme visible-xs">
             {% for phone in phones %}
-
-            {# Probably a better way to do this? #}
-            {% set img_url = phone.model|replace({' ': '-', '+': "-Plus"}) %}
-
                 <div class="item">
                     <div class="item-inner">
-                        <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
+                        <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
                         <h2 class="h5 text-center">{{ phone.model }}</h2>
                         {% for mem, url in phone.mem %}
                             <a href="{{ url }}" class="btn btn-blue btn-30">{{ mem }}GB</a>
@@ -86,7 +82,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
+                                                <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
                                                 <div class="caption">
                                                     <h2 class="h4">{{ phone.model }}</h2>
                                                 </div>
@@ -105,7 +101,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ img_url}}.png" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
+                                        <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
                                         <div class="caption">
                                             <h2 class="h4">{{ phone.model }}</h2>
                                         </div>

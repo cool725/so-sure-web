@@ -114,6 +114,7 @@ class PhoneInsuranceController extends BaseController
                     'make' => $phone->getMake(),
                     'model' => $phone->getModel(),
                     'currentPhonePrice' => $phone->getCurrentPhonePrice(),
+                    'imageUrlWithFallback' => $phone->getImageUrlWithFallback(),
                 ];
             }
             $phonesMem[$phone->getName()]['mem'][$phone->getMemory()] = $this->generateUrl(
