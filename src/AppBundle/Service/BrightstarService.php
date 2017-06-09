@@ -80,6 +80,9 @@ class BrightstarService extends S3EmailService
 
     public function validateClaimDetails(Claim $claim, Brightstar $brightstar)
     {
+        $now = new \DateTime();
+        $warningDate = $this->addBusinessDays($brightstar->orderDate, 3);
+
         $policy = $claim->getPolicy();
         $user = $policy->getUser();
         similar_text(strtolower($user->getName()), $brightstar->name, $percent);
@@ -99,7 +102,9 @@ class BrightstarService extends S3EmailService
                 $user->getName(),
                 $percent
             );
-            $this->logger->warning($msg);
+            if ($warningDate > $now) {
+                $this->logger->warning($msg);
+            }
             $this->errors[$brightstar->claimNumber][] = $msg;
         }
 
@@ -115,7 +120,9 @@ class BrightstarService extends S3EmailService
                 $user->getBillingAddress()->getPostCode(),
                 $user->getBillingAddress()->__toString()
             );
-            $this->logger->warning($msg);
+            if ($warningDate > $now) {
+                $this->logger->warning($msg);
+            }
             $this->errors[$brightstar->claimNumber][] = $msg;
         }
 
@@ -127,7 +134,9 @@ class BrightstarService extends S3EmailService
                 $claim->getType(),
                 $brightstar->service
             );
-            $this->logger->warning($msg);
+            if ($warningDate > $now) {
+                $this->logger->warning($msg);
+            }
             $this->errors[$brightstar->claimNumber][] = $msg;
         }
         // although we would expect 1 day, if ordered after 4pm, then could take 2
@@ -139,7 +148,9 @@ class BrightstarService extends S3EmailService
                 $brightstar->replacementReceivedDate->format('d M Y'),
                 $brightstar->orderDate->format('d M Y')
             );
-            $this->logger->warning($msg);
+            if ($warningDate > $now) {
+                $this->logger->warning($msg);
+            }
             $this->errors[$brightstar->claimNumber][] = $msg;
         }
         // TODO: Validate replacement imei & delivery date (set?)
