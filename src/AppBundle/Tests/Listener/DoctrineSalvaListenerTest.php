@@ -46,7 +46,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
     {
     }
 
-    public function testSalvaPreUpdate()
+    public function testSalvaPreUpdateActive()
     {
         $user = static::createUser(
             static::$userManager,
@@ -73,6 +73,60 @@ class DoctrineSalvaListenerTest extends WebTestCase
         $this->runPreUpdateUser($user, $policy, $this->never(), ['email' => ['foo@', 'bar@']]);
     }
     
+    public function testSalvaPreUpdateUnpaid()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSalvaPreUpdateUnpaid', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        // policy updated
+        $this->runPreUpdate($policy, $this->once(), ['phone' => ['Apple', 'Samsung']]);
+        $this->runPreUpdate($policy, $this->once(), ['imei' => ['11', '12']]);
+        $this->runPreUpdate($policy, $this->once(), ['premium' => [1, 2]]);
+        $this->runPreUpdate($policy, $this->never(), ['potValue' => [1, 2]]);
+
+        // user updated
+        $this->runPreUpdateUser($user, $policy, $this->once(), ['firstName' => ['foo', 'bar']]);
+        $this->runPreUpdateUser($user, $policy, $this->once(), ['lastName' => ['foo', 'bar']]);
+        $this->runPreUpdateUser($user, $policy, $this->never(), ['email' => ['foo@', 'bar@']]);
+    }
+
+    public function testSalvaPreUpdatePending()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSalvaPreUpdatePending', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        // policy updated
+        $this->runPreUpdate($policy, $this->never(), ['phone' => ['Apple', 'Samsung']]);
+        $this->runPreUpdate($policy, $this->never(), ['imei' => ['11', '12']]);
+        $this->runPreUpdate($policy, $this->never(), ['premium' => [1, 2]]);
+        $this->runPreUpdate($policy, $this->never(), ['potValue' => [1, 2]]);
+
+        // user updated
+        $this->runPreUpdateUser($user, $policy, $this->never(), ['firstName' => ['foo', 'bar']]);
+        $this->runPreUpdateUser($user, $policy, $this->never(), ['lastName' => ['foo', 'bar']]);
+        $this->runPreUpdateUser($user, $policy, $this->never(), ['email' => ['foo@', 'bar@']]);
+    }
+
     private function runPreUpdate($policy, $count, $changeSet, $event = null)
     {
         if (!$event) {
