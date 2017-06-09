@@ -37,6 +37,9 @@ class DoctrineSalvaListener
                 if (!$policy->isValidPolicy()) {
                     $this->logger->debug(sprintf('preUpdateDebug invalid policy'));
                     return;
+                } elseif (!$policy->isBillablePolicy()) {
+                    $this->logger->debug(sprintf('preUpdateDebug not billable policy'));
+                    return;
                 }
 
                 $fields = [
@@ -56,7 +59,7 @@ class DoctrineSalvaListener
             }
 
             if ($document instanceof User) {
-                if (!$document->hasActivePolicy()) {
+                if (!$document->hasActivePolicy() && !$document->hasUnpaidPolicy()) {
                     return;
                 }
                 $fields = [
@@ -66,7 +69,8 @@ class DoctrineSalvaListener
                 foreach ($fields as $field) {
                     if ($eventArgs->hasChangedField($field)) {
                         foreach ($document->getPolicies() as $policy) {
-                            if ($policy instanceof SalvaPhonePolicy && $policy->isValidPolicy()) {
+                            if ($policy instanceof SalvaPhonePolicy &&
+                                $policy->isValidPolicy() && $policy->isBillablePolicy()) {
                                 if (!in_array($policy->getId(), $dispatched)) {
                                     $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
                                     $dispatched[] = $policy->getId();
