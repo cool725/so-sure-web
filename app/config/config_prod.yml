@@ -41,6 +41,9 @@ assetic:
         uglifycss:
             bin:        /usr/local/bin/uglifycss
             apply_to:   '\.css$'
+        uglifyjs2:
+            bin:        /usr/local/bin/uglifyjs
+            apply_to:   '\.js$'
 
 monolog:
     handlers:
@@ -63,17 +66,17 @@ monolog:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"
             level:  info
-            channels: ["salva"]            
+            channels: ["salva"]
         davies:
             type:   stream
             path:   "%kernel.logs_dir%/davies.log"
             level:  info
-            channels: ["davies"]            
+            channels: ["davies"]
         receperio:
             type:   stream
             path:   "%kernel.logs_dir%/receperio.log"
             level:  info
-            channels: ["receperio"]            
+            channels: ["receperio"]
         main:
             type:         fingers_crossed
             action_level: info
