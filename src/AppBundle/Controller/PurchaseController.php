@@ -593,6 +593,17 @@ class PurchaseController extends BaseController
             if ($request->request->has('cancel_form')) {
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
+                    $body = sprintf(
+                        'Requested cancellation for policy %s/%s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject(sprintf('Requested Policy Cancellation'))
+                        ->setFrom('info@so-sure.com')
+                        ->setTo('support@wearesosure.com')
+                        ->setBody($body, 'text/html');
+                    $this->get('mailer')->send($message);
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
                         ['Policy Id' => $policy->getId()]
