@@ -128,7 +128,7 @@ class DigitsService
             if (!$user->getMobileNumberVerified()) {
                 $user->setMobileNumberVerified(true);
                 $this->dm->flush();
-            }            
+            }
         }
 
         // Moved to last to help with debugging - onced resolved, could be place earlier in process
