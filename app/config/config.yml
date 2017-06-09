@@ -115,8 +115,7 @@ assetic:
         sass:
             bin:        /usr/local/bin/sass
             apply_to:   '\.scss$'
-        # uglifyjs2:
-            # bin:        /usr/local/bin/uglifyjs
+
 fos_user:
     db_driver: mongodb
     firewall_name: main

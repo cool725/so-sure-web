@@ -1,14 +1,14 @@
 $(function(){
 
     // Expand The Range element for customisation
-    const $element = $('input[type="range"]');
+    $element = $('input[type="range"]');
 
     // Slider Vars
     var current_value    = $('#reward-slider').val();
     var max_value        = $('#reward-slider').prop('max');
     var maxpot_value     = $('#reward-slider').data('maxpot');
     var connection_value = $('#reward-slider').data('connection-value');
-    var montly_premium   = $('#reward-slider').data('premium');    
+    var montly_premium   = $('#reward-slider').data('premium');
     var claim_check      = $('#claim-check').data('cashback-check');
     var yearly_high      = $('#reward-slider').data('max-comparison');
 
@@ -16,7 +16,7 @@ $(function(){
     var cashback         = $('#cashback');
     var cashback_new     = $('#cashback-with-claim');
     var cashback_text    = $('#cashback-text');
-    var premium_value    = $('.premium-value');    
+    var premium_value    = $('.premium-value');
 
     // The Handle
     var $handle;
@@ -24,13 +24,13 @@ $(function(){
     // Update the slider value
     function updateHandle(el, val) {
         el.textContent = val;
-    }      
+    }
 
     // Set the bar width
     function setBars() {
 
         premium_value.each(function() {
-            
+
             var price     = ($(this).text().replace(/[^\d\.]/g, ''));
             var bar_width = ((price / yearly_high) * 100);
             var bar       = $(this).closest('td').prev().find('.bar div');
@@ -56,7 +56,7 @@ $(function(){
 
     //         // Loading Overlay
     //         $('#loading-overlay-switch').fadeIn('400', function() {
-                
+
     //         });
 
     //         // Reset - if neeeded
@@ -67,8 +67,8 @@ $(function(){
 
     // What if - Needs improving
     $('#what-if').click(function(e) {
-        
-        e.preventDefault();       
+
+        e.preventDefault();
 
         // Set field for mixpanel
         $('#buy_form_claim_used').val(true);
@@ -78,26 +78,26 @@ $(function(){
             $('.premium-table').fadeToggle('400', function() {
                 $('.claim-options').fadeIn();
                 $('.loading-overlay').fadeOut();
-                // $(document).scrollTop( $('#cashback-card').offset().top - 30);  
+                // $(document).scrollTop( $('#cashback-card').offset().top - 30);
             });
 
         });
-    });   
+    });
 
     $('#what-if-return').click(function(e) {
-        
-        e.preventDefault();       
+
+        e.preventDefault();
 
         $('#loading-overlay-switch').fadeIn(function() {
 
             $('.claim-options').fadeToggle('400', function() {
                 $('.premium-table').fadeIn();
                 $('.loading-overlay').fadeOut();
-                // $(document).scrollTop( $('#cashback-card').offset().top - 30); 
+                // $(document).scrollTop( $('#cashback-card').offset().top - 30);
 
                 // Reset the claims
                 cashback_new.text('');
-                cashback.removeClass('cashback-with-claim');  
+                cashback.removeClass('cashback-with-claim');
                 var option = 0;
                 $('.claim-options-list > button.active').removeClass('active');
                 $('.claim-options-list > button:first-child').addClass('active');
@@ -105,7 +105,7 @@ $(function(){
 
             });
         });
-    });       
+    });
 
     function whatIf(save_value) {
 
@@ -119,7 +119,7 @@ $(function(){
                 $(this).addClass('active').siblings().removeClass('active');
                 $(cashback_text).text(new_text);
                 switchIf();
-            });            
+            });
 
             // Trigger for slider
             if ($(this).hasClass('active')) {
@@ -152,13 +152,13 @@ $(function(){
                         cashback.addClass('cashback-with-claim');
                         cashback_new.text('£0');
                         break;
-                    }                                                                       
+                    }
                 }
             }
 
-        });     
-    }   
-  
+        });
+    }
+
     // Begin Range Slider
     $element
 
@@ -179,13 +179,13 @@ $(function(){
 
                 // Set the number on the slider handle based on pos
                 $handle = $('.rewardslider__handle', this.$range);
-                updateHandle($handle[0], this.value);  
+                updateHandle($handle[0], this.value);
 
-                $('#loading-overlay-init').fadeOut('slow', function() {                    
+                $('#loading-overlay-init').fadeOut('slow', function() {
 
                     var save_value = yearly_high;
                     whatIf(save_value);
-                    setBars(); 
+                    setBars();
 
                 });
             },
@@ -195,7 +195,7 @@ $(function(){
                 // Set field for mixpanel
                 $('#buy_form_slider_used').val(true);
 
-                updateHandle($handle[0], this.value);   
+                updateHandle($handle[0], this.value);
 
                 var updated_value = $('#reward-slider').val();
                 var save_value    = updated_value * connection_value;
@@ -204,16 +204,16 @@ $(function(){
                     save_value = maxpot_value;
                 }
 
-                var premium = roundToTwo(montly_premium - save_value); 
+                var premium = roundToTwo(montly_premium - save_value);
                 var total   = premium.toFixed(2);
 
                 // Update cashback and premium
                 function updateValues() {
                     $('#cashback').text('£' + save_value);
-                    $('#premium').text('£' + total);                  
-                }               
+                    $('#premium').text('£' + total);
+                }
 
-                whatIf(save_value);                             
+                whatIf(save_value);
                 updateValues();
                 setBars();
             },
