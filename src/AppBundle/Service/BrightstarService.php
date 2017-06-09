@@ -108,10 +108,12 @@ class BrightstarService extends S3EmailService
             $brightstar->postcode
         )) {
             $msg = sprintf(
-                'Brightstar Claim %s: %s does not match expected postcode %s',
+                'Brightstar Claim %s: %s (%s) does not match expected postcode %s (%s)',
                 $brightstar->claimNumber,
                 $brightstar->postcode,
-                $user->getBillingAddress()->getPostCode()
+                $brightstar->getAddress()->__toString(),
+                $user->getBillingAddress()->getPostCode(),
+                $user->getBillingAddress()->__toString()
             );
             $this->logger->warning($msg);
             $this->errors[$brightstar->claimNumber][] = $msg;
@@ -120,7 +122,7 @@ class BrightstarService extends S3EmailService
         if (($brightstar->getServiceType() == Brightstar::SERVICE_TYPE_SWAP && !$claim->isPhoneReturnExpected()) ||
             ($brightstar->getServiceType() == Brightstar::SERVICE_TYPE_DELIVER && $claim->isPhoneReturnExpected())) {
             $msg = sprintf(
-                'Brightstar Claim %s: Claim Type %s has incorrect Courier server %s',
+                'Brightstar Claim %s: Claim Type %s has incorrect Courier service %s',
                 $brightstar->claimNumber,
                 $claim->getType(),
                 $brightstar->service
@@ -128,10 +130,11 @@ class BrightstarService extends S3EmailService
             $this->logger->warning($msg);
             $this->errors[$brightstar->claimNumber][] = $msg;
         }
-        $expectedDeliveryDateBy = $this->addBusinessDays($brightstar->orderDate, 1);
+        // although we would expect 1 day, if ordered after 4pm, then could take 2
+        $expectedDeliveryDateBy = $this->addBusinessDays($brightstar->orderDate, 2);
         if ($expectedDeliveryDateBy < $brightstar->replacementReceivedDate) {
             $msg = sprintf(
-                'Brightstar Claim %s: Replacement Received Date %s is not within 1 business day of order date %s',
+                'Brightstar Claim %s: Replacement Received Date %s is not within 2 business day of order date %s',
                 $brightstar->claimNumber,
                 $brightstar->replacementReceivedDate->format('d M Y'),
                 $brightstar->orderDate->format('d M Y')
