@@ -8,7 +8,7 @@
       <li role="presentation"><a href="#claims">Claims <span class="badge" title="Number of claims">{{ (policy.claims|length + policy.linkedClaims|length) }}</span></a></li>
       <li role="presentation"><a href="#network">Network Claims <span class="badge" title="Number of network claims">{{ policy.networkClaims|length }}</span></a></li>
       <li role="presentation"><a href="#history">History</a></li>
-      {% if is_granted('ROLE_ADMIN') %}
+      {% if is_granted('ROLE_EMPLOYEE') %}
         <li role="presentation"><a href="#admin">Admin</a></li>
       {% endif %}
     </ul>
@@ -128,7 +128,7 @@
                             {% endif %}
                         </tr>
                         {% endif %}
-                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')  %}
+                        {% if is_granted('ROLE_EMPLOYEE')  %}
                         <tr>
                           <td>Policy Recipero Checks<br />
                             <strong>NOT CLAIMS RELATED</strong>
@@ -176,7 +176,7 @@
                             </ul>
                           </td>
                         </tr>
-                        {% if is_granted('ROLE_ADMIN')%}
+                        {% if is_granted('ROLE_EMPLOYEE')%}
                         <tr>
                             <td>
                                 Manual Recipero Check
@@ -486,6 +486,31 @@
             </table>
         </div>
         <div role="tabpanel" class="tab-pane" id="history">
+            {% if is_granted('ROLE_EMPLOYEE') %}
+            <h3>Salva History</h3>
+            <table>
+                <tr>
+                    <td>Salva Policy Numbers</td>
+                    <td>
+                        {% for key, value in policy.salvaPolicyNumbers %}
+                            <ul>
+                                {{ key }} - {{ value }}
+                            </ul>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Salva Policy Results</td>
+                    <td>
+                        {% for key, value in policy.salvaPolicyResultsUnserialized %}
+                            <ul>
+                                {{ key }} - {{ value|json_encode }}
+                            </ul>
+                        {% endfor %}
+                    </td>
+                </tr>
+            </table>
+            {% endif %}
             <h3>User History</h3>
             <table>
             {% for item in user_history %}
@@ -521,94 +546,10 @@
               <p>No history is present</p>
             {% endif %}
         </div>
-      {% if is_granted('ROLE_ADMIN') %}
+      {% if is_granted('ROLE_EMPLOYEE') %}
         <div role="tabpanel" class="tab-pane" id="admin">
             <h3>Admin</h3>
             <table class="table table-striped">
-                <tr>
-                    <td>Imei</td>
-                    <td>
-                      {{ form_start(imei_form, {'attr': {'class': 'form-inline'}}) }}
-                      <div class="form-group">
-                          {{ form_errors(imei_form.imei) }}
-                          {{ form_widget(imei_form.imei) }}
-                      </div>
-                      {{ form_widget(imei_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-imei-update'}}) }}
-                      {{ form_end(imei_form) }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Phone</td>
-                    <td>
-                      {{ form_start(phone_form, {'attr': {'class': 'form-inline'}}) }}
-                      <div class="form-group">
-                          {{ form_errors(phone_form.phone) }}
-                          {{ form_widget(phone_form.phone) }}
-                      </div>
-                      {{ form_widget(phone_form.next, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-phone-update'}}) }}
-                      {{ form_end(phone_form) }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Facebook</td>
-                    <td>
-                      {% if policy.user.facebookId | length > 0 %}
-                            <img src="https://graph.facebook.com/{{ policy.user.facebookId }}/picture" />
-                            {{ policy.user.facebookId }}
-                      {% else %}
-                          Not present
-                      {% endif %}
-                      {{ form_start(facebook_form, {'attr': {'class': 'form-inline'}}) }}
-                      {{ form_widget(facebook_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-danger confirm-facebook-clear'}}) }}
-                      {{ form_end(facebook_form) }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Salva Policy Numbers</td>
-                    <td>
-                        {% for key, value in policy.salvaPolicyNumbers %}
-                            <ul>
-                                {{ key }} - {{ value }}
-                            </ul>
-                        {% endfor %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Salva Policy Results</td>
-                    <td>
-                        {% for key, value in policy.salvaPolicyResultsUnserialized %}
-                            <ul>
-                                {{ key }} - {{ value|json_encode }}
-                            </ul>
-                        {% endfor %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Record BACS Payment</td>
-                    <td>
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bacsModal"
-                            >Record BACS Payment</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Create Policy</td>
-                    <td>Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
-                    <br>(not necessarily bacs)<br>
-                        {{ form_start(create_form)}}
-                        {{ form_widget(create_form.create, {'attr': {'class': 'btn btn-danger'}})}}
-                        {{ form_end(create_form)}}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Connect Users</td>
-                    <td>
-                        {{ form_start(connect_form)}}
-                        {{ form_widget(connect_form.email, {'attr': {'placeholder':'Email'}})}}
-                        {{ form_widget(connect_form.connect, {'attr': {'class': 'btn btn-danger'}})}}<br>
-                        <i>Email must exist and have a valid policy.</i>
-                        {{ form_end(connect_form)}}
-                    </td>
-                </tr>
                 <tr>
                     <td>Imei Screenshot Upload</td>
                     <td>
@@ -679,6 +620,16 @@
                 {% endif %}
                 <tr>
                     <td>
+                        Regenerate Policy Schedule<br />(Name change, etc)
+                    </td>
+                    <td>
+                        {{ form_start(regenerate_policy_schedule_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(regenerate_policy_schedule_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-regenerate-schedule'}}) }}
+                        {{ form_end(regenerate_policy_schedule_form) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         Resend Policy Welcome Email
                     </td>
                     <td>
@@ -688,15 +639,71 @@
                       </td>
                 </tr>
                 <tr>
+                    <td>Facebook</td>
                     <td>
-                        Regenerate Policy Schedule<br />(Name change, etc)
-                    </td>
-                    <td>
-                        {{ form_start(regenerate_policy_schedule_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(regenerate_policy_schedule_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-regenerate-schedule'}}) }}
-                        {{ form_end(regenerate_policy_schedule_form) }}
+                      {% if policy.user.facebookId | length > 0 %}
+                            <img src="https://graph.facebook.com/{{ policy.user.facebookId }}/picture" />
+                            {{ policy.user.facebookId }}
+                      {% else %}
+                          Not present
+                      {% endif %}
+                      {{ form_start(facebook_form, {'attr': {'class': 'form-inline'}}) }}
+                      {{ form_widget(facebook_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-danger confirm-facebook-clear'}}) }}
+                      {{ form_end(facebook_form) }}
                     </td>
                 </tr>
+              {% if is_granted('ROLE_ADMIN') %}
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Imei</td>
+                    <td>
+                      {{ form_start(imei_form, {'attr': {'class': 'form-inline'}}) }}
+                      <div class="form-group">
+                          {{ form_errors(imei_form.imei) }}
+                          {{ form_widget(imei_form.imei) }}
+                      </div>
+                      {{ form_widget(imei_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-imei-update'}}) }}
+                      {{ form_end(imei_form) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Phone</td>
+                    <td>
+                      {{ form_start(phone_form, {'attr': {'class': 'form-inline'}}) }}
+                      <div class="form-group">
+                          {{ form_errors(phone_form.phone) }}
+                          {{ form_widget(phone_form.phone) }}
+                      </div>
+                      {{ form_widget(phone_form.next, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-phone-update'}}) }}
+                      {{ form_end(phone_form) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Record BACS Payment</td>
+                    <td>
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bacsModal"
+                            >Record BACS Payment</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Create Policy</td>
+                    <td>Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
+                    <br>(not necessarily bacs)<br>
+                        {{ form_start(create_form)}}
+                        {{ form_widget(create_form.create, {'attr': {'class': 'btn btn-danger'}})}}
+                        {{ form_end(create_form)}}
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Connect Users</td>
+                    <td>
+                        {{ form_start(connect_form)}}
+                        {{ form_widget(connect_form.email, {'attr': {'placeholder':'Email'}})}}
+                        {{ form_widget(connect_form.connect, {'attr': {'class': 'btn btn-danger'}})}}<br>
+                        <i>Email must exist and have a valid policy.</i>
+                        {{ form_end(connect_form)}}
+                    </td>
+                </tr>
+              {% endif %}
             </table>
         </div>
       {% endif %}
