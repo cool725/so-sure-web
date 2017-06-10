@@ -81,7 +81,7 @@
                             <td>{% if user.hasPolicy %}Yes{% else %}-{% endif %}</td>
                             <td>{{ user.firstname }} {{ user.lastname }}</td>
                             <td>
-                                {% if is_granted('ROLE_ADMIN') %}
+                                {% if is_granted('ROLE_EMPLOYEE') %}
                                     <a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.email }}</a>
                                 {% else %}
                                     {{ user.email }}
