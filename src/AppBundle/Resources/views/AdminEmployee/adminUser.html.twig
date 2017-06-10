@@ -99,6 +99,16 @@
                                 ><i class="fa fa-plus"></i> Add partial policy</button>
                     </td>
                 </tr>
+                <tr>
+                    <td>Recipero Make/Model Check</td>
+                    <td>{{ form_start(makemodel_form)}}
+                        {{ form_widget(makemodel_form.serial, {'attr': {'placeholder':'IMEI or Serial Number'}})}}
+                        {{ form_widget(makemodel_form.check, {'attr': {'class': 'btn btn-info'}})}}
+                        {{ form_end(makemodel_form)}}
+                        <br>
+                        £0.05 to run check
+                    </td>
+                </tr>
             </table>
 </div>
 
