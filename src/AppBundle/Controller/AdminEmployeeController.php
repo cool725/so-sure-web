@@ -1321,6 +1321,7 @@ class AdminEmployeeController extends BaseController
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(PhonePolicy::class);
         $statsRepo = $dm->getRepository(Stats::class);
+        $numWeeks = 4;
 
         if (!$now) {
             $now = new \DateTime();
@@ -1335,7 +1336,7 @@ class AdminEmployeeController extends BaseController
             $end = $this->endOfDay($end);
             $date = $date->add(new \DateInterval('P7D'));
         }
-        $date = $date->sub(new \DateInterval('P21D'));
+        $date = $date->sub(new \DateInterval(sprintf('P%dD', $numWeeks * 7)));
 
         $count = 1;
         while ($date < $now) {
@@ -1386,7 +1387,7 @@ class AdminEmployeeController extends BaseController
         }
 
         return [
-            'weeks' => array_slice($weeks, -3),
+            'weeks' =>  array_reverse(array_slice($weeks, 0 - $numWeeks)),
             'now' => $now,
         ];
     }
