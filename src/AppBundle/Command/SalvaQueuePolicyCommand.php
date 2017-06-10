@@ -24,6 +24,12 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
                 'policyNumber'
             )
             ->addOption(
+                'prefix',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy prefix'
+            )
+            ->addOption(
                 'cancel',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -67,6 +73,7 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
     {
         $salva = $this->getContainer()->get('app.salva');
         $policyNumber = $input->getOption('policyNumber');
+        $prefix = $input->getOption('prefix');
         $cancel = $input->getOption('cancel');
         $clear = true === $input->getOption('clear');
         $requeue = $input->getOption('requeue');
@@ -110,7 +117,7 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
             }
         } else {
-            $count = $salva->process($process);
+            $count = $salva->process($process, $prefix);
             $output->writeln(sprintf("Sent %s policy updates", $count));
         }
     }

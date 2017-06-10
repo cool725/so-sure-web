@@ -530,7 +530,7 @@ class SalvaExportService
         $this->dm->flush();
     }
 
-    public function process($max)
+    public function process($max, $prefix = null)
     {
         $count = 0;
         while ($count < $max) {
@@ -555,6 +555,9 @@ class SalvaExportService
                 }
                 if (!$policy) {
                     throw new \Exception(sprintf('Unable to find policyId: %s', $data['policyId']));
+                }
+                if (!$policy->isValidPolicy($prefix)) {
+                    throw new \Exception(sprintf('Invalid policy - policyId: %s', $data['policyId']));
                 }
 
                 $this->processPolicy($policy, $action, $cancelReason);
