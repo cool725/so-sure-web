@@ -19,6 +19,8 @@ class IntercomService
 {
     const KEY_INTERCOM_QUEUE = 'queue:intercom';
 
+    const TAG_DONT_CONTACT = "Don't Contact (Temp)";
+
     const SECURE_WEB = 'web';
     const SECURE_ANDROID = 'android';
     const SECURE_IOS = 'ios';
@@ -64,6 +66,7 @@ class IntercomService
     protected $secure;
     protected $secureAndroid;
     protected $secureIOS;
+    protected $mailer;
 
     /**
      * @param DocumentManager $dm
@@ -73,6 +76,7 @@ class IntercomService
      * @param string          $secure
      * @param string          $secureAndroid
      * @param string          $secureIOS
+     * @param                 $mailer
      */
     public function __construct(
         DocumentManager $dm,
@@ -81,7 +85,8 @@ class IntercomService
         $redis,
         $secure,
         $secureAndroid,
-        $secureIOS
+        $secureIOS,
+        $mailer
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -90,6 +95,7 @@ class IntercomService
         $this->secure = $secure;
         $this->secureAndroid = $secureAndroid;
         $this->secureIOS = $secureIOS;
+        $this->mailer = $mailer;
     }
 
     public function update(User $user, $allowSoSure = false, $undelete = false)
@@ -703,10 +709,24 @@ class IntercomService
     {
         return $this->redis->lrange(self::KEY_INTERCOM_QUEUE, 0, $max);
     }
-    
+
     public function maintenance()
     {
-        return array_merge($this->leadsMaintenance(), $this->usersMaintenance());
+        $lines = array_merge($this->leadsMaintenance(), $this->usersMaintenance());
+        $this->emailReport($lines);
+
+        return $lines;
+    }
+
+    private function emailReport($lines)
+    {
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Intercom Mainteanance and Duplicate Entries')
+            ->setFrom('tech@so-sure.com')
+            ->setTo('tech@so-sure.com')
+            ->setBody(implode(PHP_EOL, $lines), 'text/text');
+        $this->mailer->send($message);
+
     }
 
     private function leadsMaintenance()
@@ -765,6 +785,7 @@ class IntercomService
     {
         $userRepo = $this->dm->getRepository(User::class);
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
+        $emails = [];
         $output = [];
         $page = 1;
         $pages = 1;
@@ -776,6 +797,24 @@ class IntercomService
             $pages = $resp->pages->total_pages;
             foreach ($resp->users as $user) {
                 if (strlen(trim($user->email)) > 0) {
+                    $doNotContact = false;
+                    foreach ($user->tags->tags as $tag) {
+                        $tagName = html_entity_decode($tag->name, ENT_QUOTES | ENT_XML1, 'UTF-8');
+                        /*
+                        if (strlen($tagName) > 0) {
+                            print_r($tagName);
+                        }
+                        */
+                        if (!$doNotContact) {
+                            $doNotContact = stripos($tagName, self::TAG_DONT_CONTACT) !== false;
+                        }
+                    }
+                    if (!$doNotContact) {
+                        if (isset($emails[trim($user->email)]) && $emails[trim($user->email)] != $user->id) {
+                            $output[] = sprintf("Duplicate users for email %s", $user->email);
+                        }
+                        $emails[trim($user->email)] = $user->id;
+                    }
                     $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
                         $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
                     if ($user->unsubscribed_from_emails && !$optedOut) {

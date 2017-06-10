@@ -154,6 +154,7 @@ services:
             secure:         "%intercom_secure%"
             android:        "%intercom_secure_android%"
             ios:            "%intercom_secure_ios%"
+            mailer:         "@mailer"
 
     app.address:
         class: AppBundle\Service\PCAService
