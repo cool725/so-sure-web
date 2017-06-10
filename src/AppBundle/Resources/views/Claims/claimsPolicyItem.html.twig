@@ -685,6 +685,16 @@
                     </td>
                 </tr>
                 <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Recipero Make/Model Check</td>
+                    <td>{{ form_start(makemodel_form)}}
+                        {{ form_widget(makemodel_form.serial, {'attr': {'placeholder':'IMEI or Serial Number'}})}}
+                        {{ form_widget(makemodel_form.check, {'attr': {'class': 'btn btn-info'}})}}
+                        {{ form_end(makemodel_form)}}
+                        <br>
+                        £0.05 to run check
+                    </td>
+                </tr>
+                <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Create Policy</td>
                     <td>Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
                     <br>(not necessarily bacs)<br>

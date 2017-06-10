@@ -389,6 +389,11 @@ class AdminEmployeeController extends BaseController
         $regeneratePolicyScheduleForm = $this->get('form.factory')
             ->createNamedBuilder('regenerate_policy_schedule_form')->add('regenerate', SubmitType::class)
             ->getForm();
+        $makeModelForm = $this->get('form.factory')
+            ->createNamedBuilder('makemodel_form')
+            ->add('serial', TextType::class)
+            ->add('check', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -661,6 +666,19 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('makemodel_form')) {
+                $makeModelForm->handleRequest($request);
+                if ($makeModelForm->isValid()) {
+                    $imeiValidator = $this->get('app.imei');
+                    $phone = new Phone();
+                    $imeiValidator->checkSerial($phone, $makeModelForm->getData()['serial'], $policy->getUser());
+                    $this->addFlash(
+                        'success',
+                        sprintf('%s', json_encode($imeiValidator->getResponseData()))
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -684,6 +702,7 @@ class AdminEmployeeController extends BaseController
             'billing_form' => $billingForm->createView(),
             'resend_email_form' => $resendEmailForm->createView(),
             'regenerate_policy_schedule_form' => $regeneratePolicyScheduleForm->createView(),
+            'makemodel_form' => $makeModelForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
