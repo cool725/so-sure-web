@@ -671,7 +671,13 @@ class AdminEmployeeController extends BaseController
                 if ($makeModelForm->isValid()) {
                     $imeiValidator = $this->get('app.imei');
                     $phone = new Phone();
-                    $imeiValidator->checkSerial($phone, $makeModelForm->getData()['serial'], $policy->getUser());
+                    $imeiValidator->checkSerial(
+                        $phone,
+                        $makeModelForm->getData()['serial'],
+                        $policy->getUser(),
+                        null,
+                        false
+                    );
                     $this->addFlash(
                         'success',
                         sprintf('%s', json_encode($imeiValidator->getResponseData()))
