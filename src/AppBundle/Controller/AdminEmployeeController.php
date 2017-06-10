@@ -743,6 +743,11 @@ class AdminEmployeeController extends BaseController
         $userPermissionForm = $this->get('form.factory')
             ->createNamedBuilder('user_permission_form', UserPermissionType::class, $user)
             ->getForm();
+        $makeModelForm = $this->get('form.factory')
+            ->createNamedBuilder('makemodel_form')
+            ->add('serial', TextType::class)
+            ->add('check', SubmitType::class)
+            ->getForm();
 
         $policyData = new SalvaPhonePolicy();
         $policyForm = $this->get('form.factory')
@@ -842,6 +847,25 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('makemodel_form')) {
+                $makeModelForm->handleRequest($request);
+                if ($makeModelForm->isValid()) {
+                    $imeiValidator = $this->get('app.imei');
+                    $phone = new Phone();
+                    $imeiValidator->checkSerial(
+                        $phone,
+                        $makeModelForm->getData()['serial'],
+                        $user,
+                        null,
+                        false
+                    );
+                    $this->addFlash(
+                        'success',
+                        sprintf('%s', json_encode($imeiValidator->getResponseData()))
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
             }
         }
 
@@ -852,6 +876,7 @@ class AdminEmployeeController extends BaseController
             'user_detail_form' => $userDetailForm->createView(),
             'user_email_form' => $userEmailForm->createView(),
             'user_permission_form' => $userPermissionForm->createView(),
+            'makemodel_form' => $makeModelForm->createView(),
         ];
     }
 
