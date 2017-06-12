@@ -246,7 +246,12 @@ class FacebookService
 
     public function getAccountKitUserDataFromToken($accessToken)
     {
-        $url = sprintf('https://graph.accountkit.com/v1.2/me/?access_token=%s', $accessToken);
+        $appSecretProof = hash_hmac('sha256', $accessToken, $this->accountKitSecret);
+        $url = sprintf(
+            'https://graph.accountkit.com/v1.2/me?access_token=%s&appsecret_proof=%s',
+            $accessToken,
+            $appSecretProof
+        );
         $client = new Client();
         $res = $client->request('GET', $url);
 
