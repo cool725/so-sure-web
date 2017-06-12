@@ -16,13 +16,13 @@
         <div class="container">
 
             <div class="row">
-                  <div class="col-md-8 col-md-offset-2">
+                  <div class="col-md-12">
                       <h2>Update your card details</h2>
                       <p>Your current card is: {{ user.paymentMethod }}</p>
                       {% if webpay_action and webpay_reference %}
                       <form action="{{ webpay_action }}" method="post" id="webpay-form">
                           <div class="row">
-                              <div class="form-group col-sm-12 text-center">
+                              <div class="form-group col-sm-12">
                                   <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
                                   <input type="submit" class="btn btn-primary " value="Update your card details">
                               </div>
