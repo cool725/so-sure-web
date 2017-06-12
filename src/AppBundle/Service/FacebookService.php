@@ -27,18 +27,23 @@ class FacebookService
     /** @var Facebook */
     protected $fb;
 
+    /** @var string */
+    protected $accountKitSecret;
+
     /**
      * @param LoggerInterface $logger
      * @param                 $router
      * @param string          $appId
      * @param string          $secret
+     * @param string          $accountKitSecret
      */
-    public function __construct(LoggerInterface $logger, $router, $appId, $secret)
+    public function __construct(LoggerInterface $logger, $router, $appId, $secret, $accountKitSecret)
     {
         $this->logger = $logger;
         $this->router = $router;
         $this->appId = $appId;
         $this->secret = $secret;
+        $this->accountKitSecret = $accountKitSecret;
     }
 
     /**
@@ -222,7 +227,7 @@ class FacebookService
             'https://graph.accountkit.com/v1.2/access_token?grant_type=authorization_code&code=%s&access_token=AA|%s|%s',
             $authorizationCode,
             $this->appId,
-            $this->secret
+            $this->accountKitSecret
         );
         // @codingStandardsIgnoreEnd
 

@@ -31,10 +31,11 @@ services:
     app.facebook:
         class: AppBundle\Service\FacebookService
         arguments:
-            logger:    "@logger"
-            router:    "@router"
-            fb_appid:  "%fb_appid%"
-            fb_secret: "%fb_secret%"
+            logger:             "@logger"
+            router:             "@router"
+            fb_appid:           "%fb_appid%"
+            fb_secret:          "%fb_secret%"
+            account_kit_secret: "%account_kit_secret%"
 
     app.mailchimp.prelaunch:
         class: AppBundle\Service\MailchimpService
