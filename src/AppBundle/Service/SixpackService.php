@@ -176,9 +176,9 @@ class SixpackService
                 return null;
             }
 
-            if ($alternative == self::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL) {
+            if ($alternative == self::ALTERNATIVES_SHARE_MESSAGE_SIMPLE) {
                 return sprintf("Join me on so-sure, really cheap and pretty clever %s", $data[0]);
-            } elseif ($alternative == self::ALTERNATIVES_SHARE_MESSAGE_SIMPLE) {
+            } elseif ($alternative == self::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL) {
                 // @codingStandardsIgnoreStart
                 return sprintf(
                     "Hey, I've just joined so-sure – better insurance that is up to 80%% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: %s. Add my code after you pay: %s",
