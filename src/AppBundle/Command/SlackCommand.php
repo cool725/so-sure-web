@@ -119,6 +119,7 @@ class SlackCommand extends ContainerAwareCommand
         $initial = 70;
         $growth = 9;
         $weekOffset = 17;
+        $dow = 1;
 
         if (!$weeks) {
             $now = new \DateTime();
@@ -156,25 +157,46 @@ class SlackCommand extends ContainerAwareCommand
 
         $yesterday = new \DateTime();
         $yesterday->sub(new \DateInterval('P1D'));
+        $oneWeekAgo = new \DateTime();
+        $oneWeekAgo->sub(new \DateInterval('P7D'));
+
         $total = $repo->countAllActivePolicies();
         $daily = $total - $repo->countAllActivePolicies($yesterday);
         $weekStart = $repo->countAllActivePolicies($start);
         $weekTarget = round($weekStart * 1.1) - $weekStart;
+        $previousWeekStart = $repo->countAllActivePolicies($oneWeekAgo);
+        $previousWeekTarget = round($previousWeekStart * 1.1) - $previousWeekStart;
 
-        // @codingStandardsIgnoreStart
-        $text = sprintf(
-            "*%s*\n\nLast 24 hours: *%d*\n\nWeekly Target: %d\nWeekly Actual: %d\nWeekly Remaining: %d\n\nOverall Target: %d\nOverall Actual: %d\nOverall Remaining: %d\n\n_policy compounding_",
-            $weekText,
-            $daily,
-            $weekTarget,
-            $total - $weekStart,
-            $weekTarget + $weekStart - $total,
-            $growthTarget,
-            $total,
-            $target - $total
-        );
-        // @codingStandardsIgnoreEnd
-
+        if ($dow == 0) {
+            // @codingStandardsIgnoreStart
+            $text = sprintf(
+                "*%s*\n\nLast 24 hours: *%d*\n\nPrevious Weekly Target: %d\nPrevious Weekly Actual: %d\nPrevious Weekly Remaining: %d\n\nNew Weekly Target: %d\n\nOverall Target: %d\nOverall Actual: %d\nOverall Remaining: %d\n\n_policy compounding_",
+                $weekText,
+                $daily,
+                $previousWeekTarget,
+                $total - $previousWeekStart,
+                $previousWeekTarget + $previousWeekStart - $total,
+                $weekTarget,
+                $growthTarget,
+                $total,
+                $target - $total
+            );
+            // @codingStandardsIgnoreEnd
+        } else {
+            // @codingStandardsIgnoreStart
+            $text = sprintf(
+                "*%s*\n\nLast 24 hours: *%d*\n\nWeekly Target: %d\nWeekly Actual: %d\nWeekly Remaining: %d\n\nOverall Target: %d\nOverall Actual: %d\nOverall Remaining: %d\n\n_policy compounding_",
+                $weekText,
+                $daily,
+                $weekTarget,
+                $total - $weekStart,
+                $weekTarget + $weekStart - $total,
+                $growthTarget,
+                $total,
+                $target - $total
+            );
+            // @codingStandardsIgnoreEnd
+        }
         if (!$skipSlack) {
             $this->send($text, $channel);
         }
