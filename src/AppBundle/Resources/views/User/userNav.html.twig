@@ -1,15 +1,31 @@
     <section class="user-homepage--header">
         <div class="container">
             <div class="col-md-12">
-                <img src="{{ app.user.getImageUrlFallback }}" alt="{{ app.user.firstname }}" class="img-circle user-img">
-                <h2 class="text-white">Welcome back, {{ app.user.firstname }}!</h2>
-                {# TODO: put policy in session #}
-                {% if policy is defined %}
-                <h3 class="text-light-blue">{{ policy.phone }}</h3>
-                <h5 class="text-light-blue">Policy: {{ policy.policyNumber }} ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
-                {% endif %}
-                {# <span class="text-white"><em>Policy:</em> {{ policy.policyNumber }} ({{ policy.start|date('d M Y') }} - {{ policy.end|date('d M Y') }})</span> #}
-                {# <br /><span class="text-white"><em>Phone:</em> {{ policy.phone }}</span> #}
+                <div class="user-homepage--header-inner">
+                    <img src="{{ app.user.getImageUrlFallback }}" alt="{{ app.user.firstname }}" class="img-circle user-img">
+                    <h2>Welcome back, {{ app.user.firstname }}!</h2>
+                    {# TODO: put policy in session #}
+                    {% if policy is defined %}
+                        <div class="clearfix">
+                            <h3 class="text-blue">
+                                {{ policy.phone }}
+                                <div class="btn-group switch-policy">
+                                    <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Switch policy <i class="fa fa-caret-down" aria-hidden="true"></i></a>
+                                    <ul class="dropdown-menu">
+                                    {% for policyItem in policy.user.getPolicies %}
+                                        <li>
+                                            <a href="{{ path('user_policy', {'id': policyItem.id}) }}">
+                                                Phone name
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </h3>
+                            <h5>Policy: <strong>{{ policy.policyNumber }}</strong> ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </section>

@@ -10,12 +10,12 @@
 	}
 
 	&-light {
-		background: transparent no-repeat center top url("/images/logo/so-sure-logo-light.svg");
+		background: transparent no-repeat center top url("#{$cdn_url}/logo/so-sure_so-sure-full-logo-white-flat.svg");
 		background-size: 130px;
 	}
 
     &-blue-flat {
-        background: transparent no-repeat center top url("https://cdn.so-sure.com/images/logo/so-sure_so-sure-full-logo-blue-flat.svg");
+        background: transparent no-repeat center top url("#{$cdn_url}/logo/so-sure_so-sure-full-logo-blue-flat.svg");
         background-size: 130px;
     }
 }

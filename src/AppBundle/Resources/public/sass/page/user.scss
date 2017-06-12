@@ -1,11 +1,13 @@
 // user.scss
 
 @import "../mixins";
+@import "../common/type";
 @import "../common/palette";
-@import "homepage";
+@import "../common/paletteNew";
+// @import "homepage";
 
 .navbar-default {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 .user-homepage {
@@ -14,34 +16,50 @@
 		text-align: center;
 		padding-bottom: 45px;
 
-		h2 {
-			margin-top: 20px;
-		}
+        &-inner {
+            padding-top: 20px;
+
+            * {
+                margin: 0 0 10px 0;
+            }
+        }
 
 		img {
 			width: 140px; height: 140px;
-			display: block;
 			border: 4px solid $white;
-			margin: 0 auto;
+			margin: 0 0 10px 0;
 		}
 
 		@include breakpoint(tablet) {
 			text-align: left;
 
-			h2 {
-				margin-top: 5px;
-			}
-
 			img {
 				display: inline-block;
 				float: left;
-				margin: 0 15px 0 0;
+				margin: -20px 15px 0 0;
 			}
 		}
+
+        .switch-policy {
+            font-family: $avenir-book;
+            font-size: 14px;
+            padding: 10px 0 0 10px;
+
+            a {
+                &:hover, &:focus, &:active {
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .switch-policy.btn-group.open .dropdown-toggle {
+            text-decoration: none;
+            box-shadow: none;
+        }
 	}
 
 	&--nav {
-		background-color: $grey-light;
+		// background-color: $grey-light;
 	}
 
 	&--content {
@@ -115,15 +133,32 @@
 // Nav
 .nav-pills {
 
+    > li {
+        margin-right: 15px;
+
+        &:last-of-type {
+            margin-right: 0;
+        }
+    }
+
 	> li > a {
-		@include border-radius(0);
+		// @include border-radius(0);
+        border: 2px solid $blue;
+        color: $blue;
+
+        &:hover, &:focus {
+            background-color: $blue;
+            color: $white;
+        }
 	}
 
-	> li > a.active,
-	> li > a.active:hover,
-	> li > a.active:focus {
-	    background-color: transparent;
-	    color: $grey-dark;
+	> li.active > a,
+	> li.active > a:hover,
+	> li.active > a:focus {
+        background-color: $blue;
+        color: $white;
+	    // background-color: transparent;
+	    // color: $grey-dark;
 	}
 }
 
