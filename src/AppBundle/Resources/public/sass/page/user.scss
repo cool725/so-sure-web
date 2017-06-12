@@ -4,7 +4,11 @@
 @import "../common/type";
 @import "../common/palette";
 @import "../common/paletteNew";
-// @import "homepage";
+@import "homepage";
+
+body {
+    background-color: $blue;
+}
 
 .navbar-default {
     margin-bottom: 20px;
@@ -49,10 +53,16 @@
 		margin-bottom: 25px;
 	}
 
+    &--nav {
+        background-color: $white;
+        padding: 15px 0 0 0;
+    }
+
 }
 
 // Switch policy
 .policy-dropdown {
+    font-family: $avenir-book;
     min-width: 200px !important;
     left: auto; right: auto;
 
