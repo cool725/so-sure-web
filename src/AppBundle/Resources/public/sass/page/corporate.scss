@@ -96,7 +96,7 @@ img[data-src] {
         left: 0;
         z-index: 8;
         background-position: left bottom;
-        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-left-bottom.svg');
+        background-image: url('#{cdn_url}/images/corporate/so-sure_skyline-left-bottom.svg');
         background-size: 30%;
         @include breakpoint(midtablet) {
             background-size: 40%;
@@ -117,7 +117,7 @@ img[data-src] {
         right: 0;
         z-index: 7;
         background-position: right bottom;
-        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-right-bottom.svg');
+        background-image: url('#{cdn_url}/images/corporate/so-sure_skyline-right-bottom.svg');
         background-size: 40%;
         @include breakpoint(midtablet) {
             background-size: 50%;
@@ -199,7 +199,7 @@ img[data-src] {
         left: 0;
         z-index: 8;
         background-position: left bottom;
-        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-left-bottom.svg');
+        background-image: url('#{cdn_url}/images/corporate/so-sure_skyline-simple-left-bottom.svg');
         background-size: 30%;
         @include breakpoint(midtablet) {
             background-size: 40%;
@@ -220,7 +220,7 @@ img[data-src] {
         right: 0;
         z-index: 7;
         background-position: right bottom;
-        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-right-bottom.svg');
+        background-image: url('#{cdn_url}/images/corporate/so-sure_skyline-simple-right-bottom.svg');
         background-size: 40%;
         @include breakpoint(midtablet) {
             background-size: 50%;
