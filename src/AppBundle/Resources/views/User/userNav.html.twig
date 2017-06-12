@@ -6,6 +6,11 @@
                     <h2 class="text-light-blue">Welcome back, {{ app.user.firstname }}!</h2>
                     {# TODO: put policy in session #}
                     {% if policy is defined %}
+                        {% if policy.user.getValidPolicies(true) | length == 1 %}
+                        <div class="h3 text-white">
+                            <span class="text-nowrap">{{ policy.phone }}</span>
+                        </div>
+                        {% else %}
                         <div class="dropdown policy-dropdown-list">
                             <a href="#"
                                class="dropdown-toggle h3 text-white"
@@ -19,10 +24,10 @@
                             </a>
                             <ul class="dropdown-menu policy-dropdown" aria-labelledby="policyDropdownList">
                                 <li class="dropdown-header">My policies</li>
-                                {% for policyItem in policy.user.getPolicies %}
+                                {% for policyItem in policy.user.getValidPolicies(true) %}
                                     <li>
                                         <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}">
-                                            {{ policyItem.defaultName }}
+                                            {{ policyItem.defaultName }} ({{ policyItem.policyNumber }})
                                         </a>
                                     </li>
                                 {% endfor %}
@@ -30,6 +35,7 @@
                                 {# <li><a href="">Add another policy?</a></li> #}
                             </ul>
                         </div>
+                        {% endif %}
                         <h5 class="text-light-blue">Policy: <strong>{{ policy.policyNumber }}</strong> ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
                     {% endif %}
                 </div>
