@@ -1,3 +1,40 @@
+ AccountKit_OnInteractive = function(){
+    AccountKit.init(
+      {
+        appId: $('.login-account-kit').data('key'), 
+        state:$('.login-account-kit').data('csrf'), 
+        version:"v1.0",
+        fbAppEventsEnabled:true
+      }
+    );
+  };
+
+  // login callback
+  function loginCallback(response) {
+    if (response.status === "PARTIALLY_AUTHENTICATED") {
+      var code = response.code;
+      var csrf = response.state;
+      alert(response.code);
+      // Send code to server to exchange for access token
+    }
+    else if (response.status === "NOT_AUTHENTICATED") {
+      // handle authentication failure
+    }
+    else if (response.status === "BAD_PARAMS") {
+      // handle bad parameters
+    }
+  }
+
+  // phone form submission handler
+  function smsLogin() {
+    var countryCode = document.getElementById("country_code").value;
+    var phoneNumber = document.getElementById("phone_number").value;
+    AccountKit.login(
+      'PHONE', 
+      {countryCode: countryCode, phoneNumber: phoneNumber}, // will use default values if not specified
+      loginCallback
+    );
+  }  
 function onLogin(loginResponse) {
   // Send headers to your server and validate user by calling Digits API
   var oAuthHeaders = loginResponse.oauth_echo_headers;
@@ -28,10 +65,11 @@ function loadDigits() {
 $(function() {
   
     $(window).bind("load", function() { 
-      loadDigits();
+     // loadAccountKit();
+      //   loadDigits();
     });
 
-    loadDigitsInterval = setInterval(function(){ loadDigits(); }, 10000);
+//    loadDigitsInterval = setInterval(function(){ loadDigits(); }, 10000);
 
     $('.swap-login').on('click', function() {
       $('.login-email').toggle();
