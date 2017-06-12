@@ -217,12 +217,14 @@ class FacebookService
 
     public function getAccountKitAccessToken($authorizationCode)
     {
+        // @codingStandardsIgnoreStart
         $url = sprintf(
             'https://graph.accountkit.com/v1.2/access_token?grant_type=authorization_code&code=%s&access_token=AA|%s|%s',
             $authorizationCode,
             $this->appId,
             $this->secret
         );
+        // @codingStandardsIgnoreEnd
 
         $client = new Client();
         $res = $client->request('GET', $url);

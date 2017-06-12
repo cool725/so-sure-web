@@ -91,7 +91,7 @@ class ApiController extends BaseController
 
                 $digits = $this->get('app.digits');
                 $user = $digits->validateUser($provider, $credentials, $this->getCognitoIdentityId($request));
-            } elseif($accountKitUserData) {
+            } elseif ($accountKitUserData) {
                 $authorizationCode = $this->getDataString($accountKitUserData, 'authorization_code');
 
                 $facebook = $this->get('app.facebook');
