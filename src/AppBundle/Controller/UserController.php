@@ -312,6 +312,23 @@ class UserController extends BaseController
             }
         }
 
+        $sixpack = $this->get('app.sixpack');
+        $shareExperiment = $sixpack->participate(
+            SixpackService::EXPERIMENT_SHARE_MESSAGE,
+            [
+                SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
+                SixpackService::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL
+            ],
+            false,
+            1,
+            $policy->getStandardSCode()->getCode()
+        );
+        $shareExperimentText = $sixpack->getText(
+            SixpackService::EXPERIMENT_SHARE_MESSAGE,
+            $shareExperiment,
+            [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
+        );
+
         return array(
             'policy' => $policy,
             'email_form' => $emailInvitationForm->createView(),
@@ -320,6 +337,7 @@ class UserController extends BaseController
             'scode_form' => $scodeForm->createView(),
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
+            'share_experiment_text' => $shareExperimentText,
         );
     }
 

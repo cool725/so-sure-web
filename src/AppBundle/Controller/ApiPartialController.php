@@ -22,17 +22,115 @@ use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
+use AppBundle\Service\SixpackService;
 use AppBundle\Exception\ValidationException;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @Route("/api/v1/partial")
  */
 class ApiPartialController extends BaseController
 {
+    /**
+     * @Route("/ab/{name}", name="api_ab_partipate")
+     * @Method({"GET"})
+     */
+    public function abParticipateAction($name)
+    {
+        try {
+            $sixpack = $this->get('app.sixpack');
+
+            if ($name == SixpackService::EXPERIMENT_SHARE_MESSAGE) {
+                $user = $this->getUser();
+                if (!$user || !$user instanceof User || !$user->hasActivePolicy()) {
+                    throw new NotFoundHttpException();
+                }
+                // all policies should have the same scode
+                $scode = $user->getPolicies()[0]->getStandardSCode();
+
+                $experiment = $sixpack->participate(
+                    SixpackService::EXPERIMENT_SHARE_MESSAGE,
+                    [
+                        SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
+                        SixpackService::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL
+                    ],
+                    false,
+                    1,
+                    $scode->getCode()
+                );
+                $text = $sixpack->getText(
+                    SixpackService::EXPERIMENT_SHARE_MESSAGE,
+                    $experiment,
+                    [$scode->getShareLink(), $scode->getCode()]
+                );
+
+                return new JsonResponse([
+                    'option' => $experiment,
+                    'text' => $text
+                ]);
+            } else {
+                throw new NotFoundHttpException();
+            }
+        } catch (NotFoundHttpException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find experiment',
+                404
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api abParticipateAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/ab/{name}", name="api_ab_convert")
+     * @Method({"POST"})
+     */
+    public function abConvertAction(Request $request, $name)
+    {
+        try {
+            $sixpack = $this->get('app.sixpack');
+
+            if ($name == SixpackService::EXPERIMENT_SHARE_MESSAGE) {
+                $id = $this->getRequestString($request, 'id');
+                if ($id) {
+                    $experiment = $sixpack->convertByClientId(
+                        $id,
+                        SixpackService::EXPERIMENT_SHARE_MESSAGE
+                    );
+                } else {
+                    $experiment = $sixpack->convert(
+                        SixpackService::EXPERIMENT_SHARE_MESSAGE
+                    );
+                }
+
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::SUCCESS,
+                    '',
+                    200
+                );
+            } else {
+                throw new NotFoundHttpException();
+            }
+        } catch (NotFoundHttpException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find experiment',
+                404
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api abConvertAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
     /**
      * @Route("/sns", name="api_sns")
      * @Method({"POST"})
