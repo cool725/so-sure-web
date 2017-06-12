@@ -14,12 +14,12 @@
 
 	&--header {
 		text-align: center;
-		padding-bottom: 45px;
+		padding-bottom: 20px;
 
         &-inner {
             padding-top: 20px;
 
-            * {
+            > * {
                 margin: 0 0 10px 0;
             }
         }
@@ -39,27 +39,6 @@
 				margin: -20px 15px 0 0;
 			}
 		}
-
-        .switch-policy {
-            font-family: $avenir-book;
-            font-size: 14px;
-            padding: 10px 0 0 10px;
-
-            a {
-                &:hover, &:focus, &:active {
-                    text-decoration: none;
-                }
-            }
-        }
-
-        .switch-policy.btn-group.open .dropdown-toggle {
-            text-decoration: none;
-            box-shadow: none;
-        }
-	}
-
-	&--nav {
-		// background-color: $grey-light;
 	}
 
 	&--content {
@@ -71,6 +50,28 @@
 	}
 
 }
+
+// Switch policy
+.policy-dropdown {
+    min-width: 200px !important;
+    left: auto; right: auto;
+
+    @include breakpoint(mobileishup) {
+        right: 0 !important;
+    }
+}
+
+.policy-dropdown-list {
+    display: inline-block;
+    margin-bottom: 20px;
+
+    a {
+        &:hover, &:focus {
+            text-decoration: none;
+        }
+    }
+}
+
 
 // Reward Pot
 .circle-chart-container {
@@ -132,7 +133,6 @@
 
 // Nav
 .nav-pills {
-
     > li {
         margin-right: 15px;
 
@@ -142,7 +142,6 @@
     }
 
 	> li > a {
-		// @include border-radius(0);
         border: 2px solid $blue;
         color: $blue;
 
@@ -157,8 +156,6 @@
 	> li.active > a:focus {
         background-color: $blue;
         color: $white;
-	    // background-color: transparent;
-	    // color: $grey-dark;
 	}
 }
 

@@ -6,24 +6,22 @@
                     <h2>Welcome back, {{ app.user.firstname }}!</h2>
                     {# TODO: put policy in session #}
                     {% if policy is defined %}
-                        <div class="clearfix">
-                            <h3 class="text-blue">
-                                {{ policy.phone }}
-                                <div class="btn-group switch-policy">
-                                    <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Switch policy <i class="fa fa-caret-down" aria-hidden="true"></i></a>
-                                    <ul class="dropdown-menu">
-                                    {% for policyItem in policy.user.getPolicies %}
-                                        <li>
-                                            <a href="{{ path('user_policy', {'id': policyItem.id}) }}">
-                                                Phone name
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-                                    </ul>
-                                </div>
-                            </h3>
-                            <h5>Policy: <strong>{{ policy.policyNumber }}</strong> ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
+                        <div class="dropdown policy-dropdown-list">
+                            <a href="#" class="dropdown-toggle h3 text-blue" type="button" id="policyDropdownList" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="text-nowrap">{{ policy.phone }} <i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                            </a>
+                            <ul class="dropdown-menu policy-dropdown" aria-labelledby="policyDropdownList">
+                                {% for policyItem in policy.user.getPolicies %}
+                                    <li>
+                                        <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}">
+                                            <i class="fa fa-mobile" aria-hidden="true"></i>
+                                            <strong>{{ policyItem.defaultName }}</strong>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
+                        <h5>Policy: <strong>{{ policy.policyNumber }}</strong> ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
                     {% endif %}
                 </div>
             </div>
@@ -34,7 +32,7 @@
         <div class="container">
             <nav id="user-homepage--nav">
                 <ul class="nav nav-pills scroll">
-                    <li role="presentation" class="{% if app.request.get('_route') == 'user_home' %}active{% endif %}"><a href="{{ path('user_home') }}">Home</a></li>
+                    <li role="presentation" class="{% if app.request.get('_route') == 'user_home' or app.request.get('_route')  == 'user_policy' %}active{% endif %}"><a href="{{ path('user_home') }}">Home</a></li>
                     {# <li role="presentation"><a href="#">Personal Info</a></li> #}
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' %}active{% endif %}"><a href="{{ path('user_card_details') }}">Payment Details</a></li>
                 </ul>
