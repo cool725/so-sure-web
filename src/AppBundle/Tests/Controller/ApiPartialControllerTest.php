@@ -6,14 +6,55 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Sns;
+use AppBundle\Document\Policy;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
+use AppBundle\Service\SixpackService;
 
 /**
  * @group functional-net
  */
 class ApiPartialControllerTest extends BaseControllerTest
 {
+    // ab
+
+    /**
+     *
+     */
+    public function testABUnknownTest()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', 'unknown');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testABWithRequiredUserNoUser()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPERIMENT_SHARE_MESSAGE);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testAB()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testAB', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPERIMENT_SHARE_MESSAGE);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(200);
+    }
+
     // sns
 
     /**

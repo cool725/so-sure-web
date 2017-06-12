@@ -16,6 +16,10 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
     const EXPERIMENT_LANDING_HOME = 'landing-or-home';
     const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
+    const EXPERIMENT_SHARE_MESSAGE = 'share-message';
+
+    const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
+    const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';
 
     // Completed test - SW-45
     // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
@@ -55,16 +59,24 @@ class SixpackService
         $this->mixpanel = $mixpanel;
     }
 
-    public function participate($experiment, $alternatives, $logMixpanel = false, $trafficFraction = 1)
-    {
+    public function participate(
+        $experiment,
+        $alternatives,
+        $logMixpanel = false,
+        $trafficFraction = 1,
+        $clientId = null
+    ) {
         // default to first option
         $result = $alternatives[0];
         try {
+            if (!$clientId) {
+                $clientId = $this->requestService->getUser() ?
+                    $this->requestService->getUser()->getId() :
+                    $this->requestService->getTrackingId();
+            }
             $data = [
                 'experiment' => $experiment,
-                'client_id' => $this->requestService->getUser() ?
-                    $this->requestService->getUser()->getId() :
-                    $this->requestService->getTrackingId(),
+                'client_id' => $clientId,
                 'traffic_fraction' => $trafficFraction,
             ];
             $query = http_build_query($data);
@@ -154,5 +166,29 @@ class SixpackService
         }
 
         return false;
+    }
+
+    public function getText($experiment, $alternative, $data = null)
+    {
+        if ($experiment == self::EXPERIMENT_SHARE_MESSAGE) {
+            // Expected [0] => 'share link', [1] => 'share code'
+            if (count($data) != 2) {
+                return null;
+            }
+
+            if ($alternative == self::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL) {
+                return sprintf("Join me on so-sure, really cheap and pretty clever %s", $data[0]);
+            } elseif ($alternative == self::ALTERNATIVES_SHARE_MESSAGE_SIMPLE) {
+                // @codingStandardsIgnoreStart
+                return sprintf(
+                    "Hey, I've just joined so-sure – better insurance that is up to 80%% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: %s. Add my code after you pay: %s",
+                    $data[0],
+                    $data[1]
+                );
+                // @codingStandardsIgnoreEnd
+            }
+        }
+
+        return null;
     }
 }
