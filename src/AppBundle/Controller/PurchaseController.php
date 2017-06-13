@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
@@ -569,5 +570,62 @@ class PurchaseController extends BaseController
             // would expect 1 of the 2 above - default back to user home just in case
             return $this->redirectToRoute('user_home');
         }
+    }
+
+    /**
+     * @Route("/cancel/{id}", name="purchase_cancel")
+     * @Template
+    */
+    public function cancelAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unable to see policy');
+        }
+        $cancelForm = $this->get('form.factory')
+            ->createNamedBuilder('cancel_form')
+            ->add('cancel', SubmitType::class)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('cancel_form')) {
+                $cancelForm->handleRequest($request);
+                if ($cancelForm->isValid()) {
+                    $body = sprintf(
+                        'Requested cancellation for policy %s/%s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject(sprintf('Requested Policy Cancellation'))
+                        ->setFrom('info@so-sure.com')
+                        ->setTo('support@wearesosure.com')
+                        ->setBody($body, 'text/html');
+                    $this->get('mailer')->send($message);
+                    $this->get('app.mixpanel')->queueTrack(
+                        MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
+                        ['Policy Id' => $policy->getId()]
+                    );
+                    // @codingStandardsIgnoreStart
+                    $this->addFlash(
+                        'success',
+                        'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
+                    );
+                    // @codingStandardsIgnoreEnd
+                }
+            }
+        } else {
+            $this->get('app.mixpanel')->queueTrack(
+                MixpanelService::EVENT_CANCEL_POLICY_PAGE,
+                ['Policy Id' => $policy->getId()]
+            );
+        }
+
+        return [
+            'policy' => $policy,
+            'cancel_form' => $cancelForm->createView(),
+        ];
     }
 }
