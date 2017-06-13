@@ -537,7 +537,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
-        if (count($this->getValidPolicies()) > 5) {
+        if (count($this->getValidPolicies()) >= 3) {
             return false;
         }
 
