@@ -1,0 +1,33 @@
+// checkoutNav.scss
+
+.checkout-nav {
+	background-color: $off-white;
+	border-top: 1px solid $pale-grey;
+	border-bottom: 1px solid $pale-grey;
+
+	.step-inactive {
+		display: none;
+	}
+
+	ul {
+		padding: 10px 15px;
+		margin: 0;
+
+		li {
+			list-style: none;
+
+			img {
+				float: left;
+				margin-right: 15px;
+			}
+
+			> * {
+				margin: 0;
+			}
+
+			span {
+				display: block;
+			}
+		}
+	}
+}

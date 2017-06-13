@@ -1,0 +1,204 @@
+// checkout.scss
+
+@import "../mixins";
+@import "../common/paletteNew";
+@import "checkoutNavNew";
+
+.checkout {
+
+    h1 {
+        text-align: center;
+        line-height: 30px;
+
+        .title-top {
+            font-size: 18px;
+        }
+
+        .title-phone {
+            font-size: 25px;
+        }
+
+        .title-price {
+            font-size: 20px;
+        }
+
+        @include breakpoint(tablet) {
+            line-height: inherit;
+
+            .title-top,
+            .title-phone {
+                font-size: inherit;
+            }
+
+            .title-price {
+                font-size: 28px;
+            }
+        }
+    }
+
+}
+
+.checkout--step {
+    padding: 15px 0;
+    background-color: $off-white;
+    border-top: 1px solid $pale-grey;
+    border-bottom: 1px solid $pale-grey;
+}
+
+// .checkout {
+// 	padding: 0 0 30px;
+
+// 	h3 {
+// 		display: none;
+// 	}
+
+// 	&--step {
+// 		max-width: 410px;
+// 		margin: 0 auto;
+
+// 		@include breakpoint(tablet) {
+// 			 max-width: 510px;
+
+// 		}
+
+// 	}
+
+// 	&--step-review {
+// 		line-height: 2;
+
+// 		@include breakpoint(mobileishup) {
+// 			padding: 0 20px;
+// 		}
+// 	}
+
+// 	.form-footer {
+// 		margin-top: 25px;
+// 	}
+
+// 	.radio {
+// 	    width: 45%;
+// 	    font-size: 14px;
+// 	    text-align: center;
+// 	    display: inline-block;
+// 	    padding: 10px 0;
+// 	    border: 2px solid $blue;
+// 	    @include border-radius(3px);
+
+// 	    &:first-of-type {
+// 	    	margin-right: 10%;
+// 	    }
+
+// 	    label {
+// 	    	text-align: center;
+// 	    }
+
+// 	    input {
+// 	    	margin-top: 2px;
+// 	    }
+// 	}
+
+// 	.radio.radio-selected {
+// 		background-color: $blue;
+// 		color: $white;
+// 	}
+
+// 	.address-manual-cont {
+// 	    margin-top: 15px;
+// 	}
+
+// 	@include breakpoint(tablet) {
+//         padding: 0 0 100px;
+//         margin-top: 5px;
+//         border-top: 2px solid $blue;
+
+//         h3 {
+// 	        display: block;
+// 	        padding: 0 0 10px;
+// 	        margin-bottom: 25px;
+// 	        color: $blue;
+// 	        border-bottom: 2px solid $grey-light;
+//         }
+// 	}
+// }
+
+// .terms-checkbox {
+//     margin-top: 20px;
+
+//     label {
+// 	    font-size: 16px !important;
+// 	    font-weight: bold;
+//     }
+// }
+
+// .birthday select {
+//     font-size: 14px;
+//     padding: 5px 15px;
+//     background-color: $white;
+//     background-image: none;
+//     -webkit-background-clip: padding-box;
+//           background-clip: padding-box;
+//     border: 2px solid $grey-light;
+//     @include border-radius(4px);
+// }
+
+// .review-terms {
+//     background-color: $blue-lightest;
+//     border: 2px solid $blue;
+//  	@include border-radius(4px);
+//     color: $grey-dark;
+//     padding: 25px;
+//     margin: 15px 0;
+
+//     ol {
+//     	padding-left: 25px;
+
+//     	li {
+//     		padding: 5px 0;
+//     	}
+//     }
+// }
+
+// /* Includes */
+
+// .purchase-download {
+//     margin: 10px 0 40px;
+
+// 	&--btns {
+//     	text-align: center;
+// 	}
+// }
+
+// .help-block ul {
+//     list-style: none;
+//     text-align: left;
+//     margin: 0; padding: 0;
+
+//     li {
+// 	    color: $red;
+// 	    font-size: 13px;
+//     }
+// }
+
+// .has-error .control-label,
+// .address-show-error-text {
+// 	color: $red;
+// }
+
+.intl-tel-input {
+	display: block;
+}
+
+.iti-flag {
+    right: 15px;
+	background-image: url("/components/intl-tel-input/flags.png");}
+
+	@media only screen and (-webkit-min-device-pixel-ratio: 2),
+	only screen and (min--moz-device-pixel-ratio: 2),
+	only screen and (-o-min-device-pixel-ratio: 2 / 1),
+	only screen and (min-device-pixel-ratio: 2),
+	only screen and (min-resolution: 192dpi),
+	only screen and (min-resolution: 2dppx) {
+
+    	.iti-flag{background-image:url("/components/intl-tel-input/flags@2x.png")}
+}
+

@@ -1,11 +1,14 @@
 {% extends 'base.html.twig' %}
 
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
         'components/bootstrap-daterangepicker/daterangepicker.css'
         'components/intl-tel-input/intlTelInput.css'
-        '@AppBundle/Resources/public/sass/page/checkout.scss'
+        '@AppBundle/Resources/public/sass/page/checkoutNew.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
     {% endstylesheets %}
