@@ -35,6 +35,7 @@ use AppBundle\Form\Type\PurchaseStepPhoneType;
 use AppBundle\Form\Type\PurchaseStepPhoneNoPhoneType;
 
 use AppBundle\Service\MixpanelService;
+use AppBundle\Service\SixpackService;
 
 use AppBundle\Security\UserVoter;
 
@@ -213,7 +214,21 @@ class PurchaseController extends BaseController
             'quote_url' => $session ? $session->get('quote_url') : null,
         );
 
-        return $data;
+        $alternative = $request->get('force_result');
+        if (!$alternative) {
+            $alternative = $this->getSessionSixpackTest(
+                $request,
+                SixpackService::EXPERIMENT_PURCHASE_FLOW,
+                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
+                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
+            );
+        }
+
+        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
+            return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressNew.html.twig', $data);
+        }
     }
 
     /**
@@ -243,7 +258,21 @@ class PurchaseController extends BaseController
             'step' => 2,
         );
 
-        return $data;
+        $alternative = $request->get('force_result');
+        if (!$alternative) {
+            $alternative = $this->getSessionSixpackTest(
+                $request,
+                SixpackService::EXPERIMENT_PURCHASE_FLOW,
+                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
+                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
+            );
+        }
+
+        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
+            return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhone.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhoneNew.html.twig', $data);
+        }
     }
 
     /**
@@ -446,7 +475,21 @@ class PurchaseController extends BaseController
             'policy_key' => $this->getParameter('policy_key'),
         );
 
-        return $data;
+        $alternative = $request->get('force_result');
+        if (!$alternative) {
+            $alternative = $this->getSessionSixpackTest(
+                $request,
+                SixpackService::EXPERIMENT_PURCHASE_FLOW,
+                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
+                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
+            );
+        }
+
+        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
+            return $this->render('AppBundle:Purchase:purchaseStepPhoneReview.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig', $data);
+        }
     }
 
     /**
