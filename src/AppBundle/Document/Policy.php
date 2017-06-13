@@ -1002,6 +1002,37 @@ abstract class Policy
         $this->notes[$now->getTimestamp()] = $note;
     }
 
+    public function getLatestNoteTimestamp()
+    {
+        $timestamp = 0;
+        foreach ($this->getNotes() as $noteTimestamp => $note) {
+            if ($noteTimestamp > $timestamp) {
+                $timestamp = $noteTimestamp;
+            }
+        }
+
+        return $timestamp;
+    }
+
+    public function getLatestNoteTimestampColour()
+    {
+        if (count($this->getNotes()) == 0) {
+            return 'white';
+        }
+
+        $now = new \DateTime();
+        $latest = \DateTime::createFromFormat('U', $this->getLatestNoteTimestamp());
+        $diff = $now->diff($latest);
+
+        if ($diff->days > 30) {
+            return 'red';
+        } elseif ($diff->days <= 2) {
+            return 'green';
+        }
+
+        return 'white';
+    }
+
     public function setId($id)
     {
         if ($this->id) {
@@ -1913,6 +1944,12 @@ abstract class Policy
         return $this->getStatus() !== null && $this->getPremium() !== null;
     }
 
+    public function age()
+    {
+        $now = new \DateTime();
+        return $now->diff($this->getStart())->days;
+    }
+
     public function getPolicyPrefix($environment)
     {
         $prefix = null;
@@ -2249,6 +2286,34 @@ abstract class Policy
         //print sprintf("%f ?= %f\n", $outstanding, $totalScheduledPayments);
 
         return $this->areEqualToTwoDp($outstanding, $totalScheduledPayments);
+    }
+
+    public function getClaimsText()
+    {
+        $data = Claim::sumClaims($this->getClaims());
+
+        if ($data['total'] == 0) {
+            return '-';
+        }
+
+        $text = '';
+        if ($data['in-review'] > 0) {
+            $text = sprintf('%s<span title="In Review" class="fa fa-question">%s</span> ', $text, $data['in-review']);
+        }
+        if ($data['approved'] + $data['settled'] > 0) {
+            $text = sprintf('%s<span title="Approved & Settled" class="fa fa-thumbs-up">%s</span> ', $text, $data['approved'] + $data['settled']);
+        }
+        if ($data['declined'] + $data['withdrawn'] > 0) {
+            $text = sprintf('%s<span title="Declined & Withdrawn" class="fa fa-thumbs-down">%s</span> ', $text, $data['declined'] + $data['withdrawn']);
+        }
+        if (count($this->getLinkedClaims()) > 0) {
+            $text = sprintf('%s<span title="Linked (e.g. policy upgrade) class="fa fa-link">%s</span> ', $text, count($this->getLinkedClaims()));
+        }
+        if (count($this->getNetworkClaims()) > 0) {
+            $text = sprintf('%s<span title="Network claims (any status)" class="fa fa-group">%s</span> ', $text, count($this->getNetworkClaims()));
+        }
+
+        return $text;
     }
 
     public function getSupportWarnings()

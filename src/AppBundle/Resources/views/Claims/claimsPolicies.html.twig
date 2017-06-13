@@ -101,11 +101,13 @@
                     <tr>
                         <th>Policy Number</th>
                         <th>Policy Status</th>
+                        <th>Policy Age (days)</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Mobile</th>
                         <th>Claims</th>
                         <th>Pot Value</th>
+                        <th># Notes</th>
                         {#
                         <th>Facebook</th>
                         <th>User Status</th>
@@ -124,7 +126,9 @@
                             </a></td>
                             <td>{{ policy.status }}
                                 {% if policy.status == "cancelled" %} / {{ policy.cancelledReason }}{% endif %}
+                                {% if policy.status == "unpaid" %} / {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London') }}{% endif %}
                             </td>
+                            <td>{{ policy.age }}</td>
                             <td>{{ policy.user.firstname }} {{ policy.user.lastname }}</td>
                             <td>
                                 {% if is_granted('ROLE_EMPLOYEE') %}
@@ -135,11 +139,10 @@
                             </td>
                             <td>{{ policy.user.mobileNumber }}</td>
                             <td>
-                                <span title="Number of Claims + Linked Claims (any status)">{{ (policy.claims|length + policy.linkedClaims|length) }}</span>
-                                /
-                                <span title="Number of Network Claims (any status)">{{ policy.networkClaims|length }}</span>
+                                {{ policy.getClaimsText | raw}}
                             </td>
                             <td>£{{ policy.potValue }}</td>
+                            <td style="background-color: {{ policy.getLatestNoteTimestampColour }}">{{ policy.notes|length }}</td>
                             {#
                             <td>{% if policy.user.facebookId | length > 0 %}Yes{% else %}No{% endif %}</td>
                             <td>{% if policy.user.locked %}locked{% elseif policy.user.enabled %}enabled{% else %}disabled{%endif %}</td>
