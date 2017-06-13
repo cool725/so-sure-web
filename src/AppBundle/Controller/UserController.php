@@ -69,6 +69,7 @@ class UserController extends BaseController
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
         }
+        $this->denyAccessUnlessGranted('view', $policy);
 
         $scode = null;
         if ($session = $this->get('session')) {
