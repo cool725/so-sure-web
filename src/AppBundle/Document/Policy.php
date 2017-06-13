@@ -2298,19 +2298,39 @@ abstract class Policy
 
         $text = '';
         if ($data['in-review'] > 0) {
-            $text = sprintf('%s<span title="In Review" class="fa fa-question">%s</span> ', $text, $data['in-review']);
+            $text = sprintf(
+                '%s<span title="In Review" class="fa fa-question">%s</span> ',
+                $text,
+                $data['in-review']
+            );
         }
         if ($data['approved'] + $data['settled'] > 0) {
-            $text = sprintf('%s<span title="Approved & Settled" class="fa fa-thumbs-up">%s</span> ', $text, $data['approved'] + $data['settled']);
+            $text = sprintf(
+                '%s<span title="Approved & Settled" class="fa fa-thumbs-up">%s</span> ',
+                $text,
+                $data['approved'] + $data['settled']
+            );
         }
         if ($data['declined'] + $data['withdrawn'] > 0) {
-            $text = sprintf('%s<span title="Declined & Withdrawn" class="fa fa-thumbs-down">%s</span> ', $text, $data['declined'] + $data['withdrawn']);
+            $text = sprintf(
+                '%s<span title="Declined & Withdrawn" class="fa fa-thumbs-down">%s</span> ',
+                $text,
+                $data['declined'] + $data['withdrawn']
+            );
         }
         if (count($this->getLinkedClaims()) > 0) {
-            $text = sprintf('%s<span title="Linked (e.g. policy upgrade) class="fa fa-link">%s</span> ', $text, count($this->getLinkedClaims()));
+            $text = sprintf(
+                '%s<span title="Linked (e.g. policy upgrade) class="fa fa-link">%s</span> ',
+                $text,
+                count($this->getLinkedClaims())
+            );
         }
         if (count($this->getNetworkClaims()) > 0) {
-            $text = sprintf('%s<span title="Network claims (any status)" class="fa fa-group">%s</span> ', $text, count($this->getNetworkClaims()));
+            $text = sprintf(
+                '%s<span title="Network claims (any status)" class="fa fa-group">%s</span> ',
+                $text,
+                count($this->getNetworkClaims())
+            );
         }
 
         return $text;
