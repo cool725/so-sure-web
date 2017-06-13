@@ -13,9 +13,17 @@
                 As a reminder your policy is for a <strong>{{ policy.phone }}</strong> and runs from <strong>{{ policy.start | date('d M Y H:i', 'Europe/London') }}</strong> to <strong>{{ policy.end | date('d M Y H:i', 'Europe/London') }}</strong>.<br><br>
                 We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to
 				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
-				<br><br>
+				<br><br><br>
 
-			   <b>Cancel your policy now if your phone already has a cracked screen.</b>
+		   </div>
+		</div>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		<table border="1" cellpadding="20" cellspacing="0" height="100%" width="100%" id="cancelPolicy">
+    <tr>
+        <td align="center" valign="top">
+			   <b><a href="{{ url('purchase_cancel', {'id': policy.id }) }}">Cancel your policy now</a> if your phone already has a cracked screen.</b>
 
 			   <br><br>
 
@@ -23,6 +31,10 @@
 
 			   <br><br>
 			   If you think you might have purchased your policy by mistake, you can <a href="{{ url('purchase_cancel', {'id': policy.id }) }}">cancel your policy <b>today</b></a> and we will fully refund your premium. If you are in any doubt, please email us at <a href="mailto:info@wearesosure.com?subject=Query from {{ policy.policyNumber }}">info@wearesosure.com.</a>
+		</td>
+	</tr>
+		</table>
+		   </div>
 		</div>
 	{{ macros.end_table() }}
 {% endblock %}
