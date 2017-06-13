@@ -50,6 +50,8 @@ class ApiController extends BaseController
             $data = json_decode($request->getContent(), true)['body'];
             $emailUserData = null;
             $facebookUserData = null;
+            $oauthEchoUserData = null;
+            $accountKitUserData = null;
             if (isset($data['email_user'])) {
                 $emailUserData = $data['email_user'];
                 if (!$this->validateFields($emailUserData, ['email', 'password'])) {
@@ -63,6 +65,11 @@ class ApiController extends BaseController
             } elseif (isset($data['oauth_echo_user'])) {
                 $oauthEchoUserData = $data['oauth_echo_user'];
                 if (!$this->validateFields($oauthEchoUserData, ['provider', 'credentials'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+            } elseif (isset($data['account_kit_user'])) {
+                $accountKitUserData = $data['account_kit_user'];
+                if (!$this->validateFields($accountKitUserData, ['authorization_code'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
             } else {
@@ -84,7 +91,14 @@ class ApiController extends BaseController
 
                 $digits = $this->get('app.digits');
                 $user = $digits->validateUser($provider, $credentials, $this->getCognitoIdentityId($request));
+            } elseif ($accountKitUserData) {
+                $authorizationCode = $this->getDataString($accountKitUserData, 'authorization_code');
+
+                $facebook = $this->get('app.facebook');
+                $mobileNumber = $facebook->getAccountKitMobileNumber($authorizationCode);
+                $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
             }
+
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
