@@ -1589,7 +1589,7 @@ class PhonePolicyTest extends WebTestCase
     /**
      * @expectedException \Exception
      */
-    public function testShouldExpirePolicyMissingPayment()
+    public function testShouldCancelPolicyMissingPayment()
     {
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone);
@@ -1603,10 +1603,10 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPremiumInstallments(12);
 
         // Policy doesn't have a payment, so should be expired
-        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-01-01")));
     }
 
-    public function testShouldExpirePolicy()
+    public function testShouldCancelPolicy()
     {
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone);
@@ -1626,8 +1626,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldExpirePolicy(null, new \DateTime("2016-01-01")));
-        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-03-03")));
+        $this->assertFalse($policy->shouldCancelPolicy(null, new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-03-03")));
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1637,8 +1637,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldExpirePolicy(null, new \DateTime("2016-01-01")));
-        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-03-03")));
+        $this->assertFalse($policy->shouldCancelPolicy(null, new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-03-03")));
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1648,8 +1648,8 @@ class PhonePolicyTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldExpirePolicy(null, new \DateTime("2016-02-09")));
-        $this->assertTrue($policy->shouldExpirePolicy(null, new \DateTime("2016-04-15")));
+        $this->assertFalse($policy->shouldCancelPolicy(null, new \DateTime("2016-02-09")));
+        $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-04-15")));
     }
 
     public function testCanCancelPolicy()
@@ -2756,5 +2756,115 @@ class PhonePolicyTest extends WebTestCase
             $policy->setCancelledReason($reason);
             $this->assertFalse($policy->isRefundAllowed());
         }
+    }
+
+    public function testIsInRenewalTimeframe()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testIsReadyForRenewal', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setEnd(new \DateTime("2016-12-31 23:59:59"));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        // 21 day renewal
+        $this->assertTrue($policy->isInRenewalTimeframe(new \DateTime("2016-12-10")));
+        $this->assertTrue($policy->isInRenewalTimeframe(new \DateTime("2016-12-31 23:59")));
+        $this->assertFalse($policy->isInRenewalTimeframe(new \DateTime("2017-01-01 00:01")));
+        $this->assertFalse($policy->isInRenewalTimeframe(new \DateTime("2017-12-01")));
+
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $this->assertFalse($policy->isInRenewalTimeframe(new \DateTime("2016-12-31 23:59")));
+    }
+
+    public function testCanCreatePendingRenewal()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testCanCreatePendingRenewal', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setEnd(new \DateTime("2016-12-31 23:59:59"));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        // 21 day renewal
+        $this->assertTrue($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
+        $this->assertFalse($policy->canCreatePendingRenewal(new \DateTime("2017-01-01 00:01")));
+
+        // TODO add tests on user canRenewPolicy
+    }
+
+    public function testCanRenew()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testCanCreatePendingRenewal', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setEnd(new \DateTime("2016-12-31 23:59:59"));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $this->assertFalse($policy->canRenew(new \DateTime("2016-12-10")));
+
+        $renewalPolicy = new SalvaPhonePolicy();
+        $renewalPolicy->setPhone(static::$phone);
+
+        $renewalPolicy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $renewalPolicy->setStart(new \DateTime("2017-01-01"));
+        $renewalPolicy->setEnd(new \DateTime("2017-12-31 23:59:59"));
+        $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+
+        $policy->link($renewalPolicy);
+
+        $this->assertTrue($policy->canRenew(new \DateTime("2016-12-10")));
+
+        // TODO add tests on user canRenewPolicy
+    }
+
+    public function testIsRenewed()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testIsRenewed', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setEnd(new \DateTime("2016-12-31 23:59:59"));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = new SalvaPhonePolicy();
+        $renewalPolicy->setPhone(static::$phone);
+
+        $renewalPolicy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $renewalPolicy->setStart(new \DateTime("2017-01-01"));
+        $renewalPolicy->setEnd(new \DateTime("2017-12-31 23:59:59"));
+        $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+
+        $policy->link($renewalPolicy);
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy->setStatus(Policy::STATUS_RENEWAL);
+        $this->assertTrue($policy->isRenewed());
     }
 }

@@ -90,6 +90,25 @@ abstract class Price
         return $this->toTwoDp($this->getMonthlyPremiumPrice($date) * 12);
     }
 
+    public function getAdjustedInitialMonthlyPremiumPrice($potValue, \DateTime $date = null)
+    {
+        $monthlyAdjustment = floor(100 * $potValue / 12) / 100;
+        $monthlyAdjustment = $potValue - ($monthlyAdjustment * 11);
+
+        return $this->toTwoDp($this->getMonthlyPremiumPrice($date) - $monthlyAdjustment);
+    }
+
+    public function getAdjustedStandardMonthlyPremiumPrice($potValue, \DateTime $date = null)
+    {
+        $monthlyAdjustment = floor(100 * $potValue / 12) / 100;
+        return $this->toTwoDp($this->getMonthlyPremiumPrice($date) - $monthlyAdjustment);
+    }
+
+    public function getAdjustedYearlyPremiumPrice($potValue, \DateTime $date = null)
+    {
+        return $this->toTwoDp($this->getYearlyPremiumPrice($date) - $potValue);
+    }
+
     public function getYearlyGwp()
     {
         return $this->toTwoDp($this->getGwp() * 12);

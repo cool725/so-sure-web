@@ -1,0 +1,13 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your policy is renewed.
+
+**
+------------------------------------------------------------
+Thank you for trusting so-sure to provide you with amazing cover for loss, left, accidental damage, and breakdown.
+
+Your policy is for {{ policy.phone }} and runs from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
+
+We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
+
+{% endblock body %}

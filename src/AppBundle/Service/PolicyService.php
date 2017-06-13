@@ -334,7 +334,7 @@ class PolicyService
         }
     }
 
-    public function create(Policy $policy, \DateTime $date = null, $setActive = false)
+    public function create(Policy $policy, \DateTime $date = null, $setActive = false, $numPayments = null)
     {
         $this->statsd->startTiming("policy.create");
         try {
@@ -356,7 +356,7 @@ class PolicyService
                 $user->addPayerPolicy($policy);
             }
 
-            $this->generateScheduledPayments($policy, $date);
+            $this->generateScheduledPayments($policy, $date, $numPayments);
 
             // Generate/set scode prior to creating policy as policy create has a fallback scode creation
             $scode = null;
@@ -717,7 +717,7 @@ class PolicyService
         }
     }
 
-    public function generateScheduledPayments(Policy $policy, \DateTime $date = null)
+    public function generateScheduledPayments(Policy $policy, \DateTime $date = null, $numPayments = null)
     {
         if (!$date) {
             // TODO: Should this be policy start date?
@@ -732,18 +732,32 @@ class PolicyService
         }
 
         $payment = null;
+        $paymentItem = null;
         foreach ($policy->getPayments() as $paymentItem) {
             if (!$paymentItem->isSuccess()) {
+                $paymentItem = null;
                 continue;
             }
+        }
 
-            if ($this->areEqualToFourDp($paymentItem->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
-                $policy->setPremiumInstallments(1);
-                return;
+        if (!$numPayments && $paymentItem) {
+            if ($this->areEqualToFourDp(
+                $paymentItem->getAmount(),
+                $policy->getPremium()->getYearlyPremiumPrice()
+            )) {
+                $numPayments = 1;
             } elseif ($this->areEqualToFourDp(
                 $paymentItem->getAmount(),
                 $policy->getPremium()->getMonthlyPremiumPrice()
             )) {
+                $numPayments = 12;
+            }
+        }
+
+        if ($numPayments) {
+            if ($numPayments == 1) {
+                $policy->setPremiumInstallments(1);
+            } elseif ($numPayments == 12) {
                 $policy->setPremiumInstallments(12);
                 for ($i = 1; $i <= 11; $i++) {
                     $scheduledDate = clone $date;
@@ -755,19 +769,24 @@ class PolicyService
                     $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
                     $policy->addScheduledPayment($scheduledPayment);
                 }
-                return;
             } else {
                 throw new InvalidPremiumException(sprintf(
                     'Invalid payment %f for policy %s [Expected %f or %f]',
-                    $paymentItem->getAmount(),
+                    $paymentItem ? $paymentItem->getAmount() : $numPayments,
                     $policy->getId(),
                     $policy->getPremium()->getYearlyPremiumPrice(),
                     $policy->getPremium()->getMonthlyPremiumPrice()
                 ));
             }
+        } else {
+            throw new InvalidPremiumException(sprintf(
+                'Invalid payment %f for policy %s [Expected %f or %f]',
+                $paymentItem ? $paymentItem->getAmount() : $numPayments,
+                $policy->getId(),
+                $policy->getPremium()->getYearlyPremiumPrice(),
+                $policy->getPremium()->getMonthlyPremiumPrice()
+            ));
         }
-
-        throw new \Exception(sprintf('Missing payment for policy %s', $policy->getId()));
     }
 
     /**
@@ -853,13 +872,17 @@ class PolicyService
      */
     public function newPolicyEmail(Policy $policy, $attachmentFiles = null, $bcc = null)
     {
+        $baseTemplate = 'AppBundle:Email:policy/new';
+        if ($policy->getPreviousPolicy()) {
+            $baseTemplate = 'AppBundle:Email:policy/renew';
+        }
         try {
             $this->mailer->sendTemplate(
                 sprintf('Your so-sure policy %s', $policy->getPolicyNumber()),
                 $policy->getUser()->getEmail(),
-                'AppBundle:Email:policy/new.html.twig',
+                sprintf('%s.html.twig', $baseTemplate),
                 ['policy' => $policy],
-                'AppBundle:Email:policy/new.txt.twig',
+                sprintf('%s.txt.twig', $baseTemplate),
                 ['policy' => $policy],
                 $attachmentFiles,
                 $bcc
@@ -1063,7 +1086,7 @@ class PolicyService
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
         foreach ($policies as $policy) {
-            if ($policy->shouldExpirePolicy($prefix)) {
+            if ($policy->shouldCancelPolicy($prefix)) {
                 $cancelled[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
                     try {
@@ -1081,6 +1104,74 @@ class PolicyService
         }
 
         return $cancelled;
+    }
+
+    public function activateRenewalPolicies($prefix, $dryRun = false)
+    {
+        $renewals = [];
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findRenewalPoliciesForActivation($prefix);
+        foreach ($policies as $policy) {
+            $renewals[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $policy->setStatus(Policy::STATUS_ACTIVE);
+                    $this->dm->flush();
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error activating Policy %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $renewals;
+    }
+
+    public function expireEndingPolicies($prefix, $dryRun = false)
+    {
+        $expired = [];
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findPoliciesForExpiration($prefix);
+        foreach ($policies as $policy) {
+            $expired[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    // TODO: Send email?
+                    $policy->setStatus(Policy::STATUS_EXPIRED);
+                    $this->dm->flush();
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error Expiring Policy %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $expired;
+    }
+
+    public function createPendingRenewalPolicies($prefix, $dryRun = false)
+    {
+        $pendingRenewal = [];
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findPoliciesForPendingRenewal($prefix);
+        foreach ($policies as $policy) {
+            if ($policy->canCreatePendingRenewal()) {
+                $pendingRenewal[$policy->getId()] = $policy->getPolicyNumber();
+                if (!$dryRun) {
+                    $this->createPendingRenewal($policy);
+                }
+            }
+        }
+
+        return $pendingRenewal;
     }
 
     public function notifyPendingCancellations($prefix, $days = null)
@@ -1105,7 +1196,7 @@ class PolicyService
 
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
         foreach ($policies as $policy) {
-            if ($policy->shouldExpirePolicy($prefix, $date) && $policy->isClaimInProgress()) {
+            if ($policy->shouldCancelPolicy($prefix, $date) && $policy->isClaimInProgress()) {
                 foreach ($policy->getClaims() as $claim) {
                     $this->pendingCancellationEmail($claim, $policy->getPolicyExpirationDate());
                     $count++;
@@ -1136,5 +1227,46 @@ class PolicyService
             null,
             'bcc@so-sure.com'
         );
+    }
+
+    public function createPendingRenewal(Policy $policy)
+    {
+        $newPolicy = new SalvaPhonePolicy();
+        $newPolicy->setPhone($policy->getPhone());
+        $newPolicy->setImei($policy->getImei());
+        $newPolicy->setSerialNumber($policy->getSerialNumber());
+        $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+
+        $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $newPolicy->init($policy->getUser(), $latestTerms);
+
+        $policy->link($newPolicy);
+
+        $this->dm->persist($newPolicy);
+        $this->dm->flush();
+
+        return $newPolicy;
+    }
+
+    public function renew(Policy $policy, $numPayments, $usePot)
+    {
+        $newPolicy = $policy->getNextPolicy();
+        if (!$newPolicy) {
+            throw new \Exception(sprintf(
+                'Policy %s does not have a next policy (renewal not allowed)',
+                $policy->getId()
+            ));
+        }
+
+        // TODO: $usePot
+        $this->create($newPolicy, $policy->getEnd(), null, $numPayments);
+        if ($usePot) {
+            $newPolicy->getPremium()->setAnnualDiscount($policy->getPotValue());
+        }
+        $newPolicy->setStatus(Policy::STATUS_RENEWAL);
+        $this->dm->flush();
+
+        return $newPolicy;
     }
 }

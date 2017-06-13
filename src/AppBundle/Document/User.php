@@ -546,17 +546,55 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
-    public function canPurchasePolicy()
+    public function hasSuspectedFraudulentClaim()
     {
-        // TODO: Add additional checks - perhaps any suspected fraudulent claims, etc
+        foreach ($this->getAllPolicies() as $policy) {
+            if ($policy->hasSuspectedFraudulentClaim()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Can purchase implies that user is allowed to purchase an additional policy
+     * This is different than being allowed to renew an existing policy
+     * although lines get blurred if a policy expires and then user wants to re-purchase
+     */
+    public function canPurchasePolicy($checkMaxPolicies = true)
+    {
+        if ($this->hasSuspectedFraudulentClaim()) {
+            return false;
+        }
+
         if ($this->hasCancelledPolicyWithUserDeclined()) {
             return false;
         }
 
-        if (count($this->getValidPolicies()) >= self::MAX_POLICIES_PER_USER) {
+        if ($checkMaxPolicies && count($this->getValidPolicies(true)) >= self::MAX_POLICIES_PER_USER) {
             return false;
         }
 
+        return true;
+    }
+
+    public function canRenewPolicy()
+    {
+        if ($this->hasSuspectedFraudulentClaim()) {
+            return false;
+        }
+
+        if ($this->hasCancelledPolicyWithUserDeclined()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function areRenewalsDesired()
+    {
+        // TODO: determine logic
         return true;
     }
 
@@ -631,7 +669,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function getFirstPolicy()
     {
-        $policies = $this->getCreatedPolicies();
+        $policies = $this->getValidPolicies(true);
         if (!is_array($policies)) {
             $policies = $policies->getValues();
         }
@@ -649,7 +687,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function getLatestPolicy()
     {
-        $policies = $this->getCreatedPolicies();
+        $policies = $this->getValidPolicies(true);
         if (!is_array($policies)) {
             $policies = $policies->getValues();
         }

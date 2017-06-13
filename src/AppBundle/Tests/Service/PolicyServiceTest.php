@@ -366,7 +366,7 @@ class PolicyServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException AppBundle\Exception\InvalidPremiumException
      */
     public function testGenerateScheduledPaymentsFailedMonthlyPayments()
     {

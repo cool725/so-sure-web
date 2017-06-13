@@ -12,9 +12,11 @@ use AppBundle\Validator\Constraints as AppAssert;
 class Feature
 {
     const FEATURE_QUOTE_LEAD = 'quote-lead';
+    const FEATURE_RENEWAL = 'renewal';
 
     public static $features = [
-        self::FEATURE_QUOTE_LEAD
+        self::FEATURE_QUOTE_LEAD,
+        self::FEATURE_RENEWAL,
     ];
 
     /**

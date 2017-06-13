@@ -743,6 +743,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.renew:
+        class: AppBundle\Form\Type\RenewType
+        arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.purchasesteppersonal:
         class: AppBundle\Form\Type\PurchaseStepPersonalType
         arguments: ["@request_stack", "%form_required%"]
