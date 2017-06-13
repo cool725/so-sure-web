@@ -243,13 +243,39 @@ class AdminEmployeeController extends BaseController
      */
     public function adminUsersAction(Request $request)
     {
+        $emailForm = $this->get('form.factory')
+            ->createNamedBuilder('email_form')
+            ->add('email', EmailType::class)
+            ->add('create', SubmitType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('email_form')) {
+                $emailForm->handleRequest($request);
+                if ($emailForm->isValid()) {
+                    $email = $this->getDataString($emailForm->getData(), 'email');
+                    $dm = $this->getManager();
+                    $userManager = $this->get('fos_user.user_manager');
+                    $user = $userManager->createUser();
+                    $user->setEnabled(true);
+                    $user->setEmail($email);
+                    $dm->persist($user);
+                    $dm->flush();
+                    $this->addFlash('success', sprintf(
+                        'Created User. %s',
+                        $email
+                    ));
+                }
+            }
+        }
+
         try {
             $data = $this->searchUsers($request);
         } catch (RedirectException $e) {
             return new RedirectResponse($e->getMessage());
         }
         return array_merge($data, [
-            'policy_route' => 'admin_policy'
+            'policy_route' => 'admin_policy',
+            'email_form' => $emailForm->createView(),
         ]);
     }
 

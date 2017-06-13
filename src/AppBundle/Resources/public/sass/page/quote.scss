@@ -1,6 +1,7 @@
 // quote.scss
 
 @import "../mixins";
+@import "../common/type";
 @import "../common/palette";
 @import "homepage";
 @import "rewardCalculator";
@@ -151,8 +152,10 @@
 }
 
 .memory-dropdown {
+	font-family: $avenir-book;
     min-width: 200px !important;
     left: auto; right: auto;
+
 
     @include breakpoint(mobileishup) {
 		right: 0 !important;

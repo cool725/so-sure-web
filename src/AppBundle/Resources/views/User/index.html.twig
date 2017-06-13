@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 
+{# Set vars #}
 {% set white_logo = true %}
 
 {% block javascripts %}
@@ -224,7 +225,7 @@
                 <div id="modal-connect"
                      class="modal-body text-center"
                      data-share-link="{{ policy.standardSCode.shareLink }}"
-                     data-share-text="Hey, I've just joined so-sure – better insurance that is up to 80% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: {{ policy.standardSCode.shareLink }}. Add my code after you pay: {{ policy.standardSCode.code }}">
+                     data-share-text="{{ share_experiment_text }}">
                     <h4>Invite via:</h4>
                     <div id="share"></div>
                     <div class="text-break text-grey">

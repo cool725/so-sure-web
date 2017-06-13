@@ -1,47 +1,48 @@
 // user.scss
 
 @import "../mixins";
+@import "../common/type";
 @import "../common/palette";
+@import "../common/paletteNew";
 @import "homepage";
 
+body {
+    background-color: $blue;
+}
+
 .navbar-default {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 .user-homepage {
 
 	&--header {
 		text-align: center;
-		padding-bottom: 45px;
+		padding-bottom: 20px;
 
-		h2 {
-			margin-top: 20px;
-		}
+        &-inner {
+            padding-top: 20px;
+
+            > * {
+                margin: 0 0 10px 0;
+            }
+        }
 
 		img {
 			width: 140px; height: 140px;
-			display: block;
 			border: 4px solid $white;
-			margin: 0 auto;
+			margin: 0 0 10px 0;
 		}
 
 		@include breakpoint(tablet) {
 			text-align: left;
 
-			h2 {
-				margin-top: 5px;
-			}
-
 			img {
 				display: inline-block;
 				float: left;
-				margin: 0 15px 0 0;
+				margin: -20px 15px 0 0;
 			}
 		}
-	}
-
-	&--nav {
-		background-color: $grey-light;
 	}
 
 	&--content {
@@ -52,7 +53,35 @@
 		margin-bottom: 25px;
 	}
 
+    &--nav {
+        background-color: $white;
+        padding: 15px 0 0 0;
+    }
+
 }
+
+// Switch policy
+.policy-dropdown {
+    font-family: $avenir-book;
+    min-width: 200px !important;
+    left: auto; right: auto;
+
+    @include breakpoint(mobileishup) {
+        right: 0 !important;
+    }
+}
+
+.policy-dropdown-list {
+    display: inline-block;
+    margin-bottom: 20px;
+
+    a {
+        &:hover, &:focus {
+            text-decoration: none;
+        }
+    }
+}
+
 
 // Reward Pot
 .circle-chart-container {
@@ -114,16 +143,29 @@
 
 // Nav
 .nav-pills {
+    > li {
+        margin-right: 15px;
+
+        &:last-of-type {
+            margin-right: 0;
+        }
+    }
 
 	> li > a {
-		@include border-radius(0);
+        border: 2px solid $blue;
+        color: $blue;
+
+        &:hover, &:focus {
+            background-color: $blue;
+            color: $white;
+        }
 	}
 
-	> li > a.active,
-	> li > a.active:hover,
-	> li > a.active:focus {
-	    background-color: transparent;
-	    color: $grey-dark;
+	> li.active > a,
+	> li.active > a:hover,
+	> li.active > a:focus {
+        background-color: $blue;
+        color: $white;
 	}
 }
 

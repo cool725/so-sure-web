@@ -1,15 +1,44 @@
     <section class="user-homepage--header">
         <div class="container">
             <div class="col-md-12">
-                <img src="{{ app.user.getImageUrlFallback }}" alt="{{ app.user.firstname }}" class="img-circle user-img">
-                <h2 class="text-white">Welcome back, {{ app.user.firstname }}!</h2>
-                {# TODO: put policy in session #}
-                {% if policy is defined %}
-                <h3 class="text-light-blue">{{ policy.phone }}</h3>
-                <h5 class="text-light-blue">Policy: {{ policy.policyNumber }} ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
-                {% endif %}
-                {# <span class="text-white"><em>Policy:</em> {{ policy.policyNumber }} ({{ policy.start|date('d M Y') }} - {{ policy.end|date('d M Y') }})</span> #}
-                {# <br /><span class="text-white"><em>Phone:</em> {{ policy.phone }}</span> #}
+                <div class="user-homepage--header-inner">
+                    <img src="{{ app.user.getImageUrlFallback }}" alt="{{ app.user.firstname }}" class="img-circle user-img">
+                    <h2 class="text-light-blue">Welcome back, {{ app.user.firstname }}!</h2>
+                    {# TODO: put policy in session #}
+                    {% if policy is defined %}
+                        {% if policy.user.getValidPolicies(true) | length == 1 %}
+                        <div class="h3 text-white">
+                            <span class="text-nowrap">{{ policy.phone }}</span>
+                        </div>
+                        {% else %}
+                        <div class="dropdown policy-dropdown-list">
+                            <a href="#"
+                               class="dropdown-toggle h3 text-white"
+                               type="button"
+                               id="policyDropdownList"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="true"
+                               title="Switch policy">
+                                <span class="text-nowrap">{{ policy.phone }} <i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                            </a>
+                            <ul class="dropdown-menu policy-dropdown" aria-labelledby="policyDropdownList">
+                                <li class="dropdown-header">My policies</li>
+                                {% for policyItem in policy.user.getValidPolicies(true) %}
+                                    <li>
+                                        <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}">
+                                            {{ policyItem.defaultName }} ({{ policyItem.policyNumber }})
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                                {# <li role="separator" class="divider"></li> #}
+                                {# <li><a href="">Add another policy?</a></li> #}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        <h5 class="text-light-blue">Policy: <strong>{{ policy.policyNumber }}</strong> ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </section>
@@ -18,7 +47,7 @@
         <div class="container">
             <nav id="user-homepage--nav">
                 <ul class="nav nav-pills scroll">
-                    <li role="presentation" class="{% if app.request.get('_route') == 'user_home' %}active{% endif %}"><a href="{{ path('user_home') }}">Home</a></li>
+                    <li role="presentation" class="{% if app.request.get('_route') == 'user_home' or app.request.get('_route')  == 'user_policy' %}active{% endif %}"><a href="{{ path('user_home') }}">Home</a></li>
                     {# <li role="presentation"><a href="#">Personal Info</a></li> #}
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' %}active{% endif %}"><a href="{{ path('user_card_details') }}">Payment Details</a></li>
                 </ul>

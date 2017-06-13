@@ -57,6 +57,7 @@
                 </a>
 
                 <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
+                    <li class="dropdown-header">Select alternate model</li>
                     {% if phones | length > 1 %}
                         {% for phone_mem in phones if phone_mem.id != phone.id %}
                             <li>
@@ -64,6 +65,7 @@
                             </li>
                         {% endfor %}
                     {% endif %}
+                    <li role="separator" class="divider"></li>
                     <li><a href="#" data-toggle="modal" data-target="#quote-model"> I have a different phone</a></li>
                 </ul>
             </div>
