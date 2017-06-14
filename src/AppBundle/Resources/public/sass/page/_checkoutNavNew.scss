@@ -5,20 +5,19 @@
 	border-top: 1px solid $pale-grey;
 	border-bottom: 1px solid $pale-grey;
 
-	.step-inactive {
-		display: none;
-	}
-
 	ul {
 		padding: 10px 15px;
 		margin: 0;
 
 		li {
 			list-style: none;
+			position: relative;
 
 			img {
 				float: left;
 				margin-right: 15px;
+				position: relative;
+				z-index: 4;
 			}
 
 			> * {
@@ -27,6 +26,67 @@
 
 			span {
 				display: block;
+			}
+
+			@include breakpoint(tablet) {
+
+				&:first-of-type:after {
+					content: '';
+					display: block;
+					width: 160px; height: 1px;
+					border-top: 2px dashed $lightest-blue;
+
+					position: absolute;
+					top: 30px; left: 145px;
+					z-index: 3;
+				}
+
+				&:last-of-type:after {
+					content: '';
+					display: block;
+					width: 160px; height: 1px;
+					border-top: 2px dashed $lightest-blue;
+
+					position: absolute;
+					top: 30px; right: 142px;
+					z-index: 3;
+				}
+
+			}
+		}
+	}
+
+	.step-inactive {
+		display: none;
+	}
+
+	@include breakpoint(tablet) {
+		padding-top: 30px;
+		padding-bottom: 30px;
+
+		.step-inactive {
+			display: inline;
+		}
+
+		.step-no {
+			display: none;
+		}
+
+		ul {
+			width: 700px;
+			margin: 0 auto;
+			text-align: center;
+
+			li {
+				width: 33.3333333333%;
+				display: block;
+				float: left;
+				text-align: center;
+
+				img {
+					float: none;
+					margin: 0 0 10px 0;
+				}
 			}
 		}
 	}

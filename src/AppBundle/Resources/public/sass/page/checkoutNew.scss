@@ -14,6 +14,10 @@
             font-size: 18px;
         }
 
+        .title-top-all {
+            font-size: 18px;
+        }
+
         .title-phone {
             font-size: 25px;
         }
@@ -30,6 +34,10 @@
                 font-size: inherit;
             }
 
+            .title-top-all {
+                font-size: 24px;
+            }
+
             .title-price {
                 font-size: 28px;
             }
@@ -43,7 +51,65 @@
     background-color: $off-white;
     border-top: 1px solid $pale-grey;
     border-bottom: 1px solid $pale-grey;
+
+    form {
+        max-width: 345px;
+        margin: 0 auto;
+    }
+
+    @include breakpoint(tablet) {
+        padding: 30px 0;
+    }
 }
+
+.step {
+
+    &--hide {
+        // display: none;
+    }
+
+}
+
+// Cover / Benefits
+.owl-carousel {
+
+    .item {
+        text-align: center;
+
+        img {
+            width: 135px; height: 135px;
+            display: block;
+            margin: 0 auto;
+        }
+    }
+
+}
+
+.cover-list {
+
+    img {
+        display: block;
+        margin: 0 auto 15px;
+    }
+
+    h4 {
+        text-align: center;
+    }
+}
+
+.benefits--review {
+    margin: 0 -15px;
+    padding: 0 30px 30px;
+    background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
+    background-position: right 20px bottom 10px;
+
+    .h4 {
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+}
+
 
 // .checkout {
 // 	padding: 0 0 30px;
