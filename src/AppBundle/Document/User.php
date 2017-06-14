@@ -28,6 +28,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     use PhoneTrait;
     use GravatarTrait;
 
+    const MAX_POLICIES_PER_USER = 2;
+
     /**
      * @MongoDB\Id
      */
@@ -537,7 +539,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
-        if (count($this->getValidPolicies()) >= 3) {
+        if (count($this->getValidPolicies()) >= self::MAX_POLICIES_PER_USER) {
             return false;
         }
 
