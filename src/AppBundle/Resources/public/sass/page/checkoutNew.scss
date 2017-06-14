@@ -97,16 +97,33 @@
     }
 }
 
-.benefits--review {
+.benefits--review-mobile {
     margin: 0 -15px;
     padding: 0 30px 30px;
     background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
-    background-position: right 20px bottom 10px;
+    background-position: right -110px bottom -22px;
 
-    .h4 {
-        &:last-of-type {
-            margin-bottom: 0;
-        }
+    li {
+        margin: 15px 0;
+    }
+}
+
+.benefits--review-desktop {
+    width: 700px;
+    margin: 0 auto;
+    padding-bottom: 30px;
+
+    h4 {
+        margin: 20px 0 10px;
+    }
+
+    img {
+        float: left;
+        margin-right: 15px;
+    }
+
+    .row {
+        margin-bottom: 30px;
     }
 }
 
