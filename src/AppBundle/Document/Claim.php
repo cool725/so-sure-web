@@ -26,6 +26,8 @@ class Claim
     const STATUS_SETTLED = 'settled';
     const STATUS_DECLINED = 'declined';
     const STATUS_WITHDRAWN = 'withdrawn';
+    // Temporary status to allow the system to suggest closing a claim, as the policy is about to be cancelled
+    const STATUS_PENDING_CLOSED = 'pending-closed';
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -153,7 +155,7 @@ class Claim
     protected $type;
 
     /**
-     * @Assert\Choice({"in-review", "approved", "settled", "declined", "withdrawn"}, strict=true)
+     * @Assert\Choice({"in-review", "approved", "settled", "declined", "withdrawn", "pending-closed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -839,6 +841,7 @@ class Claim
             self::STATUS_SETTLED => 0,
             self::STATUS_DECLINED => 0,
             self::STATUS_WITHDRAWN => 0,
+            self::STATUS_PENDING_CLOSED => 0,
         ];
         foreach ($claims as $claim) {
             $data[$claim->getStatus()]++;
