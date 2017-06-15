@@ -1040,7 +1040,7 @@ class PolicyService
         }
         $repo = $this->dm->getRepository(Policy::class);
 
-        return $repo->findPoliciesForCancellation($prefix, $includeFuture, $date);
+        return $repo->findPoliciesForPendingCancellation($prefix, $includeFuture, $date);
     }
 
     public function cancelPoliciesPendingCancellation($prefix = null, \DateTime $date = null)
@@ -1079,5 +1079,60 @@ class PolicyService
         }
 
         return $cancelled;
+    }
+
+    public function notifyPendingCancellations($prefix, $days = null)
+    {
+        $count = 0;
+        if (!$days) {
+            $days = 5;
+        }
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $date = new \DateTime();
+        $date = $date->add(new \DateInterval(sprintf('P%dD', $days)));
+
+        $pendingCancellationPolicies = $policyRepo->findPoliciesForPendingCancellation($prefix, false, $date);
+        foreach ($pendingCancellationPolicies as $policy) {
+            if ($policy->isClaimInProgress()) {
+                foreach ($policy->getClaims() as $claim) {
+                    $this->pendingCancellationEmail($claim, $policy->getPendingCancellation());
+                    $count++;
+                }
+            }
+        }
+
+        $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
+        foreach ($policies as $policy) {
+            if ($policy->shouldExpirePolicy($prefix, $date) && $policy->isClaimInProgress()) {
+                foreach ($policy->getClaims() as $claim) {
+                    $this->pendingCancellationEmail($claim, $policy->getPolicyExpirationDate());
+                    $count++;
+                }
+            }
+        }
+
+        return $count;
+    }
+
+    public function pendingCancellationEmail(Claim $claim, $cancellationDate)
+    {
+        $baseTemplate = sprintf('AppBundle:Email:davies/pendingCancellation');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $subject = sprintf(
+            'Claim %s should be finalised',
+            $claim->getNumber()
+        );
+        $this->mailer->sendTemplate(
+            $subject,
+            'claims@wearesosure.com',
+            $htmlTemplate,
+            ['claim' => $claim, 'cancellationDate' => $cancellationDate],
+            null,
+            null,
+            null,
+            'bcc@so-sure.com'
+        );
     }
 }

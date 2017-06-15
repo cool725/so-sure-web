@@ -36,7 +36,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->count();
     }
 
-    public function findPoliciesForCancellation($policyPrefix, $includeFuture, \DateTime $date = null)
+    public function findPoliciesForPendingCancellation($policyPrefix, $includeFuture, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
