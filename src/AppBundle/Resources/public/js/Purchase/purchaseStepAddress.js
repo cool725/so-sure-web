@@ -17,6 +17,7 @@ $(function(){
     //     });
     // });
 
+    // Step Validation
     $('#step--validate').click(function(e) {
 
         e.preventDefault();
@@ -68,8 +69,6 @@ $(function(){
                 form.submit();
             }
         });
-
-        // alert( "Valid: " + form.valid() );
 
         if (form.valid() == true){
             $('.step--hide').show();

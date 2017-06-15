@@ -76,10 +76,12 @@
 
     <div class="payment--step">
         <div class="payment--step-inner clearfix">
-            <h4>How would you like to pay?</h4>
+            <h4>How would you like to pay?<br>
+            <small>(Select an option below)</small></h4>
             <div class="payment--btn" id="payment--monthly" data-target="#purchase_form_amount_0">
                 <span class="billed visible-xs">Monthly <br></span>
-                <span class="amount">£XX.XX <span class="hidden-xs">a month</span><br></span>
+                <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
+                <span class="hidden-xs">a month</span><br></span>
                 <small class="visible-xs">Billed 2nd of each month</small>
                 <small class="hidden-xs">You will be billed the 2nd of each month</small>
             </div>
@@ -88,7 +90,8 @@
             </div>
             <div class="payment--btn" id="payment--yearly" data-target="#purchase_form_amount_1">
                 <span class="billed visible-xs">Yearly <br></span>
-                <span class="amount">£XX.XX <span class="hidden-xs">a year</span><br></span>
+                <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}
+                <span class="hidden-xs">a year</span><br></span>
                 <small class="visible-xs">Billed on date of purchase</small>
                 <small class="hidden-xs">You will be billed for the year on purchase</small>
             </div>
@@ -99,16 +102,14 @@
         <div class="container">
 
             {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form'}}) }}
-                <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+                <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    <div class="payment-options">
-                        {{ form_widget(purchase_form.amount) }}
-                    </div>
+                    {{ form_widget(purchase_form.amount) }}
                     <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
                 </div>
                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'IMEI Number', 'pattern':'[-/\\s]*([0-9][-/\\s]*){15,17}', 'title': 'Enter a valid 15 or 17 digit IMEI Number'}}) }}
+                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'IMEI Number'}}) }}
                     <div class="text-break text-grey">
                         <div class="line"></div>OR<div class="line"></div>
                     </div>
@@ -139,7 +140,7 @@
                 {% endif %}
                 <div class="form-group">
                     <a href="#"
-                       id="#step--validate"
+                       id="step--validate"
                        class="btn btn-green btn-block btn-pad"
                        {# data-toggle="modal" #}
                        {# data-target="#reviewModal" #}
@@ -147,7 +148,7 @@
                         Continue
                     </a>
                 </div>
-                <div class="modal modal-middle fade"
+                <div class="modal modal-purchase fade"
                      id="reviewModal"
                      tabindex="-1"
                      role="dialog">
@@ -155,7 +156,9 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">Before you proceed! Please confirm the following are correct</h4>
+                                <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
+                            </div>
+                            <div class="modal-body">
                                 <ol>
                                     <li>My phone is in full working condition and my screen is not cracked.</li>
                                     <li>I am a resident of the United Kingdom.</li>
@@ -164,8 +167,6 @@
                                 <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                                 {# TODO hidden input or cta changes hidden input #}
                                 {{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct'}) }}
-                            </div>
-                            <div class="modal-body">
                                 {% if app.user.hasValidPaymentMethod %}
                                     {# TODO We need to think how we'll show this??? #}
                                     <div class="form-group">

@@ -61,6 +61,11 @@
     @include breakpoint(tablet) {
         padding: 30px 0;
     }
+
+    .payment-options {
+        // height: 0;
+        // visibility: hidden;
+    }
 }
 
 .step {
@@ -89,10 +94,6 @@
         }
     }
 
-    .payment-options {
-        display: none;
-    }
-
     .payment--btn {
         padding: 10px 0;
         width: 50%;
@@ -106,6 +107,11 @@
 
         &:first-of-type {
             border-right: 1px solid $pale-grey;
+        }
+
+        &:hover, &:focus {
+            background: $primary-blue url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
+            color: $white;
         }
 
         .billed {
@@ -145,6 +151,7 @@
         background: $primary-blue url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
         color: $white;
     }
+
 }
 
 

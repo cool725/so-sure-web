@@ -20,6 +20,10 @@ $(function(){
     return this.optional(element) || /^[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}$/i.test(value);
     }, "Please specify a valid Postcode");
 
+    jQuery.validator.addMethod("imei", function(value, element) {
+    return this.optional(element) || /[-/\\s]*([0-9][-/\\s]*){15,17}/.test(value);
+    }, "Enter a valid 15 or 17 digit IMEI Number");
+
     jQuery.validator.addMethod("check_date_of_birth", function (value, element) {
         if (this.optional(element)) {
             return true;
@@ -42,6 +46,7 @@ $(function(){
         }
         return true;
     }, 'Sorry, only persons over the age of 18 can be covered');
+
 
 
     // $('.form-control').on('change', function() {

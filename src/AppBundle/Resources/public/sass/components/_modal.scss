@@ -17,13 +17,13 @@
 		padding: 15px 25px 0;
 
 		h2, h3, h4, h5 {
-			border-bottom: 2px solid $grey-light;
+			// border-bottom: 2px solid $grey-light;
 			padding-bottom: 15px;
 		}
 
 		.close {
 			opacity: 1;
-			color: $grey-dark;
+			color: $primary-blue;
 		}
 	}
 
@@ -52,7 +52,7 @@
 
 		@include breakpoint(desktop) {
 			width: 1170px;
-		}		
+		}
 
 	}
 
@@ -87,17 +87,17 @@
 		padding: 10px 30px 10px 15px;
 		background-color: $grey-light;
 		border: 1px solid $grey;
-		@include border-radius(4px);		
+		@include border-radius(4px);
 		font-family: $avenir-book;
 		font-size: 16px;
 		cursor: pointer;
-		position: relative;		
+		position: relative;
 
 		&:after {
 			content: '\f054';
 			font-family: FontAwesome;
 			position: absolute;
-			right: 15px; top: 10px;			
+			right: 15px; top: 10px;
 		}
 	}
 
@@ -133,3 +133,23 @@
 	}
 
 }
+
+// .modal-purchase {
+
+// 	.modal-title {
+// 		color: $primary-blue;
+// 	}
+
+// 	.modal-body {
+
+// 		ol {
+// 			padding: 0 0 0 15px;
+
+// 			li {
+// 				font-weight: bold;
+// 				font-size: 16px;
+// 				line-height: 1.5;
+// 			}
+// 		}
+// 	}
+// }
