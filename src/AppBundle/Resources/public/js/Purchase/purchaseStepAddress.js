@@ -1,21 +1,99 @@
 $(function(){
 
-    $("#purchase_form_mobileNumber").intlTelInput({
-        preferredCountries: ['gb'],
-        initialCountry: 'gb',
-        allowDropdown: false
+    // Mask date input and add picker
+    $('.dob').mask('00/00/0000');
+    // $('.dob').focus(function() {
+    //     $(this).daterangepicker({
+    //         singleDatePicker: true,
+    //         showDropdowns: true,
+    //         linkedCalendars: false,
+    //         // autoUpdateInput: false,
+    //         showCustomRangeLabel: false,
+    //         // startDate: 06/09/2017,
+    //         // endDate: 06/15/2017,
+    //         opens: 'center',
+    //         drops: 'up',
+    //         parentEl: ''
+    //     });
+    // });
+
+    $('#step--validate').click(function(e) {
+
+        e.preventDefault();
+
+        var form = $('.validate-form');
+
+        form.validate({
+            debug: true,
+            rules: {
+                "purchase_form[name]" : {
+                    required: true,
+                },
+                "purchase_form[email]" : {
+                    required: true,
+                    email: true
+                },
+                "purchase_form[birthday]" : {
+                    required: true,
+                    check_date_of_birth: true
+                },
+                "purchase_form[mobileNumber]" : {
+                    required: true,
+                    phoneUK: true
+                },
+                "purchase_form[addressLine1]" : {
+                    required: true
+                },
+                "purchase_form[city]" :  {
+                    required: true
+                },
+                "purchase_form[postcode]" : {
+                    required: true,
+                    postcodeUK: true
+                }
+            },
+            messages: {
+                "purchase_form[name]": 'Please enter your full name',
+                "purchase_form[email]" : {
+                    required: 'Please enter your email address'
+                },
+                "purchase_form[birthday]" : 'Sorry, only persons over the age of 18 can be covered',
+                "purchase_form[mobileNumber]" : 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)',
+                "purchase_form[addressLine1]" : 'Please enter the first line of your address',
+                "purchase_form[city]" : 'Please enter your City',
+                "purchase_form[postcode]" : 'Please enter a valid UK postcode'
+            },
+
+            submitHandler: function(form) {
+                form.submit();
+            }
+        });
+
+        // alert( "Valid: " + form.valid() );
+
+        if (form.valid() == true){
+            $('.step--hide').show();
+            $('#step--one-controls').hide();
+        }
+
     });
 
-    $("#purchase_form_mobileNumber").on("countrychange", function(e, countryData) {
-        setTimeout(function() {
-            var country = $("#purchase_form_mobileNumber").intlTelInput("getSelectedCountryData");
-            if (country.length == 0 || country.iso2 != 'gb') {
-                $(".mobile-err").html("<ul><li>Sorry, we currently only support UK Residents</li></ul>");
-            } else {
-                $(".mobile-err").html("");
-            }
-        }, 1500);
-    });
+    // $("#purchase_form_mobileNumber").intlTelInput({
+    //     preferredCountries: ['gb'],
+    //     initialCountry: 'gb',
+    //     allowDropdown: false
+    // });
+
+    // $("#purchase_form_mobileNumber").on("countrychange", function(e, countryData) {
+    //     setTimeout(function() {
+    //         var country = $("#purchase_form_mobileNumber").intlTelInput("getSelectedCountryData");
+    //         if (country.length == 0 || country.iso2 != 'gb') {
+    //             $(".mobile-err").html("<ul><li>Sorry, we currently only support UK Residents</li></ul>");
+    //         } else {
+    //             $(".mobile-err").html("");
+    //         }
+    //     }, 1500);
+    // });
 
     var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
     var key = $('#ss-root').data('pca-key');

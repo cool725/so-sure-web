@@ -54,6 +54,7 @@ class PurchaseStepPersonalAddressType extends AbstractType
             ->add('birthday', BirthdayType::class, [
                   'required' => $this->required,
                   'format'   => 'dd MM yyyy',
+                  'widget' => 'single_text',
                   'placeholder' => array(
                       'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
                   ),

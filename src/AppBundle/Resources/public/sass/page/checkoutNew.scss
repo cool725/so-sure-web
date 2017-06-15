@@ -1,6 +1,7 @@
 // checkout.scss
 
 @import "../mixins";
+@import "../common/type";
 @import "../common/paletteNew";
 @import "checkoutNavNew";
 
@@ -65,10 +66,78 @@
 .step {
 
     &--hide {
-        // display: none;
+        display: none;
     }
 
 }
+
+.payment--step {
+    background-color: $off-white;
+    border-top: 1px solid $pale-grey;
+    text-align: center;
+
+    &-inner {
+        max-width: 700px;
+        position: relative;
+        margin: 0 auto;
+        padding: 10px 0 0;
+        border-left: 1px solid $pale-grey;
+        border-right: 1px solid $pale-grey;
+
+        h4 {
+            margin: 0 0 10px;
+        }
+    }
+
+    .payment--btn {
+        padding: 10px 0;
+        width: 50%;
+        float: left;
+        border-top: 1px solid $pale-grey;
+
+        font-family: $avenir-heavy;
+        color: $dark-grey;
+        // font-weight: bold;
+
+        &:first-of-type {
+            border-right: 1px solid $pale-grey;
+        }
+
+        &:hover, &:focus, &:active {
+            background-color: $primary-blue;
+            color: $white;
+        }
+
+        .billed {
+            font-size: 16px;
+        }
+
+        .amount {
+            font-size: 24px;
+        }
+
+        small {
+            font-size: 12px;
+            font-family: $avenir-book;
+        }
+
+        &-or {
+            // width: 10px; height: 10px;
+            @include border-radius(50%);
+            padding: 8px;
+            background-color: $white;
+            position: absolute;
+            left: 50%; bottom: 30px;
+            margin-left: -20px;
+
+            @include breakpoint(tablet) {
+                bottom: 50px;
+            }
+        }
+    }
+}
+
+
 
 // Cover / Benefits
 .owl-carousel {
@@ -109,21 +178,27 @@
 }
 
 .benefits--review-desktop {
-    width: 700px;
-    margin: 0 auto;
     padding-bottom: 30px;
+    background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
+    background-position: right top;
 
-    h4 {
-        margin: 20px 0 10px;
-    }
+    .benefits--inner {
+        width: 700px;
+        margin: 0 auto;
 
-    img {
-        float: left;
-        margin-right: 15px;
-    }
+        h4 {
+            margin: 20px 0 10px;
+        }
 
-    .row {
-        margin-bottom: 30px;
+        img {
+            float: left;
+            margin-right: 15px;
+        }
+
+        .row {
+            margin-bottom: 30px;
+        }
+
     }
 }
 

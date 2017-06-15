@@ -89,9 +89,19 @@
         <div class="checkout--step">
             <div class="container">
 
-                {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+<div class="bs-callout bs-callout-warning hidden">
+  <h4>Oh snap!</h4>
+  <p>This form seems to be invalid :(</p>
+</div>
 
-                    <div class="step--one">
+<div class="bs-callout bs-callout-info hidden">
+  <h4>Yay!</h4>
+  <p>Everything seems to be ok :)</p>
+</div>
+
+                {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form'}}) }}
+
+                    <div class="form-step">
                         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
                             {{ form_label(purchase_form.name, 'Full Name:', { 'label_attr': {'class': 'sr-only'} }) }}
                             {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name'}}) }}
@@ -103,8 +113,8 @@
                             {{ form_widget(purchase_form.email, {'attr':{'class':'form-control', 'placeholder': 'Email'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.email) }}</div>
                         </div>
-                        <div id="step--one-controls" class="form-group">
-                            <a href="#" class="btn btn-green btn-block btn-pad step--validate">
+                        <div id="step--one-controls" class="form-group form-controls">
+                            <a href="#" id="step--validate" class="btn btn-green btn-block btn-pad">
                                 Continue
                             </a>
                             <div class="text-break text-grey">
@@ -119,15 +129,15 @@
                         </div>
                     </div>
 
-                    <div class="step--one-two step--hide">
+                    <div class="form-step step--hide">
                         <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %} text-left">
                             {{ form_label(purchase_form.birthday, 'Date of Birth:', { 'label_attr': {'class': 'sr-only'} }) }}
-                            {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday'}}) }}
+                            {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday form-control dob', 'placeholder': 'Date of birth (DD/MM/YYYY)'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
                         </div>
                         <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
                             {{ form_label(purchase_form.mobileNumber, 'Mobile Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                            {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'pattern':'(0044|[+]44|0)[\\s]*7[\\s]*[1-9]([\\s]*([0-9][\\s]*){8})', 'title': 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)', 'placeholder':'Mobile Number'}}) }}
+                            {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'placeholder':'Mobile number'}}) }}
                             <div class="mobile-err help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
                         </div>
                         {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
@@ -146,7 +156,7 @@
 
                         <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}">
                             <div class="form-group form-group-fix address-show-error" style="display: none;">
-                                <small class="text-danger address-show-error-text"></small>
+                                <label class="text-danger address-show-error-text error"></label>
                             </div>
                             <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
                                 {{ form_label(purchase_form.addressLine1, 'Billing Address Line 1:', { 'label_attr': {'class': 'sr-only'} }) }}
@@ -230,8 +240,9 @@
     'components/bootstrap-daterangepicker/daterangepicker.js'
     'components/typeahead.js/typeahead.bundle.min.js'
     'components/owl.carousel/owl.carousel.min.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
     'components/fuse.js/fuse.min.js'
-    'components/intl-tel-input/intlTelInput.min.js'
+    'components/jquery-validation/jquery.validate.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'

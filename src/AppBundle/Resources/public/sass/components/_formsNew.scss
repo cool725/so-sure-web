@@ -15,3 +15,36 @@
 .help-block {
     font-size: 14px;
 }
+
+.error,
+input.error {
+    color: $red;
+}
+
+.has-error {
+
+    .form-control {
+        border-color: $red;
+
+        &:focus {
+            box-shadow: none;
+            outline: none;
+            border-color: $red;
+        }
+    }
+
+    .help-block {
+        color: $red;
+    }
+}
+
+label {
+    font-size: 15px;
+    font-family: $avenir-book;
+    font-weight: normal;
+    margin-bottom: 5px;
+
+    .req {
+        color: $blue;
+    }
+}
