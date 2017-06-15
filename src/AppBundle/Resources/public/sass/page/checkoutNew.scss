@@ -89,23 +89,23 @@
         }
     }
 
+    .payment-options {
+        display: none;
+    }
+
     .payment--btn {
         padding: 10px 0;
         width: 50%;
         float: left;
         border-top: 1px solid $pale-grey;
 
+        cursor: pointer;
+
         font-family: $avenir-heavy;
         color: $dark-grey;
-        // font-weight: bold;
 
         &:first-of-type {
             border-right: 1px solid $pale-grey;
-        }
-
-        &:hover, &:focus, &:active {
-            background-color: $primary-blue;
-            color: $white;
         }
 
         .billed {
@@ -122,18 +122,28 @@
         }
 
         &-or {
-            // width: 10px; height: 10px;
+            width: 40px; height: 40px;
             @include border-radius(50%);
+            font-weight: bold;
+            line-height: 25px;
             padding: 8px;
+            color: $primary-blue;
             background-color: $white;
+            border: 1px solid $primary-blue;
             position: absolute;
             left: 50%; bottom: 30px;
             margin-left: -20px;
 
             @include breakpoint(tablet) {
-                bottom: 50px;
+                bottom: 20px;
             }
         }
+    }
+
+    .payment--btn-selected {
+        background-color: $primary-blue;
+        background: $primary-blue url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
+        color: $white;
     }
 }
 

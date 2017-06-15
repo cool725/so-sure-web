@@ -1,13 +1,31 @@
 $(function(){
-	$('input:radio').click(function(){
-		$(this).parent().parent().addClass('radio-selected')
-		       .siblings().removeClass('radio-selected');
-	});
 
-    $('#policy-modal').on('show.bs.modal', function (event) {
-        sosuretrack('View Full Policy');
+    // Payment buttons action radio buttons
+    $('.payment--btn').click(function(event) {
+
+        $(this).toggleClass('payment--btn-selected')
+        .siblings()
+        .removeClass('payment--btn-selected');
+
+        var radio = $(this).data('target');
+
+        $(radio).prop('checked', true);
+
     });
-    if ($('#webpay-form').attr('action')) {
-        $('#webpay-form').submit();
-    }
+
+    $('#step--validate').click(function(e) {
+
+        e.preventDefault();
+
+    });
+
+
+    // $('#policy-modal').on('show.bs.modal', function (event) {
+    //     sosuretrack('View Full Policy');
+    // });
+
+    // if ($('#webpay-form').attr('action')) {
+    //     $('#webpay-form').submit();
+    // }
+
 });

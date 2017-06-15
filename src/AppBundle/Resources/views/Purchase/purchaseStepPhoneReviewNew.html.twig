@@ -77,7 +77,7 @@
     <div class="payment--step">
         <div class="payment--step-inner clearfix">
             <h4>How would you like to pay?</h4>
-            <div class="payment--btn">
+            <div class="payment--btn" id="payment--monthly" data-target="#purchase_form_amount_0">
                 <span class="billed visible-xs">Monthly <br></span>
                 <span class="amount">£XX.XX <span class="hidden-xs">a month</span><br></span>
                 <small class="visible-xs">Billed 2nd of each month</small>
@@ -86,7 +86,7 @@
             <div class="payment--btn-or">
                 OR
             </div>
-            <div class="payment--btn">
+            <div class="payment--btn" id="payment--yearly" data-target="#purchase_form_amount_1">
                 <span class="billed visible-xs">Yearly <br></span>
                 <span class="amount">£XX.XX <span class="hidden-xs">a year</span><br></span>
                 <small class="visible-xs">Billed on date of purchase</small>
@@ -98,10 +98,12 @@
     <div class="checkout--step">
         <div class="container">
 
-            {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+            {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form'}}) }}
                 <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    {{ form_widget(purchase_form.amount) }}
+                    <div class="payment-options">
+                        {{ form_widget(purchase_form.amount) }}
+                    </div>
                     <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
                 </div>
                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
@@ -137,8 +139,8 @@
                 {% endif %}
                 <div class="form-group">
                     <a href="#"
-                       id=""
-                       class="btn btn-green btn-block btn-pad step--validate"
+                       id="#step--validate"
+                       class="btn btn-green btn-block btn-pad"
                        {# data-toggle="modal" #}
                        {# data-target="#reviewModal" #}
                        >

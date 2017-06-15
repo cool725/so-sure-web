@@ -16,25 +16,17 @@
     font-size: 14px;
 }
 
-.error,
-input.error {
+.error {
     color: $red;
 }
 
-.has-error {
+.error.form-control {
+    border-color: $red;
 
-    .form-control {
+    &:focus {
+        box-shadow: none;
+        outline: none;
         border-color: $red;
-
-        &:focus {
-            box-shadow: none;
-            outline: none;
-            border-color: $red;
-        }
-    }
-
-    .help-block {
-        color: $red;
     }
 }
 

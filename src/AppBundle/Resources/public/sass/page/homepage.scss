@@ -25,9 +25,9 @@ body {
     	outline: none;
     }
     transition: all 0.3s ease;
-	
+
 	@include breakpoint(tablet) {
-		
+
 		color: $white;
 
 	}
@@ -52,4 +52,11 @@ body {
 			background-color: darken($blue, 20%);
 		}
 	}
+}
+
+.twitter-typeahead,
+.tt-input,
+.tt-menu,
+.tt-hint {
+    max-width: 320px;
 }
