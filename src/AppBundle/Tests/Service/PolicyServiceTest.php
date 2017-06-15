@@ -450,6 +450,7 @@ class PolicyServiceTest extends WebTestCase
             $policy,
             PhonePolicy::CANCELLED_ACTUAL_FRAUD,
             false,
+            false,
             new \DateTime('2016-02-02')
         );
         // 6.99 / month
@@ -703,7 +704,13 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         static::$policyService->setEnvironment('test');
 
-        static::$policyService->cancel($policy, PhonePolicy::CANCELLED_COOLOFF, false, new \DateTime('2016-01-10'));
+        static::$policyService->cancel(
+            $policy,
+            PhonePolicy::CANCELLED_COOLOFF,
+            false,
+            false,
+            new \DateTime('2016-01-10')
+        );
         $this->assertEquals(0, $policy->getTotalPremiumPrice());
         $this->assertEquals(0, $policy->getTotalGwp());
         $this->assertEquals(0, $policy->getUsedGwp());

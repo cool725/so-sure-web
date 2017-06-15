@@ -12,6 +12,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
+use AppBundle\Document\Claim;
 use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
@@ -768,8 +769,28 @@ class PolicyService
         throw new \Exception(sprintf('Missing payment for policy %s', $policy->getId()));
     }
 
-    public function cancel(Policy $policy, $reason, $skipNetworkEmail = false, \DateTime $date = null)
-    {
+    /**
+     * @param Policy    $policy
+     * @param string    $reason
+     * @param boolean   $skipNetworkEmail
+     * @param boolean   $closeOpenClaims  Where we are required to cancel the policy (binder),
+     *                                    we need to close out claims
+     * @param \DateTime $date
+     */
+    public function cancel(
+        Policy $policy,
+        $reason,
+        $skipNetworkEmail = false,
+        $closeOpenClaims = false,
+        \DateTime $date = null
+    ) {
+        if ($closeOpenClaims && $policy->isClaimInProgress()) {
+            foreach ($policy->getClaims() as $claim) {
+                $claim->setStatus(Claim::STATUS_PENDING_CLOSED);
+                $this->claimPendingClosedEmail($claim);
+            }
+            $this->dm->flush();
+        }
         $policy->cancel($reason, $date);
         $this->dm->flush();
 
@@ -909,6 +930,24 @@ class PolicyService
         );
     }
 
+    public function claimPendingClosedEmail(Claim $claim)
+    {
+        $baseTemplate = sprintf('AppBundle:Email:davies/claimCancellation');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $this->mailer->sendTemplate(
+            sprintf('Claim %s should be closed', $claim->getNumber()),
+            'claims@wearesosure.com',
+            $htmlTemplate,
+            ['claim' => $claim],
+            null,
+            null,
+            null,
+            'bcc@so-sure.com'
+        );
+    }
+
     /**
      * @param Policy $policy
      */
@@ -1009,8 +1048,34 @@ class PolicyService
         $cancelled = [];
         $policies = $this->getPoliciesPendingCancellation(false, $prefix, $date);
         foreach ($policies as $policy) {
-            $this->cancel($policy, Policy::CANCELLED_USER_REQUESTED, false, $date);
+            $this->cancel($policy, Policy::CANCELLED_USER_REQUESTED, false, true, $date);
             $cancelled[] = $policy;
+        }
+
+        return $cancelled;
+    }
+
+    public function cancelUnpaidPolicies($prefix, $dryRun = false)
+    {
+        $cancelled = [];
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
+        foreach ($policies as $policy) {
+            if ($policy->shouldExpirePolicy($prefix)) {
+                $cancelled[$policy->getId()] = $policy->getPolicyNumber();
+                if (!$dryRun) {
+                    try {
+                        $this->cancel($policy, Policy::CANCELLED_UNPAID, false, true);
+                    } catch (\Exception $e) {
+                        $msg = sprintf(
+                            'Error Cancelling Policy %s / %s',
+                            $policy->getPolicyNumber(),
+                            $policy->getId()
+                        );
+                        $this->logger->error($msg, ['exception' => $e]);
+                    }
+                }
+            }
         }
 
         return $cancelled;
