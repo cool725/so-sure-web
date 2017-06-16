@@ -13,6 +13,7 @@ $(function(){
 
     });
 
+    // Validate step
     $('#step--validate').click(function(e) {
 
         e.preventDefault();
@@ -36,29 +37,25 @@ $(function(){
                     digits: 'Only digits are valid for an IMEI Number',
                     imei: 'IMEI Number is not valid'
                 }
+            },
+
+            submitHandler: function(form) {
+                form.submit();
+            },
+
+            invalidHandler: function(event, validator) {
+                $('.payment--step h4 small').addClass('error');
             }
-
-            // submitHandler: function(form) {
-            //     form.submit();
-            // }
-
-            // [-/\\s]*([0-9][-/\\s]*){15,17}
         });
 
         if (form.valid() == true){
+
             console.log('Valid');
+
+            // TODO Add IMEI check here?
 
             $('#reviewModal').modal();
         }
     });
-
-
-    // $('#policy-modal').on('show.bs.modal', function (event) {
-    //     sosuretrack('View Full Policy');
-    // });
-
-    // if ($('#webpay-form').attr('action')) {
-    //     $('#webpay-form').submit();
-    // }
 
 });

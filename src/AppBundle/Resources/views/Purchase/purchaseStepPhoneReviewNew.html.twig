@@ -141,10 +141,7 @@
                 <div class="form-group">
                     <a href="#"
                        id="step--validate"
-                       class="btn btn-green btn-block btn-pad"
-                       {# data-toggle="modal" #}
-                       {# data-target="#reviewModal" #}
-                       >
+                       class="btn btn-green btn-block btn-pad">
                         Continue
                     </a>
                 </div>
@@ -166,15 +163,15 @@
                                 </ol>
                                 <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                                 {# TODO hidden input or cta changes hidden input #}
-                                {{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct'}) }}
+                                <p class="text-center">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct'}) }}</p>
                                 {% if app.user.hasValidPaymentMethod %}
                                     {# TODO We need to think how we'll show this??? #}
                                     <div class="form-group">
-                                        {{ form_widget(purchase_form.existing, {'label': 'I confirm the above is correct', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                        {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                                     </div>
                                 {% else %}
                                     <div class="form-group">
-                                        {{ form_widget(purchase_form.next, {'label': 'I confirm the above is correct', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                        {{ form_widget(purchase_form.next, {'label': 'Continue to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                                     </div>
                                 {% endif %}
                             </div>
@@ -207,13 +204,35 @@
             </div>
             <div class="modal-body">
                 <p><strong>It's easy to find your IMEI number:</strong></p>
-                <ul>
+                <ul class="list-unstyled">
                     <li>
                         It's easy to find your IMEI &amp; Serial Numbers.  Open the Settings app, and navigate to <strong>General</strong> > <strong>About</strong>.  The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
                     </li>
                     <br>
                     <li>
                         You can also log into your iTunes account and find the IMEI &amp; Serial Numbers display on the phone information screen.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-middle fade"
+     id="nonAppleModal"
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">IMEI Number</h4>
+            </div>
+            <div class="modal-body">
+                <p><strong>It's easy to find your IMEI number:</strong></p>
+                <ul class="list-unstyled">
+                    <li>
+                        Just dial <a href="tel:*#06#">*#06#</a> on your mobile and your IMEI will immediately be displayed.  There is no cost to dial this number.
                     </li>
                 </ul>
             </div>
@@ -230,10 +249,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                    <span class="sr-only">Close</span>
-                </button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h3>So-Sure Policy Terms</h3>
             </div>
             <div class="modal-body modal-policy">
