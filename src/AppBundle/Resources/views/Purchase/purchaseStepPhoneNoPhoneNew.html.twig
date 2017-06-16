@@ -1,11 +1,16 @@
+{% set use_pca = true %}
+
 {% extends 'base.html.twig' %}
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
+{% set distraction_free = 1 %}
 
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
+        'components/owl.carousel/owl.carousel.min.css'
+        'components/owl.carousel/owl.theme.default.min.css'
         'components/bootstrap-daterangepicker/daterangepicker.css'
         'components/intl-tel-input/intlTelInput.css'
         '@AppBundle/Resources/public/sass/page/checkoutNew.scss'
@@ -14,78 +19,54 @@
     {% endstylesheets %}
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/typeahead.js/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %}
-
 {% block body %}
-<section id="purchase-step-phone" class="checkout">
+
+<section id="purchase-step-personal" class="checkout">
 
     {% include 'AppBundle::Purchase/purchaseNavNew.html.twig' %}
 
-    <div class="container">
-
-        <div class="row">
-            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
-
-                <div class="checkout--step">
-
-                    <h3>Phone Details</h3>
-
-                        {{ form_start(purchase_no_phone_form, {'attr': {'data-toggle': 'validator', 'class': '', 'novalidate':''}}) }}
-                            <div class="form-group">
-                                <label class="">Your Phone:</label>
-                                    <button type="button"
-                                            class="btn btn-primary-hollow btn-block"
-                                            data-toggle="modal"
-                                            data-target="#phoneModal"><i class="fa fa-mobile fa-lg" aria-hidden="true"></i> SELECT PHONE</button>
-
-                            </div>
-                            <div class="form-group form-footer">
-                                <div class="row">
-                                    <div class="col-xs-6 col-sm-6 col-md-6">
-                                        <a class="btn btn-primary-hollow" href="{{ path('purchase_step_personal') }}">Back</a>
-                                    </div>
-                                    <div class="col-sm-6 col-md-6">
-                                        <input type="submit" class="btn btn-default  btn-block btn-arrow-right disabled"
-                                            value="PHONE REQUIRED">
-                                </div>
-                            </div>
-                        {{ form_end(purchase_no_phone_form) }}
-                </div>
-
-            </div>
+    <div class="checkout--top">
+        <div class="container">
+            <h1 class="h2">
+                <span class="title-phone">No phone selected</span>
+            </h1>
         </div>
-
     </div>
+    <div class="checkout--step">
+        {{ form_start(purchase_no_phone_form, {'attr': {'data-toggle': 'validator', 'class': '', 'novalidate':''}}) }}
+            <a href="#"
+               class="btn btn-blue btn-block btn-pad"
+               data-toggle="modal"
+               data-target="#quoteModel">Select phone</a>
+        {{ form_end(purchase_no_phone_form) }}
+    </div>
+
 </section>
 
-<div class="modal fade"
-     id="phoneModal"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="quoteModelLabel"
-     aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                    <span class="sr-only">Close</span>
-                </button>
-                <h3 class="text-center">Get a quote</h3>
-            </div>
-            <div class="modal-body text-center">
-                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': 'purchase-select'})) }}
-            </div>
-        </div>
-    </div>
-</div>
+{# Page Modals #}
 
+{% include 'AppBundle::Default/modalQuote.html.twig' %}
+
+{# End Page Modals #}
+
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/moment/moment.min.js'
+    'components/bootstrap-daterangepicker/daterangepicker.js'
+    'components/typeahead.js/typeahead.bundle.min.js'
+    'components/owl.carousel/owl.carousel.min.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
+    'components/fuse.js/fuse.min.js'
+    'components/jquery-validation/jquery.validate.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Purchase/purchaseStepNew.js'
+    '@AppBundle/Resources/public/js/Purchase/purchaseStepAddressNew.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

@@ -31,7 +31,10 @@
                 <h1>
                     <span class="title-top">Insurance for your</span>
                     <br class="visible-xs">
-                    <span class="title-phone text-blue text-nowrap">{{ phone.make }} {{ phone.model }}
+                    <span class="title-phone text-blue text-nowrap"
+                          data-toggle="modal"
+                          data-target="#quoteModel"
+                          title="Change phone">{{ phone.make }} {{ phone.model }}
                     {% if phone.memory %}
                         {{ phone.memory }}GB</span>
                     {% endif %}
