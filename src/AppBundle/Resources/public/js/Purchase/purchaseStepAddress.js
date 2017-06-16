@@ -1,4 +1,7 @@
 $(function(){
+
+    $('.dob').mask('00/00/0000');
+
     $("#purchase_form_mobileNumber").intlTelInput({
         preferredCountries: ['gb'],
         //onlyCountries: ['gb'],
