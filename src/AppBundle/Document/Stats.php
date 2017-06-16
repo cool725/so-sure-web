@@ -14,11 +14,18 @@ class Stats
     const INSTALL_APPLE = 'install-apple';
     const INSTALL_GOOGLE = 'install-google';
     const MIXPANEL_TOTAL_SITE_VISITORS = 'mixpanel-total-site-visitors';
+
+    // Moved to MIXPANEL_CPC_QUOTES_UK mid June 2017
     const MIXPANEL_LANDING_UK = 'mixpanel-landing-uk';
+    const MIXPANEL_CPC_QUOTES_UK = 'mixpanel-cpc-quotes-uk';
+
     const MIXPANEL_QUOTES_UK = 'mixpanel-quotes-uk';
+    const MIXPANEL_CPC_MANUFACTURER_UK = 'mixpanel-cpc-manufacturer-uk';
     const MIXPANEL_CLICK_BUY_NOW = 'mixpanel-click-buy-now';
     const MIXPANEL_RECEIVE_PERSONAL_DETAILS = 'mixpanel-receive-personal-details';
     const MIXPANEL_INVITE_SOMEONE = 'mixpanel-invite-someone';
+    const MIXPANEL_VIEW_INVITATION_SCODE = 'mixpanel-view-invitation-scode';
+    const MIXPANEL_VIEW_INVITATION_EMAIL = 'mixpanel-view-invitation-email';
 
     /**
      * @MongoDB\Id

@@ -1403,6 +1403,8 @@ class AdminEmployeeController extends BaseController
                 Stats::MIXPANEL_TOTAL_SITE_VISITORS,
                 Stats::MIXPANEL_QUOTES_UK,
                 Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
+                Stats::MIXPANEL_CPC_QUOTES_UK,
+                Stats::MIXPANEL_CPC_MANUFACTURER_UK,
             ] as $stat) {
                 if (!isset($week[$stat])) {
                     $week[$stat] = '-';
