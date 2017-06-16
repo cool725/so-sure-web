@@ -22,6 +22,7 @@ $(function(){
 
         form.validate({
             debug: true,
+            validClass: 'has-success',
             rules: {
                 "purchase_form[imei]" : {
                     required: true,
@@ -34,12 +35,20 @@ $(function(){
                 "purchase_form[amount]" : {
                     required: true
                 },
+                "purchase_form[serialNumber]" : {
+                    required: true,
+                    digits: true
+                }
             },
             messages: {
                 "purchase_form[imei]" : {
                     required: 'Enter a valid 15 or 17 digit IMEI Number',
                     digits: 'Only digits are valid for an IMEI Number',
                     imei: 'IMEI Number is not valid'
+                },
+                "purchase_form[serialNumber]" : {
+                    required:'Enter a valid serial number',
+                    digits: 'Only digits are valid for a Serial Number'
                 }
             },
 

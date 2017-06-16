@@ -27,7 +27,10 @@
             <h1>
                 <span class="title-top-all">Cover details</span>
                 <br>
-                <span class="title-phone text-blue text-nowrap">{{ phone.make }} {{ phone.model }}
+                <span class="title-phone text-blue text-nowrap"
+                      data-toggle="modal"
+                      data-target="#quoteModel"
+                      title="Change phone">{{ phone.make }} {{ phone.model }}
                 {% if phone.memory %}
                     {{ phone.memory }}GB</span>
                 {% endif %}

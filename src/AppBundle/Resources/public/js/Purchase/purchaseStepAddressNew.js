@@ -28,6 +28,7 @@ $(function(){
 
         form.validate({
             debug: true,
+            validClass: 'has-success',
             rules: {
                 "purchase_form[name]" : {
                     required: true,

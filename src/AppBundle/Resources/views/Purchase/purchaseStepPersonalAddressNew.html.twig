@@ -126,6 +126,7 @@
                         <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %} text-left">
                             {{ form_label(purchase_form.birthday, 'Date of Birth:', { 'label_attr': {'class': 'sr-only'} }) }}
                             {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday form-control dob', 'placeholder': 'Date of birth (DD/MM/YYYY)'}}) }}
+                            <span class="help-block text-center">Tip: Just type the numbers, we'll do the rest</span>
                             <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
                         </div>
                         <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
