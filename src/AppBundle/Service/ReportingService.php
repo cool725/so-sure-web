@@ -167,8 +167,11 @@ class ReportingService
                 $end
             );
         }
+        $data['totalEndingPoliciesAdjUpgrade'] = $data['totalEndingPolicies'] - $data['totalUpgradePolicies'];
+        $data['endingEndingPoliciesAdjUpgrade'] = $data['endingEndingPolicies'] - $data['endingUpgradePolicies'];
 
         $data['newPolicies'] = $policyRepo->countAllNewPolicies($end, $start);
+        $data['newPoliciesAdjUpgrade'] = $data['newPolicies'] - $data['endingUpgradePolicies'];
         $data['newPoliciesPremium'] = $data['newDirectPoliciesPremium'] + $data['newInvitationPoliciesPremium'] +
             $data['newSCodePoliciesPremium'];
         if ($data['newPolicies'] != 0) {
@@ -179,6 +182,7 @@ class ReportingService
 
         $data['totalActivePolicies'] = $policyRepo->countAllActivePolicies();
         $data['totalPolicies'] = $policyRepo->countAllNewPolicies();
+        $data['totalPoliciesAdjUpgrade'] = $data['totalPolicies'] - $data['totalUpgradePolicies'];
         $data['totalPoliciesPremium'] = $data['totalDirectPoliciesPremium'] + $data['totalInvitationPoliciesPremium'] +
             $data['totalSCodePoliciesPremium'];
         if ($data['totalPolicies'] != 0) {
