@@ -109,17 +109,11 @@
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.amount) }}
                     <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
+                    <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                 </div>
                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'IMEI Number'}}) }}
-                    <div class="text-break text-grey">
-                        <div class="line"></div>OR<div class="line"></div>
-                    </div>
-                    <a href="#"
-                       class="btn btn-blue btn-block btn-pad"
-                       onclick="sosuretrack('Clicked Upload Imei');Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">Send us a screenshot of your IMEI</a>
-                    <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                     <span class="help-block text-center">
                         <a href="#"
                            class="text-underline"
@@ -127,6 +121,18 @@
                            data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
                            >Dial *#06# to show your IMEI number.</a>
                     </span>
+                </div>
+
+                <div class="form-group">
+                    <div class="text-break text-grey">
+                        <div class="line"></div>OR<div class="line"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <a href="#"
+                       class="btn btn-blue btn-block btn-pad"
+                       onclick="sosuretrack('Clicked Upload Imei');Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">Send us a screenshot of your IMEI</a><br>
                 </div>
                 {% if purchase_form.serialNumber is defined %}
                     <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">

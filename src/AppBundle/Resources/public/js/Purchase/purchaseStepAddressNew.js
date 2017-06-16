@@ -77,6 +77,11 @@ $(function(){
             }
         });
 
+        // if ($('.purchase_form_name, .purchase_form_email').valid() == true ) {
+
+        //     console,
+        // }
+
         if (form.valid() == true){
             $('.step--hide').show();
             $('#step--one-controls').hide();
