@@ -53,7 +53,14 @@ class MixpanelService
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';
+
+    // Moved to CUSTOM_CPC_QUOTE_PAGE_UK mid June 2017
     const CUSTOM_LANDING_PAGE_UK = '$custom_event:443514';
+    const CUSTOM_CPC_QUOTE_PAGE_UK = '$custom_event:534870';
+
+    const CUSTOM_CPC_MANUFACTURER_PAGE_UK = '$custom_event:534868';
+    const CUSTOM_INVITATION_PAGE_SCODE = '$custom_event:534894';
+    const CUSTOM_INVITATION_PAGE_EMAIL = '$custom_event:534898';
 
     /** @var DocumentManager */
     protected $dm;
@@ -260,7 +267,11 @@ class MixpanelService
             self::CUSTOM_LANDING_PAGE_UK,
             self::EVENT_BUY_BUTTON_CLICKED,
             self::EVENT_RECEIVE_DETAILS,
-            self::EVENT_INVITE
+            self::EVENT_INVITE,
+            self::CUSTOM_CPC_QUOTE_PAGE_UK,
+            self::CUSTOM_CPC_MANUFACTURER_PAGE_UK,
+            self::CUSTOM_INVITATION_PAGE_SCODE,
+            self::CUSTOM_INVITATION_PAGE_EMAIL,
         ];
         $data = $this->mixpanelData->data('events', [
             'event' => $events,
@@ -280,6 +291,12 @@ class MixpanelService
             } elseif ($event == self::CUSTOM_LANDING_PAGE_UK) {
                 $stats['Landing Page UK'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_LANDING_UK, $start, $results[$key]);
+            } elseif ($event == self::CUSTOM_CPC_QUOTE_PAGE_UK) {
+                $stats['CPC Quote Page UK'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_CPC_QUOTES_UK, $start, $results[$key]);
+            } elseif ($event == self::CUSTOM_CPC_MANUFACTURER_PAGE_UK) {
+                $stats['CPC Manufacturer Page UK'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_CPC_MANUFACTURER_UK, $start, $results[$key]);
             } elseif ($event == self::EVENT_BUY_BUTTON_CLICKED) {
                 $stats['Click Buy Now Button'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_CLICK_BUY_NOW, $start, $results[$key]);
@@ -289,6 +306,12 @@ class MixpanelService
             } elseif ($event == self::EVENT_INVITE) {
                 $stats['Invite someone'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_INVITE_SOMEONE, $start, $results[$key]);
+            } elseif ($event == self::CUSTOM_INVITATION_PAGE_SCODE) {
+                $stats['View Invitation SCode'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_VIEW_INVITATION_SCODE, $start, $results[$key]);
+            } elseif ($event == self::CUSTOM_INVITATION_PAGE_EMAIL) {
+                $stats['View Invitation Email'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_VIEW_INVITATION_EMAIL, $start, $results[$key]);
             }
         }
 
