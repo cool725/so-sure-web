@@ -29,7 +29,11 @@ $(function(){
                     minlength: 15,
                     maxlength: 17,
                     imei: true
-                }
+                    // remote: We can use this option to lookup imei
+                },
+                "purchase_form[amount]" : {
+                    required: true
+                },
             },
             messages: {
                 "purchase_form[imei]" : {
@@ -39,13 +43,18 @@ $(function(){
                 }
             },
 
+            errorPlacement: function(error, element) {
+                if (element.attr('name') == 'purchase_form[amount]') {
+                    $('.payment--step h4 small').addClass('error');
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+
             submitHandler: function(form) {
                 form.submit();
             },
 
-            invalidHandler: function(event, validator) {
-                $('.payment--step h4 small').addClass('error');
-            }
         });
 
         if (form.valid() == true){

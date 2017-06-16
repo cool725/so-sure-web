@@ -2,6 +2,8 @@ $(function(){
 
     // Mask date input and add picker
     $('.dob').mask('00/00/0000');
+    // $('.phone').mask('077-555-0000');
+
     // $('.dob').focus(function() {
     //     $(this).daterangepicker({
     //         singleDatePicker: true,
@@ -29,6 +31,7 @@ $(function(){
             rules: {
                 "purchase_form[name]" : {
                     required: true,
+                    fullName: true
                 },
                 "purchase_form[email]" : {
                     required: true,
@@ -54,7 +57,10 @@ $(function(){
                 }
             },
             messages: {
-                "purchase_form[name]": 'Please enter your full name',
+                "purchase_form[name]": {
+                    required: 'Please enter your full name',
+                    fullName: 'Please enter your first and last name'
+                },
                 "purchase_form[email]" : {
                     required: 'Please enter your email address'
                 },
