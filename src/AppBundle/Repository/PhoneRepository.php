@@ -13,7 +13,12 @@ class PhoneRepository extends DocumentRepository
     public function findActive()
     {
         $qb = $this->createQueryBuilder();
-        $qb->addAnd($qb->expr()->field('os')->in([Phone::OS_CYANOGEN, Phone::OS_ANDROID, Phone::OS_IOS]));
+        $qb->addAnd($qb->expr()->field('os')->in([
+            Phone::OS_CYANOGEN,
+            Phone::OS_ANDROID,
+            Phone::OS_IOS,
+            Phone::OS_WINDOWS
+        ]));
         $qb->addAnd($qb->expr()->field('make')->notEqual("ALL"));
         $qb->addAnd($qb->expr()->field('active')->equals(true));
         $qb->sort('make', 'asc')
