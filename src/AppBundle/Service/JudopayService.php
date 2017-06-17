@@ -586,34 +586,29 @@ class JudopayService
             ));
         }
 
-        $payment = null;
         $policy = $scheduledPayment->getPolicy();
         $paymentMethod = $policy->getUser()->getPaymentMethod();
+        if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
+            throw new \Exception(sprintf(
+                'Payment method not valid for scheduled payment %s',
+                $scheduledPayment->getId()
+            ));
+        }
         try {
-            if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
-                throw new \Exception(sprintf(
-                    'Payment method not valid for scheduled payment %s',
-                    $scheduledPayment->getId()
-                ));
-            }
-
             $payment = $this->tokenPay($policy, $scheduledPayment->getAmount(), $scheduledPayment->getType());
+            $this->processScheduledPaymentResult($scheduledPayment, $payment);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         } catch (\Exception $e) {
-            // TODO: Nicer handling if Judo has an issue
             $this->logger->error(sprintf(
                 'Error running scheduled payment %s. Ex: %s',
                 $scheduledPayment->getId(),
                 $e->getMessage()
             ));
-
-            /* processScheduledPaymentResult will set result to failed as payment will not exist or be failed
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-            */
-        }
 
-        $this->processScheduledPaymentResult($scheduledPayment, $payment);
+            throw $e;
+        }
 
         return $scheduledPayment;
     }
@@ -640,13 +635,11 @@ class JudopayService
         }
     }
 
-    public function processScheduledPaymentResult($scheduledPayment, Payment $payment = null, \DateTime $date = null)
+    public function processScheduledPaymentResult($scheduledPayment, $payment, \DateTime $date = null)
     {
         $policy = $scheduledPayment->getPolicy();
-        if ($payment) {
-            $scheduledPayment->setPayment($payment);
-        }
-        if ($payment && $payment->getResult() == JudoPayment::RESULT_SUCCESS) {
+        $scheduledPayment->setPayment($payment);
+        if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
             // will only be sent if card is expiring
             $this->cardExpiringEmail($policy, $date);
