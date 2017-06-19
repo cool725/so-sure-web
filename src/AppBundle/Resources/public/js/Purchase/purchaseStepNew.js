@@ -17,7 +17,6 @@ $(function(){
     return this.optional(element) || value.match(/\w+\s+\w+/);
     }, 'Please enter your full name');
 
-
     // UK mobile number
     jQuery.validator.addMethod('phoneUK', function(phone_number, element) {
     return this.optional(element) || phone_number.length > 9 &&
@@ -32,7 +31,9 @@ $(function(){
     // IMEI Number
     // jQuery.validator.addMethod("imei", function(value, element) {
 
-
+    //     return this.optional(element) ||
+    //     element.value === element.defaultValue ||
+    //     $.validator.methods.creditcard.call(this, value, element);
 
     // }, "Please enter a valid IMEI Number");
 
@@ -41,8 +42,13 @@ $(function(){
             return this.optional(element) || /^[a-zA-Z0-9]+$/.test(value);
     });
 
+    // Date formate check
+    jQuery.validator.addMethod('validDate', function(value, element) {
+    return this.optional(element) || value.match(/^\d\d?\/\d\d?\/\d\d\d\d$/);
+    }, 'Please enter a valid date in the format DD/MM/YYYY');
+
     // Over 18 Check
-    jQuery.validator.addMethod("check_date_of_birth", function (value, element) {
+    jQuery.validator.addMethod("checkDateOfBirth", function (value, element) {
         if (this.optional(element)) {
             return true;
         }

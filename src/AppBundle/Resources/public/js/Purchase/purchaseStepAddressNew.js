@@ -40,7 +40,8 @@ $(function(){
             },
             "purchase_form[birthday]" : {
                 required: true,
-                check_date_of_birth: true
+                validDate: true,
+                checkDateOfBirth: true
             },
             "purchase_form[mobileNumber]" : {
                 required: true,
@@ -65,7 +66,10 @@ $(function(){
             "purchase_form[email]" : {
                 required: 'Please enter your email address'
             },
-            "purchase_form[birthday]" : 'Sorry, only persons over the age of 18 can be covered',
+            "purchase_form[birthday]" : {
+                required: 'Please enter a valid date in the format DD/MM/YYYY',
+                check_date_of_birth: 'Sorry, only persons over the age of 18 can be covered',
+            },
             "purchase_form[mobileNumber]" : 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)',
             "purchase_form[addressLine1]" : 'Please enter the first line of your address',
             "purchase_form[city]" : 'Please enter your City',
@@ -78,13 +82,23 @@ $(function(){
 
     });
 
-    // Reveal form when first field is valid
+    // Reveal form when first two fields are valid
     $('#purchase_form_email').on('keyup', function() {
-
         if ($('#purchase_form_name').valid() == true && $('#purchase_form_email').valid() == true) {
-            console.log('Name & Email valid');
+            // console.log('Name & Email valid');
             $('.step--hide').show();
             $('#step--one-controls').hide();
+        }
+    });
+
+    // Click check validate form?
+    // Case: user clicks continue before filling in any fields
+    $('#step--validate').click(function() {
+
+        if (form.valid() == true){
+            return true;
+        } else {
+            return false;
         }
     });
 
