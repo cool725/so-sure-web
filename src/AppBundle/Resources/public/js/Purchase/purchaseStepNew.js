@@ -32,7 +32,7 @@ $(function(){
     // IMEI Number
     jQuery.validator.addMethod("imei", function(value, element) {
     return this.optional(element) || /[-/\\s]*([0-9][-/\\s]*){15,17}/.test(value);
-    }, "Enter a valid IMEI Number");
+    }, "Please enter a valid IMEI Number");
 
     // Over 18 Check
     jQuery.validator.addMethod("check_date_of_birth", function (value, element) {

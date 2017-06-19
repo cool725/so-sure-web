@@ -30,9 +30,7 @@ $(function(){
             rules: {
                 "purchase_form[imei]" : {
                     required: true,
-                    digits: true,
                     minlength: 15,
-                    // maxlength: 17,
                     imei: true
                     // remote: We can use this option to lookup imei
                 },
@@ -41,18 +39,16 @@ $(function(){
                 },
                 "purchase_form[serialNumber]" : {
                     required: true,
-                    digits: true
                 }
             },
             messages: {
                 "purchase_form[imei]" : {
-                    required: 'Enter a valid IMEI Number',
-                    digits: 'Only digits are valid for an IMEI Number',
-                    imei: 'IMEI Number is not valid'
+                    required: 'Please enter a valid IMEI Number',
+                    // digits: 'Only digits are valid for an IMEI Number',
+                    imei: 'Please enter a valid IMEI Number'
                 },
                 "purchase_form[serialNumber]" : {
-                    required:'Enter a valid serial number',
-                    digits: 'Only digits are valid for a Serial Number'
+                    required:'Please enter a valid serial number',
                 }
             },
 
