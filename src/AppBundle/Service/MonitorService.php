@@ -215,7 +215,7 @@ class MonitorService
 
     public function judopayReceipts()
     {
-        $results = $this->judopay->getTransactions(50, false);
+        $results = $this->judopay->getTransactions(20, false);
         if (count($results['additional-payments']) > 0) {
             // @codingStandardsIgnoreStart
             throw new \Exception(sprintf(
