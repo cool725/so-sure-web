@@ -31,7 +31,8 @@ $(function(){
                 "purchase_form[imei]" : {
                     required: true,
                     minlength: 15,
-                    imei: true
+                    creditcard: true
+                    // imei: true
                     // remote: We can use this option to lookup imei
                 },
                 "purchase_form[amount]" : {
@@ -46,7 +47,7 @@ $(function(){
                 "purchase_form[imei]" : {
                     required: 'Please enter a valid IMEI Number',
                     // digits: 'Only digits are valid for an IMEI Number',
-                    imei: 'Please enter a valid IMEI Number'
+                    creditcard: 'Please enter a valid IMEI Number'
                 },
                 "purchase_form[serialNumber]" : {
                     required:'Please enter a valid serial number',
