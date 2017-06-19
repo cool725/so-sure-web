@@ -649,8 +649,10 @@ class JudopayService
     public function processScheduledPaymentResult($scheduledPayment, $payment, \DateTime $date = null)
     {
         $policy = $scheduledPayment->getPolicy();
-        $scheduledPayment->setPayment($payment);
-        if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
+        if ($payment) {
+            $scheduledPayment->setPayment($payment);
+        }
+        if ($payment && $payment->getResult() == JudoPayment::RESULT_SUCCESS) {
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
 
             // will only be sent if card is expiring
