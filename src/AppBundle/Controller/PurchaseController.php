@@ -330,7 +330,11 @@ class PurchaseController extends BaseController
             $purchase->setPhone($phone);
             // Default to monthly payment
             if ('GET' === $request->getMethod()) {
-                $purchase->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+                if ($user->allowedMonthlyPayments()) {
+                    $purchase->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+                } elseif ($user->allowedYearlyPayments()) {
+                    $purchase->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+                }
             }
         }
 
