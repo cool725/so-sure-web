@@ -22,11 +22,11 @@ $(function(){
     jQuery.validator.addMethod('phoneUK', function(phone_number, element) {
     return this.optional(element) || phone_number.length > 9 &&
     phone_number.match(/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/);
-    }, 'Please specify a valid phone number');
+    }, 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)');
 
     // UK Postcode
     jQuery.validator.addMethod("postcodeUK", function(value, element) {
-    return this.optional(element) || /^[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}$/i.test(value);
+    return this.optional(element) || /^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([AZa-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$/.test(value);
     }, "Please specify a valid Postcode");
 
     // IMEI Number
