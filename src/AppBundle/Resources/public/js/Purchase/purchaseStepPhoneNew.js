@@ -22,6 +22,10 @@ $(function(){
 
         form.validate({
             debug: true,
+            onfocusout: function(element) {
+                this.element(element);
+                // console.log('onfocusout fired');
+            },
             validClass: 'has-success',
             rules: {
                 "purchase_form[imei]" : {
@@ -67,8 +71,6 @@ $(function(){
         });
 
         if (form.valid() == true){
-
-            console.log('Valid');
 
             // TODO Add IMEI check here?
 
