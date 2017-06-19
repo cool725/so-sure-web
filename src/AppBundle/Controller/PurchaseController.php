@@ -300,6 +300,16 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('purchase_step_personal');
         }
 
+        $alternative = $request->get('force_result');
+        if (!$alternative) {
+            $alternative = $this->getSessionSixpackTest(
+                $request,
+                SixpackService::EXPERIMENT_PURCHASE_FLOW,
+                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
+                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
+            );
+        }
+
         $dm = $this->getManager();
 
         $phone = $this->getSessionQuotePhone($request);
@@ -318,6 +328,10 @@ class PurchaseController extends BaseController
 
         if ($phone) {
             $purchase->setPhone($phone);
+        }
+        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW) {
+            $purchase->setAgreed(true);
+            $purchase->setNew(true);
         }
 
         $purchaseForm = $this->get('form.factory')
@@ -474,16 +488,6 @@ class PurchaseController extends BaseController
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'policy_key' => $this->getParameter('policy_key'),
         );
-
-        $alternative = $request->get('force_result');
-        if (!$alternative) {
-            $alternative = $this->getSessionSixpackTest(
-                $request,
-                SixpackService::EXPERIMENT_PURCHASE_FLOW,
-                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
-                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
-            );
-        }
 
         if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
             return $this->render('AppBundle:Purchase:purchaseStepPhoneReview.html.twig', $data);

@@ -106,7 +106,7 @@
                             {{ form_widget(purchase_form.email, {'attr':{'class':'form-control', 'placeholder': 'Email'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.email) }}</div>
                         </div>
-                        <div id="step--one-controls" class="form-group form-controls">
+                        <div id="step--one-controls" class="form-group form-controls {% if app and app.user and app.user.email|length > 0 and app.user.name|length > 0 %}step--hide{% endif %}">
                             <a href="#" id="step--validate" class="btn btn-green btn-block btn-pad">
                                 Continue
                             </a>
@@ -122,7 +122,7 @@
                         </div>
                     </div>
 
-                    <div class="form-step step--hide">
+                    <div class="form-step {% if app and app.user and app.user.email|length > 0 and app.user.name|length > 0 %}{%else%}step--hide{% endif %}">
                         <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %} text-left">
                             {{ form_label(purchase_form.birthday, 'Date of Birth:', { 'label_attr': {'class': 'sr-only'} }) }}
                             {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday form-control dob', 'placeholder': 'Date of birth (DD/MM/YYYY)'}}) }}
@@ -199,7 +199,7 @@
         <div class="checkout--top">
             <div class="container">
                 <h1 class="h2">
-                    <span class="title-phone">No phone selected</span>
+                    <span class="title-phone">Please select your phone to continue with your purchase.</span>
                 </h1>
             </div>
         </div>

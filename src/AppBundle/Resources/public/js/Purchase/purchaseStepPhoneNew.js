@@ -77,4 +77,7 @@ $(function(){
         }
     });
 
+    if ($.trim($('#Reference').val()).length > 0) {
+        $('#webpay-form').submit();
+    }
 });
