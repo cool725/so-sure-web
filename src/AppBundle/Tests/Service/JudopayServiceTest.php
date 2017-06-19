@@ -450,6 +450,12 @@ class JudopayServiceTest extends WebTestCase
 
         self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
+
+        static::$dm->clear();
+        $repo = static::$dm->getRepository(ScheduledPayment::class);
+        $updatedScheduledPayment = $repo->find($scheduledPayment->getId());
+        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $updatedScheduledPayment->getStatus());
+        $this->assertTrue($updatedScheduledPayment->getPayment()->isSuccess());
     }
 
     public function testJudoScheduledPaymentDelayed()
