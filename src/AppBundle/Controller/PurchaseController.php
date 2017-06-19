@@ -328,7 +328,12 @@ class PurchaseController extends BaseController
 
         if ($phone) {
             $purchase->setPhone($phone);
+            // Default to monthly payment
+            if ('GET' === $request->getMethod()) {
+                $purchase->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+            }
         }
+
         if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW) {
             $purchase->setAgreed(true);
             $purchase->setNew(true);
