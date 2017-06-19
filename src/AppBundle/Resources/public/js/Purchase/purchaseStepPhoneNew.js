@@ -32,7 +32,7 @@ $(function(){
                     required: true,
                     minlength: 15,
                     // creditcard: true // Extend
-                    // imei: true
+                    imei: true
                     // remote: We can use this option to lookup imei
                 },
                 "purchase_form[amount]" : {
