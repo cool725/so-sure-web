@@ -32,7 +32,7 @@ $(function(){
     // IMEI Number
     jQuery.validator.addMethod("imei", function(value, element) {
     return this.optional(element) || /[-/\\s]*([0-9][-/\\s]*){15,17}/.test(value);
-    }, "Enter a valid 15 or 17 digit IMEI Number");
+    }, "Enter a valid IMEI Number");
 
     // Over 18 Check
     jQuery.validator.addMethod("check_date_of_birth", function (value, element) {
@@ -46,13 +46,13 @@ $(function(){
         month = arr_dateText[1];
         year = arr_dateText[2];
 
-        var mydate = new Date();
-        mydate.setFullYear(year, month - 1, day);
+        var birthdate = new Date();
+        birthdate.setFullYear(year, month - 1, day);
 
-        var maxDate = new Date();
-        maxDate.setYear(maxDate.getYear() - 18);
+        var minAge = new Date();
+        minAge.setYear(minAge.getYear() - 18);
 
-        if (maxDate < mydate) {
+        if (minAge < birthdate) {
             return false;
         }
         return true;

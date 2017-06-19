@@ -32,7 +32,7 @@ $(function(){
                     required: true,
                     digits: true,
                     minlength: 15,
-                    maxlength: 17,
+                    // maxlength: 17,
                     imei: true
                     // remote: We can use this option to lookup imei
                 },
@@ -46,7 +46,7 @@ $(function(){
             },
             messages: {
                 "purchase_form[imei]" : {
-                    required: 'Enter a valid 15 or 17 digit IMEI Number',
+                    required: 'Enter a valid IMEI Number',
                     digits: 'Only digits are valid for an IMEI Number',
                     imei: 'IMEI Number is not valid'
                 },
